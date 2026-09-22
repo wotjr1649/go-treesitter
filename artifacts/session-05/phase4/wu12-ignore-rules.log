@@ -1,0 +1,8 @@
+docs/prompts/example.md
+docs/specs/example.md
+docs/plans/example.md
+artifacts/handoff/example.md
+.env.local
+private.key
+.vscode/settings.json
+.scratch/example.exe

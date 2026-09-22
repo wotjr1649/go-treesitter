@@ -1,0 +1,4 @@
+12 observations validated; receipt fields identical across four cells for each fixture
+JsonPosition.cs A=288.039 ms | B=290.443 ms | C=398.214 ms | D=377.923 ms
+JsonTextReader-excerpt.cs A=124.900 ms | B=126.656 ms | C=187.623 ms | D=149.936 ms
+MathUtils.cs A=24.550 ms | B=24.151 ms | C=46.015 ms | D=30.495 ms

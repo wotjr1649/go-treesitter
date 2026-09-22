@@ -1,0 +1,53 @@
+{
+  "files": [
+    {
+      "path": ".scratch/cprobe/oracle-final.exe",
+      "sha256": "e229394a52ebd796a3ad7358f8a7e0bb048ed730a6e282f1493cee19c714c841"
+    },
+    {
+      "path": "tools/native-oracle/probe.c",
+      "sha256": "b2d3042833db521cd1aed1cd5bc4b51f434aa93662750204657dce0e30765272"
+    },
+    {
+      "path": "internal/gtsadapter/native_oracle_test.go",
+      "sha256": "ae41e6f05e1b1e9b3a2c38f6401d0fa267d1cc662e9f74d73cfc891c74de8b5b"
+    },
+    {
+      "path": "internal/provenance/identities.json",
+      "sha256": "c190e01ce1fa283b3953d9ff613a5dbf9b57f8c5ace8820c72501b8ddeeed1a2"
+    },
+    {
+      "path": ".scratch/cprobe/runtime.zip",
+      "sha256": "9306baf028b60c7d54a5470d220c2d7cf048655f079481ebfe56817ba3d08ba9"
+    },
+    {
+      "path": ".scratch/cprobe/typescript/tsx/src/parser.c",
+      "sha256": "1902cb53fa7ff5179df89b2eea863165e84c8cc866226419dc26921d8c055885"
+    },
+    {
+      "path": ".scratch/cprobe/typescript/tsx/src/scanner.c",
+      "sha256": "d563cd30b2f39718c9ae4292795c5ce03a2ad01954ba3a86ef84c2781a736673"
+    },
+    {
+      "path": ".scratch/cprobe/typescript/common/scanner.h",
+      "sha256": "da66ef2bd14a3f7ea743e25ba068c6c9aae2c3509db200ff80c4a0e6116e564c"
+    },
+    {
+      "path": ".scratch/cprobe/typescript/tsx/src/tree_sitter/parser.h",
+      "sha256": "a1f6ef161fbaf48a0e10fca90ef5290a062462b307b3898aa562993853b9f80a"
+    }
+  ],
+  "runtime_commit": "f5afe475deb7c0bae6407fb776c76824f717bb61",
+  "grammar_commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f",
+  "phase": 4,
+  "generator_version": null,
+  "flags": [
+    "-std=c11",
+    "-fPIC",
+    "-O2"
+  ],
+  "generator_mode": "checked-in",
+  "abi": 14,
+  "compiler": "gcc.exe (Rev3, Built by MSYS2 project) 16.2.0",
+  "lane": "Windows native C diagnostic"
+}

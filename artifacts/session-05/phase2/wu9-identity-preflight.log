@@ -1,0 +1,18 @@
+{
+  "phase": 2,
+  "lane": "native C diagnostic preflight",
+  "status": "NOT_RUN",
+  "grammar_commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f",
+  "parser_sha256": "1902cb53fa7ff5179df89b2eea863165e84c8cc866226419dc26921d8c055885",
+  "package_sha256": "26892ef49837678a747f81e344ed26938ec5804e29e003ad34fd5a3c87c68baf",
+  "actual_abi": 14,
+  "contract_abis": [
+    15,
+    13
+  ],
+  "required_generator": "tree-sitter-cli 0.24.7",
+  "declared_generator_range": "^0.24.4",
+  "compiled": false,
+  "executed": false,
+  "reason": "pinned checked-in parser ABI differs; exact generator identity unavailable; stop at first structural obstacle"
+}

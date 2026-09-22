@@ -1,0 +1,30 @@
+{
+  "go": "go1.27.1",
+  "goos": "windows",
+  "goarch": "amd64",
+  "cgo_enabled": 0,
+  "repetitions_per_fixture_per_cell": 1,
+  "total_measured_parses": 12,
+  "profiler": "off",
+  "warmup": 0,
+  "parse_timeout_seconds": 60,
+  "fixture_order": [
+    "JsonPosition.cs",
+    "JsonTextReader-excerpt.cs",
+    "MathUtils.cs"
+  ],
+  "GOFLAGS_by_cell": {
+    "A": "",
+    "B": "",
+    "C": "-modfile=D:/AIDEV/go-treesitter/go.mod",
+    "D": "-modfile=D:/AIDEV/go-treesitter/go.mod"
+  },
+  "files": {
+    "experiments\\v052-v053\\internal\\gtsadapter\\probe_test.go": "8b84a165da8fe892b0d3c9643581065407e80c98b5b5b2af6f6a9532a7b7eb22",
+    "experiments\\v052-v053\\go.mod": "d4a2d915075a37a522e0a5bf3b089031eacac35b25923ccc7a58add8f2573fa6",
+    "experiments\\v052-v053\\go.sum": "2701082ec9716b90f9f57d8763d507e25802b98919e7fd3dd2c9d240bcd01fb1",
+    "go.mod": "60e068a66c71f3ce7c1b04dbe04e404e01e2d1eace07373dfe3fd0a8345f6889",
+    "go.sum": "87c97651162785c246dabcd3fdcd916cd7baabe2f8554bbdb31eea5ce9704cd6",
+    "testdata\\newtonsoft\\manifest.json": "ebcc24c38655c645e6238f6770bed964a61f12ae395e5e7c27cd445f60169218"
+  }
+}

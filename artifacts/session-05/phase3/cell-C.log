@@ -1,0 +1,6 @@
+=== RUN   TestComparison
+    probe_test.go:89: resolved comparison version mismatch
+--- FAIL: TestComparison (0.02s)
+FAIL
+FAIL	command-line-arguments	0.110s
+FAIL

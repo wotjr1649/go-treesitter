@@ -1,0 +1,7 @@
+=== RUN   TestCorpusIdentity
+    probe_test.go:66: JsonPosition.cs bytes=5986 sha256=4f9e601f9d0be45c4f60f15bf1b6ca8f85dec51e353ebb50e405cc6f8e422c14
+    probe_test.go:66: JsonTextReader-excerpt.cs bytes=12408 sha256=d76fd62cfc90076c11d86cb7d7a0058df181231aa3b34f30e549f650b5294d4a
+    probe_test.go:66: MathUtils.cs bytes=5016 sha256=426587acd7f1f50c3d3dc94f13e9c27726c32c1bbe22d0291d86485afa368640
+--- PASS: TestCorpusIdentity (0.00s)
+PASS
+ok  	github.com/wotjr1649/go-treesitter/experiments/v052-v053/internal/gtsadapter	0.101s

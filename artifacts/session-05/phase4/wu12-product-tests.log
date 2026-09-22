@@ -1,0 +1,4 @@
+ok  	github.com/wotjr1649/go-treesitter/internal/boundary	0.642s
+ok  	github.com/wotjr1649/go-treesitter/internal/gtsadapter	0.816s
+ok  	github.com/wotjr1649/go-treesitter/internal/provenance	1.479s
+ok  	github.com/wotjr1649/go-treesitter/syntax	0.344s

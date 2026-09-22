@@ -30,7 +30,7 @@ share a record, because "fixing" the first would *break* C agreement.
 | Record | Symptom | Cause | Verdict |
 |---|---|---|---|
 | `KR-0001a` | bare `&` | grammar requires `&…;`; the C scanner stops at `&` too | **C-faithful.** Not a defect of this runtime. |
-| `KR-0001b` | bare `=` after a leading identifier | a heuristic that exists **only** in the Go port | **Suspected Go-only divergence.** Needs oracle confirmation. |
+| `KR-0001b` | bare `=` after a leading identifier | a heuristic that exists **only** in the Go port | **Confirmed TSX divergence (E5).** JavaScript remains source-level E1. |
 
 The original report compared against `tsc` 5.9.3, **not** against C tree-sitter. Comparing to a
 different oracle and reporting the difference as a runtime defect is exactly the evidence error
@@ -89,7 +89,7 @@ Witness shape for `const a = <p>a & b</p>;` under `tsx`:
 |---|---|
 | **Upstream issue** | `odvcencio/gotreesitter#1242` (partially) — and, properly, a `tree-sitter-javascript` grammar question |
 | **Fixtures** | F1, F2, F3 |
-| **Verdict** | The pinned runtime agrees with the C implementation. |
+| **Verdict** | TSX F1–F3 have errors in both runtimes (E5). Their recovered-tree shapes differ; only the error-state characterization agrees. |
 
 ### Root cause
 
@@ -144,13 +144,13 @@ change in this repository or in gotreesitter's runtime.
 
 ---
 
-## KR-0001b — bare `=` after a leading identifier (suspected Go-only divergence)
+## KR-0001b — bare `=` after a leading identifier (TSX divergence)
 
 | Field | Value |
 |---|---|
 | **Upstream issue** | `odvcencio/gotreesitter#1242` (partially) |
 | **Fixtures** | F4, F5 |
-| **Verdict** | **Suspected real defect.** Evidence level `E1` (source reading). Needs `E5` to confirm. |
+| **Verdict** | **Confirmed for TSX at E5.** The native C probe parses F4/F5 cleanly; pinned Go reports errors. JavaScript's cause remains E1; its Go failures are retained at E3. |
 
 ### Root cause
 
@@ -182,22 +182,25 @@ compensates for is unknown, so neither block may be removed without evidence.
 
 ### Evidence status — read this before acting
 
-This root cause is **`E1` (static inspection of both sources)**. It is not `E5`.
-No comparison against a running C parser has been made. Specifically unknown:
+Session 05's native diagnostic compares pinned TSX C and Go parses of F1–F7.
+F4/F5 are clean in C and erroneous in Go (E5); F6/F7 ordered tree digests agree.
+F1–F3 remain erroneous on both sides, with different recovered trees.
+The user revised generator selection in ADR-0007 before this probe: checked-in
+ABI 14 sources are identified by commit/hash and accepted by the pinned runtime's
+13–15 ABI range. No generator ran and its historic version is not asserted.
 
-- whether the C parse of F4/F5 is actually clean end to end (the scanner is only one stage);
-- what the Go-only `/` and `onlyWhitespace` blocks compensate for, and what removing them breaks.
-
-**A patch is not authorized on `E1` evidence.** See `docs/specs/validation.md` § Claim vocabulary
-and `ADR-0001` § Runtime patch boundary.
+Evidence: `artifacts/session-05/phase2/native-manifest.json`, native output and
+differential logs. The earlier identity-blocked attempt is retained separately.
+JavaScript C execution and the effects of changing the slash/whitespace guards
+remain untested. **No patch or fork is authorized by this result.**
 
 ### Fork-trigger evaluation (as of this record)
 
 | Condition | Status |
 |---|---|
-| Reproduces at the exact pinned baseline | **yes** (`v0.53.0` and upstream `main`) |
+| Reproduces at the exact pinned baseline | **yes** (`v0.53.0`, retained Phase 2 product test) |
 | Appears in the CGO-free product lane | **yes** (a plain fresh parse; not race-dependent) |
-| Upstream has no fix in a tagged release, and is not already tracking it | **no fix**; issue open with no comment, label, or linked PR |
+| Upstream has no fix in a tagged release, and is not already tracking it | **no tagged fix observed**; public tag query on 2026-09-22 ends at v0.53.0; issue open without maintainer response or linked PR |
 
 All three conditions currently read as satisfied. That makes `KR-0001b` the **first and only**
 candidate that has ever reached the trigger — and precisely why the `E5` requirement matters before
@@ -205,7 +208,7 @@ anyone acts on it. Creating a fork remains a **user-owned decision**.
 
 ### Required test behaviour
 
-Assert that F4–F5 currently produce `accepted_with_errors`, tagged as a **suspected divergence**
+Assert that F4–F5 currently produce `accepted_with_errors`, tagged as a **divergence ratchet**
 rather than as accepted behaviour. If they become clean, that is the fix landing — investigate and
 retire, do not silently pass.
 
@@ -225,10 +228,10 @@ its own retirement condition. Move the record to a retired section; do not delet
 
 These are measured, upstream-documented properties. Reporting them as defects is a reporting error.
 
-### KC-0001 — C# never takes the compact route
+### KC-0001 — C# compact declines on the recorded real corpus
 
-At the baseline, C# parses always decline the compact scheduler and fall back to the classic GLR
-path. Upstream's own pinned real-corpus matrix records `c_sharp: 0 PASS / 2 FALLBACK`, the worst of
+At the baseline, the recorded C# real-corpus parses decline the compact scheduler and fall back
+to the classic GLR path. Upstream's pinned matrix records `c_sharp: 0 PASS / 2 FALLBACK`, the worst of
 the Release-Critical set (`go`, `python` 2/0; `javascript` 1/0; `typescript`, `tsx` 1/1).
 
 Consequences to expect, not to file: non-linear parse cost on catch-pattern-dense input
@@ -237,6 +240,10 @@ recording verbatim; no incremental reuse for C#, so every edit is a full reparse
 
 Widening compact admission is upstream work. Because upstream documents and tracks it, this does
 **not** count toward the fork trigger.
+
+Do not generalize the corpus observation to every C# input. Session 05 Phase 1's
+small SM-CS fixture took the compact route; its incremental edit used a full
+reparse. Phase 3 independently recorded declines on its three larger inputs.
 
 ### KC-0002 — the race lane is roughly 14× the product lane
 
@@ -256,3 +263,12 @@ classic production route with the compact route explicitly disabled. A downstrea
 **Not yet a ratchet** — not reproduced at the current baseline. The experiment that would settle it
 is a 2×2 over `{v0.52.0, v0.53.0} × {default route, compact disabled}`.
 Until reproduced at the baseline, do not cite it as a defect of `v0.53.0`.
+
+Session 05 Phase 3 executed all four cells once per fixture with the same C#
+grammar blob and LF corpus. The excerpt's `HasError` was false in all cells:
+the reported route-dependent error flag was not reproduced. All four instead
+contained a missing `;` at byte 335 (row 6, column 26), yielding
+`accepted_with_errors` under this repository's contract. A separate retained
+adapter test covers that receipt (E3). This is not a new ratchet or a claim of
+C# oracle agreement; C# differential diagnosis remains open. Node/token counts
+and outcome were unchanged across cells. See Phase 3 evidence for conditions.
