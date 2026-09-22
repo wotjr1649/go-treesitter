@@ -141,6 +141,17 @@ Newtonsoft MIT fixtures, whose notice remains in `testdata/newtonsoft/LICENSE.md
 Other inline cases and transformations were authored in this repository. The
 JSON file itself uses LF; intentional CRLF source bytes are encoded in strings.
 
+## Go edit-fuzz recovery
+
+The Go edit-fuzz regression adds `go-recovery-cases.json`: four clean edit
+origins and 24 recovery variants (plain, leading newline, header comment and
+CRLF, each with six ASCII/UTF-8 corruptions of `package`). All are authored
+under this repository's MIT license, with exact source hashes and edit ranges.
+`windows-c-v2/go-recovery/` contains all 28 native C records. The minimized
+`FuzzIncrementalAgreement/7596da024a0d8a5b` input remains in the adapter corpus.
+Twenty Go repeats and three C executions per recovery variant agreed after
+the Go version-order patch; 24 native C edits also agreed with fresh C.
+
 ## What is deliberately absent
 
 - No fixture is copied from `code-map-memo`'s `.work/` run directories at runtime. If bytes are

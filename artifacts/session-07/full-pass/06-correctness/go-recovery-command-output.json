@@ -1,0 +1,31 @@
+{
+  "sha256": "7ce2298eeae95b05995f5d0601563e5b5765ab99ae4e0c82792e9f0b40893a5f",
+  "files": {
+    "artifacts/session-07/full-pass/fuzz-edits-60s.log": "d42d2b807ff90ad798c7b844c693fcae49de0ea63de4d6cfaffca36bd47186a0",
+    "artifacts/session-07/full-pass/fuzz-go-30s.log": "fd26a0cc2d1805cc33f38528158d852aa60f76e46adc018c57e8407b350f1b4d",
+    "artifacts/session-07/full-pass/go-edit-probe-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/session-07/full-pass/go-edit-variants.log": "988640da19d4e91e7d9c8b8b6cbd62a0bb74da2c1de9bb5adaaeb192dff0402e",
+    "artifacts/session-07/full-pass/go-recovery-adopt.log": "7554a13fb0d01f0aca1cd9ca68788a00be134423c27a5c74787ceee6c934174b",
+    "artifacts/session-07/full-pass/go-recovery-candidate.log": "78d8968b92ab42cf97e9df57bde96a470b726a465e1ff3361059d328908c7577",
+    "artifacts/session-07/full-pass/go-recovery-catalog-206.log": "c023e22150d9929ce99751d0621bd89fe32672f362e83d7044fccf0a2ee28ae6",
+    "artifacts/session-07/full-pass/go-recovery-catalog-base-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/session-07/full-pass/go-recovery-catalog-gpl-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/session-07/full-pass/go-recovery-gpl-tests.log": "e789ddc8b4c28d3483da42b33c09280616a45e449c0d3ab9e5560841f1b2998b",
+    "artifacts/session-07/full-pass/go-recovery-native-edits.log": "324ceb860dc7b50f660df3fedabb862dd3bfc8ee2e4bda95633b54a12a4dc269",
+    "artifacts/session-07/full-pass/go-recovery-native-edits-v2.log": "acc882173e0b1f996d4f9476c77d62b77948f0b463c19c97e68095e9ee26a0bb",
+    "artifacts/session-07/full-pass/go-recovery-native-records.log": "becc0fb4b7d191cfbad4d672ed16182e078ca119b123c09cf255621def8f8549",
+    "artifacts/session-07/full-pass/go-recovery-overlay-tests.log": "121b13d4b896fcfacd7f972cd032a96fdb66582ff97f23c666bc878f44760bf1",
+    "artifacts/session-07/full-pass/go-recovery-product-tests.log": "28172a84496590fb452385acfb4077acf5e5ef935f8c92ea18a517750eaeee34",
+    "artifacts/session-07/full-pass/go-recovery-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/session-07/full-pass/hardening-cancel-progress.log": "f9e34ee923bfc1c37061684f0572d8b5f3fe7c34e2aeb3ef8ecd50f3b3a52c02",
+    "artifacts/session-07/full-pass/hardening-cancel-seeds.log": "d17a2d140ac8c191866f546518b2a0494a522711285192b7fceda507953276c8",
+    "artifacts/session-07/full-pass/hardening-race.log": "879b849f1a7e7905cccc2e3638b52b9a15784aa52c0169a4d8eaf79cd8dd60e5",
+    ".scratch/full-pass/receipt.py": "5f49e48dfe57607141560a24ecec9e2e98c9c5ecc3e19185c9955a98056e764a",
+    ".scratch/full-pass/go_edit_probe.go": "789a1eadd61a36941e6dcf611e48d042eb45ff44eb1c0cac5d4306030b45a8d8",
+    ".scratch/full-pass/go-edit-variants.py": "ed77be7cd14571bffb5c3527559d69fdac670c7b56c61eccb21112b232310dbe",
+    ".scratch/full-pass/go-recovery-campaign.py": "f89f45d81705739fc3de983302804ba8ffa800a18aa7f4852872cbe9968c538c",
+    ".scratch/full-pass/adopt-go-recovery.py": "0a42e159e8da365bbc498529d2bd59588fc6886f2ea4fbb9e0727dd6116f8b0e",
+    ".scratch/full-pass/probe.go": "b0c20d558474505d2e9873889c3bb044192cf939c4c5a3830b397bdaf72566bf",
+    ".scratch/full-pass/go-native-edit-inputs.json": "23d3b417d5e667ecb39f653b205c5b6859ff4ab5fe0bb8abbc7913b9b8d8f318"
+  }
+}

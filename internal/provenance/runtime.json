@@ -7,7 +7,7 @@
     "commit": "c871b1f576866c40b1695677fe3512243e266d39"
   },
   "archive_sha256": "a7fc4a2f1b369542b14429c36a09a41d6db0bb0d2beec5844930b4a17c6ae3a6",
-  "source_sha256": "1f9a696bf5b12aa8744a89889e44f5715970c612be651f41de18fab05927ea42",
+  "source_sha256": "019ab919817e0a3ecc8b59e38b558fcd5eef2322b4da6e102369fb9db41d4b9b",
   "importer_sha256": "53a181e54344788a455f49d110b5189a98778154169375701d1ec0253c48699c",
   "separator_sha256": "834555a032637f7b690c4582ffb06500cabf27fbbd1604fb900ab1e8ce19d388",
   "internal_module": "github.com/wotjr1649/go-treesitter/internal/runtime",
@@ -31,6 +31,10 @@
     {
       "path": "tools/runtime-bundle/patches/catalog-optional-blob-providers.patch",
       "sha256": "abfde39555646e52e27492a00fb33a98543a09d60c2b34e7910f3535d5305d5b"
+    },
+    {
+      "path": "tools/runtime-bundle/patches/go-recovery-version-order.patch",
+      "sha256": "2f253486ff4476861433c815e03bf16f6dee70e68f7470172dee9ec38d7bb626"
     }
   ],
   "separated_files": {
@@ -2237,7 +2241,7 @@
     },
     "grammars/runtime/runtime_profiles.go": {
       "origin_sha256": "b50848227f84630b98dea46ee596363a146f55f93f45ca40edb4d9c8cd2323ed",
-      "sha256": "9925fc9cc95ea7d3e0166b52dcb33aeae07d9ce6a49b51da059409992904d0c1"
+      "sha256": "b1be41df74aa470b1b30496c05063eec692010cf726605172be67242761fc23e"
     },
     "grammars/runtime/rust_external_lex_states_gen.go": {
       "origin_sha256": "a7e64f0662f68c806a3e3120926d9a3d27293b1517520660e4de63f24f44350b",

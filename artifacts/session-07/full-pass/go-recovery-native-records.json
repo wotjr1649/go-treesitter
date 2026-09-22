@@ -1,0 +1,32 @@
+{
+  "command": [
+    "python",
+    "tools/native-oracle/run.py",
+    "record",
+    "--build",
+    ".scratch/oracle/build-full-pass-v2",
+    "--cases",
+    "testdata/oracle/go-recovery-cases.json",
+    "--output",
+    "testdata/oracle/windows-c-v2/go-recovery"
+  ],
+  "candidate_commit": "bea44c01696d9597c88aac592bde56c88ed78bea",
+  "status_before": " M internal/gtsadapter/native_oracle_test.go\n M internal/gtsadapter/oracle_test.go\n M tools/native-oracle/probe.c\n?? artifacts/session-07/full-pass/06-correctness/\n?? artifacts/session-07/full-pass/08-packaging/\n?? artifacts/session-07/full-pass/fuzz-edits-60s.json\n?? artifacts/session-07/full-pass/fuzz-go-30s.json\n?? artifacts/session-07/full-pass/go-edit-probe-build.json\n?? artifacts/session-07/full-pass/go-edit-variants.json\n?? artifacts/session-07/full-pass/go-recovery-candidate.json\n?? artifacts/session-07/full-pass/go-recovery-overlay-tests.json\n?? artifacts/session-07/full-pass/hardening-cancel-progress.json\n?? artifacts/session-07/full-pass/hardening-cancel-seeds.json\n?? artifacts/session-07/full-pass/hardening-race.json\n?? artifacts/session-07/full-pass/modulezip-tool-build.json\n?? artifacts/session-07/full-pass/native-tsx-probe-build.json\n?? artifacts/session-07/full-pass/native-tsx-probe-check.json\n?? internal/gtsadapter/hardening_test.go\n?? internal/gtsadapter/testdata/\n?? testdata/oracle/go-recovery-cases.json\n",
+  "started_unix": 1790101783.1744475,
+  "elapsed_seconds": 0.8899717330932617,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "d9fd4c96e8e31a718a854deb12d0c4b66d651cfdd60d7fceccc071541788a14d"
+  },
+  "log_sha256": "becc0fb4b7d191cfbad4d672ed16182e078ca119b123c09cf255621def8f8549"
+}

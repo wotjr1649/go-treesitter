@@ -1,0 +1,33 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./internal/gtsadapter",
+    "-run",
+    "^$",
+    "-fuzz",
+    "^FuzzBoundedParse$",
+    "-fuzztime=30s",
+    "-parallel=2",
+    "-timeout=120s"
+  ],
+  "candidate_commit": "bea44c01696d9597c88aac592bde56c88ed78bea",
+  "status_before": " M internal/gtsadapter/native_oracle_test.go\n?? artifacts/session-07/full-pass/hardening-cancel-seeds.json\n?? internal/gtsadapter/hardening_test.go\n",
+  "started_unix": 1790100994.516097,
+  "elapsed_seconds": 79.11428427696228,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "d9fd4c96e8e31a718a854deb12d0c4b66d651cfdd60d7fceccc071541788a14d"
+  },
+  "log_sha256": "fd26a0cc2d1805cc33f38528158d852aa60f76e46adc018c57e8407b350f1b4d"
+}

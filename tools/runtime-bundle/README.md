@@ -51,3 +51,10 @@ are preserved in the nested `grammars/gpl` module. The main manifest binds the
 separator and excluded origin hashes. `catalog-optional-blob-providers.patch`
 lets an explicitly registered blob use the existing cache and scanner binding
 when an aggregate catalog is also present. This changes no parser tables.
+
+`go-recovery-version-order.patch` enables the existing C version transaction
+for the pinned Go blob. An edit-fuzz witness previously produced a fresh ERROR
+subtree with an extra `expression_statement`; incremental and C agreed without
+it. `TestGoRecoveryOrderOracleRecords` retains 28 C records and 24 edits, with
+the original minimized fuzz input kept in the adapter's fuzz corpus. This
+option applies to fresh parsing; incremental reuse admission is unchanged.

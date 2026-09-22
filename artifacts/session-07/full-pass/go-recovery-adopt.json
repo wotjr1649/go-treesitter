@@ -1,0 +1,25 @@
+{
+  "command": [
+    "python",
+    ".scratch/full-pass/adopt-go-recovery.py"
+  ],
+  "candidate_commit": "bea44c01696d9597c88aac592bde56c88ed78bea",
+  "status_before": " M internal/gtsadapter/native_oracle_test.go\n M internal/gtsadapter/oracle_test.go\n M tools/native-oracle/probe.c\n?? artifacts/session-07/full-pass/06-correctness/\n?? artifacts/session-07/full-pass/08-packaging/\n?? artifacts/session-07/full-pass/fuzz-edits-60s.json\n?? artifacts/session-07/full-pass/fuzz-go-30s.json\n?? artifacts/session-07/full-pass/go-edit-probe-build.json\n?? artifacts/session-07/full-pass/go-edit-variants.json\n?? artifacts/session-07/full-pass/go-recovery-candidate.json\n?? artifacts/session-07/full-pass/go-recovery-overlay-tests.json\n?? artifacts/session-07/full-pass/hardening-cancel-progress.json\n?? artifacts/session-07/full-pass/hardening-cancel-seeds.json\n?? artifacts/session-07/full-pass/hardening-race.json\n?? artifacts/session-07/full-pass/modulezip-tool-build.json\n?? artifacts/session-07/full-pass/native-tsx-probe-build.json\n?? artifacts/session-07/full-pass/native-tsx-probe-check.json\n?? internal/gtsadapter/hardening_test.go\n?? internal/gtsadapter/testdata/\n?? testdata/oracle/go-recovery-cases.json\n",
+  "started_unix": 1790101783.1738696,
+  "elapsed_seconds": 17.65882706642151,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "8047c2aa9193b3b76f05468d7b72920535945dcfa668d6cc638a1c523095671b"
+  },
+  "log_sha256": "7554a13fb0d01f0aca1cd9ca68788a00be134423c27a5c74787ceee6c934174b"
+}

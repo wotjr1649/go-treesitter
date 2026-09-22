@@ -27,6 +27,7 @@
     "catalog-c-family-lexer-reuse.patch",
     "KR-0002-csharp-recovery-transaction.patch",
     "KR-0004-csharp-preserve-recovery-errors.patch",
-    "catalog-optional-blob-providers.patch"
+    "catalog-optional-blob-providers.patch",
+    "go-recovery-version-order.patch"
   ]
 }

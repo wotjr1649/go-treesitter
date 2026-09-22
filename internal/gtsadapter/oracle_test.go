@@ -133,6 +133,10 @@ func TestCSharpRecoveryPreservationOracleRecords(t *testing.T) {
 	runOracleCorpus(t, "testdata/oracle/csharp-preservation-cases.json", "testdata/oracle/windows-c-v2/cs-preservation", "")
 }
 
+func TestGoRecoveryOrderOracleRecords(t *testing.T) {
+	runOracleCorpus(t, "testdata/oracle/go-recovery-cases.json", "testdata/oracle/windows-c-v2/go-recovery", "")
+}
+
 func runOracleRecords(t *testing.T) {
 	runOracleCorpus(t, "testdata/oracle/cases.json", "testdata/oracle/windows-c-v2/base", "testdata/oracle/active-differences.json")
 }
