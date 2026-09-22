@@ -83,7 +83,7 @@ func TestNativeOracleDifferential(t *testing.T) {
 				t.Logf("C[%d]=%+v", first, c.Nodes[first])
 			}
 		}
-		if c.HasError != (i < 3) || r.HasError != (i < 5) {
+		if c.HasError != (i < 3) || r.HasError != (i < 3) {
 			t.Fatalf("unexpected error-state differential for %s", f.id)
 		}
 		for _, node := range c.Nodes {
@@ -91,7 +91,7 @@ func TestNativeOracleDifferential(t *testing.T) {
 				t.Fatalf("C clean expectation contains a missing node for %s", f.id)
 			}
 		}
-		if i >= 5 && first != -1 {
+		if i >= 3 && first != -1 {
 			t.Fatalf("control tree differential for %s", f.id)
 		}
 	}
