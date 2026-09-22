@@ -1,0 +1,6 @@
+=== RUN   TestUpstreamImportBoundary
+    boundary_test.go:40: boundary violation: github.com/wotjr1649/go-treesitter/syntax imports github.com/odvcencio/gotreesitter; only github.com/wotjr1649/go-treesitter/internal/gtsadapter is allowed
+--- FAIL: TestUpstreamImportBoundary (0.15s)
+FAIL
+FAIL	github.com/wotjr1649/go-treesitter/internal/boundary	0.506s
+FAIL
