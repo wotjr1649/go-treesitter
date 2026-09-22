@@ -1,0 +1,25 @@
+{
+  "command": [
+    "python",
+    ".scratch/full-pass/csharp-order.py"
+  ],
+  "candidate_commit": "c9996dc43b3c13fd4c832e4d20a599fce6445c5b",
+  "status_before": "",
+  "started_unix": 1790088709.644791,
+  "elapsed_seconds": 21.197043895721436,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "60e068a66c71f3ce7c1b04dbe04e404e01e2d1eace07373dfe3fd0a8345f6889",
+    "go.sum": "87c97651162785c246dabcd3fdcd916cd7baabe2f8554bbdb31eea5ce9704cd6",
+    "internal/provenance/identities.json": "c6fc8f06a9e492e7a147fedb863272ecadca836460ab2c10bbec8f1bcd9a11f7"
+  },
+  "log_sha256": "0a8401b7085def9f544574b492035230d2eb7f5a49848511db974f92665c42cb"
+}

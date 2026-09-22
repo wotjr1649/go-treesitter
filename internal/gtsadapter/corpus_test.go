@@ -11,7 +11,7 @@ import (
 	"github.com/wotjr1649/go-treesitter/syntax"
 )
 
-func TestMissingNodesCannotLookClean(t *testing.T) {
+func TestRecoveredErrorsCannotLookClean(t *testing.T) {
 	manifestBytes, err := os.ReadFile("../../testdata/newtonsoft/manifest.json")
 	if err != nil {
 		t.Fatal(err)
@@ -41,12 +41,12 @@ func TestMissingNodesCannotLookClean(t *testing.T) {
 		defer r.Tree.Close()
 	}
 	t.Logf("source_sha256=%x diagnostics=%+v", sha256.Sum256(source), r.Diagnostics)
-	if err != nil || r.Tree == nil || r.Outcome != syntax.AcceptedWithErrors || !r.HasMissing || r.HasError || !r.Complete() {
-		t.Fatalf("missing-node receipt changed: error=%T", err)
+	if err != nil || r.Tree == nil || r.Outcome != syntax.AcceptedWithErrors || r.HasMissing || !r.HasError || !r.Complete() {
+		t.Fatalf("C recovery receipt changed: error=%T", err)
 	}
 	for _, n := range r.Tree.Nodes() {
-		if n.Missing {
-			t.Logf("missing=%+v", n)
+		if n.Error || n.Missing {
+			t.Logf("recovered=%+v", n)
 		}
 	}
 	if r.Tree.(*tree).raw != nil {

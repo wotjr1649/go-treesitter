@@ -1,0 +1,718 @@
+{
+  "abi": 15,
+  "input_bytes": 66,
+  "has_error": true,
+  "start": 0,
+  "end": 66,
+  "nodes": [
+    {
+      "Type": "compilation_unit",
+      "Field": "",
+      "Parent": -1,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 0,
+      "EndByte": 66,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 11,
+        "Column": 0
+      }
+    },
+    {
+      "Type": "namespace_declaration",
+      "Field": "",
+      "Parent": 0,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 0,
+      "EndByte": 65,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 10,
+        "Column": 3
+      }
+    },
+    {
+      "Type": "namespace",
+      "Field": "",
+      "Parent": 1,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 0,
+      "EndByte": 9,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 9
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "name",
+      "Parent": 1,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 10,
+      "EndByte": 11,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 10
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 11
+      }
+    },
+    {
+      "Type": "declaration_list",
+      "Field": "body",
+      "Parent": 1,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 12,
+      "EndByte": 65,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 12
+      },
+      "EndPoint": {
+        "Row": 10,
+        "Column": 3
+      }
+    },
+    {
+      "Type": "{",
+      "Field": "",
+      "Parent": 4,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 12,
+      "EndByte": 13,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 12
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 13
+      }
+    },
+    {
+      "Type": "enum_declaration",
+      "Field": "",
+      "Parent": 4,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 14,
+      "EndByte": 63,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 14
+      },
+      "EndPoint": {
+        "Row": 10,
+        "Column": 1
+      }
+    },
+    {
+      "Type": "enum",
+      "Field": "",
+      "Parent": 6,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 14,
+      "EndByte": 18,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 14
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 18
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "name",
+      "Parent": 6,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 19,
+      "EndByte": 20,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 19
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 20
+      }
+    },
+    {
+      "Type": "enum_member_declaration_list",
+      "Field": "body",
+      "Parent": 6,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 21,
+      "EndByte": 63,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 21
+      },
+      "EndPoint": {
+        "Row": 10,
+        "Column": 1
+      }
+    },
+    {
+      "Type": "{",
+      "Field": "",
+      "Parent": 9,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 21,
+      "EndByte": 22,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 21
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 22
+      }
+    },
+    {
+      "Type": "enum_member_declaration",
+      "Field": "",
+      "Parent": 9,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 23,
+      "EndByte": 25,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 2
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "name",
+      "Parent": 11,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 23,
+      "EndByte": 25,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 2
+      }
+    },
+    {
+      "Type": ",",
+      "Field": "",
+      "Parent": 9,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 25,
+      "EndByte": 26,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 2
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 3
+      }
+    },
+    {
+      "Type": "enum_member_declaration",
+      "Field": "",
+      "Parent": 9,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 27,
+      "EndByte": 29,
+      "StartPoint": {
+        "Row": 2,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 2,
+        "Column": 2
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "name",
+      "Parent": 14,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 27,
+      "EndByte": 29,
+      "StartPoint": {
+        "Row": 2,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 2,
+        "Column": 2
+      }
+    },
+    {
+      "Type": ",",
+      "Field": "",
+      "Parent": 9,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 29,
+      "EndByte": 30,
+      "StartPoint": {
+        "Row": 2,
+        "Column": 2
+      },
+      "EndPoint": {
+        "Row": 2,
+        "Column": 3
+      }
+    },
+    {
+      "Type": "enum_member_declaration",
+      "Field": "",
+      "Parent": 9,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 31,
+      "EndByte": 33,
+      "StartPoint": {
+        "Row": 3,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 3,
+        "Column": 2
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "name",
+      "Parent": 17,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 31,
+      "EndByte": 33,
+      "StartPoint": {
+        "Row": 3,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 3,
+        "Column": 2
+      }
+    },
+    {
+      "Type": ",",
+      "Field": "",
+      "Parent": 9,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 33,
+      "EndByte": 34,
+      "StartPoint": {
+        "Row": 3,
+        "Column": 2
+      },
+      "EndPoint": {
+        "Row": 3,
+        "Column": 3
+      }
+    },
+    {
+      "Type": "enum_member_declaration",
+      "Field": "",
+      "Parent": 9,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 35,
+      "EndByte": 37,
+      "StartPoint": {
+        "Row": 4,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 4,
+        "Column": 2
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "name",
+      "Parent": 20,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 35,
+      "EndByte": 37,
+      "StartPoint": {
+        "Row": 4,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 4,
+        "Column": 2
+      }
+    },
+    {
+      "Type": ",",
+      "Field": "",
+      "Parent": 9,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 37,
+      "EndByte": 38,
+      "StartPoint": {
+        "Row": 4,
+        "Column": 2
+      },
+      "EndPoint": {
+        "Row": 4,
+        "Column": 3
+      }
+    },
+    {
+      "Type": "preproc_if",
+      "Field": "",
+      "Parent": 9,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 39,
+      "EndByte": 54,
+      "StartPoint": {
+        "Row": 5,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 7,
+        "Column": 6
+      }
+    },
+    {
+      "Type": "#if",
+      "Field": "",
+      "Parent": 23,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 39,
+      "EndByte": 42,
+      "StartPoint": {
+        "Row": 5,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 5,
+        "Column": 3
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "condition",
+      "Parent": 23,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 43,
+      "EndByte": 44,
+      "StartPoint": {
+        "Row": 5,
+        "Column": 4
+      },
+      "EndPoint": {
+        "Row": 5,
+        "Column": 5
+      }
+    },
+    {
+      "Type": "enum_member_declaration",
+      "Field": "",
+      "Parent": 23,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 45,
+      "EndByte": 46,
+      "StartPoint": {
+        "Row": 6,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 6,
+        "Column": 1
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "name",
+      "Parent": 26,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 45,
+      "EndByte": 46,
+      "StartPoint": {
+        "Row": 6,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 6,
+        "Column": 1
+      }
+    },
+    {
+      "Type": "ERROR",
+      "Field": "",
+      "Parent": 23,
+      "Named": true,
+      "Extra": true,
+      "Missing": false,
+      "Error": true,
+      "StartByte": 46,
+      "EndByte": 47,
+      "StartPoint": {
+        "Row": 6,
+        "Column": 1
+      },
+      "EndPoint": {
+        "Row": 6,
+        "Column": 2
+      }
+    },
+    {
+      "Type": ",",
+      "Field": "",
+      "Parent": 28,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 46,
+      "EndByte": 47,
+      "StartPoint": {
+        "Row": 6,
+        "Column": 1
+      },
+      "EndPoint": {
+        "Row": 6,
+        "Column": 2
+      }
+    },
+    {
+      "Type": "#endif",
+      "Field": "",
+      "Parent": 23,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 48,
+      "EndByte": 54,
+      "StartPoint": {
+        "Row": 7,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 7,
+        "Column": 6
+      }
+    },
+    {
+      "Type": "ERROR",
+      "Field": "",
+      "Parent": 9,
+      "Named": true,
+      "Extra": true,
+      "Missing": false,
+      "Error": true,
+      "StartByte": 55,
+      "EndByte": 57,
+      "StartPoint": {
+        "Row": 8,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 8,
+        "Column": 2
+      }
+    },
+    {
+      "Type": ",",
+      "Field": "",
+      "Parent": 9,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 57,
+      "EndByte": 58,
+      "StartPoint": {
+        "Row": 8,
+        "Column": 2
+      },
+      "EndPoint": {
+        "Row": 8,
+        "Column": 3
+      }
+    },
+    {
+      "Type": "enum_member_declaration",
+      "Field": "",
+      "Parent": 9,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 59,
+      "EndByte": 61,
+      "StartPoint": {
+        "Row": 9,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 9,
+        "Column": 2
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "name",
+      "Parent": 33,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 59,
+      "EndByte": 61,
+      "StartPoint": {
+        "Row": 9,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 9,
+        "Column": 2
+      }
+    },
+    {
+      "Type": "}",
+      "Field": "",
+      "Parent": 9,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 62,
+      "EndByte": 63,
+      "StartPoint": {
+        "Row": 10,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 10,
+        "Column": 1
+      }
+    },
+    {
+      "Type": "}",
+      "Field": "",
+      "Parent": 4,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 64,
+      "EndByte": 65,
+      "StartPoint": {
+        "Row": 10,
+        "Column": 2
+      },
+      "EndPoint": {
+        "Row": 10,
+        "Column": 3
+      }
+    }
+  ],
+  "schema": 1,
+  "fixture": "CS-members-4-2",
+  "language": "c_sharp",
+  "source_sha256": "55aa271550283538204a3e2d9cd42f417cf827bdd9f1fcc9b34c7bec84f6c86c",
+  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "nodes_sha256": "00d315fb6bd171e3e55962c341398776360cc335f79892012ae2172d972f2571"
+}

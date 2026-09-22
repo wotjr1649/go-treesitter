@@ -1,0 +1,1580 @@
+{
+  "candidate_sha256": "305dd7e6928189841cb2d26772fc2f99fbd7adc492c8a0c6c777be5f59374c05",
+  "oracle_sha256": "fad674c4632b7436101878d85c354fdbe9af717edac1a4c352ae9b579b901abb",
+  "elapsed_seconds": 10.487870600016322,
+  "attempts": [
+    {
+      "source_sha256": "d76fd62cfc90076c11d86cb7d7a0058df181231aa3b34f30e549f650b5294d4a",
+      "bytes": 12408,
+      "go_zero": 1,
+      "c_zero": 0,
+      "retained": true,
+      "go": {
+        "Digest": "fcea3d928ec6cf0b58965e5c4c2f7818c82ff82d400bab827bf6d170eae8a9f0",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "a202c834c126cedb3e6814ad6321659982297c63085013c6321c56cd6d7c6b5a",
+      "bytes": 6433,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Outcome": "early_stop",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": false,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "78e08b2767d269929520d067f985faaf974d5204429ea46861c4163db62665f8",
+      "bytes": 5975,
+      "go_zero": 1,
+      "c_zero": 0,
+      "retained": true,
+      "go": {
+        "Digest": "809b79bbd82393b9ecc6c32d8ef57f8dae60cd71f1f8624d1192b56425c6d20a",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "4b5c038b889cd1756574e69b448308d6f065fb29b71283434974c88101b80fce",
+      "bytes": 3135,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Outcome": "early_stop",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": false,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "10a57c7795b10b348cba5538413b2e7603986ae4407c7d490dffa9a905e8ca10",
+      "bytes": 2840,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "c05bd4660a967ee33cbe61112dcb0f796cee410326b56238535e8d291603d599",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "61e53783c1c3c13fbd0f5784df89519598a3c78ab955a725a8a3112651755f86",
+      "bytes": 4456,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Outcome": "early_stop",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": false,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "162b9061cdda8df9373e3de2bb381c25bc3ea810176f6d79079271b306da7f92",
+      "bytes": 4618,
+      "go_zero": 1,
+      "c_zero": 0,
+      "retained": true,
+      "go": {
+        "Digest": "35108fd7d0ba9316cdc2c2175329fdf502df93cae0de31b12dbc109fae377415",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "d9d6ca495d716b3b60a8b1d854ed747b929e8240cad914c291133f2c8148b2ec",
+      "bytes": 3100,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Outcome": "early_stop",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": false,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "c2b08ba782001d10fb171a22675554e0cee19442b00c6552c3f0404f320db79a",
+      "bytes": 3517,
+      "go_zero": 10,
+      "c_zero": 0,
+      "retained": true,
+      "go": {
+        "Digest": "9ff2de6f79200c5d32a522e59c3b251dca726e9f508987b8dcfccddddad5b01a",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "ccd0121c017746e99ae0e0301ddfaa3c6ffd2e86914aa506378ec58fa01822d7",
+      "bytes": 1999,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Outcome": "early_stop",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": false,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "2a188a1da4b1e0aa83fc9167499640284c50f61aa17d0e16013ce12954d87f86",
+      "bytes": 1518,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "08702b125e70d3fa489f502bea7bca707c80f5584c0a7af009687f48c42c1135",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "5da8ce43f5dac2050ea7f938163c7f75e148649c354602bf76ef498aa6dde0ed",
+      "bytes": 2798,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Outcome": "early_stop",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": false,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "9f86fec6e66d2cfaa208fbe9240937b8f23c30da9dd701009cf64f9c88f7b16a",
+      "bytes": 2685,
+      "go_zero": 6,
+      "c_zero": 0,
+      "retained": true,
+      "go": {
+        "Digest": "de7e441f7d3bd6ab273d3da725369ce7c529a83c368d665fd840600bd718689a",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "cf25175da9cefa0430176b94431963f2e8228f85034685ef680f0bdd9b0e16ab",
+      "bytes": 1966,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Outcome": "early_stop",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": false,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "9534203d91453559db03c4683a88f4826267b13dd06d98f246e45124954ba08c",
+      "bytes": 1637,
+      "go_zero": 3,
+      "c_zero": 1,
+      "retained": true,
+      "go": {
+        "Digest": "c911d77c672225a8b211a53a116561bb2a403bfe5c4432d9ddfedbd06743f67e",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "c9357d5bae65ad90bd823cdcb62beb46a1ceed7760491e31603519a5cc95ab0f",
+      "bytes": 1017,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Outcome": "early_stop",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": false,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "8c613d972b7b19396cf3df1c8308e50a0cf5af6de3f0fe396475f47df626337e",
+      "bytes": 620,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "f996b111f9b4362d2256ef767e56f04f1934f3fe7eec06f07fe4051eb7d3052b",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "69017e0ee9d1e6b9b1d25b77e28140c8266ed9c20fd7861cfd23c033caf18a72",
+      "bytes": 1218,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Outcome": "early_stop",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": false,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "b00d60d3729556e9126a6bc6be07cdfe630e2009c56f36b3e5c13d3d0489a90f",
+      "bytes": 1337,
+      "go_zero": 2,
+      "c_zero": 0,
+      "retained": true,
+      "go": {
+        "Digest": "a398460af8c33510abcd12c2ed55e82f279885b9d6a6464647a72f9e0aed60a2",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "97ac35e8c01d562aed2af0c9937c8be9a0d43e53fcb8ccb7be9d8a6de13f2f01",
+      "bytes": 918,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Outcome": "early_stop",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": false,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "bdd7987d1fa8f12b8f199afe7b75429f3bec3d1af3b12a03a4207cd3f7b2a7a8",
+      "bytes": 787,
+      "go_zero": 1,
+      "c_zero": 0,
+      "retained": true,
+      "go": {
+        "Digest": "6f06de42b16dc16c121b5a36adcaac010d9cc9e61bd07cf03028388035aca5ea",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "8926827a104538a1bd259e387212574bbbc3872e34127da7c0d01bf6e93b1a0d",
+      "bytes": 389,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Outcome": "early_stop",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": false,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "6c737d48ccb3f01b0da4c6583c9736c26c266943496211975415a08098aea446",
+      "bytes": 398,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "0726f7f67054eb4b9c0215aa4d5483c9706c075437a7f65da3aa779a487404e0",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "ff73ac2c490e46784cd2ee7fca3be330d50290a53d1ea34cf70f24eeb155dc55",
+      "bytes": 478,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Outcome": "early_stop",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": false,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "12d488ac083f604265afcdad899afd63428b60a44fc08a7ca3b3acb6b09e6d86",
+      "bytes": 677,
+      "go_zero": 1,
+      "c_zero": 1,
+      "retained": false,
+      "go": {
+        "Digest": "9e2b2011ce8da6d4b9f07bcba3a669b2baa76b4d88fd3393f616521468c9b321",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "9f7aecdfce3262a4526d879c7b3c8d150c9e2c01758292b1be1f5b1fa2f21cd0",
+      "bytes": 591,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "21f0dccb3290da073c5920ea6c373f2f58950719ffa2c0c880db96eb7c9bbba5",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "1a49f3a272d852c53f43bb96b24f8614e3c0d3df49cba6126eb1feb625f6fb51",
+      "bytes": 615,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "7ce348977cf774dd2d0656a2e6641e44d712bc991d7c050e728fbf8a1694b568",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "2bdff78b46d3e077c7e55da4c56fba32e5aba9afb2d7755fd23c45b7c15e43b2",
+      "bytes": 574,
+      "go_zero": 1,
+      "c_zero": 0,
+      "retained": true,
+      "go": {
+        "Digest": "017fc11f566cbee1f78308e44d7b26c7f5fe7a213061dd994a55f94f3a1d67bd",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "0c65f175be2cc92e25ccfe1d3eda00ac7c3b2b985728e64eb1cb9806598ebde0",
+      "bytes": 527,
+      "go_zero": 1,
+      "c_zero": 0,
+      "retained": true,
+      "go": {
+        "Digest": "beea9f7b4dae26f06261ceb12a2dc401a539ac42d1504ad90b08198dd79274a2",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "f2e51c7d33f471ed85135f26a5b8b58ac6a17d5ad7a53604ea7185bbbd17cbbd",
+      "bytes": 431,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Outcome": "early_stop",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": false,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "03cc02b24c018c96db9f093181e4c570518506c913740f47aeaf79c9216408e7",
+      "bytes": 464,
+      "go_zero": 1,
+      "c_zero": 1,
+      "retained": false,
+      "go": {
+        "Digest": "ccc69071db8d2b9bd1a0a45be959e20d8258f7772290ce2c1ae617588f5ee6bf",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "3f1bb0be055d7b8b1e6f0712760d844805b99686d163d04628801fd6d0685aec",
+      "bytes": 393,
+      "go_zero": 1,
+      "c_zero": 0,
+      "retained": true,
+      "go": {
+        "Digest": "72b3984e1628ff1a0712c0e07846f6fa4cf3b7adafd560f6b4c98694a409e4d7",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "3288ec12fe759cfba211dd5ceb866b4a42eef79393007ef72b3df6927a8eda1a",
+      "bytes": 297,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Outcome": "early_stop",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": false,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "3a2bd066f72d2819e00e0c81eb5e172492a7964644f2bfd6b1fc907b11922dab",
+      "bytes": 330,
+      "go_zero": 1,
+      "c_zero": 0,
+      "retained": true,
+      "go": {
+        "Digest": "d5bbae8d5e284cc3788c3866f657922d29c00e1a7c96f0fcee1ffaa50dcd6e8e",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "25a060a7cdf121bf325a076b5e98578a06d9256d4eec76dc683ca1120d709bd9",
+      "bytes": 234,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "0c9788a9b4e2bd43eadce68ceec63d688009ab7435dd2c7c2bd106d043c85a18",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "5190eeb9c2084a91d5118e68e62be83c39f1fe978a3db3c44c16d395d46ad1e6",
+      "bytes": 268,
+      "go_zero": 1,
+      "c_zero": 0,
+      "retained": true,
+      "go": {
+        "Digest": "7344cfc92aa12bf9e8b66c7ebb73bb05176864c40aa7f0955b7aefd60fb48d98",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "d3ba5b282e45ad6bff8a62343feefd168c532471989ea756fb62664377d0e54d",
+      "bytes": 172,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Outcome": "early_stop",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": false,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "bf38234f3da1526a87178c36689be8d5de97520ce37409b54ef1eec5faa57506",
+      "bytes": 173,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "8d22e4ce3623e78ce7957bb35220e953de41243c3da86d29ad13f7abfa5d3bb4",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "924033ea9bf1effbbf741b5a1ac4fe1d69a22eedb495252cc7b977332f1c6283",
+      "bytes": 191,
+      "go_zero": 1,
+      "c_zero": 0,
+      "retained": true,
+      "go": {
+        "Digest": "6ae4f03de21e13e77e16932ddc1380dc3f16ea16783d0b3864324a3fe8c90d38",
+        "Outcome": "accepted_clean",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": false,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "9919fbbdb04cacc6e65589f249e4446351048de12901c952edae823a36353c37",
+      "bytes": 95,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Outcome": "early_stop",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": false,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "1acf97894dce77e1359f284a293117abc179445593762fc7f80955d8a999760e",
+      "bytes": 96,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "37d0e8715a8bfb50fb5ea84a5eb30684c9fc7d07d0b1cace0ae3cca603aa6185",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "a5d337c2534e5f7b2191eb8f62728b5f5a651cf59c709af17b26bf5db12a8e53",
+      "bytes": 97,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "bb081c94182720c2f4a1dee311c7458cd1aa2f558fd76469e48a4ea919f377a8",
+        "Outcome": "accepted_clean",
+        "Stop": "accepted",
+        "Route": "compact",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": false,
+        "Missing": false
+      },
+      "c_has_error": false
+    },
+    {
+      "source_sha256": "02be26f55e7205d1666be6a2b05e939cdc9df5c3bbd165a32df939eb4a30cdaa",
+      "bytes": 121,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "e5c693ee7544e03ae22c468abbb8c123f258768cd80bc345bf9d4ab8f276b8e1",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "4ce46a45e32fe67781e3ec3c4227babb75927aa25fe6306ed996bd0ed3d94f9a",
+      "bytes": 164,
+      "go_zero": 1,
+      "c_zero": 0,
+      "retained": true,
+      "go": {
+        "Digest": "ee6bd82a800353dcf50d9c1ef472c661f0eb1c7d74f2a4c5cc9fac2bf8ede31c",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "01661afc7a7ac18b1d3e70573b1ab671e7c9ff3381d5f7b094b47807d492624f",
+      "bytes": 70,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "031105d807e63240fbb1501bafa664ead2d3d03e0761954daa857de7d8da0657",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "42bd46ffebc6538183a6df47675561466590707064103394dfa81b03f2769592",
+      "bytes": 94,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "c68ced57f9451c023d0e42fafc85ed8834b761b331f6beaa72daa25d5098e658",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "5647d7a0626a87d1be707295a811cada97649e1126fdf9f2e181efc29707958c",
+      "bytes": 96,
+      "go_zero": 1,
+      "c_zero": 0,
+      "retained": true,
+      "go": {
+        "Digest": "652f943ed926eea46074336b565b498d670fa78de3364e016f60e3115228f791",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "a2ee7f8d8139758247428cc4147ae2c05d41bf3b98836a67a59d84bc569e3975",
+      "bytes": 94,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "e25bc291c93da4051f45e1e6828a2a8d410523fcc4bcf98a96022bb20cba5944",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      },
+      "c_has_error": true
+    },
+    {
+      "source_sha256": "7b6ebc2e38ca84f0512f982b23f31be09971b4ce6f65d0d350ececa5242ae8e0",
+      "bytes": 28,
+      "go_zero": 0,
+      "c_zero": 0,
+      "retained": false,
+      "go": {
+        "Digest": "6c803b3214fde67af71389281fb0fdfa91fea7881f541017daff5065a941bd2e",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      },
+      "c_has_error": true
+    }
+  ],
+  "best": {
+    "source": "namespace Newtonsoft.Json\n{\n                            dateParseHandling = _dateParseHandling;\n",
+    "source_sha256": "5647d7a0626a87d1be707295a811cada97649e1126fdf9f2e181efc29707958c",
+    "go": {
+      "ID": "reduce",
+      "Nodes": [
+        {
+          "Type": "compilation_unit",
+          "Field": "",
+          "Parent": -1,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 0,
+          "EndByte": 96,
+          "StartPoint": {
+            "Row": 0,
+            "Column": 0
+          },
+          "EndPoint": {
+            "Row": 3,
+            "Column": 0
+          }
+        },
+        {
+          "Type": "ERROR",
+          "Field": "",
+          "Parent": 0,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": true,
+          "StartByte": 0,
+          "EndByte": 95,
+          "StartPoint": {
+            "Row": 0,
+            "Column": 0
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 67
+          }
+        },
+        {
+          "Type": "namespace",
+          "Field": "",
+          "Parent": 1,
+          "Named": false,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 0,
+          "EndByte": 9,
+          "StartPoint": {
+            "Row": 0,
+            "Column": 0
+          },
+          "EndPoint": {
+            "Row": 0,
+            "Column": 9
+          }
+        },
+        {
+          "Type": "qualified_name",
+          "Field": "",
+          "Parent": 1,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 10,
+          "EndByte": 25,
+          "StartPoint": {
+            "Row": 0,
+            "Column": 10
+          },
+          "EndPoint": {
+            "Row": 0,
+            "Column": 25
+          }
+        },
+        {
+          "Type": "identifier",
+          "Field": "qualifier",
+          "Parent": 3,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 10,
+          "EndByte": 20,
+          "StartPoint": {
+            "Row": 0,
+            "Column": 10
+          },
+          "EndPoint": {
+            "Row": 0,
+            "Column": 20
+          }
+        },
+        {
+          "Type": ".",
+          "Field": "",
+          "Parent": 3,
+          "Named": false,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 20,
+          "EndByte": 21,
+          "StartPoint": {
+            "Row": 0,
+            "Column": 20
+          },
+          "EndPoint": {
+            "Row": 0,
+            "Column": 21
+          }
+        },
+        {
+          "Type": "identifier",
+          "Field": "name",
+          "Parent": 3,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 21,
+          "EndByte": 25,
+          "StartPoint": {
+            "Row": 0,
+            "Column": 21
+          },
+          "EndPoint": {
+            "Row": 0,
+            "Column": 25
+          }
+        },
+        {
+          "Type": "{",
+          "Field": "",
+          "Parent": 1,
+          "Named": false,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 26,
+          "EndByte": 27,
+          "StartPoint": {
+            "Row": 1,
+            "Column": 0
+          },
+          "EndPoint": {
+            "Row": 1,
+            "Column": 1
+          }
+        },
+        {
+          "Type": "field_declaration",
+          "Field": "",
+          "Parent": 1,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 56,
+          "EndByte": 95,
+          "StartPoint": {
+            "Row": 2,
+            "Column": 28
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 67
+          }
+        },
+        {
+          "Type": "variable_declaration",
+          "Field": "",
+          "Parent": 8,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 56,
+          "EndByte": 94,
+          "StartPoint": {
+            "Row": 2,
+            "Column": 28
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 66
+          }
+        },
+        {
+          "Type": "identifier",
+          "Field": "type",
+          "Parent": 9,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 56,
+          "EndByte": 73,
+          "StartPoint": {
+            "Row": 2,
+            "Column": 28
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 45
+          }
+        },
+        {
+          "Type": "variable_declarator",
+          "Field": "",
+          "Parent": 9,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 73,
+          "EndByte": 94,
+          "StartPoint": {
+            "Row": 2,
+            "Column": 45
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 66
+          }
+        },
+        {
+          "Type": "identifier",
+          "Field": "name",
+          "Parent": 11,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 73,
+          "EndByte": 73,
+          "StartPoint": {
+            "Row": 2,
+            "Column": 45
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 45
+          }
+        },
+        {
+          "Type": "=",
+          "Field": "",
+          "Parent": 11,
+          "Named": false,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 74,
+          "EndByte": 75,
+          "StartPoint": {
+            "Row": 2,
+            "Column": 46
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 47
+          }
+        },
+        {
+          "Type": "identifier",
+          "Field": "",
+          "Parent": 11,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 76,
+          "EndByte": 94,
+          "StartPoint": {
+            "Row": 2,
+            "Column": 48
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 66
+          }
+        },
+        {
+          "Type": ";",
+          "Field": "",
+          "Parent": 8,
+          "Named": false,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 94,
+          "EndByte": 95,
+          "StartPoint": {
+            "Row": 2,
+            "Column": 66
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 67
+          }
+        }
+      ],
+      "Observations": [
+        {
+          "Digest": "652f943ed926eea46074336b565b498d670fa78de3364e016f60e3115228f791",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "Incremental": null,
+      "IncrementalNodes": null,
+      "IncrementalEqual": false
+    },
+    "c": {
+      "abi": 15,
+      "input_bytes": 96,
+      "has_error": true,
+      "start": 0,
+      "end": 96,
+      "nodes": [
+        {
+          "Type": "compilation_unit",
+          "Field": "",
+          "Parent": -1,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 0,
+          "EndByte": 96,
+          "StartPoint": {
+            "Row": 0,
+            "Column": 0
+          },
+          "EndPoint": {
+            "Row": 3,
+            "Column": 0
+          }
+        },
+        {
+          "Type": "ERROR",
+          "Field": "",
+          "Parent": 0,
+          "Named": true,
+          "Extra": true,
+          "Missing": false,
+          "Error": true,
+          "StartByte": 0,
+          "EndByte": 95,
+          "StartPoint": {
+            "Row": 0,
+            "Column": 0
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 67
+          }
+        },
+        {
+          "Type": "namespace",
+          "Field": "",
+          "Parent": 1,
+          "Named": false,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 0,
+          "EndByte": 9,
+          "StartPoint": {
+            "Row": 0,
+            "Column": 0
+          },
+          "EndPoint": {
+            "Row": 0,
+            "Column": 9
+          }
+        },
+        {
+          "Type": "qualified_name",
+          "Field": "",
+          "Parent": 1,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 10,
+          "EndByte": 25,
+          "StartPoint": {
+            "Row": 0,
+            "Column": 10
+          },
+          "EndPoint": {
+            "Row": 0,
+            "Column": 25
+          }
+        },
+        {
+          "Type": "identifier",
+          "Field": "qualifier",
+          "Parent": 3,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 10,
+          "EndByte": 20,
+          "StartPoint": {
+            "Row": 0,
+            "Column": 10
+          },
+          "EndPoint": {
+            "Row": 0,
+            "Column": 20
+          }
+        },
+        {
+          "Type": ".",
+          "Field": "",
+          "Parent": 3,
+          "Named": false,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 20,
+          "EndByte": 21,
+          "StartPoint": {
+            "Row": 0,
+            "Column": 20
+          },
+          "EndPoint": {
+            "Row": 0,
+            "Column": 21
+          }
+        },
+        {
+          "Type": "identifier",
+          "Field": "name",
+          "Parent": 3,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 21,
+          "EndByte": 25,
+          "StartPoint": {
+            "Row": 0,
+            "Column": 21
+          },
+          "EndPoint": {
+            "Row": 0,
+            "Column": 25
+          }
+        },
+        {
+          "Type": "{",
+          "Field": "",
+          "Parent": 1,
+          "Named": false,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 26,
+          "EndByte": 27,
+          "StartPoint": {
+            "Row": 1,
+            "Column": 0
+          },
+          "EndPoint": {
+            "Row": 1,
+            "Column": 1
+          }
+        },
+        {
+          "Type": "field_declaration",
+          "Field": "",
+          "Parent": 1,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 56,
+          "EndByte": 95,
+          "StartPoint": {
+            "Row": 2,
+            "Column": 28
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 67
+          }
+        },
+        {
+          "Type": "variable_declaration",
+          "Field": "",
+          "Parent": 8,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 56,
+          "EndByte": 94,
+          "StartPoint": {
+            "Row": 2,
+            "Column": 28
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 66
+          }
+        },
+        {
+          "Type": "identifier",
+          "Field": "type",
+          "Parent": 9,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 56,
+          "EndByte": 73,
+          "StartPoint": {
+            "Row": 2,
+            "Column": 28
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 45
+          }
+        },
+        {
+          "Type": "ERROR",
+          "Field": "",
+          "Parent": 9,
+          "Named": true,
+          "Extra": true,
+          "Missing": false,
+          "Error": true,
+          "StartByte": 74,
+          "EndByte": 75,
+          "StartPoint": {
+            "Row": 2,
+            "Column": 46
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 47
+          }
+        },
+        {
+          "Type": "=",
+          "Field": "",
+          "Parent": 11,
+          "Named": false,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 74,
+          "EndByte": 75,
+          "StartPoint": {
+            "Row": 2,
+            "Column": 46
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 47
+          }
+        },
+        {
+          "Type": "variable_declarator",
+          "Field": "",
+          "Parent": 9,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 76,
+          "EndByte": 94,
+          "StartPoint": {
+            "Row": 2,
+            "Column": 48
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 66
+          }
+        },
+        {
+          "Type": "identifier",
+          "Field": "name",
+          "Parent": 13,
+          "Named": true,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 76,
+          "EndByte": 94,
+          "StartPoint": {
+            "Row": 2,
+            "Column": 48
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 66
+          }
+        },
+        {
+          "Type": ";",
+          "Field": "",
+          "Parent": 8,
+          "Named": false,
+          "Extra": false,
+          "Missing": false,
+          "Error": false,
+          "StartByte": 94,
+          "EndByte": 95,
+          "StartPoint": {
+            "Row": 2,
+            "Column": 66
+          },
+          "EndPoint": {
+            "Row": 2,
+            "Column": 67
+          }
+        }
+      ]
+    }
+  }
+}

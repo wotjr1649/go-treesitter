@@ -28,5 +28,17 @@ state and queued string tokens when a reused span ends at a boundary already
 scanned by that lexer. `TestCFamilyLexerStateAcrossReuse` covers includes,
 macros, conditionals, escaped strings and ordinary code through the adapter.
 
+`KR-0002-csharp-recovery-transaction.patch` corrects recovery scheduling,
+hidden missing-node costs, shared-prefix ambiguity retention and acceptance
+ordering. It enables the pinned C# grammar's packed version transaction and
+preserves the resulting complete recovery tree instead of widening its retry
+policy. `KR-0004-csharp-preserve-recovery-errors.patch` prevents source-based
+reconstruction from replacing an error-bearing C# tree.
+
+Run `python tools/runtime-bundle/check.py` with `CGO_ENABLED=0` for the private
+merge and acceptance invariants. Its temporary Go test overlay leaves the
+carrier's file inventory unchanged. Public adapter tests compare all ordered
+nodes against the pinned C records and check fresh/edit equality.
+
 The source's MIT notice is retained verbatim in `internal/runtime/LICENSE`.
 Grammar and fixture notices are covered separately in `THIRD_PARTY_NOTICES.md`.

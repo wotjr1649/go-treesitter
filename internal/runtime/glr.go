@@ -68,6 +68,8 @@ type glrStack struct {
 	dead bool
 	// accepted is set when the stack reaches a ParseActionAccept.
 	accepted bool
+	// C breaks equal positive-cost results by acceptance time, not slice position.
+	cAcceptOrder uint64
 	// shifted is set when this stack consumed the current token via a SHIFT
 	// action in a GLR fork that also produced REDUCE actions. When the
 	// reducing stacks cause the same token to be re-processed, shifted
@@ -92,6 +94,8 @@ type glrStack struct {
 	// lockstep token loop uses this to avoid letting an already-advanced
 	// sibling suppress that group's Strategy 1 recovery.
 	cRecoverMissingGroup *cRecGroup
+	// A missing-token sibling resumes its previous lookahead next round.
+	cRecoverPendingToken *Token
 	// diagnosticTopology carries a version identity only in gts_workcount
 	// builds. The production type is zero-sized, so it does not change the
 	// parser stack layout. Ordinary Go value copies preserve the identity;
@@ -668,6 +672,8 @@ func (s *glrStack) clone() glrStack {
 			branchOrder:                s.branchOrder,
 			cRec:                       s.cRec.clone(),
 			cRecoverMissingGroup:       s.cRecoverMissingGroup,
+			cRecoverPendingToken:       s.cRecoverPendingToken,
+			cAcceptOrder:               s.cAcceptOrder,
 			diagnosticTopology:         s.diagnosticTopology,
 			cNodeBaseline:              s.cNodeBaseline,
 			cEntryAggGen:               s.cEntryAggGen,
@@ -688,6 +694,8 @@ func (s *glrStack) clone() glrStack {
 		branchOrder:                s.branchOrder,
 		cRec:                       s.cRec.clone(),
 		cRecoverMissingGroup:       s.cRecoverMissingGroup,
+		cRecoverPendingToken:       s.cRecoverPendingToken,
+		cAcceptOrder:               s.cAcceptOrder,
 		diagnosticTopology:         s.diagnosticTopology,
 		cNodeBaseline:              s.cNodeBaseline,
 		cEntryAggGen:               s.cEntryAggGen,
@@ -711,6 +719,8 @@ func (s *glrStack) cloneWithScratch(scratch *gssScratch) glrStack {
 		branchOrder:                s.branchOrder,
 		cRec:                       s.cRec.clone(),
 		cRecoverMissingGroup:       s.cRecoverMissingGroup,
+		cRecoverPendingToken:       s.cRecoverPendingToken,
+		cAcceptOrder:               s.cAcceptOrder,
 		diagnosticTopology:         s.diagnosticTopology,
 		cNodeBaseline:              s.cNodeBaseline,
 		cEntryAggGen:               s.cEntryAggGen,
@@ -3549,6 +3559,50 @@ func tryGSSMainMergeForParserPhase(p *Parser, a, b *glrStack, phase string, reco
 	return merged
 }
 
+// A shared immutable error prefix has identical recovery history on both
+// paths. Only the clean suffixes may merge; distinct error-bearing payloads
+// and paths that bypass that common prefix remain separate.
+func gssSharedClosedErrorPrefix(scratch *glrMergeScratch, a, b *gssNode) bool {
+	if !compactPackedGSSVersionOrderEnabledForMerge(scratch) {
+		return false
+	}
+	var boundary *gssNode
+	seen := make(map[*gssNode]bool)
+	queue := []*gssNode{a, b}
+	for len(queue) > 0 {
+		n := queue[len(queue)-1]
+		queue = queue[:len(queue)-1]
+		if n == nil {
+			return false
+		}
+		if seen[n] {
+			continue
+		}
+		seen[n] = true
+		if len(seen)&63 == 0 && scratch.parser != nil &&
+			resultMaterializationShouldStop(scratch.parser.resultMaterializationStopReason(scratch.arena)) {
+			return false
+		}
+		if stackEntryHasNode(n.entry) && (stackEntryNodeHasError(n.entry) ||
+			stackEntryNodeIsMissing(n.entry) || stackEntryNodeSymbol(n.entry) == errorSymbol) {
+			if boundary != nil && boundary != n {
+				return false
+			}
+			boundary = n
+			continue
+		}
+		for i := 0; i < n.linkCount(); i++ {
+			prev, entry := n.link(i)
+			if stackEntryHasNode(entry) && (stackEntryNodeHasError(entry) ||
+				stackEntryNodeIsMissing(entry) || stackEntryNodeSymbol(entry) == errorSymbol) {
+				return false
+			}
+			queue = append(queue, prev)
+		}
+	}
+	return boundary != nil
+}
+
 func gssMainCanMergeWithScratch(scratch *glrMergeScratch, a, b *glrStack) bool {
 	if a.gss.head == nil || b.gss.head == nil {
 		return false
@@ -3562,8 +3616,10 @@ func gssMainCanMergeWithScratch(scratch *glrMergeScratch, a, b *glrStack) bool {
 	if a.top().state != b.top().state || a.byteOffset != b.byteOffset {
 		return false
 	}
-	return gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a.gss.head) &&
-		gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b.gss.head)
+	return (gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a.gss.head) &&
+		gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b.gss.head)) ||
+		(a.cRec == nil && b.cRec == nil && !a.cPaused && !b.cPaused &&
+			gssSharedClosedErrorPrefix(scratch, a.gss.head, b.gss.head))
 }
 
 // gssStackCleanZeroErrorAllLinksWithScratch applies the GSS clean-zero gate
@@ -3605,8 +3661,10 @@ func gssMainCanMergeWithScratchPhase(scratch *glrMergeScratch, a, b *glrStack, p
 		workCountRecordGSSReject(workCountParserFromMergeScratch(scratch), phase, workCountConvergenceReasonStatus, "GSS merge state or byte differs", a, b)
 		return false
 	}
-	clean := gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a.gss.head) &&
-		gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b.gss.head)
+	clean := (gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a.gss.head) &&
+		gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b.gss.head)) ||
+		(a.cRec == nil && b.cRec == nil && !a.cPaused && !b.cPaused &&
+			gssSharedClosedErrorPrefix(scratch, a.gss.head, b.gss.head))
 	workCountRecordGSSCleanReject(workCountParserFromMergeScratch(scratch), phase, a, b, clean)
 	return clean
 }
@@ -3637,8 +3695,9 @@ func gssNodesCanMergeWithScratch(scratch *glrMergeScratch, a, b *gssNode) bool {
 	if a.entry.state != b.entry.state {
 		return false
 	}
-	if !gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a) ||
-		!gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b) {
+	if (!gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a) ||
+		!gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b)) &&
+		!gssSharedClosedErrorPrefix(scratch, a, b) {
 		return false
 	}
 	aOffset, aOK := gssNodeUniformByteOffset(a, make(map[*gssNode]bool))
@@ -3891,7 +3950,8 @@ func cStackLinkPayloadsEquivalentAtOffsets(scratch *glrMergeScratch, a, b stackE
 	if !stackEntryHasNode(a) || !stackEntryHasNode(b) {
 		return !stackEntryHasNode(a) && !stackEntryHasNode(b)
 	}
-	// The enclosing GSS merge proves that every link is clean. Do not use
+	// Distinct payloads belong to the clean suffix; a shared error prefix
+	// matched by identity above. Do not use
 	// rawStackEntryErrorCost for C's positive-error shortcut: that Go walk uses
 	// flattened arity and does not price a raw error leaf as C does.
 	aHeader, aHeaderOK := cStackLinkPayloadHeader(scratch, a)
@@ -4673,7 +4733,8 @@ func (p *gssMainPreflight) nodesCanMerge(a, b *gssNode) bool {
 	if a.entry.state != b.entry.state {
 		return false
 	}
-	if !p.cleanZeroErrorAllLinks(a) || !p.cleanZeroErrorAllLinks(b) {
+	if (!p.cleanZeroErrorAllLinks(a) || !p.cleanZeroErrorAllLinks(b)) &&
+		!gssSharedClosedErrorPrefix(p.scratch, a, b) {
 		return false
 	}
 	aOffset, aOK := p.uniformByteOffset(a, p.acquireOffsetSeen())

@@ -61,7 +61,7 @@ const (
 
 func normalizeCSharpCompatibility(root *Node, source []byte, p *Parser, lang *Language) {
 	missing := csharpMissingNativeResultCompatibility(lang)
-	nativeRecoveredStructure := nativeRecoveredStructureIsAuthoritative(root, source, p, lang)
+	nativeRecoveredStructure := nativeRecoveredStructureIsAuthoritative(root, source, p, lang) || (root != nil && root.HasError())
 	if p != nil {
 		p.normalizationStats.nativeRecoveredStructureAuthoritative = nativeRecoveredStructure
 	}

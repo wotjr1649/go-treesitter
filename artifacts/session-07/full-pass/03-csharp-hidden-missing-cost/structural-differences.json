@@ -1,0 +1,2041 @@
+[
+  {
+    "id": "JsonTextReader-excerpt.cs",
+    "blocks": [
+      {
+        "action": "replace",
+        "go_range": [
+          5,
+          6
+        ],
+        "c_range": [
+          5,
+          6
+        ],
+        "go": [
+          {
+            "Type": "namespace_declaration",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 281,
+            "EndByte": 12407,
+            "StartPoint": {
+              "Row": 4,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 376,
+              "Column": 1
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "namespace_declaration",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 281,
+            "EndByte": 12405,
+            "StartPoint": {
+              "Row": 4,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 375,
+              "Column": 5
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          11,
+          12
+        ],
+        "c_range": [
+          11,
+          12
+        ],
+        "go": [
+          {
+            "Type": "declaration_list",
+            "Field": "body",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 307,
+            "EndByte": 12407,
+            "StartPoint": {
+              "Row": 5,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 376,
+              "Column": 1
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "declaration_list",
+            "Field": "body",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 307,
+            "EndByte": 12405,
+            "StartPoint": {
+              "Row": 5,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 375,
+              "Column": 5
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          57,
+          58
+        ],
+        "c_range": [
+          57,
+          58
+        ],
+        "go": [
+          {
+            "Type": "class_declaration",
+            "Field": "",
+            "Parent": 11,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 742,
+            "EndByte": 12405,
+            "StartPoint": {
+              "Row": 25,
+              "Column": 4
+            },
+            "EndPoint": {
+              "Row": 375,
+              "Column": 5
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "class_declaration",
+            "Field": "",
+            "Parent": 11,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 742,
+            "EndByte": 6962,
+            "StartPoint": {
+              "Row": 25,
+              "Column": 4
+            },
+            "EndPoint": {
+              "Row": 212,
+              "Column": 9
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          69,
+          70
+        ],
+        "c_range": [
+          69,
+          70
+        ],
+        "go": [
+          {
+            "Type": "declaration_list",
+            "Field": "body",
+            "Parent": 57,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 810,
+            "EndByte": 12405,
+            "StartPoint": {
+              "Row": 26,
+              "Column": 4
+            },
+            "EndPoint": {
+              "Row": 375,
+              "Column": 5
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "declaration_list",
+            "Field": "body",
+            "Parent": 57,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 810,
+            "EndByte": 6962,
+            "StartPoint": {
+              "Row": 26,
+              "Column": 4
+            },
+            "EndPoint": {
+              "Row": 212,
+              "Column": 9
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          626,
+          627
+        ],
+        "c_range": [
+          626,
+          627
+        ],
+        "go": [
+          {
+            "Type": "method_declaration",
+            "Field": "",
+            "Parent": 69,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 3752,
+            "EndByte": 6962,
+            "StartPoint": {
+              "Row": 134,
+              "Column": 8
+            },
+            "EndPoint": {
+              "Row": 212,
+              "Column": 9
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "method_declaration",
+            "Field": "",
+            "Parent": 69,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 3752,
+            "EndByte": 6952,
+            "StartPoint": {
+              "Row": 134,
+              "Column": 8
+            },
+            "EndPoint": {
+              "Row": 211,
+              "Column": 13
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          641,
+          642
+        ],
+        "c_range": [
+          641,
+          642
+        ],
+        "go": [
+          {
+            "Type": "block",
+            "Field": "body",
+            "Parent": 626,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 3820,
+            "EndByte": 6962,
+            "StartPoint": {
+              "Row": 135,
+              "Column": 8
+            },
+            "EndPoint": {
+              "Row": 212,
+              "Column": 9
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "block",
+            "Field": "body",
+            "Parent": 626,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 3820,
+            "EndByte": 6952,
+            "StartPoint": {
+              "Row": 135,
+              "Column": 8
+            },
+            "EndPoint": {
+              "Row": 211,
+              "Column": 13
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          653,
+          654
+        ],
+        "c_range": [
+          653,
+          654
+        ],
+        "go": [
+          {
+            "Type": "switch_statement",
+            "Field": "",
+            "Parent": 641,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 3873,
+            "EndByte": 6952,
+            "StartPoint": {
+              "Row": 138,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 211,
+              "Column": 13
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "switch_statement",
+            "Field": "",
+            "Parent": 641,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 3873,
+            "EndByte": 6786,
+            "StartPoint": {
+              "Row": 138,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 206,
+              "Column": 21
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          658,
+          659
+        ],
+        "c_range": [
+          658,
+          659
+        ],
+        "go": [
+          {
+            "Type": "switch_body",
+            "Field": "body",
+            "Parent": 653,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 3903,
+            "EndByte": 6952,
+            "StartPoint": {
+              "Row": 139,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 211,
+              "Column": 13
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "switch_body",
+            "Field": "body",
+            "Parent": 653,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 3903,
+            "EndByte": 6786,
+            "StartPoint": {
+              "Row": 139,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 206,
+              "Column": 21
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          825,
+          828
+        ],
+        "c_range": [
+          825,
+          828
+        ],
+        "go": [
+          {
+            "Type": "type_pattern",
+            "Field": "",
+            "Parent": 823,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 4709,
+            "EndByte": 4730,
+            "StartPoint": {
+              "Row": 158,
+              "Column": 21
+            },
+            "EndPoint": {
+              "Row": 158,
+              "Column": 42
+            }
+          },
+          {
+            "Type": "qualified_name",
+            "Field": "type",
+            "Parent": 825,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 4709,
+            "EndByte": 4730,
+            "StartPoint": {
+              "Row": 158,
+              "Column": 21
+            },
+            "EndPoint": {
+              "Row": 158,
+              "Column": 42
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "qualifier",
+            "Parent": 826,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 4709,
+            "EndByte": 4717,
+            "StartPoint": {
+              "Row": 158,
+              "Column": 21
+            },
+            "EndPoint": {
+              "Row": 158,
+              "Column": 29
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "constant_pattern",
+            "Field": "",
+            "Parent": 823,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 4709,
+            "EndByte": 4730,
+            "StartPoint": {
+              "Row": 158,
+              "Column": 21
+            },
+            "EndPoint": {
+              "Row": 158,
+              "Column": 42
+            }
+          },
+          {
+            "Type": "member_access_expression",
+            "Field": "",
+            "Parent": 825,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 4709,
+            "EndByte": 4730,
+            "StartPoint": {
+              "Row": 158,
+              "Column": 21
+            },
+            "EndPoint": {
+              "Row": 158,
+              "Column": 42
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "expression",
+            "Parent": 826,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 4709,
+            "EndByte": 4717,
+            "StartPoint": {
+              "Row": 158,
+              "Column": 21
+            },
+            "EndPoint": {
+              "Row": 158,
+              "Column": 29
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          902,
+          903
+        ],
+        "c_range": [
+          902,
+          903
+        ],
+        "go": [
+          {
+            "Type": "switch_section",
+            "Field": "",
+            "Parent": 658,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5150,
+            "EndByte": 6938,
+            "StartPoint": {
+              "Row": 169,
+              "Column": 16
+            },
+            "EndPoint": {
+              "Row": 210,
+              "Column": 26
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "switch_section",
+            "Field": "",
+            "Parent": 658,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5150,
+            "EndByte": 6764,
+            "StartPoint": {
+              "Row": 169,
+              "Column": 16
+            },
+            "EndPoint": {
+              "Row": 205,
+              "Column": 6
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          905,
+          906
+        ],
+        "c_range": [
+          905,
+          906
+        ],
+        "go": [
+          {
+            "Type": "if_statement",
+            "Field": "",
+            "Parent": 902,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5179,
+            "EndByte": 6786,
+            "StartPoint": {
+              "Row": 170,
+              "Column": 20
+            },
+            "EndPoint": {
+              "Row": 206,
+              "Column": 21
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "if_statement",
+            "Field": "",
+            "Parent": 902,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5179,
+            "EndByte": 5896,
+            "StartPoint": {
+              "Row": 170,
+              "Column": 20
+            },
+            "EndPoint": {
+              "Row": 186,
+              "Column": 25
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          916,
+          917
+        ],
+        "c_range": [
+          916,
+          917
+        ],
+        "go": [
+          {
+            "Type": "block",
+            "Field": "consequence",
+            "Parent": 905,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5249,
+            "EndByte": 6786,
+            "StartPoint": {
+              "Row": 171,
+              "Column": 20
+            },
+            "EndPoint": {
+              "Row": 206,
+              "Column": 21
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "block",
+            "Field": "consequence",
+            "Parent": 905,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5249,
+            "EndByte": 5896,
+            "StartPoint": {
+              "Row": 171,
+              "Column": 20
+            },
+            "EndPoint": {
+              "Row": 186,
+              "Column": 25
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          978,
+          981
+        ],
+        "c_range": [
+          978,
+          982
+        ],
+        "go": [
+          {
+            "Type": "ERROR",
+            "Field": "",
+            "Parent": 916,
+            "Named": true,
+            "Extra": true,
+            "Missing": false,
+            "Error": true,
+            "StartByte": 5772,
+            "EndByte": 5776,
+            "StartPoint": {
+              "Row": 183,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 183,
+              "Column": 28
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "",
+            "Parent": 978,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5772,
+            "EndByte": 5776,
+            "StartPoint": {
+              "Row": 183,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 183,
+              "Column": 28
+            }
+          },
+          {
+            "Type": "block",
+            "Field": "",
+            "Parent": 916,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5801,
+            "EndByte": 5896,
+            "StartPoint": {
+              "Row": 184,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 186,
+              "Column": 25
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "local_declaration_statement",
+            "Field": "",
+            "Parent": 916,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5772,
+            "EndByte": 5870,
+            "StartPoint": {
+              "Row": 183,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 185,
+              "Column": 67
+            }
+          },
+          {
+            "Type": "variable_declaration",
+            "Field": "",
+            "Parent": 978,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5772,
+            "EndByte": 5869,
+            "StartPoint": {
+              "Row": 183,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 185,
+              "Column": 66
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "type",
+            "Parent": 979,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5772,
+            "EndByte": 5776,
+            "StartPoint": {
+              "Row": 183,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 183,
+              "Column": 28
+            }
+          },
+          {
+            "Type": "ERROR",
+            "Field": "",
+            "Parent": 979,
+            "Named": true,
+            "Extra": true,
+            "Missing": false,
+            "Error": true,
+            "StartByte": 5801,
+            "EndByte": 5802,
+            "StartPoint": {
+              "Row": 184,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 184,
+              "Column": 25
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          982,
+          987
+        ],
+        "c_range": [
+          983,
+          987
+        ],
+        "go": [
+          {
+            "Type": "expression_statement",
+            "Field": "",
+            "Parent": 980,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5831,
+            "EndByte": 5870,
+            "StartPoint": {
+              "Row": 185,
+              "Column": 28
+            },
+            "EndPoint": {
+              "Row": 185,
+              "Column": 67
+            }
+          },
+          {
+            "Type": "assignment_expression",
+            "Field": "",
+            "Parent": 982,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5831,
+            "EndByte": 5869,
+            "StartPoint": {
+              "Row": 185,
+              "Column": 28
+            },
+            "EndPoint": {
+              "Row": 185,
+              "Column": 66
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "left",
+            "Parent": 983,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5831,
+            "EndByte": 5848,
+            "StartPoint": {
+              "Row": 185,
+              "Column": 28
+            },
+            "EndPoint": {
+              "Row": 185,
+              "Column": 45
+            }
+          },
+          {
+            "Type": "=",
+            "Field": "operator",
+            "Parent": 983,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5849,
+            "EndByte": 5850,
+            "StartPoint": {
+              "Row": 185,
+              "Column": 46
+            },
+            "EndPoint": {
+              "Row": 185,
+              "Column": 47
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "right",
+            "Parent": 983,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5851,
+            "EndByte": 5869,
+            "StartPoint": {
+              "Row": 185,
+              "Column": 48
+            },
+            "EndPoint": {
+              "Row": 185,
+              "Column": 66
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "variable_declarator",
+            "Field": "",
+            "Parent": 979,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5831,
+            "EndByte": 5869,
+            "StartPoint": {
+              "Row": 185,
+              "Column": 28
+            },
+            "EndPoint": {
+              "Row": 185,
+              "Column": 66
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "name",
+            "Parent": 983,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5831,
+            "EndByte": 5848,
+            "StartPoint": {
+              "Row": 185,
+              "Column": 28
+            },
+            "EndPoint": {
+              "Row": 185,
+              "Column": 45
+            }
+          },
+          {
+            "Type": "=",
+            "Field": "",
+            "Parent": 983,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5849,
+            "EndByte": 5850,
+            "StartPoint": {
+              "Row": 185,
+              "Column": 46
+            },
+            "EndPoint": {
+              "Row": 185,
+              "Column": 47
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "",
+            "Parent": 983,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5851,
+            "EndByte": 5869,
+            "StartPoint": {
+              "Row": 185,
+              "Column": 48
+            },
+            "EndPoint": {
+              "Row": 185,
+              "Column": 66
+            }
+          }
+        ]
+      },
+      {
+        "action": "insert",
+        "go_range": [
+          2090,
+          2090
+        ],
+        "c_range": [
+          2090,
+          2091
+        ],
+        "go": [],
+        "c": [
+          {
+            "Type": "ERROR",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": true,
+            "Missing": false,
+            "Error": true,
+            "StartByte": 12406,
+            "EndByte": 12407,
+            "StartPoint": {
+              "Row": 376,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 376,
+              "Column": 1
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "CS-excerpt-no-enum",
+    "blocks": [
+      {
+        "action": "replace",
+        "go_range": [
+          5,
+          6
+        ],
+        "c_range": [
+          5,
+          6
+        ],
+        "go": [
+          {
+            "Type": "namespace_declaration",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 281,
+            "EndByte": 12114,
+            "StartPoint": {
+              "Row": 4,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 360,
+              "Column": 1
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "namespace_declaration",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 281,
+            "EndByte": 12112,
+            "StartPoint": {
+              "Row": 4,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 359,
+              "Column": 5
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          11,
+          12
+        ],
+        "c_range": [
+          11,
+          12
+        ],
+        "go": [
+          {
+            "Type": "declaration_list",
+            "Field": "body",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 307,
+            "EndByte": 12114,
+            "StartPoint": {
+              "Row": 5,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 360,
+              "Column": 1
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "declaration_list",
+            "Field": "body",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 307,
+            "EndByte": 12112,
+            "StartPoint": {
+              "Row": 5,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 359,
+              "Column": 5
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          16,
+          17
+        ],
+        "c_range": [
+          16,
+          17
+        ],
+        "go": [
+          {
+            "Type": "class_declaration",
+            "Field": "",
+            "Parent": 11,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 449,
+            "EndByte": 12112,
+            "StartPoint": {
+              "Row": 9,
+              "Column": 4
+            },
+            "EndPoint": {
+              "Row": 359,
+              "Column": 5
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "class_declaration",
+            "Field": "",
+            "Parent": 11,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 449,
+            "EndByte": 6669,
+            "StartPoint": {
+              "Row": 9,
+              "Column": 4
+            },
+            "EndPoint": {
+              "Row": 196,
+              "Column": 9
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          28,
+          29
+        ],
+        "c_range": [
+          28,
+          29
+        ],
+        "go": [
+          {
+            "Type": "declaration_list",
+            "Field": "body",
+            "Parent": 16,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 517,
+            "EndByte": 12112,
+            "StartPoint": {
+              "Row": 10,
+              "Column": 4
+            },
+            "EndPoint": {
+              "Row": 359,
+              "Column": 5
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "declaration_list",
+            "Field": "body",
+            "Parent": 16,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 517,
+            "EndByte": 6669,
+            "StartPoint": {
+              "Row": 10,
+              "Column": 4
+            },
+            "EndPoint": {
+              "Row": 196,
+              "Column": 9
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          585,
+          586
+        ],
+        "c_range": [
+          585,
+          586
+        ],
+        "go": [
+          {
+            "Type": "method_declaration",
+            "Field": "",
+            "Parent": 28,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 3459,
+            "EndByte": 6669,
+            "StartPoint": {
+              "Row": 118,
+              "Column": 8
+            },
+            "EndPoint": {
+              "Row": 196,
+              "Column": 9
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "method_declaration",
+            "Field": "",
+            "Parent": 28,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 3459,
+            "EndByte": 6659,
+            "StartPoint": {
+              "Row": 118,
+              "Column": 8
+            },
+            "EndPoint": {
+              "Row": 195,
+              "Column": 13
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          600,
+          601
+        ],
+        "c_range": [
+          600,
+          601
+        ],
+        "go": [
+          {
+            "Type": "block",
+            "Field": "body",
+            "Parent": 585,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 3527,
+            "EndByte": 6669,
+            "StartPoint": {
+              "Row": 119,
+              "Column": 8
+            },
+            "EndPoint": {
+              "Row": 196,
+              "Column": 9
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "block",
+            "Field": "body",
+            "Parent": 585,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 3527,
+            "EndByte": 6659,
+            "StartPoint": {
+              "Row": 119,
+              "Column": 8
+            },
+            "EndPoint": {
+              "Row": 195,
+              "Column": 13
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          612,
+          613
+        ],
+        "c_range": [
+          612,
+          613
+        ],
+        "go": [
+          {
+            "Type": "switch_statement",
+            "Field": "",
+            "Parent": 600,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 3580,
+            "EndByte": 6659,
+            "StartPoint": {
+              "Row": 122,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 195,
+              "Column": 13
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "switch_statement",
+            "Field": "",
+            "Parent": 600,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 3580,
+            "EndByte": 6493,
+            "StartPoint": {
+              "Row": 122,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 190,
+              "Column": 21
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          617,
+          618
+        ],
+        "c_range": [
+          617,
+          618
+        ],
+        "go": [
+          {
+            "Type": "switch_body",
+            "Field": "body",
+            "Parent": 612,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 3610,
+            "EndByte": 6659,
+            "StartPoint": {
+              "Row": 123,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 195,
+              "Column": 13
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "switch_body",
+            "Field": "body",
+            "Parent": 612,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 3610,
+            "EndByte": 6493,
+            "StartPoint": {
+              "Row": 123,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 190,
+              "Column": 21
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          861,
+          862
+        ],
+        "c_range": [
+          861,
+          862
+        ],
+        "go": [
+          {
+            "Type": "switch_section",
+            "Field": "",
+            "Parent": 617,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 4857,
+            "EndByte": 6645,
+            "StartPoint": {
+              "Row": 153,
+              "Column": 16
+            },
+            "EndPoint": {
+              "Row": 194,
+              "Column": 26
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "switch_section",
+            "Field": "",
+            "Parent": 617,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 4857,
+            "EndByte": 6471,
+            "StartPoint": {
+              "Row": 153,
+              "Column": 16
+            },
+            "EndPoint": {
+              "Row": 189,
+              "Column": 6
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          864,
+          865
+        ],
+        "c_range": [
+          864,
+          865
+        ],
+        "go": [
+          {
+            "Type": "if_statement",
+            "Field": "",
+            "Parent": 861,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 4886,
+            "EndByte": 6493,
+            "StartPoint": {
+              "Row": 154,
+              "Column": 20
+            },
+            "EndPoint": {
+              "Row": 190,
+              "Column": 21
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "if_statement",
+            "Field": "",
+            "Parent": 861,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 4886,
+            "EndByte": 5603,
+            "StartPoint": {
+              "Row": 154,
+              "Column": 20
+            },
+            "EndPoint": {
+              "Row": 170,
+              "Column": 25
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          875,
+          876
+        ],
+        "c_range": [
+          875,
+          876
+        ],
+        "go": [
+          {
+            "Type": "block",
+            "Field": "consequence",
+            "Parent": 864,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 4956,
+            "EndByte": 6493,
+            "StartPoint": {
+              "Row": 155,
+              "Column": 20
+            },
+            "EndPoint": {
+              "Row": 190,
+              "Column": 21
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "block",
+            "Field": "consequence",
+            "Parent": 864,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 4956,
+            "EndByte": 5603,
+            "StartPoint": {
+              "Row": 155,
+              "Column": 20
+            },
+            "EndPoint": {
+              "Row": 170,
+              "Column": 25
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          937,
+          940
+        ],
+        "c_range": [
+          937,
+          941
+        ],
+        "go": [
+          {
+            "Type": "ERROR",
+            "Field": "",
+            "Parent": 875,
+            "Named": true,
+            "Extra": true,
+            "Missing": false,
+            "Error": true,
+            "StartByte": 5479,
+            "EndByte": 5483,
+            "StartPoint": {
+              "Row": 167,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 167,
+              "Column": 28
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "",
+            "Parent": 937,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5479,
+            "EndByte": 5483,
+            "StartPoint": {
+              "Row": 167,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 167,
+              "Column": 28
+            }
+          },
+          {
+            "Type": "block",
+            "Field": "",
+            "Parent": 875,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5508,
+            "EndByte": 5603,
+            "StartPoint": {
+              "Row": 168,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 170,
+              "Column": 25
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "local_declaration_statement",
+            "Field": "",
+            "Parent": 875,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5479,
+            "EndByte": 5577,
+            "StartPoint": {
+              "Row": 167,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 169,
+              "Column": 67
+            }
+          },
+          {
+            "Type": "variable_declaration",
+            "Field": "",
+            "Parent": 937,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5479,
+            "EndByte": 5576,
+            "StartPoint": {
+              "Row": 167,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 169,
+              "Column": 66
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "type",
+            "Parent": 938,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5479,
+            "EndByte": 5483,
+            "StartPoint": {
+              "Row": 167,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 167,
+              "Column": 28
+            }
+          },
+          {
+            "Type": "ERROR",
+            "Field": "",
+            "Parent": 938,
+            "Named": true,
+            "Extra": true,
+            "Missing": false,
+            "Error": true,
+            "StartByte": 5508,
+            "EndByte": 5509,
+            "StartPoint": {
+              "Row": 168,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 168,
+              "Column": 25
+            }
+          }
+        ]
+      },
+      {
+        "action": "replace",
+        "go_range": [
+          941,
+          946
+        ],
+        "c_range": [
+          942,
+          946
+        ],
+        "go": [
+          {
+            "Type": "expression_statement",
+            "Field": "",
+            "Parent": 939,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5538,
+            "EndByte": 5577,
+            "StartPoint": {
+              "Row": 169,
+              "Column": 28
+            },
+            "EndPoint": {
+              "Row": 169,
+              "Column": 67
+            }
+          },
+          {
+            "Type": "assignment_expression",
+            "Field": "",
+            "Parent": 941,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5538,
+            "EndByte": 5576,
+            "StartPoint": {
+              "Row": 169,
+              "Column": 28
+            },
+            "EndPoint": {
+              "Row": 169,
+              "Column": 66
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "left",
+            "Parent": 942,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5538,
+            "EndByte": 5555,
+            "StartPoint": {
+              "Row": 169,
+              "Column": 28
+            },
+            "EndPoint": {
+              "Row": 169,
+              "Column": 45
+            }
+          },
+          {
+            "Type": "=",
+            "Field": "operator",
+            "Parent": 942,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5556,
+            "EndByte": 5557,
+            "StartPoint": {
+              "Row": 169,
+              "Column": 46
+            },
+            "EndPoint": {
+              "Row": 169,
+              "Column": 47
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "right",
+            "Parent": 942,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5558,
+            "EndByte": 5576,
+            "StartPoint": {
+              "Row": 169,
+              "Column": 48
+            },
+            "EndPoint": {
+              "Row": 169,
+              "Column": 66
+            }
+          }
+        ],
+        "c": [
+          {
+            "Type": "variable_declarator",
+            "Field": "",
+            "Parent": 938,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5538,
+            "EndByte": 5576,
+            "StartPoint": {
+              "Row": 169,
+              "Column": 28
+            },
+            "EndPoint": {
+              "Row": 169,
+              "Column": 66
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "name",
+            "Parent": 942,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5538,
+            "EndByte": 5555,
+            "StartPoint": {
+              "Row": 169,
+              "Column": 28
+            },
+            "EndPoint": {
+              "Row": 169,
+              "Column": 45
+            }
+          },
+          {
+            "Type": "=",
+            "Field": "",
+            "Parent": 942,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5556,
+            "EndByte": 5557,
+            "StartPoint": {
+              "Row": 169,
+              "Column": 46
+            },
+            "EndPoint": {
+              "Row": 169,
+              "Column": 47
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "",
+            "Parent": 942,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5558,
+            "EndByte": 5576,
+            "StartPoint": {
+              "Row": 169,
+              "Column": 48
+            },
+            "EndPoint": {
+              "Row": 169,
+              "Column": 66
+            }
+          }
+        ]
+      },
+      {
+        "action": "insert",
+        "go_range": [
+          2049,
+          2049
+        ],
+        "c_range": [
+          2049,
+          2050
+        ],
+        "go": [],
+        "c": [
+          {
+            "Type": "ERROR",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": true,
+            "Missing": false,
+            "Error": true,
+            "StartByte": 12113,
+            "EndByte": 12114,
+            "StartPoint": {
+              "Row": 360,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 360,
+              "Column": 1
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

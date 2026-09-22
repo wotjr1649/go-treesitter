@@ -256,7 +256,7 @@ Phase 2 logs and its fresh C receipts bind the comparison independently of
 Session 05. No numeric-symbol, separate alias metadata, query or incremental
 C-comparison claim is made. Product baseline remains unchanged.
 
-## KR-0002 — C# excerpt recovery structure differs
+## KR-0002 — retired: C# recovery candidate ordering
 
 | Field | Value |
 |---|---|
@@ -289,6 +289,15 @@ guard makes the enum-only control agree, but leaves 19 structural difference
 blocks in the full excerpt. This is a causal diagnosis, not a complete patch;
 neither diagnostic change is adopted. Exact traces, identities and rejected
 experiments are retained in that phase. The signature above is unchanged.
+
+Full-pass product retirement: the internal carrier now retains the pending
+lookahead of a missing-token sibling, preserves the C version ordering, counts
+hidden missing leaves, merges only clean suffixes over an identical closed
+error prefix, and orders tied positive-cost results by actual acceptance time.
+The original excerpt now matches all 2,092 C nodes and the existing no-enum
+control matches all 2,051. The 33-record order catalog and retained invariant
+checks enforce these cases. Origin, grammar blob and C epoch are unchanged.
+Historical statements above describe the original failure, not the carrier.
 
 ## KR-0003 — TypeScript/TSX upstream grammar patch difference (retired)
 
@@ -329,7 +338,7 @@ the old identity. Current tests require exact clean agreement instead of a
 known-difference exception. This retirement does not widen KR-0001 or KR-0002
 and does not approve a release.
 
-## KR-0004 — C# source reconstruction hides a recovery error
+## KR-0004 — retired: C# reconstruction error preservation
 
 | Field | Value |
 |---|---|
@@ -399,3 +408,13 @@ contained a missing `;` at byte 335 (row 6, column 26), yielding
 adapter test covers that receipt (E3). This is not a new ratchet or a claim of
 C# oracle agreement; C# differential diagnosis remains open. Node/token counts
 and outcome were unchanged across cells. See Phase 3 evidence for conditions.
+
+Full-pass product retirement: source-based C# reconstruction no longer replaces
+an error-bearing native tree. The 41-record preservation catalog requires exact
+C nodes, error/missing flags, source ranges and all 40 edit comparisons. Private
+core changes alone fixed the original large witness but still let reconstruction
+clear errors on smaller variants; that failed intermediate run is preserved.
+The independently inventoried KR-0002 and KR-0004 patches therefore form one
+verified product commit. Original signature JSON and C evidence are retained;
+neither C# case is an active exception. Release-wide platform, licensing and
+resource gates still have their own completion requirements.

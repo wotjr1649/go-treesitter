@@ -2130,6 +2130,9 @@ func (p *Parser) cNodeErrorCost(n *Node) uint32 {
 		if n.isMissing() {
 			return cErrCostPerMissingTree + cErrCostPerRecovery
 		}
+		if n.rawShape != 0 && n.rawShape != rawShapeZeroChildRef {
+			return p.rawStackEntryErrorCost(n.ownerArena, newStackEntryNode(n.parseState, n))
+		}
 		return 0
 	}
 	if len(p.cNodeMemoCache) == 0 {
@@ -2204,6 +2207,8 @@ func (p *Parser) cNodeErrorCostAndVisibleSubtreeCount(n *Node) (uint32, int) {
 		var cost uint32
 		if n.isMissing() {
 			cost = cErrCostPerMissingTree + cErrCostPerRecovery
+		} else if n.rawShape != 0 && n.rawShape != rawShapeZeroChildRef {
+			cost = p.rawStackEntryErrorCost(n.ownerArena, newStackEntryNode(n.parseState, n))
 		}
 		visible := 0
 		if p.cSymbolVisible(n.symbol) {
@@ -3888,8 +3893,12 @@ func (p *Parser) cHandleError(stacks *[]glrStack, si int, source []byte, tok Tok
 		}
 		missingVersions[vi].branchOrder = (*stacks)[si].branchOrder
 		missingVersions[vi].cRecoverMissingGroup = group
+		// C resumes recovery at the end of a version round. Its next round
+		// advances the absorber before the newly created missing sibling.
+		// Queue this lookahead so the shared-token loop preserves that order.
+		missingVersions[vi].cRecoverPendingToken = &tok
+		missingVersions[vi].shifted = true
 		*stacks = append(*stacks, missingVersions[vi])
-		needsRedispatch = true
 	}
 
 	// 4. Run recover for the current lookahead across the absorbing group.
@@ -4401,7 +4410,7 @@ func (p *Parser) cRecoverEOFAccept(v *glrStack, tok Token, nodeCount *int, arena
 	if debugRecoveryCycleChecks {
 		debugRecoveryCheckNodeAcyclic(p, arena, "recover-eof-accept-root", root)
 	}
-	v.accepted = true
+	p.acceptStack(v)
 	v.shifted = true
 	workCountTopologyRetireVersion(v)
 }

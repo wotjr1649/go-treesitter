@@ -1,0 +1,25 @@
+{
+  "command": [
+    "python",
+    ".scratch/full-pass/reduce-csharp-else-tokens.py"
+  ],
+  "candidate_commit": "8b0eca02cf987a7d7aaf33f3bde040444cf59e96",
+  "status_before": " M internal/gtsadapter/adapter.go\n M syntax/result.go\n M syntax/result_test.go\n?? artifacts/session-07/full-pass/02-product-runtime/catalog-notices/\n?? artifacts/session-07/full-pass/03-csharp-exact-selection/\n?? artifacts/session-07/full-pass/03-csharp-hidden-missing-cost/\n?? artifacts/session-07/full-pass/03-csharp-order/\n?? artifacts/session-07/full-pass/03-csharp-pattern-trace/\n?? artifacts/session-07/full-pass/03-csharp-pending-raw/\n?? artifacts/session-07/full-pass/03-csharp-pending/\n?? artifacts/session-07/full-pass/03-csharp-preserve-errors/\n?? artifacts/session-07/full-pass/03-csharp-raw-recovery-cost/\n?? artifacts/session-07/full-pass/03-csharp-recovered-conflicts/\n?? artifacts/session-07/full-pass/03-csharp-repeat-order/\n?? artifacts/session-07/full-pass/03-csharp-selection-trace/\n?? artifacts/session-07/full-pass/03-csharp-transaction-candidate/\n?? artifacts/session-07/full-pass/03-csharp-transaction-raw/\n?? artifacts/session-07/full-pass/04-catalog/build-cobol-oracle.json\n?? artifacts/session-07/full-pass/04-catalog/build-diagnostics.json\n?? artifacts/session-07/full-pass/04-catalog/build.json\n?? artifacts/session-07/full-pass/04-catalog/cases.json\n?? artifacts/session-07/full-pass/04-catalog/cobol-c-oracle.json\n?? artifacts/session-07/full-pass/04-catalog/comparison.json\n?? artifacts/session-07/full-pass/04-catalog/diagnostics-cobol.json\n?? artifacts/session-07/full-pass/04-catalog/diagnostics-cpp.json\n?? artifacts/session-07/full-pass/04-catalog/gofmt-diagnostics.json\n?? artifacts/session-07/full-pass/additional-grammar-acquisition.json\n?? artifacts/session-07/full-pass/catalog-basic.json\n?? artifacts/session-07/full-pass/catalog-diagnostics.json\n?? artifacts/session-07/full-pass/catalog-final-paths.json\n?? artifacts/session-07/full-pass/catalog-notice-acquisition.json\n?? artifacts/session-07/full-pass/catalog-notice-followup.json\n?? artifacts/session-07/full-pass/catalog-notice-metadata.json\n?? artifacts/session-07/full-pass/cobol-c-oracle.json\n?? artifacts/session-07/full-pass/csharp-else-reduction.json\n?? artifacts/session-07/full-pass/csharp-exact-selection.json\n?? artifacts/session-07/full-pass/csharp-hidden-missing-cost.json\n?? artifacts/session-07/full-pass/csharp-minimal-patterns.json\n?? artifacts/session-07/full-pass/csharp-order-experiment.json\n?? artifacts/session-07/full-pass/csharp-pattern-trace.json\n?? artifacts/session-07/full-pass/csharp-pending-experiment-02.json\n?? artifacts/session-07/full-pass/csharp-pending-experiment.json\n?? artifacts/session-07/full-pass/csharp-pending-raw.json\n?? artifacts/session-07/full-pass/csharp-preprocessor-cases.json\n?? artifacts/session-07/full-pass/csharp-preserve-errors.json\n?? artifacts/session-07/full-pass/csharp-raw-recovery-cost.json\n?? artifacts/session-07/full-pass/csharp-recovered-conflicts.json\n?? artifacts/session-07/full-pass/csharp-repeat-order.json\n?? artifacts/session-07/full-pass/csharp-selection-trace.json\n?? artifacts/session-07/full-pass/csharp-transaction-candidate.json\n?? artifacts/session-07/full-pass/csharp-transaction-observe.json\n?? artifacts/session-07/full-pass/csharp-transaction-raw.json\n?? artifacts/session-07/full-pass/csharp-zero-reduction.json\n?? artifacts/session-07/full-pass/eof-coverage-tests.json\n?? tools/catalog/\n",
+  "started_unix": 1790094627.7662656,
+  "elapsed_seconds": 78.80641222000122,
+  "exit": 1,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "30d57306385e4e03cedf5071baaf9a84b981a7446c07d4d1536bbfa3f043d767"
+  },
+  "log_sha256": "631719503c6b8f2f8124543eb0098f19dc67974928f885f5fd6de7371c6d0413"
+}

@@ -301,7 +301,8 @@ def compare(left, right, cases_path=ROOT / 'testdata/oracle/cases.json'):
                 continue
             r = read_json(path)
             if (r['build_sha256'] != build_hash or r['schema'] != 1 or
-                    r['start'] != 0 or r['end'] != r['input_bytes'] or not r['nodes'] or
+                    r['start'] > r['end'] or r['end'] != r['input_bytes'] or not r['nodes'] or
+                    r['nodes'][0]['StartByte'] != r['start'] or r['nodes'][0]['EndByte'] != r['end'] or
                     r['nodes_sha256'] != sha(json.dumps(r['nodes'], ensure_ascii=False, separators=(',', ':')).encode())):
                 raise ValueError('invalid or incomplete C receipt')
             if r['fixture'] in records or name != r['fixture'] + '.json':

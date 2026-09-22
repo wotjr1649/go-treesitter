@@ -114,9 +114,12 @@ over all seven routes, including UTF-8/CRLF and wide sibling boundaries.
 Eight further TypeScript/TSX controls now agree with the officially adopted C
 grammar built with the complete maintained upstream patch. KR-0003 is retired;
 the original unpatched C evidence is preserved.
-The C# recovery reduction in KR-0004 also shows that `accepted_clean` can hide
-upstream recovery differences. C# remains blocked for release despite the
-adapter's complete diagnostic checks.
+The C# recovery changes preserve missing-token scheduling, ambiguity over a
+shared error history and the order in which results were accepted. Source-based
+reconstruction preserves error-bearing trees. The retained C# catalogs add 74
+fresh records and 72 edits, including reduced inputs, identifier changes,
+Unicode, CRLF and the original real-world excerpts. Original KR-0002/KR-0004
+failure evidence remains available; those inputs now require exact C agreement.
 
 The library's own code is [MIT licensed](LICENSE). See
 [third-party notices](THIRD_PARTY_NOTICES.md) for the pinned runtime, assessed

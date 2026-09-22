@@ -2744,9 +2744,17 @@ func (p *Parser) applyReduceActionDispatch(source []byte, s *glrStack, act Parse
 	}
 }
 
+func (p *Parser) acceptStack(s *glrStack) {
+	if !s.accepted && p != nil {
+		p.cNextAcceptOrder++
+		s.cAcceptOrder = p.cNextAcceptOrder
+	}
+	s.accepted = true
+}
+
 func (p *Parser) applyAcceptAction(s *glrStack) {
 	workCountRecordAccept()
-	s.accepted = true
+	p.acceptStack(s)
 	workCountRecordAcceptedHead(p, s, "parse-action accept")
 	if p != nil && p.glrTrace {
 		fmt.Printf("      -> ACCEPT\n")
@@ -2756,7 +2764,7 @@ func (p *Parser) applyAcceptAction(s *glrStack) {
 func (p *Parser) applyRecoverAction(s *glrStack, act ParseAction, tok Token, nodeCount *int, arena *nodeArena, entryScratch *glrEntryScratch, gssScratch *gssScratch, trackChildErrors *bool) {
 	workCountRecordExplicitRecover()
 	if tok.Symbol == 0 && tok.StartByte == tok.EndByte {
-		s.accepted = true
+		p.acceptStack(s)
 		workCountRecordAcceptedHead(p, s, "EOF recovery accepted head")
 		return
 	}
@@ -3105,7 +3113,7 @@ func (p *Parser) rawStackEntryErrorCost(arena *nodeArena, entry stackEntry) uint
 		if !stackEntryHasNode(item.entry) {
 			continue
 		}
-		childCount := stackEntryNodeChildCount(item.entry)
+		_, childCount, _ := rawStackWalkEntryHeader(arena, item)
 		if stackEntryNodeIsMissing(item.entry) && childCount == 0 {
 			cost += cErrCostPerMissingTree + cErrCostPerRecovery
 			continue

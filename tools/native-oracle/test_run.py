@@ -36,7 +36,7 @@ class OracleBoundaryTest(unittest.TestCase):
         # make two stale or misbound receipts acceptable evidence.
         for mutation, reason in [('epoch', 'build epoch'), ('abi', 'C ABI'),
                                  ('abi_range', 'C ABI'), ('abi_bounds', 'C ABI'),
-                                 ('header', 'C ABI'), ('bytes', 'input byte')]:
+                                 ('header', 'C ABI'), ('root_span', 'incomplete C receipt'), ('bytes', 'input byte')]:
             with self.subTest(mutation=mutation), tempfile.TemporaryDirectory(dir=run.ROOT / '.scratch') as work:
                 directory = Path(work) / 'records'
                 directory.mkdir()
@@ -57,9 +57,13 @@ class OracleBoundaryTest(unittest.TestCase):
                     receipt['abi'] = 999
                 elif mutation == 'header':
                     build['grammars']['go']['runtime_header_sha256'] = '0' * 64
+                elif mutation == 'root_span':
+                    receipt['start'] += 1
                 else:
                     receipt['input_bytes'] += 1
                     receipt['end'] += 1
+                    receipt['nodes'][0]['EndByte'] += 1
+                    receipt['nodes_sha256'] = run.sha(json.dumps(receipt['nodes'], ensure_ascii=False, separators=(',', ':')).encode())
                 run.write_new(directory / 'build.json', build)
                 receipt['build_sha256'] = run.sha((directory / 'build.json').read_bytes())
                 run.write_new(directory / 'SM-GO.json', receipt)

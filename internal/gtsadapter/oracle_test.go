@@ -93,7 +93,8 @@ func validateOracle(c oracleCase, source []byte, r oracleRecord, buildHash strin
 		r.BuildSHA256 != buildHash || r.InputBytes != len(source) {
 		return fmt.Errorf("oracle identity mismatch for %s", c.ID)
 	}
-	if r.Start != 0 || uint64(r.End) != uint64(len(source)) || len(r.Nodes) == 0 {
+	if r.Start > r.End || uint64(r.End) != uint64(len(source)) || len(r.Nodes) == 0 ||
+		r.Nodes[0].StartByte != r.Start || r.Nodes[0].EndByte != r.End {
 		return fmt.Errorf("incomplete C receipt for %s", c.ID)
 	}
 	for i, n := range r.Nodes {
@@ -121,7 +122,15 @@ func TestTypeScriptContextualOracleRecords(t *testing.T) {
 }
 
 func TestCSharpRecoveryVariantOracleRecords(t *testing.T) {
-	runOracleCorpus(t, "testdata/oracle/csharp-recovery-cases.json", "testdata/oracle/windows-c-v2/cs-recovery", "testdata/oracle/csharp-recovery-differences.json")
+	runOracleCorpus(t, "testdata/oracle/csharp-recovery-cases.json", "testdata/oracle/windows-c-v2/cs-recovery", "")
+}
+
+func TestCSharpRecoveryOrderOracleRecords(t *testing.T) {
+	runOracleCorpus(t, "testdata/oracle/csharp-order-cases.json", "testdata/oracle/windows-c-v2/cs-order", "")
+}
+
+func TestCSharpRecoveryPreservationOracleRecords(t *testing.T) {
+	runOracleCorpus(t, "testdata/oracle/csharp-preservation-cases.json", "testdata/oracle/windows-c-v2/cs-preservation", "")
 }
 
 func runOracleRecords(t *testing.T) {
@@ -341,19 +350,10 @@ func runOracleCorpus(t *testing.T, casesPath, recordsDir, differencesPath string
 				if known.Source != c.SHA256 || known.CDigest != receipt.NodesSHA256 || known.GoDigest != nodeDigest(goNodes) {
 					t.Fatalf("STALE or NEW REGRESSION %s: exact recorded difference changed", known.Record)
 				}
-				if c.ID == "CS-JsonTextReader-excerpt" {
-					if known.Record != "KR-0002" || !receipt.HasError || result.HasError || !result.HasMissing || result.Outcome != syntax.AcceptedWithErrors {
-						t.Fatal("KR-0002 recovery signature changed")
-					}
-					return
+				if known.Record != "KR-0001a" || c.Group != "KR-0001a" {
+					t.Fatal("only the documented bare-ampersand characterization may differ")
 				}
-				if c.Group == "KR-0003" || c.Group == "KR-0004" {
-					if known.Record != c.Group || first < 0 || !receipt.HasError || result.HasError || result.HasMissing || result.Outcome != syntax.AcceptedClean {
-						t.Fatalf("%s clean-Go/error-C signature changed", c.Group)
-					}
-					return
-				}
-			} else if c.Group == "KR-0001a" || c.Group == "KR-0004" {
+			} else if c.Group == "KR-0001a" {
 				t.Fatal("missing known-difference identity")
 			}
 			if c.Group == "KR-0001a" {
@@ -365,8 +365,16 @@ func runOracleCorpus(t *testing.T, casesPath, recordsDir, differencesPath string
 			if first >= 0 {
 				t.Fatal("unregistered ordered tree difference")
 			}
-			if receipt.HasError || result.Outcome != syntax.AcceptedClean {
-				t.Fatal("clean control outcome changed")
+			wantOutcome := syntax.AcceptedClean
+			wantMissing := false
+			for _, node := range receipt.Nodes {
+				wantMissing = wantMissing || node.Missing
+			}
+			if receipt.HasError || wantMissing {
+				wantOutcome = syntax.AcceptedWithErrors
+			}
+			if result.HasError != receipt.HasError || result.HasMissing != wantMissing || result.Outcome != wantOutcome {
+				t.Fatal("outcome or error receipt disagrees with the authoritative C tree")
 			}
 		})
 	}
@@ -393,8 +401,8 @@ func TestCSharpRecoveryOrigin(t *testing.T) {
 		t.Fatalf("raw runtime failure: %T", err)
 	}
 	nodes := snapshot(raw.RootNode(), lang)
-	if nodeDigest(nodes) != "a52dc375a5c88da82a979a2f2c62fb2a854900d22f24aea82309d1e3ce1a6f79" {
-		t.Fatal("raw runtime recovery signature changed")
+	if nodeDigest(nodes) != "673a2377a867d27cf8c0a02a5e54df64d3610547f38efe8b69cdb61c9aca59cc" || !raw.RootNode().HasError() {
+		t.Fatal("raw runtime disagrees with the pinned C recovery tree")
 	}
 	t.Logf("raw runtime nodes=%d digest=%s error=%t stop=%s", len(nodes), nodeDigest(nodes), raw.RootNode().HasError(), raw.ParseRuntime().StopReason)
 }
@@ -422,6 +430,7 @@ func TestOracleRejectsChangedEvidence(t *testing.T) {
 	for _, alter := range []func(*oracleRecord){
 		func(r *oracleRecord) { r.ABI++ }, func(r *oracleRecord) { r.BuildSHA256 = "other" },
 		func(r *oracleRecord) { r.SourceSHA256 = "other" }, func(r *oracleRecord) { r.End = 0 },
+		func(r *oracleRecord) { r.Start = 1 },
 		func(r *oracleRecord) { r.NodesSHA256 = "other" }, func(r *oracleRecord) { r.Nodes = nil },
 	} {
 		changed := r

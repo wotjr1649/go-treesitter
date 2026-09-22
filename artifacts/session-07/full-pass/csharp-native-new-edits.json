@@ -1,0 +1,31 @@
+{
+  "command": [
+    "python",
+    "tools/native-oracle/check_edits.py",
+    "--executable",
+    ".scratch/oracle/build-full-pass-v2/c_sharp.exe",
+    "--cases",
+    ".scratch/full-pass/csharp-new-edits.json",
+    "--filename",
+    "x.cs"
+  ],
+  "candidate_commit": "388f50cb156e13ff2aad0b32e69f102f422199d4",
+  "status_before": " M internal/provenance/identities.json\n M internal/provenance/runtime.json\n M internal/runtime/glr.go\n M internal/runtime/grammars/runtime/runtime_profiles.go\n M internal/runtime/parser.go\n M internal/runtime/parser_recover_c.go\n M internal/runtime/parser_reduce.go\n M internal/runtime/parser_result.go\n M tools/runtime-bundle/source.json\n?? artifacts/session-07/full-pass/02-product-runtime/catalog-notices/\n?? artifacts/session-07/full-pass/03-csharp-accept-order/\n?? artifacts/session-07/full-pass/03-csharp-exact-selection/\n?? artifacts/session-07/full-pass/03-csharp-full-trace/\n?? artifacts/session-07/full-pass/03-csharp-hidden-missing-cost/\n?? artifacts/session-07/full-pass/03-csharp-keep-first-recovery-v2/\n?? artifacts/session-07/full-pass/03-csharp-keep-first-recovery-v3/\n?? artifacts/session-07/full-pass/03-csharp-keep-first-recovery/\n?? artifacts/session-07/full-pass/03-csharp-kr2-only/\n?? artifacts/session-07/full-pass/03-csharp-order/\n?? artifacts/session-07/full-pass/03-csharp-pattern-trace/\n?? artifacts/session-07/full-pass/03-csharp-pending-raw/\n?? artifacts/session-07/full-pass/03-csharp-pending/\n?? artifacts/session-07/full-pass/03-csharp-preserve-condense-order/\n?? artifacts/session-07/full-pass/03-csharp-preserve-errors/\n?? artifacts/session-07/full-pass/03-csharp-raw-recovery-cost/\n?? artifacts/session-07/full-pass/03-csharp-recovered-conflicts/\n?? artifacts/session-07/full-pass/03-csharp-reduced-trace/\n?? artifacts/session-07/full-pass/03-csharp-repeat-order/\n?? artifacts/session-07/full-pass/03-csharp-reviewed-candidate/\n?? artifacts/session-07/full-pass/03-csharp-selection-trace/\n?? artifacts/session-07/full-pass/03-csharp-shared-error-prefix/\n?? artifacts/session-07/full-pass/03-csharp-transaction-candidate/\n?? artifacts/session-07/full-pass/03-csharp-transaction-raw/\n?? artifacts/session-07/full-pass/03-csharp-v3-reduced-trace/\n?? artifacts/session-07/full-pass/03-kr2-product/\n?? artifacts/session-07/full-pass/additional-grammar-acquisition.json\n?? artifacts/session-07/full-pass/adopt-kr2.json\n?? artifacts/session-07/full-pass/catalog-final-paths.json\n?? artifacts/session-07/full-pass/catalog-notice-acquisition.json\n?? artifacts/session-07/full-pass/catalog-notice-followup.json\n?? artifacts/session-07/full-pass/catalog-notice-metadata.json\n?? artifacts/session-07/full-pass/csharp-accept-order.json\n?? artifacts/session-07/full-pass/csharp-else-reduction.json\n?? artifacts/session-07/full-pass/csharp-else-token-reduction.json\n?? artifacts/session-07/full-pass/csharp-exact-selection.json\n?? artifacts/session-07/full-pass/csharp-expanded-campaign.json\n?? artifacts/session-07/full-pass/csharp-full-trace.json\n?? artifacts/session-07/full-pass/csharp-hidden-missing-cost.json\n?? artifacts/session-07/full-pass/csharp-incremental-candidate.json\n?? artifacts/session-07/full-pass/csharp-keep-first-recovery-v2.json\n?? artifacts/session-07/full-pass/csharp-keep-first-recovery-v3.json\n?? artifacts/session-07/full-pass/csharp-keep-first-recovery.json\n?? artifacts/session-07/full-pass/csharp-kr2-only.json\n?? artifacts/session-07/full-pass/csharp-minimal-patterns.json\n?? artifacts/session-07/full-pass/csharp-order-experiment.json\n?? artifacts/session-07/full-pass/csharp-order-native-records.json\n?? artifacts/session-07/full-pass/csharp-pattern-trace.json\n?? artifacts/session-07/full-pass/csharp-pending-experiment-02.json\n?? artifacts/session-07/full-pass/csharp-pending-experiment.json\n?? artifacts/session-07/full-pass/csharp-pending-raw.json\n?? artifacts/session-07/full-pass/csharp-pointer-reduction.json\n?? artifacts/session-07/full-pass/csharp-preprocessor-cases.json\n?? artifacts/session-07/full-pass/csharp-preservation-native-records.json\n?? artifacts/session-07/full-pass/csharp-preserve-condense-order.json\n?? artifacts/session-07/full-pass/csharp-preserve-errors.json\n?? artifacts/session-07/full-pass/csharp-raw-recovery-cost.json\n?? artifacts/session-07/full-pass/csharp-recovered-conflicts.json\n?? artifacts/session-07/full-pass/csharp-reduced-trace.json\n?? artifacts/session-07/full-pass/csharp-repeat-order.json\n?? artifacts/session-07/full-pass/csharp-reviewed-candidate.json\n?? artifacts/session-07/full-pass/csharp-runtime-invariants-v2.json\n?? artifacts/session-07/full-pass/csharp-runtime-invariants.json\n?? artifacts/session-07/full-pass/csharp-selection-trace.json\n?? artifacts/session-07/full-pass/csharp-shared-error-prefix.json\n?? artifacts/session-07/full-pass/csharp-transaction-candidate.json\n?? artifacts/session-07/full-pass/csharp-transaction-observe.json\n?? artifacts/session-07/full-pass/csharp-transaction-raw.json\n?? artifacts/session-07/full-pass/csharp-v3-reduced-trace.json\n?? artifacts/session-07/full-pass/csharp-zero-reduction.json\n?? testdata/oracle/csharp-order-cases.json\n?? testdata/oracle/csharp-preservation-cases.json\n?? testdata/oracle/windows-c-v2/cs-order/\n?? testdata/oracle/windows-c-v2/cs-preservation/\n?? tools/runtime-bundle/check.py\n?? tools/runtime-bundle/patches/KR-0002-csharp-recovery-transaction.patch\n?? tools/runtime-bundle/testdata/\n",
+  "started_unix": 1790097098.7422197,
+  "elapsed_seconds": 1.9106431007385254,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "0567199a4f3b0bbfdc50b67844cc4480a33acaf8791ec3a3b54a4c4c573ed0c5"
+  },
+  "log_sha256": "fdd30b26bf8c5540905d05622638853bf68fd66709287978c3bd9464641e7f47"
+}

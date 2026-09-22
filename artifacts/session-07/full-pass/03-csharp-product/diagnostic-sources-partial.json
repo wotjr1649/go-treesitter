@@ -1,0 +1,7 @@
+{
+  "status": "PARTIAL_ARCHIVE",
+  "reason": "Initial source archive stopped on the pre-bundle overlay target .scratch/session07-runtime/parser_recover_c.go. No inputs were overwritten. diagnostic-sources-v2.json indexes the completed carrier-era archive.",
+  "sha256": "2816c2be48c07fe4a36701e11bc5f32422cce5166fe9fb3cb8e4c669a5ef5b14",
+  "entries": 42,
+  "zip_crc_failure": null
+}

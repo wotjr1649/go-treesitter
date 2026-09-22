@@ -7,7 +7,7 @@
     "commit": "c871b1f576866c40b1695677fe3512243e266d39"
   },
   "archive_sha256": "a7fc4a2f1b369542b14429c36a09a41d6db0bb0d2beec5844930b4a17c6ae3a6",
-  "source_sha256": "5be9ed7731cc44777a5cf80da909462f5f840dc21f227402eb40af4f75419aa7",
+  "source_sha256": "76370b51c75f828daf988e74aac37296ee5902b837b852187b3912d3d5082c7e",
   "importer_sha256": "97889d1db4776db7d0aabf9cb01022e3bec77a46e37982c62793923c6ab992b2",
   "internal_module": "github.com/wotjr1649/go-treesitter/internal/runtime",
   "patches": [
@@ -18,6 +18,14 @@
     {
       "path": "tools/runtime-bundle/patches/catalog-c-family-lexer-reuse.patch",
       "sha256": "9658d436c23c09e5e6fbe05936174c04fee7e9da3bb3a6981497c6e94b4f0db1"
+    },
+    {
+      "path": "tools/runtime-bundle/patches/KR-0002-csharp-recovery-transaction.patch",
+      "sha256": "9f0af74ff23dc2d19d6e5ed97b9b4814ef38414707d660eb239e5c02616a1fec"
+    },
+    {
+      "path": "tools/runtime-bundle/patches/KR-0004-csharp-preserve-recovery-errors.patch",
+      "sha256": "0c5613e1051b5d053264d36a3c9ff48389877c0eaf76d024da721abaf9079aa2"
     }
   ],
   "files": {
@@ -115,7 +123,7 @@
     },
     "glr.go": {
       "origin_sha256": "5abe04726f366d6543ff0f6770e420be48cfb3303a9d317b5f3341f37db6561a",
-      "sha256": "5abe04726f366d6543ff0f6770e420be48cfb3303a9d317b5f3341f37db6561a"
+      "sha256": "0e6dd2f5c04843e569fbc630539b046e403475976589135a5d70d0bb0acad8b6"
     },
     "glr_forest.go": {
       "origin_sha256": "7e59f8f394ac245138eec9abb82ff5a8cd66b80ae09e4b5f9de6f572c38a78e4",
@@ -2239,7 +2247,7 @@
     },
     "grammars/runtime/runtime_profiles.go": {
       "origin_sha256": "b50848227f84630b98dea46ee596363a146f55f93f45ca40edb4d9c8cd2323ed",
-      "sha256": "850c6d9a74f49210cdcccfdc29b4d5b113fb7e0f53637adf475ebab5b01ba624"
+      "sha256": "9925fc9cc95ea7d3e0166b52dcb33aeae07d9ce6a49b51da059409992904d0c1"
     },
     "grammars/runtime/rust_external_lex_states_gen.go": {
       "origin_sha256": "a7e64f0662f68c806a3e3120926d9a3d27293b1517520660e4de63f24f44350b",
@@ -5447,7 +5455,7 @@
     },
     "parser.go": {
       "origin_sha256": "ffae2409b0b5fe67b15c66ec1583f079565e52ba46a2c59c377881a0c699f8c5",
-      "sha256": "ffae2409b0b5fe67b15c66ec1583f079565e52ba46a2c59c377881a0c699f8c5"
+      "sha256": "ff6faeb68114d9f7aa9c44dbac6504e9b22d1be32b6bed87c03e05f93f30c5ae"
     },
     "parser_api.go": {
       "origin_sha256": "27314224ace4ec5f94f0e3e34e6da7cb5c639ee10afd6b410743cc7b7b1846f9",
@@ -5503,7 +5511,7 @@
     },
     "parser_recover_c.go": {
       "origin_sha256": "16f7ea87b480fe7b3d54bc9d5ad215fa62579f4929ae3135ecd0915446175766",
-      "sha256": "16f7ea87b480fe7b3d54bc9d5ad215fa62579f4929ae3135ecd0915446175766"
+      "sha256": "656e6398b11c19bf432c9f272f830ce63ba7a06018b0c6beff762f71502f9fa6"
     },
     "parser_recover_cycle_debug.go": {
       "origin_sha256": "1a46c3ef94802e47287dec81645f9b8a9041d72d44dabb2ce86ec5f030ae3602",
@@ -5515,11 +5523,11 @@
     },
     "parser_reduce.go": {
       "origin_sha256": "c55f69b9bfa1dfc998e10827446299c31b7ffe5c9a352fb0faa6288eb4720ea5",
-      "sha256": "c55f69b9bfa1dfc998e10827446299c31b7ffe5c9a352fb0faa6288eb4720ea5"
+      "sha256": "c4238c5e79b43c2a477bec9d43df3fe6d343928111679d09345ac15a23064ed3"
     },
     "parser_result.go": {
       "origin_sha256": "109537482cbb77882ac70e9a7b726a22bd30a01bc42b7ca612b50b439f7f2e8a",
-      "sha256": "109537482cbb77882ac70e9a7b726a22bd30a01bc42b7ca612b50b439f7f2e8a"
+      "sha256": "81d996a40a2eff0931a0341ed528136e024d611d248c5632818b93c01b63f9a6"
     },
     "parser_result_ada.go": {
       "origin_sha256": "1fb4217fc83d31bfa4ec029291bce63302df240ccfc91c4f03d2c48fd7326799",
@@ -5567,7 +5575,7 @@
     },
     "parser_result_csharp.go": {
       "origin_sha256": "17e967c49784489d220de74b2606ad1dda05f321742c49806eb4e10bac0a2e7f",
-      "sha256": "17e967c49784489d220de74b2606ad1dda05f321742c49806eb4e10bac0a2e7f"
+      "sha256": "947a08bb22a6142e0b6ccfbc66735e27d2f6c62b1e98f7582980f3104f450fe3"
     },
     "parser_result_csharp_attribute.go": {
       "origin_sha256": "f66b6775450f0b59c3b0ac47f7ccc680eee07b466ebdfb2767a94f3bf979d4e7",

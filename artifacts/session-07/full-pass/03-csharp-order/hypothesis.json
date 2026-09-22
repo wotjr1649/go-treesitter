@@ -1,0 +1,9 @@
+{
+  "hypothesis": "remove non-C absorber/missing-sibling order exception in cCondenseAndResume",
+  "baseline": "v0.53.0",
+  "archive_sha256": "a7fc4a2f1b369542b14429c36a09a41d6db0bb0d2beec5844930b4a17c6ae3a6",
+  "before_sha256": "16f7ea87b480fe7b3d54bc9d5ad215fa62579f4929ae3135ecd0915446175766",
+  "after_sha256": "5e176b520710f80af58d66f87e619ec65b51947eaba35eb97c04b00eea7f15f5",
+  "removed_source": "\t\t\tif !p.compactPackedGSSVersionOrderEnabled() {\n\t\t\t\tif cRecoverVersionShouldStayBefore(stacks[j], stacks[i]) {\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t\tif cRecoverVersionShouldStayBefore(stacks[i], stacks[j]) {\n\t\t\t\t\tstacks[i], stacks[j] = stacks[j], stacks[i]\n\t\t\t\t\tif workCountInstrumentationEnabled {\n\t\t\t\t\t\tworkCountTopologySyncVersionOrder(stacks)\n\t\t\t\t\t}\n\t\t\t\t\tstatusI = p.cCondenseVersionStatus(&stacks[i], subtreeCostRelevant)\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t}\n",
+  "product_adopted": false
+}

@@ -1,0 +1,31 @@
+{
+  "command": [
+    "go",
+    "build",
+    "-trimpath",
+    "-modfile=.scratch/session07-runtime.mod",
+    "-overlay=D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\csharp\\overlay.json",
+    "-o",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\csharp\\order.exe",
+    "./.scratch/full-pass/probe.go"
+  ],
+  "candidate_commit": "c9996dc43b3c13fd4c832e4d20a599fce6445c5b",
+  "status_before": "?? artifacts/session-07/full-pass/03-csharp-order/\n",
+  "started_unix": 1790088714.426433,
+  "elapsed_seconds": 11.788089513778687,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "60e068a66c71f3ce7c1b04dbe04e404e01e2d1eace07373dfe3fd0a8345f6889",
+    "go.sum": "87c97651162785c246dabcd3fdcd916cd7baabe2f8554bbdb31eea5ce9704cd6",
+    "internal/provenance/identities.json": "c6fc8f06a9e492e7a147fedb863272ecadca836460ab2c10bbec8f1bcd9a11f7"
+  },
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

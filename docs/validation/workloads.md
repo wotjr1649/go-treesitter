@@ -123,6 +123,24 @@ comment, retaining all other LF bytes. It retains the Newtonsoft MIT notice in
 `testdata/newtonsoft/LICENSE.md` and has its own exact source hash. The native C
 record is in `windows-c-cs-recovery/`; KR-0004 owns its distinct signature.
 
+## C# full-pass hardening
+
+The full-pass hardening adds `csharp-order-cases.json` (33 records, 32 edits)
+and `csharp-preservation-cases.json` (41 records, 40 edits). Each catalog includes
+the same clean edit origin and records exact source hashes and edit bytes.
+The cases cover conditional enum members, closed recovery prefixes, accept
+ordering, pointer/declaration ambiguity, comments, renaming, Korean identifiers,
+CRLF and leading hidden whitespace. C records are in the corresponding
+`windows-c-v2/cs-order` and `windows-c-v2/cs-preservation` directories. The 72
+target inputs were compared against three native C runs and repeated in Go
+100 times for recovery inputs or 20 times for clean inputs. Native C edits were
+also compared against fresh C trees for all 72 targets.
+
+Minimal reductions and the original real-world inputs derive from the existing
+Newtonsoft MIT fixtures, whose notice remains in `testdata/newtonsoft/LICENSE.md`.
+Other inline cases and transformations were authored in this repository. The
+JSON file itself uses LF; intentional CRLF source bytes are encoded in strings.
+
 ## What is deliberately absent
 
 - No fixture is copied from `code-map-memo`'s `.work/` run directories at runtime. If bytes are

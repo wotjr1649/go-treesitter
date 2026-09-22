@@ -34,8 +34,10 @@ the importer, its source inventory and each patch. `identities.json` binds the
 manifest. Missing, changed or additional runtime files fail provenance checks.
 
 The initial patch is the six-line KR-0001b scanner correction. KR-0002 and
-KR-0004 will be adopted only after their own focused C comparisons and regression
-checks pass, in separate work units. A rejected experiment is not a runtime patch.
+KR-0004 have separate patches, focused C comparisons and ablation evidence.
+Their product adoption is atomic: core recovery alone leaves source-based
+reconstruction free to clear errors on reduced inputs, so the intermediate
+state does not pass the product suite. A rejected experiment is not a runtime patch.
 Further improvements require matching evidence and must not change the pinned
 origin, oracle epoch or Release-Critical scope as a side effect.
 

@@ -7,6 +7,13 @@ Active differences have exact Go and C hashes in `active-differences.json`;
 the original `known-differences.json` preserves the pre-patch failures.
 Changing either side fails the ratchet; an unregistered difference fails too.
 
+Only the six documented KR-0001a bare-ampersand shapes remain active differences.
+The C# order and preservation catalogs require exact nodes and error receipts.
+`csharp-recovery-differences.json` retains the former KR-0004 signature as
+historical evidence and is no longer an active exception. C roots may omit
+leading hidden text; their reported span must match their first canonical node
+and end at the full input length.
+
 Produce records from the repository root with an installed C compiler:
 
 ```powershell

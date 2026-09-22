@@ -17,6 +17,7 @@ import (
 // Parser is not safe for concurrent use. Use one parser per goroutine, a
 // ParserPool, or guard shared parser instances with external synchronization.
 type Parser struct {
+	cNextAcceptOrder    uint64
 	language            *Language
 	reuseCursor         reuseCursor
 	reuseScratch        reuseScratch
@@ -2883,7 +2884,7 @@ func (p *Parser) tryAdvanceEOFOnSingleStack(s *glrStack, tok Token, expectedEOFB
 			if semanticPhaseTraceActive() {
 				semanticPhaseTraceRecordActionExecution(p, s, tok, act, 0, "eof-prefix-accept", false)
 			}
-			s.accepted = true
+			p.acceptStack(s)
 			if workCountInstrumentationEnabled {
 				workCountTopologyRecordActionResult(s)
 			}
@@ -5414,6 +5415,7 @@ func (p *Parser) parseInternal(source []byte, ts TokenSource, reuse *reuseCursor
 		return finalizeRecoveredNodes(nodes), true
 	}
 
+	p.cNextAcceptOrder = 0
 	stacks, maxStacksSeen = p.newInitialParseStacks(scratch, reuse, timing, len(source))
 	if workCountInstrumentationEnabled && len(stacks) != 0 {
 		workCountTopologyRecordInitialVersion(&stacks[0]) // work-count-assembly: topology initial-version seam
@@ -6012,7 +6014,29 @@ func (p *Parser) parseInternal(source []byte, ts TokenSource, reuse *reuseCursor
 		stackRelexRestoreTok := Token{}
 		stackRelexActive := false
 		packedVersionOrder := p.compactPackedGSSVersionOrderEnabled()
-		for si := 0; si < numStacks || (packedVersionOrder && si < len(stacks)); si++ {
+		pendingDispatch := false
+		pendingSharedToken := Token{}
+		pendingSteps := 0
+		advanceVersion := func(si int) int {
+			if !pendingDispatch {
+				return si + 1
+			}
+			tok = pendingSharedToken
+			stackRelexActive = false
+			pendingDispatch = false
+			s := &stacks[si]
+			if s.dead || s.accepted || s.cPaused {
+				s.cRecoverPendingToken = nil
+				return si + 1
+			}
+			if s.shifted {
+				s.cRecoverPendingToken = nil
+				s.shifted = false
+			}
+			pendingSteps++
+			return si
+		}
+		for si := 0; (si < numStacks || (packedVersionOrder && si < len(stacks))) && pendingSteps < maxConsecutivePrimaryReduces; si = advanceVersion(si) {
 			s := &stacks[si]
 			if stackRelexActive {
 				tok = stackRelexRestoreTok
@@ -6044,6 +6068,11 @@ func (p *Parser) parseInternal(source []byte, ts TokenSource, reuse *reuseCursor
 			// Faithful C recovery port (parser_recover_c.go): a stack already
 			// in the C error state dispatches through ts_parser__recover
 			// instead of the parse table, except for shiftable tokens.
+			if s.cRecoverPendingToken != nil {
+				pendingDispatch = true
+				pendingSharedToken = tok
+				tok = *s.cRecoverPendingToken
+			}
 			if s.cRec != nil && p.errorCostCompetitionEnabled() {
 				outcome, redispatch, reason := p.cRecoverDispatchInError(&stacks, si, source, tok, &nodeCount, arena, &scratch.entries, &scratch.gss, trackChildErrors)
 				if resultMaterializationShouldStop(reason) {
@@ -6903,6 +6932,9 @@ func (p *Parser) parseInternal(source []byte, ts TokenSource, reuse *reuseCursor
 					}
 				}
 			}
+		}
+		if pendingSteps >= maxConsecutivePrimaryReduces {
+			return finalize(stacks, ParseStopIterationLimit)
 		}
 		// The last stack in the loop may have dispatched on its own re-lexed
 		// tokenization; restore the shared lookahead before anything after the
@@ -8949,7 +8981,7 @@ func transientFrontierPopulationCap(maxStacks, maxStackCullTrigger int, noResult
 }
 
 func (p *Parser) promotePrimaryStack(stacks []glrStack) {
-	if len(stacks) <= 1 {
+	if len(stacks) <= 1 || p.compactPackedGSSVersionOrderEnabled() {
 		return
 	}
 	best := 0

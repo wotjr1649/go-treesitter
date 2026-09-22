@@ -1,0 +1,32 @@
+{
+  "runtime_manifest_sha256": "5c6867c9ac7a6403c1f77647bedfe372a7c69be835e49fc0af18932c4a443d2c",
+  "patch_sha256": "9f0af74ff23dc2d19d6e5ed97b9b4814ef38414707d660eb239e5c02616a1fec",
+  "changed_files": {
+    "glr.go": {
+      "before": "5abe04726f366d6543ff0f6770e420be48cfb3303a9d317b5f3341f37db6561a",
+      "after": "0e6dd2f5c04843e569fbc630539b046e403475976589135a5d70d0bb0acad8b6"
+    },
+    "parser_recover_c.go": {
+      "before": "16f7ea87b480fe7b3d54bc9d5ad215fa62579f4929ae3135ecd0915446175766",
+      "after": "656e6398b11c19bf432c9f272f830ce63ba7a06018b0c6beff762f71502f9fa6"
+    },
+    "parser.go": {
+      "before": "ffae2409b0b5fe67b15c66ec1583f079565e52ba46a2c59c377881a0c699f8c5",
+      "after": "ff6faeb68114d9f7aa9c44dbac6504e9b22d1be32b6bed87c03e05f93f30c5ae"
+    },
+    "grammars/runtime/runtime_profiles.go": {
+      "before": "850c6d9a74f49210cdcccfdc29b4d5b113fb7e0f53637adf475ebab5b01ba624",
+      "after": "9925fc9cc95ea7d3e0166b52dcb33aeae07d9ce6a49b51da059409992904d0c1"
+    },
+    "parser_reduce.go": {
+      "before": "c55f69b9bfa1dfc998e10827446299c31b7ffe5c9a352fb0faa6288eb4720ea5",
+      "after": "c4238c5e79b43c2a477bec9d43df3fe6d343928111679d09345ac15a23064ed3"
+    },
+    "parser_result.go": {
+      "before": "109537482cbb77882ac70e9a7b726a22bd30a01bc42b7ca612b50b439f7f2e8a",
+      "after": "81d996a40a2eff0931a0341ed528136e024d611d248c5632818b93c01b63f9a6"
+    }
+  },
+  "reproduced_files": 1527,
+  "excluded_kr4_overlay": "parser_result_csharp.go"
+}

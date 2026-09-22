@@ -563,6 +563,11 @@ func stackCompareForResultSelectionWithRawShape(p *Parser, arena *nodeArena, a, 
 			}
 			return -1
 		} else if ac > 0 {
+			if p.compactPackedGSSVersionOrderEnabled() && a.cAcceptOrder != b.cAcceptOrder {
+				if a.cAcceptOrder < b.cAcceptOrder {
+					return -1
+				}
+			}
 			return 1
 		}
 	}

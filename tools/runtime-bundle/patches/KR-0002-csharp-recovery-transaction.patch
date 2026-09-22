@@ -1,0 +1,368 @@
+--- a/glr.go
++++ b/glr.go
+@@ -68,6 +68,8 @@
+ 	dead bool
+ 	// accepted is set when the stack reaches a ParseActionAccept.
+ 	accepted bool
++	// C breaks equal positive-cost results by acceptance time, not slice position.
++	cAcceptOrder uint64
+ 	// shifted is set when this stack consumed the current token via a SHIFT
+ 	// action in a GLR fork that also produced REDUCE actions. When the
+ 	// reducing stacks cause the same token to be re-processed, shifted
+@@ -92,6 +94,8 @@
+ 	// lockstep token loop uses this to avoid letting an already-advanced
+ 	// sibling suppress that group's Strategy 1 recovery.
+ 	cRecoverMissingGroup *cRecGroup
++	// A missing-token sibling resumes its previous lookahead next round.
++	cRecoverPendingToken *Token
+ 	// diagnosticTopology carries a version identity only in gts_workcount
+ 	// builds. The production type is zero-sized, so it does not change the
+ 	// parser stack layout. Ordinary Go value copies preserve the identity;
+@@ -668,6 +672,8 @@
+ 			branchOrder:                s.branchOrder,
+ 			cRec:                       s.cRec.clone(),
+ 			cRecoverMissingGroup:       s.cRecoverMissingGroup,
++			cRecoverPendingToken:       s.cRecoverPendingToken,
++			cAcceptOrder:               s.cAcceptOrder,
+ 			diagnosticTopology:         s.diagnosticTopology,
+ 			cNodeBaseline:              s.cNodeBaseline,
+ 			cEntryAggGen:               s.cEntryAggGen,
+@@ -688,6 +694,8 @@
+ 		branchOrder:                s.branchOrder,
+ 		cRec:                       s.cRec.clone(),
+ 		cRecoverMissingGroup:       s.cRecoverMissingGroup,
++		cRecoverPendingToken:       s.cRecoverPendingToken,
++		cAcceptOrder:               s.cAcceptOrder,
+ 		diagnosticTopology:         s.diagnosticTopology,
+ 		cNodeBaseline:              s.cNodeBaseline,
+ 		cEntryAggGen:               s.cEntryAggGen,
+@@ -711,6 +719,8 @@
+ 		branchOrder:                s.branchOrder,
+ 		cRec:                       s.cRec.clone(),
+ 		cRecoverMissingGroup:       s.cRecoverMissingGroup,
++		cRecoverPendingToken:       s.cRecoverPendingToken,
++		cAcceptOrder:               s.cAcceptOrder,
+ 		diagnosticTopology:         s.diagnosticTopology,
+ 		cNodeBaseline:              s.cNodeBaseline,
+ 		cEntryAggGen:               s.cEntryAggGen,
+@@ -3549,6 +3559,50 @@
+ 	return merged
+ }
+ 
++// A shared immutable error prefix has identical recovery history on both
++// paths. Only the clean suffixes may merge; distinct error-bearing payloads
++// and paths that bypass that common prefix remain separate.
++func gssSharedClosedErrorPrefix(scratch *glrMergeScratch, a, b *gssNode) bool {
++	if !compactPackedGSSVersionOrderEnabledForMerge(scratch) {
++		return false
++	}
++	var boundary *gssNode
++	seen := make(map[*gssNode]bool)
++	queue := []*gssNode{a, b}
++	for len(queue) > 0 {
++		n := queue[len(queue)-1]
++		queue = queue[:len(queue)-1]
++		if n == nil {
++			return false
++		}
++		if seen[n] {
++			continue
++		}
++		seen[n] = true
++		if len(seen)&63 == 0 && scratch.parser != nil &&
++			resultMaterializationShouldStop(scratch.parser.resultMaterializationStopReason(scratch.arena)) {
++			return false
++		}
++		if stackEntryHasNode(n.entry) && (stackEntryNodeHasError(n.entry) ||
++			stackEntryNodeIsMissing(n.entry) || stackEntryNodeSymbol(n.entry) == errorSymbol) {
++			if boundary != nil && boundary != n {
++				return false
++			}
++			boundary = n
++			continue
++		}
++		for i := 0; i < n.linkCount(); i++ {
++			prev, entry := n.link(i)
++			if stackEntryHasNode(entry) && (stackEntryNodeHasError(entry) ||
++				stackEntryNodeIsMissing(entry) || stackEntryNodeSymbol(entry) == errorSymbol) {
++				return false
++			}
++			queue = append(queue, prev)
++		}
++	}
++	return boundary != nil
++}
++
+ func gssMainCanMergeWithScratch(scratch *glrMergeScratch, a, b *glrStack) bool {
+ 	if a.gss.head == nil || b.gss.head == nil {
+ 		return false
+@@ -3562,8 +3616,10 @@
+ 	if a.top().state != b.top().state || a.byteOffset != b.byteOffset {
+ 		return false
+ 	}
+-	return gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a.gss.head) &&
+-		gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b.gss.head)
++	return (gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a.gss.head) &&
++		gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b.gss.head)) ||
++		(a.cRec == nil && b.cRec == nil && !a.cPaused && !b.cPaused &&
++			gssSharedClosedErrorPrefix(scratch, a.gss.head, b.gss.head))
+ }
+ 
+ // gssStackCleanZeroErrorAllLinksWithScratch applies the GSS clean-zero gate
+@@ -3605,8 +3661,10 @@
+ 		workCountRecordGSSReject(workCountParserFromMergeScratch(scratch), phase, workCountConvergenceReasonStatus, "GSS merge state or byte differs", a, b)
+ 		return false
+ 	}
+-	clean := gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a.gss.head) &&
+-		gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b.gss.head)
++	clean := (gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a.gss.head) &&
++		gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b.gss.head)) ||
++		(a.cRec == nil && b.cRec == nil && !a.cPaused && !b.cPaused &&
++			gssSharedClosedErrorPrefix(scratch, a.gss.head, b.gss.head))
+ 	workCountRecordGSSCleanReject(workCountParserFromMergeScratch(scratch), phase, a, b, clean)
+ 	return clean
+ }
+@@ -3637,8 +3695,9 @@
+ 	if a.entry.state != b.entry.state {
+ 		return false
+ 	}
+-	if !gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a) ||
+-		!gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b) {
++	if (!gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a) ||
++		!gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b)) &&
++		!gssSharedClosedErrorPrefix(scratch, a, b) {
+ 		return false
+ 	}
+ 	aOffset, aOK := gssNodeUniformByteOffset(a, make(map[*gssNode]bool))
+@@ -3891,7 +3950,8 @@
+ 	if !stackEntryHasNode(a) || !stackEntryHasNode(b) {
+ 		return !stackEntryHasNode(a) && !stackEntryHasNode(b)
+ 	}
+-	// The enclosing GSS merge proves that every link is clean. Do not use
++	// Distinct payloads belong to the clean suffix; a shared error prefix
++	// matched by identity above. Do not use
+ 	// rawStackEntryErrorCost for C's positive-error shortcut: that Go walk uses
+ 	// flattened arity and does not price a raw error leaf as C does.
+ 	aHeader, aHeaderOK := cStackLinkPayloadHeader(scratch, a)
+@@ -4673,7 +4733,8 @@
+ 	if a.entry.state != b.entry.state {
+ 		return false
+ 	}
+-	if !p.cleanZeroErrorAllLinks(a) || !p.cleanZeroErrorAllLinks(b) {
++	if (!p.cleanZeroErrorAllLinks(a) || !p.cleanZeroErrorAllLinks(b)) &&
++		!gssSharedClosedErrorPrefix(p.scratch, a, b) {
+ 		return false
+ 	}
+ 	aOffset, aOK := p.uniformByteOffset(a, p.acquireOffsetSeen())
+--- a/parser_recover_c.go
++++ b/parser_recover_c.go
+@@ -2130,6 +2130,9 @@
+ 		if n.isMissing() {
+ 			return cErrCostPerMissingTree + cErrCostPerRecovery
+ 		}
++		if n.rawShape != 0 && n.rawShape != rawShapeZeroChildRef {
++			return p.rawStackEntryErrorCost(n.ownerArena, newStackEntryNode(n.parseState, n))
++		}
+ 		return 0
+ 	}
+ 	if len(p.cNodeMemoCache) == 0 {
+@@ -2204,6 +2207,8 @@
+ 		var cost uint32
+ 		if n.isMissing() {
+ 			cost = cErrCostPerMissingTree + cErrCostPerRecovery
++		} else if n.rawShape != 0 && n.rawShape != rawShapeZeroChildRef {
++			cost = p.rawStackEntryErrorCost(n.ownerArena, newStackEntryNode(n.parseState, n))
+ 		}
+ 		visible := 0
+ 		if p.cSymbolVisible(n.symbol) {
+@@ -3888,8 +3893,12 @@
+ 		}
+ 		missingVersions[vi].branchOrder = (*stacks)[si].branchOrder
+ 		missingVersions[vi].cRecoverMissingGroup = group
++		// C resumes recovery at the end of a version round. Its next round
++		// advances the absorber before the newly created missing sibling.
++		// Queue this lookahead so the shared-token loop preserves that order.
++		missingVersions[vi].cRecoverPendingToken = &tok
++		missingVersions[vi].shifted = true
+ 		*stacks = append(*stacks, missingVersions[vi])
+-		needsRedispatch = true
+ 	}
+ 
+ 	// 4. Run recover for the current lookahead across the absorbing group.
+@@ -4401,7 +4410,7 @@
+ 	if debugRecoveryCycleChecks {
+ 		debugRecoveryCheckNodeAcyclic(p, arena, "recover-eof-accept-root", root)
+ 	}
+-	v.accepted = true
++	p.acceptStack(v)
+ 	v.shifted = true
+ 	workCountTopologyRetireVersion(v)
+ }
+--- a/parser.go
++++ b/parser.go
+@@ -17,6 +17,7 @@
+ // Parser is not safe for concurrent use. Use one parser per goroutine, a
+ // ParserPool, or guard shared parser instances with external synchronization.
+ type Parser struct {
++	cNextAcceptOrder    uint64
+ 	language            *Language
+ 	reuseCursor         reuseCursor
+ 	reuseScratch        reuseScratch
+@@ -2883,7 +2884,7 @@
+ 			if semanticPhaseTraceActive() {
+ 				semanticPhaseTraceRecordActionExecution(p, s, tok, act, 0, "eof-prefix-accept", false)
+ 			}
+-			s.accepted = true
++			p.acceptStack(s)
+ 			if workCountInstrumentationEnabled {
+ 				workCountTopologyRecordActionResult(s)
+ 			}
+@@ -5414,6 +5415,7 @@
+ 		return finalizeRecoveredNodes(nodes), true
+ 	}
+ 
++	p.cNextAcceptOrder = 0
+ 	stacks, maxStacksSeen = p.newInitialParseStacks(scratch, reuse, timing, len(source))
+ 	if workCountInstrumentationEnabled && len(stacks) != 0 {
+ 		workCountTopologyRecordInitialVersion(&stacks[0]) // work-count-assembly: topology initial-version seam
+@@ -6012,7 +6014,29 @@
+ 		stackRelexRestoreTok := Token{}
+ 		stackRelexActive := false
+ 		packedVersionOrder := p.compactPackedGSSVersionOrderEnabled()
+-		for si := 0; si < numStacks || (packedVersionOrder && si < len(stacks)); si++ {
++		pendingDispatch := false
++		pendingSharedToken := Token{}
++		pendingSteps := 0
++		advanceVersion := func(si int) int {
++			if !pendingDispatch {
++				return si + 1
++			}
++			tok = pendingSharedToken
++			stackRelexActive = false
++			pendingDispatch = false
++			s := &stacks[si]
++			if s.dead || s.accepted || s.cPaused {
++				s.cRecoverPendingToken = nil
++				return si + 1
++			}
++			if s.shifted {
++				s.cRecoverPendingToken = nil
++				s.shifted = false
++			}
++			pendingSteps++
++			return si
++		}
++		for si := 0; (si < numStacks || (packedVersionOrder && si < len(stacks))) && pendingSteps < maxConsecutivePrimaryReduces; si = advanceVersion(si) {
+ 			s := &stacks[si]
+ 			if stackRelexActive {
+ 				tok = stackRelexRestoreTok
+@@ -6044,6 +6068,11 @@
+ 			// Faithful C recovery port (parser_recover_c.go): a stack already
+ 			// in the C error state dispatches through ts_parser__recover
+ 			// instead of the parse table, except for shiftable tokens.
++			if s.cRecoverPendingToken != nil {
++				pendingDispatch = true
++				pendingSharedToken = tok
++				tok = *s.cRecoverPendingToken
++			}
+ 			if s.cRec != nil && p.errorCostCompetitionEnabled() {
+ 				outcome, redispatch, reason := p.cRecoverDispatchInError(&stacks, si, source, tok, &nodeCount, arena, &scratch.entries, &scratch.gss, trackChildErrors)
+ 				if resultMaterializationShouldStop(reason) {
+@@ -6904,6 +6933,9 @@
+ 				}
+ 			}
+ 		}
++		if pendingSteps >= maxConsecutivePrimaryReduces {
++			return finalize(stacks, ParseStopIterationLimit)
++		}
+ 		// The last stack in the loop may have dispatched on its own re-lexed
+ 		// tokenization; restore the shared lookahead before anything after the
+ 		// dispatch loop reads it.
+@@ -8949,7 +8981,7 @@
+ }
+ 
+ func (p *Parser) promotePrimaryStack(stacks []glrStack) {
+-	if len(stacks) <= 1 {
++	if len(stacks) <= 1 || p.compactPackedGSSVersionOrderEnabled() {
+ 		return
+ 	}
+ 	best := 0
+--- a/grammars/runtime/runtime_profiles.go
++++ b/grammars/runtime/runtime_profiles.go
+@@ -228,10 +228,11 @@
+ 			{State: 479, Lookahead: gotreesitter.ConflictPolicyAnyLookahead, Kind: gotreesitter.ConflictPolicyRepetitionShift, ReduceSymbols: []gotreesitter.Symbol{467}},
+ 		},
+ 	},
+-	// C#'s certified low-pressure accepted-error trees are authoritative. A
++	// C#'s packed version transaction preserves complete recovered trees. A
+ 	// fresh no-stacks parse instead benefits from a bounded cap-16 retry; the
+ 	// generic cap-48 ladder exceeds the large-file memory and time budgets.
+ 	"c_sharp": {
++		compactPackedGSSVersionOrder:  true,
+ 		blobSHA256:                    mustRuntimeProfileSHA256("7ad425e89733339dde94e3c03b762ae478fb453b530493f5d62e1ae7537e1784"),
+ 		externalScannerFullParseRetry: gotreesitter.ExternalScannerFullParseRetrySkipRepeat,
+ 		fullParseGSSConvergence:       true,
+@@ -243,10 +244,8 @@
+ 			gotreesitter.ResultCompatibilityNativeRecoveredStructure,
+ 		fullParseAcceptedErrorRetryProfile: gotreesitter.FullParseAcceptedErrorRetryProfile{
+ 			SkipCompleteAcceptedErrorRetry:             true,
+-			SkipCompleteMaxEntryScratchPeak:            csharpAcceptedErrorRetryMaxEntryScratchPeak,
+ 			FreshErrorNoStacksRetryMaxStacks:           csharpFreshErrorNoStacksRetryMaxStacks,
+ 			SkipInitialCompleteAcceptedErrorMergeRetry: true,
+-			GSSConvergenceAcceptedErrorMergePerKey:     csharpGSSConvergenceErrorMergePerKey,
+ 		},
+ 	},
+ 	// Crystal's external-scanner repeat selects the same tree after the complete
+--- a/parser_reduce.go
++++ b/parser_reduce.go
+@@ -2744,9 +2744,17 @@
+ 	}
+ }
+ 
++func (p *Parser) acceptStack(s *glrStack) {
++	if !s.accepted && p != nil {
++		p.cNextAcceptOrder++
++		s.cAcceptOrder = p.cNextAcceptOrder
++	}
++	s.accepted = true
++}
++
+ func (p *Parser) applyAcceptAction(s *glrStack) {
+ 	workCountRecordAccept()
+-	s.accepted = true
++	p.acceptStack(s)
+ 	workCountRecordAcceptedHead(p, s, "parse-action accept")
+ 	if p != nil && p.glrTrace {
+ 		fmt.Printf("      -> ACCEPT\n")
+@@ -2756,7 +2764,7 @@
+ func (p *Parser) applyRecoverAction(s *glrStack, act ParseAction, tok Token, nodeCount *int, arena *nodeArena, entryScratch *glrEntryScratch, gssScratch *gssScratch, trackChildErrors *bool) {
+ 	workCountRecordExplicitRecover()
+ 	if tok.Symbol == 0 && tok.StartByte == tok.EndByte {
+-		s.accepted = true
++		p.acceptStack(s)
+ 		workCountRecordAcceptedHead(p, s, "EOF recovery accepted head")
+ 		return
+ 	}
+@@ -3105,7 +3113,7 @@
+ 		if !stackEntryHasNode(item.entry) {
+ 			continue
+ 		}
+-		childCount := stackEntryNodeChildCount(item.entry)
++		_, childCount, _ := rawStackWalkEntryHeader(arena, item)
+ 		if stackEntryNodeIsMissing(item.entry) && childCount == 0 {
+ 			cost += cErrCostPerMissingTree + cErrCostPerRecovery
+ 			continue
+--- a/parser_result.go
++++ b/parser_result.go
+@@ -563,6 +563,11 @@
+ 			}
+ 			return -1
+ 		} else if ac > 0 {
++			if p.compactPackedGSSVersionOrderEnabled() && a.cAcceptOrder != b.cAcceptOrder {
++				if a.cAcceptOrder < b.cAcceptOrder {
++					return -1
++				}
++			}
+ 			return 1
+ 		}
+ 	}

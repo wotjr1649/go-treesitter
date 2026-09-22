@@ -228,10 +228,11 @@ var builtinLanguageRuntimeProfiles = map[string]builtinLanguageRuntimeProfile{
 			{State: 479, Lookahead: gotreesitter.ConflictPolicyAnyLookahead, Kind: gotreesitter.ConflictPolicyRepetitionShift, ReduceSymbols: []gotreesitter.Symbol{467}},
 		},
 	},
-	// C#'s certified low-pressure accepted-error trees are authoritative. A
+	// C#'s packed version transaction preserves complete recovered trees. A
 	// fresh no-stacks parse instead benefits from a bounded cap-16 retry; the
 	// generic cap-48 ladder exceeds the large-file memory and time budgets.
 	"c_sharp": {
+		compactPackedGSSVersionOrder:  true,
 		blobSHA256:                    mustRuntimeProfileSHA256("7ad425e89733339dde94e3c03b762ae478fb453b530493f5d62e1ae7537e1784"),
 		externalScannerFullParseRetry: gotreesitter.ExternalScannerFullParseRetrySkipRepeat,
 		fullParseGSSConvergence:       true,
@@ -243,10 +244,8 @@ var builtinLanguageRuntimeProfiles = map[string]builtinLanguageRuntimeProfile{
 			gotreesitter.ResultCompatibilityNativeRecoveredStructure,
 		fullParseAcceptedErrorRetryProfile: gotreesitter.FullParseAcceptedErrorRetryProfile{
 			SkipCompleteAcceptedErrorRetry:             true,
-			SkipCompleteMaxEntryScratchPeak:            csharpAcceptedErrorRetryMaxEntryScratchPeak,
 			FreshErrorNoStacksRetryMaxStacks:           csharpFreshErrorNoStacksRetryMaxStacks,
 			SkipInitialCompleteAcceptedErrorMergeRetry: true,
-			GSSConvergenceAcceptedErrorMergePerKey:     csharpGSSConvergenceErrorMergePerKey,
 		},
 	},
 	// Crystal's external-scanner repeat selects the same tree after the complete
