@@ -28,8 +28,7 @@ type Oracle struct {
 	TransportVersion string   `json:"transport_version"`
 	TransportCommit  string   `json:"transport_commit"`
 	Generator        string   `json:"generator"`
-	PreferredABI     int      `json:"preferred_abi"`
-	FallbackABI      int      `json:"fallback_abi"`
+	ABIPolicy        string   `json:"abi_policy"`
 	BuildFlags       []string `json:"build_flags"`
 }
 

@@ -19,9 +19,8 @@
     "transport_module": "github.com/tree-sitter/go-tree-sitter",
     "transport_version": "v0.25.0",
     "transport_commit": "adc13ffd8b2c0b01b878fda9f7c422ce0df5fad3",
-    "generator": "tree-sitter-cli 0.24.7",
-    "preferred_abi": 15,
-    "fallback_abi": 13,
+    "generator": "installed-or-checked-in",
+    "abi_policy": "runtime-compatible",
     "build_flags": ["-std=c11", "-fPIC", "-O2"]
   }
 }

@@ -23,9 +23,9 @@ var regressionFixtures = []struct {
 	{"F7", "const g = <p>plain</p>;", 17, 17},
 }
 
-func TestKR0001aCharacterization(t *testing.T)    { regressionCases(t, 0, 3, "KR-0001a") }
-func TestKR0001bSuspectedDivergence(t *testing.T) { regressionCases(t, 3, 5, "KR-0001b") }
-func TestKR0001Controls(t *testing.T)             { regressionCases(t, 5, 7, "controls") }
+func TestKR0001aCharacterization(t *testing.T) { regressionCases(t, 0, 3, "KR-0001a") }
+func TestKR0001bDivergence(t *testing.T)       { regressionCases(t, 3, 5, "KR-0001b") }
+func TestKR0001Controls(t *testing.T)          { regressionCases(t, 5, 7, "controls") }
 
 func regressionCases(t *testing.T, start, end int, record string) {
 	t.Helper()
