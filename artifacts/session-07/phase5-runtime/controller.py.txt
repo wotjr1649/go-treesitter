@@ -1,0 +1,96 @@
+import difflib, hashlib, json, os, pathlib, statistics, subprocess, sys, zipfile
+
+root = pathlib.Path(__file__).resolve().parents[1]
+out = root / 'artifacts/session-07/phase5-runtime'
+work = root / '.scratch/cost-reuse'
+runtime = root / '.scratch/session07-runtime'
+sha = lambda data: hashlib.sha256(data).hexdigest()
+canonical = lambda value: json.dumps(value, sort_keys=True, separators=(',', ':')).encode()
+def save(path, value):
+    with path.open('x', encoding='utf-8', newline='\n') as f:
+        json.dump(value, f, ensure_ascii=False, indent=2)
+        f.write('\n')
+
+if sys.argv[1] == 'prepare':
+    out.mkdir(parents=True, exist_ok=True)
+    work.mkdir(parents=True, exist_ok=True)
+    archive = root / '.scratch/modcache/cache/download/github.com/odvcencio/gotreesitter/@v/v0.53.0.zip'
+    prefix = 'github.com/odvcencio/gotreesitter@v0.53.0/'
+    with zipfile.ZipFile(archive) as z:
+        expected = {p[len(prefix):]: sha(z.read(p)) for p in z.namelist()}
+    actual = {p.relative_to(runtime).as_posix(): sha(p.read_bytes()) for p in runtime.rglob('*') if p.is_file()}
+    assert expected == actual, 'experimental runtime is not pristine'
+    original = (runtime / 'parser_reduce.go').read_text(encoding='utf-8')
+    before = '\t\tif ac, bc := p.rawStackEntryErrorCost(arena, aEntry), p.rawStackEntryErrorCost(arena, bEntry); ac != bc {'
+    assert original.count(before) == 1
+    changed = original.replace(before, '\t\tac, bc := p.rawStackEntryErrorCost(arena, aEntry), p.rawStackEntryErrorCost(arena, bEntry)\n\t\tif ac != bc {')
+    before = '\t\tif ac := p.rawStackEntryErrorCost(arena, aEntry); ac > 0 {'
+    assert changed.count(before) == 1
+    changed = changed.replace(before, '\t\tif ac > 0 {')
+    backing = work / 'parser_reduce.go.txt'
+    with backing.open('x', encoding='utf-8', newline='\n') as f: f.write(changed)
+    save(work / 'candidate.json', {'Replace': {str(runtime / 'parser_reduce.go'): str(backing)}})
+    with (out / 'candidate.diff').open('x', encoding='utf-8', newline='\n') as f:
+        f.writelines(difflib.unified_diff(original.splitlines(True), changed.splitlines(True), 'original/parser_reduce.go', 'candidate/parser_reduce.go'))
+    owned = [root/'parser.go', root/'go.mod', root/'go.sum', root/'internal/provenance/identities.json', root/'tools/measure/main.go']
+    owned += list((root/'internal/gtsadapter').glob('*.go')) + list((root/'syntax').glob('*.go'))
+    save(out/'plan.json', {'purpose': 'isolated duplicate error-cost calculation removal; no product patch', 'samples_per_variant': 5, 'warm_iterations': 3, 'language': 'cs', 'order': 'alternating baseline/candidate', 'process_timeout_seconds': 45, 'GOMAXPROCS': '1', 'GOMEMLIMIT': '512MiB', 'GOGC': '100', 'archive_sha256': sha(archive.read_bytes()), 'file_count': len(actual), 'original_tree_sha256': sha(canonical(actual)), 'changed_file_before_sha256': sha(original.encode()), 'changed_file_after_sha256': sha(changed.encode()), 'owned_sources': {p.relative_to(root).as_posix(): sha(p.read_bytes()) for p in owned}})
+    print('pristine files', len(actual), 'one source file overlay prepared')
+    sys.exit(0)
+
+env = {k: v for k,v in os.environ.items() if k.upper() in ('SYSTEMROOT','WINDIR','COMSPEC','PATHEXT','PATH','TEMP','TMP')}
+env.update(GOMAXPROCS='1', GOMEMLIMIT='512MiB', GOGC='100')
+if sys.argv[1] == 'measure':
+    rows = []
+    with (out/'samples.jsonl').open('x', encoding='utf-8', newline='\n') as log:
+        for i in range(5):
+            for variant in (['baseline','candidate'] if i%2 == 0 else ['candidate','baseline']):
+                exe = work/(variant+'.exe')
+                result = subprocess.run([str(exe), '-language', 'cs', '-iterations', '3'], capture_output=True, check=True, timeout=45, env=env)
+                row = json.loads(result.stdout)
+                row.update(variant=variant, sample=i, executable_sha256=sha(exe.read_bytes()))
+                log.write(json.dumps(row)+'\n'); log.flush(); rows.append(row)
+                print(variant, i, row['WarmNanosecondsPerParse'], flush=True)
+    assert len({r['SourceSHA256'] for r in rows}) == len({r['NodesSHA256'] for r in rows}) == 1
+    summary = {}
+    for v in ('baseline', 'candidate'):
+        data = [r for r in rows if r['variant']==v]
+        summary[v] = {key: {'median': statistics.median(r[key] for r in data), 'min': min(r[key] for r in data), 'max': max(r[key] for r in data)} for key in ('ColdNanoseconds','WarmNanosecondsPerParse','AllocatedBytesPerParse','FinalHeapBytes')}
+    save(out/'measurements.json', summary)
+elif sys.argv[1] == 'compare':
+    catalogs = [json.loads((root/('testdata/oracle/'+name)).read_text(encoding='utf-8')) for name in ('cases.json','extended-cases.json')]
+    cases = [c for catalog in catalogs for c in catalog]
+    for c in cases:
+        if 'source' not in c: c['source'] = (root/c['path']).read_bytes().decode('utf-8')
+        assert sha(c['source'].encode()) == c['sha256']
+    requests = [{'ID': c['id'], 'Filename': c['filename'], 'Source': c['source']} for c in cases]
+    results = {}
+    for variant in ('baseline','candidate'):
+        exe = work/('probe-'+variant+'.exe')
+        result = subprocess.run([str(exe)], input=json.dumps(requests).encode(), capture_output=True, check=True, timeout=120, env=env)
+        results[variant] = {r['ID']: r for r in map(json.loads,result.stdout.splitlines())}
+    builddir = root/'.scratch/oracle/build-07-hardening'
+    build = json.loads((builddir/'build.json').read_text(encoding='utf-8'))
+    pins = json.loads((root/'internal/provenance/identities.json').read_text(encoding='utf-8'))
+    assert build['pins'] == pins
+    known = json.loads((root/'testdata/oracle/known-differences.json').read_text(encoding='utf-8'))
+    rows=[]
+    for c in cases:
+        a,b = results['baseline'][c['id']], results['candidate'][c['id']]
+        assert not a['Error'] and not b['Error']
+        assert a['Nodes']==b['Nodes'], c['id']
+        for field in ('Outcome','StopReason','HasError','HasMissing','SnapshotComplete'):
+            assert a['Diagnostics'].get(field)==b['Diagnostics'].get(field), (c['id'],field)
+        artifact=build['grammars'][c['language']]; exe=builddir/artifact['executable']
+        assert sha(exe.read_bytes()) == artifact['executable_sha256']
+        native=json.loads(subprocess.run([str(exe)], input=c['source'].encode(), capture_output=True, check=True, timeout=15, env=env).stdout)
+        same=b['Nodes']==native['nodes']
+        assert same == (c['id'] not in known), c['id']
+        digest = lambda n: sha(json.dumps(n,ensure_ascii=False,separators=(',',':')).encode())
+        if c['id'] in known:
+            assert digest(a['Nodes'])==known[c['id']]['GoDigest'] and digest(native['nodes'])==known[c['id']]['CDigest']
+        rows.append({'id':c['id'],'source_sha256':c['sha256'],'baseline_candidate_equal':True,'c_equal':same,'go_digest':digest(a['Nodes']),'c_digest':digest(native['nodes']),'go_nodes':len(a['Nodes']),'c_nodes':len(native['nodes'])})
+    save(out/'comparisons.json', {'pins':pins,'c_build_sha256':sha((builddir/'build.json').read_bytes()),'executables':{v:sha((work/('probe-'+v+'.exe')).read_bytes()) for v in results},'rows':rows})
+    print('85 fresh ordered snapshots identical between variants; expected C differences unchanged')
+else:
+    raise ValueError('unknown mode')

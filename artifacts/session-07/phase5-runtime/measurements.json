@@ -1,0 +1,46 @@
+{
+  "baseline": {
+    "ColdNanoseconds": {
+      "median": 1289550100,
+      "min": 1112349900,
+      "max": 2236446900
+    },
+    "WarmNanosecondsPerParse": {
+      "median": 1292605833,
+      "min": 970753066,
+      "max": 2293374733
+    },
+    "AllocatedBytesPerParse": {
+      "median": 24425554,
+      "min": 24425514,
+      "max": 24425570
+    },
+    "FinalHeapBytes": {
+      "median": 39439648,
+      "min": 39439328,
+      "max": 39440432
+    }
+  },
+  "candidate": {
+    "ColdNanoseconds": {
+      "median": 981696800,
+      "min": 893555800,
+      "max": 1062702400
+    },
+    "WarmNanosecondsPerParse": {
+      "median": 830128200,
+      "min": 726231966,
+      "max": 1007923033
+    },
+    "AllocatedBytesPerParse": {
+      "median": 19978053,
+      "min": 19978037,
+      "max": 19978069
+    },
+    "FinalHeapBytes": {
+      "median": 39440192,
+      "min": 39439152,
+      "max": 39440944
+    }
+  }
+}

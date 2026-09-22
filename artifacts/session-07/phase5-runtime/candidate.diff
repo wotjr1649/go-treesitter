@@ -1,0 +1,21 @@
+--- original/parser_reduce.go
++++ candidate/parser_reduce.go
+@@ -2928,7 +2928,8 @@
+ 	if aParent != nil && bParent != nil {
+ 		aEntry := newStackEntryNode(aParent.parseState, aParent)
+ 		bEntry := newStackEntryNode(bParent.parseState, bParent)
+-		if ac, bc := p.rawStackEntryErrorCost(arena, aEntry), p.rawStackEntryErrorCost(arena, bEntry); ac != bc {
++		ac, bc := p.rawStackEntryErrorCost(arena, aEntry), p.rawStackEntryErrorCost(arena, bEntry)
++		if ac != bc {
+ 			if ac < bc {
+ 				return -1
+ 			}
+@@ -2940,7 +2941,7 @@
+ 			}
+ 			return 1
+ 		}
+-		if ac := p.rawStackEntryErrorCost(arena, aEntry); ac > 0 {
++		if ac > 0 {
+ 			return -1
+ 		}
+ 		if cmp := p.compareRawStackEntries(arena, aEntry, bEntry); cmp != 0 {
