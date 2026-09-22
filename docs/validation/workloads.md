@@ -41,7 +41,9 @@ See `docs/validation/known-regressions.md`.
 ## Tier 3 — pinned public corpus (external; lands when a comparison session is authorized)
 
 Newtonsoft.Json @ `4f73e74372445108d2c1bda37b36e6f5e43402e0`, MIT (James Newton-King).
-The license file must be copied alongside the sources.
+The license file must be copied alongside the sources. Session 05 stores them
+under `testdata/newtonsoft/`; `manifest.json` and the nested comparison harness
+check all three LF hashes and the license before any measurement.
 
 | File | LF bytes | SHA-256 |
 |---|---:|---|
