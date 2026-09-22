@@ -1,0 +1,31 @@
+goos: windows
+goarch: amd64
+pkg: github.com/wotjr1649/go-treesitter/internal/gtsadapter
+cpu: Intel(R) Core(TM) Ultra 9 285H
+BenchmarkSnapshotLookup/BuildIndex         	     200	    871842 ns/op	  888320 B/op	     109 allocs/op
+BenchmarkSnapshotLookup/BuildIndex         	     200	    831409 ns/op	  888320 B/op	     109 allocs/op
+BenchmarkSnapshotLookup/BuildIndex         	     200	    973574 ns/op	  888320 B/op	     109 allocs/op
+BenchmarkSnapshotLookup/BuildIndex         	     200	    854507 ns/op	  888320 B/op	     109 allocs/op
+BenchmarkSnapshotLookup/BuildIndex         	     200	    875758 ns/op	  888320 B/op	     109 allocs/op
+BenchmarkSnapshotLookup/LinearPosition     	     200	     15295 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/LinearPosition     	     200	     13626 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/LinearPosition     	     200	     13280 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/LinearPosition     	     200	     13896 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/LinearPosition     	     200	     13304 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/LinearType         	     200	     13070 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/LinearType         	     200	     14942 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/LinearType         	     200	     12987 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/LinearType         	     200	     13862 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/LinearType         	     200	     13256 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/IndexedPosition    	     200	       594.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/IndexedPosition    	     200	       482.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/IndexedPosition    	     200	       555.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/IndexedPosition    	     200	       520.0 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/IndexedPosition    	     200	       477.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/IndexedType        	     200	      5196 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/IndexedType        	     200	      5566 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/IndexedType        	     200	      5324 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/IndexedType        	     200	      5630 ns/op	       0 B/op	       0 allocs/op
+BenchmarkSnapshotLookup/IndexedType        	     200	      6242 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/wotjr1649/go-treesitter/internal/gtsadapter	1.392s

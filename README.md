@@ -37,6 +37,15 @@ error outcomes, cancellation and tree release from a separate Go module.
 Keep each tree on one worker; close every returned tree. The API remains
 unreleased and may change before the first version tag.
 
+For repeated AST lookup, build `index, err := syntax.NewIndex(result.Tree.Nodes())`
+after a complete result. `index.NodeAt(byteOffset)` returns the deepest node's
+snapshot index, and `index.OfType("identifier")` yields matching indexes in
+preorder. Positions use half-open UTF-8 byte ranges; EOF and zero-width missing
+nodes are excluded from position lookup. The index is optional, retains no
+backend handle, and supports concurrent readers. Rebuild it after an edit.
+Construction adds time and memory, so a single scan can be cheaper for a few
+lookups. See the retained `BenchmarkSnapshotLookup` for the measured workload.
+
 For bounded inputs, set `Request.Limits`, for example
 `syntax.Limits{MaxInputBytes: 8 << 20, MaxSnapshotNodes: 100_000,
 MemoryBudgetBytes: 64 << 20}`. Runtime memory and work limits are checked at

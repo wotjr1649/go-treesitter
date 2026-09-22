@@ -48,6 +48,9 @@ artifacts/             evidence plane, append-only
 
 `syntax/` and the root constructor are public import paths; the adapter remains
 internal. They are not versioned as a stable release yet. See ADR-0009.
+`syntax.Index` optionally indexes snapshot byte ranges and node types for
+repeated lookup. It carries no parser handle or semantic-resolution behavior.
+See ADR-0011 for ownership and cost.
 
 ## Boundary rules
 

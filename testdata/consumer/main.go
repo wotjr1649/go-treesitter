@@ -41,6 +41,24 @@ func main() {
 	if !reflect.DeepEqual(inc.Tree.Nodes(), fresh.Tree.Nodes()) {
 		panic("incremental snapshot differs or old-tree release invalidated it")
 	}
+	index, err := syntax.NewIndex(fresh.Tree.Nodes())
+	if err != nil {
+		panic("snapshot index failed")
+	}
+	node, found := index.NodeAt(uint32(bytes.Index(after, []byte("22"))))
+	if !found || fresh.Tree.Nodes()[node].Type != "int_literal" {
+		panic("position lookup failed")
+	}
+	identifiers := 0
+	for i := range index.OfType("identifier") {
+		if fresh.Tree.Nodes()[i].Type != "identifier" {
+			panic("type lookup failed")
+		}
+		identifiers++
+	}
+	if identifiers == 0 {
+		panic("type lookup empty")
+	}
 	broken, err := p.Parse(context.Background(), syntax.Request{Filename: "x.go", Source: []byte("package p\nfunc f( {\n"), Timeout: time.Second})
 	if err != nil || !broken.Complete() || broken.Outcome != syntax.AcceptedWithErrors || broken.Tree == nil {
 		panic("usable error tree not exposed")

@@ -65,6 +65,7 @@ Never check in their output.
 |---|---|---|
 | `GEN-CS-PATTERN` | C# classes with `catch (…) when (e is T Target)` filter patterns | method count 1 / 4 / 8 / 16 |
 | `GEN-CS-BULK` | repeated numbered C# classes with `var x<i> = <i>; return x<i>;` | target ≥ 137 KiB; edit site = first `x0` |
+| `GEN-GO-LOOKUP` | `package p` plus numbered `var item<i> = <i>` declarations | 2,048 declarations, LF; `BenchmarkSnapshotLookup`; five fixed samples of 200 operations in Session 07 |
 
 `GEN-CS-BULK` matches the generator upstream itself uses for its C# recovered-structure parity
 witness. Keep it aligned with upstream's shape so results stay comparable.

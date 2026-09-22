@@ -1,0 +1,184 @@
+{
+  "schema": 1,
+  "go": "go1.27.1",
+  "os": "windows",
+  "arch": "amd64",
+  "cgo": 0,
+  "GOMAXPROCS": 1,
+  "GOMEMLIMIT": "512MiB",
+  "samples_per_variant": 5,
+  "iterations_per_sample": 200,
+  "source_sha256": "563efddda8feb88f22542ec91f96d2ba3c848c4f075638429f71a0136db0af78",
+  "source_bytes": 38750,
+  "generator": "package p LF; 2048 lines var item{i} = {i} LF",
+  "files": {
+    "syntax/index.go": "815a0b039ec294e015bde3b1d21c5be8a37bf6df03bbe6d855f8569e2e83045d",
+    "internal/gtsadapter/index_test.go": "4fb1f68d92f175d1300cff596b984c18221c608f4ff0f6793d1c348e2ee9f1cf",
+    "internal/gtsadapter/adapter.go": "cc52357b3a73ec3d0eb5887abff260573e9074a5e2cf26fb17da8b4ff102906a",
+    "go.mod": "60e068a66c71f3ce7c1b04dbe04e404e01e2d1eace07373dfe3fd0a8345f6889",
+    "go.sum": "87c97651162785c246dabcd3fdcd916cd7baabe2f8554bbdb31eea5ce9704cd6",
+    "internal/provenance/identities.json": "c190e01ce1fa283b3953d9ff613a5dbf9b57f8c5ace8820c72501b8ddeeed1a2"
+  },
+  "measurements": {
+    "BuildIndex": {
+      "median_ns": 871842.0,
+      "min_ns": 831409.0,
+      "max_ns": 973574.0,
+      "samples": [
+        {
+          "ns": 871842.0,
+          "bytes": 888320,
+          "allocs": 109
+        },
+        {
+          "ns": 831409.0,
+          "bytes": 888320,
+          "allocs": 109
+        },
+        {
+          "ns": 973574.0,
+          "bytes": 888320,
+          "allocs": 109
+        },
+        {
+          "ns": 854507.0,
+          "bytes": 888320,
+          "allocs": 109
+        },
+        {
+          "ns": 875758.0,
+          "bytes": 888320,
+          "allocs": 109
+        }
+      ]
+    },
+    "LinearPosition": {
+      "median_ns": 13626.0,
+      "min_ns": 13280.0,
+      "max_ns": 15295.0,
+      "samples": [
+        {
+          "ns": 15295.0,
+          "bytes": 0,
+          "allocs": 0
+        },
+        {
+          "ns": 13626.0,
+          "bytes": 0,
+          "allocs": 0
+        },
+        {
+          "ns": 13280.0,
+          "bytes": 0,
+          "allocs": 0
+        },
+        {
+          "ns": 13896.0,
+          "bytes": 0,
+          "allocs": 0
+        },
+        {
+          "ns": 13304.0,
+          "bytes": 0,
+          "allocs": 0
+        }
+      ]
+    },
+    "LinearType": {
+      "median_ns": 13256.0,
+      "min_ns": 12987.0,
+      "max_ns": 14942.0,
+      "samples": [
+        {
+          "ns": 13070.0,
+          "bytes": 0,
+          "allocs": 0
+        },
+        {
+          "ns": 14942.0,
+          "bytes": 0,
+          "allocs": 0
+        },
+        {
+          "ns": 12987.0,
+          "bytes": 0,
+          "allocs": 0
+        },
+        {
+          "ns": 13862.0,
+          "bytes": 0,
+          "allocs": 0
+        },
+        {
+          "ns": 13256.0,
+          "bytes": 0,
+          "allocs": 0
+        }
+      ]
+    },
+    "IndexedPosition": {
+      "median_ns": 520.0,
+      "min_ns": 477.5,
+      "max_ns": 594.5,
+      "samples": [
+        {
+          "ns": 594.5,
+          "bytes": 0,
+          "allocs": 0
+        },
+        {
+          "ns": 482.5,
+          "bytes": 0,
+          "allocs": 0
+        },
+        {
+          "ns": 555.5,
+          "bytes": 0,
+          "allocs": 0
+        },
+        {
+          "ns": 520.0,
+          "bytes": 0,
+          "allocs": 0
+        },
+        {
+          "ns": 477.5,
+          "bytes": 0,
+          "allocs": 0
+        }
+      ]
+    },
+    "IndexedType": {
+      "median_ns": 5566.0,
+      "min_ns": 5196.0,
+      "max_ns": 6242.0,
+      "samples": [
+        {
+          "ns": 5196.0,
+          "bytes": 0,
+          "allocs": 0
+        },
+        {
+          "ns": 5566.0,
+          "bytes": 0,
+          "allocs": 0
+        },
+        {
+          "ns": 5324.0,
+          "bytes": 0,
+          "allocs": 0
+        },
+        {
+          "ns": 5630.0,
+          "bytes": 0,
+          "allocs": 0
+        },
+        {
+          "ns": 6242.0,
+          "bytes": 0,
+          "allocs": 0
+        }
+      ]
+    }
+  }
+}
