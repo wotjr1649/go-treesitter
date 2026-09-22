@@ -1,0 +1,464 @@
+{
+  "go": {
+    "default": {
+      "ColdNanoseconds": {
+        "median": 55418100,
+        "min": 53582500,
+        "max": 57681700
+      },
+      "WarmNanosecondsPerParse": {
+        "median": 2713645,
+        "min": 2453090,
+        "max": 2843275
+      },
+      "InitialHeapBytes": {
+        "median": 912520,
+        "min": 912200,
+        "max": 913160
+      },
+      "FinalHeapBytes": {
+        "median": 16053480,
+        "min": 16013304,
+        "max": 16094472
+      },
+      "AllocatedBytesPerParse": {
+        "median": 1445760,
+        "min": 1445757,
+        "max": 1445766
+      },
+      "process_wall_ns": {
+        "median": 151635600,
+        "min": 143238300,
+        "max": 193426000
+      }
+    },
+    "subset": {
+      "ColdNanoseconds": {
+        "median": 53625000,
+        "min": 51802200,
+        "max": 60141800
+      },
+      "WarmNanosecondsPerParse": {
+        "median": 2573365,
+        "min": 2500985,
+        "max": 2669145
+      },
+      "InitialHeapBytes": {
+        "median": 251704,
+        "min": 251224,
+        "max": 256960
+      },
+      "FinalHeapBytes": {
+        "median": 15303720,
+        "min": 15260664,
+        "max": 15344040
+      },
+      "AllocatedBytesPerParse": {
+        "median": 1445760,
+        "min": 1445755,
+        "max": 1445773
+      },
+      "process_wall_ns": {
+        "median": 153033800,
+        "min": 144509500,
+        "max": 186274400
+      }
+    }
+  },
+  "py": {
+    "default": {
+      "ColdNanoseconds": {
+        "median": 25770500,
+        "min": 24916000,
+        "max": 28073400
+      },
+      "WarmNanosecondsPerParse": {
+        "median": 2915085,
+        "min": 2800445,
+        "max": 3068215
+      },
+      "InitialHeapBytes": {
+        "median": 912360,
+        "min": 912040,
+        "max": 913640
+      },
+      "FinalHeapBytes": {
+        "median": 7253616,
+        "min": 7252672,
+        "max": 7254064
+      },
+      "AllocatedBytesPerParse": {
+        "median": 1349668,
+        "min": 1349651,
+        "max": 1349730
+      },
+      "process_wall_ns": {
+        "median": 124105800,
+        "min": 115308400,
+        "max": 143685400
+      }
+    },
+    "subset": {
+      "ColdNanoseconds": {
+        "median": 24896300,
+        "min": 23633800,
+        "max": 25801000
+      },
+      "WarmNanosecondsPerParse": {
+        "median": 2907545,
+        "min": 2617740,
+        "max": 3156675
+      },
+      "InitialHeapBytes": {
+        "median": 252184,
+        "min": 250744,
+        "max": 252184
+      },
+      "FinalHeapBytes": {
+        "median": 6501168,
+        "min": 6492704,
+        "max": 6502560
+      },
+      "AllocatedBytesPerParse": {
+        "median": 1349654,
+        "min": 1349648,
+        "max": 1349669
+      },
+      "process_wall_ns": {
+        "median": 114295900,
+        "min": 111104000,
+        "max": 123443400
+      }
+    }
+  },
+  "js": {
+    "default": {
+      "ColdNanoseconds": {
+        "median": 9614200,
+        "min": 9579800,
+        "max": 10181700
+      },
+      "WarmNanosecondsPerParse": {
+        "median": 1144670,
+        "min": 923005,
+        "max": 1246680
+      },
+      "InitialHeapBytes": {
+        "median": 912168,
+        "min": 911848,
+        "max": 912968
+      },
+      "FinalHeapBytes": {
+        "median": 11352952,
+        "min": 11351672,
+        "max": 11354072
+      },
+      "AllocatedBytesPerParse": {
+        "median": 381134,
+        "min": 381134,
+        "max": 381136
+      },
+      "process_wall_ns": {
+        "median": 56794200,
+        "min": 55736000,
+        "max": 60378900
+      }
+    },
+    "subset": {
+      "ColdNanoseconds": {
+        "median": 7524200,
+        "min": 7406700,
+        "max": 7926500
+      },
+      "WarmNanosecondsPerParse": {
+        "median": 1124715,
+        "min": 1081760,
+        "max": 1203840
+      },
+      "InitialHeapBytes": {
+        "median": 252168,
+        "min": 251208,
+        "max": 252328
+      },
+      "FinalHeapBytes": {
+        "median": 10601896,
+        "min": 10600936,
+        "max": 10602056
+      },
+      "AllocatedBytesPerParse": {
+        "median": 381134,
+        "min": 381132,
+        "max": 381135
+      },
+      "process_wall_ns": {
+        "median": 53702200,
+        "min": 50973400,
+        "max": 57616900
+      }
+    }
+  },
+  "jsx": {
+    "default": {
+      "ColdNanoseconds": {
+        "median": 11746000,
+        "min": 10466600,
+        "max": 12089600
+      },
+      "WarmNanosecondsPerParse": {
+        "median": 2621385,
+        "min": 2500720,
+        "max": 2780245
+      },
+      "InitialHeapBytes": {
+        "median": 915816,
+        "min": 915816,
+        "max": 916936
+      },
+      "FinalHeapBytes": {
+        "median": 12647768,
+        "min": 12647592,
+        "max": 12648248
+      },
+      "AllocatedBytesPerParse": {
+        "median": 943881,
+        "min": 943881,
+        "max": 943886
+      },
+      "process_wall_ns": {
+        "median": 111539200,
+        "min": 107928200,
+        "max": 119872300
+      }
+    },
+    "subset": {
+      "ColdNanoseconds": {
+        "median": 9370400,
+        "min": 8530700,
+        "max": 9531400
+      },
+      "WarmNanosecondsPerParse": {
+        "median": 2479005,
+        "min": 2388010,
+        "max": 2759695
+      },
+      "InitialHeapBytes": {
+        "median": 255656,
+        "min": 255496,
+        "max": 257096
+      },
+      "FinalHeapBytes": {
+        "median": 11897016,
+        "min": 11896216,
+        "max": 11897816
+      },
+      "AllocatedBytesPerParse": {
+        "median": 943883,
+        "min": 943881,
+        "max": 943885
+      },
+      "process_wall_ns": {
+        "median": 103667200,
+        "min": 99848400,
+        "max": 104635900
+      }
+    }
+  },
+  "ts": {
+    "default": {
+      "ColdNanoseconds": {
+        "median": 46885300,
+        "min": 45956700,
+        "max": 55094500
+      },
+      "WarmNanosecondsPerParse": {
+        "median": 3064250,
+        "min": 2760110,
+        "max": 3514635
+      },
+      "InitialHeapBytes": {
+        "median": 912808,
+        "min": 912328,
+        "max": 913288
+      },
+      "FinalHeapBytes": {
+        "median": 10745728,
+        "min": 10738240,
+        "max": 10746768
+      },
+      "AllocatedBytesPerParse": {
+        "median": 2091832,
+        "min": 2091827,
+        "max": 2091841
+      },
+      "process_wall_ns": {
+        "median": 141911700,
+        "min": 134151600,
+        "max": 156268600
+      }
+    },
+    "subset": {
+      "ColdNanoseconds": {
+        "median": 48162600,
+        "min": 41860000,
+        "max": 52376800
+      },
+      "WarmNanosecondsPerParse": {
+        "median": 2944970,
+        "min": 2855475,
+        "max": 3097280
+      },
+      "InitialHeapBytes": {
+        "median": 251528,
+        "min": 250888,
+        "max": 252168
+      },
+      "FinalHeapBytes": {
+        "median": 9993792,
+        "min": 9993456,
+        "max": 9994288
+      },
+      "AllocatedBytesPerParse": {
+        "median": 2091829,
+        "min": 2091824,
+        "max": 2091841
+      },
+      "process_wall_ns": {
+        "median": 149158500,
+        "min": 131683400,
+        "max": 172454300
+      }
+    }
+  },
+  "tsx": {
+    "default": {
+      "ColdNanoseconds": {
+        "median": 63053700,
+        "min": 56776200,
+        "max": 68158700
+      },
+      "WarmNanosecondsPerParse": {
+        "median": 7343280,
+        "min": 6480270,
+        "max": 7534070
+      },
+      "InitialHeapBytes": {
+        "median": 916936,
+        "min": 915176,
+        "max": 921712
+      },
+      "FinalHeapBytes": {
+        "median": 10912096,
+        "min": 10905544,
+        "max": 10920744
+      },
+      "AllocatedBytesPerParse": {
+        "median": 5777683,
+        "min": 5777674,
+        "max": 5777696
+      },
+      "process_wall_ns": {
+        "median": 269185300,
+        "min": 248884800,
+        "max": 277683400
+      }
+    },
+    "subset": {
+      "ColdNanoseconds": {
+        "median": 59644800,
+        "min": 56031000,
+        "max": 61425300
+      },
+      "WarmNanosecondsPerParse": {
+        "median": 6848490,
+        "min": 6385925,
+        "max": 6890660
+      },
+      "InitialHeapBytes": {
+        "median": 256296,
+        "min": 255336,
+        "max": 256936
+      },
+      "FinalHeapBytes": {
+        "median": 10169816,
+        "min": 10168360,
+        "max": 10171080
+      },
+      "AllocatedBytesPerParse": {
+        "median": 5777684,
+        "min": 5777670,
+        "max": 5777711
+      },
+      "process_wall_ns": {
+        "median": 254026300,
+        "min": 228776200,
+        "max": 265875100
+      }
+    }
+  },
+  "cs": {
+    "default": {
+      "ColdNanoseconds": {
+        "median": 909293300,
+        "min": 650761400,
+        "max": 2034199900
+      },
+      "WarmNanosecondsPerParse": {
+        "median": 1044417865,
+        "min": 826338845,
+        "max": 2034392205
+      },
+      "InitialHeapBytes": {
+        "median": 916632,
+        "min": 916152,
+        "max": 916952
+      },
+      "FinalHeapBytes": {
+        "median": 39440464,
+        "min": 39439680,
+        "max": 39441264
+      },
+      "AllocatedBytesPerParse": {
+        "median": 24425448,
+        "min": 24425439,
+        "max": 24425479
+      },
+      "process_wall_ns": {
+        "median": 21911648200,
+        "min": 17511918900,
+        "max": 42894702100
+      }
+    },
+    "subset": {
+      "ColdNanoseconds": {
+        "median": 799022500,
+        "min": 764173300,
+        "max": 947854900
+      },
+      "WarmNanosecondsPerParse": {
+        "median": 1018939215,
+        "min": 855125120,
+        "max": 1295484435
+      },
+      "InitialHeapBytes": {
+        "median": 255976,
+        "min": 254376,
+        "max": 260912
+      },
+      "FinalHeapBytes": {
+        "median": 38689168,
+        "min": 38687744,
+        "max": 38693944
+      },
+      "AllocatedBytesPerParse": {
+        "median": 24425436,
+        "min": 24425436,
+        "max": 24425436
+      },
+      "process_wall_ns": {
+        "median": 21262856300,
+        "min": 17939362800,
+        "max": 26789276200
+      }
+    }
+  }
+}

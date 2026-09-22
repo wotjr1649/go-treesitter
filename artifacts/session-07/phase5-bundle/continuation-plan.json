@@ -1,0 +1,9 @@
+{
+  "reason": "20 warm C# parses observed at 0.939s each plus startup exhausted 20s process bound",
+  "original_completed_rows": 61,
+  "remaining_rows": 9,
+  "process_timeout_seconds": 45,
+  "measurement_iterations_unchanged": 20,
+  "failed_attempt_retained": "measurements-01.log",
+  "orphan_process_check": "no measure-default.exe or measure-subset.exe observed after subprocess.run timeout cleanup"
+}

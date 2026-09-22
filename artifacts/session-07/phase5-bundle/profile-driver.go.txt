@@ -1,0 +1,102 @@
+// Command measure reports one bounded, fixed-workload parser measurement.
+// It writes JSON to stdout; it neither reads source files nor uses the network.
+package main
+
+import (
+	"bytes"
+	"context"
+	"crypto/sha256"
+	"encoding/json"
+	"flag"
+	"fmt"
+	"os"
+	"runtime"
+"runtime/pprof"
+	"time"
+
+	treesitter "github.com/wotjr1649/go-treesitter"
+	"github.com/wotjr1649/go-treesitter/syntax"
+)
+
+func main() {
+ profile, err := os.OpenFile(".scratch/csharp-cpu.pprof", os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+ if err != nil { panic(err) }
+ if err := pprof.StartCPUProfile(profile); err != nil { panic(err) }
+ defer func() { pprof.StopCPUProfile(); if err := profile.Close(); err != nil { panic(err) } }()
+
+	language := flag.String("language", "go", "go, py, js, jsx, ts, tsx or cs")
+	iterations := flag.Int("iterations", 20, "warm parses (1..1000)")
+	flag.Parse()
+	formats := map[string]string{
+		"go": "func f%d() int { return %d }\n", "py": "def f%d():\n    return %d\n",
+		"js": "const value%d = %d;\n", "jsx": "const View%d = () => <p>{%d}</p>;\n",
+		"ts": "const value%d: number = %d;\n", "tsx": "const View%d = () => <p>{%d}</p>;\n",
+		"cs": "class C%d { public int F() => %d; }\n",
+	}
+	format, ok := formats[*language]
+	if !ok || *iterations < 1 || *iterations > 1000 {
+		fmt.Fprintln(os.Stderr, "invalid workload options")
+		os.Exit(2)
+	}
+	var source bytes.Buffer
+	if *language == "go" {
+		source.WriteString("package p\n")
+	}
+	for i := range 128 {
+		fmt.Fprintf(&source, format, i, i)
+	}
+	runtime.GC()
+	var initial runtime.MemStats
+	runtime.ReadMemStats(&initial)
+	p := treesitter.New()
+	var nodesDigest string
+	var nodeCount int
+	var cold time.Duration
+	var warm time.Duration
+	var allocated uint64
+	for i := 0; i <= *iterations; i++ {
+		var before, after runtime.MemStats
+		runtime.ReadMemStats(&before)
+		start := time.Now()
+		r, err := p.Parse(context.Background(), syntax.Request{Filename: "measure." + *language, Source: source.Bytes(), Timeout: 10 * time.Second})
+		duration := time.Since(start)
+		runtime.ReadMemStats(&after)
+		if err != nil || !r.Complete() || r.Outcome != syntax.AcceptedClean {
+			if r.Tree != nil {
+				r.Tree.Close()
+			}
+			fmt.Fprintln(os.Stderr, "incomplete measurement parse", r.Outcome)
+			os.Exit(1)
+		}
+		nodes := r.Tree.Nodes()
+		encoded, err := json.Marshal(nodes)
+		if err != nil {
+			r.Tree.Close()
+			panic(err)
+		}
+		digest := fmt.Sprintf("%x", sha256.Sum256(encoded))
+		r.Tree.Close()
+		if i == 0 {
+			cold, nodesDigest, nodeCount = duration, digest, len(nodes)
+		} else {
+			if digest != nodesDigest {
+				fmt.Fprintln(os.Stderr, "nondeterministic snapshot")
+				os.Exit(1)
+			}
+			warm += duration
+			allocated += after.TotalAlloc - before.TotalAlloc
+		}
+	}
+	runtime.GC()
+	var final runtime.MemStats
+	runtime.ReadMemStats(&final)
+	if err := json.NewEncoder(os.Stdout).Encode(struct {
+		Language, SourceSHA256, NodesSHA256                      string
+		Bytes, Nodes, Iterations                                 int
+		ColdNanoseconds, WarmNanosecondsPerParse                 int64
+		InitialHeapBytes, FinalHeapBytes, AllocatedBytesPerParse uint64
+	}{*language, fmt.Sprintf("%x", sha256.Sum256(source.Bytes())), nodesDigest, source.Len(), nodeCount, *iterations,
+		int64(cold), int64(warm) / int64(*iterations), initial.HeapAlloc, final.HeapAlloc, allocated / uint64(*iterations)}); err != nil {
+		panic(err)
+	}
+}

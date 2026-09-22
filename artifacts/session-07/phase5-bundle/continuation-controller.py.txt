@@ -1,0 +1,26 @@
+import hashlib,json,os,pathlib,statistics,subprocess,time
+root=pathlib.Path.cwd();phase=root/'artifacts/session-07/phase5-bundle';sha=lambda b:hashlib.sha256(b).hexdigest()
+plan=json.loads((phase/'measurement-plan.json').read_text(encoding='utf-8'));rows=[json.loads(s) for s in (phase/'samples.jsonl').read_text(encoding='utf-8').splitlines()]
+assert len(rows)==61
+exes={v:root/('.scratch/measure-'+v+'.exe') for v in ('default','subset')}
+for v,p in exes.items():assert sha(p.read_bytes())==plan['binaries'][v]['sha256']
+env={k:v for k,v in os.environ.items() if k.upper() in ('SYSTEMROOT','WINDIR','COMSPEC','PATHEXT','PATH','TEMP','TMP')};env.update(GOMAXPROCS='1',GOMEMLIMIT='512MiB',GOGC='100')
+complete={(r['variant'],r['sample']) for r in rows if r['Language']=='cs'}
+with (phase/'continuation-plan.json').open('x',encoding='utf-8',newline='\n') as f:json.dump({'reason':'20 warm C# parses observed at 0.939s each plus startup exhausted 20s process bound','original_completed_rows':61,'remaining_rows':9,'process_timeout_seconds':45,'measurement_iterations_unchanged':20,'failed_attempt_retained':'measurements-01.log','orphan_process_check':'no measure-default.exe or measure-subset.exe observed after subprocess.run timeout cleanup'},f,indent=2);f.write('\n')
+with (phase/'continuation-samples.jsonl').open('x',encoding='utf-8',newline='\n') as stream:
+ for sample in range(5):
+  for variant in (('default','subset') if sample%2==0 else ('subset','default')):
+   if (variant,sample) in complete:continue
+   start=time.perf_counter_ns();result=subprocess.run([str(exes[variant]),'-language','cs','-iterations','20'],capture_output=True,timeout=45,check=True,env=env);wall=time.perf_counter_ns()-start
+   row=json.loads(result.stdout);row.update(variant=variant,sample=sample,process_wall_ns=wall);rows.append(row);stream.write(json.dumps(row,separators=(',',':'))+'\n');stream.flush()
+   print('completed cs',variant,sample,flush=True)
+assert len(rows)==70
+summary={}
+for language in plan['languages']:
+ own=[r for r in rows if r['Language']==language];assert len({(r['SourceSHA256'],r['NodesSHA256'],r['Bytes'],r['Nodes']) for r in own})==1
+ summary[language]={}
+ for variant in exes:
+  group=[r for r in own if r['variant']==variant];assert len(group)==5
+  summary[language][variant]={k:{'median':statistics.median(r[k] for r in group),'min':min(r[k] for r in group),'max':max(r[k] for r in group)} for k in ['ColdNanoseconds','WarmNanosecondsPerParse','InitialHeapBytes','FinalHeapBytes','AllocatedBytesPerParse','process_wall_ns']}
+with (phase/'measurements.json').open('x',encoding='utf-8',newline='\n') as f:json.dump(summary,f,indent=2);f.write('\n')
+print('all seventy planned samples complete; seven source/tree identities match across builds')

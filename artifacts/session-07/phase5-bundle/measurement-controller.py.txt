@@ -1,0 +1,27 @@
+import hashlib,json,os,pathlib,statistics,subprocess,time
+root=pathlib.Path.cwd(); phase=root/'artifacts/session-07/phase5-bundle'; sha=lambda b:hashlib.sha256(b).hexdigest()
+exes={variant:root/('.scratch/measure-'+variant+'.exe') for variant in ('default','subset')}
+env={k:v for k,v in os.environ.items() if k.upper() in ('SYSTEMROOT','WINDIR','COMSPEC','PATHEXT','PATH','TEMP','TMP')};env.update(GOMAXPROCS='1',GOMEMLIMIT='512MiB',GOGC='100')
+metadata={'schema':1,'runs_per_variant_per_language':5,'warm_iterations_per_run':20,'languages':['go','py','js','jsx','ts','tsx','cs'],'order':'default/subset then subset/default, alternating by sample','environment':{'GOMAXPROCS':1,'GOMEMLIMIT':'512MiB','GOGC':100,'os':'windows','arch':'amd64','go':'go1.27.1','CGO_ENABLED':0},'binaries':{v:{'sha256':sha(p.read_bytes()),'bytes':p.stat().st_size} for v,p in exes.items()},'inputs':{p:sha((root/p).read_bytes()) for p in ['tools/measure/main.go','internal/gtsadapter/adapter.go','go.mod','go.sum','internal/provenance/identities.json']}}
+with (phase/'measurement-plan.json').open('x',encoding='utf-8',newline='\n') as f:json.dump(metadata,f,indent=2);f.write('\n')
+rows=[]
+with (phase/'samples.jsonl').open('x',encoding='utf-8',newline='\n') as stream:
+ for language in metadata['languages']:
+  for sample in range(5):
+   for variant in (('default','subset') if sample%2==0 else ('subset','default')):
+    start=time.perf_counter_ns();result=subprocess.run([str(exes[variant]),'-language',language,'-iterations','20'],capture_output=True,timeout=20,check=True,env=env);wall=time.perf_counter_ns()-start
+    row=json.loads(result.stdout);row.update(variant=variant,sample=sample,process_wall_ns=wall)
+    rows.append(row);stream.write(json.dumps(row,separators=(',',':'))+'\n');stream.flush()
+  own=[r for r in rows if r['Language']==language]
+  assert len({(r['SourceSHA256'],r['NodesSHA256'],r['Bytes'],r['Nodes']) for r in own})==1
+  print(language,'five paired samples complete; snapshots equal',flush=True)
+summary={}
+for language in metadata['languages']:
+ summary[language]={}
+ for variant in exes:
+  own=[r for r in rows if r['Language']==language and r['variant']==variant]
+  summary[language][variant]={k:{'median':statistics.median(r[k] for r in own),'min':min(r[k] for r in own),'max':max(r[k] for r in own)} for k in ['ColdNanoseconds','WarmNanosecondsPerParse','InitialHeapBytes','FinalHeapBytes','AllocatedBytesPerParse','process_wall_ns']}
+with (phase/'measurements.json').open('x',encoding='utf-8',newline='\n') as f:json.dump(summary,f,indent=2);f.write('\n')
+print('binary bytes', {v:r['bytes'] for v,r in metadata['binaries'].items()})
+for lang,data in summary.items():
+ print(lang,{v:{k:round(m['median']) for k,m in d.items()} for v,d in data.items()})

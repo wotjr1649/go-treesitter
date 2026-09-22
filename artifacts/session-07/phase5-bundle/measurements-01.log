@@ -1,0 +1,19 @@
+go five paired samples complete; snapshots equal
+py five paired samples complete; snapshots equal
+js five paired samples complete; snapshots equal
+jsx five paired samples complete; snapshots equal
+ts five paired samples complete; snapshots equal
+tsx five paired samples complete; snapshots equal
+Traceback (most recent call last):
+  File "D:\AIDEV\go-treesitter\.scratch\measure-bundles.py", line 12, in <module>
+    start=time.perf_counter_ns();result=subprocess.run([str(exes[variant]),'-language',language,'-iterations','20'],capture_output=True,timeout=20,check=True,env=env);wall=time.perf_counter_ns()-start
+                                        ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\js\AppData\Local\Python\pythoncore-3.14-64\Lib\subprocess.py", line 557, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\js\AppData\Local\Python\pythoncore-3.14-64\Lib\subprocess.py", line 1221, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\js\AppData\Local\Python\pythoncore-3.14-64\Lib\subprocess.py", line 1664, in _communicate
+    raise TimeoutExpired(self.args, orig_timeout)
+subprocess.TimeoutExpired: Command '['D:\\AIDEV\\go-treesitter\\.scratch\\measure-subset.exe', '-language', 'cs', '-iterations', '20']' timed out after 20 seconds

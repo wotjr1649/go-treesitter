@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "runs_per_variant_per_language": 5,
+  "warm_iterations_per_run": 20,
+  "languages": [
+    "go",
+    "py",
+    "js",
+    "jsx",
+    "ts",
+    "tsx",
+    "cs"
+  ],
+  "order": "default/subset then subset/default, alternating by sample",
+  "environment": {
+    "GOMAXPROCS": 1,
+    "GOMEMLIMIT": "512MiB",
+    "GOGC": 100,
+    "os": "windows",
+    "arch": "amd64",
+    "go": "go1.27.1",
+    "CGO_ENABLED": 0
+  },
+  "binaries": {
+    "default": {
+      "sha256": "03414c11664e70d878cf9ce3c529d5c9ffc9efff964504be4c7db68539e49638",
+      "bytes": 35230208
+    },
+    "subset": {
+      "sha256": "e192769b9e4e31eb2af0c5b32475f86bcf6fb22a8a8d714268712cc451d5d10c",
+      "bytes": 17077760
+    }
+  },
+  "inputs": {
+    "tools/measure/main.go": "6cdb644f4a2cc7930a583bd8bad0121b1b783e9adace86d3044ee30363723d2a",
+    "internal/gtsadapter/adapter.go": "cc52357b3a73ec3d0eb5887abff260573e9074a5e2cf26fb17da8b4ff102906a",
+    "go.mod": "60e068a66c71f3ce7c1b04dbe04e404e01e2d1eace07373dfe3fd0a8345f6889",
+    "go.sum": "87c97651162785c246dabcd3fdcd916cd7baabe2f8554bbdb31eea5ce9704cd6",
+    "internal/provenance/identities.json": "c190e01ce1fa283b3953d9ff613a5dbf9b57f8c5ace8820c72501b8ddeeed1a2"
+  }
+}

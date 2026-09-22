@@ -67,6 +67,25 @@ go vet ./...
 go test ./... -count=1
 ```
 
+Consumers that need only the seven assessed routes can use upstream's existing
+embedded grammar selection. This keeps the selected blobs inside the executable
+and needs no runtime downloads or external grammar directory:
+
+```powershell
+$subset = 'grammar_subset,grammar_subset_go,grammar_subset_python,grammar_subset_javascript,grammar_subset_typescript,grammar_subset_tsx,grammar_subset_c_sharp'
+go build -tags $subset ./...
+go test -tags $subset ./... -count=1
+```
+
+On the retained Windows measurement program this reduced the binary from
+35,230,208 to 17,077,760 bytes. These are that executable's measurements, not a
+fixed library size. [The measurements](artifacts/session-07/phase5-bundle/review.md)
+include all samples, startup/heap costs and the unresolved C# parsing hotspot.
+`go run ./tools/measure -language go -iterations 20` reproduces one fixed
+workload; available routes are `go`, `py`, `js`, `jsx`, `ts`, `tsx` and `cs`.
+The tool reports Go heap metrics, not OS RSS, and separates first-use grammar
+loading from subsequent parse API calls. Default builds keep upstream's catalog.
+
 `docs/prompts/`, `docs/specs/`, `docs/plans/`, and `artifacts/handoff/` are local
 documents intentionally excluded from Git. Retained test evidence is under
 `artifacts/session-05/` and `artifacts/session-06/`. See `experiments/v052-v053/`

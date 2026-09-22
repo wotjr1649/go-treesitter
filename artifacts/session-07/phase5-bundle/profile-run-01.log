@@ -1,0 +1,1 @@
+{"Language":"cs","SourceSHA256":"5b13e70b587f2477f1767b7451c9eeb1b5f736393a01e3ff76ecc2a7c9e2a4ae","NodesSHA256":"7ef7a59bd7a8c963a77af00407a42eba98b83700189c6c67927383f1399a79ca","Bytes":4644,"Nodes":2305,"Iterations":3,"ColdNanoseconds":1129476200,"WarmNanosecondsPerParse":706489166,"InitialHeapBytes":2168232,"FinalHeapBytes":40656296,"AllocatedBytesPerParse":24425493}

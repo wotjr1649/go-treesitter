@@ -1,0 +1,29 @@
+File: measure-profile.exe
+Build ID: D:\AIDEV\go-treesitter\.scratch\measure-profile.exe2026-09-22 21:06:54.1447561 +0900 KST
+Type: cpu
+Time: 2026-09-22 21:06:54 KST
+Duration: 3.29s, Total samples = 3.20s (97.15%)
+Showing nodes accounting for 2.20s, 68.75% of 3.20s total
+Dropped 117 nodes (cum <= 0.02s)
+Showing top 20 nodes out of 173
+      flat  flat%   sum%        cum   cum%
+     0.37s 11.56% 11.56%      1.13s 35.31%  github.com/odvcencio/gotreesitter.rawStackWalkChildAt
+     0.31s  9.69% 21.25%      0.31s  9.69%  github.com/odvcencio/gotreesitter.stackEntryNodeParseState
+     0.26s  8.12% 29.38%      1.68s 52.50%  github.com/odvcencio/gotreesitter.(*Parser).rawStackEntryErrorCost
+     0.19s  5.94% 35.31%      0.19s  5.94%  github.com/odvcencio/gotreesitter.(*gssMainPreflight).cachedReach
+     0.17s  5.31% 40.62%      0.25s  7.81%  github.com/odvcencio/gotreesitter.(*nodeArena).rawShapeChildren
+     0.15s  4.69% 45.31%      0.18s  5.62%  github.com/odvcencio/gotreesitter.stackEntryNodeChildCount
+     0.11s  3.44% 48.75%      0.11s  3.44%  github.com/odvcencio/gotreesitter.gssNodeIndexInSlab (inline)
+     0.10s  3.12% 51.88%      0.10s  3.12%  runtime.asyncPreempt
+     0.07s  2.19% 54.06%      0.07s  2.19%  github.com/odvcencio/gotreesitter.rawShapeChildRange.count (inline)
+     0.06s  1.88% 55.94%      0.57s 17.81%  github.com/odvcencio/gotreesitter.(*gssMainPreflight).canReach
+     0.06s  1.88% 57.81%      0.06s  1.88%  github.com/odvcencio/gotreesitter.stackEntryRawShapeRef
+     0.05s  1.56% 59.38%      0.05s  1.56%  github.com/odvcencio/gotreesitter.nodeChildEntryAtNoMaterialize
+     0.04s  1.25% 60.62%      0.04s  1.25%  github.com/odvcencio/gotreesitter.(*corridorTables).classifyCell
+     0.04s  1.25% 61.88%      0.10s  3.12%  github.com/odvcencio/gotreesitter.(*corridorTables).row
+     0.04s  1.25% 63.12%      0.04s  1.25%  github.com/odvcencio/gotreesitter.(*gssNode).extraLink (inline)
+     0.04s  1.25% 64.38%      0.04s  1.25%  github.com/odvcencio/gotreesitter.(*nodeArena).rawShapeForRef
+     0.04s  1.25% 65.62%      0.14s  4.38%  github.com/odvcencio/gotreesitter.rawShapeForStackWalkEntry
+     0.04s  1.25% 66.88%      0.04s  1.25%  github.com/odvcencio/gotreesitter.stackEntryNodeSymbol
+     0.03s  0.94% 67.81%      0.03s  0.94%  github.com/odvcencio/gotreesitter.(*gssMainPreflight).cacheReach
+     0.03s  0.94% 68.75%      0.14s  4.38%  github.com/odvcencio/gotreesitter.(*gssScratch).reachMarkForSlab
