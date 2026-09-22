@@ -1,0 +1,24 @@
+=== RUN   TestReachableOutcomes
+=== RUN   TestReachableOutcomes/unsupported_utf8
+    adapter_test.go:46: {Outcome:unsupported_input Language:go InputBytes:1 StopReason: StoppedEarly:false RootPresent:false RootStartByte:0 RootEndByte:0 HasError:false HasMissing:false ErrorType: DeadlineApplied:false TokensConsumed:0 LastTokenEndByte:0 ExpectedEOFByte:1 Iterations:0 IterationLimit:0 Nodes:0 NodeLimit:0 PeakStackDepth:0 StackDepthLimit:0 ArenaBytes:0 ScratchBytes:0 MemoryBudgetBytes:0 Truncated:false Route:not_run FallbackReason: ReusedOldTree:false FallbackDetailAvailable:false}
+=== RUN   TestReachableOutcomes/unsupported_grammar
+    adapter_test.go:46: {Outcome:unsupported_input Language: InputBytes:0 StopReason: StoppedEarly:false RootPresent:false RootStartByte:0 RootEndByte:0 HasError:false HasMissing:false ErrorType: DeadlineApplied:false TokensConsumed:0 LastTokenEndByte:0 ExpectedEOFByte:0 Iterations:0 IterationLimit:0 Nodes:0 NodeLimit:0 PeakStackDepth:0 StackDepthLimit:0 ArenaBytes:0 ScratchBytes:0 MemoryBudgetBytes:0 Truncated:false Route:not_run FallbackReason: ReusedOldTree:false FallbackDetailAvailable:false}
+=== RUN   TestReachableOutcomes/cancelled
+    adapter_test.go:46: {Outcome:cancelled Language:go InputBytes:10 StopReason: StoppedEarly:false RootPresent:false RootStartByte:0 RootEndByte:0 HasError:false HasMissing:false ErrorType: DeadlineApplied:false TokensConsumed:0 LastTokenEndByte:0 ExpectedEOFByte:10 Iterations:0 IterationLimit:0 Nodes:0 NodeLimit:0 PeakStackDepth:0 StackDepthLimit:0 ArenaBytes:0 ScratchBytes:0 MemoryBudgetBytes:0 Truncated:false Route:not_run FallbackReason: ReusedOldTree:false FallbackDetailAvailable:false}
+=== RUN   TestReachableOutcomes/cancelled_before_unsupported
+    adapter_test.go:46: {Outcome:cancelled Language: InputBytes:1 StopReason: StoppedEarly:false RootPresent:false RootStartByte:0 RootEndByte:0 HasError:false HasMissing:false ErrorType: DeadlineApplied:false TokensConsumed:0 LastTokenEndByte:0 ExpectedEOFByte:1 Iterations:0 IterationLimit:0 Nodes:0 NodeLimit:0 PeakStackDepth:0 StackDepthLimit:0 ArenaBytes:0 ScratchBytes:0 MemoryBudgetBytes:0 Truncated:false Route:not_run FallbackReason: ReusedOldTree:false FallbackDetailAvailable:false}
+=== RUN   TestReachableOutcomes/accepted_clean
+    adapter_test.go:46: {Outcome:accepted_clean Language:go InputBytes:22 StopReason:accepted StoppedEarly:false RootPresent:true RootStartByte:0 RootEndByte:22 HasError:false HasMissing:false ErrorType: DeadlineApplied:false TokensConsumed:11 LastTokenEndByte:22 ExpectedEOFByte:22 Iterations:0 IterationLimit:0 Nodes:17 NodeLimit:0 PeakStackDepth:0 StackDepthLimit:0 ArenaBytes:0 ScratchBytes:0 MemoryBudgetBytes:0 Truncated:false Route:compact FallbackReason: ReusedOldTree:false FallbackDetailAvailable:false}
+=== RUN   TestReachableOutcomes/accepted_with_errors
+    adapter_test.go:46: {Outcome:accepted_with_errors Language:go InputBytes:20 StopReason:accepted StoppedEarly:false RootPresent:true RootStartByte:0 RootEndByte:20 HasError:true HasMissing:false ErrorType: DeadlineApplied:false TokensConsumed:10 LastTokenEndByte:20 ExpectedEOFByte:20 Iterations:0 IterationLimit:0 Nodes:10 NodeLimit:0 PeakStackDepth:0 StackDepthLimit:0 ArenaBytes:0 ScratchBytes:0 MemoryBudgetBytes:0 Truncated:false Route:compact FallbackReason: ReusedOldTree:false FallbackDetailAvailable:false}
+--- PASS: TestReachableOutcomes (0.08s)
+    --- PASS: TestReachableOutcomes/unsupported_utf8 (0.00s)
+    --- PASS: TestReachableOutcomes/unsupported_grammar (0.00s)
+    --- PASS: TestReachableOutcomes/cancelled (0.00s)
+    --- PASS: TestReachableOutcomes/cancelled_before_unsupported (0.00s)
+    --- PASS: TestReachableOutcomes/accepted_clean (0.08s)
+    --- PASS: TestReachableOutcomes/accepted_with_errors (0.00s)
+=== RUN   TestInvalidEditDoesNotMutatePrevious
+--- PASS: TestInvalidEditDoesNotMutatePrevious (0.00s)
+PASS
+ok  	github.com/wotjr1649/go-treesitter/internal/gtsadapter	0.194s
