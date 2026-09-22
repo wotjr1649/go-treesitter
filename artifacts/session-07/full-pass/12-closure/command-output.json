@@ -1,0 +1,19 @@
+{
+  "sha256": "8493f3aca88bee56ea66ae05bbe9ac7568a0d69dace0e577ddf2cd05725e2240",
+  "entries": {
+    "packaging/consumer-gpl.log": "0e3e476166c1c21f64d44f915a4aca441bffcef5895c936d46dd4a3b3ddf4e75",
+    "packaging/consumer-main.log": "4b6e15cb2b658a595367f87c827305198799d9915145efaa1e623711c29c69e0",
+    "packaging/graph-gpl.log": "e2ed7e305bff3f921edb21693b3ac609d19b2c29fdd997b2ce2a328c29f0c7a2",
+    "packaging/graph-main.log": "930f6ed6a32e240a8d1ff9d0dd040670ed372ad5f0debba2bcca0b5e8da09eaf",
+    "packaging/probe-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "packaging/zip-gpl.log": "241ae88ba149d0e6f36b9a484b7c52b3dc87b3e7f82628f9fc627722966203e5",
+    "packaging/zip-main.log": "939bd35fbf5875c8999333b7f03a9053cccbc1dad25990aed1bb4b382d317dd5",
+    "harness/prepare-closure.py": "2eae54f5f3b213f3e47a42196758796e834bbc914fdfe4306c518e2e8b185666",
+    "harness/closure-packaging.py": "8fee58daeaaeb24e3d85c1e7936046281cdc9010dafdc3c5fcb6d2fa1d28648f",
+    "harness/closure-consumer-correctness.py": "493cdc09c579d0e6b568084f38091b87d162a94d6ba772d947ff83dbbaed7936",
+    "harness/verify-closure.py": "4e0d5decbaddc59a95d4f857c211751fb43e299079327fded4a1ff41ce5c99d7",
+    "harness/check-closing-docs.py": "04ca029923fa72338bbdbac920a093fc814e680e770356d2b1b2fd86cba51d87",
+    "harness/release-identity.py": "34d2430448b518b451a7168c57ffd539001b0a6303e4fc905164c8420a336894",
+    "harness/archive-release.py": "b8c6e3fb0bdc2befadd2f11e4570c442fd67316aa1efbca9e326ab41eaf4b0ce"
+  }
+}

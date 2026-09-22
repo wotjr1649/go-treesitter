@@ -1,0 +1,43 @@
+{
+  "candidate_commit": "d880651517afc0793a9d7132838ca1c3b1a69809",
+  "tested_code_commit": "23d6885ebe8709616614c89ffb6511ea815fb23f",
+  "production_digest": "d50d1152b10dae6d3b576baaa5449727d782696998aab9cf758537cd5391896d",
+  "test_manifest_digest": "bd21fcbe5cd169b62fac6232a74cb8a7f4d26b2576af8f618afe0dd8c5bb722b",
+  "production_and_tests_byte_identical": true,
+  "changed_module_zip_entries": {
+    "main": [
+      "github.com/wotjr1649/go-treesitter@v0.0.1/README.md",
+      "github.com/wotjr1649/go-treesitter@v0.0.1/docs/reports/release-critical-status.md"
+    ],
+    "gpl": []
+  },
+  "closing_consumer_c_records": 100,
+  "runtime_manifest_sha256": "5d1f526c35e223341914cbfada8abe1c4c49d52824a09950bde05d331ff41e46",
+  "artifacts": [
+    {
+      "module": "github.com/wotjr1649/go-treesitter",
+      "version": "v0.0.1",
+      "candidate_commit": "d880651517afc0793a9d7132838ca1c3b1a69809",
+      "path": ".scratch\\full-pass\\closure-packaging\\main-v0.0.1.zip",
+      "sha256": "84e296a3820ef0f9aa661f297ce4585d5d6a0e054fc749954bc81c3e2ff27d12",
+      "bytes": 23613068,
+      "entries": 2680
+    },
+    {
+      "module": "github.com/wotjr1649/go-treesitter/grammars/gpl",
+      "version": "v0.0.1",
+      "candidate_commit": "d880651517afc0793a9d7132838ca1c3b1a69809",
+      "path": ".scratch\\full-pass\\closure-packaging\\gpl-v0.0.1.zip",
+      "sha256": "ec4e23ff5684793cc9a0e2b11a37923e11450fda8bd96dee8cb72411724ce56d",
+      "bytes": 2611399,
+      "entries": 31
+    }
+  ],
+  "verdict": "BLOCKED_EXTERNAL",
+  "remaining": [
+    "Native Windows ARM64/hosted CI require a target and execution authority; no origin is configured.",
+    "Brightscript/Cooklang upstream ISC/MIT declarations remain unresolved."
+  ],
+  "remote_writes": 0,
+  "published_tags": 0
+}

@@ -1,0 +1,28 @@
+{
+  "command": [
+    "go",
+    "list",
+    "-m",
+    "-json",
+    "all"
+  ],
+  "candidate_commit": "d880651517afc0793a9d7132838ca1c3b1a69809",
+  "status_before": "?? artifacts/session-07/full-pass/12-closure/\n",
+  "started_unix": 1790119455.7601073,
+  "elapsed_seconds": 0.014825105667114258,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\closure-packaging\\consumer-main",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "file:///D:/AIDEV/go-treesitter/.scratch/full-pass/closure-packaging/proxy",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "d7288ee4c91bf8299cb2dc315ead43fc3b1505e3189c08915012dce9523d4983"
+  },
+  "log_sha256": "930f6ed6a32e240a8d1ff9d0dd040670ed372ad5f0debba2bcca0b5e8da09eaf"
+}

@@ -1,0 +1,23 @@
+{
+  "modules": [
+    {
+      "module": "github.com/wotjr1649/go-treesitter",
+      "version": "v0.0.1",
+      "candidate_commit": "d880651517afc0793a9d7132838ca1c3b1a69809",
+      "path": ".scratch\\full-pass\\closure-packaging\\main-v0.0.1.zip",
+      "sha256": "84e296a3820ef0f9aa661f297ce4585d5d6a0e054fc749954bc81c3e2ff27d12",
+      "bytes": 23613068,
+      "entries": 2680
+    },
+    {
+      "module": "github.com/wotjr1649/go-treesitter/grammars/gpl",
+      "version": "v0.0.1",
+      "candidate_commit": "d880651517afc0793a9d7132838ca1c3b1a69809",
+      "path": ".scratch\\full-pass\\closure-packaging\\gpl-v0.0.1.zip",
+      "sha256": "ec4e23ff5684793cc9a0e2b11a37923e11450fda8bd96dee8cb72411724ce56d",
+      "bytes": 2611399,
+      "entries": 31
+    }
+  ],
+  "tool_sha256": "b1d5ae97e07def0c433d2ee8057642bdc011d9c013215f1fb5a76d8f31811771"
+}
