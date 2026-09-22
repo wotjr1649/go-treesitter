@@ -1,0 +1,6 @@
+=== RUN   TestMissingNodesCannotLookClean
+    corpus_test.go:43: source_sha256=d76fd62cfc90076c11d86cb7d7a0058df181231aa3b34f30e549f650b5294d4a diagnostics={Outcome:accepted_with_errors Language:c_sharp InputBytes:12408 StopReason:accepted StoppedEarly:false RootPresent:true RootStartByte:0 RootEndByte:12408 HasError:false HasMissing:true ErrorType: DeadlineApplied:false TokensConsumed:1349 LastTokenEndByte:12408 ExpectedEOFByte:12408 Iterations:1626 IterationLimit:372240 Nodes:23541 NodeLimit:645216 PeakStackDepth:90 StackDepthLimit:24816 ArenaBytes:10002600 ScratchBytes:7362160 MemoryBudgetBytes:536870912 Truncated:false Route:classic FallbackReason: ReuseReason: ReusedOldTree:false FallbackDetailAvailable:false}
+    corpus_test.go:49: missing={Type:; Field: Parent:14 Named:false Extra:false Missing:true Error:false StartByte:335 EndByte:335 StartPoint:{Row:6 Column:26} EndPoint:{Row:6 Column:26}}
+--- PASS: TestMissingNodesCannotLookClean (0.22s)
+PASS
+ok  	github.com/wotjr1649/go-treesitter/internal/gtsadapter	0.353s

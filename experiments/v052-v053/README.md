@@ -13,7 +13,9 @@ go test ./internal/gtsadapter -run TestCorpusIdentity -v -count=1 -args -corpus 
 Run once per cell, with `TestComparison`, explicit `-cell A`/`B`/`C`/`D`,
 `-expected-version`, and `-compact-disabled` only for B and D. A/B run inside
 this module. C/D run from the repository root using the test file path as the
-Go test package argument. Exact session invocations live in Phase 3 evidence.
+Go test package argument and `GOFLAGS=-modfile=<absolute main go.mod>` so the
+metadata subprocess also resolves the main pin from its nested test directory.
+Exact session invocations live in Phase 3 evidence.
 
 Every corpus hash and the shared C# grammar blob are checked before parsing.
 Parses are sequential; process-global admission counter deltas are therefore

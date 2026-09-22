@@ -259,3 +259,12 @@ classic production route with the compact route explicitly disabled. A downstrea
 **Not yet a ratchet** — not reproduced at the current baseline. The experiment that would settle it
 is a 2×2 over `{v0.52.0, v0.53.0} × {default route, compact disabled}`.
 Until reproduced at the baseline, do not cite it as a defect of `v0.53.0`.
+
+Session 05 Phase 3 executed all four cells once per fixture with the same C#
+grammar blob and LF corpus. The excerpt's `HasError` was false in all cells:
+the reported route-dependent error flag was not reproduced. All four instead
+contained a missing `;` at byte 335 (row 6, column 26), yielding
+`accepted_with_errors` under this repository's contract. A separate retained
+adapter test covers that receipt (E3). This is not a new ratchet or a claim of
+C# oracle agreement; C# differential diagnosis remains open. Node/token counts
+and outcome were unchanged across cells. See Phase 3 evidence for conditions.
