@@ -1,0 +1,30 @@
+{
+  "command": [
+    "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\bench-baseline.exe",
+    "-test.run=^$",
+    "-test.bench=^BenchmarkRelease$/^go$/^replace$",
+    "-test.benchtime=300x",
+    "-test.benchmem",
+    "-test.timeout=60s",
+    "-test.cpuprofile=D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\release-go-replace-baseline.pprof"
+  ],
+  "candidate_commit": "23d6885ebe8709616614c89ffb6511ea815fb23f",
+  "status_before": "?? artifacts/session-07/full-pass/11-release/\n",
+  "started_unix": 1790118769.1984692,
+  "elapsed_seconds": 0.8930795192718506,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\performance-baseline\\internal\\gtsadapter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "d7288ee4c91bf8299cb2dc315ead43fc3b1505e3189c08915012dce9523d4983"
+  },
+  "log_sha256": "2c05bd2e8ceafce66ed3949218bba1a3867ff8f9a5aea14078d5a7add5c9e5f8"
+}

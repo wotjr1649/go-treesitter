@@ -1,0 +1,30 @@
+{
+  "command": [
+    "go",
+    "build",
+    "-mod=readonly",
+    "-trimpath",
+    "-o",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\release-packaging\\consumer-probe.exe",
+    "./probe"
+  ],
+  "candidate_commit": "23d6885ebe8709616614c89ffb6511ea815fb23f",
+  "status_before": "?? artifacts/session-07/full-pass/11-release/\n",
+  "started_unix": 1790118368.0055065,
+  "elapsed_seconds": 7.992823123931885,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\release-packaging\\consumer-main",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "file:///D:/AIDEV/go-treesitter/.scratch/full-pass/release-packaging/proxy",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "d7288ee4c91bf8299cb2dc315ead43fc3b1505e3189c08915012dce9523d4983"
+  },
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

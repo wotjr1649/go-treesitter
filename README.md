@@ -102,13 +102,15 @@ Completion preserves grammar-owned root coordinates and requires the runtime's
 actual and expected EOF receipts; the retained COBOL controls also compare all
 ordered nodes with the pinned C oracle.
 
-`docs/prompts/`, `docs/specs/`, `docs/plans/`, and `artifacts/handoff/` are local
-documents intentionally excluded from Git. Retained test evidence is under
+`docs/prompts/`, `docs/plans/`, and `artifacts/handoff/` are local documents
+excluded from Git. `docs/specs/baseline-provenance.md` is tracked with runtime
+identity changes; the other local specifications remain excluded. Retained test evidence is under
 `artifacts/session-05/`, `artifacts/session-06/` and `artifacts/session-07/`. See `experiments/v052-v053/`
 for the older runtime comparison.
 
-Product tests include 94 source-bound C oracle records without invoking a C
-compiler. [Oracle tooling](tools/native-oracle/README.md) documents producing
+Product tests include 688 source-bound C oracle records and 439 edit comparisons
+across the seven core routes, without invoking a C compiler.
+[Oracle tooling](tools/native-oracle/README.md) documents producing
 new records, using an updated generator, and comparing artifacts before adoption.
 Generator selection has no release constant; runtime/grammar identities remain
 pinned. The [isolated scanner evaluation](artifacts/session-06/phase3/patch-decision.md)
@@ -126,6 +128,15 @@ reconstruction preserves error-bearing trees. The retained C# catalogs add 74
 fresh records and 72 edits, including reduced inputs, identifier changes,
 Unicode, CRLF and the original real-world excerpts. Original KR-0002/KR-0004
 failure evidence remains available; those inputs now require exact C agreement.
+
+The final recovery corpus also covers Go EOF/NUL terminals, reserved keywords,
+version-specific lookahead, hidden missing nodes and incremental dependencies.
+No active C-tree exception remains. The internal Go blob is derived from the
+same pinned C grammar, with distinct origin and product identities (ADR-0015).
+Performance and memory measurements, controlled fallback reasons and remaining
+release blockers are recorded in the [final review](artifacts/session-07/full-pass/11-release/review.md).
+Brightscript and Cooklang still have conflicting upstream ISC/MIT declarations;
+native Windows ARM64 and hosted CI execution remain required for release.
 
 The library's own code is [MIT licensed](LICENSE). See
 [third-party notices](THIRD_PARTY_NOTICES.md) for the pinned runtime, all catalog

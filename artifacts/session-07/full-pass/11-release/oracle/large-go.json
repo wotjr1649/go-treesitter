@@ -1,0 +1,68 @@
+{
+  "request": {
+    "ID": "large-go-8192-append",
+    "Filename": "large.go",
+    "Edit": {
+      "StartByte": 161630,
+      "OldEndByte": 161630,
+      "NewEndByte": 161631
+    },
+    "Repeat": 3
+  },
+  "source_sha256": "f11ec79221bea7c1f5911a1a1858f888ad7393c73c6c75718b3611eb12a63536",
+  "previous_sha256": "4182b4ef9ed80cb09f2ae8adb4a62a0db62eb20e4043c6cc83d7e1fa681478fa",
+  "executable_hashes": {
+    "go": "2261e84c0904b2c4a735e488ede4a88aa02345dae5d82c1a1dd0d5450ea545e9",
+    "C": "4910a998c4109c0519e7b002811f3fec4dbe95f5d8c07c109f80fc37c9eb8b53"
+  },
+  "runtime_manifest_sha256": "5d1f526c35e223341914cbfada8abe1c4c49d52824a09950bde05d331ff41e46",
+  "nodes": 57348,
+  "node_digest": "e4e9693a29f5989f8e4ed6511d975cfe09c488b700c1b55f2834408fadae09c3",
+  "observations": [
+    {
+      "Digest": "e4e9693a29f5989f8e4ed6511d975cfe09c488b700c1b55f2834408fadae09c3",
+      "Outcome": "accepted_clean",
+      "Stop": "accepted",
+      "Route": "compact",
+      "Fallback": "",
+      "Reuse": "",
+      "Complete": true,
+      "Error": false,
+      "Missing": false
+    },
+    {
+      "Digest": "e4e9693a29f5989f8e4ed6511d975cfe09c488b700c1b55f2834408fadae09c3",
+      "Outcome": "accepted_clean",
+      "Stop": "accepted",
+      "Route": "compact",
+      "Fallback": "",
+      "Reuse": "",
+      "Complete": true,
+      "Error": false,
+      "Missing": false
+    },
+    {
+      "Digest": "e4e9693a29f5989f8e4ed6511d975cfe09c488b700c1b55f2834408fadae09c3",
+      "Outcome": "accepted_clean",
+      "Stop": "accepted",
+      "Route": "compact",
+      "Fallback": "",
+      "Reuse": "",
+      "Complete": true,
+      "Error": false,
+      "Missing": false
+    }
+  ],
+  "incremental": {
+    "Digest": "e4e9693a29f5989f8e4ed6511d975cfe09c488b700c1b55f2834408fadae09c3",
+    "Outcome": "accepted_clean",
+    "Stop": "accepted",
+    "Route": "classic",
+    "Fallback": "compact incremental parse found no authenticated subtree",
+    "Reuse": "",
+    "Complete": true,
+    "Error": false,
+    "Missing": false
+  },
+  "passed": true
+}

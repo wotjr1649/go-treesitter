@@ -1,0 +1,4508 @@
+{
+  "executable_sha256": "7285c8ee1938b69460480f7b19f2b77be14d76c54d70ff2bd8f50d7d9fa9d9e9",
+  "module_zip_sha256": "ddc5582ea95c74816518f8ffafc40f01d31fe8da0a7aa6a5e7621ba6ede00791",
+  "rows": [
+    {
+      "id": "SM-GO",
+      "source_sha256": "47cfffc0dc66a7f20d58685427ecaca39d8ac4ac75471e6530aaf1841661321f",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "d4d64e8caa56baa6891010603d48fd5127323cd94946478943dd4de6aa1872b3",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "d4d64e8caa56baa6891010603d48fd5127323cd94946478943dd4de6aa1872b3",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "d4d64e8caa56baa6891010603d48fd5127323cd94946478943dd4de6aa1872b3",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "SM-PY",
+      "source_sha256": "f186e0e276ead544103c820adf9961737ec923d60efebbcf649b7b40c26f5f1d",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "e0b3ef187e78a7dbf71d5d0e9e1b3c5602904b545d6e6babc68ee6ff2e5af948",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "e0b3ef187e78a7dbf71d5d0e9e1b3c5602904b545d6e6babc68ee6ff2e5af948",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "e0b3ef187e78a7dbf71d5d0e9e1b3c5602904b545d6e6babc68ee6ff2e5af948",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "SM-JS",
+      "source_sha256": "09aeef593af2f529431e4c57a0c402a00f31f5411d55268a1ace6e7b1444cbae",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "d3047920546c02615fbfb5a0888ea5fad6dbaf6352dc6519c283cc5c1e15a7cd",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "d3047920546c02615fbfb5a0888ea5fad6dbaf6352dc6519c283cc5c1e15a7cd",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "d3047920546c02615fbfb5a0888ea5fad6dbaf6352dc6519c283cc5c1e15a7cd",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "SM-JSX",
+      "source_sha256": "09aeef593af2f529431e4c57a0c402a00f31f5411d55268a1ace6e7b1444cbae",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "d3047920546c02615fbfb5a0888ea5fad6dbaf6352dc6519c283cc5c1e15a7cd",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "d3047920546c02615fbfb5a0888ea5fad6dbaf6352dc6519c283cc5c1e15a7cd",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "d3047920546c02615fbfb5a0888ea5fad6dbaf6352dc6519c283cc5c1e15a7cd",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "SM-TS",
+      "source_sha256": "57a50045ef18ba04b8c4654afb297c656cfeefdcaf9cde00603226dd97d631dd",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "24573c518cdce35c525950429e09353fbfc5d3cd7258edaa8c17e786b22bea46",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "24573c518cdce35c525950429e09353fbfc5d3cd7258edaa8c17e786b22bea46",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "24573c518cdce35c525950429e09353fbfc5d3cd7258edaa8c17e786b22bea46",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "SM-TSX",
+      "source_sha256": "8a3be41bdf61db2f6cb9c2fddce14401c51a0ab8be7f0834b692a54a939dc208",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "8f7cbd90290710423f9d63e0422b9f7988861a3bd1002403c96c9de1307a3250",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "8f7cbd90290710423f9d63e0422b9f7988861a3bd1002403c96c9de1307a3250",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "8f7cbd90290710423f9d63e0422b9f7988861a3bd1002403c96c9de1307a3250",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "SM-CS",
+      "source_sha256": "b34543a9997d7e4b16da9c38d7ce6aec80b98cb4445ca9fee6d00a4eb4a26b59",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "d6d0047a141148fe9eee4afb926e08c04681ea4ad84cf19776b391163c8a4ad9",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "d6d0047a141148fe9eee4afb926e08c04681ea4ad84cf19776b391163c8a4ad9",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "d6d0047a141148fe9eee4afb926e08c04681ea4ad84cf19776b391163c8a4ad9",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-F1",
+      "source_sha256": "efd1f1afadcb0a0721f4cb1334c41d5d8c1306eb3e059d43f4ca025e5f31706a",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "ac5c93bbf11d309c9985b7ddd943267fa2cc6118d5c9a892a1de173117a08fea",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "ac5c93bbf11d309c9985b7ddd943267fa2cc6118d5c9a892a1de173117a08fea",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "ac5c93bbf11d309c9985b7ddd943267fa2cc6118d5c9a892a1de173117a08fea",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-F2",
+      "source_sha256": "64a8995a210895b9beb7d5d59f04aff12461314928d622c3523e1bde2092e8e3",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "5da5c78c5ba969ba7026df492882b7a4b433150316b5180baec4fcde78984cbd",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "5da5c78c5ba969ba7026df492882b7a4b433150316b5180baec4fcde78984cbd",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "5da5c78c5ba969ba7026df492882b7a4b433150316b5180baec4fcde78984cbd",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-F3",
+      "source_sha256": "7cfe8fb425960bf47c9a2a48c734772700de3dd0da691bd087b1f5cb3417769a",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "d8a41e1c20bc4a335a1396390b568d36c92c8d3ff77c777fc9855d67614cd064",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "d8a41e1c20bc4a335a1396390b568d36c92c8d3ff77c777fc9855d67614cd064",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "d8a41e1c20bc4a335a1396390b568d36c92c8d3ff77c777fc9855d67614cd064",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-F4",
+      "source_sha256": "00fb2b5a4c026746e65f819a40a4a1b4410006b400d0fffdf50fa06485ae15af",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-F5",
+      "source_sha256": "c868254fda1dfbe6613fde4dca3538a1233e554464e172cbc9e2785a802ff2a7",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "dc7f9d674d44470e8b50b971694ebca281b2c7175ad89b6577f722b0d98d9bef",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "dc7f9d674d44470e8b50b971694ebca281b2c7175ad89b6577f722b0d98d9bef",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "dc7f9d674d44470e8b50b971694ebca281b2c7175ad89b6577f722b0d98d9bef",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-F6",
+      "source_sha256": "8c7dc4153eba3baa321de48374d7b902197a96a24ccf68a9d89d78aab69cd10c",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "e94ea962770268feae79970e6647cfce1eda1b9738fc0e83ab9983f2cc2a8139",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "e94ea962770268feae79970e6647cfce1eda1b9738fc0e83ab9983f2cc2a8139",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "e94ea962770268feae79970e6647cfce1eda1b9738fc0e83ab9983f2cc2a8139",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-F7",
+      "source_sha256": "f4792d0e83f86c02a59533ca2a1fc3a75a4f607d91f217414ba111c4993003cd",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-attribute",
+      "source_sha256": "3dacfbcd1e0376e6b8c4eeb6cd278f681057bcb303352c344232afb7a4cda973",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "426bac954206d7929e25c35c47794b4c2e500ab8a5c0000f49e72b2f1aac81de",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "426bac954206d7929e25c35c47794b4c2e500ab8a5c0000f49e72b2f1aac81de",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "426bac954206d7929e25c35c47794b4c2e500ab8a5c0000f49e72b2f1aac81de",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-attributes-expression",
+      "source_sha256": "7706a55f5cdaa714a65cd3c846e804bf06c4ca09d2e4367942d1f764325afb5c",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "538c7d01ab018727c47192643d8dbb794ad08b8bd3a8eea5b58ea4f73f9028f1",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "538c7d01ab018727c47192643d8dbb794ad08b8bd3a8eea5b58ea4f73f9028f1",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "538c7d01ab018727c47192643d8dbb794ad08b8bd3a8eea5b58ea4f73f9028f1",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-self-closing",
+      "source_sha256": "13ce55ee399bebf84f1800b52150bf7621e3a7c7d01953388d73cad8057f2ec1",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "0bdecd7a6ab2a1586cd8b7fb465695541d6aaad66ec813e76a6bf297cf921d51",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "0bdecd7a6ab2a1586cd8b7fb465695541d6aaad66ec813e76a6bf297cf921d51",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "0bdecd7a6ab2a1586cd8b7fb465695541d6aaad66ec813e76a6bf297cf921d51",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-spread",
+      "source_sha256": "9c1a24244146c68db481989ea93d8301536717ebe7ccfb1df05f5a88cc16ab64",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "eb860287d36f7cc6c77530083ee0c74af48b894bf40b2b2720a085af726acb6b",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "eb860287d36f7cc6c77530083ee0c74af48b894bf40b2b2720a085af726acb6b",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "eb860287d36f7cc6c77530083ee0c74af48b894bf40b2b2720a085af726acb6b",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-nested",
+      "source_sha256": "14f3fe9c0268a50788014716516c5fdcd55c7e56d56b88d76a6ba142a95541a7",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "2a1cdac4492a0e4f5c9f0df2d3c3b9c6bed488e5839898ffbff749c8508c4aad",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "2a1cdac4492a0e4f5c9f0df2d3c3b9c6bed488e5839898ffbff749c8508c4aad",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "2a1cdac4492a0e4f5c9f0df2d3c3b9c6bed488e5839898ffbff749c8508c4aad",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-fragment",
+      "source_sha256": "196cedd0efe08f5599699995a12685ec958272ba4ab75c98c1d5129f0ca7800b",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "d5a1e184d2b8147b393ae226f0319da4f65f60648b864374fcc7ca82f8a755af",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "d5a1e184d2b8147b393ae226f0319da4f65f60648b864374fcc7ca82f8a755af",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "d5a1e184d2b8147b393ae226f0319da4f65f60648b864374fcc7ca82f8a755af",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-multiline",
+      "source_sha256": "95eedca478dd4dd9d34a06e42da28cc6ad4b9b5aa42b289ff317701b90c8c125",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "5c5b295788eaa87beb626ffbd2f6bf6dcc7aa57ee6bfb630e627f301fe48d7fc",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "5c5b295788eaa87beb626ffbd2f6bf6dcc7aa57ee6bfb630e627f301fe48d7fc",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "5c5b295788eaa87beb626ffbd2f6bf6dcc7aa57ee6bfb630e627f301fe48d7fc",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-slash-text",
+      "source_sha256": "8175cac650b27351600e79ccbef11a72cbb149c4e4af48ead411f99b4479ebfe",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-unicode-text",
+      "source_sha256": "7f66123e1fb818a0ba95b014d1ffddf7a4b9f57c20a6b35c18359577c144515f",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "029750d753894feee368c3606fe4212c11ad1035163adcfba79b1205186cd543",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "029750d753894feee368c3606fe4212c11ad1035163adcfba79b1205186cd543",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "029750d753894feee368c3606fe4212c11ad1035163adcfba79b1205186cd543",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-namespace-attribute",
+      "source_sha256": "f6646fa99ff433dc096782ea96e8e52f3d81d419293df84164a064f4551973c4",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "61a48cb617426ea409fbcf053ed5a9a04b54fb18788f77108c009c9359391f03",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "61a48cb617426ea409fbcf053ed5a9a04b54fb18788f77108c009c9359391f03",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "61a48cb617426ea409fbcf053ed5a9a04b54fb18788f77108c009c9359391f03",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-expression-child",
+      "source_sha256": "235835df891325024c7c09713e7cc9317b774fdfa50d5b4c1bcfa724f1843709",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "c62eb93dd2fd46cfcb41cf3bcef72b85ca2f29fd5745035d0fb1c60c944b6b41",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "c62eb93dd2fd46cfcb41cf3bcef72b85ca2f29fd5745035d0fb1c60c944b6b41",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "c62eb93dd2fd46cfcb41cf3bcef72b85ca2f29fd5745035d0fb1c60c944b6b41",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-asi",
+      "source_sha256": "e7cf6549233a13052274f4997b701898870e32ada7f60305040ee584c6b6d472",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "2b4c3aa0a9f6b543b0d9a79dfb81ddd7254856363d1214b23d87d682ff2c1aaf",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "2b4c3aa0a9f6b543b0d9a79dfb81ddd7254856363d1214b23d87d682ff2c1aaf",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "2b4c3aa0a9f6b543b0d9a79dfb81ddd7254856363d1214b23d87d682ff2c1aaf",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-F1",
+      "source_sha256": "efd1f1afadcb0a0721f4cb1334c41d5d8c1306eb3e059d43f4ca025e5f31706a",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "ac5c93bbf11d309c9985b7ddd943267fa2cc6118d5c9a892a1de173117a08fea",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "ac5c93bbf11d309c9985b7ddd943267fa2cc6118d5c9a892a1de173117a08fea",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "ac5c93bbf11d309c9985b7ddd943267fa2cc6118d5c9a892a1de173117a08fea",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-F2",
+      "source_sha256": "64a8995a210895b9beb7d5d59f04aff12461314928d622c3523e1bde2092e8e3",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "5da5c78c5ba969ba7026df492882b7a4b433150316b5180baec4fcde78984cbd",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "5da5c78c5ba969ba7026df492882b7a4b433150316b5180baec4fcde78984cbd",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "5da5c78c5ba969ba7026df492882b7a4b433150316b5180baec4fcde78984cbd",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-F3",
+      "source_sha256": "7cfe8fb425960bf47c9a2a48c734772700de3dd0da691bd087b1f5cb3417769a",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "d8a41e1c20bc4a335a1396390b568d36c92c8d3ff77c777fc9855d67614cd064",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "d8a41e1c20bc4a335a1396390b568d36c92c8d3ff77c777fc9855d67614cd064",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "d8a41e1c20bc4a335a1396390b568d36c92c8d3ff77c777fc9855d67614cd064",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-F4",
+      "source_sha256": "00fb2b5a4c026746e65f819a40a4a1b4410006b400d0fffdf50fa06485ae15af",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-F5",
+      "source_sha256": "c868254fda1dfbe6613fde4dca3538a1233e554464e172cbc9e2785a802ff2a7",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "dc7f9d674d44470e8b50b971694ebca281b2c7175ad89b6577f722b0d98d9bef",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "dc7f9d674d44470e8b50b971694ebca281b2c7175ad89b6577f722b0d98d9bef",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "dc7f9d674d44470e8b50b971694ebca281b2c7175ad89b6577f722b0d98d9bef",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-F6",
+      "source_sha256": "8c7dc4153eba3baa321de48374d7b902197a96a24ccf68a9d89d78aab69cd10c",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "e94ea962770268feae79970e6647cfce1eda1b9738fc0e83ab9983f2cc2a8139",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "e94ea962770268feae79970e6647cfce1eda1b9738fc0e83ab9983f2cc2a8139",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "e94ea962770268feae79970e6647cfce1eda1b9738fc0e83ab9983f2cc2a8139",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-F7",
+      "source_sha256": "f4792d0e83f86c02a59533ca2a1fc3a75a4f607d91f217414ba111c4993003cd",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-attribute",
+      "source_sha256": "3dacfbcd1e0376e6b8c4eeb6cd278f681057bcb303352c344232afb7a4cda973",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "426bac954206d7929e25c35c47794b4c2e500ab8a5c0000f49e72b2f1aac81de",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "426bac954206d7929e25c35c47794b4c2e500ab8a5c0000f49e72b2f1aac81de",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "426bac954206d7929e25c35c47794b4c2e500ab8a5c0000f49e72b2f1aac81de",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-attributes-expression",
+      "source_sha256": "7706a55f5cdaa714a65cd3c846e804bf06c4ca09d2e4367942d1f764325afb5c",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "538c7d01ab018727c47192643d8dbb794ad08b8bd3a8eea5b58ea4f73f9028f1",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "538c7d01ab018727c47192643d8dbb794ad08b8bd3a8eea5b58ea4f73f9028f1",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "538c7d01ab018727c47192643d8dbb794ad08b8bd3a8eea5b58ea4f73f9028f1",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-self-closing",
+      "source_sha256": "13ce55ee399bebf84f1800b52150bf7621e3a7c7d01953388d73cad8057f2ec1",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "0bdecd7a6ab2a1586cd8b7fb465695541d6aaad66ec813e76a6bf297cf921d51",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "0bdecd7a6ab2a1586cd8b7fb465695541d6aaad66ec813e76a6bf297cf921d51",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "0bdecd7a6ab2a1586cd8b7fb465695541d6aaad66ec813e76a6bf297cf921d51",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-spread",
+      "source_sha256": "9c1a24244146c68db481989ea93d8301536717ebe7ccfb1df05f5a88cc16ab64",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "eb860287d36f7cc6c77530083ee0c74af48b894bf40b2b2720a085af726acb6b",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "eb860287d36f7cc6c77530083ee0c74af48b894bf40b2b2720a085af726acb6b",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "eb860287d36f7cc6c77530083ee0c74af48b894bf40b2b2720a085af726acb6b",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-nested",
+      "source_sha256": "14f3fe9c0268a50788014716516c5fdcd55c7e56d56b88d76a6ba142a95541a7",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "2a1cdac4492a0e4f5c9f0df2d3c3b9c6bed488e5839898ffbff749c8508c4aad",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "2a1cdac4492a0e4f5c9f0df2d3c3b9c6bed488e5839898ffbff749c8508c4aad",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "2a1cdac4492a0e4f5c9f0df2d3c3b9c6bed488e5839898ffbff749c8508c4aad",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-fragment",
+      "source_sha256": "196cedd0efe08f5599699995a12685ec958272ba4ab75c98c1d5129f0ca7800b",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "d5a1e184d2b8147b393ae226f0319da4f65f60648b864374fcc7ca82f8a755af",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "d5a1e184d2b8147b393ae226f0319da4f65f60648b864374fcc7ca82f8a755af",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "d5a1e184d2b8147b393ae226f0319da4f65f60648b864374fcc7ca82f8a755af",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-multiline",
+      "source_sha256": "95eedca478dd4dd9d34a06e42da28cc6ad4b9b5aa42b289ff317701b90c8c125",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "5c5b295788eaa87beb626ffbd2f6bf6dcc7aa57ee6bfb630e627f301fe48d7fc",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "5c5b295788eaa87beb626ffbd2f6bf6dcc7aa57ee6bfb630e627f301fe48d7fc",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "5c5b295788eaa87beb626ffbd2f6bf6dcc7aa57ee6bfb630e627f301fe48d7fc",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-slash-text",
+      "source_sha256": "8175cac650b27351600e79ccbef11a72cbb149c4e4af48ead411f99b4479ebfe",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-unicode-text",
+      "source_sha256": "7f66123e1fb818a0ba95b014d1ffddf7a4b9f57c20a6b35c18359577c144515f",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "029750d753894feee368c3606fe4212c11ad1035163adcfba79b1205186cd543",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "029750d753894feee368c3606fe4212c11ad1035163adcfba79b1205186cd543",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "029750d753894feee368c3606fe4212c11ad1035163adcfba79b1205186cd543",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-namespace-attribute",
+      "source_sha256": "f6646fa99ff433dc096782ea96e8e52f3d81d419293df84164a064f4551973c4",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "61a48cb617426ea409fbcf053ed5a9a04b54fb18788f77108c009c9359391f03",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "61a48cb617426ea409fbcf053ed5a9a04b54fb18788f77108c009c9359391f03",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "61a48cb617426ea409fbcf053ed5a9a04b54fb18788f77108c009c9359391f03",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-expression-child",
+      "source_sha256": "235835df891325024c7c09713e7cc9317b774fdfa50d5b4c1bcfa724f1843709",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "c62eb93dd2fd46cfcb41cf3bcef72b85ca2f29fd5745035d0fb1c60c944b6b41",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "c62eb93dd2fd46cfcb41cf3bcef72b85ca2f29fd5745035d0fb1c60c944b6b41",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "c62eb93dd2fd46cfcb41cf3bcef72b85ca2f29fd5745035d0fb1c60c944b6b41",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "javascript-asi",
+      "source_sha256": "e7cf6549233a13052274f4997b701898870e32ada7f60305040ee584c6b6d472",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "2b4c3aa0a9f6b543b0d9a79dfb81ddd7254856363d1214b23d87d682ff2c1aaf",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "2b4c3aa0a9f6b543b0d9a79dfb81ddd7254856363d1214b23d87d682ff2c1aaf",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "2b4c3aa0a9f6b543b0d9a79dfb81ddd7254856363d1214b23d87d682ff2c1aaf",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "forest",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "CS-JsonPosition",
+      "source_sha256": "4f9e601f9d0be45c4f60f15bf1b6ca8f85dec51e353ebb50e405cc6f8e422c14",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "497b521896923fd6c7cc6a4e0c72e491dee68f033f1d8ab9ef818f34e937c1c9",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "497b521896923fd6c7cc6a4e0c72e491dee68f033f1d8ab9ef818f34e937c1c9",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "497b521896923fd6c7cc6a4e0c72e491dee68f033f1d8ab9ef818f34e937c1c9",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "CS-JsonTextReader-excerpt",
+      "source_sha256": "d76fd62cfc90076c11d86cb7d7a0058df181231aa3b34f30e549f650b5294d4a",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "673a2377a867d27cf8c0a02a5e54df64d3610547f38efe8b69cdb61c9aca59cc",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "673a2377a867d27cf8c0a02a5e54df64d3610547f38efe8b69cdb61c9aca59cc",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "673a2377a867d27cf8c0a02a5e54df64d3610547f38efe8b69cdb61c9aca59cc",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "CS-MathUtils",
+      "source_sha256": "426587acd7f1f50c3d3dc94f13e9c27726c32c1bbe22d0291d86485afa368640",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "7b19bf28b5e0a55e3e81f00ce23fa9051430ac7a0270dae972af56116822ceef",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "7b19bf28b5e0a55e3e81f00ce23fa9051430ac7a0270dae972af56116822ceef",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "7b19bf28b5e0a55e3e81f00ce23fa9051430ac7a0270dae972af56116822ceef",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "TS-generic",
+      "source_sha256": "2221ef0d568eda41a67efc37792c99b462a7a53d0d321e851f1bfa9e3d3f2e14",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "e5bdfce14d6c13b1b1200aab58bcd64a5b491680159d48c9357f87e09b508f0c",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "e5bdfce14d6c13b1b1200aab58bcd64a5b491680159d48c9357f87e09b508f0c",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "e5bdfce14d6c13b1b1200aab58bcd64a5b491680159d48c9357f87e09b508f0c",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "TSX-generic",
+      "source_sha256": "8f162663e427252bccd05b638dc0b85bbb8f0c730b140f9d061256cd6eaf2a8f",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "5dbb4daaa94e66fb05a62eb2407f8eff21bb33205a058ffc14ae66ee38468bab",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "5dbb4daaa94e66fb05a62eb2407f8eff21bb33205a058ffc14ae66ee38468bab",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "5dbb4daaa94e66fb05a62eb2407f8eff21bb33205a058ffc14ae66ee38468bab",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "ts-newline-in",
+      "source_sha256": "5ea3710f7074d1d368230ee1e7bdf20d855fa5e3e259f00b8dc59de61ea363a0",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "ts-newline-optional-in",
+      "source_sha256": "2d9a64aab3c346b5c7555602956c354788ccb653dfc5679332219db6464a6855",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "ts-binary-in",
+      "source_sha256": "89e94573313f662240db118ff1c0f6b09bd332873c544cb3fad5920c954b2c0b",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "ts-semicolon-in",
+      "source_sha256": "e0d40be55bfa639775ab6fb7ea39cdbb0bfeed72742313057b058acfe8e02ae2",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-newline-in",
+      "source_sha256": "5ea3710f7074d1d368230ee1e7bdf20d855fa5e3e259f00b8dc59de61ea363a0",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-newline-optional-in",
+      "source_sha256": "2d9a64aab3c346b5c7555602956c354788ccb653dfc5679332219db6464a6855",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-binary-in",
+      "source_sha256": "89e94573313f662240db118ff1c0f6b09bd332873c544cb3fad5920c954b2c0b",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "tsx-semicolon-in",
+      "source_sha256": "e0d40be55bfa639775ab6fb7ea39cdbb0bfeed72742313057b058acfe8e02ae2",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "CS-excerpt-no-enum",
+      "source_sha256": "d76ae3bbb63cc5c578a75fa14318dffe0dae30400de4e0a3ef9c19dfd5405ef4",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "bbd0e59d8eae0ef84721fb6eb28183c79710cd3833f5e67eb58b87e4344a2636",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "bbd0e59d8eae0ef84721fb6eb28183c79710cd3833f5e67eb58b87e4344a2636",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "bbd0e59d8eae0ef84721fb6eb28183c79710cd3833f5e67eb58b87e4344a2636",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "CS-before-clean",
+      "source_sha256": "84c144a5bd7ab732cb9c440175d4e4ac52598deb86381f9ba15844af656d03fd",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "8cdad0599987c9eabb5494d9193b04430798f6261553f8fc04bbd6504b978e67",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "8cdad0599987c9eabb5494d9193b04430798f6261553f8fc04bbd6504b978e67",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "8cdad0599987c9eabb5494d9193b04430798f6261553f8fc04bbd6504b978e67",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": null
+    },
+    {
+      "id": "CS-original",
+      "source_sha256": "eb41f09b405e12a43b7a23fb00cdbbfc792ebd320185dda6509b0d31e6cff8aa",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "6b6600a862c01a6206419fad54c46cf7664bc0be50620e4fb16823ceebf1f828",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "6b6600a862c01a6206419fad54c46cf7664bc0be50620e4fb16823ceebf1f828",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "6b6600a862c01a6206419fad54c46cf7664bc0be50620e4fb16823ceebf1f828",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "6b6600a862c01a6206419fad54c46cf7664bc0be50620e4fb16823ceebf1f828",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-no-comments",
+      "source_sha256": "2f98121f64449de8aaba25bb6673b18179ab98aa6b85cf3b20afa6ab1ca0a4bc",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "94adaa1f9de3899bc9ea1deece1a302c6f54b9ae54625e12b6e01936bf259a9e",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "94adaa1f9de3899bc9ea1deece1a302c6f54b9ae54625e12b6e01936bf259a9e",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "94adaa1f9de3899bc9ea1deece1a302c6f54b9ae54625e12b6e01936bf259a9e",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "94adaa1f9de3899bc9ea1deece1a302c6f54b9ae54625e12b6e01936bf259a9e",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-short-namespace",
+      "source_sha256": "072eb1c427cd8cbe8bb6127438d0d4d571ec4b60b0b6746587c08e81b1030e9d",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "ecba57b7897a9663ef4a493f59947585512eee3fad92471e86a3441ed30ef6ec",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "ecba57b7897a9663ef4a493f59947585512eee3fad92471e86a3441ed30ef6ec",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "ecba57b7897a9663ef4a493f59947585512eee3fad92471e86a3441ed30ef6ec",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "ecba57b7897a9663ef4a493f59947585512eee3fad92471e86a3441ed30ef6ec",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-short-names",
+      "source_sha256": "83302e6b5c3c7da9fc60cb888aaf0f93de46ff2f2d13564aba862d341117e300",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "40ba5aea19b93e5cd479aa997ea9ee74f44f4e9b38477aee6aa96a8fbbab6c70",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "40ba5aea19b93e5cd479aa997ea9ee74f44f4e9b38477aee6aa96a8fbbab6c70",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "40ba5aea19b93e5cd479aa997ea9ee74f44f4e9b38477aee6aa96a8fbbab6c70",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "40ba5aea19b93e5cd479aa997ea9ee74f44f4e9b38477aee6aa96a8fbbab6c70",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-unindented",
+      "source_sha256": "122c2e7ceaa22036b265b420aa538c7abe9265df89a46698f09feb42bf54754a",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "25740da7c07934980a82cec49a6ac9c6929ef48bff7abc08039fb6ada190ce21",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "25740da7c07934980a82cec49a6ac9c6929ef48bff7abc08039fb6ada190ce21",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "25740da7c07934980a82cec49a6ac9c6929ef48bff7abc08039fb6ada190ce21",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "25740da7c07934980a82cec49a6ac9c6929ef48bff7abc08039fb6ada190ce21",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-JsonPosition-cs",
+      "source_sha256": "4f9e601f9d0be45c4f60f15bf1b6ca8f85dec51e353ebb50e405cc6f8e422c14",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "497b521896923fd6c7cc6a4e0c72e491dee68f033f1d8ab9ef818f34e937c1c9",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "497b521896923fd6c7cc6a4e0c72e491dee68f033f1d8ab9ef818f34e937c1c9",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "497b521896923fd6c7cc6a4e0c72e491dee68f033f1d8ab9ef818f34e937c1c9",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "497b521896923fd6c7cc6a4e0c72e491dee68f033f1d8ab9ef818f34e937c1c9",
+        "Outcome": "accepted_clean",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": false,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-JsonTextReader-excerpt-cs",
+      "source_sha256": "d76fd62cfc90076c11d86cb7d7a0058df181231aa3b34f30e549f650b5294d4a",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "673a2377a867d27cf8c0a02a5e54df64d3610547f38efe8b69cdb61c9aca59cc",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "673a2377a867d27cf8c0a02a5e54df64d3610547f38efe8b69cdb61c9aca59cc",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "673a2377a867d27cf8c0a02a5e54df64d3610547f38efe8b69cdb61c9aca59cc",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "673a2377a867d27cf8c0a02a5e54df64d3610547f38efe8b69cdb61c9aca59cc",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-MathUtils-cs",
+      "source_sha256": "426587acd7f1f50c3d3dc94f13e9c27726c32c1bbe22d0291d86485afa368640",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "7b19bf28b5e0a55e3e81f00ce23fa9051430ac7a0270dae972af56116822ceef",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "7b19bf28b5e0a55e3e81f00ce23fa9051430ac7a0270dae972af56116822ceef",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "7b19bf28b5e0a55e3e81f00ce23fa9051430ac7a0270dae972af56116822ceef",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "7b19bf28b5e0a55e3e81f00ce23fa9051430ac7a0270dae972af56116822ceef",
+        "Outcome": "accepted_clean",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": false,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-CS-excerpt-no-enum",
+      "source_sha256": "d76ae3bbb63cc5c578a75fa14318dffe0dae30400de4e0a3ef9c19dfd5405ef4",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "bbd0e59d8eae0ef84721fb6eb28183c79710cd3833f5e67eb58b87e4344a2636",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "bbd0e59d8eae0ef84721fb6eb28183c79710cd3833f5e67eb58b87e4344a2636",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "bbd0e59d8eae0ef84721fb6eb28183c79710cd3833f5e67eb58b87e4344a2636",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "bbd0e59d8eae0ef84721fb6eb28183c79710cd3833f5e67eb58b87e4344a2636",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-qualified-case",
+      "source_sha256": "080c5b49b51d394aa6b68a5d4a2a65f0ca7f0dded2829a2a0500a79c83f04f22",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "6c8637aaa9e950fbda388bbe07027422078235c10560bfb6e9486a298929d8e3",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "6c8637aaa9e950fbda388bbe07027422078235c10560bfb6e9486a298929d8e3",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "6c8637aaa9e950fbda388bbe07027422078235c10560bfb6e9486a298929d8e3",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "6c8637aaa9e950fbda388bbe07027422078235c10560bfb6e9486a298929d8e3",
+        "Outcome": "accepted_clean",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": false,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-qualified-two",
+      "source_sha256": "d8e3930fb6972e753bb29fb31d6b10e95f1fbff5e98f20d6d275b09bbeeb0a51",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "c43ea5b8a0ab8285485a3cb83e89345dda6b059e33ed417a46a3e266eff260a1",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "c43ea5b8a0ab8285485a3cb83e89345dda6b059e33ed417a46a3e266eff260a1",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "c43ea5b8a0ab8285485a3cb83e89345dda6b059e33ed417a46a3e266eff260a1",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "c43ea5b8a0ab8285485a3cb83e89345dda6b059e33ed417a46a3e266eff260a1",
+        "Outcome": "accepted_clean",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": false,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-invoke",
+      "source_sha256": "f14b2e2bdd27c1cc80b71a52ba837eb87931d7173ba460c707bdc4a2142688c4",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "326ba46663a2e3b8f4da7f94c421fc8d3edf3e9f525c1ab265a1493a3544f174",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "326ba46663a2e3b8f4da7f94c421fc8d3edf3e9f525c1ab265a1493a3544f174",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "326ba46663a2e3b8f4da7f94c421fc8d3edf3e9f525c1ab265a1493a3544f174",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "326ba46663a2e3b8f4da7f94c421fc8d3edf3e9f525c1ab265a1493a3544f174",
+        "Outcome": "accepted_clean",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": false,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-conditional-else",
+      "source_sha256": "a3a9f65b312d2310f3df734a97c0e9c5006e48fceb45761e88de52c273f24829",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "a131aef1faf2a610c27724162c082d5f2b1624c015adc7660a3ba19dae6540f6",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "a131aef1faf2a610c27724162c082d5f2b1624c015adc7660a3ba19dae6540f6",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "a131aef1faf2a610c27724162c082d5f2b1624c015adc7660a3ba19dae6540f6",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "a131aef1faf2a610c27724162c082d5f2b1624c015adc7660a3ba19dae6540f6",
+        "Outcome": "accepted_clean",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": false,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-else-after-endif",
+      "source_sha256": "7d10545a90dd0f6281794b162acfb3874a316223bf3722198fde1f58f3753ac8",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "ad4cd9329bac66f38f4f75b06a8e2db1dee1bb3dd90e70916faa7f2e2ca7a9a7",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "ad4cd9329bac66f38f4f75b06a8e2db1dee1bb3dd90e70916faa7f2e2ca7a9a7",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "ad4cd9329bac66f38f4f75b06a8e2db1dee1bb3dd90e70916faa7f2e2ca7a9a7",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "ad4cd9329bac66f38f4f75b06a8e2db1dee1bb3dd90e70916faa7f2e2ca7a9a7",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-switch-directives",
+      "source_sha256": "79bebefc2fcff071973fa49df0375da5752102a890213c0069f5147d7a40b05d",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "118b7b07b5a82ae61111158ae8cddc167e325c6e91e5f55551d6b51068a43db0",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "118b7b07b5a82ae61111158ae8cddc167e325c6e91e5f55551d6b51068a43db0",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "118b7b07b5a82ae61111158ae8cddc167e325c6e91e5f55551d6b51068a43db0",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "118b7b07b5a82ae61111158ae8cddc167e325c6e91e5f55551d6b51068a43db0",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-error-before-switch",
+      "source_sha256": "e7ab5cdc20b4a1c622fb94b49087a29e574f979a57b63774badb427d61fc48fb",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "7b0acc53d66923460a59c25a50d3347d7cdc19625c7c3e83d0b119cfd67e39c6",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "7b0acc53d66923460a59c25a50d3347d7cdc19625c7c3e83d0b119cfd67e39c6",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "7b0acc53d66923460a59c25a50d3347d7cdc19625c7c3e83d0b119cfd67e39c6",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "7b0acc53d66923460a59c25a50d3347d7cdc19625c7c3e83d0b119cfd67e39c6",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-zero-identifier-reduction-original",
+      "source_sha256": "5647d7a0626a87d1be707295a811cada97649e1126fdf9f2e181efc29707958c",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "9e3c3627f96574e142fc207b57b6d7dc4561acb346bcbdae7a3d45350f169d07",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "9e3c3627f96574e142fc207b57b6d7dc4561acb346bcbdae7a3d45350f169d07",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "9e3c3627f96574e142fc207b57b6d7dc4561acb346bcbdae7a3d45350f169d07",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "9e3c3627f96574e142fc207b57b6d7dc4561acb346bcbdae7a3d45350f169d07",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-zero-identifier-reduction-comment",
+      "source_sha256": "e651b98429ff7742b2687574a0d67d7324f6397368a5738d7531c8db4da468d2",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "f539bc306a176ff2b3193fe6c75ffebf818da04ba867cf1ccfb066fe4e0d2da7",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "f539bc306a176ff2b3193fe6c75ffebf818da04ba867cf1ccfb066fe4e0d2da7",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "f539bc306a176ff2b3193fe6c75ffebf818da04ba867cf1ccfb066fe4e0d2da7",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "f539bc306a176ff2b3193fe6c75ffebf818da04ba867cf1ccfb066fe4e0d2da7",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-zero-identifier-reduction-crlf",
+      "source_sha256": "dac6e17b50c3067cb035778e8339b00b82d9fe94171abbceae001319ba74c1bb",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "e9098ea2403e738bea5d5a6ff675694d18863fb705f4fef6292b4464d5d79dfb",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "e9098ea2403e738bea5d5a6ff675694d18863fb705f4fef6292b4464d5d79dfb",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "e9098ea2403e738bea5d5a6ff675694d18863fb705f4fef6292b4464d5d79dfb",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "e9098ea2403e738bea5d5a6ff675694d18863fb705f4fef6292b4464d5d79dfb",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-zero-identifier-reduction-leading-line",
+      "source_sha256": "2bb65f30961101b1007e04bbbdea0a17a537cc2ebcb47bcf1ea110c5bf52244c",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "b39681534c5aa88850c170df31cc8bf608f0cd5b780cc3b6e3f288c446cbc1c1",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "b39681534c5aa88850c170df31cc8bf608f0cd5b780cc3b6e3f288c446cbc1c1",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "b39681534c5aa88850c170df31cc8bf608f0cd5b780cc3b6e3f288c446cbc1c1",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "b39681534c5aa88850c170df31cc8bf608f0cd5b780cc3b6e3f288c446cbc1c1",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-zero-identifier-reduction-renamed",
+      "source_sha256": "36427b82ab327e498aab0e095cb1f00a42be9c0c664b43856dbc88c7a24feb7b",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "4d84957fc1c58ef94310c75db9292e74b2995541f6a290caabe2e0e6b4030f74",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "4d84957fc1c58ef94310c75db9292e74b2995541f6a290caabe2e0e6b4030f74",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "4d84957fc1c58ef94310c75db9292e74b2995541f6a290caabe2e0e6b4030f74",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "4d84957fc1c58ef94310c75db9292e74b2995541f6a290caabe2e0e6b4030f74",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-zero-identifier-reduction-unicode",
+      "source_sha256": "63130e931e424ae94a87626adc8040fe40feb11ac519113a41817ccbf3fc57be",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "131c9bc205b4f5bee1f89d108524ef84105568bc750106e1775d5fe92d111ed7",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "131c9bc205b4f5bee1f89d108524ef84105568bc750106e1775d5fe92d111ed7",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "131c9bc205b4f5bee1f89d108524ef84105568bc750106e1775d5fe92d111ed7",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "131c9bc205b4f5bee1f89d108524ef84105568bc750106e1775d5fe92d111ed7",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-else-declaration-reduction-original",
+      "source_sha256": "c4e898c3c756b6783d4a22fa5759fe3641844191241641885dabc0e2d6ca2c0d",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "12ffff4c8969f75836c8c255928c2f612df34e61bfa91bc930e566a5ece11941",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "12ffff4c8969f75836c8c255928c2f612df34e61bfa91bc930e566a5ece11941",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "12ffff4c8969f75836c8c255928c2f612df34e61bfa91bc930e566a5ece11941",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "12ffff4c8969f75836c8c255928c2f612df34e61bfa91bc930e566a5ece11941",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-else-declaration-reduction-comment",
+      "source_sha256": "a5c25f38e4314f8b3bc399ca53f219f6ef5d27eae0a33291c07a89313512af12",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "b9f5eed5a50fdc1559ba20d2f38a2aa9755050d32b7c93cd0c765b0e7906482e",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "b9f5eed5a50fdc1559ba20d2f38a2aa9755050d32b7c93cd0c765b0e7906482e",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "b9f5eed5a50fdc1559ba20d2f38a2aa9755050d32b7c93cd0c765b0e7906482e",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "b9f5eed5a50fdc1559ba20d2f38a2aa9755050d32b7c93cd0c765b0e7906482e",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-else-declaration-reduction-crlf",
+      "source_sha256": "5e2d1c0769c79b6266535f2a7a79996c706425f07f2ec90a2f012f1177e2e9ae",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "5229926f04d6db78f486ad248a174ebf43a5b9e2eba3bbf83c3a84682330b7b7",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "5229926f04d6db78f486ad248a174ebf43a5b9e2eba3bbf83c3a84682330b7b7",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "5229926f04d6db78f486ad248a174ebf43a5b9e2eba3bbf83c3a84682330b7b7",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "5229926f04d6db78f486ad248a174ebf43a5b9e2eba3bbf83c3a84682330b7b7",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-else-declaration-reduction-leading-line",
+      "source_sha256": "52e128b8ea6ebf19ddb00eead9e9c7f5f28f6f6fe0e1e0e33302fdca39691b64",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "d7fe305fd7710b67c2b06105292eb94d305bcd5ad2c482a81116de184acbc173",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "d7fe305fd7710b67c2b06105292eb94d305bcd5ad2c482a81116de184acbc173",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "d7fe305fd7710b67c2b06105292eb94d305bcd5ad2c482a81116de184acbc173",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "d7fe305fd7710b67c2b06105292eb94d305bcd5ad2c482a81116de184acbc173",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-else-declaration-reduction-renamed",
+      "source_sha256": "d92b6821f70b9599429b0f3784b4d246327bc06d0ee217ef776b4ace889592b9",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "7f70f65c6d138f7c14d14691496a1d210f846e11d27c236fd687ccb1cab31241",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "7f70f65c6d138f7c14d14691496a1d210f846e11d27c236fd687ccb1cab31241",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "7f70f65c6d138f7c14d14691496a1d210f846e11d27c236fd687ccb1cab31241",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "7f70f65c6d138f7c14d14691496a1d210f846e11d27c236fd687ccb1cab31241",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-else-declaration-reduction-unicode",
+      "source_sha256": "7752e7551044fbec5eff17eb06560ba906b19cb8d28b18521e80fa1c284025f0",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "c7cc239631a35175cf052b686dbff4f47d9e8efc37aee3369f1d72021b4a2c34",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "c7cc239631a35175cf052b686dbff4f47d9e8efc37aee3369f1d72021b4a2c34",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        },
+        {
+          "Digest": "c7cc239631a35175cf052b686dbff4f47d9e8efc37aee3369f1d72021b4a2c34",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "c7cc239631a35175cf052b686dbff4f47d9e8efc37aee3369f1d72021b4a2c34",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-pointer-argument-reduction-original",
+      "source_sha256": "2085c5b9269725da46bc2bbd0ab6052e2380661b54e530a7bd2ed999cab58a3e",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "7fb3225f706112af3f2e85308108421838d1d2a39610583eee6a34889cf420e0",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        },
+        {
+          "Digest": "7fb3225f706112af3f2e85308108421838d1d2a39610583eee6a34889cf420e0",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        },
+        {
+          "Digest": "7fb3225f706112af3f2e85308108421838d1d2a39610583eee6a34889cf420e0",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        }
+      ],
+      "incremental": {
+        "Digest": "7fb3225f706112af3f2e85308108421838d1d2a39610583eee6a34889cf420e0",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      }
+    },
+    {
+      "id": "CS-pointer-argument-reduction-comment",
+      "source_sha256": "4ba6c6be302c3d8ada06cfeffb2ed969b0d4db9a65a22730de038ff2e02da1f1",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "78080f05ba390def15d7cf1f4b49d0111635255836ccd812e1e758a7d2b99281",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        },
+        {
+          "Digest": "78080f05ba390def15d7cf1f4b49d0111635255836ccd812e1e758a7d2b99281",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        },
+        {
+          "Digest": "78080f05ba390def15d7cf1f4b49d0111635255836ccd812e1e758a7d2b99281",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        }
+      ],
+      "incremental": {
+        "Digest": "78080f05ba390def15d7cf1f4b49d0111635255836ccd812e1e758a7d2b99281",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      }
+    },
+    {
+      "id": "CS-pointer-argument-reduction-crlf",
+      "source_sha256": "03759f2914321508960736e8940bab27b349a5803bc5a6fbe698392c30cc74bd",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "c66c0e23f9c480df306d575dac567835f7a754f000d99204ce056b5223628684",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        },
+        {
+          "Digest": "c66c0e23f9c480df306d575dac567835f7a754f000d99204ce056b5223628684",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        },
+        {
+          "Digest": "c66c0e23f9c480df306d575dac567835f7a754f000d99204ce056b5223628684",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        }
+      ],
+      "incremental": {
+        "Digest": "c66c0e23f9c480df306d575dac567835f7a754f000d99204ce056b5223628684",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      }
+    },
+    {
+      "id": "CS-pointer-argument-reduction-leading-line",
+      "source_sha256": "a8be9d221231532dc2f094d94d28c3602b2a165f0fb9de9dd283bf8ad2cc22d0",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "f602a27d154faa1a6b2d168bfc62b22d1155e8aa11bf4bed0b6fbafe7730bb9e",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        },
+        {
+          "Digest": "f602a27d154faa1a6b2d168bfc62b22d1155e8aa11bf4bed0b6fbafe7730bb9e",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        },
+        {
+          "Digest": "f602a27d154faa1a6b2d168bfc62b22d1155e8aa11bf4bed0b6fbafe7730bb9e",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        }
+      ],
+      "incremental": {
+        "Digest": "f602a27d154faa1a6b2d168bfc62b22d1155e8aa11bf4bed0b6fbafe7730bb9e",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      }
+    },
+    {
+      "id": "CS-pointer-argument-reduction-renamed",
+      "source_sha256": "62b295e9739919950948192864432768274aa7aafd824bdb0f7565baf61f166c",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "f80db1f5968d83948e7707aa36b339184f14e8f60d66e2d47afdbde2163bbab8",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        },
+        {
+          "Digest": "f80db1f5968d83948e7707aa36b339184f14e8f60d66e2d47afdbde2163bbab8",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        },
+        {
+          "Digest": "f80db1f5968d83948e7707aa36b339184f14e8f60d66e2d47afdbde2163bbab8",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        }
+      ],
+      "incremental": {
+        "Digest": "f80db1f5968d83948e7707aa36b339184f14e8f60d66e2d47afdbde2163bbab8",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      }
+    },
+    {
+      "id": "CS-pointer-argument-reduction-unicode",
+      "source_sha256": "f183025e08e4f1c13a44e29a629503546606ca814bd66b473c0a725479172d0b",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "4acfc194fe8b1396400fdd345c6ee6bd11703768d10ba0f98579153a532a55c7",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        },
+        {
+          "Digest": "4acfc194fe8b1396400fdd345c6ee6bd11703768d10ba0f98579153a532a55c7",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        },
+        {
+          "Digest": "4acfc194fe8b1396400fdd345c6ee6bd11703768d10ba0f98579153a532a55c7",
+          "Outcome": "accepted_with_errors",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": true,
+          "Missing": true
+        }
+      ],
+      "incremental": {
+        "Digest": "4acfc194fe8b1396400fdd345c6ee6bd11703768d10ba0f98579153a532a55c7",
+        "Outcome": "accepted_with_errors",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": true,
+        "Missing": true
+      }
+    },
+    {
+      "id": "CS-valid-pointer",
+      "source_sha256": "cd80e247001c3aa5853e0dfb13307844b4d8e858604dea4df622d6a477a9a0a6",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "ef4a55f3e4dd659b8eb8f641b5e80cca18c18cdea313af8b7efbe33f7af5533c",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "ef4a55f3e4dd659b8eb8f641b5e80cca18c18cdea313af8b7efbe33f7af5533c",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "ef4a55f3e4dd659b8eb8f641b5e80cca18c18cdea313af8b7efbe33f7af5533c",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "ef4a55f3e4dd659b8eb8f641b5e80cca18c18cdea313af8b7efbe33f7af5533c",
+        "Outcome": "accepted_clean",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": false,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-valid-products",
+      "source_sha256": "303e684eda4960b0aa677c2559de3403a26b1835bd1cd56903bdbfa26e0cab47",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "d1a58fd5b82b4b5e4b332515c582fac2d917e7deab9798b754bd9fb15ffaad84",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "d1a58fd5b82b4b5e4b332515c582fac2d917e7deab9798b754bd9fb15ffaad84",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "d1a58fd5b82b4b5e4b332515c582fac2d917e7deab9798b754bd9fb15ffaad84",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "d1a58fd5b82b4b5e4b332515c582fac2d917e7deab9798b754bd9fb15ffaad84",
+        "Outcome": "accepted_clean",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": false,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-valid-products-renamed",
+      "source_sha256": "ffa3e9377d4dd1a78e245f56364c20493f1e02f39f7122e1f1235db72a8b59b7",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "b2609cc7f98d62acedd49ac0c9e30feddf42d618ef19f5a189701fc7fe775b02",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "b2609cc7f98d62acedd49ac0c9e30feddf42d618ef19f5a189701fc7fe775b02",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "b2609cc7f98d62acedd49ac0c9e30feddf42d618ef19f5a189701fc7fe775b02",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "b2609cc7f98d62acedd49ac0c9e30feddf42d618ef19f5a189701fc7fe775b02",
+        "Outcome": "accepted_clean",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": false,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-valid-out-var",
+      "source_sha256": "a36106677380711167167e348dbebb3d7653645ef8b31457bc44eb7ef28cd1d3",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "7e7c7ac8c8356a3222faeec9a47668bcfecb80bd8e6ef79eb4ed9d90e05f79d7",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "7e7c7ac8c8356a3222faeec9a47668bcfecb80bd8e6ef79eb4ed9d90e05f79d7",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "7e7c7ac8c8356a3222faeec9a47668bcfecb80bd8e6ef79eb4ed9d90e05f79d7",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "7e7c7ac8c8356a3222faeec9a47668bcfecb80bd8e6ef79eb4ed9d90e05f79d7",
+        "Outcome": "accepted_clean",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": false,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-valid-else",
+      "source_sha256": "3f5b0a605ea7ba50d9c545a7a590104fdefddaa75b22c27ea194e1f933ac606d",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "8fd300f9905aa582349b72876f821de5dbb32fa520fb92e26c75457778aae3d3",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "8fd300f9905aa582349b72876f821de5dbb32fa520fb92e26c75457778aae3d3",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "8fd300f9905aa582349b72876f821de5dbb32fa520fb92e26c75457778aae3d3",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "8fd300f9905aa582349b72876f821de5dbb32fa520fb92e26c75457778aae3d3",
+        "Outcome": "accepted_clean",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": false,
+        "Missing": false
+      }
+    },
+    {
+      "id": "CS-valid-preprocessor",
+      "source_sha256": "cc8e38d17f7314d0e0dccf1a8cc2f7e65b37678a288f9faa6e6e8f0037859289",
+      "passed": true,
+      "observations": [
+        {
+          "Digest": "3a359fc5f0d053d0592530824720ea32ae631fcd5a8040b98c91c98035478061",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "3a359fc5f0d053d0592530824720ea32ae631fcd5a8040b98c91c98035478061",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        {
+          "Digest": "3a359fc5f0d053d0592530824720ea32ae631fcd5a8040b98c91c98035478061",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "compact",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        }
+      ],
+      "incremental": {
+        "Digest": "3a359fc5f0d053d0592530824720ea32ae631fcd5a8040b98c91c98035478061",
+        "Outcome": "accepted_clean",
+        "Stop": "accepted",
+        "Route": "classic",
+        "Fallback": "",
+        "Reuse": "external_scanner_unsupported",
+        "Complete": true,
+        "Error": false,
+        "Missing": false
+      }
+    }
+  ],
+  "records": 100,
+  "edits": 40
+}

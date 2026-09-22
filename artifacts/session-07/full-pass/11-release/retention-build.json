@@ -1,0 +1,29 @@
+{
+  "command": [
+    "go",
+    "build",
+    "-trimpath",
+    "-o",
+    ".scratch/full-pass/retention-release.exe",
+    ".scratch/full-pass/retention.go"
+  ],
+  "candidate_commit": "23d6885ebe8709616614c89ffb6511ea815fb23f",
+  "status_before": "?? artifacts/session-07/full-pass/11-release/\n",
+  "started_unix": 1790118576.2471418,
+  "elapsed_seconds": 0.5076944828033447,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "d7288ee4c91bf8299cb2dc315ead43fc3b1505e3189c08915012dce9523d4983"
+  },
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

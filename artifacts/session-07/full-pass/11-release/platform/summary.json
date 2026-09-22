@@ -1,0 +1,54 @@
+{
+  "host_class": "local Windows workstation",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "machine": "AMD64",
+  "dependency_packages": 137,
+  "cgo_files": 0,
+  "runtime_cgo": false,
+  "artifacts": [
+    {
+      "goos": "windows",
+      "goarch": "amd64",
+      "path": ".scratch\\full-pass\\release-platform\\consumer-amd64.exe",
+      "sha256": "42042dc21abed5f81a17c4d52dc6299ce298307987a15e692ea7c45da759d9f8",
+      "bytes": 34749952,
+      "execution": "PASS"
+    },
+    {
+      "goos": "windows",
+      "goarch": "arm64",
+      "path": ".scratch\\full-pass\\release-platform\\consumer-arm64.exe",
+      "sha256": "9f5b4b3544bce3ca99642470f6a7215b0b7ba5010cac478fb530c4d7807018bf",
+      "bytes": 33235456,
+      "execution": "NOT_RUN"
+    },
+    {
+      "goos": "linux",
+      "goarch": "amd64",
+      "path": ".scratch\\full-pass\\release-platform\\consumer-linux",
+      "sha256": "a98fbcdc02dcd8971c7897607ac9d034ebfafdb99e38797e407fb14a36be2156",
+      "bytes": 34574471,
+      "execution": "NOT_RUN"
+    },
+    {
+      "goos": "darwin",
+      "goarch": "arm64",
+      "path": ".scratch\\full-pass\\release-platform\\consumer-darwin",
+      "sha256": "d8228ad71b22ba843205f8a1b36b9cf934b9fe96ab3a1e5f7cfac54a3cce92d5",
+      "bytes": 33911730,
+      "execution": "NOT_RUN"
+    },
+    {
+      "goos": "wasip1",
+      "goarch": "wasm",
+      "path": ".scratch\\full-pass\\release-platform\\consumer.wasm",
+      "sha256": "1a1a713c81af52355fc5151f418169ae085f8400ac15783599d4058f9034a0cd",
+      "bytes": 39749140,
+      "execution": "NOT_RUN"
+    }
+  ],
+  "pe_imports": "kernel32.dll only",
+  "native_windows_amd64": "PASS",
+  "native_windows_arm64": "NOT_RUN",
+  "hosted_ci": "NOT_RUN"
+}

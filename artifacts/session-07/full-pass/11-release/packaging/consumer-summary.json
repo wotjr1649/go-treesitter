@@ -1,0 +1,13 @@
+{
+  "candidate_commit": "23d6885ebe8709616614c89ffb6511ea815fb23f",
+  "main": "PASS",
+  "gpl": "PASS",
+  "module_counts": [
+    2,
+    3
+  ],
+  "replace_directives": 0,
+  "empty_module_caches": true,
+  "proxy": "task-local file proxy; no network",
+  "scope": "whole official module ZIPs; seven core routes, NUL index, JSX/TSX fix, Go edit/fresh equality, errors, cancel, GPL three grammars"
+}

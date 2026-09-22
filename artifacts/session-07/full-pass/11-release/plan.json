@@ -1,0 +1,19 @@
+{
+  "candidate_commit": "23d6885ebe8709616614c89ffb6511ea815fb23f",
+  "runtime_manifest_sha256": "5d1f526c35e223341914cbfada8abe1c4c49d52824a09950bde05d331ff41e46",
+  "scripts": {
+    "release-correctness.py": "26d6996604e4f01bcc03ebdfaf8673569f37a39918410badcd059753461ceba4",
+    "release-checks.py": "e2c45ab02f03dba8e1499bb0c25bbf7a512f6aea6f5e69f04d52efcabf66b794",
+    "release-resources.py": "6599ae14aaff1eb1a116e15d5d1997373c7db44c9fbcb63eed23fbf54586ebc0",
+    "release-large-oracle.py": "f20cf24cf494f88cad0baaacd1ec8c3c2bf8c871237bbe8102a013bf76dc34a4",
+    "analyze-release-benchmarks.py": "d1cd5cb05b0a8619a9762ee366291fcb69b1aa62f5627abf425a659c69e10a17"
+  },
+  "correctness": "688 retained fresh C records, 439 edits, repeated 20 clean / 100 error Go parses and three fresh C parses",
+  "catalog": "206, three fresh / edit / pre-cancel / input budget / close",
+  "fuzz": "60 seconds each incremental agreement and bounded parse, parallel=2",
+  "resources": "193 cycles, 3281 trees, 12 checkpoints; separate race diagnostics",
+  "performance": "five paired randomized seeds, 40 timed operations in 59 modes, GOMAXPROCS=4",
+  "packaging": "official x/mod CreateFromVCS/CheckZip for v0.0.1, fresh file-proxy consumers, no replace",
+  "native_arm64": "NOT_RUN; no native host available",
+  "hosted_ci": "NOT_RUN; no authorized remote write"
+}

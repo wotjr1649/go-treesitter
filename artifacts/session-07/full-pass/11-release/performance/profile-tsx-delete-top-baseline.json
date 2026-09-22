@@ -1,0 +1,30 @@
+{
+  "command": [
+    "go",
+    "tool",
+    "pprof",
+    "-top",
+    "-cum",
+    "-nodecount=30",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\release-tsx-delete-baseline.pprof"
+  ],
+  "candidate_commit": "23d6885ebe8709616614c89ffb6511ea815fb23f",
+  "status_before": "?? artifacts/session-07/full-pass/11-release/\n",
+  "started_unix": 1790118766.0271118,
+  "elapsed_seconds": 0.13334155082702637,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "d7288ee4c91bf8299cb2dc315ead43fc3b1505e3189c08915012dce9523d4983"
+  },
+  "log_sha256": "00288ed8d8c988dafb7b7d1b5ddee6e1581f4acd1b15f1ca91b04197667867ef"
+}

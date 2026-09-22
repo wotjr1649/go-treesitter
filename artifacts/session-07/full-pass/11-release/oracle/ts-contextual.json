@@ -1,0 +1,5172 @@
+{
+  "catalog_sha256": "0430f2db7abcc0314e6ea2a6b2a4575cdfa63cdefd17f3ed787cd077ff1f3664",
+  "runtime_manifest_sha256": "5d1f526c35e223341914cbfada8abe1c4c49d52824a09950bde05d331ff41e46",
+  "executable_sha256": "2261e84c0904b2c4a735e488ede4a88aa02345dae5d82c1a1dd0d5450ea545e9",
+  "c_build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "rows": [
+    {
+      "id": "ts-newline-in",
+      "source_sha256": "5ea3710f7074d1d368230ee1e7bdf20d855fa5e3e259f00b8dc59de61ea363a0",
+      "passed": true,
+      "c_deterministic": true,
+      "c_incremental_equal": null,
+      "go": {
+        "ID": "ts-newline-in",
+        "Nodes": [
+          {
+            "Type": "program",
+            "Field": "",
+            "Parent": -1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 63,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 5,
+              "Column": 0
+            }
+          },
+          {
+            "Type": "type_alias_declaration",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 62,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 4,
+              "Column": 1
+            }
+          },
+          {
+            "Type": "type",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 4,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 4
+            }
+          },
+          {
+            "Type": "type_identifier",
+            "Field": "name",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5,
+            "EndByte": 11,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 5
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 11
+            }
+          },
+          {
+            "Type": "=",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 12,
+            "EndByte": 13,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "object_type",
+            "Field": "value",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 14,
+            "EndByte": 62,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 14
+            },
+            "EndPoint": {
+              "Row": 4,
+              "Column": 1
+            }
+          },
+          {
+            "Type": "{",
+            "Field": "",
+            "Parent": 5,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 14,
+            "EndByte": 15,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 14
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 15
+            }
+          },
+          {
+            "Type": "property_signature",
+            "Field": "",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 18,
+            "EndByte": 33,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 17
+            }
+          },
+          {
+            "Type": "property_identifier",
+            "Field": "name",
+            "Parent": 7,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 18,
+            "EndByte": 25,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 9
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 7,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 25,
+            "EndByte": 33,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 9
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 17
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 9,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 25,
+            "EndByte": 26,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 9
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 10
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 9,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 27,
+            "EndByte": 33,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 11
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 17
+            }
+          },
+          {
+            "Type": "string",
+            "Field": "",
+            "Parent": 11,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 27,
+            "EndByte": 33,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 11
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 17
+            }
+          },
+          {
+            "Type": "property_signature",
+            "Field": "",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 36,
+            "EndByte": 46,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 12
+            }
+          },
+          {
+            "Type": "property_identifier",
+            "Field": "name",
+            "Parent": 13,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 36,
+            "EndByte": 38,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 4
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 13,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 38,
+            "EndByte": 46,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 4
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 12
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 15,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 38,
+            "EndByte": 39,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 4
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 5
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 15,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 40,
+            "EndByte": 46,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 6
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 12
+            }
+          },
+          {
+            "Type": "string",
+            "Field": "",
+            "Parent": 17,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 40,
+            "EndByte": 46,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 6
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 12
+            }
+          },
+          {
+            "Type": "property_signature",
+            "Field": "",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 49,
+            "EndByte": 60,
+            "StartPoint": {
+              "Row": 3,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "property_identifier",
+            "Field": "name",
+            "Parent": 19,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 49,
+            "EndByte": 52,
+            "StartPoint": {
+              "Row": 3,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 5
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 19,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 52,
+            "EndByte": 60,
+            "StartPoint": {
+              "Row": 3,
+              "Column": 5
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 13
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 21,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 52,
+            "EndByte": 53,
+            "StartPoint": {
+              "Row": 3,
+              "Column": 5
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 6
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 21,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 54,
+            "EndByte": 60,
+            "StartPoint": {
+              "Row": 3,
+              "Column": 7
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "string",
+            "Field": "",
+            "Parent": 23,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 54,
+            "EndByte": 60,
+            "StartPoint": {
+              "Row": 3,
+              "Column": 7
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "}",
+            "Field": "",
+            "Parent": 5,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 61,
+            "EndByte": 62,
+            "StartPoint": {
+              "Row": 4,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 4,
+              "Column": 1
+            }
+          }
+        ],
+        "Observations": [
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          }
+        ],
+        "Incremental": null,
+        "IncrementalNodes": null,
+        "IncrementalEqual": false
+      }
+    },
+    {
+      "id": "ts-newline-optional-in",
+      "source_sha256": "2d9a64aab3c346b5c7555602956c354788ccb653dfc5679332219db6464a6855",
+      "passed": true,
+      "c_deterministic": true,
+      "c_incremental_equal": null,
+      "go": {
+        "ID": "ts-newline-optional-in",
+        "Nodes": [
+          {
+            "Type": "program",
+            "Field": "",
+            "Parent": -1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 53,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 4,
+              "Column": 0
+            }
+          },
+          {
+            "Type": "interface_declaration",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 52,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 1
+            }
+          },
+          {
+            "Type": "interface",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 9,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 9
+            }
+          },
+          {
+            "Type": "type_identifier",
+            "Field": "name",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 10,
+            "EndByte": 16,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 10
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 16
+            }
+          },
+          {
+            "Type": "interface_body",
+            "Field": "body",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 17,
+            "EndByte": 52,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 17
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 1
+            }
+          },
+          {
+            "Type": "{",
+            "Field": "",
+            "Parent": 4,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 17,
+            "EndByte": 18,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 17
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 18
+            }
+          },
+          {
+            "Type": "property_signature",
+            "Field": "",
+            "Parent": 4,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 21,
+            "EndByte": 36,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 17
+            }
+          },
+          {
+            "Type": "property_identifier",
+            "Field": "name",
+            "Parent": 6,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 21,
+            "EndByte": 28,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 9
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 6,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 28,
+            "EndByte": 36,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 9
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 17
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 8,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 28,
+            "EndByte": 29,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 9
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 10
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 8,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 30,
+            "EndByte": 36,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 11
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 17
+            }
+          },
+          {
+            "Type": "string",
+            "Field": "",
+            "Parent": 10,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 30,
+            "EndByte": 36,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 11
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 17
+            }
+          },
+          {
+            "Type": "property_signature",
+            "Field": "",
+            "Parent": 4,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 39,
+            "EndByte": 50,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "property_identifier",
+            "Field": "name",
+            "Parent": 12,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 39,
+            "EndByte": 41,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 4
+            }
+          },
+          {
+            "Type": "?",
+            "Field": "",
+            "Parent": 12,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 41,
+            "EndByte": 42,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 4
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 5
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 12,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 42,
+            "EndByte": 50,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 5
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 13
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 15,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 42,
+            "EndByte": 43,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 5
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 6
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 15,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 44,
+            "EndByte": 50,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 7
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "string",
+            "Field": "",
+            "Parent": 17,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 44,
+            "EndByte": 50,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 7
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "}",
+            "Field": "",
+            "Parent": 4,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 51,
+            "EndByte": 52,
+            "StartPoint": {
+              "Row": 3,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 1
+            }
+          }
+        ],
+        "Observations": [
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          }
+        ],
+        "Incremental": null,
+        "IncrementalNodes": null,
+        "IncrementalEqual": false
+      }
+    },
+    {
+      "id": "ts-binary-in",
+      "source_sha256": "89e94573313f662240db118ff1c0f6b09bd332873c544cb3fad5920c954b2c0b",
+      "passed": true,
+      "c_deterministic": true,
+      "c_incremental_equal": null,
+      "go": {
+        "ID": "ts-binary-in",
+        "Nodes": [
+          {
+            "Type": "program",
+            "Field": "",
+            "Parent": -1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 32,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 0
+            }
+          },
+          {
+            "Type": "lexical_declaration",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 31,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 12
+            }
+          },
+          {
+            "Type": "const",
+            "Field": "kind",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 5,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 5
+            }
+          },
+          {
+            "Type": "variable_declarator",
+            "Field": "",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 6,
+            "EndByte": 30,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 6
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 11
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "name",
+            "Parent": 3,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 6,
+            "EndByte": 12,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 6
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 12
+            }
+          },
+          {
+            "Type": "=",
+            "Field": "",
+            "Parent": 3,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 13,
+            "EndByte": 14,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 13
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 14
+            }
+          },
+          {
+            "Type": "binary_expression",
+            "Field": "value",
+            "Parent": 3,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 15,
+            "EndByte": 30,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 15
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 11
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "left",
+            "Parent": 6,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 15,
+            "EndByte": 18,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 15
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 18
+            }
+          },
+          {
+            "Type": "in",
+            "Field": "operator",
+            "Parent": 6,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 21,
+            "EndByte": 23,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 4
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "right",
+            "Parent": 6,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 24,
+            "EndByte": 30,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 5
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 11
+            }
+          },
+          {
+            "Type": ";",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 30,
+            "EndByte": 31,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 11
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 12
+            }
+          }
+        ],
+        "Observations": [
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          }
+        ],
+        "Incremental": null,
+        "IncrementalNodes": null,
+        "IncrementalEqual": false
+      }
+    },
+    {
+      "id": "ts-semicolon-in",
+      "source_sha256": "e0d40be55bfa639775ab6fb7ea39cdbb0bfeed72742313057b058acfe8e02ae2",
+      "passed": true,
+      "c_deterministic": true,
+      "c_incremental_equal": null,
+      "go": {
+        "ID": "ts-semicolon-in",
+        "Nodes": [
+          {
+            "Type": "program",
+            "Field": "",
+            "Parent": -1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 60,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 0
+            }
+          },
+          {
+            "Type": "type_alias_declaration",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 59,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 59
+            }
+          },
+          {
+            "Type": "type",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 4,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 4
+            }
+          },
+          {
+            "Type": "type_identifier",
+            "Field": "name",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5,
+            "EndByte": 11,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 5
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 11
+            }
+          },
+          {
+            "Type": "=",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 12,
+            "EndByte": 13,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "object_type",
+            "Field": "value",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 14,
+            "EndByte": 58,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 14
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 58
+            }
+          },
+          {
+            "Type": "{",
+            "Field": "",
+            "Parent": 5,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 14,
+            "EndByte": 15,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 14
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 15
+            }
+          },
+          {
+            "Type": "property_signature",
+            "Field": "",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 16,
+            "EndByte": 31,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 16
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 31
+            }
+          },
+          {
+            "Type": "property_identifier",
+            "Field": "name",
+            "Parent": 7,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 16,
+            "EndByte": 23,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 16
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 23
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 7,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 23,
+            "EndByte": 31,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 23
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 31
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 9,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 23,
+            "EndByte": 24,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 23
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 24
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 9,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 25,
+            "EndByte": 31,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 25
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 31
+            }
+          },
+          {
+            "Type": "string",
+            "Field": "",
+            "Parent": 11,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 25,
+            "EndByte": 31,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 25
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 31
+            }
+          },
+          {
+            "Type": ";",
+            "Field": "",
+            "Parent": 5,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 31,
+            "EndByte": 32,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 31
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 32
+            }
+          },
+          {
+            "Type": "property_signature",
+            "Field": "",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 33,
+            "EndByte": 43,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 33
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 43
+            }
+          },
+          {
+            "Type": "property_identifier",
+            "Field": "name",
+            "Parent": 14,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 33,
+            "EndByte": 35,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 33
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 35
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 14,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 35,
+            "EndByte": 43,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 35
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 43
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 16,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 35,
+            "EndByte": 36,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 35
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 36
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 16,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 37,
+            "EndByte": 43,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 37
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 43
+            }
+          },
+          {
+            "Type": "string",
+            "Field": "",
+            "Parent": 18,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 37,
+            "EndByte": 43,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 37
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 43
+            }
+          },
+          {
+            "Type": ";",
+            "Field": "",
+            "Parent": 5,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 43,
+            "EndByte": 44,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 43
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 44
+            }
+          },
+          {
+            "Type": "property_signature",
+            "Field": "",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 45,
+            "EndByte": 56,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 45
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 56
+            }
+          },
+          {
+            "Type": "property_identifier",
+            "Field": "name",
+            "Parent": 21,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 45,
+            "EndByte": 48,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 45
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 48
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 21,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 48,
+            "EndByte": 56,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 48
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 56
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 23,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 48,
+            "EndByte": 49,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 48
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 49
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 23,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 50,
+            "EndByte": 56,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 50
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 56
+            }
+          },
+          {
+            "Type": "string",
+            "Field": "",
+            "Parent": 25,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 50,
+            "EndByte": 56,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 50
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 56
+            }
+          },
+          {
+            "Type": "}",
+            "Field": "",
+            "Parent": 5,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 57,
+            "EndByte": 58,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 57
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 58
+            }
+          },
+          {
+            "Type": ";",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 58,
+            "EndByte": 59,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 58
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 59
+            }
+          }
+        ],
+        "Observations": [
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          }
+        ],
+        "Incremental": null,
+        "IncrementalNodes": null,
+        "IncrementalEqual": false
+      }
+    },
+    {
+      "id": "tsx-newline-in",
+      "source_sha256": "5ea3710f7074d1d368230ee1e7bdf20d855fa5e3e259f00b8dc59de61ea363a0",
+      "passed": true,
+      "c_deterministic": true,
+      "c_incremental_equal": null,
+      "go": {
+        "ID": "tsx-newline-in",
+        "Nodes": [
+          {
+            "Type": "program",
+            "Field": "",
+            "Parent": -1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 63,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 5,
+              "Column": 0
+            }
+          },
+          {
+            "Type": "type_alias_declaration",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 62,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 4,
+              "Column": 1
+            }
+          },
+          {
+            "Type": "type",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 4,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 4
+            }
+          },
+          {
+            "Type": "type_identifier",
+            "Field": "name",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5,
+            "EndByte": 11,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 5
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 11
+            }
+          },
+          {
+            "Type": "=",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 12,
+            "EndByte": 13,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "object_type",
+            "Field": "value",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 14,
+            "EndByte": 62,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 14
+            },
+            "EndPoint": {
+              "Row": 4,
+              "Column": 1
+            }
+          },
+          {
+            "Type": "{",
+            "Field": "",
+            "Parent": 5,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 14,
+            "EndByte": 15,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 14
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 15
+            }
+          },
+          {
+            "Type": "property_signature",
+            "Field": "",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 18,
+            "EndByte": 33,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 17
+            }
+          },
+          {
+            "Type": "property_identifier",
+            "Field": "name",
+            "Parent": 7,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 18,
+            "EndByte": 25,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 9
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 7,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 25,
+            "EndByte": 33,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 9
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 17
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 9,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 25,
+            "EndByte": 26,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 9
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 10
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 9,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 27,
+            "EndByte": 33,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 11
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 17
+            }
+          },
+          {
+            "Type": "string",
+            "Field": "",
+            "Parent": 11,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 27,
+            "EndByte": 33,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 11
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 17
+            }
+          },
+          {
+            "Type": "property_signature",
+            "Field": "",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 36,
+            "EndByte": 46,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 12
+            }
+          },
+          {
+            "Type": "property_identifier",
+            "Field": "name",
+            "Parent": 13,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 36,
+            "EndByte": 38,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 4
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 13,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 38,
+            "EndByte": 46,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 4
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 12
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 15,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 38,
+            "EndByte": 39,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 4
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 5
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 15,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 40,
+            "EndByte": 46,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 6
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 12
+            }
+          },
+          {
+            "Type": "string",
+            "Field": "",
+            "Parent": 17,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 40,
+            "EndByte": 46,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 6
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 12
+            }
+          },
+          {
+            "Type": "property_signature",
+            "Field": "",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 49,
+            "EndByte": 60,
+            "StartPoint": {
+              "Row": 3,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "property_identifier",
+            "Field": "name",
+            "Parent": 19,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 49,
+            "EndByte": 52,
+            "StartPoint": {
+              "Row": 3,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 5
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 19,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 52,
+            "EndByte": 60,
+            "StartPoint": {
+              "Row": 3,
+              "Column": 5
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 13
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 21,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 52,
+            "EndByte": 53,
+            "StartPoint": {
+              "Row": 3,
+              "Column": 5
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 6
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 21,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 54,
+            "EndByte": 60,
+            "StartPoint": {
+              "Row": 3,
+              "Column": 7
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "string",
+            "Field": "",
+            "Parent": 23,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 54,
+            "EndByte": 60,
+            "StartPoint": {
+              "Row": 3,
+              "Column": 7
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "}",
+            "Field": "",
+            "Parent": 5,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 61,
+            "EndByte": 62,
+            "StartPoint": {
+              "Row": 4,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 4,
+              "Column": 1
+            }
+          }
+        ],
+        "Observations": [
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          }
+        ],
+        "Incremental": null,
+        "IncrementalNodes": null,
+        "IncrementalEqual": false
+      }
+    },
+    {
+      "id": "tsx-newline-optional-in",
+      "source_sha256": "2d9a64aab3c346b5c7555602956c354788ccb653dfc5679332219db6464a6855",
+      "passed": true,
+      "c_deterministic": true,
+      "c_incremental_equal": null,
+      "go": {
+        "ID": "tsx-newline-optional-in",
+        "Nodes": [
+          {
+            "Type": "program",
+            "Field": "",
+            "Parent": -1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 53,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 4,
+              "Column": 0
+            }
+          },
+          {
+            "Type": "interface_declaration",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 52,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 1
+            }
+          },
+          {
+            "Type": "interface",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 9,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 9
+            }
+          },
+          {
+            "Type": "type_identifier",
+            "Field": "name",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 10,
+            "EndByte": 16,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 10
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 16
+            }
+          },
+          {
+            "Type": "interface_body",
+            "Field": "body",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 17,
+            "EndByte": 52,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 17
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 1
+            }
+          },
+          {
+            "Type": "{",
+            "Field": "",
+            "Parent": 4,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 17,
+            "EndByte": 18,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 17
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 18
+            }
+          },
+          {
+            "Type": "property_signature",
+            "Field": "",
+            "Parent": 4,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 21,
+            "EndByte": 36,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 17
+            }
+          },
+          {
+            "Type": "property_identifier",
+            "Field": "name",
+            "Parent": 6,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 21,
+            "EndByte": 28,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 9
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 6,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 28,
+            "EndByte": 36,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 9
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 17
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 8,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 28,
+            "EndByte": 29,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 9
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 10
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 8,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 30,
+            "EndByte": 36,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 11
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 17
+            }
+          },
+          {
+            "Type": "string",
+            "Field": "",
+            "Parent": 10,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 30,
+            "EndByte": 36,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 11
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 17
+            }
+          },
+          {
+            "Type": "property_signature",
+            "Field": "",
+            "Parent": 4,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 39,
+            "EndByte": 50,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "property_identifier",
+            "Field": "name",
+            "Parent": 12,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 39,
+            "EndByte": 41,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 4
+            }
+          },
+          {
+            "Type": "?",
+            "Field": "",
+            "Parent": 12,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 41,
+            "EndByte": 42,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 4
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 5
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 12,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 42,
+            "EndByte": 50,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 5
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 13
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 15,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 42,
+            "EndByte": 43,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 5
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 6
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 15,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 44,
+            "EndByte": 50,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 7
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "string",
+            "Field": "",
+            "Parent": 17,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 44,
+            "EndByte": 50,
+            "StartPoint": {
+              "Row": 2,
+              "Column": 7
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "}",
+            "Field": "",
+            "Parent": 4,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 51,
+            "EndByte": 52,
+            "StartPoint": {
+              "Row": 3,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 3,
+              "Column": 1
+            }
+          }
+        ],
+        "Observations": [
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          }
+        ],
+        "Incremental": null,
+        "IncrementalNodes": null,
+        "IncrementalEqual": false
+      }
+    },
+    {
+      "id": "tsx-binary-in",
+      "source_sha256": "89e94573313f662240db118ff1c0f6b09bd332873c544cb3fad5920c954b2c0b",
+      "passed": true,
+      "c_deterministic": true,
+      "c_incremental_equal": null,
+      "go": {
+        "ID": "tsx-binary-in",
+        "Nodes": [
+          {
+            "Type": "program",
+            "Field": "",
+            "Parent": -1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 32,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 2,
+              "Column": 0
+            }
+          },
+          {
+            "Type": "lexical_declaration",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 31,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 12
+            }
+          },
+          {
+            "Type": "const",
+            "Field": "kind",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 5,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 5
+            }
+          },
+          {
+            "Type": "variable_declarator",
+            "Field": "",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 6,
+            "EndByte": 30,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 6
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 11
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "name",
+            "Parent": 3,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 6,
+            "EndByte": 12,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 6
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 12
+            }
+          },
+          {
+            "Type": "=",
+            "Field": "",
+            "Parent": 3,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 13,
+            "EndByte": 14,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 13
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 14
+            }
+          },
+          {
+            "Type": "binary_expression",
+            "Field": "value",
+            "Parent": 3,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 15,
+            "EndByte": 30,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 15
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 11
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "left",
+            "Parent": 6,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 15,
+            "EndByte": 18,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 15
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 18
+            }
+          },
+          {
+            "Type": "in",
+            "Field": "operator",
+            "Parent": 6,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 21,
+            "EndByte": 23,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 2
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 4
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "right",
+            "Parent": 6,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 24,
+            "EndByte": 30,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 5
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 11
+            }
+          },
+          {
+            "Type": ";",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 30,
+            "EndByte": 31,
+            "StartPoint": {
+              "Row": 1,
+              "Column": 11
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 12
+            }
+          }
+        ],
+        "Observations": [
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          }
+        ],
+        "Incremental": null,
+        "IncrementalNodes": null,
+        "IncrementalEqual": false
+      }
+    },
+    {
+      "id": "tsx-semicolon-in",
+      "source_sha256": "e0d40be55bfa639775ab6fb7ea39cdbb0bfeed72742313057b058acfe8e02ae2",
+      "passed": true,
+      "c_deterministic": true,
+      "c_incremental_equal": null,
+      "go": {
+        "ID": "tsx-semicolon-in",
+        "Nodes": [
+          {
+            "Type": "program",
+            "Field": "",
+            "Parent": -1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 60,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 0
+            }
+          },
+          {
+            "Type": "type_alias_declaration",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 59,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 59
+            }
+          },
+          {
+            "Type": "type",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 4,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 4
+            }
+          },
+          {
+            "Type": "type_identifier",
+            "Field": "name",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 5,
+            "EndByte": 11,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 5
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 11
+            }
+          },
+          {
+            "Type": "=",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 12,
+            "EndByte": 13,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "object_type",
+            "Field": "value",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 14,
+            "EndByte": 58,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 14
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 58
+            }
+          },
+          {
+            "Type": "{",
+            "Field": "",
+            "Parent": 5,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 14,
+            "EndByte": 15,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 14
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 15
+            }
+          },
+          {
+            "Type": "property_signature",
+            "Field": "",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 16,
+            "EndByte": 31,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 16
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 31
+            }
+          },
+          {
+            "Type": "property_identifier",
+            "Field": "name",
+            "Parent": 7,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 16,
+            "EndByte": 23,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 16
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 23
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 7,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 23,
+            "EndByte": 31,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 23
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 31
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 9,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 23,
+            "EndByte": 24,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 23
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 24
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 9,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 25,
+            "EndByte": 31,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 25
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 31
+            }
+          },
+          {
+            "Type": "string",
+            "Field": "",
+            "Parent": 11,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 25,
+            "EndByte": 31,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 25
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 31
+            }
+          },
+          {
+            "Type": ";",
+            "Field": "",
+            "Parent": 5,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 31,
+            "EndByte": 32,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 31
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 32
+            }
+          },
+          {
+            "Type": "property_signature",
+            "Field": "",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 33,
+            "EndByte": 43,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 33
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 43
+            }
+          },
+          {
+            "Type": "property_identifier",
+            "Field": "name",
+            "Parent": 14,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 33,
+            "EndByte": 35,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 33
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 35
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 14,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 35,
+            "EndByte": 43,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 35
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 43
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 16,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 35,
+            "EndByte": 36,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 35
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 36
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 16,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 37,
+            "EndByte": 43,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 37
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 43
+            }
+          },
+          {
+            "Type": "string",
+            "Field": "",
+            "Parent": 18,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 37,
+            "EndByte": 43,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 37
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 43
+            }
+          },
+          {
+            "Type": ";",
+            "Field": "",
+            "Parent": 5,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 43,
+            "EndByte": 44,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 43
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 44
+            }
+          },
+          {
+            "Type": "property_signature",
+            "Field": "",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 45,
+            "EndByte": 56,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 45
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 56
+            }
+          },
+          {
+            "Type": "property_identifier",
+            "Field": "name",
+            "Parent": 21,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 45,
+            "EndByte": 48,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 45
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 48
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 21,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 48,
+            "EndByte": 56,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 48
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 56
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 23,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 48,
+            "EndByte": 49,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 48
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 49
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 23,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 50,
+            "EndByte": 56,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 50
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 56
+            }
+          },
+          {
+            "Type": "string",
+            "Field": "",
+            "Parent": 25,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 50,
+            "EndByte": 56,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 50
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 56
+            }
+          },
+          {
+            "Type": "}",
+            "Field": "",
+            "Parent": 5,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 57,
+            "EndByte": 58,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 57
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 58
+            }
+          },
+          {
+            "Type": ";",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 58,
+            "EndByte": 59,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 58
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 59
+            }
+          }
+        ],
+        "Observations": [
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "compact",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          }
+        ],
+        "Incremental": null,
+        "IncrementalNodes": null,
+        "IncrementalEqual": false
+      }
+    }
+  ]
+}

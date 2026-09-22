@@ -1,0 +1,11 @@
+{
+  "cycles": 193,
+  "parses_per_cycle": 17,
+  "checkpoints": 12,
+  "gc_at_checkpoints": 2,
+  "timeout_seconds": 300,
+  "concurrent_measurement_processes": 1,
+  "runtime_manifest_sha256": "5d1f526c35e223341914cbfada8abe1c4c49d52824a09950bde05d331ff41e46",
+  "binary_sha256": "70d0267afa7c0ef41b1c3c9da2b4031a50647f7070f8a46f7fc288d18dc3b1d5",
+  "harness_sha256": "c26ab4c1c48f37ac10161d9cd11810ee919ed50728ea2a44309ea90e74609946"
+}

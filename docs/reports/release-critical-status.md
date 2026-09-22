@@ -1,67 +1,70 @@
 # Release-Critical status board
 
-Current state, not a promise. Gate definitions: `docs/specs/validation.md`.
-Baseline: unchanged, see `docs/specs/baseline-provenance.md` and identities.json.
-Last updated: 2026-09-23, Session 07.
+Updated 2026-09-23, Session 07. **Release is BLOCKED_EXTERNAL.** Development,
+Integration and the retained seven-route Release-Critical correctness gates
+pass. This is finite-corpus E5 evidence, not proof for all source programs or
+all 206 grammars. [Final review](../../artifacts/session-07/full-pass/11-release/review.md).
 
-Development and Integration are green with exact known-difference ratchets.
-The public constructor and external-module consumer now exercise the result
-contract end to end. Release-Critical and Release have not passed.
+The tested product source commit is `23d6885ebe8709616614c89ffb6511ea815fb23f`.
+Runtime origin remains `gotreesitter v0.53.0`; the internal carrier manifest is
+`5d1f526c35e223341914cbfada8abe1c4c49d52824a09950bde05d331ff41e46`.
+The Go product blob now derives from the already pinned C tables (ADR-0015).
+C runtime v0.25.1 and grammar base commits remain pinned. Candidate C's complete
+TypeScript patch remains the approved C artifact (ADR-0012).
 
-| Language | Development | Release-Critical | Current limitation |
-|---|---|---|---|
-| Go | green | not fully assessed | Registered fresh/edit snapshots agree with C for represented fields; finite corpus only. |
-| Python | green | not fully assessed | Registered fresh/edit snapshots agree with C; broader release corpus pending. |
-| JavaScript `.js` | green | not fully assessed | Registered fresh/edit controls agree; JSX text limitation is listed separately. |
-| TypeScript `.ts` | green | not fully assessed | KR-0003 retired after explicit full-patch Candidate C adoption; registered fresh/edit trees agree with the new C artifacts. |
-| JSX | green | not fully assessed | KR-0001b retired in the approved internal runtime; fresh/edit C comparisons pass. |
-| TSX | green | not fully assessed | KR-0001b and KR-0003 retired; full release assessment pending. |
-| C# | green, ratcheted | **red** | KR-0002 recovered-tree difference and KR-0004 false-clean source reconstruction. |
+| Route | Retained Release-Critical gate | Limitation |
+|---|---|---|
+| Go | PASS, fresh/edit/C agreement | C-derived Go artifact has its own identity; generic compact admission is not a transferred certificate. |
+| Python | PASS, fresh/edit/C agreement | Scanner-prefix checks may require an explicit fresh fallback. |
+| JavaScript | PASS, fresh/edit/C agreement | Recovery can decline compact admission. |
+| JSX | PASS, fresh/edit/C agreement | Bare `&` remains a C grammar error; the recovered tree now agrees exactly. |
+| TypeScript | PASS, fresh/edit/C agreement | Maintained Candidate C patch is required for the pinned oracle artifacts. |
+| TSX | PASS, fresh/edit/C agreement | Conservative reuse and recovery checks have a measured deletion cost. |
+| C# | PASS, fresh/edit/C agreement | KR-0002/4 retired; the external scanner still uses an explicit full reparse on edits. |
 
-All seven routes remain in scope. No blocked language was removed to pass a
-gate. Bare `&` remains erroneous in C and Go (KR-0001a); making it clean would
-break the characterization. No language has passed the full release assessment.
+KR-0001b, KR-0002, KR-0003 and KR-0004 are retired for their retained controls.
+Original failures remain recorded. No active C-tree exception or unexplained
+comparison mismatch remains in the executed final corpus. Controlled fallback
+reasons are enumerated in `11-release/fallbacks.json`.
 
-## Independent phase evidence
+## Executed evidence
 
-| Session 07 phase | What it establishes |
+- 688 C records, 439 edited records; repeated fresh recovery observations and
+  three native C executions per record. One additional 8,192-declaration Go
+  edit agrees with C over all 57,348 ordered nodes.
+- 206 basic grammar checks: 203 in the base module and 3 in the optional GPL
+  module; three fresh runs, edit/fresh equality, cancellation, admission and
+  close. This does not certify C parity for the entire catalog.
+- Product and selected-grammar suites, vet, oracle-tool tests, four private
+  runtime invariants, 66 race test/subtest results and two 60-second fuzz runs.
+- 193 memory cycles / 3,281 closed trees. Post-GC heap stayed within
+  83,966,168–83,967,832 bytes; peak RSS was 295,403,520 bytes on the measured
+  Windows AMD64 host. This finite observation is not a hard RSS guarantee.
+- Five randomized paired performance seeds plus longer lookup samples and
+  profiles. Correctness has costs: TSX delete median +41.8%, Go replace +23.8%
+  versus the earlier `2e18f90` baseline. Profiled avoidable raw-cost walks and
+  conflict-driven stack copying were fixed; all samples remain recorded.
+- Official Go module ZIP creation and checks, empty-cache consumers without
+  replace, 100 external-consumer C comparisons, and separate GPL consumption.
+
+## Platform and remaining release blockers
+
+| Gate | State |
 |---|---|
-| Phase 1 | Public API and actual external consumer, E3. |
-| Phase 2 | Fresh 94-input baseline/candidate/C comparison; four `=` inputs corrected only in the isolated scanner candidate, 90 snapshots unchanged. New KR-0003/4 retain their own C records and signatures, E5. C# diagnostic patches remain unsuitable for adoption. |
-| Phase 3 | Retained input/snapshot/work/memory admission limits, cancellation, ownership and worker tests; bounded fuzz and race diagnostics remain separately labeled. |
-| Phase 4 | 35 additional fresh C records and 21 incremental/fresh/C comparisons, E5; independent ABI/epoch/input checks reject coherent stale metadata. |
-| Phase 5 search | Optional immutable position/type index and five-sample lookup measurements on the declared Go workload, E4. |
-| Phase 5 bundle | Existing selected-grammar tags reduce one measured executable's size; C# parse cost remains high. |
-| Phase 5 runtime | Separate duplicate-cost-call candidate: measured allocation reduction; unchanged snapshots on its fixed 85-case set. It was not combined with the scanner patch or adopted. |
-| Phase 6 | MIT/notices, product graph and ordinary PE checks, consumer execution and CGO-free cross-links. Other native targets and remote CI remain NOT_RUN. |
+| Windows AMD64 native | PASS: CGO=0 build/tests/consumer execution. |
+| Product dependency/PE audit | PASS: 137 dependency packages, zero CgoFiles, no runtime/cgo; ordinary PE imports kernel32.dll only. |
+| Windows ARM64 | CGO=0 cross-link PASS; native execution NOT_RUN. |
+| Linux AMD64, Darwin ARM64, wasip1/wasm | CGO=0 cross-link PASS; execution NOT_RUN and outside first-release native scope. |
+| Hosted CI | NOT_RUN. Native AMD64/ARM64 jobs are prepared; origin is not configured and push authority/target is pending. |
+| License release gate | BLOCKED_EXTERNAL: Brightscript and Cooklang conflict between ISC and MIT declarations. |
 
-These are separate observations. A candidate or measurement does not inherit a
-different phase's result. Full commands, input hashes, failed attempts and limits
-are under `artifacts/session-07/` in the named phase.
+Own code remains MIT. The optional GPL module contains caddy, disassembly and
+jq with source archives and notices. All 206 inventory rows have identified
+license evidence, but the two conflicting declarations need rights-holder
+clarification before release. A local candidate ZIP is not publication approval.
 
-## Platform and packaging
-
-| Target | State |
-|---|---|
-| Windows AMD64 | CGO=0 build, consumer execution, default/subset regression and vet passed, E3. Product graph excludes runtime/cgo; ordinary PE imports kernel32.dll only. |
-| Windows ARM64 | Ordinary CGO=0 executable linked; native execution NOT_RUN. |
-| Linux AMD64, Darwin ARM64, wasip1/wasm | Ordinary CGO=0 executables linked; execution NOT_RUN; outside first-release platform scope. |
-| Hosted CI / Linux C container | NOT_RUN. Windows native C is the executed oracle transport. |
-
-Own code is MIT. Notices cover the runtime, six assessed grammars, C oracle and
-licensed corpus. The broader upstream default aggregate grammar catalog still
-needs a complete notice inventory for release; the selected assessed bundle is
-documented. Memory admission is not a hard process-RSS cap. Grammar caches,
-source copies, snapshots and aggregate worker memory need application budgets.
-
-The owner approved an internal carrier of the pinned runtime with minimal fixes,
-documented in ADR-0013. KR-0001b is now applied to the product and a fresh
-94-input campaign matches the isolated scanner candidate in every observation;
-86 exact C trees, six preserved bare-ampersand recovery shapes and two C#
-regressions remain. The external consumer installs a local `v0.0.1` module ZIP
-without replace. The initial release version is `v0.0.1`, not a release claim.
-KR-0002 and KR-0004 still require correction and independent evidence. TypeScript
-full-patch adoption is recorded in ADR-0012. No remote write or release was made.
-
-Update this board when a gate changes, a record is added/retired, or the baseline
-moves. Individual test runs belong in phase evidence.
+The initial version remains `v0.0.1`. No tag, release, push or remote write was
+performed. MemoryBudgetBytes covers parser-managed accounting, not total process
+RSS; grammar caches, source copies, snapshots and concurrent workers require
+separate application budgets. The independent private-diff review limitation is
+documented in `09-audit/review.md` rather than reported as a completed review.
