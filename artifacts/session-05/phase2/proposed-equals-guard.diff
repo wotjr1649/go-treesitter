@@ -1,0 +1,12 @@
+--- a/grammars/runtime/tsx_scanner.go
++++ b/grammars/runtime/tsx_scanner.go
+@@ -458,3 +457,0 @@
+-			if lexer.Lookahead() == '=' {
+-				return false
+-			}
+--- a/grammars/runtime/javascript_scanner.go
++++ b/grammars/runtime/javascript_scanner.go
+@@ -523,3 +522,0 @@
+-			if lexer.Lookahead() == '=' {
+-				return false
+-			}

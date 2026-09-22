@@ -1,0 +1,5 @@
+{
+  "grammars/runtime/tsx_scanner.go": "a10ec174eb9ca31b73e0fc6adae338912b902002b1bc1951a2890b4bf05b3fad",
+  "grammars/runtime/javascript_scanner.go": "0ea6fb03d2a8044020e48036b620499062120dc2592fa28170d3c3c53824f4f9",
+  "proposed-equals-guard.diff": "3ea2eda12951b1a6b5ad7e5b7f052a9449a45c2e7405fe20b551472dcf4dc4f0"
+}
