@@ -1,0 +1,24 @@
+artifacts/session-06/phase3/candidate.diff:4: space before tab in indent.
++ 			for unicode.IsSpace(lexer.Lookahead()) {
+artifacts/session-06/phase3/candidate.diff:5: space before tab in indent.
++ 				lexer.Advance(false)
+artifacts/session-06/phase3/candidate.diff:6: space before tab in indent.
++ 			}
+artifacts/session-06/phase3/candidate.diff:10: space before tab in indent.
++ 			sawText = true
+artifacts/session-06/phase3/candidate.diff:11: space before tab in indent.
++ 			onlyWhitespace = false
+artifacts/session-06/phase3/candidate.diff:12: space before tab in indent.
++ 			continue
+artifacts/session-06/phase3/candidate.diff:16: space before tab in indent.
++ 			for unicode.IsSpace(lexer.Lookahead()) {
+artifacts/session-06/phase3/candidate.diff:17: space before tab in indent.
++ 				lexer.Advance(false)
+artifacts/session-06/phase3/candidate.diff:18: space before tab in indent.
++ 			}
+artifacts/session-06/phase3/candidate.diff:22: space before tab in indent.
++ 			sawText = true
+artifacts/session-06/phase3/candidate.diff:23: space before tab in indent.
++ 			onlyWhitespace = false
+artifacts/session-06/phase3/candidate.diff:24: space before tab in indent.
++ 			continue
