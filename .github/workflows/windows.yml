@@ -4,22 +4,40 @@
   "permissions": {"contents": "read"},
   "jobs": {
     "product": {
-      "runs-on": "windows-latest",
+      "strategy": {"fail-fast": false, "matrix": {"include": [
+        {"runner": "windows-latest", "arch": "amd64"},
+        {"runner": "windows-11-arm", "arch": "arm64"}
+      ]}},
+      "runs-on": "${{ matrix.runner }}",
       "timeout-minutes": 15,
       "env": {"CGO_ENABLED": "0"},
       "steps": [
         {"uses": "actions/checkout@v7", "with": {"persist-credentials": false}},
         {"uses": "actions/setup-go@v7", "with": {"go-version-file": "go.mod"}},
+        {"name": "Native architecture", "run": "go env GOOS GOARCH CGO_ENABLED\n[Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture\nif ((go env GOOS) -ne 'windows' -or (go env GOARCH) -ne '${{ matrix.arch }}') { throw 'native target mismatch' }"},
         {"name": "Build", "run": "go build ./..."},
         {"name": "Vet", "run": "go vet ./..."},
         {"name": "Test including recorded C comparisons", "run": "go test ./... -count=1 -timeout 120s"},
         {"name": "Selected embedded grammars", "run": "go test -tags grammar_subset,grammar_subset_go,grammar_subset_python,grammar_subset_javascript,grammar_subset_typescript,grammar_subset_tsx,grammar_subset_c_sharp ./... -count=1 -timeout 120s"},
         {"name": "Oracle identity and input boundary tests", "run": "python -m unittest discover -s tools/native-oracle -p test_*.py"},
+        {"name": "Native consumer execution", "run": "go build -o native-consumer.exe ./testdata/consumer\n./native-consumer.exe\nif ($LASTEXITCODE -ne 0) { throw 'consumer failed' }"},
+        {"name": "Runtime private invariants", "run": "python tools/runtime-bundle/check.py"},
         {
           "name": "Windows ARM64 build",
           "env": {"GOOS": "windows", "GOARCH": "arm64"},
           "run": "go build ./...\ngo build -o arm64-consumer.exe ./testdata/consumer"
         }
+      ]
+    },
+    "race": {
+      "runs-on": "windows-latest",
+      "timeout-minutes": 15,
+      "env": {"CGO_ENABLED": "1"},
+      "steps": [
+        {"uses": "actions/checkout@v7", "with": {"persist-credentials": false}},
+        {"uses": "actions/setup-go@v7", "with": {"go-version-file": "go.mod"}},
+        {"name": "Race diagnostic toolchain", "run": "go env GOOS GOARCH CGO_ENABLED\ngcc --version"},
+        {"name": "Supported worker and snapshot concurrency", "run": "go test -race ./syntax ./internal/gtsadapter -run '^Test(IndependentWorkers|Index.*|Cancellation.*|RuntimeTimeoutReleasesPartialTree)$' -count=1 -timeout=180s"}
       ]
     }
   }

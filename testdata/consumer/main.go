@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"runtime"
 	"time"
 
 	treesitter "github.com/wotjr1649/go-treesitter"
@@ -12,7 +13,23 @@ import (
 )
 
 func main() {
+	fmt.Printf("runtime=%s/%s\n", runtime.GOOS, runtime.GOARCH)
 	p := treesitter.New()
+	for filename, source := range map[string]string{
+		"x.go": "package p\nvar x = 1", "x.py": "x = 1\n", "x.js": "const x = 1;\n",
+		"x.jsx": "const x = <p>text</p>;\n", "x.ts": "const x: number = 1;\n",
+		"x.tsx": "const x = <p>text</p>;\n", "x.cs": "class C {}\n",
+	} {
+		r, err := p.Parse(context.Background(), syntax.Request{Filename: filename, Source: []byte(source), Timeout: time.Second})
+		if err != nil || !r.Complete() || r.Outcome != syntax.AcceptedClean || r.Tree == nil {
+			panic("core grammar unavailable to consumer: " + filename)
+		}
+		_, err = syntax.NewIndex(r.Tree.Nodes())
+		r.Tree.Close()
+		if err != nil {
+			panic("consumer index rejected grammar snapshot: " + filename)
+		}
+	}
 	for _, filename := range []string{"x.jsx", "x.tsx"} {
 		fixed, err := p.Parse(context.Background(), syntax.Request{Filename: filename,
 			Source: []byte("const d = <p>a = b</p>;"), Timeout: time.Second})

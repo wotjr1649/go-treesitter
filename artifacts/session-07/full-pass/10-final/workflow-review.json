@@ -1,0 +1,10 @@
+{
+  "workflow_sha256": "6f34b4cc271298511af6c9c8ff9850920416afb19f69894f763dd7b69b71809d",
+  "reviewed_runner_documentation": "https://docs.github.com/en/actions/reference/runners/github-hosted-runners",
+  "reviewed_date": "2026-09-23",
+  "native_amd64": "PASS",
+  "native_arm64": "NOT_RUN",
+  "hosted_ci": "NOT_RUN",
+  "boundary": "local workflow preparation only; no push, workflow dispatch or remote write",
+  "checks": "JSON, native runner matrix, read-only permissions, credential persistence disabled, bounded jobs, product/race lane separation"
+}

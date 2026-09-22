@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -105,7 +106,7 @@ func runExternalConsumer(t *testing.T, optionalGPL bool) {
 	if err != nil {
 		t.Fatalf("external consumer: %v\n%s\n%s", err, out, diagnostics.Bytes())
 	}
-	expected := "external consumer: fresh, edit, errors, cancellation, release OK\n"
+	expected := fmt.Sprintf("runtime=%s/%s\nexternal consumer: fresh, edit, errors, cancellation, release OK\n", runtime.GOOS, runtime.GOARCH)
 	if optionalGPL {
 		expected = "external GPL consumer: caddy, disassembly, jq, go OK\n"
 	}
