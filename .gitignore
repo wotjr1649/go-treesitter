@@ -1,0 +1,24 @@
+*.exe
+*.test
+*.out
+coverage/
+.scratch/
+docs/prompts/
+docs/specs/
+docs/plans/
+
+# Local session notes and machine/account configuration are not public assets.
+artifacts/handoff/
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.p12
+*.pfx
+.vs/
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini

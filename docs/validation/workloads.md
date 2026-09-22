@@ -1,0 +1,83 @@
+# Workload and fixture register
+
+Authoritative inventory of every input used to make a claim. Identity rules live in
+`docs/specs/baseline-provenance.md`; this file holds the values.
+
+## Rules
+
+- Every fixture has a recorded SHA-256 **of its LF bytes** and a recorded license/provenance.
+- A hash mismatch fails the run. Never update a hash without stating why in the same commit.
+- Inline fixtures (Go string literals) need no hash — the source file is the hash. Prefer inline for
+  anything under ~1 KB.
+- External fixtures are copied in with their license file. Never read them live from `_ref` or from
+  `code-map-memo`; those are read-only and may move.
+- `.gitattributes` must pin `*.cs`, `*.ts`, `*.tsx`, `*.js`, `*.jsx`, `*.py`, `*.go` fixtures to LF
+  and mark `*.bin` as `-text`, before the first external fixture lands.
+
+## Tier 1 — smoke (inline, present from the foundation session)
+
+Purpose: prove the grammar loads, the adapter maps outcomes correctly, and the product lane builds.
+Not parity. Not performance.
+
+| ID | Language | Shape |
+|---|---|---|
+| `SM-GO` | go | package + func with a short statement |
+| `SM-PY` | python | def + if + comprehension |
+| `SM-JS` | javascript | arrow function returning JSX |
+| `SM-JSX` | javascript (`.jsx`) | same input routed by extension |
+| `SM-TS` | typescript | interface + generic arrow function |
+| `SM-TSX` | tsx | component returning JSX |
+| `SM-CS` | c_sharp | class with a property and an expression-bodied member |
+
+Each runs: fresh parse → assert outcome; trivial append edit → incremental parse → assert
+`incremental == fresh` **and** record the reuse/fallback reason. The equality assertion is
+self-consistency, not parity (`docs/specs/oracle.md`).
+
+## Tier 2 — known-regression ratchet (inline)
+
+`KR-0001` fixtures F1–F7, each run against both `tsx` and `javascript`.
+See `docs/validation/known-regressions.md`.
+
+## Tier 3 — pinned public corpus (external; lands when a comparison session is authorized)
+
+Newtonsoft.Json @ `4f73e74372445108d2c1bda37b36e6f5e43402e0`, MIT (James Newton-King).
+The license file must be copied alongside the sources.
+
+| File | LF bytes | SHA-256 |
+|---|---:|---|
+| `JsonPosition.cs` | 5,986 | `4f9e601f9d0be45c4f60f15bf1b6ca8f85dec51e353ebb50e405cc6f8e422c14` |
+| `JsonTextReader-excerpt.cs` | 12,408 | `d76fd62cfc90076c11d86cb7d7a0058df181231aa3b34f30e549f650b5294d4a` |
+| `MathUtils.cs` | 5,016 | `426587acd7f1f50c3d3dc94f13e9c27726c32c1bbe22d0291d86485afa368640` |
+
+Total 23,410 bytes. `JsonTextReader-excerpt.cs` is also an upstream `gotreesitter` regression
+fixture; the LF blob is 12,408 bytes while the same file in a Windows working tree with
+`core.autocrlf=true` is 12,785 bytes. **Use the LF bytes.** This is the concrete reason
+`.gitattributes` is mandatory.
+
+## Tier 4 — deterministic generators (code, not files)
+
+Generators are reproducible inputs defined in test code, with their parameters recorded.
+Never check in their output.
+
+| ID | Shape | Parameters |
+|---|---|---|
+| `GEN-CS-PATTERN` | C# classes with `catch (…) when (e is T Target)` filter patterns | method count 1 / 4 / 8 / 16 |
+| `GEN-CS-BULK` | repeated numbered C# classes with `var x<i> = <i>; return x<i>;` | target ≥ 137 KiB; edit site = first `x0` |
+
+`GEN-CS-BULK` matches the generator upstream itself uses for its C# recovered-structure parity
+witness. Keep it aligned with upstream's shape so results stay comparable.
+
+## Tier 5 — oracle digests (generated, checked in)
+
+Produced only in the oracle lane (`docs/specs/oracle.md`). One digest file per
+(language, fixture, oracle epoch). The Windows product lane compares against these and never needs a
+C toolchain. A digest file records the oracle tuple that produced it; a digest whose tuple does not
+match the current epoch is `NOT_RUN`, not a failure.
+
+Not present yet — no oracle lane has been executed from this repository.
+
+## What is deliberately absent
+
+- No fixture is copied from `code-map-memo`'s `.work/` run directories at runtime. If bytes are
+  needed, they are copied in once, hashed, and licensed here.
+- No repository-wide corpus. Every workload is named, bounded, and justified by a claim it supports.

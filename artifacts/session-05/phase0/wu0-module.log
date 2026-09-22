@@ -1,0 +1,6 @@
+{
+	"Module": {
+		"Path": "github.com/wotjr1649/go-treesitter"
+	},
+	"Go": "1.27.1"
+}
