@@ -23,6 +23,7 @@
   ],
   "file_count": 1527,
   "patches": [
-    "KR-0001b-jsx-text.patch"
+    "KR-0001b-jsx-text.patch",
+    "catalog-c-family-lexer-reuse.patch"
   ]
 }

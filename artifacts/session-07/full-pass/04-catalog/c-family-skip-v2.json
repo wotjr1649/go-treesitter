@@ -1,0 +1,725 @@
+{
+  "overlay_sha256": "5e6ae4251f714d00a9da5153e45f85cfb010dacf0b5b19f5c237cdafccd701a5",
+  "rows": [
+    {
+      "language": "c",
+      "source": "#include <stdio.h>\nint main() { return 0; }\n",
+      "sha256": "a7bdc6d24c8e517a21a7e85cef313864b4f46252946b2d8c0978e9ea80ac4ed4",
+      "exit": 0,
+      "receipt": {
+        "Language": "c",
+        "SourceSHA256": "a7bdc6d24c8e517a21a7e85cef313864b4f46252946b2d8c0978e9ea80ac4ed4",
+        "Fresh": [
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "b20a772c573e169242bb1d22e3f29474a9343099631ae2bc87b1efad5723befa",
+            "Nodes": 18
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "b20a772c573e169242bb1d22e3f29474a9343099631ae2bc87b1efad5723befa",
+            "Nodes": 18
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "b20a772c573e169242bb1d22e3f29474a9343099631ae2bc87b1efad5723befa",
+            "Nodes": 18
+          }
+        ],
+        "Deterministic": true,
+        "Clean": true,
+        "EditEqual": true,
+        "Cancellation": true,
+        "Admission": true,
+        "Errors": null,
+        "FailureDiagnostics": null,
+        "EditIncremental": null,
+        "EditFresh": null
+      }
+    },
+    {
+      "language": "c",
+      "source": "#include \"x.h\"\nint x = 1;\n",
+      "sha256": "5c7452eab8b7a69fae11f7fcc6f563633b9f7a1f6ecaea3386745071df3bb41c",
+      "exit": 0,
+      "receipt": {
+        "Language": "c",
+        "SourceSHA256": "5c7452eab8b7a69fae11f7fcc6f563633b9f7a1f6ecaea3386745071df3bb41c",
+        "Fresh": [
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "cdda66dcfd1c10e6ca9b6d93f4fd9f63f20398d64f0b9088b8ff8edcb3ca6d2f",
+            "Nodes": 14
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "cdda66dcfd1c10e6ca9b6d93f4fd9f63f20398d64f0b9088b8ff8edcb3ca6d2f",
+            "Nodes": 14
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "cdda66dcfd1c10e6ca9b6d93f4fd9f63f20398d64f0b9088b8ff8edcb3ca6d2f",
+            "Nodes": 14
+          }
+        ],
+        "Deterministic": true,
+        "Clean": true,
+        "EditEqual": true,
+        "Cancellation": true,
+        "Admission": true,
+        "Errors": null,
+        "FailureDiagnostics": null,
+        "EditIncremental": null,
+        "EditFresh": null
+      }
+    },
+    {
+      "language": "c",
+      "source": "#define VALUE 1\nint x = VALUE;\n",
+      "sha256": "3facfd6891a1d05af68d90dda8e536d27d96b1fe71c78f2122f24ff86be821ef",
+      "exit": 0,
+      "receipt": {
+        "Language": "c",
+        "SourceSHA256": "3facfd6891a1d05af68d90dda8e536d27d96b1fe71c78f2122f24ff86be821ef",
+        "Fresh": [
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "b67c22e8c09f1ea77fc9e9f1831bf19ffb95fb84eabb67abafdb3e110d9b9448",
+            "Nodes": 12
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "b67c22e8c09f1ea77fc9e9f1831bf19ffb95fb84eabb67abafdb3e110d9b9448",
+            "Nodes": 12
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "b67c22e8c09f1ea77fc9e9f1831bf19ffb95fb84eabb67abafdb3e110d9b9448",
+            "Nodes": 12
+          }
+        ],
+        "Deterministic": true,
+        "Clean": true,
+        "EditEqual": true,
+        "Cancellation": true,
+        "Admission": true,
+        "Errors": null,
+        "FailureDiagnostics": null,
+        "EditIncremental": null,
+        "EditFresh": null
+      }
+    },
+    {
+      "language": "c",
+      "source": "#define F(x) ((x)+1)\nint x = F(2);\n",
+      "sha256": "3884f94f167611d487294fe9ea5ff3b58fc077e51fdbef762513d65559fdddba",
+      "exit": 0,
+      "receipt": {
+        "Language": "c",
+        "SourceSHA256": "3884f94f167611d487294fe9ea5ff3b58fc077e51fdbef762513d65559fdddba",
+        "Fresh": [
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "08fd7abbb979828c14040a8a378fa140dac8f186ece8c6d962d7da715d0f7c2f",
+            "Nodes": 21
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "08fd7abbb979828c14040a8a378fa140dac8f186ece8c6d962d7da715d0f7c2f",
+            "Nodes": 21
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "08fd7abbb979828c14040a8a378fa140dac8f186ece8c6d962d7da715d0f7c2f",
+            "Nodes": 21
+          }
+        ],
+        "Deterministic": true,
+        "Clean": true,
+        "EditEqual": true,
+        "Cancellation": true,
+        "Admission": true,
+        "Errors": null,
+        "FailureDiagnostics": null,
+        "EditIncremental": null,
+        "EditFresh": null
+      }
+    },
+    {
+      "language": "c",
+      "source": "#if FLAG\nint x;\n#else\nint y;\n#endif\n",
+      "sha256": "6f204b2b48d2643c1b701ff513f1bb5c649e1acfa196a3a439d1b284fb888845",
+      "exit": 0,
+      "receipt": {
+        "Language": "c",
+        "SourceSHA256": "6f204b2b48d2643c1b701ff513f1bb5c649e1acfa196a3a439d1b284fb888845",
+        "Fresh": [
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "204e2f035ed50273d7b3794efaf9991f49fd272d4a76747d59165b192b1c1950",
+            "Nodes": 16
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "204e2f035ed50273d7b3794efaf9991f49fd272d4a76747d59165b192b1c1950",
+            "Nodes": 16
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "204e2f035ed50273d7b3794efaf9991f49fd272d4a76747d59165b192b1c1950",
+            "Nodes": 16
+          }
+        ],
+        "Deterministic": true,
+        "Clean": true,
+        "EditEqual": true,
+        "Cancellation": true,
+        "Admission": true,
+        "Errors": null,
+        "FailureDiagnostics": null,
+        "EditIncremental": null,
+        "EditFresh": null
+      }
+    },
+    {
+      "language": "c",
+      "source": "const char *x = \"one\\ntwo\";\n",
+      "sha256": "93e5f9f2165780a9b185e360d3506c2ee73c6f133998fa68afa5eeff49509606",
+      "exit": 0,
+      "receipt": {
+        "Language": "c",
+        "SourceSHA256": "93e5f9f2165780a9b185e360d3506c2ee73c6f133998fa68afa5eeff49509606",
+        "Fresh": [
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "932489a53c7bd0dd2d7e20818f6b53878bb4dafba5909905f2dec12c34353d17",
+            "Nodes": 17
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "932489a53c7bd0dd2d7e20818f6b53878bb4dafba5909905f2dec12c34353d17",
+            "Nodes": 17
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "932489a53c7bd0dd2d7e20818f6b53878bb4dafba5909905f2dec12c34353d17",
+            "Nodes": 17
+          }
+        ],
+        "Deterministic": true,
+        "Clean": true,
+        "EditEqual": true,
+        "Cancellation": true,
+        "Admission": true,
+        "Errors": null,
+        "FailureDiagnostics": null,
+        "EditIncremental": null,
+        "EditFresh": null
+      }
+    },
+    {
+      "language": "c",
+      "source": "int x = 1; /* ordinary */\n",
+      "sha256": "a2d57a4a6f409f910e2403ee3199a47ffb43b94fad7cbd60968969809463844b",
+      "exit": 0,
+      "receipt": {
+        "Language": "c",
+        "SourceSHA256": "a2d57a4a6f409f910e2403ee3199a47ffb43b94fad7cbd60968969809463844b",
+        "Fresh": [
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "24b3abf7f9ed524bac266a6ac5f62d9074913e254aedc5ff45e71f961a93a362",
+            "Nodes": 9
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "24b3abf7f9ed524bac266a6ac5f62d9074913e254aedc5ff45e71f961a93a362",
+            "Nodes": 9
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "24b3abf7f9ed524bac266a6ac5f62d9074913e254aedc5ff45e71f961a93a362",
+            "Nodes": 9
+          }
+        ],
+        "Deterministic": true,
+        "Clean": true,
+        "EditEqual": true,
+        "Cancellation": true,
+        "Admission": true,
+        "Errors": null,
+        "FailureDiagnostics": null,
+        "EditIncremental": null,
+        "EditFresh": null
+      }
+    },
+    {
+      "language": "cpp",
+      "source": "#include <iostream>\nint main() { std::cout << 1; return 0; }\n",
+      "sha256": "6bc15c37731ac9d1f14aed5157c4f22233ee04ec327b554643c48e428c04d437",
+      "exit": 0,
+      "receipt": {
+        "Language": "cpp",
+        "SourceSHA256": "6bc15c37731ac9d1f14aed5157c4f22233ee04ec327b554643c48e428c04d437",
+        "Fresh": [
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "a4f47d29e0bd0c940a296987d3287fb00d3bd08396254911323b0eec847e23b5",
+            "Nodes": 27
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "a4f47d29e0bd0c940a296987d3287fb00d3bd08396254911323b0eec847e23b5",
+            "Nodes": 27
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "a4f47d29e0bd0c940a296987d3287fb00d3bd08396254911323b0eec847e23b5",
+            "Nodes": 27
+          }
+        ],
+        "Deterministic": true,
+        "Clean": true,
+        "EditEqual": true,
+        "Cancellation": true,
+        "Admission": true,
+        "Errors": null,
+        "FailureDiagnostics": null,
+        "EditIncremental": null,
+        "EditFresh": null
+      }
+    },
+    {
+      "language": "cpp",
+      "source": "#include <stdio.h>\nint main() { return 0; }\n",
+      "sha256": "a7bdc6d24c8e517a21a7e85cef313864b4f46252946b2d8c0978e9ea80ac4ed4",
+      "exit": 0,
+      "receipt": {
+        "Language": "cpp",
+        "SourceSHA256": "a7bdc6d24c8e517a21a7e85cef313864b4f46252946b2d8c0978e9ea80ac4ed4",
+        "Fresh": [
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "b20a772c573e169242bb1d22e3f29474a9343099631ae2bc87b1efad5723befa",
+            "Nodes": 18
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "b20a772c573e169242bb1d22e3f29474a9343099631ae2bc87b1efad5723befa",
+            "Nodes": 18
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "b20a772c573e169242bb1d22e3f29474a9343099631ae2bc87b1efad5723befa",
+            "Nodes": 18
+          }
+        ],
+        "Deterministic": true,
+        "Clean": true,
+        "EditEqual": true,
+        "Cancellation": true,
+        "Admission": true,
+        "Errors": null,
+        "FailureDiagnostics": null,
+        "EditIncremental": null,
+        "EditFresh": null
+      }
+    },
+    {
+      "language": "cpp",
+      "source": "#include \"x.h\"\nint x = 1;\n",
+      "sha256": "5c7452eab8b7a69fae11f7fcc6f563633b9f7a1f6ecaea3386745071df3bb41c",
+      "exit": 0,
+      "receipt": {
+        "Language": "cpp",
+        "SourceSHA256": "5c7452eab8b7a69fae11f7fcc6f563633b9f7a1f6ecaea3386745071df3bb41c",
+        "Fresh": [
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "cdda66dcfd1c10e6ca9b6d93f4fd9f63f20398d64f0b9088b8ff8edcb3ca6d2f",
+            "Nodes": 14
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "cdda66dcfd1c10e6ca9b6d93f4fd9f63f20398d64f0b9088b8ff8edcb3ca6d2f",
+            "Nodes": 14
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "cdda66dcfd1c10e6ca9b6d93f4fd9f63f20398d64f0b9088b8ff8edcb3ca6d2f",
+            "Nodes": 14
+          }
+        ],
+        "Deterministic": true,
+        "Clean": true,
+        "EditEqual": true,
+        "Cancellation": true,
+        "Admission": true,
+        "Errors": null,
+        "FailureDiagnostics": null,
+        "EditIncremental": null,
+        "EditFresh": null
+      }
+    },
+    {
+      "language": "cpp",
+      "source": "#define VALUE 1\nint x = VALUE;\n",
+      "sha256": "3facfd6891a1d05af68d90dda8e536d27d96b1fe71c78f2122f24ff86be821ef",
+      "exit": 0,
+      "receipt": {
+        "Language": "cpp",
+        "SourceSHA256": "3facfd6891a1d05af68d90dda8e536d27d96b1fe71c78f2122f24ff86be821ef",
+        "Fresh": [
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "b67c22e8c09f1ea77fc9e9f1831bf19ffb95fb84eabb67abafdb3e110d9b9448",
+            "Nodes": 12
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "b67c22e8c09f1ea77fc9e9f1831bf19ffb95fb84eabb67abafdb3e110d9b9448",
+            "Nodes": 12
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "b67c22e8c09f1ea77fc9e9f1831bf19ffb95fb84eabb67abafdb3e110d9b9448",
+            "Nodes": 12
+          }
+        ],
+        "Deterministic": true,
+        "Clean": true,
+        "EditEqual": true,
+        "Cancellation": true,
+        "Admission": true,
+        "Errors": null,
+        "FailureDiagnostics": null,
+        "EditIncremental": null,
+        "EditFresh": null
+      }
+    },
+    {
+      "language": "cpp",
+      "source": "#define F(x) ((x)+1)\nint x = F(2);\n",
+      "sha256": "3884f94f167611d487294fe9ea5ff3b58fc077e51fdbef762513d65559fdddba",
+      "exit": 0,
+      "receipt": {
+        "Language": "cpp",
+        "SourceSHA256": "3884f94f167611d487294fe9ea5ff3b58fc077e51fdbef762513d65559fdddba",
+        "Fresh": [
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "08fd7abbb979828c14040a8a378fa140dac8f186ece8c6d962d7da715d0f7c2f",
+            "Nodes": 21
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "08fd7abbb979828c14040a8a378fa140dac8f186ece8c6d962d7da715d0f7c2f",
+            "Nodes": 21
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "08fd7abbb979828c14040a8a378fa140dac8f186ece8c6d962d7da715d0f7c2f",
+            "Nodes": 21
+          }
+        ],
+        "Deterministic": true,
+        "Clean": true,
+        "EditEqual": true,
+        "Cancellation": true,
+        "Admission": true,
+        "Errors": null,
+        "FailureDiagnostics": null,
+        "EditIncremental": null,
+        "EditFresh": null
+      }
+    },
+    {
+      "language": "cpp",
+      "source": "#if FLAG\nint x;\n#else\nint y;\n#endif\n",
+      "sha256": "6f204b2b48d2643c1b701ff513f1bb5c649e1acfa196a3a439d1b284fb888845",
+      "exit": 0,
+      "receipt": {
+        "Language": "cpp",
+        "SourceSHA256": "6f204b2b48d2643c1b701ff513f1bb5c649e1acfa196a3a439d1b284fb888845",
+        "Fresh": [
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "204e2f035ed50273d7b3794efaf9991f49fd272d4a76747d59165b192b1c1950",
+            "Nodes": 16
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "204e2f035ed50273d7b3794efaf9991f49fd272d4a76747d59165b192b1c1950",
+            "Nodes": 16
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "204e2f035ed50273d7b3794efaf9991f49fd272d4a76747d59165b192b1c1950",
+            "Nodes": 16
+          }
+        ],
+        "Deterministic": true,
+        "Clean": true,
+        "EditEqual": true,
+        "Cancellation": true,
+        "Admission": true,
+        "Errors": null,
+        "FailureDiagnostics": null,
+        "EditIncremental": null,
+        "EditFresh": null
+      }
+    },
+    {
+      "language": "cpp",
+      "source": "const char *x = \"one\\ntwo\";\n",
+      "sha256": "93e5f9f2165780a9b185e360d3506c2ee73c6f133998fa68afa5eeff49509606",
+      "exit": 0,
+      "receipt": {
+        "Language": "cpp",
+        "SourceSHA256": "93e5f9f2165780a9b185e360d3506c2ee73c6f133998fa68afa5eeff49509606",
+        "Fresh": [
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "932489a53c7bd0dd2d7e20818f6b53878bb4dafba5909905f2dec12c34353d17",
+            "Nodes": 17
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "932489a53c7bd0dd2d7e20818f6b53878bb4dafba5909905f2dec12c34353d17",
+            "Nodes": 17
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "932489a53c7bd0dd2d7e20818f6b53878bb4dafba5909905f2dec12c34353d17",
+            "Nodes": 17
+          }
+        ],
+        "Deterministic": true,
+        "Clean": true,
+        "EditEqual": true,
+        "Cancellation": true,
+        "Admission": true,
+        "Errors": null,
+        "FailureDiagnostics": null,
+        "EditIncremental": null,
+        "EditFresh": null
+      }
+    },
+    {
+      "language": "cpp",
+      "source": "int x = 1; /* ordinary */\n",
+      "sha256": "a2d57a4a6f409f910e2403ee3199a47ffb43b94fad7cbd60968969809463844b",
+      "exit": 0,
+      "receipt": {
+        "Language": "cpp",
+        "SourceSHA256": "a2d57a4a6f409f910e2403ee3199a47ffb43b94fad7cbd60968969809463844b",
+        "Fresh": [
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "24b3abf7f9ed524bac266a6ac5f62d9074913e254aedc5ff45e71f961a93a362",
+            "Nodes": 9
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "24b3abf7f9ed524bac266a6ac5f62d9074913e254aedc5ff45e71f961a93a362",
+            "Nodes": 9
+          },
+          {
+            "Complete": true,
+            "Outcome": "accepted_clean",
+            "HasError": false,
+            "HasMissing": false,
+            "StopReason": "accepted",
+            "Digest": "24b3abf7f9ed524bac266a6ac5f62d9074913e254aedc5ff45e71f961a93a362",
+            "Nodes": 9
+          }
+        ],
+        "Deterministic": true,
+        "Clean": true,
+        "EditEqual": true,
+        "Cancellation": true,
+        "Admission": true,
+        "Errors": null,
+        "FailureDiagnostics": null,
+        "EditIncremental": null,
+        "EditFresh": null
+      }
+    }
+  ]
+}

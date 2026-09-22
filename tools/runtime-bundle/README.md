@@ -23,5 +23,10 @@ tests cover JSX/TSX fresh C trees and edits; the bare ampersand controls must st
 erroneous. Original known-difference records remain in `testdata/oracle`, while
 `active-differences.json` lists only differences present in the current carrier.
 
+`catalog-c-family-lexer-reuse.patch` preserves the C/C++ lexer's preprocessor
+state and queued string tokens when a reused span ends at a boundary already
+scanned by that lexer. `TestCFamilyLexerStateAcrossReuse` covers includes,
+macros, conditionals, escaped strings and ordinary code through the adapter.
+
 The source's MIT notice is retained verbatim in `internal/runtime/LICENSE`.
 Grammar and fixture notices are covered separately in `THIRD_PARTY_NOTICES.md`.

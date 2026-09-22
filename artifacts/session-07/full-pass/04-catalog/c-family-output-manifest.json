@@ -1,0 +1,13 @@
+{
+  "archive_sha256": "8b7892e022e1fb382be883e9012107425ceb118e290f695626342982b0f7d580",
+  "files": {
+    "c-family-adoption.log": "35559129336d6fdb017358c03725af1f93c4c9bdf7bcaa065e22c75f62af62fe",
+    "c-family-baseline-witness.log": "1e9f1f7d2e2e076c9fc0b2cbf716d7e88f3d82a8715e1eb5417cd901e426cd49",
+    "c-family-product-tests.log": "9b79001b4923b64b6556ef7cf2f25c7e547d7ecc995512c401f639cce0ec9189",
+    "c-family-skip-candidate.log": "4a63e091b6254423cec73544080d65f543ccc8dc141f80b39be70bc4f10e76ca",
+    "c-family-skip-v2.log": "793e1b533d452eb6c5212242930f49fd1ad9a50c041497c9b95fd40b0bd012ef",
+    "04-catalog/build-c-family-skip-v2-v2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "04-catalog/build-c-family-skip.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "04-catalog/c-family-reproduction.log": "bc82951534935d19f19b8931c5c0df205a7230bcbaf2bd370e43b2160fc0933e"
+  }
+}

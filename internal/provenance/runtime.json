@@ -7,13 +7,17 @@
     "commit": "c871b1f576866c40b1695677fe3512243e266d39"
   },
   "archive_sha256": "a7fc4a2f1b369542b14429c36a09a41d6db0bb0d2beec5844930b4a17c6ae3a6",
-  "source_sha256": "b4e7e9c50ec227318288c2e3203320a057c14331f24a516d99ebb6c0d0e50dac",
+  "source_sha256": "5be9ed7731cc44777a5cf80da909462f5f840dc21f227402eb40af4f75419aa7",
   "importer_sha256": "97889d1db4776db7d0aabf9cb01022e3bec77a46e37982c62793923c6ab992b2",
   "internal_module": "github.com/wotjr1649/go-treesitter/internal/runtime",
   "patches": [
     {
       "path": "tools/runtime-bundle/patches/KR-0001b-jsx-text.patch",
       "sha256": "5c7beb8650898e8a6f9b669399606e754da0674eae190d9dce904787117afbbe"
+    },
+    {
+      "path": "tools/runtime-bundle/patches/catalog-c-family-lexer-reuse.patch",
+      "sha256": "9658d436c23c09e5e6fbe05936174c04fee7e9da3bb3a6981497c6e94b4f0db1"
     }
   ],
   "files": {
@@ -1563,7 +1567,7 @@
     },
     "grammars/runtime/c_lexer.go": {
       "origin_sha256": "ec8011cb876d7ec6ae45a3542e696b286349bced62868f8eb53d278390bdd8c5",
-      "sha256": "1edb94ac9e6a147505f637a581dae4c7415dc087c646d21147694fa35d0e71af"
+      "sha256": "1f1eb32f00e9844562f7954fd255701b0985c7e485c31e144bfba95cad72fd6f"
     },
     "grammars/runtime/c_sharp_external_lex_states.go": {
       "origin_sha256": "ef437c0109cc03b18906a9faf23be8e4c06378c738940318b90cbb045a1ba7ae",

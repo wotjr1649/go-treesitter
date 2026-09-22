@@ -389,6 +389,20 @@ func (ts *CTokenSource) SkipToByte(offset uint32) gotreesitter.Token {
 	if target > len(ts.src) {
 		target = len(ts.src)
 	}
+	// A reused leaf may end inside an already scanned string queue or at
+	// the live cursor. Preserve the lexer state and discard only tokens
+	// covered by the reused span. A cursor-only skip would lose #include
+	// context; clearing the queue would lose the remaining string tokens.
+	if target <= ts.cur.offset {
+		next := 0
+		for next < len(ts.pending) && ts.pending[next].EndByte <= uint32(target) {
+			next++
+		}
+		if target == ts.cur.offset || (next < len(ts.pending) && ts.pending[next].StartByte == uint32(target)) {
+			ts.pending = ts.pending[next:]
+			return ts.Next()
+		}
+	}
 
 	ts.pending = nil
 	ts.done = false

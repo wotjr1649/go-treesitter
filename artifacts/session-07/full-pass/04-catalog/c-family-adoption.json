@@ -1,0 +1,8 @@
+{
+  "modified_runtime_files": [
+    "grammars/runtime/c_lexer.go"
+  ],
+  "old_manifest_sha256": "d35a3de216578357f35f694e5b96d4c1cc8e2f9acd99aa86fdbbb1b9740c3983",
+  "new_manifest_sha256": "9cf7f081c6016aac05b035413b65c6f2283bf31a9f5dbfbfd300ceb8840018af",
+  "patch_sha256": "9658d436c23c09e5e6fbe05936174c04fee7e9da3bb3a6981497c6e94b4f0db1"
+}
