@@ -21,6 +21,7 @@ type Diagnostics struct {
 	ArenaBytes, ScratchBytes, MemoryBudgetBytes int64
 	Truncated                                   bool
 	Route, FallbackReason                       string
+	ReuseReason                                 string
 	ReusedOldTree                               bool
 	// Fresh-route fallback detail is not available per parse upstream.
 	FallbackDetailAvailable bool

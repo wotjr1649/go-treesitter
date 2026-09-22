@@ -53,6 +53,7 @@ func (Adapter) Parse(ctx context.Context, req syntax.Request) (syntax.Result, er
 	var raw *gts.Tree
 	var lang *gts.Language
 	var parseErr error
+	var profile gts.IncrementalParseProfile
 	attempted := false
 	source := req.Source
 	if valid && ctx.Err() == nil {
@@ -85,7 +86,7 @@ func (Adapter) Parse(ctx context.Context, req syntax.Request) (syntax.Result, er
 					raw, parseErr = p.ParseWithTokenSourceFactory(source, factory)
 				}
 			} else if old != nil {
-				raw, parseErr = p.ParseIncremental(source, old)
+				raw, profile, parseErr = p.ParseIncrementalProfiled(source, old)
 			} else {
 				raw, parseErr = p.Parse(source)
 			}
@@ -120,6 +121,7 @@ func (Adapter) Parse(ctx context.Context, req syntax.Request) (syntax.Result, er
 		d.Truncated = rt.Truncated
 		d.ReusedOldTree = rt.IncrementalOldTreeReuseRoute || rt.CompactIncrementalReuseRoute
 		d.FallbackReason = rt.CompactIncrementalFallbackReason
+		d.ReuseReason = profile.ReuseUnsupportedReason
 		d.FallbackDetailAvailable = req.Previous != nil
 		d.Route = "classic"
 		if rt.ForestFastPath {
