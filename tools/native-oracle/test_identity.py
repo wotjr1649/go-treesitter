@@ -1,10 +1,15 @@
 import tempfile
 import unittest
 from pathlib import Path
-from identity import identity
+from identity import generate, identity
 
 
 class ArtifactIdentityTest(unittest.TestCase):
+    def test_generator_cannot_write_outside_repository(self):
+        with tempfile.TemporaryDirectory() as work:
+            with self.assertRaisesRegex(ValueError, 'inside this repository'):
+                generate(Path(work) / 'api.h', Path(work) / 'src/parser.c')
+
     def test_runtime_abi_boundaries_and_unpinned_producer(self):
         with tempfile.TemporaryDirectory() as work:
             header, parser = Path(work) / 'api.h', Path(work) / 'parser.c'

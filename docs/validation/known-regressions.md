@@ -202,9 +202,11 @@ remain untested. **No patch or fork is authorized by this result.**
 | Appears in the CGO-free product lane | **yes** (a plain fresh parse; not race-dependent) |
 | Upstream has no fix in a tagged release, and is not already tracking it | **no tagged fix observed**; public tag query on 2026-09-22 ends at v0.53.0; issue open without maintainer response or linked PR |
 
-All three conditions currently read as satisfied. That makes `KR-0001b` the **first and only**
-candidate that has ever reached the trigger — and precisely why the `E5` requirement matters before
-anyone acts on it. Creating a fork remains a **user-owned decision**.
+Session 06 corrects the earlier interpretation of the third condition: an open
+public issue without an assignee or linked PR does not establish that upstream
+is not tracking it. Maintainer intent remains unknown. The first two conditions
+are established; the third must not be promoted from absence of a reply.
+Creating a fork remains a user-owned decision.
 
 ### Required test behaviour
 
@@ -223,6 +225,45 @@ baseline moves to it, or (b) an authorized patch is proven against the C oracle 
 its own retirement condition. Move the record to a retired section; do not delete it.
 
 ---
+
+## Session 06 oracle extension — KR-0001a / KR-0001b
+
+Phase 2 independently executes and compares 50 registered inputs using the
+Windows C lane authorized in ADR-0008. Both JavaScript and TSX F1–F3 contain
+errors in C and Go, with different recovered trees. F4/F5 are clean in C and
+erroneous in Go in **both** grammars (E5). F6/F7, 24 JSX boundary controls,
+the seven smoke routes, two generic-arrow controls and two clean C# corpus
+files have equal ordered snapshots for the fields represented by syntax.Node.
+
+Exact source/Go/C digests are in `testdata/oracle/known-differences.json`.
+Phase 2 logs and its fresh C receipts bind the comparison independently of
+Session 05. No numeric-symbol, separate alias metadata, query or incremental
+C-comparison claim is made. Product baseline remains unchanged.
+
+## KR-0002 — C# excerpt recovery structure differs
+
+| Field | Value |
+|---|---|
+| Upstream issue | None filed; local diagnosis only. Do not associate this with the JSX issue. |
+| Baseline | Current pinned baseline and C# blob from identities.json |
+| Fixture | `CS-JsonTextReader-excerpt`, SHA-256 `d76fd62cfc90076c11d86cb7d7a0058df181231aa3b34f30e549f650b5294d4a` |
+| Go state | accepted_with_errors, accepted, full 12,408-byte root; HasError=false, HasMissing=true; 1,919 nodes |
+| C state | full root; HasError=true, no missing nodes; 2,092 nodes |
+| First difference | node 5, namespace end: Go byte 12,407; C byte 12,405 |
+| Exact signature | source plus both ordered tree digests in known-differences.json |
+| Evidence | Session 06 Phase 2, E5; raw runtime reproduces the adapter's Go digest |
+| Release impact | C# Release-Critical remains blocked pending recovery attribution/resolution |
+| Retirement | Authorized baseline or patch yields C agreement for this input and passes the affected corpus; preserve this historical record |
+
+The first Go missing node is `;` after `internal enum ReadType`, while C reports
+ERROR nodes later in the excerpt, including conditional enum members. The input
+does contain an enum body: no claim that it is an incomplete enum or invalid C#
+source is made. The exact internal recovery cause remains open. The difference
+originates in the pinned runtime, not the adapter; it is not a route-performance
+finding. The other two C# files agree for all represented node fields.
+
+The new register is separate from KR-0001 and does not widen it. Any changed
+digest, disappearing difference, new affected fixture or missing input fails.
 
 ## Known characteristics (not regressions, not defects)
 

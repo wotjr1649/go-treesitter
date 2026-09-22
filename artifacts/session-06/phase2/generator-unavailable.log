@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "D:\AIDEV\go-treesitter\tools\native-oracle\run.py", line 241, in <module>
+    build(args.output, args.generate)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AIDEV\go-treesitter\tools\native-oracle\run.py", line 144, in build
+    raise ValueError('tree-sitter generator unavailable; prepared sources unchanged')
+ValueError: tree-sitter generator unavailable; prepared sources unchanged

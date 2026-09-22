@@ -1,0 +1,8 @@
+test_generator_cannot_write_outside_repository (test_identity.ArtifactIdentityTest.test_generator_cannot_write_outside_repository) ... ok
+test_runtime_abi_boundaries_and_unpinned_producer (test_identity.ArtifactIdentityTest.test_runtime_abi_boundaries_and_unpinned_producer) ... ok
+test_archive_and_fixture_boundaries (test_run.OracleBoundaryTest.test_archive_and_fixture_boundaries) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.036s
+
+OK

@@ -15,7 +15,7 @@ import subprocess
 import tarfile
 import urllib.request
 
-from identity import identity
+from identity import generate, identity
 
 ROOT = Path(__file__).resolve().parents[2]
 PINS = ROOT / 'internal/provenance/identities.json'
@@ -136,10 +136,12 @@ def source_locks():
     return locks
 
 
-def build(output):
+def build(output, regenerate=False):
     output = bounded(output)
     if output.exists():
         raise ValueError('build output already exists')
+    if regenerate and not shutil.which(os.environ.get('TREE_SITTER_CLI', 'tree-sitter')):
+        raise ValueError('tree-sitter generator unavailable; prepared sources unchanged')
     locks = source_locks()
     pins = read_json(PINS)
     compiler = shutil.which(os.environ.get('CC', 'gcc'))
@@ -149,13 +151,17 @@ def build(output):
     runtime = WORK / 'runtime/lib'
     output.mkdir(parents=True)
     records = {}
+    if regenerate:
+        for repo in REPOS:
+            if repo != 'runtime':
+                shutil.copytree(WORK / repo, output / 'generated' / repo)
     for language in pins['grammars']:
         repo = 'typescript' if language == 'tsx' else language
-        source = WORK / repo
+        source = (output / 'generated' if regenerate else WORK) / repo
         if repo == 'typescript':
             source /= language
         source /= 'src'
-        artifact = identity(runtime / 'include/tree_sitter/api.h', source / 'parser.c')
+        artifact = (generate if regenerate else identity)(runtime / 'include/tree_sitter/api.h', source / 'parser.c')
         executable = output / (language + ('.exe' if os.name == 'nt' else ''))
         command = [compiler, *pins['oracle']['build_flags'], '-I' + str(runtime / 'include'),
                    '-I' + str(runtime / 'src'), '-I' + str(source),
@@ -168,7 +174,9 @@ def build(output):
         records[language] = {**artifact, 'executable': executable.name,
                              'executable_sha256': sha(executable.read_bytes())}
         print('built', language, artifact['abi'], flush=True)
-    write_new(output / 'build.json', {'schema': 1, 'pins': pins, 'sources': locks,
+    generated_files = {p.relative_to(output).as_posix(): sha(p.read_bytes())
+                       for p in sorted((output / 'generated').rglob('*')) if p.is_file()} if regenerate else {}
+    write_new(output / 'build.json', {'schema': 1, 'pins': pins, 'sources': locks, 'generated_sources': generated_files,
               'driver_sha256': sha(Path(__file__).with_name('driver.c').read_bytes()),
               'compiler': compiler_version, 'compiler_sha256': sha(Path(compiler).read_bytes()),
               'os': platform.system(), 'arch': platform.machine(), 'grammars': records})
@@ -214,6 +222,8 @@ def record(build_dir, cases_path, output):
         receipt['nodes_sha256'] = sha(json.dumps(receipt['nodes'], ensure_ascii=False, separators=(',', ':')).encode())
         write_new(output / (case['id'] + '.json'), receipt)
     write_new(output / 'build.json', manifest)
+    write_new(output / 'set.json', {'schema': 1, 'cases_sha256': sha(cases_path.read_bytes()),
+              'files': {p.name: sha(p.read_bytes()) for p in sorted(output.glob('*.json'))}})
     print('recorded', len(cases), 'fixtures', flush=True)
 
 
@@ -223,11 +233,12 @@ if __name__ == '__main__':
     parser.add_argument('--build', type=Path)
     parser.add_argument('--cases', type=Path, default=ROOT / 'testdata/oracle/cases.json')
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--generate', action='store_true', help='regenerate copied grammar JSON with the currently resolved CLI')
     args = parser.parse_args()
     if args.action == 'prepare':
         prepare()
     elif args.action == 'build' and args.output:
-        build(args.output)
+        build(args.output, args.generate)
     elif args.action == 'record' and args.build and args.output:
         record(args.build, args.cases, args.output)
     else:

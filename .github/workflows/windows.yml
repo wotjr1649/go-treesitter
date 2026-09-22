@@ -12,7 +12,7 @@
         {"uses": "actions/setup-go@v7", "with": {"go-version-file": "go.mod"}},
         {"name": "Build", "run": "go build ./..."},
         {"name": "Vet", "run": "go vet ./..."},
-        {"name": "Test", "run": "go test ./... -count=1"},
+        {"name": "Test including recorded C comparisons", "run": "go test ./... -count=1"},
         {
           "name": "Windows ARM64 build",
           "env": {"GOOS": "windows", "GOARCH": "arm64"},
