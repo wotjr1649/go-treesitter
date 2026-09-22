@@ -1,0 +1,6 @@
+..\..\..\internal\gtsadapter\adapter.go:15:2: missing go.sum entry for module providing package github.com/odvcencio/gotreesitter (imported by github.com/wotjr1649/go-treesitter/internal/gtsadapter); to add:
+	go get github.com/wotjr1649/go-treesitter/internal/gtsadapter@v0.0.0
+..\..\..\internal\gtsadapter\adapter.go:16:2: missing go.sum entry for module providing package github.com/odvcencio/gotreesitter/grammars (imported by github.com/wotjr1649/go-treesitter/internal/gtsadapter); to add:
+	go get github.com/wotjr1649/go-treesitter/internal/gtsadapter@v0.0.0
+package example.com/cgo-audit-consumer/parser
+	parser\main.go:3:8: use of internal package github.com/wotjr1649/go-treesitter/internal/gtsadapter not allowed

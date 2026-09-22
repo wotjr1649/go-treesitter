@@ -1,0 +1,14 @@
+D:\AIDEV\go-treesitter\.scratch\cgo-audit-2026-09-22\buildinfo.exe: go1.27.1
+	path	github.com/wotjr1649/go-treesitter/internal/provenance/testdata/buildinfo
+	mod	github.com/wotjr1649/go-treesitter	v0.0.0-20260922095405-235e97ef5f70+dirty	
+	dep	github.com/odvcencio/gotreesitter	v0.53.0	h1:VWoixJYMb01xde2BSXejzMmvLagj8B01sOSqNUUqsfA=
+	build	-buildmode=exe
+	build	-compiler=gc
+	build	CGO_ENABLED=0
+	build	GOARCH=amd64
+	build	GOOS=windows
+	build	GOAMD64=v1
+	build	vcs=git
+	build	vcs.revision=235e97ef5f7030080e2fe3735ef093457075e73a
+	build	vcs.time=2026-09-22T09:54:05Z
+	build	vcs.modified=true

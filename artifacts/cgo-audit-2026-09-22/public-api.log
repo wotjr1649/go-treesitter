@@ -1,0 +1,18 @@
+go: module lookup disabled by GOPROXY=off
+go: module lookup disabled by GOPROXY=off
+go: module lookup disabled by GOPROXY=off
+go: module lookup disabled by GOPROXY=off
+package syntax // import "github.com/wotjr1649/go-treesitter/syntax"
+
+Package syntax defines backend-independent parse requests and results.
+
+type Diagnostics struct{ ... }
+type Edit struct{ ... }
+type Node struct{ ... }
+type Outcome string
+    const AcceptedClean Outcome = "accepted_clean" ...
+type Parser interface{ ... }
+type Point struct{ ... }
+type Request struct{ ... }
+type Result struct{ ... }
+type Tree interface{ ... }

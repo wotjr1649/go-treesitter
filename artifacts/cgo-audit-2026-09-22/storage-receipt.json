@@ -1,0 +1,10 @@
+[
+  {
+    "path": "selected-source-scan.json",
+    "raw_bytes": 240,
+    "raw_sha256": "e8e8f9eeefc35b9653fd145bbb0850485ef08d265e1ebc54e28ee5161010ecdd",
+    "git_bytes": 229,
+    "git_sha256": "4093e74f000a9c213a5a19ef3638fe846b2845c023ff8971db74b2cbea1fe72c",
+    "cause": "existing LF normalization; JSON values identical"
+  }
+]

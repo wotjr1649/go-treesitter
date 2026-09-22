@@ -1,0 +1,25 @@
+{
+  "source_head": "235e97ef5f7030080e2fe3735ef093457075e73a",
+  "inputs": {
+    "go.mod": "60e068a66c71f3ce7c1b04dbe04e404e01e2d1eace07373dfe3fd0a8345f6889",
+    "go.sum": "87c97651162785c246dabcd3fdcd916cd7baabe2f8554bbdb31eea5ce9704cd6",
+    "internal/provenance/identities.json": "c190e01ce1fa283b3953d9ff613a5dbf9b57f8c5ace8820c72501b8ddeeed1a2"
+  },
+  "env": {
+    "CGO_ENABLED": "0",
+    "GOENV": "off",
+    "GOFLAGS": "",
+    "GOWORK": "off",
+    "GOTOOLCHAIN": "local",
+    "GOPROXY": "off",
+    "GOSUMDB": "off",
+    "GOOS": "windows",
+    "GOARCH": "amd64",
+    "CC": "D:\\AIDEV\\go-treesitter\\.scratch\\cgo-audit-2026-09-22\\absent-cc.exe",
+    "CXX": "D:\\AIDEV\\go-treesitter\\.scratch\\cgo-audit-2026-09-22\\absent-cxx.exe",
+    "PATH": "C:\\Program Files\\Go\\bin;C:\\Program Files\\Git\\cmd;C:\\WINDOWS\\System32"
+  },
+  "compiler_paths_exist": false,
+  "initial_runs_per_check": 1,
+  "timeout_seconds_per_command": 180
+}

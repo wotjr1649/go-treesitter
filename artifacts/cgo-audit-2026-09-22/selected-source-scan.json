@@ -1,0 +1,11 @@
+{
+  "selected_nonstandard_source_files": 758,
+  "pattern_hits": [
+    {
+      "package": "github.com/odvcencio/gotreesitter/grammars",
+      "file": "linguist_gen.go",
+      "line": 365,
+      "text": "\"c\": \"C\","
+    }
+  ]
+}

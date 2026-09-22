@@ -1,0 +1,10 @@
+{
+	"Path": "github.com/odvcencio/gotreesitter",
+	"Version": "v0.53.0",
+	"Time": "2026-09-19T08:40:16Z",
+	"Dir": "D:\\AIDEV\\go-treesitter\\.scratch\\modcache\\github.com\\odvcencio\\gotreesitter@v0.53.0",
+	"GoMod": "D:\\AIDEV\\go-treesitter\\.scratch\\modcache\\cache\\download\\github.com\\odvcencio\\gotreesitter\\@v\\v0.53.0.mod",
+	"GoVersion": "1.22.0",
+	"Sum": "h1:VWoixJYMb01xde2BSXejzMmvLagj8B01sOSqNUUqsfA=",
+	"GoModSum": "h1:hBVkghd0paaYAVwd2087vfwdeU984bQbMo9LvpE0moo="
+}

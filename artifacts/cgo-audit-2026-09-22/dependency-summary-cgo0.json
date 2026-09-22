@@ -1,0 +1,18 @@
+{
+  "packages": 137,
+  "nonstandard_packages": [
+    "github.com/wotjr1649/go-treesitter/internal/boundary",
+    "github.com/odvcencio/gotreesitter/internal/luapattern",
+    "github.com/odvcencio/gotreesitter/internal/parsercorephase0",
+    "github.com/odvcencio/gotreesitter",
+    "github.com/odvcencio/gotreesitter/grammars/internal/standaloneregistry",
+    "github.com/odvcencio/gotreesitter/grammars/internal/pythonruntime",
+    "github.com/odvcencio/gotreesitter/grammars/runtime",
+    "github.com/odvcencio/gotreesitter/grammars",
+    "github.com/wotjr1649/go-treesitter/syntax",
+    "github.com/wotjr1649/go-treesitter/internal/gtsadapter",
+    "github.com/wotjr1649/go-treesitter/internal/provenance"
+  ],
+  "native": {},
+  "runtime_cgo": false
+}

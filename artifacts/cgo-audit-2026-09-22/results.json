@@ -1,0 +1,26 @@
+{
+  "source_head": "235e97ef5f7030080e2fe3735ef093457075e73a",
+  "input_hashes_unchanged": true,
+  "inputs": {
+    "go.mod": "60e068a66c71f3ce7c1b04dbe04e404e01e2d1eace07373dfe3fd0a8345f6889",
+    "go.sum": "87c97651162785c246dabcd3fdcd916cd7baabe2f8554bbdb31eea5ce9704cd6",
+    "internal/provenance/identities.json": "c190e01ce1fa283b3953d9ff613a5dbf9b57f8c5ace8820c72501b8ddeeed1a2"
+  },
+  "packages": [
+    "github.com/wotjr1649/go-treesitter/syntax",
+    "github.com/wotjr1649/go-treesitter/internal/boundary",
+    "github.com/wotjr1649/go-treesitter/internal/provenance",
+    "github.com/wotjr1649/go-treesitter/internal/gtsadapter"
+  ],
+  "top_level_tests": 13,
+  "pass_events_including_subtests": 90,
+  "fail_events": 0,
+  "skip_events": 0,
+  "binary_sha256": {
+    "adapter.test.exe": "984568b71d3e10e493d922a708a41eb0cc0e9fe1d9a6b76c545e190d606c7547",
+    "buildinfo-arm64.exe": "a5fdd948356e3793bc602d7109a9a7eca1b757826134cd0ea2604e07dd2ff2e2",
+    "buildinfo.exe": "fcd10a6357ab7c0a6fe8cda2cbad98cd0a2d5a044469aba278a99556533a314c",
+    "consumer.exe": "5189f9123c21e34040d054e80383f2a72b6da6ffb64dcf43f4a3fbdfa967311d"
+  },
+  "command_receipts": 20
+}

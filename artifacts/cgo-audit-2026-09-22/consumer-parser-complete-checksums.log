@@ -1,0 +1,2 @@
+package example.com/cgo-audit-consumer/parser
+	parser\main.go:3:8: use of internal package github.com/wotjr1649/go-treesitter/internal/gtsadapter not allowed
