@@ -1,0 +1,433 @@
+{
+  "abi": 15,
+  "input_bytes": 30,
+  "has_error": false,
+  "start": 0,
+  "end": 30,
+  "nodes": [
+    {
+      "Type": "program",
+      "Field": "",
+      "Parent": -1,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 0,
+      "EndByte": 30,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 0
+      }
+    },
+    {
+      "Type": "lexical_declaration",
+      "Field": "",
+      "Parent": 0,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 0,
+      "EndByte": 29,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 29
+      }
+    },
+    {
+      "Type": "const",
+      "Field": "kind",
+      "Parent": 1,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 0,
+      "EndByte": 5,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 5
+      }
+    },
+    {
+      "Type": "variable_declarator",
+      "Field": "",
+      "Parent": 1,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 6,
+      "EndByte": 28,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 6
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 28
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "name",
+      "Parent": 3,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 6,
+      "EndByte": 7,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 6
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 7
+      }
+    },
+    {
+      "Type": "=",
+      "Field": "",
+      "Parent": 3,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 8,
+      "EndByte": 9,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 8
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 9
+      }
+    },
+    {
+      "Type": "arrow_function",
+      "Field": "value",
+      "Parent": 3,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 10,
+      "EndByte": 28,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 10
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 28
+      }
+    },
+    {
+      "Type": "formal_parameters",
+      "Field": "parameters",
+      "Parent": 6,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 10,
+      "EndByte": 12,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 10
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 12
+      }
+    },
+    {
+      "Type": "(",
+      "Field": "",
+      "Parent": 7,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 10,
+      "EndByte": 11,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 10
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 11
+      }
+    },
+    {
+      "Type": ")",
+      "Field": "",
+      "Parent": 7,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 11,
+      "EndByte": 12,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 11
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 12
+      }
+    },
+    {
+      "Type": "=>",
+      "Field": "",
+      "Parent": 6,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 13,
+      "EndByte": 15,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 13
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 15
+      }
+    },
+    {
+      "Type": "jsx_element",
+      "Field": "body",
+      "Parent": 6,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 16,
+      "EndByte": 28,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 16
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 28
+      }
+    },
+    {
+      "Type": "jsx_opening_element",
+      "Field": "open_tag",
+      "Parent": 11,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 16,
+      "EndByte": 19,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 16
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 19
+      }
+    },
+    {
+      "Type": "<",
+      "Field": "",
+      "Parent": 12,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 16,
+      "EndByte": 17,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 16
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 17
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "name",
+      "Parent": 12,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 17,
+      "EndByte": 18,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 17
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 18
+      }
+    },
+    {
+      "Type": ">",
+      "Field": "",
+      "Parent": 12,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 18,
+      "EndByte": 19,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 18
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 19
+      }
+    },
+    {
+      "Type": "jsx_text",
+      "Field": "",
+      "Parent": 11,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 19,
+      "EndByte": 24,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 19
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 24
+      }
+    },
+    {
+      "Type": "jsx_closing_element",
+      "Field": "close_tag",
+      "Parent": 11,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 24,
+      "EndByte": 28,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 24
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 28
+      }
+    },
+    {
+      "Type": "</",
+      "Field": "",
+      "Parent": 17,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 24,
+      "EndByte": 26,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 24
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 26
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "name",
+      "Parent": 17,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 26,
+      "EndByte": 27,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 26
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 27
+      }
+    },
+    {
+      "Type": ">",
+      "Field": "",
+      "Parent": 17,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 27,
+      "EndByte": 28,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 27
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 28
+      }
+    },
+    {
+      "Type": ";",
+      "Field": "",
+      "Parent": 1,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 28,
+      "EndByte": 29,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 28
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 29
+      }
+    }
+  ],
+  "schema": 1,
+  "fixture": "SM-JSX",
+  "language": "javascript",
+  "source_sha256": "09aeef593af2f529431e4c57a0c402a00f31f5411d55268a1ace6e7b1444cbae",
+  "build_sha256": "700048d55fa148b339befa066f5b2b1b5c94ae4b15c129e6d2cf667d0481c31e",
+  "nodes_sha256": "d3047920546c02615fbfb5a0888ea5fad6dbaf6352dc6519c283cc5c1e15a7cd"
+}

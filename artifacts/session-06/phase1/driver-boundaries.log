@@ -1,0 +1,1 @@
+50 repeated records and build receipt are byte-identical; CRLF/control input preserved; size limit rejected

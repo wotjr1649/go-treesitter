@@ -1,0 +1,234 @@
+"""Pinned source preparation, offline C builds, and deterministic oracle records.
+
+Only prepare uses the network. build/record never download or install anything.
+"""
+import argparse
+import hashlib
+import io
+import json
+import os
+from pathlib import Path, PurePosixPath
+import platform
+import re
+import shutil
+import subprocess
+import tarfile
+import urllib.request
+
+from identity import identity
+
+ROOT = Path(__file__).resolve().parents[2]
+PINS = ROOT / 'internal/provenance/identities.json'
+WORK = ROOT / '.scratch/oracle'
+REPOS = {'runtime': 'tree-sitter/tree-sitter', 'go': 'tree-sitter/tree-sitter-go',
+         'python': 'tree-sitter/tree-sitter-python',
+         'javascript': 'tree-sitter/tree-sitter-javascript',
+         'typescript': 'tree-sitter/tree-sitter-typescript',
+         'c_sharp': 'tree-sitter/tree-sitter-c-sharp'}
+
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def read_json(path):
+    return json.loads(path.read_text(encoding='utf-8'))
+
+
+def write_new(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('x', encoding='utf-8', newline='\n') as stream:
+        json.dump(value, stream, ensure_ascii=False, indent=2)
+        stream.write('\n')
+
+
+def bounded(path, base=ROOT):
+    path = path.resolve()
+    if not path.is_relative_to(base.resolve()) or path == base.resolve():
+        raise ValueError('path must stay beneath task root')
+    return path
+
+
+def selected(repo, path):
+    if path.name.startswith('LICENSE'):
+        return True
+    if repo == 'runtime':
+        return path.parts[0] == 'lib' and path.suffix in ('.c', '.h')
+    return (path.parts[0] in ('src', 'common') or
+            (repo == 'typescript' and path.parts[:2] in (('tsx', 'src'), ('typescript', 'src')))) and path.suffix in ('.c', '.h', '.json')
+
+
+def unpack(data, destination, repo):
+    """Extract only regular build inputs; reject links/traversal before writes."""
+    destination = bounded(destination)
+    with tarfile.open(fileobj=io.BytesIO(data), mode='r:gz') as archive:
+        files = {}
+        seen, total = set(), 0
+        for count, member in enumerate(archive, 1):
+            total += member.size
+            if count > 20000 or total > 256 * 1024 * 1024:
+                raise ValueError('source archive exceeds limits')
+            path = PurePosixPath(member.name)
+            if path.is_absolute() or '..' in path.parts or '\\' in member.name or ':' in member.name:
+                raise ValueError('unsafe archive path')
+            if not member.isfile():
+                if member.isdir():
+                    continue
+                raise ValueError('non-regular archive member')
+            relative = PurePosixPath(*path.parts[1:])
+            if not relative.parts or not selected(repo, relative):
+                continue
+            target = bounded(destination.joinpath(*relative.parts), destination)
+            key = relative.as_posix()
+            if key.casefold() in seen:
+                raise ValueError('duplicate archive path')
+            seen.add(key.casefold())
+            files[key] = archive.extractfile(member).read()
+        if not files:
+            raise ValueError('empty source archive selection')
+        if destination.exists():
+            raise ValueError('source destination already exists; preserve it')
+        for name, content in files.items():
+            target = destination / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(content)
+        return {name: sha(content) for name, content in sorted(files.items())}
+
+
+def prepare():
+    pins = read_json(PINS)
+    for name, repo in REPOS.items():
+        commit = (pins['oracle']['runtime_commit'] if name == 'runtime'
+                  else pins['grammars'][name]['commit'])
+        if not re.fullmatch('[0-9a-f]{40}', commit):
+            raise ValueError('invalid public source commit')
+        lock = WORK / (name + '.json')
+        if lock.exists():
+            if read_json(lock)['commit'] != commit:
+                raise ValueError('cached source epoch changed')
+            print('retained', name, commit, flush=True)
+            continue
+        url = f'https://codeload.github.com/{repo}/tar.gz/{commit}'
+        with urllib.request.urlopen(url, timeout=60) as response:
+            data = response.read(64 * 1024 * 1024 + 1)
+        if len(data) > 64 * 1024 * 1024:
+            raise ValueError('download exceeds limit')
+        files = unpack(data, WORK / name, name)
+        write_new(lock, {'repository': repo, 'commit': commit, 'archive_sha256': sha(data), 'files': files})
+        print('prepared', name, commit, len(files), flush=True)
+
+
+def source_locks():
+    pins = read_json(PINS)
+    locks = {}
+    for name in REPOS:
+        lock = read_json(WORK / (name + '.json'))
+        expected = pins['oracle']['runtime_commit'] if name == 'runtime' else pins['grammars'][name]['commit']
+        if lock['commit'] != expected or lock['repository'] != REPOS[name]:
+            raise ValueError('source epoch/repository mismatch')
+        actual = {p.relative_to(WORK / name).as_posix() for p in (WORK / name).rglob('*') if p.is_file()}
+        if actual != set(lock['files']):
+            raise ValueError('source file set changed')
+        for path, digest in lock['files'].items():
+            if sha(bounded(WORK / name / path, WORK / name).read_bytes()) != digest:
+                raise ValueError(f'source changed: {name}/{path}')
+        locks[name] = lock
+    return locks
+
+
+def build(output):
+    output = bounded(output)
+    if output.exists():
+        raise ValueError('build output already exists')
+    locks = source_locks()
+    pins = read_json(PINS)
+    compiler = shutil.which(os.environ.get('CC', 'gcc'))
+    if not compiler:
+        raise ValueError('C compiler unavailable')
+    compiler_version = subprocess.check_output([compiler, '--version'], timeout=10).decode().splitlines()[0]
+    runtime = WORK / 'runtime/lib'
+    output.mkdir(parents=True)
+    records = {}
+    for language in pins['grammars']:
+        repo = 'typescript' if language == 'tsx' else language
+        source = WORK / repo
+        if repo == 'typescript':
+            source /= language
+        source /= 'src'
+        artifact = identity(runtime / 'include/tree_sitter/api.h', source / 'parser.c')
+        executable = output / (language + ('.exe' if os.name == 'nt' else ''))
+        command = [compiler, *pins['oracle']['build_flags'], '-I' + str(runtime / 'include'),
+                   '-I' + str(runtime / 'src'), '-I' + str(source),
+                   '-DORACLE_LANGUAGE=tree_sitter_' + language,
+                   str(Path(__file__).with_name('driver.c')), str(runtime / 'src/lib.c'), str(source / 'parser.c')]
+        if (source / 'scanner.c').exists():
+            command.append(str(source / 'scanner.c'))
+        command += ['-o', str(executable)]
+        subprocess.run(command, check=True, timeout=180)
+        records[language] = {**artifact, 'executable': executable.name,
+                             'executable_sha256': sha(executable.read_bytes())}
+        print('built', language, artifact['abi'], flush=True)
+    write_new(output / 'build.json', {'schema': 1, 'pins': pins, 'sources': locks,
+              'driver_sha256': sha(Path(__file__).with_name('driver.c').read_bytes()),
+              'compiler': compiler_version, 'compiler_sha256': sha(Path(compiler).read_bytes()),
+              'os': platform.system(), 'arch': platform.machine(), 'grammars': records})
+
+
+def fixtures(path):
+    cases = read_json(path)
+    seen = set()
+    for case in cases:
+        if not re.fullmatch('[A-Za-z0-9_-]+', case['id']) or case['id'] in seen:
+            raise ValueError('duplicate/invalid fixture id')
+        seen.add(case['id'])
+        if ('source' in case) == ('path' in case):
+            raise ValueError('fixture needs exactly one source')
+        data = case['source'].encode('utf-8') if 'source' in case else bounded(ROOT / case['path']).read_bytes()
+        data.decode('utf-8')
+        if len(data) > 4 * 1024 * 1024 or sha(data) != case['sha256']:
+            raise ValueError('fixture size/hash mismatch: ' + case['id'])
+        yield case, data
+
+
+def record(build_dir, cases_path, output):
+    output = bounded(output)
+    if output.exists():
+        raise ValueError('record output already exists; evidence is immutable')
+    build_dir = bounded(build_dir)
+    manifest = read_json(build_dir / 'build.json')
+    if manifest['pins'] != read_json(PINS):
+        raise ValueError('build epoch changed')
+    cases = list(fixtures(cases_path))
+    manifest_hash = sha((build_dir / 'build.json').read_bytes())
+    for case, data in cases:
+        artifact = manifest['grammars'][case['language']]
+        executable = bounded(build_dir / artifact['executable'], build_dir)
+        if sha(executable.read_bytes()) != artifact['executable_sha256']:
+            raise ValueError('executable identity changed')
+        result = subprocess.run([str(executable)], input=data, capture_output=True, check=True, timeout=15)
+        receipt = json.loads(result.stdout)
+        if receipt['abi'] != artifact['abi'] or receipt['input_bytes'] != len(data) or not receipt['nodes']:
+            raise ValueError('oracle input/ABI mismatch')
+        receipt.update(schema=1, fixture=case['id'], language=case['language'],
+                       source_sha256=case['sha256'], build_sha256=manifest_hash)
+        receipt['nodes_sha256'] = sha(json.dumps(receipt['nodes'], ensure_ascii=False, separators=(',', ':')).encode())
+        write_new(output / (case['id'] + '.json'), receipt)
+    write_new(output / 'build.json', manifest)
+    print('recorded', len(cases), 'fixtures', flush=True)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('action', choices=['prepare', 'build', 'record'])
+    parser.add_argument('--build', type=Path)
+    parser.add_argument('--cases', type=Path, default=ROOT / 'testdata/oracle/cases.json')
+    parser.add_argument('--output', type=Path)
+    args = parser.parse_args()
+    if args.action == 'prepare':
+        prepare()
+    elif args.action == 'build' and args.output:
+        build(args.output)
+    elif args.action == 'record' and args.build and args.output:
+        record(args.build, args.cases, args.output)
+    else:
+        parser.error('build needs --output; record needs --build and --output')

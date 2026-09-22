@@ -1,0 +1,402 @@
+[
+  {
+    "id": "SM-GO",
+    "language": "go",
+    "filename": "x.go",
+    "group": "smoke",
+    "sha256": "47cfffc0dc66a7f20d58685427ecaca39d8ac4ac75471e6530aaf1841661321f",
+    "source": "package p\nfunc f() int { return 1 }\n"
+  },
+  {
+    "id": "SM-PY",
+    "language": "python",
+    "filename": "x.py",
+    "group": "smoke",
+    "sha256": "f186e0e276ead544103c820adf9961737ec923d60efebbcf649b7b40c26f5f1d",
+    "source": "def f(xs):\n    if xs:\n        return [x + 1 for x in xs]\n"
+  },
+  {
+    "id": "SM-JS",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "smoke",
+    "sha256": "09aeef593af2f529431e4c57a0c402a00f31f5411d55268a1ace6e7b1444cbae",
+    "source": "const f = () => <p>hello</p>;\n"
+  },
+  {
+    "id": "SM-JSX",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "smoke",
+    "sha256": "09aeef593af2f529431e4c57a0c402a00f31f5411d55268a1ace6e7b1444cbae",
+    "source": "const f = () => <p>hello</p>;\n"
+  },
+  {
+    "id": "SM-TS",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "smoke",
+    "sha256": "57a50045ef18ba04b8c4654afb297c656cfeefdcaf9cde00603226dd97d631dd",
+    "source": "interface Box<T> { value: T }\nconst f = <T>(x: T): T => x;\n"
+  },
+  {
+    "id": "SM-TSX",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "smoke",
+    "sha256": "8a3be41bdf61db2f6cb9c2fddce14401c51a0ab8be7f0834b692a54a939dc208",
+    "source": "const App = () => <p>hello</p>;\n"
+  },
+  {
+    "id": "SM-CS",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "smoke",
+    "sha256": "b34543a9997d7e4b16da9c38d7ce6aec80b98cb4445ca9fee6d00a4eb4a26b59",
+    "source": "class C { public int X { get; set; } public int F() => X + 1; }\n"
+  },
+  {
+    "id": "tsx-F1",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "KR-0001a",
+    "sha256": "efd1f1afadcb0a0721f4cb1334c41d5d8c1306eb3e059d43f4ca025e5f31706a",
+    "source": "const a = <p>Org & Team</p>;"
+  },
+  {
+    "id": "tsx-F2",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "KR-0001a",
+    "sha256": "64a8995a210895b9beb7d5d59f04aff12461314928d622c3523e1bde2092e8e3",
+    "source": "const b = <p>AT&T</p>;"
+  },
+  {
+    "id": "tsx-F3",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "KR-0001a",
+    "sha256": "7cfe8fb425960bf47c9a2a48c734772700de3dd0da691bd087b1f5cb3417769a",
+    "source": "const c = <p>&</p>;"
+  },
+  {
+    "id": "tsx-F4",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "KR-0001b",
+    "sha256": "00fb2b5a4c026746e65f819a40a4a1b4410006b400d0fffdf50fa06485ae15af",
+    "source": "const d = <p>a = b</p>;"
+  },
+  {
+    "id": "tsx-F5",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "KR-0001b",
+    "sha256": "c868254fda1dfbe6613fde4dca3538a1233e554464e172cbc9e2785a802ff2a7",
+    "source": "const e = <code>k=v</code>;"
+  },
+  {
+    "id": "tsx-F6",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "control",
+    "sha256": "8c7dc4153eba3baa321de48374d7b902197a96a24ccf68a9d89d78aab69cd10c",
+    "source": "const f = <p>x &amp; y</p>;"
+  },
+  {
+    "id": "tsx-F7",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "control",
+    "sha256": "f4792d0e83f86c02a59533ca2a1fc3a75a4f607d91f217414ba111c4993003cd",
+    "source": "const g = <p>plain</p>;"
+  },
+  {
+    "id": "tsx-attribute",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "control",
+    "sha256": "3dacfbcd1e0376e6b8c4eeb6cd278f681057bcb303352c344232afb7a4cda973",
+    "source": "const x = <div className=\"a\">hi</div>;"
+  },
+  {
+    "id": "tsx-attributes-expression",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "control",
+    "sha256": "7706a55f5cdaa714a65cd3c846e804bf06c4ca09d2e4367942d1f764325afb5c",
+    "source": "const x = <div a={1} b=\"two\">text</div>;"
+  },
+  {
+    "id": "tsx-self-closing",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "control",
+    "sha256": "13ce55ee399bebf84f1800b52150bf7621e3a7c7d01953388d73cad8057f2ec1",
+    "source": "const x = <Comp value={1} />;"
+  },
+  {
+    "id": "tsx-spread",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "control",
+    "sha256": "9c1a24244146c68db481989ea93d8301536717ebe7ccfb1df05f5a88cc16ab64",
+    "source": "const x = <Comp {...props} value=\"x\" />;"
+  },
+  {
+    "id": "tsx-nested",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "control",
+    "sha256": "14f3fe9c0268a50788014716516c5fdcd55c7e56d56b88d76a6ba142a95541a7",
+    "source": "const x = <div><span>hi</span><br /></div>;"
+  },
+  {
+    "id": "tsx-fragment",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "control",
+    "sha256": "196cedd0efe08f5599699995a12685ec958272ba4ab75c98c1d5129f0ca7800b",
+    "source": "const x = <><span>hi</span></>;"
+  },
+  {
+    "id": "tsx-multiline",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "control",
+    "sha256": "95eedca478dd4dd9d34a06e42da28cc6ad4b9b5aa42b289ff317701b90c8c125",
+    "source": "const x = <p>\n  hello\n  world\n</p>;"
+  },
+  {
+    "id": "tsx-slash-text",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "control",
+    "sha256": "8175cac650b27351600e79ccbef11a72cbb149c4e4af48ead411f99b4479ebfe",
+    "source": "const x = <p>/path</p>;"
+  },
+  {
+    "id": "tsx-unicode-text",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "control",
+    "sha256": "7f66123e1fb818a0ba95b014d1ffddf7a4b9f57c20a6b35c18359577c144515f",
+    "source": "const x = <p>안녕하세요</p>;"
+  },
+  {
+    "id": "tsx-namespace-attribute",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "control",
+    "sha256": "f6646fa99ff433dc096782ea96e8e52f3d81d419293df84164a064f4551973c4",
+    "source": "const x = <svg xml:lang=\"ko\" data-id=\"x\" />;"
+  },
+  {
+    "id": "tsx-expression-child",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "control",
+    "sha256": "235835df891325024c7c09713e7cc9317b774fdfa50d5b4c1bcfa724f1843709",
+    "source": "const x = <p>{a ? b : c} tail</p>;"
+  },
+  {
+    "id": "tsx-asi",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "control",
+    "sha256": "e7cf6549233a13052274f4997b701898870e32ada7f60305040ee584c6b6d472",
+    "source": "const x = <p>hi</p>\nconst y = 1\n"
+  },
+  {
+    "id": "javascript-F1",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "KR-0001a",
+    "sha256": "efd1f1afadcb0a0721f4cb1334c41d5d8c1306eb3e059d43f4ca025e5f31706a",
+    "source": "const a = <p>Org & Team</p>;"
+  },
+  {
+    "id": "javascript-F2",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "KR-0001a",
+    "sha256": "64a8995a210895b9beb7d5d59f04aff12461314928d622c3523e1bde2092e8e3",
+    "source": "const b = <p>AT&T</p>;"
+  },
+  {
+    "id": "javascript-F3",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "KR-0001a",
+    "sha256": "7cfe8fb425960bf47c9a2a48c734772700de3dd0da691bd087b1f5cb3417769a",
+    "source": "const c = <p>&</p>;"
+  },
+  {
+    "id": "javascript-F4",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "KR-0001b",
+    "sha256": "00fb2b5a4c026746e65f819a40a4a1b4410006b400d0fffdf50fa06485ae15af",
+    "source": "const d = <p>a = b</p>;"
+  },
+  {
+    "id": "javascript-F5",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "KR-0001b",
+    "sha256": "c868254fda1dfbe6613fde4dca3538a1233e554464e172cbc9e2785a802ff2a7",
+    "source": "const e = <code>k=v</code>;"
+  },
+  {
+    "id": "javascript-F6",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "control",
+    "sha256": "8c7dc4153eba3baa321de48374d7b902197a96a24ccf68a9d89d78aab69cd10c",
+    "source": "const f = <p>x &amp; y</p>;"
+  },
+  {
+    "id": "javascript-F7",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "control",
+    "sha256": "f4792d0e83f86c02a59533ca2a1fc3a75a4f607d91f217414ba111c4993003cd",
+    "source": "const g = <p>plain</p>;"
+  },
+  {
+    "id": "javascript-attribute",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "control",
+    "sha256": "3dacfbcd1e0376e6b8c4eeb6cd278f681057bcb303352c344232afb7a4cda973",
+    "source": "const x = <div className=\"a\">hi</div>;"
+  },
+  {
+    "id": "javascript-attributes-expression",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "control",
+    "sha256": "7706a55f5cdaa714a65cd3c846e804bf06c4ca09d2e4367942d1f764325afb5c",
+    "source": "const x = <div a={1} b=\"two\">text</div>;"
+  },
+  {
+    "id": "javascript-self-closing",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "control",
+    "sha256": "13ce55ee399bebf84f1800b52150bf7621e3a7c7d01953388d73cad8057f2ec1",
+    "source": "const x = <Comp value={1} />;"
+  },
+  {
+    "id": "javascript-spread",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "control",
+    "sha256": "9c1a24244146c68db481989ea93d8301536717ebe7ccfb1df05f5a88cc16ab64",
+    "source": "const x = <Comp {...props} value=\"x\" />;"
+  },
+  {
+    "id": "javascript-nested",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "control",
+    "sha256": "14f3fe9c0268a50788014716516c5fdcd55c7e56d56b88d76a6ba142a95541a7",
+    "source": "const x = <div><span>hi</span><br /></div>;"
+  },
+  {
+    "id": "javascript-fragment",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "control",
+    "sha256": "196cedd0efe08f5599699995a12685ec958272ba4ab75c98c1d5129f0ca7800b",
+    "source": "const x = <><span>hi</span></>;"
+  },
+  {
+    "id": "javascript-multiline",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "control",
+    "sha256": "95eedca478dd4dd9d34a06e42da28cc6ad4b9b5aa42b289ff317701b90c8c125",
+    "source": "const x = <p>\n  hello\n  world\n</p>;"
+  },
+  {
+    "id": "javascript-slash-text",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "control",
+    "sha256": "8175cac650b27351600e79ccbef11a72cbb149c4e4af48ead411f99b4479ebfe",
+    "source": "const x = <p>/path</p>;"
+  },
+  {
+    "id": "javascript-unicode-text",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "control",
+    "sha256": "7f66123e1fb818a0ba95b014d1ffddf7a4b9f57c20a6b35c18359577c144515f",
+    "source": "const x = <p>안녕하세요</p>;"
+  },
+  {
+    "id": "javascript-namespace-attribute",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "control",
+    "sha256": "f6646fa99ff433dc096782ea96e8e52f3d81d419293df84164a064f4551973c4",
+    "source": "const x = <svg xml:lang=\"ko\" data-id=\"x\" />;"
+  },
+  {
+    "id": "javascript-expression-child",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "control",
+    "sha256": "235835df891325024c7c09713e7cc9317b774fdfa50d5b4c1bcfa724f1843709",
+    "source": "const x = <p>{a ? b : c} tail</p>;"
+  },
+  {
+    "id": "javascript-asi",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "control",
+    "sha256": "e7cf6549233a13052274f4997b701898870e32ada7f60305040ee584c6b6d472",
+    "source": "const x = <p>hi</p>\nconst y = 1\n"
+  },
+  {
+    "id": "CS-JsonPosition",
+    "language": "c_sharp",
+    "filename": "JsonPosition.cs",
+    "group": "corpus",
+    "sha256": "4f9e601f9d0be45c4f60f15bf1b6ca8f85dec51e353ebb50e405cc6f8e422c14",
+    "path": "testdata/newtonsoft/JsonPosition.cs"
+  },
+  {
+    "id": "CS-JsonTextReader-excerpt",
+    "language": "c_sharp",
+    "filename": "JsonTextReader-excerpt.cs",
+    "group": "corpus",
+    "sha256": "d76fd62cfc90076c11d86cb7d7a0058df181231aa3b34f30e549f650b5294d4a",
+    "path": "testdata/newtonsoft/JsonTextReader-excerpt.cs"
+  },
+  {
+    "id": "CS-MathUtils",
+    "language": "c_sharp",
+    "filename": "MathUtils.cs",
+    "group": "corpus",
+    "sha256": "426587acd7f1f50c3d3dc94f13e9c27726c32c1bbe22d0291d86485afa368640",
+    "path": "testdata/newtonsoft/MathUtils.cs"
+  },
+  {
+    "id": "TS-generic",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "control",
+    "sha256": "2221ef0d568eda41a67efc37792c99b462a7a53d0d321e851f1bfa9e3d3f2e14",
+    "source": "const f = <T>(x: T): T => x;\n"
+  },
+  {
+    "id": "TSX-generic",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "control",
+    "sha256": "8f162663e427252bccd05b638dc0b85bbb8f0c730b140f9d061256cd6eaf2a8f",
+    "source": "const f = <T,>(x: T): T => x;\n"
+  }
+]

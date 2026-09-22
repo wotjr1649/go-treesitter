@@ -71,12 +71,20 @@ witness. Keep it aligned with upstream's shape so results stay comparable.
 
 ## Tier 5 — oracle digests (generated, checked in)
 
-Produced only in the oracle lane (`docs/specs/oracle.md`). One digest file per
+Produced only in a declared oracle lane (`docs/specs/oracle.md`). One digest file per
 (language, fixture, oracle epoch). The Windows product lane compares against these and never needs a
 C toolchain. A digest file records the oracle tuple that produced it; a digest whose tuple does not
 match the current epoch is `NOT_RUN`, not a failure.
 
-Not present yet — no oracle lane has been executed from this repository.
+Session 06 adds `testdata/oracle/cases.json`: 50 hashed inputs covering the seven
+smoke routes, both grammars' F1–F7, 24 JSX boundary controls, two generic-arrow
+controls, and the three licensed Tier-3 C# files. Inline sources are authored in
+this repository; C# sources retain their existing MIT origin and license.
+The JSON identifies each exact UTF-8 byte sequence without newline conversion.
+
+`testdata/oracle/windows-c/` holds one ordered C record per input plus its build
+manifest. These are oracle observations, not assertions that the Go runtime
+agrees. Every comparison must check identities and completeness before trees.
 
 ## What is deliberately absent
 

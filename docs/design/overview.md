@@ -18,7 +18,7 @@ Normative for module layout and layer boundaries. Decisions and their reasoning 
    gotreesitter v0.53.0  (pinned; see docs/specs/baseline-provenance.md)
             ▲
             │ compared against
-   oracle digests  ← produced in the Linux oracle lane (docs/specs/oracle.md)
+   oracle digests  ← produced in an identified C oracle lane (docs/specs/oracle.md)
 ```
 
 ## Planned layout
