@@ -1,0 +1,43 @@
+import hashlib,json,pathlib,subprocess
+root=pathlib.Path(__file__).resolve().parents[1]
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+pins=json.loads((root/'internal/provenance/identities.json').read_text(encoding='utf-8'))
+manifest=json.loads((root/'LICENSES/manifest.json').read_text(encoding='utf-8'))
+locations={'tree-sitter':'runtime','tree-sitter-go':'go','tree-sitter-python':'python','tree-sitter-javascript':'javascript','tree-sitter-typescript':'typescript','tree-sitter-c-sharp':'c_sharp'}
+for item in manifest:
+    p=root/item['path']; assert sha(p)==item['sha256']
+    assert 'Permission is hereby granted' in p.read_text(encoding='utf-8')
+    if item['component']=='gotreesitter':
+        source=root/'.scratch/modcache/github.com/odvcencio/gotreesitter@v0.53.0/LICENSE'
+        assert p.read_bytes()==source.read_bytes()
+        assert pins['baseline']['commit'] in item['source']
+    else:
+        name=locations[item['component']]
+        lock=json.loads((root/('.scratch/oracle/'+name+'.json')).read_text(encoding='utf-8'))
+        assert lock['commit'] in item['source']
+        assert sha(p)==lock['files']['LICENSE']
+        assert p.read_bytes()==(root/('.scratch/oracle/'+name+'/LICENSE')).read_bytes()
+license=root/'LICENSE'
+own=license.read_text(encoding='utf-8'); upstream=(root/'LICENSES/gotreesitter.txt').read_text(encoding='utf-8')
+assert own.startswith('MIT License\n\nCopyright (c) 2026 go-treesitter contributors\n')
+assert own[own.index('Permission is hereby granted'):].strip()==upstream[upstream.index('Permission is hereby granted'):].strip()
+corpus=json.loads((root/'testdata/newtonsoft/manifest.json').read_text(encoding='utf-8'))
+assert sha(root/'testdata/newtonsoft/LICENSE.md')==corpus['license_sha256']
+ignored=['docs/prompts/example.md','docs/specs/example.md','docs/plans/example.md','artifacts/handoff/example.md','.scratch/probe.txt','.env','.env.production','.local/example','sample.pprof','sample.prof','sample.dmp','sample.stackdump','sample.trace','artifacts/private/example','.envrc','.netrc']
+for path in ignored:
+    assert subprocess.run(['git','check-ignore','-q','--',path],cwd=root).returncode==0,path
+tracked=subprocess.check_output(['git','ls-files','-z'],cwd=root).decode().split('\0')
+private=('docs/prompts/','docs/specs/','docs/plans/','artifacts/handoff/','.scratch/','artifacts/private/','.local/')
+assert not any(p.startswith(private) for p in tracked)
+objects=subprocess.check_output(['git','rev-list','--objects','--all'],cwd=root).decode().splitlines()
+assert not any(line.partition(' ')[2].startswith(private[:4]) for line in objects)
+workflow=json.loads((root/'.github/workflows/windows.yml').read_text(encoding='utf-8'))
+assert workflow['permissions']=={'contents':'read'}
+job=workflow['jobs']['product']; assert job['env']['CGO_ENABLED']=='0'
+assert job['timeout-minutes']==15
+assert job['steps'][0]['with']['persist-credentials'] is False
+commands=[s['run'] for s in job['steps'] if 'run' in s]
+assert any('grammar_subset' in c for c in commands)
+assert any('unittest discover' in c for c in commands)
+assert all('-timeout 120s' in c for c in commands if c.startswith('go test'))
+print(json.dumps({'own_license':'MIT','own_license_sha256':sha(license),'copied_notices':len(manifest),'fixture_notice':'MIT/hash matches corpus','ignore_cases':len(ignored),'private_tracked_paths':0,'private_reachable_history_paths':0,'workflow':'JSON valid; read-only credentials; CGO 0; bounded tests; subset and oracle tests included','remote_workflow_execution':'NOT_RUN'},indent=2))

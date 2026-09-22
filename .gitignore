@@ -24,3 +24,14 @@ Thumbs.db
 Desktop.ini
 __pycache__/
 *.pyc
+
+# Profiles and dumps may retain source, paths, or process memory.
+*.pprof
+*.prof
+*.dmp
+*.stackdump
+*.trace
+artifacts/private/
+.local/
+.envrc
+.netrc

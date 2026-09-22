@@ -1,0 +1,33 @@
+package main
+
+import (
+	"debug/pe"
+	"encoding/json"
+	"os"
+	"sort"
+	"strings"
+)
+
+func main() {
+	for _, path := range os.Args[1:] {
+		file, err := pe.Open(path)
+		if err != nil { panic(err) }
+		symbols, err := file.ImportedSymbols()
+		if err != nil { panic(err) }
+		seen := make(map[string]bool)
+		for _, symbol := range symbols {
+			_, library, ok := strings.Cut(symbol, ":")
+			if !ok { panic("missing DLL in imported symbol") }
+			seen[library] = true
+		}
+		libraries := make([]string, 0, len(seen))
+		for library := range seen { libraries = append(libraries, library) }
+		sort.Strings(libraries)
+		if err := json.NewEncoder(os.Stdout).Encode(struct {
+			Path string
+			Machine uint16
+			Libraries []string
+		}{path, file.Machine, libraries}); err != nil { panic(err) }
+		if err := file.Close(); err != nil { panic(err) }
+	}
+}

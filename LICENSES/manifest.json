@@ -1,0 +1,51 @@
+[
+  {
+    "component": "gotreesitter",
+    "path": "LICENSES/gotreesitter.txt",
+    "license": "MIT",
+    "source": "https://github.com/odvcencio/gotreesitter/blob/c871b1f576866c40b1695677fe3512243e266d39/LICENSE",
+    "sha256": "b174fbe1e1cffafb096528de3e8361c90a0d97e7e3f1a32061aae51e983a7cfc"
+  },
+  {
+    "component": "tree-sitter",
+    "path": "LICENSES/tree-sitter.txt",
+    "license": "MIT",
+    "source": "https://github.com/tree-sitter/tree-sitter/blob/f5afe475deb7c0bae6407fb776c76824f717bb61/LICENSE",
+    "sha256": "5f9cf9fb6acb1972b35ae29119ce563bb60ec097656bc4b69b9bac2d04c7a147"
+  },
+  {
+    "component": "tree-sitter-go",
+    "path": "LICENSES/tree-sitter-go.txt",
+    "license": "MIT",
+    "source": "https://github.com/tree-sitter/tree-sitter-go/blob/2346a3ab1bb3857b48b29d779a1ef9799a248cd7/LICENSE",
+    "sha256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1"
+  },
+  {
+    "component": "tree-sitter-python",
+    "path": "LICENSES/tree-sitter-python.txt",
+    "license": "MIT",
+    "source": "https://github.com/tree-sitter/tree-sitter-python/blob/26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64/LICENSE",
+    "sha256": "d724405ce238a22c0d35769c5a36b386ad5958192efe8bbb304fb2896254575f"
+  },
+  {
+    "component": "tree-sitter-javascript",
+    "path": "LICENSES/tree-sitter-javascript.txt",
+    "license": "MIT",
+    "source": "https://github.com/tree-sitter/tree-sitter-javascript/blob/58404d8cf191d69f2674a8fd507bd5776f46cb11/LICENSE",
+    "sha256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1"
+  },
+  {
+    "component": "tree-sitter-typescript",
+    "path": "LICENSES/tree-sitter-typescript.txt",
+    "license": "MIT",
+    "source": "https://github.com/tree-sitter/tree-sitter-typescript/blob/75b3874edb2dc714fb1fd77a32013d0f8699989f/LICENSE",
+    "sha256": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559"
+  },
+  {
+    "component": "tree-sitter-c-sharp",
+    "path": "LICENSES/tree-sitter-c-sharp.txt",
+    "license": "MIT",
+    "source": "https://github.com/tree-sitter/tree-sitter-c-sharp/blob/88366631d598ce6595ec655ce1591b315cffb14c/LICENSE",
+    "sha256": "778fb7d63b8c1844da315648c02f325c4713a6f4a5d19644fd413421422776d3"
+  }
+]

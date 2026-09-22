@@ -88,7 +88,7 @@ loading from subsequent parse API calls. Default builds keep upstream's catalog.
 
 `docs/prompts/`, `docs/specs/`, `docs/plans/`, and `artifacts/handoff/` are local
 documents intentionally excluded from Git. Retained test evidence is under
-`artifacts/session-05/` and `artifacts/session-06/`. See `experiments/v052-v053/`
+`artifacts/session-05/`, `artifacts/session-06/` and `artifacts/session-07/`. See `experiments/v052-v053/`
 for the older runtime comparison.
 
 Product tests include 85 source-bound C oracle records without invoking a C
@@ -100,3 +100,7 @@ records the candidate patch recommendation and its limits. The product runtime
 still contains the registered JSX/TSX and C# blockers.
 The separate extended catalog adds 35 fresh comparisons and 21 edit comparisons
 over all seven routes, including UTF-8/CRLF and wide sibling boundaries.
+
+The library's own code is [MIT licensed](LICENSE). See
+[third-party notices](THIRD_PARTY_NOTICES.md) for the pinned runtime, assessed
+grammars, oracle tooling and copied validation fixtures.

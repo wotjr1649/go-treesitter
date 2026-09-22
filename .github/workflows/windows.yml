@@ -12,11 +12,13 @@
         {"uses": "actions/setup-go@v7", "with": {"go-version-file": "go.mod"}},
         {"name": "Build", "run": "go build ./..."},
         {"name": "Vet", "run": "go vet ./..."},
-        {"name": "Test including recorded C comparisons", "run": "go test ./... -count=1"},
+        {"name": "Test including recorded C comparisons", "run": "go test ./... -count=1 -timeout 120s"},
+        {"name": "Selected embedded grammars", "run": "go test -tags grammar_subset,grammar_subset_go,grammar_subset_python,grammar_subset_javascript,grammar_subset_typescript,grammar_subset_tsx,grammar_subset_c_sharp ./... -count=1 -timeout 120s"},
+        {"name": "Oracle identity and input boundary tests", "run": "python -m unittest discover -s tools/native-oracle -p test_*.py"},
         {
           "name": "Windows ARM64 build",
           "env": {"GOOS": "windows", "GOARCH": "arm64"},
-          "run": "go build ./..."
+          "run": "go build ./...\ngo build -o arm64-consumer.exe ./testdata/consumer"
         }
       ]
     }

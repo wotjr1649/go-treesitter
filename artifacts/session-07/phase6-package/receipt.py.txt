@@ -1,0 +1,29 @@
+import hashlib,json,pathlib,subprocess
+root=pathlib.Path(__file__).resolve().parents[1]
+out=root/'artifacts/session-07/phase6-package'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+graph=(out/'product-graph-01.log').read_text(encoding='utf-8').splitlines()
+assert len(graph)>50
+assert all(line.endswith('|') and not line.startswith('runtime/cgo|') for line in graph)
+pe=[json.loads(s) for s in (out/'pe-imports-01.log').read_text(encoding='utf-8').splitlines()]
+assert [p['Machine'] for p in pe]==[0x8664,0xAA64]
+assert all(p['Libraries']==['kernel32.dll'] for p in pe)
+names=['package-consumer-amd64.exe','package-consumer-arm64.exe','package-consumer-linux','package-consumer-darwin','package-consumer.wasm']
+files={n:{'sha256':sha(root/'.scratch'/n),'bytes':(root/'.scratch'/n).stat().st_size} for n in names}
+assert (root/'.scratch/package-consumer-linux').read_bytes()[:4]==b'\x7fELF'
+assert (root/'.scratch/package-consumer-darwin').read_bytes()[:4]==b'\xcf\xfa\xed\xfe'
+assert (root/'.scratch/package-consumer.wasm').read_bytes()[:4]==b'\0asm'
+pins={'go.mod':'60e068a66c71f3ce7c1b04dbe04e404e01e2d1eace07373dfe3fd0a8345f6889','go.sum':'87c97651162785c246dabcd3fdcd916cd7baabe2f8554bbdb31eea5ce9704cd6','internal/provenance/identities.json':'c190e01ce1fa283b3953d9ff613a5dbf9b57f8c5ace8820c72501b8ddeeed1a2'}
+assert all(sha(root/p)==h for p,h in pins.items())
+refs={}
+for name,commit in [('gotreesitter','095a1876ae58053140033278f0863134c2b609cc'),('tree-sitter','5b951eff4f8b1431e933ed0fe45e48fcd4036a38')]:
+    path=root.parent/'_ref'/name
+    actual=subprocess.check_output(['git','-C',str(path),'rev-parse','HEAD']).decode().strip()
+    assert actual.startswith(commit), name
+    status=subprocess.check_output(['git','-C',str(path),'status','--porcelain','-z'])
+    assert not status,name
+    refs[name]={'head':actual,'status':'clean/read-only'}
+assert not subprocess.check_output(['git','remote'],cwd=root).strip()
+value={'product_packages':len(graph),'CgoFiles':0,'runtime_cgo':False,'windows_pe_imports':pe,'ordinary_binaries':files,'pins':pins,'references':refs,'remote_count':0,'execution':{'windows/amd64':'consumer ran; CGO 0 regression/vet passed','windows/arm64':'link only; native NOT_RUN','linux/amd64':'link only; execution NOT_RUN','darwin/arm64':'link only; execution NOT_RUN','wasip1/wasm':'link only; execution NOT_RUN','remote_CI':'NOT_RUN'}}
+with (out/'receipt.json').open('x',encoding='utf-8',newline='\n') as f:json.dump(value,f,indent=2);f.write('\n')
+print('CGO graph and PE checks passed;',len(graph),'packages; 5 ordinary binaries; reference trees unchanged')

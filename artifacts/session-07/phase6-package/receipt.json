@@ -1,0 +1,67 @@
+{
+  "product_packages": 140,
+  "CgoFiles": 0,
+  "runtime_cgo": false,
+  "windows_pe_imports": [
+    {
+      "Path": ".scratch/package-consumer-amd64.exe",
+      "Machine": 34404,
+      "Libraries": [
+        "kernel32.dll"
+      ]
+    },
+    {
+      "Path": ".scratch/package-consumer-arm64.exe",
+      "Machine": 43620,
+      "Libraries": [
+        "kernel32.dll"
+      ]
+    }
+  ],
+  "ordinary_binaries": {
+    "package-consumer-amd64.exe": {
+      "sha256": "9ae514f2b5ceb3e270e4d0f07fb58327fc65132c56b0d46a2d42b45b17c6a023",
+      "bytes": 35217920
+    },
+    "package-consumer-arm64.exe": {
+      "sha256": "07ddac34d0b8816addbed9cd6b70262babce7f666c95e8ec4cd7c9139ab236f4",
+      "bytes": 33714688
+    },
+    "package-consumer-linux": {
+      "sha256": "6ecda8be4136ece95d1b1ca4e81dc7c5d6880ffb88950bcdf3eb76a1e1a620da",
+      "bytes": 35039329
+    },
+    "package-consumer-darwin": {
+      "sha256": "9e7f726b314061336155fa428c48b350e865d4dd627f68110fd6edce7079e104",
+      "bytes": 34387506
+    },
+    "package-consumer.wasm": {
+      "sha256": "2d315baaaef9c2c644f095f77864276ab9ac7f2b9386a3bec81bc2ab86605d73",
+      "bytes": 40243819
+    }
+  },
+  "pins": {
+    "go.mod": "60e068a66c71f3ce7c1b04dbe04e404e01e2d1eace07373dfe3fd0a8345f6889",
+    "go.sum": "87c97651162785c246dabcd3fdcd916cd7baabe2f8554bbdb31eea5ce9704cd6",
+    "internal/provenance/identities.json": "c190e01ce1fa283b3953d9ff613a5dbf9b57f8c5ace8820c72501b8ddeeed1a2"
+  },
+  "references": {
+    "gotreesitter": {
+      "head": "095a1876ae58053140033278f0863134c2b609cc",
+      "status": "clean/read-only"
+    },
+    "tree-sitter": {
+      "head": "5b951eff4f8b1431e933ed0fe45e48fcd4036a38",
+      "status": "clean/read-only"
+    }
+  },
+  "remote_count": 0,
+  "execution": {
+    "windows/amd64": "consumer ran; CGO 0 regression/vet passed",
+    "windows/arm64": "link only; native NOT_RUN",
+    "linux/amd64": "link only; execution NOT_RUN",
+    "darwin/arm64": "link only; execution NOT_RUN",
+    "wasip1/wasm": "link only; execution NOT_RUN",
+    "remote_CI": "NOT_RUN"
+  }
+}

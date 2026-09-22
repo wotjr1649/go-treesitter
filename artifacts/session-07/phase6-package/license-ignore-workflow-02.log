@@ -1,0 +1,11 @@
+{
+  "own_license": "MIT",
+  "own_license_sha256": "a30a5aceaad7891731ebbd0899c8be4c15d5f28f5adb87c96f3dcb0e9c677efb",
+  "copied_notices": 7,
+  "fixture_notice": "MIT/hash matches corpus",
+  "ignore_cases": 16,
+  "private_tracked_paths": 0,
+  "private_reachable_history_paths": 0,
+  "workflow": "JSON valid; read-only credentials; CGO 0; bounded tests; subset and oracle tests included",
+  "remote_workflow_execution": "NOT_RUN"
+}

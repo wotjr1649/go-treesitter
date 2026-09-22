@@ -1,0 +1,2 @@
+{"Path":".scratch/package-consumer-amd64.exe","Machine":34404,"Libraries":["kernel32.dll"]}
+{"Path":".scratch/package-consumer-arm64.exe","Machine":43620,"Libraries":["kernel32.dll"]}
