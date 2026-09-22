@@ -1,0 +1,10 @@
+test_generator_cannot_write_outside_repository (test_identity.ArtifactIdentityTest.test_generator_cannot_write_outside_repository) ... ok
+test_runtime_abi_boundaries_and_unpinned_producer (test_identity.ArtifactIdentityTest.test_runtime_abi_boundaries_and_unpinned_producer) ... ok
+test_archive_and_fixture_boundaries (test_run.OracleBoundaryTest.test_archive_and_fixture_boundaries) ... ok
+test_comparison_detects_tampering_and_semantic_change (test_run.OracleBoundaryTest.test_comparison_detects_tampering_and_semantic_change) ... ok
+test_comparison_rejects_mutually_consistent_invalid_identity (test_run.OracleBoundaryTest.test_comparison_rejects_mutually_consistent_invalid_identity) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.311s
+
+OK

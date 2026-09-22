@@ -1,0 +1,48 @@
+test_archive_and_fixture_boundaries (test_run.OracleBoundaryTest.test_archive_and_fixture_boundaries) ... ok
+test_comparison_detects_tampering_and_semantic_change (test_run.OracleBoundaryTest.test_comparison_detects_tampering_and_semantic_change) ... ok
+test_comparison_rejects_mutually_consistent_invalid_identity (test_run.OracleBoundaryTest.test_comparison_rejects_mutually_consistent_invalid_identity) ... 
+  test_comparison_rejects_mutually_consistent_invalid_identity (test_run.OracleBoundaryTest.test_comparison_rejects_mutually_consistent_invalid_identity) (mutation='epoch') ... FAIL
+  test_comparison_rejects_mutually_consistent_invalid_identity (test_run.OracleBoundaryTest.test_comparison_rejects_mutually_consistent_invalid_identity) (mutation='abi') ... FAIL
+  test_comparison_rejects_mutually_consistent_invalid_identity (test_run.OracleBoundaryTest.test_comparison_rejects_mutually_consistent_invalid_identity) (mutation='abi_range') ... FAIL
+  test_comparison_rejects_mutually_consistent_invalid_identity (test_run.OracleBoundaryTest.test_comparison_rejects_mutually_consistent_invalid_identity) (mutation='bytes') ... FAIL
+
+======================================================================
+FAIL: test_comparison_rejects_mutually_consistent_invalid_identity (test_run.OracleBoundaryTest.test_comparison_rejects_mutually_consistent_invalid_identity) (mutation='epoch')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\AIDEV\go-treesitter\tools\native-oracle\test_run.py", line 40, in test_comparison_rejects_mutually_consistent_invalid_identity
+    with redirect_stdout(io.StringIO()), self.assertRaisesRegex(ValueError, reason):
+                                         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_comparison_rejects_mutually_consistent_invalid_identity (test_run.OracleBoundaryTest.test_comparison_rejects_mutually_consistent_invalid_identity) (mutation='abi')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\AIDEV\go-treesitter\tools\native-oracle\test_run.py", line 40, in test_comparison_rejects_mutually_consistent_invalid_identity
+    with redirect_stdout(io.StringIO()), self.assertRaisesRegex(ValueError, reason):
+                                         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_comparison_rejects_mutually_consistent_invalid_identity (test_run.OracleBoundaryTest.test_comparison_rejects_mutually_consistent_invalid_identity) (mutation='abi_range')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\AIDEV\go-treesitter\tools\native-oracle\test_run.py", line 40, in test_comparison_rejects_mutually_consistent_invalid_identity
+    with redirect_stdout(io.StringIO()), self.assertRaisesRegex(ValueError, reason):
+                                         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_comparison_rejects_mutually_consistent_invalid_identity (test_run.OracleBoundaryTest.test_comparison_rejects_mutually_consistent_invalid_identity) (mutation='bytes')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\AIDEV\go-treesitter\tools\native-oracle\test_run.py", line 40, in test_comparison_rejects_mutually_consistent_invalid_identity
+    with redirect_stdout(io.StringIO()), self.assertRaisesRegex(ValueError, reason):
+                                         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.221s
+
+FAILED (failures=4)

@@ -10,6 +10,43 @@ import run
 
 
 class OracleBoundaryTest(unittest.TestCase):
+    def test_comparison_rejects_mutually_consistent_invalid_identity(self):
+        # Re-hash the entire set after each mutation: checksums alone must not
+        # make two stale or misbound receipts acceptable evidence.
+        for mutation, reason in [('epoch', 'build epoch'), ('abi', 'C ABI'),
+                                 ('abi_range', 'C ABI'), ('abi_bounds', 'C ABI'),
+                                 ('header', 'C ABI'), ('bytes', 'input byte')]:
+            with self.subTest(mutation=mutation), tempfile.TemporaryDirectory(dir=run.ROOT / '.scratch') as work:
+                directory = Path(work) / 'records'
+                directory.mkdir()
+                cases = [c for c in run.read_json(run.ROOT / 'testdata/oracle/cases.json') if c['id'] == 'SM-GO']
+                cases_path = Path(work) / 'cases.json'
+                run.write_new(cases_path, cases)
+                build = run.read_json(run.ROOT / 'testdata/oracle/windows-c/build.json')
+                receipt = run.read_json(run.ROOT / 'testdata/oracle/windows-c/SM-GO.json')
+                if mutation == 'epoch':
+                    build['pins']['oracle']['runtime_commit'] = '0' * 40
+                elif mutation == 'abi':
+                    receipt['abi'] -= 1
+                elif mutation == 'abi_range':
+                    build['grammars']['go']['abi'] = receipt['abi'] = 1000
+                elif mutation == 'abi_bounds':
+                    for field in ('abi', 'runtime_abi_min', 'runtime_abi_max'):
+                        build['grammars']['go'][field] = 999
+                    receipt['abi'] = 999
+                elif mutation == 'header':
+                    build['grammars']['go']['runtime_header_sha256'] = '0' * 64
+                else:
+                    receipt['input_bytes'] += 1
+                    receipt['end'] += 1
+                run.write_new(directory / 'build.json', build)
+                receipt['build_sha256'] = run.sha((directory / 'build.json').read_bytes())
+                run.write_new(directory / 'SM-GO.json', receipt)
+                run.write_new(directory / 'set.json', {'schema': 1, 'cases_sha256': run.sha(cases_path.read_bytes()),
+                              'files': {p.name: run.sha(p.read_bytes()) for p in directory.iterdir()}})
+                with redirect_stdout(io.StringIO()), self.assertRaisesRegex(ValueError, reason):
+                    run.compare(directory, directory, cases_path)
+
     def test_comparison_detects_tampering_and_semantic_change(self):
         with tempfile.TemporaryDirectory(dir=run.ROOT / '.scratch') as work:
             directories = [Path(work) / side for side in ('left', 'right')]

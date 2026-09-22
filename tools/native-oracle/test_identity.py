@@ -6,9 +6,11 @@ from identity import generate, identity
 
 class ArtifactIdentityTest(unittest.TestCase):
     def test_generator_cannot_write_outside_repository(self):
-        with tempfile.TemporaryDirectory() as work:
-            with self.assertRaisesRegex(ValueError, 'inside this repository'):
-                generate(Path(work) / 'api.h', Path(work) / 'src/parser.c')
+        # TEMP may itself be repository-local in a contained test runner.
+        # No file or directory is created at this deliberately external path.
+        outside = Path(__file__).resolve().parents[3] / 'oracle-boundary-test'
+        with self.assertRaisesRegex(ValueError, 'inside this repository'):
+            generate(outside / 'api.h', outside / 'src/parser.c')
 
     def test_runtime_abi_boundaries_and_unpinned_producer(self):
         with tempfile.TemporaryDirectory() as work:

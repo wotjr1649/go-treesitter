@@ -239,6 +239,10 @@ def record(build_dir, cases_path, output):
 
 def compare(left, right, cases_path=ROOT / 'testdata/oracle/cases.json'):
     """Compare complete records without transferring one build's identity."""
+    pins = read_json(PINS)
+    runtime_abi = read_json(ROOT / 'testdata/oracle/runtime-abi.json')
+    if runtime_abi['schema'] != 1 or runtime_abi['runtime_commit'] != pins['oracle']['runtime_commit']:
+        raise ValueError('runtime ABI anchor epoch mismatch')
     def load(directory):
         directory = bounded(directory)
         index = read_json(directory / 'set.json')
@@ -246,6 +250,9 @@ def compare(left, right, cases_path=ROOT / 'testdata/oracle/cases.json'):
             raise ValueError('record inventory changed')
         records = {}
         build_hash = index['files']['build.json']
+        build = read_json(directory / 'build.json')
+        if build['schema'] != 1 or build['pins'] != pins:
+            raise ValueError('comparison build epoch mismatch')
         for name, digest in index['files'].items():
             path = bounded(directory / name, directory)
             if sha(path.read_bytes()) != digest:
@@ -259,11 +266,19 @@ def compare(left, right, cases_path=ROOT / 'testdata/oracle/cases.json'):
                 raise ValueError('invalid or incomplete C receipt')
             if r['fixture'] in records or name != r['fixture'] + '.json':
                 raise ValueError('duplicate/invalid C fixture')
+            artifact = build['grammars'].get(r['language'])
+            if (artifact is None or r['abi'] != artifact['abi'] or
+                    any(artifact[key] != runtime_abi[key] for key in
+                        ('runtime_abi_min', 'runtime_abi_max', 'runtime_header_sha256')) or
+                    not artifact['runtime_abi_min'] <= r['abi'] <= artifact['runtime_abi_max']):
+                raise ValueError('comparison C ABI mismatch')
             records[r['fixture']] = r
-        return index, read_json(directory / 'build.json'), records
+        return index, build, records
     li, lb, lr = load(left)
     ri, rb, rr = load(right)
-    cases = {c['id']: c for c, _ in fixtures(cases_path)}
+    inputs = list(fixtures(cases_path))
+    cases = {c['id']: c for c, _ in inputs}
+    sizes = {c['id']: len(data) for c, data in inputs}
     if (not cases or li['cases_sha256'] != ri['cases_sha256'] or
             li['cases_sha256'] != sha(cases_path.read_bytes()) or lb['pins'] != rb['pins'] or
             lr.keys() != rr.keys() or lr.keys() != cases.keys()):
@@ -275,6 +290,8 @@ def compare(left, right, cases_path=ROOT / 'testdata/oracle/cases.json'):
             raise ValueError('comparison catalog identity mismatch')
         if any(a[key] != b[key] for key in ('language', 'source_sha256', 'input_bytes')):
             raise ValueError('comparison input identity mismatch')
+        if a['input_bytes'] != sizes[name]:
+            raise ValueError('comparison input byte count mismatch')
         first = next((i for i, (x, y) in enumerate(zip(a['nodes'], b['nodes'])) if x != y), -1)
         if first < 0 and len(a['nodes']) != len(b['nodes']):
             first = min(len(a['nodes']), len(b['nodes']))

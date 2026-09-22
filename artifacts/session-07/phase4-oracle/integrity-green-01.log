@@ -1,0 +1,23 @@
+test_generator_cannot_write_outside_repository (test_identity.ArtifactIdentityTest.test_generator_cannot_write_outside_repository) ... FAIL
+test_runtime_abi_boundaries_and_unpinned_producer (test_identity.ArtifactIdentityTest.test_runtime_abi_boundaries_and_unpinned_producer) ... ok
+test_archive_and_fixture_boundaries (test_run.OracleBoundaryTest.test_archive_and_fixture_boundaries) ... ok
+test_comparison_detects_tampering_and_semantic_change (test_run.OracleBoundaryTest.test_comparison_detects_tampering_and_semantic_change) ... ok
+test_comparison_rejects_mutually_consistent_invalid_identity (test_run.OracleBoundaryTest.test_comparison_rejects_mutually_consistent_invalid_identity) ... ok
+
+======================================================================
+FAIL: test_generator_cannot_write_outside_repository (test_identity.ArtifactIdentityTest.test_generator_cannot_write_outside_repository)
+----------------------------------------------------------------------
+ValueError: tree-sitter generator unavailable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\AIDEV\go-treesitter\tools\native-oracle\test_identity.py", line 10, in test_generator_cannot_write_outside_repository
+    with self.assertRaisesRegex(ValueError, 'inside this repository'):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "inside this repository" does not match "tree-sitter generator unavailable"
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.172s
+
+FAILED (failures=1)

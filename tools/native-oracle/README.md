@@ -36,6 +36,12 @@ python tools/native-oracle/run.py compare --left testdata/oracle/windows-c --rig
 The command checks both inventories and identities, reports the first ordered
 difference, and fails on a changed tree or error state. Different producers and
 ABIs keep their separate build identities even when all snapshots are equal.
+Both builds must match the current pinned epoch. The independent
+`testdata/oracle/runtime-abi.json` receipt binds the supported ABI range and
+header hash to the pinned runtime commit, so mutually altered build metadata
+cannot redefine that range. Fixture byte lengths are checked against actual
+catalog inputs. This anchor changes only with an explicitly authorized runtime
+epoch migration; it places no version restriction on the selected generator.
 
 Add a fixture by registering its exact UTF-8 source or licensed testdata path,
 hash, grammar, and filename in `cases.json`, then produce and review new records.
