@@ -1,0 +1,5 @@
+=== RUN   TestResolvedDependency
+    provenance_test.go:24: github.com/odvcencio/gotreesitter v0.53.0
+--- PASS: TestResolvedDependency (1.05s)
+PASS
+ok  	github.com/wotjr1649/go-treesitter/internal/provenance	1.407s

@@ -1,0 +1,7 @@
+=== RUN   TestResolvedDependency
+    provenance_test.go:22: resolved dependency: exit status 1
+        identity mismatch: resolved v0.52.0, expected v0.53.0, replacement=false
+--- FAIL: TestResolvedDependency (6.91s)
+FAIL
+FAIL	github.com/wotjr1649/go-treesitter/internal/provenance	7.182s
+FAIL
