@@ -138,12 +138,6 @@ func registerBuiltinLanguages() {
 		HighlightQuery: "(identifier) @variable\n\n;; Methods\n\n(method_declaration name: (identifier) @function)\n(local_function_statement name: (identifier) @function)\n\n;; Types\n\n(interface_declaration name: (identifier) @type)\n(class_declaration name: (identifier) @type)\n(enum_declaration name: (identifier) @type)\n(struct_declaration (identifier) @type)\n(record_declaration (identifier) @type)\n(namespace_declaration name: (identifier) @module)\n\n(generic_name (identifier) @type)\n(type_parameter (identifier) @property.definition)\n(parameter type: (identifier) @type)\n(type_argument_list (identifier) @type)\n(as_expression right: (identifier) @type)\n(is_expression right: (identifier) @type)\n\n(constructor_declaration name: (identifier) @constructor)\n(destructor_declaration name: (identifier) @constructor)\n\n(_ type: (identifier) @type)\n\n(base_list (identifier) @type)\n\n(predefined_type) @type.builtin\n\n;; Enum\n(enum_member_declaration (identifier) @property.definition)\n\n;; Literals\n\n[\n  (real_literal)\n  (integer_literal)\n] @number\n\n[\n  (character_literal)\n  (string_literal)\n  (raw_string_literal)\n  (verbatim_string_literal)\n  (interpolated_string_expression)\n  (interpolation_start)\n  (interpolation_quote)\n ] @string\n\n(escape_sequence) @string.escape\n\n[\n  (boolean_literal)\n  (null_literal)\n] @constant.builtin\n\n;; Comments\n\n(comment) @comment\n\n;; Tokens\n\n[\n  \";\"\n  \".\"\n  \",\"\n] @punctuation.delimiter\n\n[\n  \"--\"\n  \"-\"\n  \"-=\"\n  \"&\"\n  \"&=\"\n  \"&&\"\n  \"+\"\n  \"++\"\n  \"+=\"\n  \"<\"\n  \"<=\"\n  \"<<\"\n  \"<<=\"\n  \"=\"\n  \"==\"\n  \"!\"\n  \"!=\"\n  \"=>\"\n  \">\"\n  \">=\"\n  \">>\"\n  \">>=\"\n  \">>>\"\n  \">>>=\"\n  \"|\"\n  \"|=\"\n  \"||\"\n  \"?\"\n  \"??\"\n  \"??=\"\n  \"^\"\n  \"^=\"\n  \"~\"\n  \"*\"\n  \"*=\"\n  \"/\"\n  \"/=\"\n  \"%\"\n  \"%=\"\n  \":\"\n] @operator\n\n[\n  \"(\"\n  \")\"\n  \"[\"\n  \"]\"\n  \"{\"\n  \"}\"\n  (interpolation_brace)\n]  @punctuation.bracket\n\n;; Keywords\n\n[\n  (modifier)\n  \"this\"\n  (implicit_type)\n] @keyword\n\n[\n  \"add\"\n  \"alias\"\n  \"as\"\n  \"base\"\n  \"break\"\n  \"case\"\n  \"catch\"\n  \"checked\"\n  \"class\"\n  \"continue\"\n  \"default\"\n  \"delegate\"\n  \"do\"\n  \"else\"\n  \"enum\"\n  \"event\"\n  \"explicit\"\n  \"extern\"\n  \"finally\"\n  \"for\"\n  \"foreach\"\n  \"global\"\n  \"goto\"\n  \"if\"\n  \"implicit\"\n  \"interface\"\n  \"is\"\n  \"lock\"\n  \"namespace\"\n  \"notnull\"\n  \"operator\"\n  \"params\"\n  \"return\"\n  \"remove\"\n  \"sizeof\"\n  \"stackalloc\"\n  \"static\"\n  \"struct\"\n  \"switch\"\n  \"throw\"\n  \"try\"\n  \"typeof\"\n  \"unchecked\"\n  \"using\"\n  \"while\"\n  \"new\"\n  \"await\"\n  \"in\"\n  \"yield\"\n  \"get\"\n  \"set\"\n  \"when\"\n  \"out\"\n  \"ref\"\n  \"from\"\n  \"where\"\n  \"select\"\n  \"record\"\n  \"init\"\n  \"with\"\n  \"let\"\n] @keyword\n\n;; Attribute\n\n(attribute name: (identifier) @attribute)\n\n;; Parameters\n\n(parameter\n  name: (identifier) @variable.parameter)\n\n;; Type constraints\n\n(type_parameter_constraints_clause (identifier) @property.definition)\n\n;; Method calls\n\n(invocation_expression (member_access_expression name: (identifier) @function))\n",
 	})
 	Register(LangEntry{
-		Name:           "caddy",
-		Language:       CaddyLanguage,
-		GrammarSource:  GrammarSourceTS2GoBlob,
-		HighlightQuery: "(comment) @comment @spell\n\n[ \n  (env)\n  (argv)\n  (block_variable)\n  (placeholder)\n] @constant\n\n(value) @variable\n(directive (keyword) @attribute)\n(global_options (option (keyword) @attribute))\n\n(keyword) @keyword\n\n(boolean) @boolean\n\n(placeholder\n  [\n    \"{\"\n    \"}\"\n  ] @punctuation.special)\n\n\n[\n  (auto)\n] @variable.builtin\n\n[\n  (string_literal)\n  (quoted_string_literal)\n  (address)\n] @string\n\n[ \n  (matcher) \n  (route)\n  (snippet_name)\n] @string.special\n\n[\n  (numeric_literal)\n  (time)\n  (size)\n  (ip_literal)\n] @number\n\n[\n  \"{\"\n  \"}\"\n] @punctuation.bracket\n\n",
-	})
-	Register(LangEntry{
 		Name:           "cairo",
 		Extensions:     []string{".cairo"},
 		Language:       CairoLanguage,
@@ -316,13 +310,6 @@ func registerBuiltinLanguages() {
 		Language:       DiffLanguage,
 		GrammarSource:  GrammarSourceTS2GoBlob,
 		HighlightQuery: "(comment) @comment @spell\n\n[\n  (addition)\n  (new_file)\n] @diff.plus\n\n[\n  (deletion)\n  (old_file)\n] @diff.minus\n\n(commit) @constant\n\n(location) @attribute\n\n(command\n  \"diff\" @function\n  (argument) @variable.parameter)\n\n(filename) @string.special.path\n\n(mode) @number\n\n([\n  \"..\"\n  \"+\"\n  \"++\"\n  \"+++\"\n  \"++++\"\n  \"-\"\n  \"--\"\n  \"---\"\n  \"----\"\n] @punctuation.special\n  (#set! priority 95))\n\n[\n  (binary_change)\n  (similarity)\n  (file_change)\n] @label\n\n(index\n  \"index\" @keyword)\n\n(similarity\n  (score) @number\n  \"%\" @number)\n",
-	})
-	Register(LangEntry{
-		Name:           "disassembly",
-		Extensions:     []string{".dis", ".dump"},
-		Language:       DisassemblyLanguage,
-		GrammarSource:  GrammarSourceTS2GoBlob,
-		HighlightQuery: "(byte) @constant\n\n[\n  (address)\n  (hexadecimal)\n  (integer)\n] @number\n\n(identifier) @variable\n\n(bad_instruction) @text.warning\n(code_location (identifier) @function.call)\n(comment) @comment\n(instruction) @function\n(memory_dump) @string\n\n[\"<\" \">\"] @punctuation.special\n[\"+\" \":\"] @punctuation.delimiter\n",
 	})
 	Register(LangEntry{
 		Name:           "djot",
@@ -715,13 +702,6 @@ func registerBuiltinLanguages() {
 		Language:       Jinja2Language,
 		GrammarSource:  GrammarSourceTS2GoBlob,
 		HighlightQuery: "(jinja_expression) @keyword\n",
-	})
-	Register(LangEntry{
-		Name:           "jq",
-		Extensions:     []string{".jq"},
-		Language:       JqLanguage,
-		GrammarSource:  GrammarSourceTS2GoBlob,
-		HighlightQuery: "[\n \"and\"\n \"as\"\n \"break\"\n \"catch\"\n \"def\"\n \"elif\"\n \"else\"\n \"end\"\n \"foreach\"\n \"if\"\n \"import\"\n \"include\"\n \"label\"\n \"module\"\n \"or\"\n \"reduce\"\n \"then\"\n \"try\"\n ] @keyword\n",
 	})
 	Register(LangEntry{
 		Name:           "jsdoc",

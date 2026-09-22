@@ -1,0 +1,121 @@
+{
+  "sha256": "f6a4fcf75392420c766c2ea24a681d86a6547dadbb37e33a56d0d95db98483be",
+  "entries": {
+    "additional-grammar-acquisition.log": {
+      "sha256": "509955b705ba696450841b899bc2b227cfc97f089595acb41c4eb0ee973fd617",
+      "bytes": 372
+    },
+    "catalog-final-paths.log": {
+      "sha256": "5a3202577cffbba7ae10ef3bc1da65540167bb5defd8f84e266ceaa764ccdd64",
+      "bytes": 2418
+    },
+    "catalog-notice-acquisition.log": {
+      "sha256": "3ace3ccf7e49ad79f2b01d2dc919e22ac993cb8f8769b1d099e75a36945c0ceb",
+      "bytes": 3234
+    },
+    "catalog-notice-followup.log": {
+      "sha256": "89ad256c3de8538e6112d0ddb8f660c26b93098327ab6c46a47b6173b30c90fc",
+      "bytes": 5422
+    },
+    "catalog-notice-metadata.log": {
+      "sha256": "ffe49d2febabe0d22f20c1ea55a667a1aeda6714e3a41b21a0adaf1900455f68",
+      "bytes": 4616
+    },
+    "gpl-blob-metadata.log": {
+      "sha256": "97e186fc8d248dd2a2aaf020206dfff852cc7ee132ea193892c7714d89150aef",
+      "bytes": 1432
+    },
+    "gpl-blob-table-equivalence.log": {
+      "sha256": "f32561c4cd18d75d21930699143fdfd87c7f48874625214dadb5008dc08b34b6",
+      "bytes": 1034
+    },
+    "gpl-converter-build-v2.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "gpl-converter-build.log": {
+      "sha256": "a2b6b6f4289c1a934a3673b6680f8001d801661635b821d55db6861e79ac8852",
+      "bytes": 99
+    },
+    "gpl-default-focused.log": {
+      "sha256": "8372f913128ac3e197b7027330014f28cbe29d77ddd083785e70fbad926feae6",
+      "bytes": 7243
+    },
+    "gpl-optional-focused-native.log": {
+      "sha256": "c3d68939cb08097667cdc70b19dc4dbd783df86f7559f24561963a27cd8ea384",
+      "bytes": 14397
+    },
+    "gpl-optional-focused.log": {
+      "sha256": "dc3531e48454bb6b8709039b94ed6be60ef2d6b93c76734cc42934b64a976f81",
+      "bytes": 762
+    },
+    "gpl-optional-provider.log": {
+      "sha256": "2f0c2811c9d931a2b7f59d6cc07f79a5f2dd06cd5ab4a23fd0a2fc1617db83f8",
+      "bytes": 1921
+    },
+    "gpl-provider-generate.log": {
+      "sha256": "82ec00077cbe4d98ec13a96050e9ce90a7ce53aa152dccaefb960f71bc9d2c9d",
+      "bytes": 32
+    },
+    "gpl-rebuild-caddy.log": {
+      "sha256": "146df8be7863b8eb5955459e20ff471c00f1e5c4cff5b4f19bdf3fa907983fb8",
+      "bytes": 258
+    },
+    "gpl-rebuild-disassembly.log": {
+      "sha256": "8db30a929397604cfd7c2c1ba9e52a60006f0215677b57fd15fb0b9a2f1a4186",
+      "bytes": 287
+    },
+    "gpl-rebuild-jq.log": {
+      "sha256": "2239650ad020bd290840e2fbe22cb151877e63263fbbaf5fe50b078bf1eca28f",
+      "bytes": 244
+    },
+    "gpl-separation-adopt.log": {
+      "sha256": "cb7d38a5d3c4bc28092a5cc6bd5cbffe4b5768e167e189888b3249eee79d985b",
+      "bytes": 50
+    },
+    "gpl-separation-generate.log": {
+      "sha256": "81a556227836f3d8b85b1c9119486a11cc2f13371f692fd7c1695e6057507fe9",
+      "bytes": 32
+    },
+    "license-catalog-206.log": {
+      "sha256": "c023e22150d9929ce99751d0621bd89fe32672f362e83d7044fccf0a2ee28ae6",
+      "bytes": 45
+    },
+    "license-catalog-base-build.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "license-catalog-gpl-build.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "license-consumer-tests.log": {
+      "sha256": "5db4686182f937b4e2c6b312ccde5f06511caa53b181ebd22d28f72ec438cdb5",
+      "bytes": 7763
+    },
+    "license-full-tests.log": {
+      "sha256": "9ae19115e58cee80d2f6c4a6a2916cf603bc9885411ffe252eb8deb6fa03bedd",
+      "bytes": 756071
+    },
+    "license-gpl-tests.log": {
+      "sha256": "6eede3065e1b9c72a7247682e39de62883ea269133ce7695f949fae1321a0397",
+      "bytes": 2660
+    },
+    "license-import-reproduce.log": {
+      "sha256": "82ec00077cbe4d98ec13a96050e9ce90a7ce53aa152dccaefb960f71bc9d2c9d",
+      "bytes": 32
+    },
+    "license-vet.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "probes/gpl_blob_equivalence_test.go": {
+      "sha256": "965b0a823ce634cb373d5733cf47a7b78bcbd8b0f993fba0a7207ccd18b2218c",
+      "bytes": 950
+    },
+    "probes/gpl_blob_metadata_test.go": {
+      "sha256": "a2a5256c1575fec745ba6b5e9ee9c1be2c05cfd2f3a29c15c3923cb04bdc6c48",
+      "bytes": 1026
+    }
+  }
+}

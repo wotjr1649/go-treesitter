@@ -1,0 +1,20 @@
+[
+  {
+    "grammar": "caddy",
+    "generated_sha256": "83014d934d1c55b5fc6bedb35bfc2053aa4adf80a9f2dd87613fc6f2d2df50a3",
+    "origin_blob_sha256": "e1af0dcba90bca6949ac1a2756e1a6db2271061b40570b9a7fa2ada29478f6fa",
+    "equal": false
+  },
+  {
+    "grammar": "disassembly",
+    "generated_sha256": "686925be6a64fffeac4cb9511766730cf886e90bb86aaa08c5f76a2b7ce3278a",
+    "origin_blob_sha256": "4fecdd8a984595d391b005cc17016ad2621d6548c86746c647b41ac6da7312de",
+    "equal": false
+  },
+  {
+    "grammar": "jq",
+    "generated_sha256": "3614b49205208c21b0dc8f19f739ba64a10d00a08e4ec810696cc5501a8a331a",
+    "origin_blob_sha256": "da99dda1ffe813f439168944c6b8eae3658a06533b8e10e36115131313a755c3",
+    "equal": false
+  }
+]

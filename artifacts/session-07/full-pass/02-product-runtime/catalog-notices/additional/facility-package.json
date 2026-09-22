@@ -1,0 +1,22 @@
+{
+  "name": "tree-sitter-facility",
+  "version": "0.1.0",
+  "description": "tree-sitter grammer for Facility Service Definitions",
+  "main": "bindings/node",
+  "scripts": {
+    "build": "tree-sitter generate && node-gyp build",
+    "test": "tree-sitter test"
+  },
+  "keywords": [
+    "tree-sitter",
+    "facility"
+  ],
+  "author": "Bryan Kenote",
+  "license": "MIT",
+  "dependencies": {
+    "nan": "^2.18.0"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "^0.20.8"
+  }
+}

@@ -1,0 +1,70 @@
+[
+  {
+    "path": "caddy.zip",
+    "source": "https://codeload.github.com/opa-oz/tree-sitter-caddy/zip/9b3fde99d3d74345b85b655a6d8065e004fbe26f",
+    "bytes": 106314,
+    "sha256": "c57e2b279d4e217da1f3f8761be2298ff0effb83b6547e106b6aaa1dd16c1909",
+    "members": 86,
+    "expanded_bytes": 435058
+  },
+  {
+    "path": "disassembly.zip",
+    "source": "https://codeload.github.com/ColinKennedy/tree-sitter-disassembly/zip/0229c0211dba909c5d45129ac784a3f4d49c243a",
+    "bytes": 47529,
+    "sha256": "24a7765b9fb01f2a0ec87847785f1756416859bd89cee705f589b8fef34eb08f",
+    "members": 41,
+    "expanded_bytes": 173652
+  },
+  {
+    "path": "jq.zip",
+    "source": "https://codeload.github.com/nverno/tree-sitter-jq/zip/1e139eba1fd3a9c34a36f0f0f47ed8b73c9b4636",
+    "bytes": 102941,
+    "sha256": "b8a3d6514369aed501d5715c8d507affa33c64b43dfb51e3a5b314fee855bcbd",
+    "members": 100,
+    "expanded_bytes": 567995
+  },
+  {
+    "path": "nim.zip",
+    "source": "https://codeload.github.com/alaviss/tree-sitter-nim/zip/9b4ede21a6ca866d29263f6b66c070961bc622b4",
+    "bytes": 3430635,
+    "sha256": "d08a5f4f036446269f7668a9d5c49b76d55392efff6accddfe70998103924db9",
+    "members": 118,
+    "expanded_bytes": 70109522
+  },
+  {
+    "path": "MIT.txt",
+    "source": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+    "bytes": 1078,
+    "sha256": "b05785f9f18e6716bab63424b11454513b9943a222595b70411009202fc592b5"
+  },
+  {
+    "path": "ISC.txt",
+    "source": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/ISC.txt",
+    "bytes": 737,
+    "sha256": "521c6f0ed8e64736684f89843d16a4df6b4b7449acbcfc6ca6630a3037ca8c53"
+  },
+  {
+    "path": "Apache-2.0.txt",
+    "source": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/Apache-2.0.txt",
+    "bytes": 10280,
+    "sha256": "074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff"
+  },
+  {
+    "path": "LLVM-exception.txt",
+    "source": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/LLVM-exception.txt",
+    "bytes": 919,
+    "sha256": "e34c58338bd89d43e709e226610d8f32b3e3c47f4ad9a99a8dc1d4ac7842488e"
+  },
+  {
+    "path": "GPL-3.0-only.txt",
+    "source": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/GPL-3.0-only.txt",
+    "bytes": 34674,
+    "sha256": "fb981668c18a279e285fc4d83fba1e836cc84dd4daa73c9697d3cfd2d8aca6e0"
+  },
+  {
+    "path": "eds-Cargo.toml",
+    "source": "https://raw.githubusercontent.com/uyha/tree-sitter-eds/26d529e6cfecde391a03c21d1474eb51e0285805/Cargo.toml",
+    "bytes": 520,
+    "sha256": "1084a437aa76180542b2a0893a827b2148499fbdeecbc5157e86aeaeb5c76143"
+  }
+]

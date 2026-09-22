@@ -24,13 +24,14 @@ func VerifyRuntime(root string) error {
 		return fmt.Errorf("runtime manifest identity mismatch")
 	}
 	var manifest struct {
-		Schema         int
-		Baseline       Baseline
-		InternalModule string `json:"internal_module"`
-		SourceSHA256   string `json:"source_sha256"`
-		ImporterSHA256 string `json:"importer_sha256"`
-		Patches        []struct{ Path, SHA256 string }
-		Files          map[string]struct{ SHA256 string }
+		Schema          int
+		Baseline        Baseline
+		InternalModule  string `json:"internal_module"`
+		SourceSHA256    string `json:"source_sha256"`
+		ImporterSHA256  string `json:"importer_sha256"`
+		SeparatorSHA256 string `json:"separator_sha256"`
+		Patches         []struct{ Path, SHA256 string }
+		Files           map[string]struct{ SHA256 string }
 	}
 	if err := json.Unmarshal(data, &manifest); err != nil {
 		return err
@@ -53,7 +54,8 @@ func VerifyRuntime(root string) error {
 		return nil
 	}
 	for _, file := range append(manifest.Patches, struct{ Path, SHA256 string }{"tools/runtime-bundle/source.json", manifest.SourceSHA256},
-		struct{ Path, SHA256 string }{"tools/runtime-bundle/import.py", manifest.ImporterSHA256}) {
+		struct{ Path, SHA256 string }{"tools/runtime-bundle/import.py", manifest.ImporterSHA256},
+		struct{ Path, SHA256 string }{"tools/runtime-bundle/separate.py", manifest.SeparatorSHA256}) {
 		if err := check(file.Path, file.SHA256); err != nil {
 			return err
 		}

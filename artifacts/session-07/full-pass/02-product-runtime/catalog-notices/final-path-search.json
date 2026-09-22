@@ -1,0 +1,29 @@
+[
+  {
+    "grammar": "ebnf",
+    "source": "https://api.github.com/repos/RubixDev/ebnf/git/trees/8e635b0b723c620774dfb8abf382a7f531894b40?recursive=1",
+    "tree_sha": "8e635b0b723c620774dfb8abf382a7f531894b40",
+    "paths": [
+      "Cargo.toml",
+      "README.md",
+      "crates/dprint-plugin-ebnf/Cargo.toml",
+      "crates/dprint-plugin-ebnf/LICENSE",
+      "crates/dprint-plugin-ebnf/README.md",
+      "crates/ebnf-fmt/Cargo.toml",
+      "crates/ebnf-fmt/LICENSE",
+      "crates/ebnf-parser/Cargo.toml",
+      "crates/ebnf-parser/LICENSE",
+      "crates/tree-sitter-ebnf/Cargo.toml",
+      "crates/tree-sitter-ebnf/LICENSE",
+      "crates/tree-sitter-ebnf/README.md"
+    ]
+  },
+  {
+    "grammar": "eds",
+    "source": "https://api.github.com/repos/uyha/tree-sitter-eds/git/trees/26d529e6cfecde391a03c21d1474eb51e0285805?recursive=1",
+    "tree_sha": "26d529e6cfecde391a03c21d1474eb51e0285805",
+    "paths": [
+      "Cargo.toml"
+    ]
+  }
+]

@@ -1,0 +1,36 @@
+{
+  "old_manifest_sha256": "cc6eb7a4f2426f66c296c09faefbaa9830ee5a9af7d11af558442eca0915e6c5",
+  "main_manifest_sha256": "b7239d3c7033d7c0552b99d6db0bef31234e304fa79cd69cab8eb4ac8b560633",
+  "main_files": 1508,
+  "removed_main_files": [
+    "grammars/caddy_scanner.go",
+    "grammars/disassembly_scanner.go",
+    "grammars/grammar_blobs/caddy.bin",
+    "grammars/grammar_blobs/disassembly.bin",
+    "grammars/grammar_blobs/jq.bin",
+    "grammars/runtime/caddy_external_lex_states_gen.go",
+    "grammars/runtime/caddy_scanner.go",
+    "grammars/runtime/disassembly_external_lex_states_gen.go",
+    "grammars/runtime/disassembly_scanner.go",
+    "grammars/runtime/support_caddy.go",
+    "grammars/runtime/support_disassembly.go",
+    "grammars/z_subset_blob_embed_caddy.go",
+    "grammars/z_subset_blob_embed_disassembly.go",
+    "grammars/z_subset_blob_embed_jq.go",
+    "grammars/z_subset_registry_register_caddy.go",
+    "grammars/z_subset_registry_register_disassembly.go",
+    "grammars/z_subset_registry_register_jq.go",
+    "grammars/z_subset_scanner_register_caddy.go",
+    "grammars/z_subset_scanner_register_disassembly.go"
+  ],
+  "optional_generated_files": {
+    "caddy_external_lex_states_gen.go": "672db8f5300b353329dc0363d0d9bad8eb0b9c0ad90a5a325cc4076fb8da876c",
+    "caddy_scanner.go": "171ef8d7c470bf5609996891e7c30d79d25acc7a84706254451cd2eac15f5098",
+    "catalog.go": "acf6a682e9efc52f42a6852c47089155f9e819a5fad9cf017fe53482745bd42c",
+    "disassembly_external_lex_states_gen.go": "6e10a8ae2a59ab15946b5fb7d4711773f4d288d850f79ab8ab779b83da000686",
+    "disassembly_scanner.go": "70500bbc515a7a12461f60c56423bfbeb8c830887d18bc28d5b32ea5b37efd70",
+    "grammar_blobs/caddy.bin": "e1af0dcba90bca6949ac1a2756e1a6db2271061b40570b9a7fa2ada29478f6fa",
+    "grammar_blobs/disassembly.bin": "4fecdd8a984595d391b005cc17016ad2621d6548c86746c647b41ac6da7312de",
+    "grammar_blobs/jq.bin": "da99dda1ffe813f439168944c6b8eae3658a06533b8e10e36115131313a755c3"
+  }
+}

@@ -30,6 +30,6 @@
   },
   "runtime": {
     "module": "github.com/wotjr1649/go-treesitter/internal/runtime",
-    "manifest_sha256": "cc6eb7a4f2426f66c296c09faefbaa9830ee5a9af7d11af558442eca0915e6c5"
+    "manifest_sha256": "f54003967aff8bb9d3bc81dc4591ca3c7a8605ab96b33cebb096c7604e9d10b5"
   }
 }

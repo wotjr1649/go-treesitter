@@ -84,3 +84,9 @@ the ordinary Go module. It uses no consumer replace directive or runtime backend
 selector. Its source/patch manifest, import boundary and lifecycle are described
 in ADR-0013. The first project version will be `v0.0.1`; a version plan does not
 establish release readiness.
+
+ADR-0014 separates three GPL grammars into the optional `grammars/gpl` module.
+The base's 203 grammars and that module's three entries retain 206 basic-test
+paths. Its own internal adapter is the sole runtime importer in that module;
+the base module's boundary remains unchanged. A side-effect import registers
+the entries at initialization, with no public runtime types or runtime download.

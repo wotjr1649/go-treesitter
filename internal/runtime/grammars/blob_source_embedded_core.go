@@ -72,7 +72,6 @@ import "embed"
 //go:embed grammar_blobs/bitbake.bin
 //go:embed grammar_blobs/blade.bin
 //go:embed grammar_blobs/brightscript.bin
-//go:embed grammar_blobs/caddy.bin
 //go:embed grammar_blobs/cairo.bin
 //go:embed grammar_blobs/capnp.bin
 //go:embed grammar_blobs/chatito.bin
@@ -89,7 +88,6 @@ import "embed"
 //go:embed grammar_blobs/desktop.bin
 //go:embed grammar_blobs/devicetree.bin
 //go:embed grammar_blobs/diff.bin
-//go:embed grammar_blobs/disassembly.bin
 //go:embed grammar_blobs/djot.bin
 //go:embed grammar_blobs/dockerfile.bin
 //go:embed grammar_blobs/doxygen.bin

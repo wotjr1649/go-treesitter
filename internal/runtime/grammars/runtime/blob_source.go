@@ -27,7 +27,7 @@ func RegisterBlob(name string, read func() []byte) {
 
 // RegisterCatalog connects an aggregate catalog without adding its dependency.
 // The reader returns blob bytes and an optional release function.
-// Its source takes precedence over individual providers, including read errors.
+// An explicitly registered blob takes precedence over the aggregate catalog.
 func RegisterCatalog(read func(string) ([]byte, func(), error), canonical func(string) string) {
 	blobSources.Lock()
 	defer blobSources.Unlock()
@@ -50,12 +50,12 @@ func readGrammarBlob(name string) (grammarBlob, error) {
 	blobSources.RLock()
 	read, catalog := blobSources.readers[name], blobSources.catalog
 	blobSources.RUnlock()
+	if read != nil {
+		return grammarBlob{data: read()}, nil
+	}
 	if catalog != nil {
 		data, release, err := catalog(name)
 		return grammarBlob{data: data, release: release}, err
-	}
-	if read != nil {
-		return grammarBlob{data: read()}, nil
 	}
 	return grammarBlob{}, fmt.Errorf("grammar blob %q is not registered", name)
 }

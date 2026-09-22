@@ -1,0 +1,30 @@
+{
+  "command": [
+    "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\gpl-source-reproduction-v2\\ts2go.exe",
+    "-input",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\gpl-source-reproduction-v2\\jq\\src\\parser.c",
+    "-output",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\gpl-source-reproduction-v2\\generated\\jq\\jq.go",
+    "-name",
+    "jq"
+  ],
+  "candidate_commit": "f54eaef096caf337e6dc79f0f19ab971916bb8bd",
+  "status_before": " M internal/provenance/identities.json\n M internal/provenance/runtime.go\n M internal/provenance/runtime.json\n M internal/runtime/grammars/blob_source_embedded_core.go\n D internal/runtime/grammars/caddy_scanner.go\n D internal/runtime/grammars/disassembly_scanner.go\n M internal/runtime/grammars/embedded_grammars_gen.go\n D internal/runtime/grammars/grammar_blobs/caddy.bin\n D internal/runtime/grammars/grammar_blobs/disassembly.bin\n D internal/runtime/grammars/grammar_blobs/jq.bin\n M internal/runtime/grammars/registry_builtin_gen.go\n M internal/runtime/grammars/runtime/blob_source.go\n M internal/runtime/grammars/runtime/builtin_scanners_gen.go\n D internal/runtime/grammars/runtime/caddy_external_lex_states_gen.go\n D internal/runtime/grammars/runtime/caddy_scanner.go\n D internal/runtime/grammars/runtime/disassembly_external_lex_states_gen.go\n D internal/runtime/grammars/runtime/disassembly_scanner.go\n D internal/runtime/grammars/runtime/support_caddy.go\n D internal/runtime/grammars/runtime/support_disassembly.go\n D internal/runtime/grammars/z_subset_blob_embed_caddy.go\n D internal/runtime/grammars/z_subset_blob_embed_disassembly.go\n D internal/runtime/grammars/z_subset_blob_embed_jq.go\n D internal/runtime/grammars/z_subset_registry_register_caddy.go\n D internal/runtime/grammars/z_subset_registry_register_disassembly.go\n D internal/runtime/grammars/z_subset_registry_register_jq.go\n D internal/runtime/grammars/z_subset_scanner_register_caddy.go\n D internal/runtime/grammars/z_subset_scanner_register_disassembly.go\n M parser_test.go\n M tools/runtime-bundle/import.py\n M tools/runtime-bundle/source.json\n?? artifacts/go.mod\n?? artifacts/session-07/full-pass/02-product-runtime/catalog-notices/\n?? artifacts/session-07/full-pass/05-licenses/\n?? artifacts/session-07/full-pass/additional-grammar-acquisition.json\n?? artifacts/session-07/full-pass/catalog-final-paths.json\n?? artifacts/session-07/full-pass/catalog-notice-acquisition.json\n?? artifacts/session-07/full-pass/catalog-notice-followup.json\n?? artifacts/session-07/full-pass/catalog-notice-metadata.json\n?? artifacts/session-07/full-pass/gpl-converter-build-v2.json\n?? artifacts/session-07/full-pass/gpl-converter-build.json\n?? artifacts/session-07/full-pass/gpl-default-focused.json\n?? artifacts/session-07/full-pass/gpl-optional-focused-native.json\n?? artifacts/session-07/full-pass/gpl-optional-focused.json\n?? artifacts/session-07/full-pass/gpl-optional-provider.json\n?? artifacts/session-07/full-pass/gpl-provider-generate.json\n?? artifacts/session-07/full-pass/gpl-rebuild-caddy.json\n?? artifacts/session-07/full-pass/gpl-rebuild-disassembly.json\n?? artifacts/session-07/full-pass/gpl-separation-adopt.json\n?? artifacts/session-07/full-pass/gpl-separation-generate.json\n?? grammars/\n?? tools/runtime-bundle/patches/catalog-optional-blob-providers.patch\n?? tools/runtime-bundle/separate.py\n",
+  "started_unix": 1790099436.4002717,
+  "elapsed_seconds": 0.08466053009033203,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "d9fd4c96e8e31a718a854deb12d0c4b66d651cfdd60d7fceccc071541788a14d"
+  },
+  "log_sha256": "2239650ad020bd290840e2fbe22cb151877e63263fbbaf5fe50b078bf1eca28f"
+}

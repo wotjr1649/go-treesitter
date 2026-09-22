@@ -87,7 +87,13 @@ include all samples, startup/heap costs and the unresolved C# parsing hotspot.
 `go run ./tools/measure -language go -iterations 20` reproduces one fixed
 workload; available routes are `go`, `py`, `js`, `jsx`, `ts`, `tsx` and `cs`.
 The tool reports Go heap metrics, not OS RSS, and separates first-use grammar
-loading from subsequent parse API calls. Default builds keep upstream's catalog.
+loading from subsequent parse API calls.
+
+The base module contains 203 grammars. The separate
+[`grammars/gpl`](grammars/gpl/README.md) module adds the pinned `caddy`,
+`disassembly` and `jq` grammars by a side-effect import, preserving 206 total.
+The base module has no dependency on that module and its ZIP excludes the GPL
+payload. Including the optional module brings its GPL distribution terms.
 
 [Basic catalog checks](tools/catalog/README.md) cover all 206 grammars with
 three fresh runs, determinism, incremental edits, cancellation and input limits.
@@ -122,5 +128,5 @@ Unicode, CRLF and the original real-world excerpts. Original KR-0002/KR-0004
 failure evidence remains available; those inputs now require exact C agreement.
 
 The library's own code is [MIT licensed](LICENSE). See
-[third-party notices](THIRD_PARTY_NOTICES.md) for the pinned runtime, assessed
+[third-party notices](THIRD_PARTY_NOTICES.md) for the pinned runtime, all catalog
 grammars, oracle tooling and copied validation fixtures.

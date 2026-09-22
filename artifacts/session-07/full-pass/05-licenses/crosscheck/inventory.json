@@ -1,0 +1,125 @@
+[
+  {
+    "grammar": "authzed",
+    "source": "https://raw.githubusercontent.com/mleonidas/tree-sitter-authzed/83e5c26a8687eb4688fe91d690c735cc3d21ad81/Cargo.toml",
+    "path": "authzed-Cargo.toml",
+    "sha256": "33ea3318cabb2abd5daf78a79ba094b69c848e3392e745a8aa2ad7b2bed2d169"
+  },
+  {
+    "grammar": "authzed",
+    "source": "https://api.github.com/repos/mleonidas/tree-sitter-authzed/git/trees/83e5c26a8687eb4688fe91d690c735cc3d21ad81?recursive=1",
+    "path": "authzed-tree.json",
+    "sha256": "33181bf475bf9fc94a562fd5903cbeefe35643d12179b3e2f9dc4341d91751a9",
+    "notice_paths": []
+  },
+  {
+    "grammar": "brightscript",
+    "source": "https://raw.githubusercontent.com/ajdelcimmuto/tree-sitter-brightscript/253fdfaa23814cb46c2d5fc19049fa0f2f62c6da/Cargo.toml",
+    "path": "brightscript-Cargo.toml",
+    "sha256": "37310875902014562c194fc5b019aca6fa23c8ab3b1db991505a29297cf89acb"
+  },
+  {
+    "grammar": "brightscript",
+    "source": "https://api.github.com/repos/ajdelcimmuto/tree-sitter-brightscript/git/trees/253fdfaa23814cb46c2d5fc19049fa0f2f62c6da?recursive=1",
+    "path": "brightscript-tree.json",
+    "sha256": "f8b2a0b75bec3a98c5d33b171c0593634b1c7ae8abc24aa1e6ebb28042b0d222",
+    "notice_paths": []
+  },
+  {
+    "grammar": "cooklang",
+    "source": "https://raw.githubusercontent.com/addcninblue/tree-sitter-cooklang/4ebe237c1cf64cf3826fc249e9ec0988fe07e58e/Cargo.toml",
+    "path": "cooklang-Cargo.toml",
+    "sha256": "f297c2c62a4ac27c6413c4417380e95467aab3b3352ce59d4a3102b659476225"
+  },
+  {
+    "grammar": "cooklang",
+    "source": "https://api.github.com/repos/addcninblue/tree-sitter-cooklang/git/trees/4ebe237c1cf64cf3826fc249e9ec0988fe07e58e?recursive=1",
+    "path": "cooklang-tree.json",
+    "sha256": "b3b0973a4aab8a0753a1db1bea958aec172e5c22e2436a65a9f513889f7925d6",
+    "notice_paths": []
+  },
+  {
+    "grammar": "corn",
+    "source": "https://raw.githubusercontent.com/jakestanger/tree-sitter-corn/464654742cbfd3a3de560aba120998f1d5dfa844/Cargo.toml",
+    "path": "corn-Cargo.toml",
+    "sha256": "d5826b05818bdd40e321183071994749fab30f8e4741997370f663bd960c0ac5"
+  },
+  {
+    "grammar": "corn",
+    "source": "https://api.github.com/repos/jakestanger/tree-sitter-corn/git/trees/464654742cbfd3a3de560aba120998f1d5dfa844?recursive=1",
+    "path": "corn-tree.json",
+    "sha256": "a3fe361a863c6f054c30ca1a0377392ff83eda1aabf31f967ea5dc1f215405fd",
+    "notice_paths": []
+  },
+  {
+    "grammar": "eex",
+    "source": "https://raw.githubusercontent.com/connorlay/tree-sitter-eex/f742f2fe327463335e8671a87c0b9b396905d1d1/Cargo.toml",
+    "path": "eex-Cargo.toml",
+    "sha256": "2d18303a2c1010ec7e287a0295e1e113443f44881d68f6b76a3c5c037d05fdc9"
+  },
+  {
+    "grammar": "eex",
+    "source": "https://api.github.com/repos/connorlay/tree-sitter-eex/git/trees/f742f2fe327463335e8671a87c0b9b396905d1d1?recursive=1",
+    "path": "eex-tree.json",
+    "sha256": "0acccd20f12bf9c3e30d9b162e0f157201c3a163f7a39ee992b43ea9c466cedb",
+    "notice_paths": []
+  },
+  {
+    "grammar": "elsa",
+    "source": "https://raw.githubusercontent.com/glapa-grossklag/tree-sitter-elsa/0a66b2b3f3c1915e67ad2ef9f7dbd2a84820d9d7/Cargo.toml",
+    "path": "elsa-Cargo.toml",
+    "sha256": "6e6faec2583301028484af37d10c2ae877f902a5d4db348e836a565369b59cc9"
+  },
+  {
+    "grammar": "elsa",
+    "source": "https://api.github.com/repos/glapa-grossklag/tree-sitter-elsa/git/trees/0a66b2b3f3c1915e67ad2ef9f7dbd2a84820d9d7?recursive=1",
+    "path": "elsa-tree.json",
+    "sha256": "a2dd7b4b9eadd415769068e3e0ed149c81d3190cc8e0d89fb5925d13af956ca1",
+    "notice_paths": []
+  },
+  {
+    "grammar": "facility",
+    "source": "https://raw.githubusercontent.com/FacilityApi/tree-sitter-facility/e4bfd3e960de9f4b4648acb1c92e9b95b47d8cfb/Cargo.toml",
+    "path": "facility-Cargo.toml",
+    "sha256": "bbd5ae7177606e1d59888bf774f61fa07d6e115476b784ca3b9305816d02d31f"
+  },
+  {
+    "grammar": "facility",
+    "source": "https://api.github.com/repos/FacilityApi/tree-sitter-facility/git/trees/e4bfd3e960de9f4b4648acb1c92e9b95b47d8cfb?recursive=1",
+    "path": "facility-tree.json",
+    "sha256": "cf094ec7e5fa06fd5423e0b7277288512df8ef179c0843f345d4a9bb0f145226",
+    "notice_paths": []
+  },
+  {
+    "grammar": "tmux",
+    "source": "https://raw.githubusercontent.com/Freed-Wu/tree-sitter-tmux/75d1b995b0c23400ac8e49db757a2e0386f9fa8f/Cargo.toml",
+    "path": "tmux-Cargo.toml",
+    "sha256": "04ee7245db8e17965467579e9ad5ed117c1b72bec615514390a75d40d0681415"
+  },
+  {
+    "grammar": "tmux",
+    "source": "https://api.github.com/repos/Freed-Wu/tree-sitter-tmux/git/trees/75d1b995b0c23400ac8e49db757a2e0386f9fa8f?recursive=1",
+    "path": "tmux-tree.json",
+    "sha256": "3487b759946cb9cf4f2525f82d961fd67bd94621fe67de95742938cd5357ea7d",
+    "notice_paths": []
+  },
+  {
+    "grammar": "eds",
+    "source": "https://raw.githubusercontent.com/uyha/tree-sitter-eds/26d529e6cfecde391a03c21d1474eb51e0285805/Cargo.toml",
+    "path": "eds-Cargo.toml",
+    "sha256": "1084a437aa76180542b2a0893a827b2148499fbdeecbc5157e86aeaeb5c76143"
+  },
+  {
+    "grammar": "eds",
+    "source": "https://api.github.com/repos/uyha/tree-sitter-eds/git/trees/26d529e6cfecde391a03c21d1474eb51e0285805?recursive=1",
+    "path": "eds-tree.json",
+    "sha256": "0c0917e080509a72ff9c0c9248eb8eab72b3fa25a6385cfc6ea48a6232e97ea8",
+    "notice_paths": []
+  },
+  {
+    "grammar": "elsa",
+    "source": "https://raw.githubusercontent.com/glapa-grossklag/tree-sitter-elsa/0a66b2b3f3c1915e67ad2ef9f7dbd2a84820d9d7/grammar.js",
+    "path": "elsa-grammar.js",
+    "sha256": "33370fb33f48c3f2ead7025a22364554f4d66574ac05bad528b4d4778f84942f"
+  }
+]

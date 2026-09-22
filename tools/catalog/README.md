@@ -6,8 +6,17 @@ language samples in a separate process (two concurrent processes maximum):
 ```powershell
 $env:CGO_ENABLED = '0'
 go build -o .scratch/catalog.exe ./tools/catalog
-python tools/catalog/check.py --executable .scratch/catalog.exe --output .scratch/catalog-results.json
+python tools/catalog/check.py --executable .scratch/catalog.exe --gpl-executable .scratch/catalog-gpl.exe --output .scratch/catalog-results.json
 ```
+
+The base executable contains 203 grammars. Build the second executable from the
+same `main.go` in a consumer module with a side-effect import of
+`github.com/wotjr1649/go-treesitter/grammars/gpl`; it supplies the three GPL
+cases. `check.py` records both executable hashes and the distribution selected
+for each case. It requires all 206 inputs and never skips unavailable grammars.
+The separate module and base module must both be version `v0.0.1` for this
+candidate. The release packaging campaign exercises the consumer ZIPs without
+a replace directive.
 
 The output file must not exist. Each case checks three clean deterministic fresh
 parses, a newline edit against a fresh parse, pre-cancellation, the input byte

@@ -99,11 +99,6 @@ func CSharpLanguage() *gotreesitter.Language {
 	return loadEmbeddedLanguage("c_sharp.bin")
 }
 
-// CaddyLanguage returns the caddy language definition.
-func CaddyLanguage() *gotreesitter.Language {
-	return loadEmbeddedLanguage("caddy.bin")
-}
-
 // CairoLanguage returns the cairo language definition.
 func CairoLanguage() *gotreesitter.Language {
 	return loadEmbeddedLanguage("cairo.bin")
@@ -227,11 +222,6 @@ func DhallLanguage() *gotreesitter.Language {
 // DiffLanguage returns the diff language definition.
 func DiffLanguage() *gotreesitter.Language {
 	return loadEmbeddedLanguage("diff.bin")
-}
-
-// DisassemblyLanguage returns the disassembly language definition.
-func DisassemblyLanguage() *gotreesitter.Language {
-	return loadEmbeddedLanguage("disassembly.bin")
 }
 
 // DjotLanguage returns the djot language definition.
@@ -517,11 +507,6 @@ func JavascriptLanguage() *gotreesitter.Language {
 // Jinja2Language returns the jinja2 language definition.
 func Jinja2Language() *gotreesitter.Language {
 	return loadEmbeddedLanguage("jinja2.bin")
-}
-
-// JqLanguage returns the jq language definition.
-func JqLanguage() *gotreesitter.Language {
-	return loadEmbeddedLanguage("jq.bin")
 }
 
 // JsdocLanguage returns the jsdoc language definition.

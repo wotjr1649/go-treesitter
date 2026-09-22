@@ -10,6 +10,7 @@ from pathlib import Path, PurePosixPath
 import re
 import subprocess
 import zipfile
+from separate import separate
 
 ROOT = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent
@@ -20,7 +21,7 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def build(archive, output):
+def build(archive, output, optional_output=None):
     source = json.loads((HERE / 'source.json').read_text(encoding='utf-8'))
     pins = json.loads((ROOT / 'internal/provenance/identities.json').read_text(encoding='utf-8'))
     if source['baseline'] != pins['baseline']:
@@ -31,6 +32,11 @@ def build(archive, output):
     relative = output.relative_to(ROOT).as_posix()
     if output == ROOT or output.exists():
         raise ValueError('output must be a new task-local directory')
+    if optional_output is not None:
+        optional_output = optional_output.resolve()
+        optional_output.relative_to(ROOT)
+        if optional_output == ROOT or optional_output.exists() or optional_output == output:
+            raise ValueError('optional output must be a different new task-local directory')
     upstream = source['baseline']['module']
     prefix = upstream + '@' + source['baseline']['version'] + '/'
     files = {}
@@ -72,14 +78,29 @@ def build(archive, output):
         command = ['git', 'apply', '--directory=' + relative, str(ROOT / patch['path'])]
         subprocess.run(command[:2] + ['--check'] + command[2:], cwd=ROOT, check=True, timeout=30)
         subprocess.run(command, cwd=ROOT, check=True, timeout=30)
+    main, optional = separate({name: (output / name).read_bytes() for name in files}, source['internal_module'])
+    for name in files:
+        if name not in main:
+            (output / name).unlink()  # Only files just created in the new output.
+        elif main[name] != (output / name).read_bytes():
+            (output / name).write_bytes(main[name])
+    if optional_output is not None:
+        optional_output.mkdir(parents=True)
+        for name, data in optional.items():
+            path = optional_output / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(data)
+        subprocess.run(['gofmt', '-w', *map(str, optional_output.glob('*.go'))], check=True, timeout=30)
     return {'schema': 1, 'baseline': source['baseline'],
             'archive_sha256': source['archive_sha256'],
             'source_sha256': digest((HERE / 'source.json').read_bytes()),
             'importer_sha256': digest(Path(__file__).read_bytes()),
+            'separator_sha256': digest((HERE / 'separate.py').read_bytes()),
             'internal_module': source['internal_module'], 'patches': patches,
+            'separated_files': {name: digest(data) for name, data in sorted(files.items()) if name not in main},
             'files': {name: {'origin_sha256': digest(data),
                              'sha256': digest((output / name).read_bytes())}
-                      for name, data in sorted(files.items())}}
+                      for name, data in sorted(files.items()) if name in main}}
 
 
 if __name__ == '__main__':
@@ -87,12 +108,13 @@ if __name__ == '__main__':
     parser.add_argument('--archive', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--manifest', type=Path, required=True)
+    parser.add_argument('--optional-output', type=Path)
     args = parser.parse_args()
     manifest = args.manifest.resolve()
     manifest.relative_to(ROOT)
     if manifest.exists():
         raise ValueError('manifest already exists')
-    result = build(args.archive, args.output)
+    result = build(args.archive, args.output, args.optional_output)
     with manifest.open('x', encoding='utf-8', newline='\n') as stream:
         json.dump(result, stream, indent=2)
         stream.write('\n')

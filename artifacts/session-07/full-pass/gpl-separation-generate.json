@@ -1,0 +1,33 @@
+{
+  "command": [
+    "python",
+    "tools/runtime-bundle/import.py",
+    "--archive",
+    ".scratch/modcache/cache/download/github.com/odvcencio/gotreesitter/@v/v0.53.0.zip",
+    "--output",
+    ".scratch/full-pass/gpl-separated-runtime",
+    "--optional-output",
+    ".scratch/full-pass/gpl-separated-adapter",
+    "--manifest",
+    ".scratch/full-pass/gpl-separated-manifest.json"
+  ],
+  "candidate_commit": "f54eaef096caf337e6dc79f0f19ab971916bb8bd",
+  "status_before": " M internal/provenance/runtime.go\n M tools/runtime-bundle/import.py\n?? artifacts/session-07/full-pass/02-product-runtime/catalog-notices/\n?? artifacts/session-07/full-pass/additional-grammar-acquisition.json\n?? artifacts/session-07/full-pass/catalog-final-paths.json\n?? artifacts/session-07/full-pass/catalog-notice-acquisition.json\n?? artifacts/session-07/full-pass/catalog-notice-followup.json\n?? artifacts/session-07/full-pass/catalog-notice-metadata.json\n?? tools/runtime-bundle/separate.py\n",
+  "started_unix": 1790098753.9793105,
+  "elapsed_seconds": 12.077670812606812,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "70aa96d36c7997847a0631d3d3ec204f278332a531c7769ac8bd1b7251a42c31"
+  },
+  "log_sha256": "81a556227836f3d8b85b1c9119486a11cc2f13371f692fd7c1695e6057507fe9"
+}

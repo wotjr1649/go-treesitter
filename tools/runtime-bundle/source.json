@@ -26,6 +26,7 @@
     "KR-0001b-jsx-text.patch",
     "catalog-c-family-lexer-reuse.patch",
     "KR-0002-csharp-recovery-transaction.patch",
-    "KR-0004-csharp-preserve-recovery-errors.patch"
+    "KR-0004-csharp-preserve-recovery-errors.patch",
+    "catalog-optional-blob-providers.patch"
   ]
 }

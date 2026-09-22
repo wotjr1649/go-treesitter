@@ -1,0 +1,182 @@
+[
+  {
+    "grammar": "clojure",
+    "source": "https://raw.githubusercontent.com/sogaiu/tree-sitter-clojure/e43eff80d17cf34852dcd92ca5e6986d23a7040f/COPYING.txt",
+    "path": "clojure-COPYING.txt",
+    "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+  },
+  {
+    "grammar": "clojure",
+    "source": "https://raw.githubusercontent.com/sogaiu/tree-sitter-clojure/e43eff80d17cf34852dcd92ca5e6986d23a7040f/README.md",
+    "path": "clojure-README.md",
+    "sha256": "85c5b01d813bf3a0f7373ea2e2da7742015ba16dec76c680ef61f89fc1c4fe37"
+  },
+  {
+    "grammar": "clojure",
+    "source": "https://raw.githubusercontent.com/sogaiu/tree-sitter-clojure/e43eff80d17cf34852dcd92ca5e6986d23a7040f/package.json",
+    "path": "clojure-package.json",
+    "sha256": "e91cb1b250c468ae0665f8425132161f060fca07eac40a8e55fec7b00ee2a824",
+    "declared_license": null,
+    "author": null
+  },
+  {
+    "grammar": "authzed",
+    "source": "https://raw.githubusercontent.com/mleonidas/tree-sitter-authzed/83e5c26a8687eb4688fe91d690c735cc3d21ad81/README.md",
+    "path": "authzed-README.md",
+    "sha256": "0c9ec6fe0a65117d6193793929db422fb60c728f436ee807797d39e31d63e05f"
+  },
+  {
+    "grammar": "authzed",
+    "source": "https://raw.githubusercontent.com/mleonidas/tree-sitter-authzed/83e5c26a8687eb4688fe91d690c735cc3d21ad81/package.json",
+    "path": "authzed-package.json",
+    "sha256": "8ff2860fec31cda220c1011967ba679c7f2f11fed6e497e7e6abda9cfa7b3786",
+    "declared_license": "MIT",
+    "author": "mleonidas"
+  },
+  {
+    "grammar": "brightscript",
+    "source": "https://raw.githubusercontent.com/ajdelcimmuto/tree-sitter-brightscript/253fdfaa23814cb46c2d5fc19049fa0f2f62c6da/package.json",
+    "path": "brightscript-package.json",
+    "sha256": "b00698d77b3f33c4097e6c94e87ae80854ba41bbf32fc826270b7db13a7dfa20",
+    "declared_license": "ISC",
+    "author": ""
+  },
+  {
+    "grammar": "cooklang",
+    "source": "https://raw.githubusercontent.com/addcninblue/tree-sitter-cooklang/4ebe237c1cf64cf3826fc249e9ec0988fe07e58e/README.md",
+    "path": "cooklang-README.md",
+    "sha256": "ac9241b9494c15e5c1036ce64fe5ba9eeae942dda409147b6f7c109a592f8cb1"
+  },
+  {
+    "grammar": "cooklang",
+    "source": "https://raw.githubusercontent.com/addcninblue/tree-sitter-cooklang/4ebe237c1cf64cf3826fc249e9ec0988fe07e58e/package.json",
+    "path": "cooklang-package.json",
+    "sha256": "2fa5f1721e6fb20f6b40a3bbf9d6fbe197460bbd168a5fb4cd339833917f6cfe",
+    "declared_license": "ISC",
+    "author": ""
+  },
+  {
+    "grammar": "corn",
+    "source": "https://raw.githubusercontent.com/jakestanger/tree-sitter-corn/464654742cbfd3a3de560aba120998f1d5dfa844/README.md",
+    "path": "corn-README.md",
+    "sha256": "f5ecaa301b1ce12ae861df4a170a6f82fcaa82eb28028d85f1b00fb2a617fbcf"
+  },
+  {
+    "grammar": "corn",
+    "source": "https://raw.githubusercontent.com/jakestanger/tree-sitter-corn/464654742cbfd3a3de560aba120998f1d5dfa844/package.json",
+    "path": "corn-package.json",
+    "sha256": "b2b2e09fd302b93f73bd802d485de38349733c0965b0d596105b1b61b0ec8be3",
+    "declared_license": "MIT",
+    "author": null
+  },
+  {
+    "grammar": "ebnf",
+    "source": "https://raw.githubusercontent.com/RubixDev/ebnf/8e635b0b723c620774dfb8abf382a7f531894b40/README.md",
+    "path": "ebnf-README.md",
+    "sha256": "b668c565598e7442981d840d798428ee39b413a90cc1d5b7101c347b698512cb"
+  },
+  {
+    "grammar": "eds",
+    "source": "https://raw.githubusercontent.com/uyha/tree-sitter-eds/26d529e6cfecde391a03c21d1474eb51e0285805/package.json",
+    "path": "eds-package.json",
+    "sha256": "f8bf9a465258e226025179a8b40b175498b21730f1511606eec792ed600c70d1",
+    "declared_license": null,
+    "author": null
+  },
+  {
+    "grammar": "eex",
+    "source": "https://raw.githubusercontent.com/connorlay/tree-sitter-eex/f742f2fe327463335e8671a87c0b9b396905d1d1/README.md",
+    "path": "eex-README.md",
+    "sha256": "41e873bb426d0194ebc3b27f2ba03b1f510c17c7c89f3e5201af64ebaa2b1b89"
+  },
+  {
+    "grammar": "eex",
+    "source": "https://raw.githubusercontent.com/connorlay/tree-sitter-eex/f742f2fe327463335e8671a87c0b9b396905d1d1/package.json",
+    "path": "eex-package.json",
+    "sha256": "a886e2f93a71f3caaa00bedbfc24285482a582731130d0587d38678a237a8f9b",
+    "declared_license": "MIT",
+    "author": "Clay"
+  },
+  {
+    "grammar": "elsa",
+    "source": "https://raw.githubusercontent.com/glapa-grossklag/tree-sitter-elsa/0a66b2b3f3c1915e67ad2ef9f7dbd2a84820d9d7/README.md",
+    "path": "elsa-README.md",
+    "sha256": "5725ea2ad059a96a51ac2a2f89d4209e9c6e5db24c0645e342a5979017dd7be8"
+  },
+  {
+    "grammar": "elsa",
+    "source": "https://raw.githubusercontent.com/glapa-grossklag/tree-sitter-elsa/0a66b2b3f3c1915e67ad2ef9f7dbd2a84820d9d7/package.json",
+    "path": "elsa-package.json",
+    "sha256": "41132ac54031f02a2c665c056e8a1f23fe1e03d96359908bdb8e143a2d11ad93",
+    "declared_license": "MIT",
+    "author": "Miles Glapa-Grossklag <miles@glapa-grossklag.com>"
+  },
+  {
+    "grammar": "facility",
+    "source": "https://raw.githubusercontent.com/FacilityApi/tree-sitter-facility/e4bfd3e960de9f4b4648acb1c92e9b95b47d8cfb/package.json",
+    "path": "facility-package.json",
+    "sha256": "50428e58753507749d49ea1793c5e40b776813fa989390ea42c42fe9108091ac",
+    "declared_license": "MIT",
+    "author": "Bryan Kenote"
+  },
+  {
+    "grammar": "facility",
+    "source": "https://raw.githubusercontent.com/FacilityApi/tree-sitter-facility/e4bfd3e960de9f4b4648acb1c92e9b95b47d8cfb/readme.md",
+    "path": "facility-readme.md",
+    "sha256": "01e8bfc57989f7d83bd7c14f6fa54fe62c94af40ea268eef00a4cdad511a6b11"
+  },
+  {
+    "grammar": "vhdl",
+    "source": "https://raw.githubusercontent.com/jpt13653903/tree-sitter-vhdl/a09b8dc58b59abf959e798849f12bc473b07bbb2/License.md",
+    "path": "vhdl-License.md",
+    "sha256": "a9323218abe9aabd3429b76634470b40c3be012600e1f96bd16ca254724fa954"
+  },
+  {
+    "grammar": "vhdl",
+    "source": "https://raw.githubusercontent.com/jpt13653903/tree-sitter-vhdl/a09b8dc58b59abf959e798849f12bc473b07bbb2/Readme.md",
+    "path": "vhdl-Readme.md",
+    "sha256": "25392f94f4e58fac3bee8d3b1300ecb4dd7d3fcaa3085ae550acbdfe0c712533"
+  },
+  {
+    "grammar": "vhdl",
+    "source": "https://raw.githubusercontent.com/jpt13653903/tree-sitter-vhdl/a09b8dc58b59abf959e798849f12bc473b07bbb2/package.json",
+    "path": "vhdl-package.json",
+    "sha256": "9223bcf5c73a835d884eccae4d058f716fec61eaf4fecde534635327bdd8af7c",
+    "declared_license": "MIT",
+    "author": "John-Philip Taylor"
+  },
+  {
+    "grammar": "tmux",
+    "source": "https://raw.githubusercontent.com/Freed-Wu/tree-sitter-tmux/75d1b995b0c23400ac8e49db757a2e0386f9fa8f/README.md",
+    "path": "tmux-README.md",
+    "sha256": "eef88f87c308ce96ce74b7706688efaa5457170068843f6f9e57e4020f6ca44a"
+  },
+  {
+    "grammar": "tmux",
+    "source": "https://raw.githubusercontent.com/Freed-Wu/tree-sitter-tmux/75d1b995b0c23400ac8e49db757a2e0386f9fa8f/package.json",
+    "path": "tmux-package.json",
+    "sha256": "e61729da98322db199c055d27a6b626c4d8d8c35f798fc24ceb303be36f7e3f2",
+    "declared_license": "MIT",
+    "author": null
+  },
+  {
+    "grammar": "janet",
+    "source": "https://raw.githubusercontent.com/sogaiu/tree-sitter-janet-simple/d183186995204314700be3e9e0a48053ea16b350/COPYING.txt",
+    "path": "janet-COPYING.txt",
+    "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+  },
+  {
+    "grammar": "janet",
+    "source": "https://raw.githubusercontent.com/sogaiu/tree-sitter-janet-simple/d183186995204314700be3e9e0a48053ea16b350/README.md",
+    "path": "janet-README.md",
+    "sha256": "a8bb741caf47de05392964b74fd8b4cab63ff24d914256ae6f322bbc159dfb80"
+  },
+  {
+    "grammar": "janet",
+    "source": "https://raw.githubusercontent.com/sogaiu/tree-sitter-janet-simple/d183186995204314700be3e9e0a48053ea16b350/package.json",
+    "path": "janet-package.json",
+    "sha256": "aa56da6d658c32e887f8de75d0a6de71589b438784ce9c912dc97d346f7388cc",
+    "declared_license": null,
+    "author": null
+  }
+]
