@@ -1,0 +1,6 @@
+test_runtime_abi_boundaries_and_unpinned_producer (test_identity.ArtifactIdentityTest.test_runtime_abi_boundaries_and_unpinned_producer) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.044s
+
+OK

@@ -40,3 +40,4 @@ understand whether the contract is still right.
 | 0004 | Parser boundary and result model | Accepted |
 | 0005 | Git branching and commit discipline | Accepted |
 | 0006 | Instruction architecture — AGENTS kernel, docs router, no skill | Accepted |
+| 0007 | Dynamic generator selection, immutable evidence inputs | Accepted |

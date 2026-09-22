@@ -86,6 +86,11 @@ func TestNativeOracleDifferential(t *testing.T) {
 		if c.HasError != (i < 3) || r.HasError != (i < 5) {
 			t.Fatalf("unexpected error-state differential for %s", f.id)
 		}
+		for _, node := range c.Nodes {
+			if i >= 3 && node.Missing {
+				t.Fatalf("C clean expectation contains a missing node for %s", f.id)
+			}
+		}
 		if i >= 5 && first != -1 {
 			t.Fatalf("control tree differential for %s", f.id)
 		}

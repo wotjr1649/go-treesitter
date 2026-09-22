@@ -198,7 +198,7 @@ remain untested. **No patch or fork is authorized by this result.**
 
 | Condition | Status |
 |---|---|
-| Reproduces at the exact pinned baseline | **yes** (`v0.53.0` and upstream `main`) |
+| Reproduces at the exact pinned baseline | **yes** (`v0.53.0`, retained Phase 2 product test) |
 | Appears in the CGO-free product lane | **yes** (a plain fresh parse; not race-dependent) |
 | Upstream has no fix in a tagged release, and is not already tracking it | **no tagged fix observed**; public tag query on 2026-09-22 ends at v0.53.0; issue open without maintainer response or linked PR |
 
@@ -228,10 +228,10 @@ its own retirement condition. Move the record to a retired section; do not delet
 
 These are measured, upstream-documented properties. Reporting them as defects is a reporting error.
 
-### KC-0001 — C# never takes the compact route
+### KC-0001 — C# compact declines on the recorded real corpus
 
-At the baseline, C# parses always decline the compact scheduler and fall back to the classic GLR
-path. Upstream's own pinned real-corpus matrix records `c_sharp: 0 PASS / 2 FALLBACK`, the worst of
+At the baseline, the recorded C# real-corpus parses decline the compact scheduler and fall back
+to the classic GLR path. Upstream's pinned matrix records `c_sharp: 0 PASS / 2 FALLBACK`, the worst of
 the Release-Critical set (`go`, `python` 2/0; `javascript` 1/0; `typescript`, `tsx` 1/1).
 
 Consequences to expect, not to file: non-linear parse cost on catch-pattern-dense input
@@ -240,6 +240,10 @@ recording verbatim; no incremental reuse for C#, so every edit is a full reparse
 
 Widening compact admission is upstream work. Because upstream documents and tracks it, this does
 **not** count toward the fork trigger.
+
+Do not generalize the corpus observation to every C# input. Session 05 Phase 1's
+small SM-CS fixture took the compact route; its incremental edit used a full
+reparse. Phase 3 independently recorded declines on its three larger inputs.
 
 ### KC-0002 — the race lane is roughly 14× the product lane
 

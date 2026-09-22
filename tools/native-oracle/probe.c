@@ -41,7 +41,11 @@ int main(void) {
         "const g = <p>plain</p>;"
     };
     TSParser *parser = ts_parser_new();
-    if (!parser || !ts_parser_set_language(parser, tree_sitter_tsx())) return 2;
+    if (!parser) return 2;
+    if (!ts_parser_set_language(parser, tree_sitter_tsx())) {
+        ts_parser_delete(parser);
+        return 2;
+    }
     for (unsigned i = 0; i < sizeof(sources) / sizeof(sources[0]); i++) {
         TSTree *tree = ts_parser_parse_string(parser, NULL, sources[i], (uint32_t)strlen(sources[i]));
         if (!tree) { ts_parser_delete(parser); return 3; }
