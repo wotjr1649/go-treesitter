@@ -1,0 +1,15 @@
+{
+  "inputs": {
+    "ts-split-pending-campaign": "743ce2a9ec351b2a73e8d890e1570a0150ef86cb46ed3f1c23de6f6e5ace22f0",
+    "go-c-eof-expanded-cases": "5aec6fa6832dde2ecde5eb0b7a7ce229855d82c9fcb68d026ca7bccc88b40f32",
+    "leading-prefix-cases": "4814cc0c6fe8e6c649ee4a21ae23536c267a165c485cd7e6568f081fd6cf3812",
+    "ts-string-expanded-cases": "d069f5f9ed75f0c216cf018c743898fd99a894f3b0df1b97dcb64bf652e54c2f",
+    "bare-amp-cases": "99b5286c83613c81a03dc8d4500677429aa1544fe0ffdaf5ad8da1a62ce8d4b2",
+    "jsx-hash-cases": "a6de5cf719a7877fa707316dfa8ddc62cff3c37141ef98634d2ce791c40469a8",
+    "tsx-paren-cases": "84b483db7accdbdf1072d3169d6293819922d8b7ca697140b1abb4892a2126c1"
+  },
+  "catalog_sha256": "8fee920f656d179d020af235763946bd1b31285682a239dd672354993db0c9fa",
+  "count": 458,
+  "edits": 295,
+  "origins": 163
+}

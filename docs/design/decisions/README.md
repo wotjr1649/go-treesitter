@@ -42,4 +42,10 @@ understand whether the contract is still right.
 | 0006 | Instruction architecture — AGENTS kernel, docs router, no skill | Accepted |
 | 0007 | Dynamic generator selection, immutable evidence inputs | Accepted |
 | 0008 | Windows native C oracle execution | Accepted |
+| 0009 | Public consumer entry | Accepted |
+| 0010 | Request resource limits | Accepted |
+| 0011 | Snapshot lookup | Accepted |
 | 0012 | Complete maintained TypeScript oracle patch | Accepted |
+| 0013 | Bundle the approved runtime | Accepted |
+| 0014 | Separate GPL grammar distribution | Accepted |
+| 0015 | Derived Go grammar and recovery | Accepted |

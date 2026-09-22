@@ -1,0 +1,19 @@
+{
+  "baseline_commit": "2e18f90a4f5205edf3091771141126bc87d5e86c",
+  "baseline_archive_sha256": "d10682b2dc0957d60dc9e1814d27c73acbcae3790bbed7160e952f3c0ba926d7",
+  "baseline_runtime_sha256": "12e87722a83730be9efe664efc8c32cf0af4ee3aabf604a966050529d5b00621",
+  "candidate_runtime_sha256": "2b2a872fcf790d5d0c84729ee310e5b3d192772cb36b253539589a2a4d5b1c0f",
+  "benchmark_sha256": "3e1adc79d52192af34ae193be82b28f665890d93f5d0abb3fc6c841b50d89cae",
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "iterations_per_benchmark": 40,
+  "gomaxprocs": 4,
+  "order": "each pair randomized with fixed seed 20260923; cases/modes shuffled per release-seed",
+  "analysis": "paired ratios, medians and full range; exact two-sided sign test across five samples; no favorable reruns",
+  "regression_policy": "large changes require profiling; correctness takes priority; no absolute latency SLO exists"
+}

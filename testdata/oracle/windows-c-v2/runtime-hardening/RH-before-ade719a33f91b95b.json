@@ -1,0 +1,243 @@
+{
+  "abi": 15,
+  "input_bytes": 24,
+  "has_error": false,
+  "start": 0,
+  "end": 24,
+  "nodes": [
+    {
+      "Type": "source_file",
+      "Field": "",
+      "Parent": -1,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 0,
+      "EndByte": 24,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 2,
+        "Column": 0
+      }
+    },
+    {
+      "Type": "package_clause",
+      "Field": "",
+      "Parent": 0,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 0,
+      "EndByte": 9,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 9
+      }
+    },
+    {
+      "Type": "package",
+      "Field": "",
+      "Parent": 1,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 0,
+      "EndByte": 7,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 7
+      }
+    },
+    {
+      "Type": "package_identifier",
+      "Field": "",
+      "Parent": 1,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 8,
+      "EndByte": 9,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 8
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 9
+      }
+    },
+    {
+      "Type": "import_declaration",
+      "Field": "",
+      "Parent": 0,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 10,
+      "EndByte": 22,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 12
+      }
+    },
+    {
+      "Type": "import",
+      "Field": "",
+      "Parent": 4,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 10,
+      "EndByte": 16,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 6
+      }
+    },
+    {
+      "Type": "import_spec",
+      "Field": "",
+      "Parent": 4,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 17,
+      "EndByte": 22,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 7
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 12
+      }
+    },
+    {
+      "Type": "interpreted_string_literal",
+      "Field": "path",
+      "Parent": 6,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 17,
+      "EndByte": 22,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 7
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 12
+      }
+    },
+    {
+      "Type": "\"",
+      "Field": "",
+      "Parent": 7,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 17,
+      "EndByte": 18,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 7
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 8
+      }
+    },
+    {
+      "Type": "interpreted_string_literal_content",
+      "Field": "",
+      "Parent": 7,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 18,
+      "EndByte": 21,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 8
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 11
+      }
+    },
+    {
+      "Type": "\"",
+      "Field": "",
+      "Parent": 7,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 21,
+      "EndByte": 22,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 11
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 12
+      }
+    },
+    {
+      "Type": ";",
+      "Field": "",
+      "Parent": 0,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 22,
+      "EndByte": 23,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 12
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 13
+      }
+    }
+  ],
+  "schema": 1,
+  "fixture": "RH-before-ade719a33f91b95b",
+  "language": "go",
+  "source_sha256": "6ef9f14ee4b34204be18fead8c9a328ee382de44ef7194213018d94676f2d9e4",
+  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "nodes_sha256": "33a955fb4fcce0a8f886654eadc2ac8fe51b7724e962a8886340c70da5497780"
+}

@@ -1,0 +1,53 @@
+{
+  "tasks": [
+    [
+      "baseline",
+      1
+    ],
+    [
+      "candidate",
+      1
+    ],
+    [
+      "candidate",
+      2
+    ],
+    [
+      "baseline",
+      2
+    ],
+    [
+      "baseline",
+      3
+    ],
+    [
+      "candidate",
+      3
+    ],
+    [
+      "baseline",
+      4
+    ],
+    [
+      "candidate",
+      4
+    ],
+    [
+      "candidate",
+      5
+    ],
+    [
+      "baseline",
+      5
+    ]
+  ],
+  "iterations": 40,
+  "GOMAXPROCS": 4,
+  "runtime_manifest_sha256": "0c3a55daca7cc31bc875259b86cc441d500d5fc14a4f7bcc46f4afc5f59195e1",
+  "baseline_commit": "2e18f90a4f5205edf3091771141126bc87d5e86c",
+  "binaries": {
+    "baseline": "b70acc98ad189a4764ed72350ee4e701c13b8b59b4f9f8c132806067c400495a",
+    "candidate": "3e90e5c25fabaee0228943c5e2984e7048a3e9da43d4d5cf7e3392e156d4fc7f"
+  },
+  "analysis": "paired log ratio 95% t interval (df=4), normality caveat; exact sign test; all samples retained"
+}

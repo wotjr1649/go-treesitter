@@ -111,6 +111,9 @@ func (TsxExternalScanner) Serialize(payload any, buf []byte) int { return 0 }
 func (TsxExternalScanner) Deserialize(payload any, buf []byte)   {}
 func (TsxExternalScanner) SupportsIncrementalReuse() bool        { return true }
 
+// Scan depends only on source, position and valid symbols; Create has no payload.
+func (TsxExternalScanner) ExternalScannerIsStateless() bool { return true }
+
 // symbolTable returns the per-Language-bound result-symbol table, falling
 // back to the pinned defaults when Scan is invoked on an unbound scanner
 // value (s.symbols is still its zero value).

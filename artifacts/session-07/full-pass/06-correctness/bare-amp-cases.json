@@ -1,0 +1,40 @@
+{
+  "cases": [
+    {
+      "ID": "tsx-F1",
+      "Filename": "x.tsx",
+      "Source": "const a = <p>Org & Team</p>;",
+      "Repeat": 1
+    },
+    {
+      "ID": "tsx-F2",
+      "Filename": "x.tsx",
+      "Source": "const b = <p>AT&T</p>;",
+      "Repeat": 1
+    },
+    {
+      "ID": "tsx-F3",
+      "Filename": "x.tsx",
+      "Source": "const c = <p>&</p>;",
+      "Repeat": 1
+    },
+    {
+      "ID": "javascript-F1",
+      "Filename": "x.jsx",
+      "Source": "const a = <p>Org & Team</p>;",
+      "Repeat": 1
+    },
+    {
+      "ID": "javascript-F2",
+      "Filename": "x.jsx",
+      "Source": "const b = <p>AT&T</p>;",
+      "Repeat": 1
+    },
+    {
+      "ID": "javascript-F3",
+      "Filename": "x.jsx",
+      "Source": "const c = <p>&</p>;",
+      "Repeat": 1
+    }
+  ]
+}

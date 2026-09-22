@@ -1,0 +1,224 @@
+{
+  "abi": 15,
+  "input_bytes": 23,
+  "has_error": false,
+  "start": 0,
+  "end": 23,
+  "nodes": [
+    {
+      "Type": "source_file",
+      "Field": "",
+      "Parent": -1,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 0,
+      "EndByte": 23,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 3,
+        "Column": 0
+      }
+    },
+    {
+      "Type": "package_clause",
+      "Field": "",
+      "Parent": 0,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 0,
+      "EndByte": 9,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 9
+      }
+    },
+    {
+      "Type": "package",
+      "Field": "",
+      "Parent": 1,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 0,
+      "EndByte": 7,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 7
+      }
+    },
+    {
+      "Type": "package_identifier",
+      "Field": "",
+      "Parent": 1,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 8,
+      "EndByte": 9,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 8
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 9
+      }
+    },
+    {
+      "Type": "const_declaration",
+      "Field": "",
+      "Parent": 0,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 10,
+      "EndByte": 21,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 11
+      }
+    },
+    {
+      "Type": "const",
+      "Field": "",
+      "Parent": 4,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 10,
+      "EndByte": 15,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 5
+      }
+    },
+    {
+      "Type": "const_spec",
+      "Field": "",
+      "Parent": 4,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 16,
+      "EndByte": 21,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 6
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 11
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "name",
+      "Parent": 6,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 16,
+      "EndByte": 17,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 6
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 7
+      }
+    },
+    {
+      "Type": "=",
+      "Field": "",
+      "Parent": 6,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 18,
+      "EndByte": 19,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 8
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 9
+      }
+    },
+    {
+      "Type": "expression_list",
+      "Field": "value",
+      "Parent": 6,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 20,
+      "EndByte": 21,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 10
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 11
+      }
+    },
+    {
+      "Type": "int_literal",
+      "Field": "",
+      "Parent": 9,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 20,
+      "EndByte": 21,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 10
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 11
+      }
+    }
+  ],
+  "schema": 1,
+  "fixture": "RH-before-a85aa9efc46d4f7e",
+  "language": "go",
+  "source_sha256": "08626b8459f7cfbb1662f6c1360cf051d3dab49204c9fe6cbe0fdfea7900e469",
+  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "nodes_sha256": "9a986df741b6705b3da6b0174529d9319394c54dec66e417f0def7c44ef7be26"
+}

@@ -1,0 +1,576 @@
+{
+  "case": {
+    "ID": "JS-amp",
+    "Source": "const a = <p>Org & Team</p>;"
+  },
+  "c": {
+    "abi": 15,
+    "input_bytes": 28,
+    "has_error": true,
+    "start": 0,
+    "end": 28,
+    "nodes": [
+      {
+        "Type": "program",
+        "Field": "",
+        "Parent": -1,
+        "Named": true,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 0,
+        "EndByte": 28,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 0
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 28
+        }
+      },
+      {
+        "Type": "lexical_declaration",
+        "Field": "",
+        "Parent": 0,
+        "Named": true,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 0,
+        "EndByte": 28,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 0
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 28
+        }
+      },
+      {
+        "Type": "const",
+        "Field": "kind",
+        "Parent": 1,
+        "Named": false,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 0,
+        "EndByte": 5,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 0
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 5
+        }
+      },
+      {
+        "Type": "variable_declarator",
+        "Field": "",
+        "Parent": 1,
+        "Named": true,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 6,
+        "EndByte": 27,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 6
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 27
+        }
+      },
+      {
+        "Type": "identifier",
+        "Field": "name",
+        "Parent": 3,
+        "Named": true,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 6,
+        "EndByte": 7,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 6
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 7
+        }
+      },
+      {
+        "Type": "=",
+        "Field": "",
+        "Parent": 3,
+        "Named": false,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 8,
+        "EndByte": 9,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 8
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 9
+        }
+      },
+      {
+        "Type": "jsx_element",
+        "Field": "value",
+        "Parent": 3,
+        "Named": true,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 10,
+        "EndByte": 27,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 10
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 27
+        }
+      },
+      {
+        "Type": "jsx_opening_element",
+        "Field": "open_tag",
+        "Parent": 6,
+        "Named": true,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 10,
+        "EndByte": 13,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 10
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 13
+        }
+      },
+      {
+        "Type": "<",
+        "Field": "",
+        "Parent": 7,
+        "Named": false,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 10,
+        "EndByte": 11,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 10
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 11
+        }
+      },
+      {
+        "Type": "identifier",
+        "Field": "name",
+        "Parent": 7,
+        "Named": true,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 11,
+        "EndByte": 12,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 11
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 12
+        }
+      },
+      {
+        "Type": ">",
+        "Field": "",
+        "Parent": 7,
+        "Named": false,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 12,
+        "EndByte": 13,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 12
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 13
+        }
+      },
+      {
+        "Type": "jsx_text",
+        "Field": "",
+        "Parent": 6,
+        "Named": true,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 13,
+        "EndByte": 17,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 13
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 17
+        }
+      },
+      {
+        "Type": "ERROR",
+        "Field": "",
+        "Parent": 6,
+        "Named": true,
+        "Extra": true,
+        "Missing": false,
+        "Error": true,
+        "StartByte": 17,
+        "EndByte": 23,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 17
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 23
+        }
+      },
+      {
+        "Type": "&",
+        "Field": "",
+        "Parent": 12,
+        "Named": false,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 17,
+        "EndByte": 18,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 17
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 18
+        }
+      },
+      {
+        "Type": "identifier",
+        "Field": "",
+        "Parent": 12,
+        "Named": true,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 19,
+        "EndByte": 23,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 19
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 23
+        }
+      },
+      {
+        "Type": "jsx_closing_element",
+        "Field": "close_tag",
+        "Parent": 6,
+        "Named": true,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 23,
+        "EndByte": 27,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 23
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 27
+        }
+      },
+      {
+        "Type": "</",
+        "Field": "",
+        "Parent": 15,
+        "Named": false,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 23,
+        "EndByte": 25,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 23
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 25
+        }
+      },
+      {
+        "Type": "identifier",
+        "Field": "name",
+        "Parent": 15,
+        "Named": true,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 25,
+        "EndByte": 26,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 25
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 26
+        }
+      },
+      {
+        "Type": ">",
+        "Field": "",
+        "Parent": 15,
+        "Named": false,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 26,
+        "EndByte": 27,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 26
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 27
+        }
+      },
+      {
+        "Type": ";",
+        "Field": "",
+        "Parent": 1,
+        "Named": false,
+        "Extra": false,
+        "Missing": false,
+        "Error": false,
+        "StartByte": 27,
+        "EndByte": 28,
+        "StartPoint": {
+          "Row": 0,
+          "Column": 27
+        },
+        "EndPoint": {
+          "Row": 0,
+          "Column": 28
+        }
+      }
+    ]
+  },
+  "trace": [
+    "new_parse",
+    "process version:0, version_count:1, state:1, row:0, col:0",
+    "lex_external state:2, row:0, column:0",
+    "lex_internal state:125, row:0, column:0",
+    "consume character:'c'",
+    "consume character:'o'",
+    "consume character:'n'",
+    "consume character:'s'",
+    "consume character:'t'",
+    "consume character:'c'",
+    "consume character:'o'",
+    "consume character:'n'",
+    "consume character:'s'",
+    "consume character:'t'",
+    "lexed_lookahead sym:const, size:5",
+    "shift state:1199",
+    "process version:0, version_count:1, state:1199, row:0, col:5",
+    "lex_external state:2, row:0, column:5",
+    "skip character:' '",
+    "lex_internal state:125, row:0, column:5",
+    "skip character:' '",
+    "consume character:'a'",
+    "consume character:'a'",
+    "lexed_lookahead sym:identifier, size:2",
+    "shift state:1311",
+    "process version:0, version_count:1, state:1311, row:0, col:7",
+    "lex_external state:5, row:0, column:7",
+    "skip character:' '",
+    "lex_internal state:125, row:0, column:7",
+    "skip character:' '",
+    "consume character:'='",
+    "lexed_lookahead sym:=, size:2",
+    "shift state:273",
+    "process version:0, version_count:1, state:273, row:0, col:9",
+    "lex_external state:2, row:0, column:9",
+    "skip character:' '",
+    "consume character:'<'",
+    "lex_internal state:125, row:0, column:9",
+    "skip character:' '",
+    "consume character:'<'",
+    "lexed_lookahead sym:<, size:2",
+    "shift state:1318",
+    "process version:0, version_count:1, state:1318, row:0, col:11",
+    "lex_external state:2, row:0, column:11",
+    "lex_internal state:31, row:0, column:11",
+    "consume character:'p'",
+    "lexed_lookahead sym:identifier, size:1",
+    "shift state:1145",
+    "process version:0, version_count:1, state:1145, row:0, col:12",
+    "lex_external state:2, row:0, column:12",
+    "lex_internal state:31, row:0, column:12",
+    "consume character:'>'",
+    "lexed_lookahead sym:>, size:1",
+    "shift state:1301",
+    "process version:0, version_count:1, state:1301, row:0, col:13",
+    "lex_external state:6, row:0, column:13",
+    "consume character:'O'",
+    "consume character:'r'",
+    "consume character:'g'",
+    "consume character:' '",
+    "lexed_lookahead sym:jsx_text, size:4",
+    "reduce sym:jsx_opening_element, child_count:3",
+    "shift state:1154",
+    "process version:0, version_count:1, state:1154, row:0, col:17",
+    "lex_external state:6, row:0, column:17",
+    "lex_internal state:9, row:0, column:17",
+    "consume character:'&'",
+    "lex_external state:1, row:0, column:17",
+    "lex_internal state:0, row:0, column:17",
+    "consume character:'&'",
+    "lexed_lookahead sym:&, size:1",
+    "detect_error",
+    "resume version:0",
+    "skip_token symbol:&",
+    "process version:0, version_count:1, state:0, row:0, col:18",
+    "lex_external state:1, row:0, column:18",
+    "lex_internal state:0, row:0, column:18",
+    "skip character:' '",
+    "consume character:'T'",
+    "consume character:'e'",
+    "consume character:'a'",
+    "consume character:'m'",
+    "lexed_lookahead sym:identifier, size:5",
+    "recover_to_previous state:273, depth:4",
+    "skip_token symbol:identifier",
+    "process version:1, version_count:2, state:273, row:0, col:18",
+    "lex_external state:2, row:0, column:18",
+    "skip character:' '",
+    "lex_internal state:125, row:0, column:18",
+    "skip character:' '",
+    "consume character:'T'",
+    "consume character:'e'",
+    "consume character:'a'",
+    "consume character:'m'",
+    "lexed_lookahead sym:identifier, size:5",
+    "shift state:543",
+    "condense",
+    "process version:0, version_count:2, state:543, row:0, col:23",
+    "lex_external state:3, row:0, column:23",
+    "lex_internal state:3, row:0, column:23",
+    "consume character:'<'",
+    "lexed_lookahead sym:<, size:1",
+    "reduce sym:primary_expression, child_count:1",
+    "reduce sym:expression, child_count:1",
+    "shift state:219",
+    "process version:1, version_count:2, state:0, row:0, col:23",
+    "lex_external state:1, row:0, column:23",
+    "lex_internal state:0, row:0, column:23",
+    "consume character:'<'",
+    "consume character:'/'",
+    "lexed_lookahead sym:</, size:2",
+    "recover_to_previous state:1154, depth:2",
+    "skip_token symbol:</",
+    "process version:2, version_count:3, state:1154, row:0, col:23",
+    "lex_external state:6, row:0, column:23",
+    "consume character:'<'",
+    "lex_internal state:9, row:0, column:23",
+    "consume character:'<'",
+    "consume character:'/'",
+    "lexed_lookahead sym:</, size:2",
+    "shift state:1313",
+    "condense",
+    "process version:0, version_count:2, state:1313, row:0, col:25",
+    "lex_external state:2, row:0, column:25",
+    "lex_internal state:31, row:0, column:25",
+    "consume character:'p'",
+    "lexed_lookahead sym:identifier, size:1",
+    "shift state:1496",
+    "process version:1, version_count:2, state:219, row:0, col:24",
+    "lex_external state:2, row:0, column:24",
+    "lex_internal state:125, row:0, column:24",
+    "consume character:'/'",
+    "lexed_lookahead sym:/, size:1",
+    "shift state:1769",
+    "process version:1, version_count:2, state:1769, row:0, col:25",
+    "lex_external state:9, row:0, column:25",
+    "lex_internal state:2, row:0, column:25",
+    "consume character:'p'",
+    "consume character:'>'",
+    "consume character:';'",
+    "lexed_lookahead sym:regex_pattern, size:3",
+    "shift state:1808",
+    "process version:0, version_count:2, state:1496, row:0, col:26",
+    "lex_external state:2, row:0, column:26",
+    "lex_internal state:6, row:0, column:26",
+    "consume character:'>'",
+    "lexed_lookahead sym:>, size:1",
+    "shift state:805",
+    "process version:0, version_count:2, state:805, row:0, col:27",
+    "lex_external state:3, row:0, column:27",
+    "lex_internal state:124, row:0, column:27",
+    "consume character:';'",
+    "lexed_lookahead sym:;, size:1",
+    "reduce sym:jsx_closing_element, child_count:3",
+    "reduce sym:jsx_element, child_count:3",
+    "reduce sym:expression, child_count:1",
+    "reduce sym:_initializer, child_count:2",
+    "reduce sym:variable_declarator, child_count:2",
+    "shift state:476",
+    "process version:0, version_count:2, state:476, row:0, col:28",
+    "lex_external state:2, row:0, column:28",
+    "lex_internal state:125, row:0, column:28",
+    "lexed_lookahead sym:end, size:0",
+    "reduce sym:lexical_declaration, child_count:3",
+    "reduce sym:declaration, child_count:1",
+    "reduce sym:statement, child_count:1",
+    "reduce sym:program, child_count:1",
+    "accept",
+    "process version:1, version_count:2, state:1808, row:0, col:28",
+    "lex_external state:2, row:0, column:28",
+    "lex_internal state:32, row:0, column:28",
+    "lex_external state:1, row:0, column:28",
+    "lex_internal state:0, row:0, column:28",
+    "lexed_lookahead sym:end, size:0",
+    "detect_error",
+    "resume version:0",
+    "recover_eof",
+    "select_smaller_error symbol:program, over_symbol:ERROR",
+    "done"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "source": "Go 1.27.1 bundled golang.org/x/mod v0.36.1-0.20260813213634-8569e2639ca1",
+  "files": {
+    "go.mod": "6b8e9e6fc08afa12287e677fa57f24771590b8db78861c69f7f9df7764c9541c",
+    "LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+    "PATENTS": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc",
+    "modfile/print.go": "9e5fcaa2123a5f0548b3a320a8c3e363a9c7ca84aaae774e7e8cdf4d9023a54b",
+    "modfile/read.go": "c433d32623ca5621e4d4d97692ddc38451ebcd6638d54fa505fd7faa9b3e4399",
+    "modfile/rule.go": "f8c2300b20509d28eb58a1a55d10b035d8b84d1c3344238eacf4b457a979698e",
+    "modfile/work.go": "ad31b233b102190481c0b6bb6a4b350c9b34ae8836f349431fe297687cb68fc5",
+    "module/module.go": "aa2b672b6d0bbc701d46556d7d46399b2ef6ce1fb918687bd067bf8d5efd7741",
+    "module/pseudo.go": "55f36593e394a3595a52f636028442f6be9ed010a6a7e0403dac980b545a374d",
+    "semver/semver.go": "58528919e1a4a35f2bf95c7dbe2124c8aa8d151ca8f5dbe87f70058f7bb35a0d",
+    "sumdb/cache.go": "3ca7a2d27f6b6941afcf39256232baaadd6ed32683f56c4c768afc6a88793a5f",
+    "sumdb/client.go": "ef2e76d302bfaee7ab1dd8240600090e5fb691b0d9914e5a748c375019e07163",
+    "sumdb/server.go": "e8a1cb9209a12ec4cb2c9e994cd53506772d4092ae4eb453e7da123045b2275a",
+    "sumdb/test.go": "d0c8a6e36bfefb5054b62b428c43481bb00d1f29bf3b3ae3096d700ac0944d2d",
+    "zip/zip.go": "3a0fd2c978e20233b6bd904a9c510dd746a7a50825c35a2e4ab1d8618f9de77b",
+    "sumdb/dirhash/hash.go": "24de6a735c1605e39b6381e6962787faa5c59adab896fb66dbc1ac8b6afcb297",
+    "sumdb/note/note.go": "5d0612c1993bff1951f782b5965490a82be4872065919963e5ce1313d12f9945",
+    "sumdb/tlog/note.go": "c1d9ff098f27aab7d354385795f175a4bc0f05c46e3c37f3b3e2223f44b76236",
+    "sumdb/tlog/tile.go": "2eb6a68b3e9f39a2926b201c0813cf2c67a1465aabc4bd88fcb310437e16bc6a",
+    "sumdb/tlog/tlog.go": "c4bb27943a3ec8ea08ae2e0325259dc2707132ab7295d16bd3d238ba699ec628",
+    "internal/lazyregexp/lazyre.go": "2c98e15329ce3fb10d4348f791446d1a7f557b92c954a26a7188dad26f78974b",
+    "cmd/modulezip/main.go": "e0cf5f9c691d7823c6d5fb2d1d8d179662ea4a0356417ae1a18908b4427511b7"
+  }
+}

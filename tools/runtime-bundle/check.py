@@ -14,7 +14,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-invariants-', dir=SCRATCH) as d
         str(ROOT / 'tools/runtime-bundle/testdata/recovery_hardening_test.go')
     }}), encoding='utf-8')
     result = subprocess.run(['go', 'test', '-overlay=' + str(overlay), './internal/runtime',
-                             '-run', '^Test(SharedClosedRecoveryPrefix|RecoveryAcceptanceOrder)$',
+                             '-run', '^Test(SharedClosedRecoveryPrefix|RecoveryAcceptanceOrder|EOFTransitions|RecoveryRawLeafCost)$',
                              '-count=1', '-timeout=30s', '-json'],
                             cwd=ROOT, capture_output=True, timeout=90)
     print(result.stdout.decode(), end='')
@@ -22,5 +22,5 @@ with tempfile.TemporaryDirectory(prefix='runtime-invariants-', dir=SCRATCH) as d
         print(result.stderr.decode(), end='')
     result.check_returncode()
     passed = {row.get('Test') for row in map(json.loads, result.stdout.splitlines()) if row.get('Action') == 'pass'}
-    if not {'TestSharedClosedRecoveryPrefix', 'TestRecoveryAcceptanceOrder'} <= passed:
+    if not {'TestSharedClosedRecoveryPrefix', 'TestRecoveryAcceptanceOrder', 'TestEOFTransitions', 'TestRecoveryRawLeafCost'} <= passed:
         raise RuntimeError('private runtime invariant tests did not run')

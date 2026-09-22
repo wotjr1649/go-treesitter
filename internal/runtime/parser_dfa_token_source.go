@@ -836,6 +836,12 @@ func (d *dfaTokenSource) preferGLRUnionDFAOverExternalToken(extTok Token, extEnd
 	if len(d.glrStates) <= 1 || extTok.Symbol == 0 || extTok.StartByte != uint32(startPos) {
 		return Token{}, 0, 0, 0, false
 	}
+	// Preserve the JSX version's full external text token. Sibling code
+	// versions can split it through the internal DFA; choosing only a shorter
+	// punctuation token would irreversibly discard the JSX interpretation.
+	if statelessJSXTextToken(d.language, extTok) {
+		return Token{}, 0, 0, 0, false
+	}
 	extSupport := d.countGLRActionSupport(extTok.Symbol)
 	if extSupport <= 0 {
 		return Token{}, 0, 0, 0, false
@@ -5496,4 +5502,14 @@ func (d *dfaTokenSource) keywordReservedInState(state StateID, keyword Symbol) b
 		}
 	}
 	return false
+}
+
+func statelessJSXTextToken(language *Language, token Token) bool {
+	if language == nil || int(token.Symbol) >= len(language.SymbolNames) ||
+		language.SymbolNames[token.Symbol] != extNameJSXText ||
+		(language.Name != "javascript" && language.Name != "typescript" && language.Name != "tsx") {
+		return false
+	}
+	scanner, ok := language.ExternalScanner.(StatelessExternalScanner)
+	return ok && scanner.ExternalScannerIsStateless()
 }

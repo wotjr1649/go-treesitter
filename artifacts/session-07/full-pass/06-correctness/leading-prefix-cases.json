@@ -1,0 +1,964 @@
+{
+  "cases": [
+    {
+      "ID": "prefix-x.go-0",
+      "Filename": "x.go",
+      "Source": " package p\nvar x = 1\n",
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.go-1",
+      "Filename": "x.go",
+      "Source": "\tpackage p\nvar x = 1\n",
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.go-2",
+      "Filename": "x.go",
+      "Source": "\npackage p\nvar x = 1\n",
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.go-3",
+      "Filename": "x.go",
+      "Source": "\rpackage p\nvar x = 1\n",
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.go-4",
+      "Filename": "x.go",
+      "Source": "\fpackage p\nvar x = 1\n",
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.go-5",
+      "Filename": "x.go",
+      "Source": "\u000bpackage p\nvar x = 1\n",
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.go-6",
+      "Filename": "x.go",
+      "Source": "\u0000package p\nvar x = 1\n",
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.go-7",
+      "Filename": "x.go",
+      "Source": "\u0001package p\nvar x = 1\n",
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.go-8",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = 1\n",
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 2
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.go-9",
+      "Filename": "x.go",
+      "Source": " package p\nvar x = 1\n",
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 2
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.go-10",
+      "Filename": "x.go",
+      "Source": " package p\nvar x = 1\n",
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.go-11",
+      "Filename": "x.go",
+      "Source": " package p\nvar x = 1\n",
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.go-12",
+      "Filename": "x.go",
+      "Source": "​package p\nvar x = 1\n",
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.go-13",
+      "Filename": "x.go",
+      "Source": " package p\nvar x = 1\n",
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.go-14",
+      "Filename": "x.go",
+      "Source": " package p\nvar x = 1\n",
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.go-15",
+      "Filename": "x.go",
+      "Source": "﻿package p\nvar x = 1\n",
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.js-0",
+      "Filename": "x.js",
+      "Source": " const value = 1;\n",
+      "Previous": "const value = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.js-1",
+      "Filename": "x.js",
+      "Source": "\tconst value = 1;\n",
+      "Previous": "const value = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.js-2",
+      "Filename": "x.js",
+      "Source": "\nconst value = 1;\n",
+      "Previous": "const value = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.js-3",
+      "Filename": "x.js",
+      "Source": "\rconst value = 1;\n",
+      "Previous": "const value = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.js-4",
+      "Filename": "x.js",
+      "Source": "\fconst value = 1;\n",
+      "Previous": "const value = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.js-5",
+      "Filename": "x.js",
+      "Source": "\u000bconst value = 1;\n",
+      "Previous": "const value = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.js-6",
+      "Filename": "x.js",
+      "Source": "\u0000const value = 1;\n",
+      "Previous": "const value = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.js-7",
+      "Filename": "x.js",
+      "Source": "\u0001const value = 1;\n",
+      "Previous": "const value = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.js-8",
+      "Filename": "x.js",
+      "Source": "const value = 1;\n",
+      "Previous": "const value = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 2
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.js-9",
+      "Filename": "x.js",
+      "Source": " const value = 1;\n",
+      "Previous": "const value = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 2
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.js-10",
+      "Filename": "x.js",
+      "Source": " const value = 1;\n",
+      "Previous": "const value = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.js-11",
+      "Filename": "x.js",
+      "Source": " const value = 1;\n",
+      "Previous": "const value = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.js-12",
+      "Filename": "x.js",
+      "Source": "​const value = 1;\n",
+      "Previous": "const value = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.js-13",
+      "Filename": "x.js",
+      "Source": " const value = 1;\n",
+      "Previous": "const value = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.js-14",
+      "Filename": "x.js",
+      "Source": " const value = 1;\n",
+      "Previous": "const value = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.js-15",
+      "Filename": "x.js",
+      "Source": "﻿const value = 1;\n",
+      "Previous": "const value = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.jsx-0",
+      "Filename": "x.jsx",
+      "Source": " const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.jsx-1",
+      "Filename": "x.jsx",
+      "Source": "\tconst View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.jsx-2",
+      "Filename": "x.jsx",
+      "Source": "\nconst View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.jsx-3",
+      "Filename": "x.jsx",
+      "Source": "\rconst View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.jsx-4",
+      "Filename": "x.jsx",
+      "Source": "\fconst View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.jsx-5",
+      "Filename": "x.jsx",
+      "Source": "\u000bconst View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.jsx-6",
+      "Filename": "x.jsx",
+      "Source": "\u0000const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.jsx-7",
+      "Filename": "x.jsx",
+      "Source": "\u0001const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.jsx-8",
+      "Filename": "x.jsx",
+      "Source": "const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 2
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.jsx-9",
+      "Filename": "x.jsx",
+      "Source": " const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 2
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.jsx-10",
+      "Filename": "x.jsx",
+      "Source": " const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.jsx-11",
+      "Filename": "x.jsx",
+      "Source": " const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.jsx-12",
+      "Filename": "x.jsx",
+      "Source": "​const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.jsx-13",
+      "Filename": "x.jsx",
+      "Source": " const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.jsx-14",
+      "Filename": "x.jsx",
+      "Source": " const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.jsx-15",
+      "Filename": "x.jsx",
+      "Source": "﻿const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.ts-0",
+      "Filename": "x.ts",
+      "Source": " const value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.ts-1",
+      "Filename": "x.ts",
+      "Source": "\tconst value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.ts-2",
+      "Filename": "x.ts",
+      "Source": "\nconst value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.ts-3",
+      "Filename": "x.ts",
+      "Source": "\rconst value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.ts-4",
+      "Filename": "x.ts",
+      "Source": "\fconst value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.ts-5",
+      "Filename": "x.ts",
+      "Source": "\u000bconst value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.ts-6",
+      "Filename": "x.ts",
+      "Source": "\u0000const value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.ts-7",
+      "Filename": "x.ts",
+      "Source": "\u0001const value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.ts-8",
+      "Filename": "x.ts",
+      "Source": "const value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 2
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.ts-9",
+      "Filename": "x.ts",
+      "Source": " const value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 2
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.ts-10",
+      "Filename": "x.ts",
+      "Source": " const value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.ts-11",
+      "Filename": "x.ts",
+      "Source": " const value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.ts-12",
+      "Filename": "x.ts",
+      "Source": "​const value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.ts-13",
+      "Filename": "x.ts",
+      "Source": " const value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.ts-14",
+      "Filename": "x.ts",
+      "Source": " const value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.ts-15",
+      "Filename": "x.ts",
+      "Source": "﻿const value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.tsx-0",
+      "Filename": "x.tsx",
+      "Source": " const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.tsx-1",
+      "Filename": "x.tsx",
+      "Source": "\tconst View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.tsx-2",
+      "Filename": "x.tsx",
+      "Source": "\nconst View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.tsx-3",
+      "Filename": "x.tsx",
+      "Source": "\rconst View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.tsx-4",
+      "Filename": "x.tsx",
+      "Source": "\fconst View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.tsx-5",
+      "Filename": "x.tsx",
+      "Source": "\u000bconst View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.tsx-6",
+      "Filename": "x.tsx",
+      "Source": "\u0000const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.tsx-7",
+      "Filename": "x.tsx",
+      "Source": "\u0001const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.tsx-8",
+      "Filename": "x.tsx",
+      "Source": "const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 2
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.tsx-9",
+      "Filename": "x.tsx",
+      "Source": " const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 2
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.tsx-10",
+      "Filename": "x.tsx",
+      "Source": " const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.tsx-11",
+      "Filename": "x.tsx",
+      "Source": " const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.tsx-12",
+      "Filename": "x.tsx",
+      "Source": "​const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.tsx-13",
+      "Filename": "x.tsx",
+      "Source": " const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.tsx-14",
+      "Filename": "x.tsx",
+      "Source": " const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "prefix-x.tsx-15",
+      "Filename": "x.tsx",
+      "Source": "﻿const View = () => <p>x</p>;\n",
+      "Previous": "const View = () => <p>x</p>;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 3
+      },
+      "Repeat": 20
+    }
+  ]
+}

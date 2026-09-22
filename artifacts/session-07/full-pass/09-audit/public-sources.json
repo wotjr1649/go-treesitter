@@ -1,0 +1,653 @@
+[
+  {
+    "url": "https://api.github.com/repos/odvcencio/gotreesitter/issues/1064",
+    "response_sha256": "0085cb0d2713d1d100e87a6196526a91e361b40614006631745e291b8e0233c2",
+    "items": [
+      {
+        "number": 1064,
+        "title": "Certify compact grammar parity against the locked C baseline",
+        "state": "open",
+        "updated_at": "2026-09-18T22:14:38Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/issues/1064"
+      }
+    ]
+  },
+  {
+    "url": "https://api.github.com/repos/odvcencio/gotreesitter/issues/1065",
+    "response_sha256": "a003f7bb04f9c3a041c81810a294db02571a34caf7a1203e4943c96dd4d0951a",
+    "items": [
+      {
+        "number": 1065,
+        "title": "Pass the compact parser performance and release gates",
+        "state": "open",
+        "updated_at": "2026-09-18T22:30:02Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/issues/1065"
+      }
+    ]
+  },
+  {
+    "url": "https://api.github.com/repos/odvcencio/gotreesitter/issues/728",
+    "response_sha256": "a127ce5cb6e2e3ca0391a567d8cfb9caf29dbf6fee8b21683c42fb72f6e0d377",
+    "items": [
+      {
+        "number": 728,
+        "title": "Incremental reuse is silently disabled for every external-scanner language on the admission-candidate route",
+        "state": "closed",
+        "updated_at": "2026-08-16T17:18:07Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/issues/728"
+      }
+    ]
+  },
+  {
+    "url": "https://api.github.com/repos/odvcencio/gotreesitter/issues/454",
+    "response_sha256": "bae517e96b8e8e0839c96b806e66a3bea7b25ebfa7a6f85a733d0603f3106203",
+    "items": [
+      {
+        "number": 454,
+        "title": "# field reports from downstream user (Windows GUI toolkit, pure-Go editor widget, multiple syntaxes) on latest release versions",
+        "state": "open",
+        "updated_at": "2026-09-18T21:07:29Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/issues/454"
+      }
+    ]
+  },
+  {
+    "url": "https://api.github.com/repos/odvcencio/gotreesitter/issues/1242",
+    "response_sha256": "a3753320a418f6e3bb2e1c5fada2e730f815b7e40bf937c5955fe7bb27548aa7",
+    "items": [
+      {
+        "number": 1242,
+        "title": "tsx: a bare `&` or `=` in JSX text produces an ERROR node — regressed in v0.21.0 and v0.36.0, still in v0.53.0",
+        "state": "open",
+        "updated_at": "2026-09-21T11:42:44Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/issues/1242"
+      }
+    ]
+  },
+  {
+    "url": "https://api.github.com/repos/tree-sitter/go-tree-sitter/issues?state=all&per_page=100",
+    "response_sha256": "a24dd7265cdf153fc2b71e93b0fc9d8e13a2b6632300a7f68cf096664b8b2cdc",
+    "items": [
+      {
+        "number": 58,
+        "title": "fix: keep query cursor options alive for the cursor's lifetime",
+        "state": "open",
+        "updated_at": "2026-08-26T21:09:18Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/58"
+      },
+      {
+        "number": 57,
+        "title": "perf: add ParseBuffer, a zero-copy path for contiguous input",
+        "state": "open",
+        "updated_at": "2026-08-23T22:35:47Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/57"
+      },
+      {
+        "number": 56,
+        "title": "fix: release the options handle after parsing",
+        "state": "open",
+        "updated_at": "2026-05-23T16:46:17Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/56"
+      },
+      {
+        "number": 55,
+        "title": "Parser.ParseWithOptions leaks a cgo handle on every call with non-nil options (Saved, never Unref'd)",
+        "state": "open",
+        "updated_at": "2026-06-03T06:56:02Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/55"
+      },
+      {
+        "number": 54,
+        "title": "Expose text on QueryMatches and QueryCaptures",
+        "state": "open",
+        "updated_at": "2026-09-03T21:02:22Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/54"
+      },
+      {
+        "number": 53,
+        "title": "go-tree-sitter fails to parse Go 1.26's new(expr) expression",
+        "state": "closed",
+        "updated_at": "2026-04-10T23:44:32Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/53"
+      },
+      {
+        "number": 52,
+        "title": "Possible memory leak when processing certain files",
+        "state": "open",
+        "updated_at": "2026-07-05T02:29:34Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/52"
+      },
+      {
+        "number": 51,
+        "title": "build!: bump tree-sitter core v0.25.1 → v0.26.6",
+        "state": "open",
+        "updated_at": "2026-02-27T00:03:06Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/51"
+      },
+      {
+        "number": 50,
+        "title": "version 0.25.0 missing?",
+        "state": "open",
+        "updated_at": "2026-09-02T14:47:51Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/50"
+      },
+      {
+        "number": 49,
+        "title": "Language grammar dependencies in go.mod pollute downstream go.sum files",
+        "state": "open",
+        "updated_at": "2026-01-15T13:54:02Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/49"
+      },
+      {
+        "number": 48,
+        "title": "feat: replace node pointer in place for much cheaper AST traversal",
+        "state": "open",
+        "updated_at": "2025-12-28T17:15:29Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/48"
+      },
+      {
+        "number": 47,
+        "title": "build: bump tree-sitter from `f5afe47` to `0df2916`",
+        "state": "open",
+        "updated_at": "2025-12-21T04:02:41Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/47"
+      },
+      {
+        "number": 46,
+        "title": "ci: bump the actions group with 2 updates",
+        "state": "open",
+        "updated_at": "2026-02-07T04:22:20Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/46"
+      },
+      {
+        "number": 45,
+        "title": "fix: Update build constraints to include FreeBSD",
+        "state": "open",
+        "updated_at": "2026-01-28T10:48:30Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/45"
+      },
+      {
+        "number": 44,
+        "title": "fix!: make `satisfiesTextPredicate` private",
+        "state": "closed",
+        "updated_at": "2025-11-12T18:35:34Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/44"
+      },
+      {
+        "number": 43,
+        "title": "perf: use the C allocator functions directly if no allocator is set",
+        "state": "closed",
+        "updated_at": "2025-11-12T18:02:17Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/43"
+      },
+      {
+        "number": 42,
+        "title": "feat: add nix flake",
+        "state": "closed",
+        "updated_at": "2025-11-12T18:02:19Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/42"
+      },
+      {
+        "number": 41,
+        "title": "Go vendoring ignores c files",
+        "state": "closed",
+        "updated_at": "2025-10-17T23:00:11Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/41"
+      },
+      {
+        "number": 40,
+        "title": "[Question] Are bindings for the `tree-sitter highlight` command on the roadmap?",
+        "state": "closed",
+        "updated_at": "2025-11-12T17:42:13Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/40"
+      },
+      {
+        "number": 39,
+        "title": "What are `buffer1` and `buffer2` in `SatisfiesTextPredicate`?",
+        "state": "closed",
+        "updated_at": "2025-11-12T19:25:16Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/39"
+      },
+      {
+        "number": 38,
+        "title": "fix README.md badge",
+        "state": "closed",
+        "updated_at": "2025-11-12T17:38:03Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/38"
+      },
+      {
+        "number": 37,
+        "title": "README.md github CI badge links to incorrect repo",
+        "state": "closed",
+        "updated_at": "2025-11-12T17:38:04Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/37"
+      },
+      {
+        "number": 36,
+        "title": "Memory not being released back to system",
+        "state": "closed",
+        "updated_at": "2025-11-12T17:36:28Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/36"
+      },
+      {
+        "number": 35,
+        "title": "Remove unnecessary allocator trampoline",
+        "state": "closed",
+        "updated_at": "2025-11-12T17:37:31Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/35"
+      },
+      {
+        "number": 34,
+        "title": ".",
+        "state": "closed",
+        "updated_at": "2025-11-12T17:47:07Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/34"
+      },
+      {
+        "number": 33,
+        "title": "sitter.NewQuery returns  tree_sitter.QueryError(nil)",
+        "state": "closed",
+        "updated_at": "2025-11-12T17:59:25Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/33"
+      },
+      {
+        "number": 32,
+        "title": "cgo callback performance",
+        "state": "closed",
+        "updated_at": "2025-11-12T17:36:27Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/32"
+      },
+      {
+        "number": 31,
+        "title": "feat: QueryCursor iterators",
+        "state": "open",
+        "updated_at": "2026-03-28T20:05:51Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/31"
+      },
+      {
+        "number": 30,
+        "title": "Consider custom iterator for captures",
+        "state": "open",
+        "updated_at": "2025-11-12T18:11:56Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/30"
+      },
+      {
+        "number": 29,
+        "title": "Slice index access parsed as type instantiation expression",
+        "state": "closed",
+        "updated_at": "2025-05-30T08:52:27Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/29"
+      },
+      {
+        "number": 28,
+        "title": "Replacement for ParseCtx",
+        "state": "closed",
+        "updated_at": "2025-11-12T17:46:24Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/28"
+      },
+      {
+        "number": 27,
+        "title": "nvim crashes when go treesitter highlighter is on: invalid node type position 97",
+        "state": "closed",
+        "updated_at": "2025-01-31T21:58:30Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/27"
+      },
+      {
+        "number": 26,
+        "title": "feat!: update to 0.25",
+        "state": "closed",
+        "updated_at": "2025-11-12T18:35:38Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/26"
+      },
+      {
+        "number": 25,
+        "title": "docs: add purego info",
+        "state": "closed",
+        "updated_at": "2024-11-24T20:29:38Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/25"
+      },
+      {
+        "number": 24,
+        "title": "refactor: captures unsafe casting from TSQueryMatch",
+        "state": "closed",
+        "updated_at": "2024-11-24T19:43:19Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/24"
+      },
+      {
+        "number": 23,
+        "title": "build: bump tree-sitter from `68c1fb6` to `274e60a`",
+        "state": "closed",
+        "updated_at": "2025-11-12T17:47:27Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/23"
+      },
+      {
+        "number": 22,
+        "title": "build: bump tree-sitter from `68c1fb6` to `18e4a24`",
+        "state": "closed",
+        "updated_at": "2024-11-17T04:31:31Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/22"
+      },
+      {
+        "number": 21,
+        "title": "refactor: change Node pointers to values & return (Node, bool)",
+        "state": "open",
+        "updated_at": "2025-05-23T10:52:59Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/21"
+      },
+      {
+        "number": 20,
+        "title": "feat: add Node.Equals",
+        "state": "closed",
+        "updated_at": "2024-11-10T01:56:11Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/20"
+      },
+      {
+        "number": 19,
+        "title": "Binding Inconsistencies",
+        "state": "open",
+        "updated_at": "2024-12-31T11:47:37Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/19"
+      },
+      {
+        "number": 18,
+        "title": "build: bump tree-sitter from `68c1fb6` to `66a1bc5`",
+        "state": "closed",
+        "updated_at": "2024-11-10T04:51:17Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/18"
+      },
+      {
+        "number": 17,
+        "title": "build: bump tree-sitter from `68c1fb6` to `3661689`",
+        "state": "closed",
+        "updated_at": "2024-11-03T04:03:17Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/17"
+      },
+      {
+        "number": 16,
+        "title": "Create version with wasm+wazero instead of cgo",
+        "state": "closed",
+        "updated_at": "2025-01-30T00:37:06Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/16"
+      },
+      {
+        "number": 15,
+        "title": "build: bump tree-sitter from `68c1fb6` to `9c8a0d4`",
+        "state": "closed",
+        "updated_at": "2024-10-27T04:07:51Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/15"
+      },
+      {
+        "number": 14,
+        "title": "feat: bump lib to 0.24",
+        "state": "closed",
+        "updated_at": "2025-11-12T18:35:37Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/14"
+      },
+      {
+        "number": 13,
+        "title": "build: bump tree-sitter from `ee06325` to `4705a31`",
+        "state": "closed",
+        "updated_at": "2024-10-20T04:03:57Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/13"
+      },
+      {
+        "number": 12,
+        "title": "bug: go-tree-sitter breaks when text is more than 32.7Kb",
+        "state": "closed",
+        "updated_at": "2024-10-10T09:02:12Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/12"
+      },
+      {
+        "number": 11,
+        "title": "build: bump tree-sitter from `ee06325` to `099fd4e`",
+        "state": "closed",
+        "updated_at": "2024-10-13T04:15:40Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/11"
+      },
+      {
+        "number": 10,
+        "title": "Set minimum go version to 1.22",
+        "state": "closed",
+        "updated_at": "2024-09-30T15:03:35Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/10"
+      },
+      {
+        "number": 9,
+        "title": "build: bump tree-sitter from `ee06325` to `12007d3`",
+        "state": "closed",
+        "updated_at": "2024-10-06T04:41:29Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/9"
+      },
+      {
+        "number": 8,
+        "title": "set _POSIX_C_SOURCE=200112L in CFLAGS",
+        "state": "closed",
+        "updated_at": "2024-09-29T04:35:49Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/8"
+      },
+      {
+        "number": 7,
+        "title": "Build failure on debian sid",
+        "state": "closed",
+        "updated_at": "2024-09-29T04:35:50Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/7"
+      },
+      {
+        "number": 6,
+        "title": "build: bump tree-sitter from `ee06325` to `4f0d463`",
+        "state": "closed",
+        "updated_at": "2024-09-29T04:16:36Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/6"
+      },
+      {
+        "number": 5,
+        "title": "build: bump tree-sitter from `ee06325` to `7e3f572`",
+        "state": "closed",
+        "updated_at": "2024-09-22T04:07:19Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/5"
+      },
+      {
+        "number": 4,
+        "title": "build: bump tree-sitter from `ee06325` to `10e474f`",
+        "state": "closed",
+        "updated_at": "2024-09-15T04:53:52Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/4"
+      },
+      {
+        "number": 3,
+        "title": "build: bump tree-sitter from `12fb318` to `ee06325`",
+        "state": "closed",
+        "updated_at": "2024-09-08T04:43:40Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/3"
+      },
+      {
+        "number": 2,
+        "title": "fatal error: 'tree_sitter/api.h' file not found",
+        "state": "closed",
+        "updated_at": "2024-08-26T16:36:06Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/issues/2"
+      },
+      {
+        "number": 1,
+        "title": "build: bump tree-sitter from `2150c91` to `6ef7685`",
+        "state": "closed",
+        "updated_at": "2024-09-01T04:04:39Z",
+        "html_url": "https://github.com/tree-sitter/go-tree-sitter/pull/1"
+      }
+    ]
+  },
+  {
+    "url": "https://api.github.com/repos/odvcencio/gotreesitter/issues?state=open&per_page=100",
+    "response_sha256": "48e3c2a9a97ad06a426a38c0daa4c3407e878104710abfc449fc539bcfed5e56",
+    "items": [
+      {
+        "number": 1243,
+        "title": "Add reusable result buffers for fact extraction",
+        "state": "open",
+        "updated_at": "2026-09-22T14:15:21Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/pull/1243"
+      },
+      {
+        "number": 1242,
+        "title": "tsx: a bare `&` or `=` in JSX text produces an ERROR node — regressed in v0.21.0 and v0.36.0, still in v0.53.0",
+        "state": "open",
+        "updated_at": "2026-09-21T11:42:44Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/issues/1242"
+      },
+      {
+        "number": 1241,
+        "title": "fix(grammars/runtime): Bind external scanner symbols from the loaded language",
+        "state": "open",
+        "updated_at": "2026-09-21T04:22:41Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/pull/1241"
+      },
+      {
+        "number": 1240,
+        "title": "update(cgo_harness): Re-pin dispatch blocker receipts after isExtra fix",
+        "state": "open",
+        "updated_at": "2026-09-21T04:13:13Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/pull/1240"
+      },
+      {
+        "number": 1238,
+        "title": "fix(parser/cobol): stale result-compatibility skip and COBOL recovery field loss",
+        "state": "open",
+        "updated_at": "2026-09-21T03:52:02Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/pull/1238"
+      },
+      {
+        "number": 1236,
+        "title": "add(ci, cgo_harness): pinned-digest cgo parity coverage (3 consolidated steps)",
+        "state": "open",
+        "updated_at": "2026-09-21T03:57:07Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/pull/1236"
+      },
+      {
+        "number": 1235,
+        "title": "fix(parsercore): Disable zero-width external relex seam by default",
+        "state": "open",
+        "updated_at": "2026-09-21T03:33:29Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/pull/1235"
+      },
+      {
+        "number": 1233,
+        "title": "fix(parser/cobol): Re-run compatibility pass on erroring root and fix CICS field IDs",
+        "state": "open",
+        "updated_at": "2026-09-21T03:21:30Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/pull/1233"
+      },
+      {
+        "number": 1232,
+        "title": "fix(parser): Keep missing nodes visible during reduce child flattening",
+        "state": "open",
+        "updated_at": "2026-09-21T03:13:15Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/pull/1232"
+      },
+      {
+        "number": 1230,
+        "title": "update(cgo_harness): Add HLSL next-live-arm parity gate to CI",
+        "state": "open",
+        "updated_at": "2026-09-21T02:57:25Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/pull/1230"
+      },
+      {
+        "number": 1226,
+        "title": "add(cgo_harness): Wire COBOL grammargen-vs-C parity into CI with per-grammar floors",
+        "state": "open",
+        "updated_at": "2026-09-21T02:31:37Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/pull/1226"
+      },
+      {
+        "number": 1223,
+        "title": "fix(cobol): Restore field metadata in EXEC CICS class-error recovery",
+        "state": "open",
+        "updated_at": "2026-09-21T03:46:03Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/pull/1223"
+      },
+      {
+        "number": 1221,
+        "title": "fix(parser): Rank accepted GLR stacks last in per-iteration cull",
+        "state": "open",
+        "updated_at": "2026-09-21T03:04:48Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/pull/1221"
+      },
+      {
+        "number": 1151,
+        "title": "chore(grammars): refresh pinned lock refs",
+        "state": "open",
+        "updated_at": "2026-09-21T12:48:19Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/pull/1151"
+      },
+      {
+        "number": 1105,
+        "title": "fix(go): align the embedded grammar with the locked C baseline",
+        "state": "open",
+        "updated_at": "2026-09-18T22:32:18Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/pull/1105"
+      },
+      {
+        "number": 1065,
+        "title": "Pass the compact parser performance and release gates",
+        "state": "open",
+        "updated_at": "2026-09-18T22:30:02Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/issues/1065"
+      },
+      {
+        "number": 1064,
+        "title": "Certify compact grammar parity against the locked C baseline",
+        "state": "open",
+        "updated_at": "2026-09-18T22:14:38Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/issues/1064"
+      },
+      {
+        "number": 1063,
+        "title": "Graduate the compact parser through seven gated packages",
+        "state": "open",
+        "updated_at": "2026-09-17T07:01:22Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/issues/1063"
+      },
+      {
+        "number": 1061,
+        "title": "Compact recovery ambiguity must use the C acceptance election",
+        "state": "open",
+        "updated_at": "2026-09-03T00:43:47Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/issues/1061"
+      },
+      {
+        "number": 1057,
+        "title": "Compact S5 must search reduced heads before a real token",
+        "state": "open",
+        "updated_at": "2026-09-18T21:36:10Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/issues/1057"
+      },
+      {
+        "number": 1056,
+        "title": "C recovery port must preserve native EOF reduction semantics",
+        "state": "open",
+        "updated_at": "2026-09-03T00:29:19Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/issues/1056"
+      },
+      {
+        "number": 1052,
+        "title": "Track the compact graduation maintenance lane",
+        "state": "open",
+        "updated_at": "2026-09-17T07:06:14Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/issues/1052"
+      },
+      {
+        "number": 576,
+        "title": "Swift recovery: upstream unsafe gap and locked-C structural divergence",
+        "state": "open",
+        "updated_at": "2026-08-13T19:22:15Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/issues/576"
+      },
+      {
+        "number": 454,
+        "title": "# field reports from downstream user (Windows GUI toolkit, pure-Go editor widget, multiple syntaxes) on latest release versions",
+        "state": "open",
+        "updated_at": "2026-09-18T21:07:29Z",
+        "html_url": "https://github.com/odvcencio/gotreesitter/issues/454"
+      }
+    ]
+  }
+]

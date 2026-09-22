@@ -51,6 +51,9 @@ type Identities struct {
 type Runtime struct {
 	Module         string `json:"module"`
 	ManifestSHA256 string `json:"manifest_sha256"`
+	// GrammarBlobs identifies derived product artifacts. Grammars above keeps
+	// the original upstream identities used to bind the unchanged C epoch.
+	GrammarBlobs map[string]string `json:"grammar_blobs,omitempty"`
 }
 
 func Read() (Identities, error) {

@@ -69,14 +69,15 @@ const (
 )
 
 var builtinLanguageRuntimeProfiles = map[string]builtinLanguageRuntimeProfile{
-	// The canonical compact corpus certifies Go's converged-path split drops
-	// against the production parser and the tree-sitter C oracle.
-	// The owned EOF bundle requires its executed recovery route before publication.
+	"tsx": {
+		blobSHA256:                   mustRuntimeProfileSHA256("bf8c490b0bbeb6d4150abce2edc193552e44b093893665dde69bd39e9e940e85"),
+		compactPackedGSSVersionOrder: true,
+	},
+	// Go uses the tables converted from the pinned C grammar. Compact-route
+	// certificates for the different grammargen blob do not transfer to it.
 	"go": {
 		compactPackedGSSVersionOrder: true,
-		blobSHA256:                   mustRuntimeProfileSHA256("9cf914d26d962d1a62e7954f8b20b302337a44cb7d4a07218eec482c45a57a08"),
-		compactConvergedSplitDrops:   true,
-		compactOwnedEOFRecovery:      true,
+		blobSHA256:                   mustRuntimeProfileSHA256("81f9b19b5886ac11646c713c0c531bd835fc026d363437ba29b28ac2faabea9a"),
 	},
 	// YAML's irreducible flow opener has one direct no-action EOF lineage whose
 	// C result is the recover_eof ERROR root. Keep this gate independent from

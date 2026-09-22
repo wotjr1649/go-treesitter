@@ -1,0 +1,9 @@
+{
+  "case": {
+    "ID": "js-cost",
+    "Filename": "x.js",
+    "Source": "const value = 1;\n",
+    "Repeat": 1
+  },
+  "sha256": "12353d74458c74c713ae51b29bd1b8d003d95f11437caaf4697fb9897256fb9c"
+}

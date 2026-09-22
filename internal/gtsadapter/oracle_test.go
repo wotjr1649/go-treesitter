@@ -98,7 +98,14 @@ func validateOracle(c oracleCase, source []byte, r oracleRecord, buildHash strin
 		return fmt.Errorf("incomplete C receipt for %s", c.ID)
 	}
 	for i, n := range r.Nodes {
-		if n.StartByte > n.EndByte || n.EndByte > r.End || n.Type == "" ||
+		// The pinned Go grammar has a literal NUL terminal. The C API exposes
+		// its NUL-terminated name as empty, including the zero-width EOF form.
+		goNUL := c.Language == "go" && i > 0 && !n.Named && !n.Extra && !n.Missing && !n.Error &&
+			n.StartByte <= n.EndByte && n.EndByte <= uint32(len(source)) &&
+			((n.StartByte == n.EndByte && n.EndByte == uint32(len(source))) ||
+				(n.EndByte == n.StartByte+1 && source[n.StartByte] == 0)) &&
+			n.StartPoint == syntax.Point(point(source[:n.StartByte])) && n.EndPoint == syntax.Point(point(source[:n.EndByte]))
+		if n.StartByte > n.EndByte || n.EndByte > r.End || (n.Type == "" && !goNUL) ||
 			(i == 0 && n.Parent != -1) || (i > 0 && (n.Parent < 0 || n.Parent >= i)) {
 			return fmt.Errorf("invalid ordered C node for %s at %d", c.ID, i)
 		}
@@ -135,6 +142,14 @@ func TestCSharpRecoveryPreservationOracleRecords(t *testing.T) {
 
 func TestGoRecoveryOrderOracleRecords(t *testing.T) {
 	runOracleCorpus(t, "testdata/oracle/go-recovery-cases.json", "testdata/oracle/windows-c-v2/go-recovery", "")
+}
+
+func TestGoRecoveryKeywordOracleRecords(t *testing.T) {
+	runOracleCorpus(t, "testdata/oracle/go-keyword-cases.json", "testdata/oracle/windows-c-v2/go-keyword", "")
+}
+
+func TestRuntimeHardeningOracleRecords(t *testing.T) {
+	runOracleCorpus(t, "testdata/oracle/runtime-hardening-cases.json", "testdata/oracle/windows-c-v2/runtime-hardening", "")
 }
 
 func runOracleRecords(t *testing.T) {
@@ -210,12 +225,7 @@ func runOracleCorpus(t *testing.T, casesPath, recordsDir, differencesPath string
 		t.Fatal(err)
 	}
 	t.Logf("runtime origin=%s manifest=%s", pins.Baseline.Version, pins.Runtime.ManifestSHA256)
-	for language, grammar := range pins.Grammars {
-		blob, err := os.ReadFile(filepath.Join(root, "internal/runtime/grammars", "grammar_blobs", language+".bin"))
-		if err != nil || fmt.Sprintf("%x", sha256.Sum256(blob)) != grammar.BlobSHA256 {
-			t.Fatalf("grammar identity mismatch: %s", language)
-		}
-	}
+	// VerifyRuntime also binds original grammar hashes and derived product blobs.
 	var cases []oracleCase
 	casesJSON := read(casesPath, &cases)
 	var set struct {
@@ -240,11 +250,12 @@ func runOracleCorpus(t *testing.T, casesPath, recordsDir, differencesPath string
 			t.Fatalf("record file identity mismatch: %s", name)
 		}
 	}
-	var differences map[string]struct {
-		Record, Source, GoDigest, CDigest string
-	}
 	if differencesPath != "" {
+		var differences map[string]json.RawMessage
 		read(differencesPath, &differences)
+		if len(differences) != 0 {
+			t.Fatal("release-critical corpus contains an active exception")
+		}
 	}
 	if len(cases) == 0 {
 		t.Fatal("missing fixture set")
@@ -350,21 +361,10 @@ func runOracleCorpus(t *testing.T, casesPath, recordsDir, differencesPath string
 				}
 				return
 			}
-			if known, ok := differences[c.ID]; ok {
-				if known.Source != c.SHA256 || known.CDigest != receipt.NodesSHA256 || known.GoDigest != nodeDigest(goNodes) {
-					t.Fatalf("STALE or NEW REGRESSION %s: exact recorded difference changed", known.Record)
-				}
-				if known.Record != "KR-0001a" || c.Group != "KR-0001a" {
-					t.Fatal("only the documented bare-ampersand characterization may differ")
-				}
-			} else if c.Group == "KR-0001a" {
-				t.Fatal("missing known-difference identity")
-			}
 			if c.Group == "KR-0001a" {
 				if !receipt.HasError || result.Outcome != syntax.AcceptedWithErrors || !result.HasError {
 					t.Fatal("NEW REGRESSION: bare ampersand characterization")
 				}
-				return // Recovered-shape differences are explicitly documented for these inputs.
 			}
 			if first >= 0 {
 				t.Fatal("unregistered ordered tree difference")
@@ -381,11 +381,6 @@ func runOracleCorpus(t *testing.T, casesPath, recordsDir, differencesPath string
 				t.Fatal("outcome or error receipt disagrees with the authoritative C tree")
 			}
 		})
-	}
-	for id := range differences {
-		if !seen[id] {
-			t.Fatalf("recorded fixture missing: %s", id)
-		}
 	}
 }
 
@@ -441,6 +436,44 @@ func TestOracleRejectsChangedEvidence(t *testing.T) {
 		alter(&changed)
 		if validateOracle(c, source, changed, "build", 15) == nil {
 			t.Fatal("changed evidence accepted")
+		}
+	}
+}
+
+func TestOracleNULTerminal(t *testing.T) {
+	for _, source := range [][]byte{[]byte("x"), {0}} {
+		start := uint32(1)
+		if source[0] == 0 {
+			start = 0
+		}
+		c := oracleCase{ID: "nul", Language: "go", SHA256: fmt.Sprintf("%x", sha256.Sum256(source))}
+		leaf := syntax.Node{Parent: 0, StartByte: start, EndByte: 1,
+			StartPoint: syntax.Point{Column: start}, EndPoint: syntax.Point{Column: 1}}
+		r := oracleRecord{Schema: 1, Fixture: c.ID, Language: c.Language, ABI: 15,
+			InputBytes: 1, SourceSHA256: c.SHA256, BuildSHA256: "build", End: 1,
+			Nodes: []syntax.Node{{Type: "source_file", Parent: -1, EndByte: 1}, leaf}}
+		r.NodesSHA256 = nodeDigest(r.Nodes)
+		if err := validateOracle(c, source, r, "build", 15); err != nil {
+			t.Fatal(err)
+		}
+		for _, alter := range []func(*syntax.Node){
+			func(n *syntax.Node) { n.Named = true }, func(n *syntax.Node) { n.Extra = true },
+			func(n *syntax.Node) { n.Missing = true }, func(n *syntax.Node) { n.Error = true },
+			func(n *syntax.Node) { n.Parent = -1 }, func(n *syntax.Node) { n.StartPoint.Column++ },
+			func(n *syntax.Node) { n.EndByte++ },
+		} {
+			r.Nodes[1] = leaf
+			alter(&r.Nodes[1])
+			r.NodesSHA256 = nodeDigest(r.Nodes)
+			if validateOracle(c, source, r, "build", 15) == nil {
+				t.Fatal("invalid anonymous NUL terminal accepted")
+			}
+		}
+		r.Nodes[1] = leaf
+		c.Language, r.Language = "typescript", "typescript"
+		r.NodesSHA256 = nodeDigest(r.Nodes)
+		if validateOracle(c, source, r, "build", 15) == nil {
+			t.Fatal("empty token name accepted outside the Go grammar")
 		}
 	}
 }

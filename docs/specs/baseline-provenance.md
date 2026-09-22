@@ -64,7 +64,9 @@ The product compiles `internal/runtime`, not a replaced external module.
 `identities.json.runtime` records the internal import path and the SHA-256 of
 `internal/provenance/runtime.json`. That manifest binds the exact original
 archive, source inventory, import relocation tool, patch inventory and every
-original/resulting file. The original grammar blob hashes above remain unchanged.
+original/resulting file. The original grammar blob hashes above remain the
+upstream origin identities. A derived product blob is separately identified by
+`runtime.grammar_blobs` and must match its manifest's resulting file hash.
 Changing the carrier requires regenerating and reviewing this identity, then
 rerunning its affected checks. This is distinct from changing the upstream origin.
 See ADR-0013 and `tools/runtime-bundle/README.md` for reproduction and retirement.
@@ -73,12 +75,20 @@ ADR-0014 separates 19 GPL-specific files and three aggregate registrations into
 the optional grammar module. The main carrier has 1,508 files; its manifest
 also binds the separator and excluded original hashes. The optional module's
 `provenance.json` binds its generated files, notices and corresponding sources.
-The 206 original grammar blobs, upstream origin and C-oracle epoch are unchanged.
+The 206 grammar origins, upstream module origin and C-oracle epoch are unchanged.
 
 The Go recovery-order patch also enables the existing C version transaction
 for the exact Go blob above. Its fresh/edit C witnesses and minimized fuzz seed
 are retained in the workload register. The carrier manifest includes this
 patch; this does not select a different upstream version or grammar.
+
+ADR-0015 derives the Go product blob from the same pinned grammar's C tables
+with the pinned upstream converter. Its hash is
+`81f9b19b5886ac11646c713c0c531bd835fc026d363437ba29b28ac2faabea9a`.
+`tools/runtime-bundle/grammars/go.json` identifies the C input, converter and
+source archive. The original Go blob above remains the origin, while the
+derived blob has independently rerun product and C comparisons. No compact-route
+certificate is transferred from the original blob.
 
 ## Identity rules
 

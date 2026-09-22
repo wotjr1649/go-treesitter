@@ -1,0 +1,1444 @@
+{
+  "cases": [
+    {
+      "ID": "Go-EOF-valid-expanded-0-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = 1",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = 1\n",
+      "Edit": {
+        "StartByte": 19,
+        "OldEndByte": 20,
+        "NewEndByte": 19
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-0-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = 1 // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = 1 // end\n",
+      "Edit": {
+        "StartByte": 26,
+        "OldEndByte": 27,
+        "NewEndByte": 26
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-0-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = 1\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = 1\n\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 21,
+        "NewEndByte": 20
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-0-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = 1;",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = 1;\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 21,
+        "NewEndByte": 20
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-1-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x int",
+      "Repeat": 2,
+      "Previous": "package p\nvar x int\n",
+      "Edit": {
+        "StartByte": 19,
+        "OldEndByte": 20,
+        "NewEndByte": 19
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-1-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x int // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x int // end\n",
+      "Edit": {
+        "StartByte": 26,
+        "OldEndByte": 27,
+        "NewEndByte": 26
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-1-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x int\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x int\n\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 21,
+        "NewEndByte": 20
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-1-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x int;",
+      "Repeat": 2,
+      "Previous": "package p\nvar x int;\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 21,
+        "NewEndByte": 20
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-2-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = y",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = y\n",
+      "Edit": {
+        "StartByte": 19,
+        "OldEndByte": 20,
+        "NewEndByte": 19
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-2-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = y // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = y // end\n",
+      "Edit": {
+        "StartByte": 26,
+        "OldEndByte": 27,
+        "NewEndByte": 26
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-2-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = y\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = y\n\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 21,
+        "NewEndByte": 20
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-2-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = y;",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = y;\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 21,
+        "NewEndByte": 20
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-3-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = true",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = true\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-3-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = true // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = true // end\n",
+      "Edit": {
+        "StartByte": 29,
+        "OldEndByte": 30,
+        "NewEndByte": 29
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-3-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = true\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = true\n\n",
+      "Edit": {
+        "StartByte": 23,
+        "OldEndByte": 24,
+        "NewEndByte": 23
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-3-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = true;",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = true;\n",
+      "Edit": {
+        "StartByte": 23,
+        "OldEndByte": 24,
+        "NewEndByte": 23
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-4-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = nil",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = nil\n",
+      "Edit": {
+        "StartByte": 21,
+        "OldEndByte": 22,
+        "NewEndByte": 21
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-4-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = nil // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = nil // end\n",
+      "Edit": {
+        "StartByte": 28,
+        "OldEndByte": 29,
+        "NewEndByte": 28
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-4-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = nil\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = nil\n\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-4-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = nil;",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = nil;\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-5-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = \"s\"",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = \"s\"\n",
+      "Edit": {
+        "StartByte": 21,
+        "OldEndByte": 22,
+        "NewEndByte": 21
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-5-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = \"s\" // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = \"s\" // end\n",
+      "Edit": {
+        "StartByte": 28,
+        "OldEndByte": 29,
+        "NewEndByte": 28
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-5-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = \"s\"\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = \"s\"\n\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-5-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = \"s\";",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = \"s\";\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-6-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = []int{}",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = []int{}\n",
+      "Edit": {
+        "StartByte": 25,
+        "OldEndByte": 26,
+        "NewEndByte": 25
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-6-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = []int{} // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = []int{} // end\n",
+      "Edit": {
+        "StartByte": 32,
+        "OldEndByte": 33,
+        "NewEndByte": 32
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-6-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = []int{}\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = []int{}\n\n",
+      "Edit": {
+        "StartByte": 26,
+        "OldEndByte": 27,
+        "NewEndByte": 26
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-6-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = []int{};",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = []int{};\n",
+      "Edit": {
+        "StartByte": 26,
+        "OldEndByte": 27,
+        "NewEndByte": 26
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-7-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = f()",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = f()\n",
+      "Edit": {
+        "StartByte": 21,
+        "OldEndByte": 22,
+        "NewEndByte": 21
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-7-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = f() // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = f() // end\n",
+      "Edit": {
+        "StartByte": 28,
+        "OldEndByte": 29,
+        "NewEndByte": 28
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-7-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = f()\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = f()\n\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-7-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = f();",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = f();\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-8-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = a.b",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = a.b\n",
+      "Edit": {
+        "StartByte": 21,
+        "OldEndByte": 22,
+        "NewEndByte": 21
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-8-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = a.b // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = a.b // end\n",
+      "Edit": {
+        "StartByte": 28,
+        "OldEndByte": 29,
+        "NewEndByte": 28
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-8-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = a.b\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = a.b\n\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-8-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = a.b;",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = a.b;\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-9-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = (1)",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = (1)\n",
+      "Edit": {
+        "StartByte": 21,
+        "OldEndByte": 22,
+        "NewEndByte": 21
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-9-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = (1) // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = (1) // end\n",
+      "Edit": {
+        "StartByte": 28,
+        "OldEndByte": 29,
+        "NewEndByte": 28
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-9-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = (1)\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = (1)\n\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-9-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = (1);",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = (1);\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-10-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = func() {}",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = func() {}\n",
+      "Edit": {
+        "StartByte": 27,
+        "OldEndByte": 28,
+        "NewEndByte": 27
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-10-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = func() {} // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = func() {} // end\n",
+      "Edit": {
+        "StartByte": 34,
+        "OldEndByte": 35,
+        "NewEndByte": 34
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-10-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = func() {}\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = func() {}\n\n",
+      "Edit": {
+        "StartByte": 28,
+        "OldEndByte": 29,
+        "NewEndByte": 28
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-10-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = func() {};",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = func() {};\n",
+      "Edit": {
+        "StartByte": 28,
+        "OldEndByte": 29,
+        "NewEndByte": 28
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-11-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = -1",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = -1\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 21,
+        "NewEndByte": 20
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-11-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = -1 // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = -1 // end\n",
+      "Edit": {
+        "StartByte": 27,
+        "OldEndByte": 28,
+        "NewEndByte": 27
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-11-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = -1\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = -1\n\n",
+      "Edit": {
+        "StartByte": 21,
+        "OldEndByte": 22,
+        "NewEndByte": 21
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-11-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = -1;",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = -1;\n",
+      "Edit": {
+        "StartByte": 21,
+        "OldEndByte": 22,
+        "NewEndByte": 21
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-12-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x, y = 1, 2",
+      "Repeat": 2,
+      "Previous": "package p\nvar x, y = 1, 2\n",
+      "Edit": {
+        "StartByte": 25,
+        "OldEndByte": 26,
+        "NewEndByte": 25
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-12-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x, y = 1, 2 // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x, y = 1, 2 // end\n",
+      "Edit": {
+        "StartByte": 32,
+        "OldEndByte": 33,
+        "NewEndByte": 32
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-12-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x, y = 1, 2\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x, y = 1, 2\n\n",
+      "Edit": {
+        "StartByte": 26,
+        "OldEndByte": 27,
+        "NewEndByte": 26
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-12-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x, y = 1, 2;",
+      "Repeat": 2,
+      "Previous": "package p\nvar x, y = 1, 2;\n",
+      "Edit": {
+        "StartByte": 26,
+        "OldEndByte": 27,
+        "NewEndByte": 26
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-13-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x int = 1",
+      "Repeat": 2,
+      "Previous": "package p\nvar x int = 1\n",
+      "Edit": {
+        "StartByte": 23,
+        "OldEndByte": 24,
+        "NewEndByte": 23
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-13-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x int = 1 // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x int = 1 // end\n",
+      "Edit": {
+        "StartByte": 30,
+        "OldEndByte": 31,
+        "NewEndByte": 30
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-13-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x int = 1\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x int = 1\n\n",
+      "Edit": {
+        "StartByte": 24,
+        "OldEndByte": 25,
+        "NewEndByte": 24
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-13-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x int = 1;",
+      "Repeat": 2,
+      "Previous": "package p\nvar x int = 1;\n",
+      "Edit": {
+        "StartByte": 24,
+        "OldEndByte": 25,
+        "NewEndByte": 24
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-14-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar (x = 1\n)",
+      "Repeat": 2,
+      "Previous": "package p\nvar (x = 1\n)\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-14-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar (x = 1\n) // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar (x = 1\n) // end\n",
+      "Edit": {
+        "StartByte": 29,
+        "OldEndByte": 30,
+        "NewEndByte": 29
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-14-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar (x = 1\n)\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar (x = 1\n)\n\n",
+      "Edit": {
+        "StartByte": 23,
+        "OldEndByte": 24,
+        "NewEndByte": 23
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-14-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar (x = 1\n);",
+      "Repeat": 2,
+      "Previous": "package p\nvar (x = 1\n);\n",
+      "Edit": {
+        "StartByte": 23,
+        "OldEndByte": 24,
+        "NewEndByte": 23
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-15-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar (x int\n)",
+      "Repeat": 2,
+      "Previous": "package p\nvar (x int\n)\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-15-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar (x int\n) // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar (x int\n) // end\n",
+      "Edit": {
+        "StartByte": 29,
+        "OldEndByte": 30,
+        "NewEndByte": 29
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-15-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar (x int\n)\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar (x int\n)\n\n",
+      "Edit": {
+        "StartByte": 23,
+        "OldEndByte": 24,
+        "NewEndByte": 23
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-15-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar (x int\n);",
+      "Repeat": 2,
+      "Previous": "package p\nvar (x int\n);\n",
+      "Edit": {
+        "StartByte": 23,
+        "OldEndByte": 24,
+        "NewEndByte": 23
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-16-0",
+      "Filename": "x.go",
+      "Source": "package p\nconst x = 1",
+      "Repeat": 2,
+      "Previous": "package p\nconst x = 1\n",
+      "Edit": {
+        "StartByte": 21,
+        "OldEndByte": 22,
+        "NewEndByte": 21
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-16-1",
+      "Filename": "x.go",
+      "Source": "package p\nconst x = 1 // end",
+      "Repeat": 2,
+      "Previous": "package p\nconst x = 1 // end\n",
+      "Edit": {
+        "StartByte": 28,
+        "OldEndByte": 29,
+        "NewEndByte": 28
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-16-2",
+      "Filename": "x.go",
+      "Source": "package p\nconst x = 1\n",
+      "Repeat": 2,
+      "Previous": "package p\nconst x = 1\n\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-16-3",
+      "Filename": "x.go",
+      "Source": "package p\nconst x = 1;",
+      "Repeat": 2,
+      "Previous": "package p\nconst x = 1;\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-17-0",
+      "Filename": "x.go",
+      "Source": "package p\nconst x int = 1",
+      "Repeat": 2,
+      "Previous": "package p\nconst x int = 1\n",
+      "Edit": {
+        "StartByte": 25,
+        "OldEndByte": 26,
+        "NewEndByte": 25
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-17-1",
+      "Filename": "x.go",
+      "Source": "package p\nconst x int = 1 // end",
+      "Repeat": 2,
+      "Previous": "package p\nconst x int = 1 // end\n",
+      "Edit": {
+        "StartByte": 32,
+        "OldEndByte": 33,
+        "NewEndByte": 32
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-17-2",
+      "Filename": "x.go",
+      "Source": "package p\nconst x int = 1\n",
+      "Repeat": 2,
+      "Previous": "package p\nconst x int = 1\n\n",
+      "Edit": {
+        "StartByte": 26,
+        "OldEndByte": 27,
+        "NewEndByte": 26
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-17-3",
+      "Filename": "x.go",
+      "Source": "package p\nconst x int = 1;",
+      "Repeat": 2,
+      "Previous": "package p\nconst x int = 1;\n",
+      "Edit": {
+        "StartByte": 26,
+        "OldEndByte": 27,
+        "NewEndByte": 26
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-18-0",
+      "Filename": "x.go",
+      "Source": "package p\ntype T int",
+      "Repeat": 2,
+      "Previous": "package p\ntype T int\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 21,
+        "NewEndByte": 20
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-18-1",
+      "Filename": "x.go",
+      "Source": "package p\ntype T int // end",
+      "Repeat": 2,
+      "Previous": "package p\ntype T int // end\n",
+      "Edit": {
+        "StartByte": 27,
+        "OldEndByte": 28,
+        "NewEndByte": 27
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-18-2",
+      "Filename": "x.go",
+      "Source": "package p\ntype T int\n",
+      "Repeat": 2,
+      "Previous": "package p\ntype T int\n\n",
+      "Edit": {
+        "StartByte": 21,
+        "OldEndByte": 22,
+        "NewEndByte": 21
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-18-3",
+      "Filename": "x.go",
+      "Source": "package p\ntype T int;",
+      "Repeat": 2,
+      "Previous": "package p\ntype T int;\n",
+      "Edit": {
+        "StartByte": 21,
+        "OldEndByte": 22,
+        "NewEndByte": 21
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-19-0",
+      "Filename": "x.go",
+      "Source": "package p\ntype T = int",
+      "Repeat": 2,
+      "Previous": "package p\ntype T = int\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-19-1",
+      "Filename": "x.go",
+      "Source": "package p\ntype T = int // end",
+      "Repeat": 2,
+      "Previous": "package p\ntype T = int // end\n",
+      "Edit": {
+        "StartByte": 29,
+        "OldEndByte": 30,
+        "NewEndByte": 29
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-19-2",
+      "Filename": "x.go",
+      "Source": "package p\ntype T = int\n",
+      "Repeat": 2,
+      "Previous": "package p\ntype T = int\n\n",
+      "Edit": {
+        "StartByte": 23,
+        "OldEndByte": 24,
+        "NewEndByte": 23
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-19-3",
+      "Filename": "x.go",
+      "Source": "package p\ntype T = int;",
+      "Repeat": 2,
+      "Previous": "package p\ntype T = int;\n",
+      "Edit": {
+        "StartByte": 23,
+        "OldEndByte": 24,
+        "NewEndByte": 23
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-20-0",
+      "Filename": "x.go",
+      "Source": "package p\nfunc f() {}",
+      "Repeat": 2,
+      "Previous": "package p\nfunc f() {}\n",
+      "Edit": {
+        "StartByte": 21,
+        "OldEndByte": 22,
+        "NewEndByte": 21
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-20-1",
+      "Filename": "x.go",
+      "Source": "package p\nfunc f() {} // end",
+      "Repeat": 2,
+      "Previous": "package p\nfunc f() {} // end\n",
+      "Edit": {
+        "StartByte": 28,
+        "OldEndByte": 29,
+        "NewEndByte": 28
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-20-2",
+      "Filename": "x.go",
+      "Source": "package p\nfunc f() {}\n",
+      "Repeat": 2,
+      "Previous": "package p\nfunc f() {}\n\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-20-3",
+      "Filename": "x.go",
+      "Source": "package p\nfunc f() {};",
+      "Repeat": 2,
+      "Previous": "package p\nfunc f() {};\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-21-0",
+      "Filename": "x.go",
+      "Source": "package p\nimport \"fmt\"",
+      "Repeat": 2,
+      "Previous": "package p\nimport \"fmt\"\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-21-1",
+      "Filename": "x.go",
+      "Source": "package p\nimport \"fmt\" // end",
+      "Repeat": 2,
+      "Previous": "package p\nimport \"fmt\" // end\n",
+      "Edit": {
+        "StartByte": 29,
+        "OldEndByte": 30,
+        "NewEndByte": 29
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-21-2",
+      "Filename": "x.go",
+      "Source": "package p\nimport \"fmt\"\n",
+      "Repeat": 2,
+      "Previous": "package p\nimport \"fmt\"\n\n",
+      "Edit": {
+        "StartByte": 23,
+        "OldEndByte": 24,
+        "NewEndByte": 23
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-21-3",
+      "Filename": "x.go",
+      "Source": "package p\nimport \"fmt\";",
+      "Repeat": 2,
+      "Previous": "package p\nimport \"fmt\";\n",
+      "Edit": {
+        "StartByte": 23,
+        "OldEndByte": 24,
+        "NewEndByte": 23
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-22-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = map[string]int{}",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = map[string]int{}\n",
+      "Edit": {
+        "StartByte": 34,
+        "OldEndByte": 35,
+        "NewEndByte": 34
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-22-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = map[string]int{} // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = map[string]int{} // end\n",
+      "Edit": {
+        "StartByte": 41,
+        "OldEndByte": 42,
+        "NewEndByte": 41
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-22-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = map[string]int{}\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = map[string]int{}\n\n",
+      "Edit": {
+        "StartByte": 35,
+        "OldEndByte": 36,
+        "NewEndByte": 35
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-22-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = map[string]int{};",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = map[string]int{};\n",
+      "Edit": {
+        "StartByte": 35,
+        "OldEndByte": 36,
+        "NewEndByte": 35
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-23-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = a[0]",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = a[0]\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-23-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = a[0] // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = a[0] // end\n",
+      "Edit": {
+        "StartByte": 29,
+        "OldEndByte": 30,
+        "NewEndByte": 29
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-23-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = a[0]\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = a[0]\n\n",
+      "Edit": {
+        "StartByte": 23,
+        "OldEndByte": 24,
+        "NewEndByte": 23
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-23-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = a[0];",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = a[0];\n",
+      "Edit": {
+        "StartByte": 23,
+        "OldEndByte": 24,
+        "NewEndByte": 23
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-24-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = a + b",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = a + b\n",
+      "Edit": {
+        "StartByte": 23,
+        "OldEndByte": 24,
+        "NewEndByte": 23
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-24-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = a + b // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = a + b // end\n",
+      "Edit": {
+        "StartByte": 30,
+        "OldEndByte": 31,
+        "NewEndByte": 30
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-24-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = a + b\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = a + b\n\n",
+      "Edit": {
+        "StartByte": 24,
+        "OldEndByte": 25,
+        "NewEndByte": 24
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-24-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = a + b;",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = a + b;\n",
+      "Edit": {
+        "StartByte": 24,
+        "OldEndByte": 25,
+        "NewEndByte": 24
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-25-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = new(int)",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = new(int)\n",
+      "Edit": {
+        "StartByte": 26,
+        "OldEndByte": 27,
+        "NewEndByte": 26
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-25-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = new(int) // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = new(int) // end\n",
+      "Edit": {
+        "StartByte": 33,
+        "OldEndByte": 34,
+        "NewEndByte": 33
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-25-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = new(int)\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = new(int)\n\n",
+      "Edit": {
+        "StartByte": 27,
+        "OldEndByte": 28,
+        "NewEndByte": 27
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-25-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = new(int);",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = new(int);\n",
+      "Edit": {
+        "StartByte": 27,
+        "OldEndByte": 28,
+        "NewEndByte": 27
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-26-0",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = struct{x int}{}",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = struct{x int}{}\n",
+      "Edit": {
+        "StartByte": 33,
+        "OldEndByte": 34,
+        "NewEndByte": 33
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-26-1",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = struct{x int}{} // end",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = struct{x int}{} // end\n",
+      "Edit": {
+        "StartByte": 40,
+        "OldEndByte": 41,
+        "NewEndByte": 40
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-26-2",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = struct{x int}{}\n",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = struct{x int}{}\n\n",
+      "Edit": {
+        "StartByte": 34,
+        "OldEndByte": 35,
+        "NewEndByte": 34
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-26-3",
+      "Filename": "x.go",
+      "Source": "package p\nvar x = struct{x int}{};",
+      "Repeat": 2,
+      "Previous": "package p\nvar x = struct{x int}{};\n",
+      "Edit": {
+        "StartByte": 34,
+        "OldEndByte": 35,
+        "NewEndByte": 34
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-27-0",
+      "Filename": "x.go",
+      "Source": "package p\nf()",
+      "Repeat": 2,
+      "Previous": "package p\nf()\n",
+      "Edit": {
+        "StartByte": 13,
+        "OldEndByte": 14,
+        "NewEndByte": 13
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-27-1",
+      "Filename": "x.go",
+      "Source": "package p\nf() // end",
+      "Repeat": 2,
+      "Previous": "package p\nf() // end\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 21,
+        "NewEndByte": 20
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-27-2",
+      "Filename": "x.go",
+      "Source": "package p\nf()\n",
+      "Repeat": 2,
+      "Previous": "package p\nf()\n\n",
+      "Edit": {
+        "StartByte": 14,
+        "OldEndByte": 15,
+        "NewEndByte": 14
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-27-3",
+      "Filename": "x.go",
+      "Source": "package p\nf();",
+      "Repeat": 2,
+      "Previous": "package p\nf();\n",
+      "Edit": {
+        "StartByte": 14,
+        "OldEndByte": 15,
+        "NewEndByte": 14
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-28-0",
+      "Filename": "x.go",
+      "Source": "package p\nx := 1",
+      "Repeat": 2,
+      "Previous": "package p\nx := 1\n",
+      "Edit": {
+        "StartByte": 16,
+        "OldEndByte": 17,
+        "NewEndByte": 16
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-28-1",
+      "Filename": "x.go",
+      "Source": "package p\nx := 1 // end",
+      "Repeat": 2,
+      "Previous": "package p\nx := 1 // end\n",
+      "Edit": {
+        "StartByte": 23,
+        "OldEndByte": 24,
+        "NewEndByte": 23
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-28-2",
+      "Filename": "x.go",
+      "Source": "package p\nx := 1\n",
+      "Repeat": 2,
+      "Previous": "package p\nx := 1\n\n",
+      "Edit": {
+        "StartByte": 17,
+        "OldEndByte": 18,
+        "NewEndByte": 17
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-28-3",
+      "Filename": "x.go",
+      "Source": "package p\nx := 1;",
+      "Repeat": 2,
+      "Previous": "package p\nx := 1;\n",
+      "Edit": {
+        "StartByte": 17,
+        "OldEndByte": 18,
+        "NewEndByte": 17
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-29-0",
+      "Filename": "x.go",
+      "Source": "package p\nx = 1",
+      "Repeat": 2,
+      "Previous": "package p\nx = 1\n",
+      "Edit": {
+        "StartByte": 15,
+        "OldEndByte": 16,
+        "NewEndByte": 15
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-29-1",
+      "Filename": "x.go",
+      "Source": "package p\nx = 1 // end",
+      "Repeat": 2,
+      "Previous": "package p\nx = 1 // end\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 22
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-29-2",
+      "Filename": "x.go",
+      "Source": "package p\nx = 1\n",
+      "Repeat": 2,
+      "Previous": "package p\nx = 1\n\n",
+      "Edit": {
+        "StartByte": 16,
+        "OldEndByte": 17,
+        "NewEndByte": 16
+      }
+    },
+    {
+      "ID": "Go-EOF-valid-expanded-29-3",
+      "Filename": "x.go",
+      "Source": "package p\nx = 1;",
+      "Repeat": 2,
+      "Previous": "package p\nx = 1;\n",
+      "Edit": {
+        "StartByte": 16,
+        "OldEndByte": 17,
+        "NewEndByte": 16
+      }
+    }
+  ]
+}

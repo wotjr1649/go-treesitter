@@ -56,6 +56,10 @@ func TestIndexRejectsMalformedSnapshots(t *testing.T) {
 		{{Type: "root", Parent: -1}, {Type: "child", Parent: -1}},
 		{{Type: "root", Parent: -1}, {Type: "child", Parent: 0, EndByte: 1}},
 		{{Parent: -1}},
+		{{Type: "root", Parent: -1}, {Parent: 0, Named: true}},
+		{{Type: "root", Parent: -1}, {Parent: 0, Extra: true}},
+		{{Type: "root", Parent: -1}, {Parent: 0, Missing: true}},
+		{{Type: "root", Parent: -1}, {Parent: 0, Error: true}},
 	} {
 		if _, err := NewIndex(nodes); err == nil {
 			t.Fatal("malformed snapshot accepted")

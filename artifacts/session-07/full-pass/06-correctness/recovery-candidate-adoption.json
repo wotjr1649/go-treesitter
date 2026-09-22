@@ -1,0 +1,24 @@
+{
+  "previous_runtime_manifest_sha256": "fdfafc5606faedfcace4bbffd54b4ab2610a9496009aeca9ea0741d852bf5319",
+  "runtime_manifest_sha256": "b632e400b6b17b01109bb4bf8efbf41544b5031d5cd09878ed353b595191c543",
+  "patch_sha256": "6a1b00bf30818fef908daa30d5c3016e7ea738f73ee8c5ff41b5ca8d5a43ce73",
+  "reproduced_files": 1508,
+  "changed_files": [
+    "grammars/grammar_blobs/go.bin",
+    "grammars/runtime/embedded_loader.go",
+    "grammars/runtime/runtime_profiles.go",
+    "grammars/runtime/tsx_scanner.go",
+    "incremental.go",
+    "lexer.go",
+    "lexer_included_ranges.go",
+    "parser.go",
+    "parser_dfa_token_source.go",
+    "parser_recover_c.go",
+    "parser_reduce.go",
+    "parser_result_go.go"
+  ],
+  "product_grammar": {
+    "go": "81f9b19b5886ac11646c713c0c531bd835fc026d363437ba29b28ac2faabea9a"
+  },
+  "candidate_overlay_sha256": "1da3ac82f78187155e84291d4d9b0721460850236e78b5190cc2ce5acc6bb357"
+}

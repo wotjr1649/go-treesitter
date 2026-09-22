@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
+	"os"
 	"reflect"
 	"runtime"
 	"strings"
@@ -87,6 +89,71 @@ func TestCancellationDuringSnapshot(t *testing.T) {
 	if !errors.Is(err, context.Canceled) || len(nodes) >= len(r.Tree.Nodes()) {
 		t.Fatal("snapshot ignored cancellation")
 	}
+}
+
+func TestCancellationDuringRecovery(t *testing.T) {
+	source, err := os.ReadFile("../../testdata/newtonsoft/JsonTextReader-excerpt.cs")
+	if err != nil {
+		t.Fatal(err)
+	}
+	warm, err := (Adapter{}).Parse(context.Background(), syntax.Request{Filename: "recovery.cs", Source: source})
+	if err != nil || !warm.Complete() || warm.Outcome != syntax.AcceptedWithErrors {
+		t.Fatal("recovery setup", err)
+	}
+	warm.Tree.Close()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	trigger := time.AfterFunc(20*time.Millisecond, cancel)
+	defer trigger.Stop()
+	start := time.Now()
+	r, err := (Adapter{}).Parse(ctx, syntax.Request{Filename: "recovery.cs", Source: bytes.Repeat(source, 64), Timeout: 2 * time.Second})
+	if r.Tree != nil {
+		r.Tree.Close()
+	}
+	t.Logf("recovery cancellation elapsed=%s diagnostics=%+v", time.Since(start), r.Diagnostics)
+	if !errors.Is(err, context.Canceled) || r.Outcome != syntax.Cancelled || r.Tree != nil || r.Complete() {
+		t.Fatal("recovery ignored cancellation", err)
+	}
+	next, err := (Adapter{}).Parse(context.Background(), syntax.Request{Filename: "next.cs", Source: []byte("class C {}")})
+	if next.Tree != nil {
+		next.Tree.Close()
+	}
+	if err != nil || !next.Complete() || next.Outcome != syntax.AcceptedClean {
+		t.Fatal("parse after recovery cancellation", err)
+	}
+}
+
+func TestLargeGoIncrementalConflict(t *testing.T) {
+	var source bytes.Buffer
+	source.WriteString("package p\n")
+	for i := range 8192 {
+		fmt.Fprintf(&source, "var item%d = %d\n", i, i)
+	}
+	p := Adapter{}
+	old, err := p.Parse(context.Background(), syntax.Request{Filename: "large.go", Source: source.Bytes(), Timeout: 5 * time.Second})
+	if err != nil || !old.Complete() {
+		t.Fatal("large input setup", err)
+	}
+	defer old.Tree.Close()
+	after := append(bytes.Clone(source.Bytes()), '\n')
+	end := uint32(source.Len())
+	inc, err := p.Parse(context.Background(), syntax.Request{Filename: "large.go", Source: after, Previous: old.Tree,
+		Edit: &syntax.Edit{StartByte: end, OldEndByte: end, NewEndByte: end + 1}, Timeout: 5 * time.Second,
+		Limits: syntax.Limits{MemoryBudgetBytes: 64 << 20}})
+	if inc.Tree != nil {
+		defer inc.Tree.Close()
+	}
+	if err != nil || !inc.Complete() || !inc.ReusedOldTree || inc.ReuseReason != "" || inc.PeakStackDepth > 64 {
+		t.Fatalf("conflicting leaf reuse grew the stack or forced a fresh retry: %v %+v", err, inc.Diagnostics)
+	}
+	fresh, err := p.Parse(context.Background(), syntax.Request{Filename: "large.go", Source: after, Timeout: 5 * time.Second})
+	if fresh.Tree != nil {
+		defer fresh.Tree.Close()
+	}
+	if err != nil || !fresh.Complete() || !reflect.DeepEqual(inc.Tree.Nodes(), fresh.Tree.Nodes()) {
+		t.Fatal("large incremental/fresh tree differs", err)
+	}
+	t.Logf("bytes=%d nodes=%d diagnostics=%+v", len(after), len(inc.Tree.Nodes()), inc.Diagnostics)
 }
 
 func FuzzIncrementalAgreement(f *testing.F) {

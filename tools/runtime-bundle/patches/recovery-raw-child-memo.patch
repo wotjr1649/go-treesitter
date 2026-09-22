@@ -1,0 +1,18 @@
+--- a/parser_reduce.go
++++ b/parser_reduce.go
+@@ -3113,6 +3113,15 @@
+ 		if !stackEntryHasNode(item.entry) {
+ 			continue
+ 		}
++		// A captured edge may reference an older raw shape of a live Node.
++		// Reuse only an aggregate for this arena, shape and node version.
++		if n := stackEntryNode(item.entry); n != nil && n.symbol != errorSymbol &&
++			n.ownerArena == arena && (!item.shapeRefKnown || item.shapeRef == n.rawShape) && len(p.cNodeMemoCache) > 0 {
++			if slot := p.cNodeMemoPrimaryHit(n); slot != nil && slot.hasCost && slot.ver == n.equivVersion {
++				cost += slot.cost
++				continue
++			}
++		}
+ 		_, childCount, _ := rawStackWalkEntryHeader(arena, item)
+ 		if stackEntryNodeIsMissing(item.entry) && childCount == 0 {
+ 			cost += cErrCostPerMissingTree + cErrCostPerRecovery

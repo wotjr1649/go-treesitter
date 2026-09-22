@@ -1,0 +1,11 @@
+{
+  "runtime_manifest_sha256": "fdfafc5606faedfcace4bbffd54b4ab2610a9496009aeca9ea0741d852bf5319",
+  "before_manifest_sha256": "12e87722a83730be9efe664efc8c32cf0af4ee3aabf604a966050529d5b00621",
+  "patch_sha256": "b89cb895b458f65b73313bed34e88a00207f2c38e09ac4186ec69e352818a543",
+  "reproduced_files": 1508,
+  "changed_files": [
+    "parser_recover_c.go",
+    "parser.go",
+    "grammars/runtime/runtime_profiles.go"
+  ]
+}

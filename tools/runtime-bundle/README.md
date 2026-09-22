@@ -57,4 +57,23 @@ for the pinned Go blob. An edit-fuzz witness previously produced a fresh ERROR
 subtree with an extra `expression_statement`; incremental and C agreed without
 it. `TestGoRecoveryOrderOracleRecords` retains 28 C records and 24 edits, with
 the original minimized fuzz input kept in the adapter's fuzz corpus. This
-option applies to fresh parsing; incremental reuse admission is unchanged.
+original patch applied to fresh parsing; subsequent recovery patches also
+repair incremental lookahead admission.
+
+`recovery-lookahead-and-eof.patch` carries the Go C-table artifact and the
+shared EOF, hidden-error-cost, lookahead and edit-dependency corrections.
+`recovery-variable-token-width.patch` allows competing JS-family versions to
+consume their own internal token widths. The dispatch loop reconciles their
+byte positions. Stateful external tokens still require identical spans.
+`recovery-cost-memo.patch` caches raw hidden-node costs in the existing bounded
+node/version memo, preserving invalidation and avoiding repeated subtree walks.
+`recovery-raw-child-memo.patch` also reuses a cached child aggregate during raw
+walks, only when its arena, captured shape and node version still match. Older
+captured shapes continue to be walked and retain their hidden missing costs.
+`incremental-leaf-conflict.patch` leaves conflicting action cells to normal
+dispatch. Reusing one shift from such a cell discarded pending reductions and
+caused repeated stack copying on the retained 8,192-declaration Go witness.
+ADR-0015 explains the origin/product distinction; `grammars/go.json` and its
+MIT source ZIP bind the independently reproduced conversion. The 458-record
+runtime-hardening corpus includes 295 edits, and the original fuzz failures
+remain retained. No active C-tree exception remains.

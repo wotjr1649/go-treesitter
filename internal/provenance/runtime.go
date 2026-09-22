@@ -31,7 +31,11 @@ func VerifyRuntime(root string) error {
 		ImporterSHA256  string `json:"importer_sha256"`
 		SeparatorSHA256 string `json:"separator_sha256"`
 		Patches         []struct{ Path, SHA256 string }
-		Files           map[string]struct{ SHA256 string }
+		Inputs          []struct{ Path, SHA256 string }
+		Files           map[string]struct {
+			SHA256       string
+			OriginSHA256 string `json:"origin_sha256"`
+		}
 	}
 	if err := json.Unmarshal(data, &manifest); err != nil {
 		return err
@@ -53,11 +57,27 @@ func VerifyRuntime(root string) error {
 		}
 		return nil
 	}
-	for _, file := range append(manifest.Patches, struct{ Path, SHA256 string }{"tools/runtime-bundle/source.json", manifest.SourceSHA256},
+	inputs := append(manifest.Patches, manifest.Inputs...)
+	for _, file := range append(inputs, struct{ Path, SHA256 string }{"tools/runtime-bundle/source.json", manifest.SourceSHA256},
 		struct{ Path, SHA256 string }{"tools/runtime-bundle/import.py", manifest.ImporterSHA256},
 		struct{ Path, SHA256 string }{"tools/runtime-bundle/separate.py", manifest.SeparatorSHA256}) {
 		if err := check(file.Path, file.SHA256); err != nil {
 			return err
+		}
+	}
+	for name := range pins.Runtime.GrammarBlobs {
+		if _, exists := pins.Grammars[name]; !exists {
+			return fmt.Errorf("derived grammar has no pinned origin: %s", name)
+		}
+	}
+	for name, origin := range pins.Grammars {
+		expected := origin.BlobSHA256
+		if derived, exists := pins.Runtime.GrammarBlobs[name]; exists {
+			expected = derived
+		}
+		file, exists := manifest.Files["grammars/grammar_blobs/"+name+".bin"]
+		if !exists || file.OriginSHA256 != origin.BlobSHA256 || file.SHA256 != expected {
+			return fmt.Errorf("runtime grammar origin/artifact mismatch: %s", name)
 		}
 	}
 	base := filepath.Join(root, "internal/runtime")

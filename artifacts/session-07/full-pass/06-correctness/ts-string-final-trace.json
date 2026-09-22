@@ -1,0 +1,11 @@
+{
+  "case": {
+    "ID": "TS-string-expand-0",
+    "Filename": "x.ts",
+    "Source": "const value: number \"0= 1;\n",
+    "Repeat": 1
+  },
+  "go_log_sha256": "56c35ecd03fa9cbf89cb8bef38464e704eef73ee66bdfc4e9df2e3e896a6e690",
+  "c_log_sha256": "93c4edcb657e8f0f6d763221f728481b6f55232563797a490f92282c15b6f2f8",
+  "c_tree_sha256": "9a1d4c15e1c820fbacd307e8d4ee955e5ad242013b81a2710c7734b64a90d453"
+}

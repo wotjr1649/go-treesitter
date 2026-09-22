@@ -189,6 +189,9 @@ func (l *Lexer) nextWithFrontier(startState uint32, emitErrorRuns bool, lookahea
 	for {
 		// EOF check.
 		if l.atLogicalEOF() {
+			if eofToken, ok := l.scan(startState, l.pos, l.row, l.col); ok && eofToken.Symbol != 0 {
+				return eofToken
+			}
 			lookaheadEndByte = maxUint32(lookaheadEndByte, l.lookaheadEndByteAt(l.pos, false))
 			recordTokenInvariantReadSpan(l.tokenInvariantReadSpanMax, l.pos, l.lookaheadEndByteAt(l.pos, false))
 			return Token{
@@ -441,8 +444,9 @@ func (l *Lexer) scanContiguousInto(startState uint32, startPos int, startRow, st
 		}
 
 		if scanPos >= len(l.source) {
-			if st.EOF >= 0 && eofHops <= len(l.states) {
-				curState = int32(st.EOF)
+			eofState := lexerEOFState(st)
+			if eofState >= 0 && eofHops <= len(l.states) {
+				curState = int32(eofState)
 				eofHops++
 				continue
 			}
@@ -650,4 +654,19 @@ func (l *Lexer) allowsZeroWidthToken(sym Symbol) bool {
 		return true
 	}
 	return int(sym) < len(l.zeroWidthTokens) && l.zeroWidthTokens[sym]
+}
+
+// A generated C DFA sees rune zero at EOF. An explicit EOF branch takes
+// precedence; otherwise a transition containing zero can accept a zero-width
+// terminal. Callers bound EOF hops and never advance the physical position.
+func lexerEOFState(state *LexState) int {
+	if state.EOF >= 0 {
+		return state.EOF
+	}
+	for _, transition := range state.Transitions {
+		if transition.Lo <= 0 && transition.Hi >= 0 {
+			return int(transition.NextState)
+		}
+	}
+	return -1
 }

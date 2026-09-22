@@ -4,6 +4,7 @@ type Point struct{ Row, Column uint32 }
 
 // Node is one entry in a preorder snapshot. Parent is -1 at the root.
 // Field names belong to the edge from Parent; child order is never sorted.
+// Type may be empty for an anonymous literal NUL terminal, as in the C API.
 type Node struct {
 	Type, Field                  string
 	Parent                       int

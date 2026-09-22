@@ -1,0 +1,11 @@
+{
+  "staged_paths": 1011,
+  "runtime_files": 1508,
+  "runtime_manifest_sha256": "5d1f526c35e223341914cbfada8abe1c4c49d52824a09950bde05d331ff41e46",
+  "carrier_index_matches_manifest": true,
+  "whitespace_warning_count": 280,
+  "whitespace_classification": "Only literal unified-diff context markers in maintained patches; no product-source warning",
+  "source_review": "10-final/review.md; 09-audit/review.md",
+  "original_failure_preserved": "raw-child-product.json",
+  "passing_rerun": "raw-child-product-final.json"
+}

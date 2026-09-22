@@ -1,0 +1,111 @@
+--- a/parser_recover_c.go
++++ b/parser_recover_c.go
+@@ -2117,10 +2117,6 @@
+ }
+ 
+ func (p *Parser) cNodeErrorCost(n *Node) uint32 {
+-	if p != nil && n != nil && n.symbol != errorSymbol && n.rawShape != 0 && n.rawShape != rawShapeZeroChildRef {
+-		return p.rawStackEntryErrorCost(n.ownerArena, newStackEntryNode(n.parseState, n))
+-	}
+-
+ 	if p == nil {
+ 		return 0
+ 	}
+@@ -2128,16 +2124,17 @@
+ 		return 0
+ 	}
+ 	// Ordinary leaves need no subtree walk. Keep them out of the bounded memo.
+-	if len(n.children) == 0 && n.symbol != errorSymbol {
++	hasRawCost := n.symbol != errorSymbol && n.rawShape != 0 && n.rawShape != rawShapeZeroChildRef
++	if len(n.children) == 0 && n.symbol != errorSymbol && !hasRawCost {
+ 		if n.isMissing() {
+ 			return cErrCostPerMissingTree + cErrCostPerRecovery
+ 		}
+-		if n.rawShape != 0 && n.rawShape != rawShapeZeroChildRef {
++		return 0
++	}
++	if len(p.cNodeMemoCache) == 0 {
++		if hasRawCost {
+ 			return p.rawStackEntryErrorCost(n.ownerArena, newStackEntryNode(n.parseState, n))
+ 		}
+-		return 0
+-	}
+-	if len(p.cNodeMemoCache) == 0 {
+ 		return cNodeErrorCostLang(p.language, n)
+ 	}
+ 	slot := p.cNodeMemoPrimaryHit(n)
+@@ -2151,34 +2148,40 @@
+ 		return cErrCostPerMissingTree + cErrCostPerRecovery
+ 	}
+ 	var cost uint32
+-	for _, c := range n.children {
+-		if c != nil && c.symbol == errorSymbol && len(c.children) == 0 {
+-			// C ERROR leaf: subtree error_cost 0 (see cNodeErrorCostLang).
+-			continue
+-		}
+-		cost += p.cNodeErrorCost(c)
+-	}
+-	if n.symbol == errorSymbol {
+-		lang := p.language
++	if hasRawCost {
++		// Raw shapes preserve hidden missing leaves. Cache their cost with
++		// the same node/version lifetime as visible recovery aggregates.
++		cost = p.rawStackEntryErrorCost(n.ownerArena, newStackEntryNode(n.parseState, n))
++	} else {
+ 		for _, c := range n.children {
+-			if c == nil || c.isExtra() {
++			if c != nil && c.symbol == errorSymbol && len(c.children) == 0 {
++				// C ERROR leaf: subtree error_cost 0 (see cNodeErrorCostLang).
+ 				continue
+ 			}
+-			if cSymbolVisibleLang(lang, c.symbol) {
+-				cost += cErrCostPerSkippedTree
+-			} else if len(c.children) > 0 {
+-				cost += cErrCostPerSkippedTree * uint32(cNodeVisibleChildCountLang(lang, c))
+-			}
+-		}
+-		bytes := uint32(0)
+-		rows := uint32(0)
+-		if n.endByte > n.startByte {
+-			bytes = n.endByte - n.startByte
+-		}
+-		if n.endPoint.Row > n.startPoint.Row {
+-			rows = n.endPoint.Row - n.startPoint.Row
+-		}
+-		cost += cErrCostPerRecovery + cErrCostPerSkippedChar*bytes + cErrCostPerSkippedLine*rows
++			cost += p.cNodeErrorCost(c)
++		}
++		if n.symbol == errorSymbol {
++			lang := p.language
++			for _, c := range n.children {
++				if c == nil || c.isExtra() {
++					continue
++				}
++				if cSymbolVisibleLang(lang, c.symbol) {
++					cost += cErrCostPerSkippedTree
++				} else if len(c.children) > 0 {
++					cost += cErrCostPerSkippedTree * uint32(cNodeVisibleChildCountLang(lang, c))
++				}
++			}
++			bytes := uint32(0)
++			rows := uint32(0)
++			if n.endByte > n.startByte {
++				bytes = n.endByte - n.startByte
++			}
++			if n.endPoint.Row > n.startPoint.Row {
++				rows = n.endPoint.Row - n.startPoint.Row
++			}
++			cost += cErrCostPerRecovery + cErrCostPerSkippedChar*bytes + cErrCostPerSkippedLine*rows
++		}
+ 	}
+ 	// Re-fetch the slot: the recursive p.cNodeErrorCost(c) calls above may
+ 	// have evicted n's slot (a child's pointer hashing into the same 2-way
+@@ -2203,7 +2206,7 @@
+ // one walk. The recovery stack needs both values at the same call sites.
+ func (p *Parser) cNodeErrorCostAndVisibleSubtreeCount(n *Node) (uint32, int) {
+ 	if p != nil && n != nil && n.symbol != errorSymbol && n.rawShape != 0 && n.rawShape != rawShapeZeroChildRef {
+-		return p.rawStackEntryErrorCost(n.ownerArena, newStackEntryNode(n.parseState, n)), p.cNodeVisibleSubtreeCount(n)
++		return p.cNodeErrorCost(n), p.cNodeVisibleSubtreeCount(n)
+ 	}
+ 
+ 	if p == nil || n == nil {

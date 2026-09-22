@@ -1,0 +1,16 @@
+{
+  "cases": [
+    {
+      "ID": "TS-leading-vtab",
+      "Filename": "x.ts",
+      "Source": "\u000bconst value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    }
+  ]
+}

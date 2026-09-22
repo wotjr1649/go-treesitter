@@ -335,8 +335,8 @@ func (l *Lexer) scanIncluded(startState uint32, startPos int, startRow, startCol
 		}
 
 		if scanCursor.rangeIdx >= len(l.includedRanges) {
-			if st.EOF >= 0 && eofHops <= len(l.states) {
-				curState = int32(st.EOF)
+			if eofState := lexerEOFState(st); eofState >= 0 && eofHops <= len(l.states) {
+				curState = int32(eofState)
 				eofHops++
 				continue
 			}

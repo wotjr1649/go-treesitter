@@ -1,0 +1,7 @@
+{
+  "parser_sha256": "3dbf6ed1238b5dfcf2be4d2f2d4cb27a14d34f34d7784eccccbfd532fd4a6d85",
+  "converter_sha256": "8ca1c95c21e1768b6d719017c97f4ee5931109ffaec67c9ed4eb91b78e4d0344",
+  "actual_blob_sha256": "81f9b19b5886ac11646c713c0c531bd835fc026d363437ba29b28ac2faabea9a",
+  "expected_blob_sha256": "81f9b19b5886ac11646c713c0c531bd835fc026d363437ba29b28ac2faabea9a",
+  "equal": true
+}

@@ -844,6 +844,20 @@ func (p *Parser) tryReuseSubtree(s *glrStack, lookahead Token, ts TokenSource, i
 				continue
 			}
 		}
+		// Interior reductions depend on lookahead beyond their visible span.
+		// The compact producer records that extent; classic nodes without a
+		// receipt must replay their leaves rather than assume the same reduce.
+		lookaheadBytes, hasDependency := compactReuseDependencyForNode(n)
+		dependencyEnd := uint64(n.EndByte()) + uint64(lookaheadBytes)
+		if !hasDependency || dependencyEnd > uint64(len(idx.newSource)) ||
+			idx.rightBoundaryTouchedByEdit(uint32(dependencyEnd)) ||
+			!idx.nodeBytesUnchanged(n.StartByte(), uint32(dependencyEnd)) {
+			idx.rejectStaleNonLeafBoundary++
+			continue
+		}
+		if !reuseLeadingPrefixMatches(n, lookahead) {
+			continue
+		}
 		nextState, truncateDepth, ok := p.reuseNonLeafTargetStateOnStack(s, n)
 		if !ok {
 			continue
@@ -1058,19 +1072,8 @@ func reuseNode(p *Parser, s *glrStack, n *Node, nextState StateID, startState St
 	s.score += int(n.dynamicPrecedence)
 	reusedBytes := n.EndByte() - n.StartByte()
 
-	// If the reused node reaches EOF, we can synthesize EOF directly
-	// instead of consuming every trailing token.
-	if n.EndByte() == idx.sourceLen {
-		pt := n.EndPoint()
-		return Token{
-			Symbol:     0,
-			StartByte:  idx.sourceLen,
-			EndByte:    idx.sourceLen,
-			StartPoint: pt,
-			EndPoint:   pt,
-		}, reusedBytes, true
-	}
-
+	// EOF can still contain a grammar's zero-width terminal. Lex it in the
+	// reused node's target state, just like every other subtree boundary.
 	// dfaTokenSource fast skip does not preserve external-scanner state.
 	// For checkpointed scanner languages, only reuse nodes when the start
 	// parser/scanner state matches exactly, then restore the recorded end
@@ -1157,7 +1160,18 @@ func advanceTokenSourceTo(ts TokenSource, lookahead Token, endByte uint32) Token
 	return tok
 }
 
+// The first token owns the lexer's proof of skipped source padding. An edit
+// can add that padding without touching the token bytes. Reparse its first
+// shift if the old subtree lacks this proof; reuse must not erase it.
+func reuseLeadingPrefixMatches(n *Node, lookahead Token) bool {
+	return !lookahead.lexerSkippedPrefix() || lookahead.lexerSkippedPrefixStart != 0 ||
+		n.hasLeadingLexerSkippedPrefixAtSourceStart()
+}
+
 func (p *Parser) reuseTargetState(state StateID, n *Node, lookahead Token) (StateID, bool) {
+	if !reuseLeadingPrefixMatches(n, lookahead) {
+		return 0, false
+	}
 	// Leaf reuse must match the current lookahead token symbol.
 	if n.ChildCount() == 0 {
 		if n.Symbol() != lookahead.Symbol {
@@ -1175,8 +1189,10 @@ func (p *Parser) reuseTargetState(state StateID, n *Node, lookahead Token) (Stat
 			return 0, false
 		}
 
+		// Reuse must not choose one branch of a shift/reduce conflict.
+		// Normal dispatch owns those reductions and competing versions.
 		action := p.lookupAction(state, n.Symbol())
-		if action == nil || len(action.Actions) == 0 {
+		if action == nil || len(action.Actions) != 1 {
 			return 0, false
 		}
 		var uniqueShiftState StateID

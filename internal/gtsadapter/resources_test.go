@@ -174,11 +174,29 @@ func TestIndependentWorkers(t *testing.T) {
 				// This is a correctness watchdog, not a latency gate. Leave room
 				// for cold grammar initialization under race instrumentation.
 				r, err := (Adapter{}).Parse(context.Background(), syntax.Request{Filename: c.file, Source: []byte(c.source), Timeout: 10 * time.Second})
-				if r.Tree != nil {
-					r.Tree.Close()
-				}
 				if err != nil || !r.Complete() || r.Outcome != syntax.AcceptedClean {
+					if r.Tree != nil {
+						r.Tree.Close()
+					}
 					t.Errorf("worker %d %s: %+v", worker, c.file, r.Diagnostics)
+					return
+				}
+				after := []byte(c.source + "\n")
+				end := uint32(len(c.source))
+				inc, incErr := (Adapter{}).Parse(context.Background(), syntax.Request{Filename: c.file, Source: after,
+					Previous: r.Tree, Edit: &syntax.Edit{StartByte: end, OldEndByte: end, NewEndByte: end + 1}, Timeout: 10 * time.Second})
+				r.Tree.Close()
+				fresh, freshErr := (Adapter{}).Parse(context.Background(), syntax.Request{Filename: c.file, Source: after, Timeout: 10 * time.Second})
+				equal := incErr == nil && freshErr == nil && inc.Complete() && fresh.Complete() &&
+					reflect.DeepEqual(inc.Tree.Nodes(), fresh.Tree.Nodes())
+				if inc.Tree != nil {
+					inc.Tree.Close()
+				}
+				if fresh.Tree != nil {
+					fresh.Tree.Close()
+				}
+				if !equal {
+					t.Errorf("worker %d %s: concurrent incremental/fresh difference", worker, c.file)
 					return
 				}
 			}

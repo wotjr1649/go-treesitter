@@ -64,9 +64,18 @@ def build(archive, output, optional_output=None):
         path = HERE / 'patches' / name
         patch = path.read_bytes()
         touched = re.findall(rb'(?m)^\+\+\+ b/([^\r\n]+)', patch)
+        for old, new in re.findall(rb'(?m)^diff --git a/([^\r\n ]+) b/([^\r\n ]+)$', patch):
+            if old != new:
+                raise ValueError('runtime patch renames a source file')
+            touched.append(new)
         if not touched or any(p.decode() not in files for p in touched):
             raise ValueError('patch outside source inventory')
         patches.append({'path': 'tools/runtime-bundle/patches/' + name, 'sha256': digest(patch)})
+    inputs = source.get('inputs', [])
+    for item in inputs:
+        path = (ROOT / item['path']).resolve()
+        if not path.is_relative_to(ROOT) or not path.is_file() or digest(path.read_bytes()) != item['sha256']:
+            raise ValueError('derived grammar input identity differs')
     output.mkdir(parents=True)
     for name, data in sorted(files.items()):
         if name.endswith('.go'):
@@ -96,7 +105,7 @@ def build(archive, output, optional_output=None):
             'source_sha256': digest((HERE / 'source.json').read_bytes()),
             'importer_sha256': digest(Path(__file__).read_bytes()),
             'separator_sha256': digest((HERE / 'separate.py').read_bytes()),
-            'internal_module': source['internal_module'], 'patches': patches,
+            'internal_module': source['internal_module'], 'patches': patches, 'inputs': inputs,
             'separated_files': {name: digest(data) for name, data in sorted(files.items()) if name not in main},
             'files': {name: {'origin_sha256': digest(data),
                              'sha256': digest((output / name).read_bytes())}

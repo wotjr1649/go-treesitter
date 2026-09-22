@@ -132,9 +132,12 @@ from C** and must fail.
 
 ### Release impact
 
-Blocks nothing on correctness grounds. It is a **usability limitation inherited from the grammar**:
-real-world JSX containing `&` will not produce extractable top-level definitions.
-Whether that is acceptable for a release is a product decision, not a correctness one.
+Bare `&` remains a **usability limitation inherited from the grammar**: it
+produces an error-bearing syntax tree. The full-pass carrier now also matches
+the exact recovered C tree for all six F1–F3 paths and their clean-to-error
+edits (E5). Their recovered-shape exceptions have been retired; the error-state
+characterization above remains required. Original differing digests are retained
+in history and `06-correctness/retired-kr0001a-differences.json`.
 
 ### Retirement condition
 

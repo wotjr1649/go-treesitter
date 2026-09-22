@@ -1,0 +1,16 @@
+{
+  "cases": [
+    {
+      "ID": "TSX-text-paren",
+      "Filename": "x.tsx",
+      "Previous": "const View = () => <p>a = b &amp; 한글</p>;\n",
+      "Source": "const View = () => <p>( = b &amp; 한글</p>;\n",
+      "Edit": {
+        "StartByte": 22,
+        "OldEndByte": 23,
+        "NewEndByte": 23
+      },
+      "Repeat": 20
+    }
+  ]
+}

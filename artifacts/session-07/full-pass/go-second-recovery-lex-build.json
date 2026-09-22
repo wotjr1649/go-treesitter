@@ -1,0 +1,29 @@
+{
+  "command": [
+    "go",
+    "build",
+    "-overlay=D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\go-second-recovery-lex\\overlay.json",
+    "-o",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\go-second-recovery-lex\\probe.exe",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\go_second_probe.go"
+  ],
+  "candidate_commit": "2e18f90a4f5205edf3091771141126bc87d5e86c",
+  "status_before": "?? artifacts/session-07/full-pass/06-correctness/go-second-diagnosis.json\n?? artifacts/session-07/full-pass/06-correctness/go-second-incremental-version-order.json\n?? artifacts/session-07/full-pass/06-correctness/go-second-no-go-compat.json\n?? artifacts/session-07/full-pass/06-correctness/go-second-no-retry.json\n?? artifacts/session-07/full-pass/06-correctness/go-second-trace.json\n?? artifacts/session-07/full-pass/08-packaging/\n?? artifacts/session-07/full-pass/fuzz-edits-after-go-60s.json\n?? artifacts/session-07/full-pass/go-second-c-trace-build.json\n?? artifacts/session-07/full-pass/go-second-incremental-version-order-build.json\n?? artifacts/session-07/full-pass/go-second-no-go-compat-build.json\n?? artifacts/session-07/full-pass/go-second-no-retry-build.json\n?? artifacts/session-07/full-pass/go-second-probe-build.json\n?? artifacts/session-07/full-pass/go-second-trace-build.json\n?? artifacts/session-07/full-pass/modulezip-tool-build.json\n?? internal/gtsadapter/testdata/fuzz/FuzzIncrementalAgreement/d726030f816a339f\n",
+  "started_unix": 1790102807.0764813,
+  "elapsed_seconds": 12.300819635391235,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "8047c2aa9193b3b76f05468d7b72920535945dcfa668d6cc638a1c523095671b"
+  },
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

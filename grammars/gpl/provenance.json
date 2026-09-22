@@ -2,7 +2,7 @@
   "schema": 1,
   "upstream_module": "github.com/odvcencio/gotreesitter",
   "upstream_version": "v0.53.0",
-  "runtime_manifest_sha256": "12e87722a83730be9efe664efc8c32cf0af4ee3aabf604a966050529d5b00621",
+  "runtime_manifest_sha256": "5d1f526c35e223341914cbfada8abe1c4c49d52824a09950bde05d331ff41e46",
   "files": {
     "go.mod": "4bd7f63f76393f8941ef41db599c6d61aa34c224171c53ddd52846cfec222b94",
     "gpl.go": "b7b661a8ee735c9f736d125e8fbdb412bdf449d32ee00ba4175773305b26fa53",

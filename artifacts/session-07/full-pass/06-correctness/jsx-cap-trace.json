@@ -1,0 +1,9 @@
+{
+  "case": {
+    "ID": "JSX-tail-hash",
+    "Filename": "x.jsx",
+    "Source": "const View = () => <p>a = b &amp; 한글</p>#\n",
+    "Repeat": 1
+  },
+  "sha256": "933312b97ab03abe3305920d37f33eda8c0c5e6c6ec6fb40e1839aa7313d113a"
+}

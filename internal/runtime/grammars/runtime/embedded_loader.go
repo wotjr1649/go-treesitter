@@ -526,6 +526,18 @@ type languageBoundExternalScanner interface {
 }
 
 func attachExternalScannerForLanguage(name string, lang *gotreesitter.Language) bool {
+	// The C-derived Go tables encode ASI internally. The literal NUL
+	// terminal has an empty type name in the C API's NUL-terminated string.
+	if name == "go" && lang != nil && len(lang.ExternalSymbols) == 0 {
+		for i, name := range lang.SymbolNames {
+			if name == "\x00" {
+				lang.SymbolNames[i] = ""
+				lang.SymbolMetadata[i].Name = ""
+			}
+		}
+		return false
+	}
+
 	s, ok := externalScannerRegistry[name]
 	if !ok || lang == nil {
 		return false

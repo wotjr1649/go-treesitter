@@ -152,6 +152,43 @@ under this repository's MIT license, with exact source hashes and edit ranges.
 Twenty Go repeats and three C executions per recovery variant agreed after
 the Go version-order patch; 24 native C edits also agreed with fresh C.
 
+## Shared EOF, token-width and edit hardening
+
+`go-keyword-cases.json` retains 34 authored inputs and 27 edits for reserved-word
+recovery. `runtime-hardening-cases.json` retains 458 authored inputs, including
+163 distinct clean origins and 295 edits. They cover Go EOF/newline/NUL,
+ASCII and Unicode leading prefixes, JS-family pending lookahead, malformed
+strings, JSX text punctuation and bare-ampersand controls. Deduplication uses
+the full filename/source/previous/edit tuple; source hashes remain per input.
+All authored inputs use the project's MIT license. Encoded CRLF and NUL bytes
+are intentional; JSON itself uses LF.
+
+The corresponding `windows-c-v2/go-keyword` and `runtime-hardening` sets contain
+new native C executions. `TestGoRecoveryKeywordOracleRecords` and
+`TestRuntimeHardeningOracleRecords` enforce exact ordered fresh/edit/C trees.
+The final nine-catalog campaign covers 788 fresh inputs and 439 edits, with
+20 Go repeats for clean inputs, 100 for error inputs, three C fresh runs per
+input, and one native C edit per catalog edit. Receipts are under
+`artifacts/session-07/full-pass/06-final-memo/` and bind their actual carrier identity.
+The minimized failures remain in `FuzzIncrementalAgreement`'s corpus.
+
+`BenchmarkRelease` generates 128 declarations for each of the seven paths and
+also uses the existing C# recovery excerpt. It separates full parse, replace,
+insert, delete, no-edit, snapshot, index construction and position lookup.
+Recovery snapshot materialization is included in full parse because the adapter
+releases non-clean backend handles before returning. Five fixed ordering seeds
+and 40 operations per benchmark are declared before execution in the performance
+evidence; these are measurements, not universal latency guarantees.
+
+`TestLargeGoIncrementalConflict` generates 8,192 numbered Go variable declarations
+and appends one newline. It requires exact incremental/fresh snapshots under a
+64 MiB runtime footprint budget, retaining actual old-tree reuse and bounded
+stack depth. Before the leaf-conflict correction, the old-tree attempt exhausted
+its scratch budget and retried fresh. The same generator participates in the
+193-cycle retention workload alongside the seven 128-declaration workloads and
+the existing C# recovery excerpt. Process RSS and post-GC live heap are recorded
+separately from parser arena/scratch receipts.
+
 ## What is deliberately absent
 
 - No fixture is copied from `code-map-memo`'s `.work/` run directories at runtime. If bytes are

@@ -1,0 +1,50 @@
+{
+  "tasks": [
+    [
+      "memo",
+      1
+    ],
+    [
+      "uncached",
+      1
+    ],
+    [
+      "uncached",
+      2
+    ],
+    [
+      "memo",
+      2
+    ],
+    [
+      "memo",
+      3
+    ],
+    [
+      "uncached",
+      3
+    ],
+    [
+      "memo",
+      4
+    ],
+    [
+      "uncached",
+      4
+    ],
+    [
+      "uncached",
+      5
+    ],
+    [
+      "memo",
+      5
+    ]
+  ],
+  "iterations": 100,
+  "executables": {
+    "uncached": "c8dbaf6bc69391066c7adce72ca8fb79bd4025e8d2cf9117352a0ea8e37c1891",
+    "memo": "9c7535965be42de1149d0b963e279318c1145e5238cb82d475c27cdebd1e9ac2"
+  },
+  "claim": "focused C# recovery cost measurement; full candidate comparison follows adoption"
+}

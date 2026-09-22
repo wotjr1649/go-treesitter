@@ -1,0 +1,58 @@
+[
+  {
+    "id": "Go-EOF-0",
+    "trace": [
+      "EOF-MATERIALIZE pre=3 known=true eof=50 target=115",
+      "EOF-MATERIALIZE pre=3 known=true eof=50 target=115"
+    ]
+  },
+  {
+    "id": "Go-EOF-1",
+    "trace": [
+      "EOF-MATERIALIZE pre=295 known=true eof=0 target=544",
+      "EOF-MATERIALIZE pre=295 known=true eof=0 target=544",
+      "EOF-SHIFT state=295 eof=0 target=544"
+    ]
+  },
+  {
+    "id": "Go-EOF-2",
+    "trace": [
+      "EOF-MATERIALIZE pre=292 known=true eof=284 target=538",
+      "EOF-MATERIALIZE pre=292 known=true eof=284 target=538"
+    ]
+  },
+  {
+    "id": "Go-EOF-3",
+    "trace": [
+      "EOF-MATERIALIZE pre=295 known=true eof=0 target=544",
+      "EOF-MATERIALIZE pre=295 known=true eof=0 target=544",
+      "EOF-SHIFT state=295 eof=0 target=544"
+    ]
+  },
+  {
+    "id": "Go-EOF-4",
+    "trace": [
+      "EOF-MATERIALIZE pre=295 known=true eof=0 target=544",
+      "EOF-MATERIALIZE pre=295 known=true eof=0 target=544",
+      "EOF-SHIFT state=295 eof=0 target=544"
+    ]
+  },
+  {
+    "id": "Go-EOF-5",
+    "trace": []
+  },
+  {
+    "id": "Go-EOF-6",
+    "trace": []
+  },
+  {
+    "id": "Go-EOF-7",
+    "trace": [
+      "EOF-SHIFT state=7 eof=0 target=123",
+      "EOF-SHIFT state=7 eof=0 target=123",
+      "EOF-SHIFT state=7 eof=0 target=123",
+      "EOF-SHIFT state=7 eof=0 target=123",
+      "EOF-SHIFT state=7 eof=0 target=123"
+    ]
+  }
+]

@@ -1256,7 +1256,9 @@
         "path": "LICENSES/grammars/go.txt",
         "sha256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1"
       },
-      "blob_sha256": "9cf914d26d962d1a62e7954f8b20b302337a44cb7d4a07218eec482c45a57a08"
+      "blob_sha256": "81f9b19b5886ac11646c713c0c531bd835fc026d363437ba29b28ac2faabea9a",
+      "origin_blob_sha256": "9cf914d26d962d1a62e7954f8b20b302337a44cb7d4a07218eec482c45a57a08",
+      "derived_artifact_manifest": "tools/runtime-bundle/grammars/go.json"
     },
     {
       "grammar": "godot_resource",

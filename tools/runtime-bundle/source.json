@@ -28,6 +28,21 @@
     "KR-0002-csharp-recovery-transaction.patch",
     "KR-0004-csharp-preserve-recovery-errors.patch",
     "catalog-optional-blob-providers.patch",
-    "go-recovery-version-order.patch"
+    "go-recovery-version-order.patch",
+    "recovery-lookahead-and-eof.patch",
+    "recovery-variable-token-width.patch",
+    "recovery-cost-memo.patch",
+    "incremental-leaf-conflict.patch",
+    "recovery-raw-child-memo.patch"
+  ],
+  "inputs": [
+    {
+      "path": "tools/runtime-bundle/grammars/go.json",
+      "sha256": "ac5df100bf51e2d791e085f45ea45fc8384148892856315f705d80b4bc8cd6ec"
+    },
+    {
+      "path": "tools/runtime-bundle/grammars/go-source.zip",
+      "sha256": "6b7f7181fd284f84a2a01602d96759002ca56ac3edcaab404eefe56ace087127"
+    }
   ]
 }

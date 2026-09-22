@@ -1,0 +1,16 @@
+{
+  "cases": [
+    {
+      "ID": "JSX-tail-hash",
+      "Filename": "x.jsx",
+      "Previous": "const View = () => <p>a = b &amp; 한글</p>;\n",
+      "Source": "const View = () => <p>a = b &amp; 한글</p>#\n",
+      "Edit": {
+        "StartByte": 44,
+        "OldEndByte": 45,
+        "NewEndByte": 45
+      },
+      "Repeat": 20
+    }
+  ]
+}

@@ -1,0 +1,972 @@
+{
+  "cases": [
+    {
+      "ID": "TS-leading-vtab",
+      "Filename": "x.ts",
+      "Source": "\u000bconst value: number = 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 0,
+        "OldEndByte": 0,
+        "NewEndByte": 1
+      },
+      "Repeat": 20
+    }
+  ],
+  "c_name_projection_only": false,
+  "executable_sha256": "5b8e53e41f9dbc8939242936f6735131ae4d4928879496de3d09efa7f62f702a",
+  "overlay_files": {
+    "D:\\AIDEV\\go-treesitter\\internal\\runtime\\grammars\\grammar_blobs\\go.bin": "81f9b19b5886ac11646c713c0c531bd835fc026d363437ba29b28ac2faabea9a",
+    "D:\\AIDEV\\go-treesitter\\internal\\runtime\\grammars\\runtime\\embedded_loader.go": "d7c6384ef30404bece807a8e16057fe49b3e1da2b21d862e8c166446cc6f8eb3",
+    "D:\\AIDEV\\go-treesitter\\internal\\runtime\\grammars\\runtime\\runtime_profiles.go": "195448d74e6e8779078d4de14200fb763563812b6db47893ccdcacf92c27e827",
+    "D:\\AIDEV\\go-treesitter\\internal\\runtime\\parser_result_go.go": "42218c4cbd5784ae64f94cee7747e5983de65b9fc5d6af6456cdd40fa3c47df8",
+    "D:\\AIDEV\\go-treesitter\\internal\\runtime\\parser_recover_c.go": "e082faf4c43b1ac347d30cd304517110c316c338d3fb7329701e03ed7f6c861d",
+    "D:\\AIDEV\\go-treesitter\\internal\\runtime\\lexer.go": "f1dc77d29d88788a78f0b2fb5c88e577f67df50b3ce740f28f2931d3abe19648",
+    "D:\\AIDEV\\go-treesitter\\internal\\runtime\\incremental.go": "2512bddc35721d5abb2c0472dda0a832d6bf84fcd0a7a9909d9f96e5e7db180c",
+    "D:\\AIDEV\\go-treesitter\\internal\\runtime\\parser.go": "b54fb3f96fefd63f92ef2328ec416839c6929a49582a52bb993a773d82bb32ff"
+  },
+  "exit": 0,
+  "stderr": "",
+  "rows": [
+    {
+      "id": "TS-leading-vtab",
+      "go": {
+        "ID": "TS-leading-vtab",
+        "Nodes": [
+          {
+            "Type": "program",
+            "Field": "",
+            "Parent": -1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 1,
+            "EndByte": 26,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 1
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 0
+            }
+          },
+          {
+            "Type": "lexical_declaration",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 1,
+            "EndByte": 25,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 1
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 25
+            }
+          },
+          {
+            "Type": "const",
+            "Field": "kind",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 1,
+            "EndByte": 6,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 1
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 6
+            }
+          },
+          {
+            "Type": "variable_declarator",
+            "Field": "",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 7,
+            "EndByte": 24,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 7
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 24
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "name",
+            "Parent": 3,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 7,
+            "EndByte": 12,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 7
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 12
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 3,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 12,
+            "EndByte": 20,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 20
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 5,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 12,
+            "EndByte": 13,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 14,
+            "EndByte": 20,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 14
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 20
+            }
+          },
+          {
+            "Type": "number",
+            "Field": "",
+            "Parent": 7,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 14,
+            "EndByte": 20,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 14
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 20
+            }
+          },
+          {
+            "Type": "=",
+            "Field": "",
+            "Parent": 3,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 21,
+            "EndByte": 22,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 21
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 22
+            }
+          },
+          {
+            "Type": "number",
+            "Field": "value",
+            "Parent": 3,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 23,
+            "EndByte": 24,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 23
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 24
+            }
+          },
+          {
+            "Type": ";",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 24,
+            "EndByte": 25,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 25
+            }
+          }
+        ],
+        "Observations": [
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          },
+          {
+            "Digest": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862",
+            "Outcome": "accepted_clean",
+            "Stop": "accepted",
+            "Route": "classic",
+            "Fallback": "",
+            "Reuse": "",
+            "Complete": true,
+            "Error": false,
+            "Missing": false
+          }
+        ],
+        "Incremental": {
+          "Digest": "2dacba643ead6c2a234933dcde6b0f749a51a631ec973540fba7f33d681871d9",
+          "Outcome": "accepted_clean",
+          "Stop": "accepted",
+          "Route": "classic",
+          "Fallback": "",
+          "Reuse": "",
+          "Complete": true,
+          "Error": false,
+          "Missing": false
+        },
+        "IncrementalNodes": [
+          {
+            "Type": "program",
+            "Field": "",
+            "Parent": -1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 0,
+            "EndByte": 26,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 0
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 0
+            }
+          },
+          {
+            "Type": "lexical_declaration",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 1,
+            "EndByte": 25,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 1
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 25
+            }
+          },
+          {
+            "Type": "const",
+            "Field": "kind",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 1,
+            "EndByte": 6,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 1
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 6
+            }
+          },
+          {
+            "Type": "variable_declarator",
+            "Field": "",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 7,
+            "EndByte": 24,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 7
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 24
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "name",
+            "Parent": 3,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 7,
+            "EndByte": 12,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 7
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 12
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 3,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 12,
+            "EndByte": 20,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 20
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 5,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 12,
+            "EndByte": 13,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 14,
+            "EndByte": 20,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 14
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 20
+            }
+          },
+          {
+            "Type": "number",
+            "Field": "",
+            "Parent": 7,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 14,
+            "EndByte": 20,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 14
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 20
+            }
+          },
+          {
+            "Type": "=",
+            "Field": "",
+            "Parent": 3,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 21,
+            "EndByte": 22,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 21
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 22
+            }
+          },
+          {
+            "Type": "number",
+            "Field": "value",
+            "Parent": 3,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 23,
+            "EndByte": 24,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 23
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 24
+            }
+          },
+          {
+            "Type": ";",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 24,
+            "EndByte": 25,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 25
+            }
+          }
+        ],
+        "IncrementalEqual": false
+      },
+      "c": {
+        "abi": 15,
+        "input_bytes": 26,
+        "has_error": false,
+        "start": 1,
+        "end": 26,
+        "nodes": [
+          {
+            "Type": "program",
+            "Field": "",
+            "Parent": -1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 1,
+            "EndByte": 26,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 1
+            },
+            "EndPoint": {
+              "Row": 1,
+              "Column": 0
+            }
+          },
+          {
+            "Type": "lexical_declaration",
+            "Field": "",
+            "Parent": 0,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 1,
+            "EndByte": 25,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 1
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 25
+            }
+          },
+          {
+            "Type": "const",
+            "Field": "kind",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 1,
+            "EndByte": 6,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 1
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 6
+            }
+          },
+          {
+            "Type": "variable_declarator",
+            "Field": "",
+            "Parent": 1,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 7,
+            "EndByte": 24,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 7
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 24
+            }
+          },
+          {
+            "Type": "identifier",
+            "Field": "name",
+            "Parent": 3,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 7,
+            "EndByte": 12,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 7
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 12
+            }
+          },
+          {
+            "Type": "type_annotation",
+            "Field": "type",
+            "Parent": 3,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 12,
+            "EndByte": 20,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 20
+            }
+          },
+          {
+            "Type": ":",
+            "Field": "",
+            "Parent": 5,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 12,
+            "EndByte": 13,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 12
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 13
+            }
+          },
+          {
+            "Type": "predefined_type",
+            "Field": "",
+            "Parent": 5,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 14,
+            "EndByte": 20,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 14
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 20
+            }
+          },
+          {
+            "Type": "number",
+            "Field": "",
+            "Parent": 7,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 14,
+            "EndByte": 20,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 14
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 20
+            }
+          },
+          {
+            "Type": "=",
+            "Field": "",
+            "Parent": 3,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 21,
+            "EndByte": 22,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 21
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 22
+            }
+          },
+          {
+            "Type": "number",
+            "Field": "value",
+            "Parent": 3,
+            "Named": true,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 23,
+            "EndByte": 24,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 23
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 24
+            }
+          },
+          {
+            "Type": ";",
+            "Field": "",
+            "Parent": 1,
+            "Named": false,
+            "Extra": false,
+            "Missing": false,
+            "Error": false,
+            "StartByte": 24,
+            "EndByte": 25,
+            "StartPoint": {
+              "Row": 0,
+              "Column": 24
+            },
+            "EndPoint": {
+              "Row": 0,
+              "Column": 25
+            }
+          }
+        ]
+      },
+      "fresh_C": true,
+      "inc_C": false,
+      "deterministic": true
+    }
+  ]
+}

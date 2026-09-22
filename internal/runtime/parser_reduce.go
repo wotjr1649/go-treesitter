@@ -3113,6 +3113,15 @@ func (p *Parser) rawStackEntryErrorCost(arena *nodeArena, entry stackEntry) uint
 		if !stackEntryHasNode(item.entry) {
 			continue
 		}
+		// A captured edge may reference an older raw shape of a live Node.
+		// Reuse only an aggregate for this arena, shape and node version.
+		if n := stackEntryNode(item.entry); n != nil && n.symbol != errorSymbol &&
+			n.ownerArena == arena && (!item.shapeRefKnown || item.shapeRef == n.rawShape) && len(p.cNodeMemoCache) > 0 {
+			if slot := p.cNodeMemoPrimaryHit(n); slot != nil && slot.hasCost && slot.ver == n.equivVersion {
+				cost += slot.cost
+				continue
+			}
+		}
 		_, childCount, _ := rawStackWalkEntryHeader(arena, item)
 		if stackEntryNodeIsMissing(item.entry) && childCount == 0 {
 			cost += cErrCostPerMissingTree + cErrCostPerRecovery
@@ -3124,7 +3133,10 @@ func (p *Parser) rawStackEntryErrorCost(arena *nodeArena, entry stackEntry) uint
 				pending = append(pending, child)
 			}
 		}
-		if stackEntryNodeSymbol(item.entry) != errorSymbol {
+		// C error leaves carry no subtree error cost; their enclosing ERROR
+		// region accounts for the skipped bytes. Hidden MISSING leaves above
+		// still have their separate recovery cost.
+		if stackEntryNodeSymbol(item.entry) != errorSymbol || childCount == 0 {
 			continue
 		}
 		for i := 0; i < childCount; i++ {

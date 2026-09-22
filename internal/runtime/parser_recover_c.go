@@ -604,15 +604,13 @@ func cRecoveryDefaultOptOut(name string) bool {
 	// measured witness blocks the switch (docs/c-parity-boards.md, Recovery):
 	//   - cpp: the port inserts a MISSING `::` where C skips a token
 	//     (TestCppMalformedClassFunctionDefinitionRecovery).
-	//   - javascript: the port exceeds the W5 incremental replace ceilings
-	//     by about 2.8 times (TestW5JavaScriptFamilyTransientErrorGate).
 	//   - julia: the scanner emits a zero-width identifier that hides the
 	//     error C reports (TestJuliaTrailingCommaAssignmentTupleCompatibility).
 	//   - html: the external lex election ledger keeps it opted out
 	//     (TestExternalLexStatesRecoveryElectionOptOutInventory); no board
 	//     case measures html yet.
 	switch name {
-	case "cpp", "html", "javascript", "julia":
+	case "cpp", "html", "julia":
 		return true
 	default:
 		return false
@@ -2126,16 +2124,17 @@ func (p *Parser) cNodeErrorCost(n *Node) uint32 {
 		return 0
 	}
 	// Ordinary leaves need no subtree walk. Keep them out of the bounded memo.
-	if len(n.children) == 0 && n.symbol != errorSymbol {
+	hasRawCost := n.symbol != errorSymbol && n.rawShape != 0 && n.rawShape != rawShapeZeroChildRef
+	if len(n.children) == 0 && n.symbol != errorSymbol && !hasRawCost {
 		if n.isMissing() {
 			return cErrCostPerMissingTree + cErrCostPerRecovery
-		}
-		if n.rawShape != 0 && n.rawShape != rawShapeZeroChildRef {
-			return p.rawStackEntryErrorCost(n.ownerArena, newStackEntryNode(n.parseState, n))
 		}
 		return 0
 	}
 	if len(p.cNodeMemoCache) == 0 {
+		if hasRawCost {
+			return p.rawStackEntryErrorCost(n.ownerArena, newStackEntryNode(n.parseState, n))
+		}
 		return cNodeErrorCostLang(p.language, n)
 	}
 	slot := p.cNodeMemoPrimaryHit(n)
@@ -2149,34 +2148,40 @@ func (p *Parser) cNodeErrorCost(n *Node) uint32 {
 		return cErrCostPerMissingTree + cErrCostPerRecovery
 	}
 	var cost uint32
-	for _, c := range n.children {
-		if c != nil && c.symbol == errorSymbol && len(c.children) == 0 {
-			// C ERROR leaf: subtree error_cost 0 (see cNodeErrorCostLang).
-			continue
-		}
-		cost += p.cNodeErrorCost(c)
-	}
-	if n.symbol == errorSymbol {
-		lang := p.language
+	if hasRawCost {
+		// Raw shapes preserve hidden missing leaves. Cache their cost with
+		// the same node/version lifetime as visible recovery aggregates.
+		cost = p.rawStackEntryErrorCost(n.ownerArena, newStackEntryNode(n.parseState, n))
+	} else {
 		for _, c := range n.children {
-			if c == nil || c.isExtra() {
+			if c != nil && c.symbol == errorSymbol && len(c.children) == 0 {
+				// C ERROR leaf: subtree error_cost 0 (see cNodeErrorCostLang).
 				continue
 			}
-			if cSymbolVisibleLang(lang, c.symbol) {
-				cost += cErrCostPerSkippedTree
-			} else if len(c.children) > 0 {
-				cost += cErrCostPerSkippedTree * uint32(cNodeVisibleChildCountLang(lang, c))
+			cost += p.cNodeErrorCost(c)
+		}
+		if n.symbol == errorSymbol {
+			lang := p.language
+			for _, c := range n.children {
+				if c == nil || c.isExtra() {
+					continue
+				}
+				if cSymbolVisibleLang(lang, c.symbol) {
+					cost += cErrCostPerSkippedTree
+				} else if len(c.children) > 0 {
+					cost += cErrCostPerSkippedTree * uint32(cNodeVisibleChildCountLang(lang, c))
+				}
 			}
+			bytes := uint32(0)
+			rows := uint32(0)
+			if n.endByte > n.startByte {
+				bytes = n.endByte - n.startByte
+			}
+			if n.endPoint.Row > n.startPoint.Row {
+				rows = n.endPoint.Row - n.startPoint.Row
+			}
+			cost += cErrCostPerRecovery + cErrCostPerSkippedChar*bytes + cErrCostPerSkippedLine*rows
 		}
-		bytes := uint32(0)
-		rows := uint32(0)
-		if n.endByte > n.startByte {
-			bytes = n.endByte - n.startByte
-		}
-		if n.endPoint.Row > n.startPoint.Row {
-			rows = n.endPoint.Row - n.startPoint.Row
-		}
-		cost += cErrCostPerRecovery + cErrCostPerSkippedChar*bytes + cErrCostPerSkippedLine*rows
 	}
 	// Re-fetch the slot: the recursive p.cNodeErrorCost(c) calls above may
 	// have evicted n's slot (a child's pointer hashing into the same 2-way
@@ -2200,6 +2205,10 @@ func (p *Parser) cNodeErrorCost(n *Node) uint32 {
 // cNodeErrorCostAndVisibleSubtreeCount computes both C subtree aggregates in
 // one walk. The recovery stack needs both values at the same call sites.
 func (p *Parser) cNodeErrorCostAndVisibleSubtreeCount(n *Node) (uint32, int) {
+	if p != nil && n != nil && n.symbol != errorSymbol && n.rawShape != 0 && n.rawShape != rawShapeZeroChildRef {
+		return p.cNodeErrorCost(n), p.cNodeVisibleSubtreeCount(n)
+	}
+
 	if p == nil || n == nil {
 		return 0, 0
 	}
@@ -3087,11 +3096,12 @@ func (p *Parser) cCollectPotentialReductions(state StateID, lookaheadSym Symbol,
 // symbol are applied (the "close in-progress productions" step); versions
 // that dead-end keep their pre-reduction shape (C leaves them in place).
 // With anyLookahead false, dead-end versions are dropped (C removes them).
-// EOF is symbol 0, so callers must pass anyLookahead explicitly instead of
-// overloading lookaheadSym == 0. The caller seed supplies reusable initial
+// C also uses the all-symbol closure when lookahead is EOF (symbol zero).
+// The caller seed supplies reusable initial
 // capacity for the returned version set; growth beyond that capacity remains
 // ordinary append growth.
 func (p *Parser) cDoAllPotentialReductions(source []byte, start glrStack, lookaheadSym Symbol, anyLookahead bool, tok Token, nodeCount *int, arena *nodeArena, entryScratch *glrEntryScratch, gssScratch *gssScratch, tmpEntries *[]stackEntry, trackChildErrors *bool, callerSeed []glrStack) ([]glrStack, bool, ParseStopReason) {
+	anyLookahead = anyLookahead || lookaheadSym == 0
 	oldDisablePostReduceForkMerge := p.disablePostReduceForkMerge
 	p.disablePostReduceForkMerge = true
 	defer func() {
@@ -3671,6 +3681,13 @@ func (p *Parser) cHandleError(stacks *[]glrStack, si int, source []byte, tok Tok
 	// (s.clone() below, its reduction/missing forks, and *s = versions[0])
 	// inherits it via clone()/cloneWithScratch(). See glrStack.cEverErrored.
 	s.cEverErrored = true
+	if p.mergeScratch != nil && !parseMaxMergePerKeyEnvConfigured() && p.mergeScratch.perKeyCap < maxStacksPerMergeKey &&
+		(p.language.Name == "go" || p.language.Name == "javascript" || p.language.Name == "typescript" || p.language.Name == "tsx") {
+		p.mergeScratch.perKeyCap = maxStacksPerMergeKey
+		p.mergeScratch.faithfulCapOne = false
+		p.mergeScratch.recoveryCapOneConvergence = false
+	}
+
 	// cHandleError running is NOT proof the input is malformed — LALR table
 	// limitations routinely drive well-formed input into a momentary
 	// no-action point that step 1 below (cDoAllPotentialReductions) resolves
@@ -3914,12 +3931,23 @@ func (p *Parser) cHandleError(stacks *[]glrStack, si int, source []byte, tok Tok
 		if v.dead || v.cRec == nil || v.cRec.group != group {
 			continue
 		}
+		beforeRecover := len(*stacks)
 		res, forked, reason := p.cRecover(stacks, v, source, tok, nodeCount, arena, entryScratch, gssScratch, trackChildErrors)
 		if reason != ParseStopNone {
 			return cRecHalted, needsRedispatch || forked, reason
 		}
 		v = &(*stacks)[i]
 		if forked {
+			// handle_error runs at the end of C's version round. Its new
+			// strategy-1 forks first run in the next round, after the absorber.
+			for j := beforeRecover; (p.language.Name == "javascript" || p.language.Name == "typescript" || p.language.Name == "tsx") && j < len(*stacks); j++ {
+				fork := &(*stacks)[j]
+				if fork.cRecoverPendingToken == nil {
+					replay := tok
+					fork.cRecoverPendingToken = &replay
+				}
+				fork.shifted = true
+			}
 			needsRedispatch = true
 		}
 		if first {
@@ -3957,6 +3985,12 @@ func (p *Parser) cRecover(stacks *[]glrStack, v *glrStack, source []byte, tok To
 	rec := v.cRec
 	if rec == nil {
 		return cRecFallthrough, false, ParseStopNone
+	}
+	if p.cRecoverSkipsSharedGoNewline(tok) {
+		// C's error-mode lexer skips this newline. Leave the version's
+		// position at its last subtree until the next real lookahead.
+		v.shifted = true
+		return cRecConsumed, false, ParseStopNone
 	}
 	vIndex := -1
 	for i := range *stacks {
@@ -4087,6 +4121,14 @@ func (p *Parser) cEffectiveVersionCount(stacks []glrStack, group *cRecGroup) int
 	return count
 }
 
+// cRecoverSkipsSharedGoNewline identifies a shared Go newline terminator.
+// C's error-mode DFA treats those bytes as skipped whitespace; explicit
+// semicolons and zero-width EOF terminators must still enter recovery normally.
+func (p *Parser) cRecoverSkipsSharedGoNewline(tok Token) bool {
+	return p.language.Name == "go" && tok.EndByte > tok.StartByte && int(tok.Symbol) < len(p.language.SymbolNames) &&
+		(p.language.SymbolNames[tok.Symbol] == "source_file_token1" || (tok.ExternalScannerToken && p.language.SymbolNames[tok.Symbol] == "_automatic_semicolon"))
+}
+
 // cRecoverElectionLookaheadSymbol returns the lookahead symbol C's
 // ts_parser__recover strategy-1 summary scan would test. C lexes each stack
 // version with its own state's lex mode: an absorbing version sits at
@@ -4103,43 +4145,49 @@ func (p *Parser) cEffectiveVersionCount(stacks []glrStack, group *cRecGroup) int
 //
 // Approximations, documented: the relex is internal-DFA only (C also offers
 // the error-mode external scanner first) and skips keyword capture
-// post-processing. EOF, wide unlexable runs and missing tokens keep the
+// post-processing except for Go's reserved keywords. EOF, wide unlexable
+// runs and missing tokens keep the
 // shared symbol (C: `end` / error-subtree lookaheads — the caller's guards
 // handle those). When the shared token was already produced by error-mode
 // lexing (DFA source with every live stack absorbing) the relex is skipped.
 func (p *Parser) cRecoverElectionLookaheadSymbol(source []byte, member *glrStack, tok Token) Symbol {
+	return p.cRecoverElectionLookahead(source, member, tok).Symbol
+}
+
+func (p *Parser) cRecoverElectionLookahead(source []byte, member *glrStack, tok Token) Token {
 	if tok.Symbol == 0 || tok.Symbol == errorSymbol || tok.Missing {
-		return tok.Symbol
+		return tok
 	}
 	if p == nil || p.language == nil || member == nil || len(source) == 0 {
-		return tok.Symbol
+		return tok
 	}
 	if p.cRecoverSharedTokenErrorModeLexed {
-		return tok.Symbol
+		return tok
 	}
 	lang := p.language
 	if len(lang.LexModes) == 0 || len(lang.LexStates) == 0 {
-		return tok.Symbol
+		return tok
 	}
 	ls := lang.LexModes[0].LexStateIndex()
 	if ls == noLookaheadLexState || int(ls) >= len(lang.LexStates) {
-		return tok.Symbol
+		return tok
 	}
 	pos := member.byteOffset
 	if pos > tok.StartByte {
 		// The shared token begins before the group position (should not
 		// happen for the current token); trust the shared identity.
-		return tok.Symbol
+		return tok
 	}
 	if int(pos) >= len(source) {
-		return tok.Symbol
+		return tok
 	}
 	lx := Lexer{
 		states:              lang.LexStates,
 		asciiTable:          lang.LexAsciiTable(),
 		source:              source,
 		pos:                 int(pos),
-		row:                 cStackPosRow(member),
+		row:                 cStackPosPoint(member).Row,
+		col:                 cStackPosPoint(member).Column,
 		immediateTokens:     lang.ImmediateTokens,
 		zeroWidthTokens:     lang.ZeroWidthTokens,
 		errorRunLexState:    uint32(ls),
@@ -4149,12 +4197,19 @@ func (p *Parser) cRecoverElectionLookaheadSymbol(source []byte, member *glrStack
 		lx.setIncludedRanges(p.included)
 	}
 	relexed := lx.NextWithErrorRuns(uint32(ls))
+	if lang.Name == "go" {
+		// The Go port's error row is empty, unlike the C grammar's RECOVER
+		// row. Capture reserved keywords without applying that empty row as
+		// a contextual filter; otherwise `var` becomes an identifier here.
+		keywordSource := dfaTokenSource{language: lang, lexer: &lx, state: cErrorState}
+		keywordSource.promoteKeyword(&relexed)
+	}
 	if relexed.Symbol == 0 && relexed.StartByte == relexed.EndByte {
 		// Whitespace-only tail: C would see `end` here while the shared
 		// token disagrees; don't fabricate an EOF election.
-		return tok.Symbol
+		return tok
 	}
-	return relexed.Symbol
+	return relexed
 }
 
 // cRecoverStrategy1Election runs the C summary scan once per token across all
@@ -4252,7 +4307,8 @@ func (p *Parser) cRecoverStrategy1Election(stacks *[]glrStack, group *cRecGroup,
 	}
 	// C's absorbing version lexes its own lookahead in error mode; judge the
 	// election with that identity, not the shared normal-mode token's.
-	electionSym := p.cRecoverElectionLookaheadSymbol(source, &(*stacks)[m0], tok)
+	electionToken := p.cRecoverElectionLookahead(source, &(*stacks)[m0], tok)
+	electionSym := electionToken.Symbol
 	if electionSym == errorSymbol {
 		// C skips strategy 1 for error-subtree lookaheads.
 		return false, false, ParseStopNone
@@ -4319,6 +4375,11 @@ func (p *Parser) cRecoverStrategy1Election(stacks *[]glrStack, group *cRecGroup,
 					return false, false, reason
 				}
 				fork.branchOrder = (*stacks)[mi].branchOrder
+				if (p.language.Name == "go" || p.language.Name == "javascript" || p.language.Name == "typescript" || p.language.Name == "tsx") && electionToken.StartByte >= tok.StartByte && (electionToken.Symbol != tok.Symbol || electionToken.EndByte != tok.EndByte) && electionToken.EndByte > electionToken.StartByte {
+					replay := electionToken
+					fork.cRecoverPendingToken = &replay
+				}
+
 				*stacks = append(*stacks, fork)
 				p.recordRecoveryLiveVersions(*stacks)
 				if nodeCount != nil {
@@ -4863,6 +4924,15 @@ func (p *Parser) cCondenseAndResume(stacks []glrStack, source []byte, ts TokenSo
 	if reason := checkStop(); reason != ParseStopNone {
 		return stacks, false, tok, reason
 	}
+	if p.cRecoverSkipsSharedGoNewline(tok) {
+		for i := range stacks {
+			if !stacks[i].dead && stacks[i].cRec != nil {
+				// Ordinary versions consumed an ASI token, but absorbing
+				// versions have not yet received their next C lookahead.
+				return stacks, false, tok, ParseStopNone
+			}
+		}
+	}
 	relevant := p.compactPackedGSSVersionOrderEnabled() && len(stacks) > 1
 	for i := range stacks {
 		if stacks[i].cPaused || stacks[i].cRec != nil || stacks[i].cRecoverMissingGroup != nil {
@@ -5345,7 +5415,49 @@ func (p *Parser) cAcceptRootRebuild(s *glrStack, arena *nodeArena, entryScratch 
 	)
 	root := p.newRecoveryParentNodeInArena(arena, cand.symbol, p.isNamedSymbol(cand.symbol), children, cand.productionID)
 	root.setFieldMetadata(fieldIDs, fieldSources)
-	root.rawShape = captureRawShapeForNodeSlice(arena, cand.symbol, cand.productionID, children)
+	// Accept replaces the root's visible children, but its raw ledger must
+	// retain invisible MISSING terminals and their recovery cost.
+	item := rawStackWalkEntry{entry: newStackEntryNode(cand.parseState, cand)}
+	_, rootChildCount, _ := rawStackWalkEntryHeader(arena, item)
+	count := rootChildCount + len(nodes) - 1
+	if count > rawShapeMaxExactChildCount {
+		return ParseStopNodeLimit
+	}
+	ref, shape := arena.allocRawShape()
+	if shape == nil {
+		return ParseStopMemoryBudget
+	}
+	shape.symbol, shape.productionID = cand.symbol, cand.productionID
+	shape.childRange = arena.allocRawShapeChildren(count)
+	rawChildren := arena.rawShapeChildren(shape)
+	if len(rawChildren) != count {
+		return ParseStopMemoryBudget
+	}
+	out := 0
+	for i, node := range nodes {
+		if i != rootIdx {
+			rawChildren[out] = newRawShapeChild(newStackEntryNode(node.parseState, node))
+			out++
+			continue
+		}
+		for j := 0; j < rootChildCount; j++ {
+			if j&63 == 0 {
+				if reason := p.resultMaterializationStopReason(arena); resultMaterializationShouldStop(reason) {
+					return reason
+				}
+			}
+			child, ok := rawStackWalkChildAt(arena, item, j)
+			if !ok {
+				return ParseStopNoStacksAlive
+			}
+			edge := newRawShapeChild(child.entry)
+			edge.packedEntry.state = StateID(rawStackWalkEntryRef(child))
+			rawChildren[out] = edge
+			out++
+		}
+	}
+	arena.storeRawShapeHash(ref, rawShapeComputeContentHash(arena, ref, cand.symbol, cand.productionID, uint16(count), rawChildren))
+	root.rawShape = ref
 	root.dynamicPrecedence = nodeSliceDynamicPrecedence(children)
 	first, last := nodes[0], nodes[len(nodes)-1]
 	cSetNodeSpan(root, first.startByte, last.endByte, first.startPoint, last.endPoint)
@@ -5555,10 +5667,10 @@ func (p *Parser) newRecoveryParentNodeInArena(arena *nodeArena, sym Symbol, name
 //
 //   - It only runs where the stack would otherwise pause with no action, so a
 //     parse in which every stack accepts the shared token pays nothing.
-//   - It requires the re-lexed token to cover exactly the shared token's byte
-//     span. Same span means a stack that adopts it advances to the same offset
-//     as every stack that took the shared token, so the versions stay in
-//     lockstep and no caller has to reason about a ragged frontier.
+//   - Ordinary grammars require the same byte span. JS-family internal tokens
+//     and stateless JSX text may split or extend it: the dispatch loop replays
+//     a shorter token's remainder and skips already-consumed shared tokens for
+//     a version that advanced farther. Stateful external tokens keep exact spans.
 //   - It requires the stack's state to have a real action for the re-lexed
 //     symbol, so a failed probe leaves the existing pause path untouched.
 //   - It runs the internal DFA only. The external scanner is never re-entered,
@@ -5605,11 +5717,13 @@ func (p *Parser) relexTokenForStackLexState(source []byte, state StateID, tok To
 	if !ok || relexed.Symbol == 0 || relexed.Symbol == tok.Symbol {
 		return tok, false
 	}
-	// Exact-span requirement: this is what keeps the shared-token loop in
-	// lockstep. A shorter or longer re-lex would leave this stack at a
-	// different byte offset than its siblings.
+	// JS-family versions can require a different token width (for example a
+	// string fragment versus a number). Dispatch reconciles the byte frontier.
+	// Other grammars and stateful external scanner tokens require exact spans.
 	if relexed.StartByte != tok.StartByte || relexed.EndByte != tok.EndByte {
-		return tok, false
+		if (lang.Name != "javascript" && lang.Name != "typescript" && lang.Name != "tsx") || (tok.ExternalScannerToken && !statelessJSXTextToken(lang, tok)) || relexed.StartByte < tok.StartByte || relexed.EndByte <= relexed.StartByte {
+			return tok, false
+		}
 	}
 	if !p.stateHasActionForSymbol(state, relexed.Symbol) {
 		return tok, false

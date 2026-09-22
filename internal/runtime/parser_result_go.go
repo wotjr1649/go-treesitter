@@ -24,6 +24,11 @@ import "bytes"
 // walk stage consumes it; the surrounding root/new-make stages are already
 // bounded or guarded and stay full-tree.
 func normalizeGoReturnedTreeCompatibilityWithCensus(root *Node, source []byte, p *Parser, lang *Language, incrementalRanges []Range, census materializationSubpassCensus) ParseStopReason {
+	// These repairs apply to the Go grammar port, not the pinned C tables.
+	if lang != nil && !lang.GeneratedByGrammargen {
+		return ParseStopNone
+	}
+
 	var arena *nodeArena
 	if root != nil {
 		arena = root.ownerArena

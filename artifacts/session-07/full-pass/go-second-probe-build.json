@@ -1,0 +1,28 @@
+{
+  "command": [
+    "go",
+    "build",
+    "-o",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\go_second_probe.exe",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\go_second_probe.go"
+  ],
+  "candidate_commit": "8e2dc0fe1a814c399073a84e61c222a15c91f1a7",
+  "status_before": " M internal/gtsadapter/native_oracle_test.go\n M tools/native-oracle/probe.c\n?? artifacts/session-07/full-pass/06-correctness/native-tsx-probe.json\n?? artifacts/session-07/full-pass/08-packaging/\n?? artifacts/session-07/full-pass/fuzz-edits-after-go-60s.json\n?? artifacts/session-07/full-pass/modulezip-tool-build.json\n?? artifacts/session-07/full-pass/native-tsx-probe-build.json\n?? artifacts/session-07/full-pass/native-tsx-probe-check.json\n?? internal/gtsadapter/testdata/fuzz/FuzzIncrementalAgreement/d726030f816a339f\n",
+  "started_unix": 1790102502.9154136,
+  "elapsed_seconds": 0.887986421585083,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "8047c2aa9193b3b76f05468d7b72920535945dcfa668d6cc638a1c523095671b"
+  },
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

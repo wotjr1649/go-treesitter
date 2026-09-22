@@ -104,6 +104,39 @@ func TestIndexRealSnapshots(t *testing.T) {
 
 var indexBenchmarkSink int
 
+func TestIndexAnonymousNULTerminal(t *testing.T) {
+	for _, source := range []string{"package p\nvar x = 1", "package p\nvar x = 1\x00"} {
+		r, err := (Adapter{}).Parse(context.Background(), syntax.Request{Filename: "nul.go", Source: []byte(source)})
+		if r.Tree != nil {
+			defer r.Tree.Close()
+		}
+		if err != nil || !r.Complete() {
+			t.Fatal("incomplete NUL snapshot")
+		}
+		nodes := r.Tree.Nodes()
+		x, err := syntax.NewIndex(nodes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var want []int
+		for i, n := range nodes {
+			if n.Type == "" {
+				want = append(want, i)
+			}
+		}
+		if len(want) == 0 || !slices.Equal(slices.Collect(x.OfType("")), want) {
+			t.Fatal("anonymous terminal omitted")
+		}
+		for offset := uint32(0); int(offset) <= len(source); offset++ {
+			got, ok := x.NodeAt(offset)
+			want, found := linearNodeAt(nodes, offset)
+			if got != want || ok != found {
+				t.Fatalf("offset=%d got=%d want=%d", offset, got, want)
+			}
+		}
+	}
+}
+
 func BenchmarkSnapshotLookup(b *testing.B) {
 	var source strings.Builder
 	source.WriteString("package p\n")

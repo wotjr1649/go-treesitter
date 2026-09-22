@@ -9,14 +9,14 @@ import (
 	"github.com/wotjr1649/go-treesitter/syntax"
 )
 
-// Exact inline bytes and same-walker node counts from the regression register.
+// Exact inline bytes and node counts from the pinned C recovery records.
 var regressionFixtures = []struct {
 	id, source      string
 	tsx, javascript int
 }{
-	{"F1", "const a = <p>Org & Team</p>;", 16, 18},
-	{"F2", "const b = <p>AT&T</p>;", 16, 18},
-	{"F3", "const c = <p>&</p>;", 18, 17},
+	{"F1", "const a = <p>Org & Team</p>;", 20, 20},
+	{"F2", "const b = <p>AT&T</p>;", 20, 20},
+	{"F3", "const c = <p>&</p>;", 18, 18},
 	{"F4", "const d = <p>a = b</p>;", 17, 17},
 	{"F5", "const e = <code>k=v</code>;", 17, 17},
 	{"F6", "const f = <p>x &amp; y</p>;", 19, 19},

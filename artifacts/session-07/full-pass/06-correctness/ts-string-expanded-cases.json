@@ -1,0 +1,112 @@
+{
+  "cases": [
+    {
+      "ID": "TS-string-expand-0",
+      "Filename": "x.ts",
+      "Source": "const value: number \"0= 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 20,
+        "NewEndByte": 22
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "TS-string-expand-1",
+      "Filename": "x.ts",
+      "Source": "const value: number \"= 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 20,
+        "NewEndByte": 21
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "TS-string-expand-2",
+      "Filename": "x.ts",
+      "Source": "const value: number \"12= 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 20,
+        "NewEndByte": 23
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "TS-string-expand-3",
+      "Filename": "x.ts",
+      "Source": "const value: number '0= 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 20,
+        "NewEndByte": 22
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "TS-string-expand-4",
+      "Filename": "x.ts",
+      "Source": "const value: number `0= 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 20,
+        "NewEndByte": 22
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "TS-string-expand-5",
+      "Filename": "x.ts",
+      "Source": "const value: number \"a= 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 20,
+        "NewEndByte": 22
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "TS-string-expand-6",
+      "Filename": "x.ts",
+      "Source": "const value: number \"\\n= 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 20,
+        "NewEndByte": 23
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "TS-string-expand-7",
+      "Filename": "x.ts",
+      "Source": "const value: number \"=0= 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 20,
+        "NewEndByte": 23
+      },
+      "Repeat": 20
+    },
+    {
+      "ID": "TS-string-expand-8",
+      "Filename": "x.ts",
+      "Source": "const value: number \"1;= 1;\n",
+      "Previous": "const value: number = 1;\n",
+      "Edit": {
+        "StartByte": 20,
+        "OldEndByte": 20,
+        "NewEndByte": 23
+      },
+      "Repeat": 20
+    }
+  ]
+}

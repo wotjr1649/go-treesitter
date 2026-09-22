@@ -1,0 +1,11 @@
+{
+  "cycles": 193,
+  "checkpoints": 12,
+  "parses_per_cycle": 17,
+  "executable_sha256": "ace82257e9b163b33bb52370d8c2b9fe6bf7c14094d3faa58fb78f9333d9cb95",
+  "source_sha256": "c26ab4c1c48f37ac10161d9cd11810ee919ed50728ea2a44309ea90e74609946",
+  "runtime_manifest_sha256": "0e532e2106fc1336060792d001613c2cccf16a361c33a07e28b22c3dbcb93722",
+  "gomaxprocs": 4,
+  "rss": "K32GetProcessMemoryInfo WorkingSetSize and PeakWorkingSetSize; Windows amd64 native",
+  "analysis": "Inspect post-double-GC live heap/object/goroutine trend after warmup; last explicit OS scavenging kept separate; finite evidence only"
+}

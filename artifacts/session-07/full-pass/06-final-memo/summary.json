@@ -1,0 +1,58 @@
+{
+  "catalogs": [
+    {
+      "catalog": "cases",
+      "count": 50,
+      "edits": 0,
+      "failed": []
+    },
+    {
+      "catalog": "extended-cases",
+      "count": 35,
+      "edits": 21,
+      "failed": []
+    },
+    {
+      "catalog": "typescript-contextual-cases",
+      "count": 8,
+      "edits": 0,
+      "failed": []
+    },
+    {
+      "catalog": "csharp-recovery-cases",
+      "count": 1,
+      "edits": 0,
+      "failed": []
+    },
+    {
+      "catalog": "csharp-order-cases",
+      "count": 33,
+      "edits": 32,
+      "failed": []
+    },
+    {
+      "catalog": "csharp-preservation-cases",
+      "count": 41,
+      "edits": 40,
+      "failed": []
+    },
+    {
+      "catalog": "go-recovery-cases",
+      "count": 28,
+      "edits": 24,
+      "failed": []
+    },
+    {
+      "catalog": "go-keyword-cases",
+      "count": 34,
+      "edits": 27,
+      "failed": []
+    },
+    {
+      "catalog": "runtime-hardening-cases",
+      "count": 458,
+      "edits": 295,
+      "failed": []
+    }
+  ]
+}

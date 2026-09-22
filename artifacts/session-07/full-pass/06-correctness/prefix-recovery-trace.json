@@ -1,0 +1,28 @@
+{
+  "rows": [
+    {
+      "case": {
+        "ID": "prefix-x.go-6",
+        "Filename": "x.go",
+        "Source": "\u0000package p\nvar x = 1\n",
+        "Repeat": 1
+      },
+      "go_log_sha256": "9443f8c63997292aaaccfcd5137d5ca843da7481a68bc2a466a3eb977d8f62e2",
+      "c_log_sha256": "c2df4358a7b74a12c1a85904b98bb93a118c9898f116d73c6c7ca9b373343c54",
+      "go_bytes": 37564,
+      "c_bytes": 4819
+    },
+    {
+      "case": {
+        "ID": "prefix-x.js-8",
+        "Filename": "x.js",
+        "Source": "const value = 1;\n",
+        "Repeat": 1
+      },
+      "go_log_sha256": "d44d87ba4a992b353445aa94b5f462da0481a4ad4b03b91139c93d63494a8d7b",
+      "c_log_sha256": "56b770f95bcb85380ef5508a7c39e04699832e2f2d205746526688fe295c81fa",
+      "go_bytes": 92389,
+      "c_bytes": 4743
+    }
+  ]
+}

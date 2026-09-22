@@ -1,0 +1,9 @@
+{
+  "case": {
+    "ID": "TSX-text-paren",
+    "Filename": "x.tsx",
+    "Source": "const View = () => <p>( = b &amp; 한글</p>;\n",
+    "Repeat": 1
+  },
+  "sha256": "879f07cfbbc33b75ba1c9843ce0a066300c7ad58c80764d10f9c9fdb6a2c75fe"
+}

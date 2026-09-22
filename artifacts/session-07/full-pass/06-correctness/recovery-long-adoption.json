@@ -1,0 +1,6 @@
+{
+  "previous_runtime_manifest_sha256": "b632e400b6b17b01109bb4bf8efbf41544b5031d5cd09878ed353b595191c543",
+  "runtime_manifest_sha256": "2b2a872fcf790d5d0c84729ee310e5b3d192772cb36b253539589a2a4d5b1c0f",
+  "patch_sha256": "6b64d70054e0d41d6c97e81d78f1236454ec11fbcf6f8662df1bd4bf564f5172",
+  "reproduced_files": 1508
+}

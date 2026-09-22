@@ -1,0 +1,7 @@
+{
+  "phase": "diagnostic executable",
+  "exit": 2,
+  "reason": "diagnostic indexed SymbolNames using ERROR symbol 65535",
+  "output_preserved": false,
+  "product_change": false
+}

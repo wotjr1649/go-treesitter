@@ -4638,10 +4638,11 @@ func (p *Parser) stampCompactPackedGSSZeroChildReceipt(ref *rawShapeRef) {
 	}
 }
 
+// Go and TSX recovery use the same C version order with or without reuse.
 func compactPackedGSSVersionOrderActiveForParse(language *Language, reuse *reuseCursor, oldTree *Tree, noTreeBenchmarkOnly bool) bool {
 	return language != nil &&
 		language.CompactPackedGSSVersionOrderCertified &&
-		reuse == nil && oldTree == nil &&
+		(reuse == nil && oldTree == nil || language.Name == "go" || language.Name == "tsx") &&
 		!noTreeBenchmarkOnly
 }
 
@@ -5232,8 +5233,8 @@ func (p *Parser) parseInternal(source []byte, ts TokenSource, reuse *reuseCursor
 		// ancestors whose error content resolved losslessly (see
 		// reconcileStaleHasErrorFlags). Repair before the runtime is stamped so
 		// the retry ladder and callers see C-derived truth. Gated to passes
-		// where the recovery machinery actually ran; the walk itself only
-		// happens when the root still claims an error.
+		// where the recovery machinery actually ran. Inspect the raw ledger
+		// first: invisible MISSING terminals still contribute C error cost.
 		//
 		// SAFETY: only for ACCEPTED, EOF-covering trees. On a truncated or
 		// stopped-early tree "no ERROR node inside" does not mean "no error"
@@ -5241,11 +5242,13 @@ func (p *Parser) parseInternal(source []byte, ts TokenSource, reuse *reuseCursor
 		// _pydecimal.py swallowed-error class: Go truncates at 64K with
 		// hasError=false where C reports hasError=true). Clearing there
 		// would widen that class; an accepted tree spanning expected EOF
-		// with zero ERROR/MISSING descendants is the only case where
+		// with zero ERROR/MISSING descendants in both raw and visible trees is
+		// the only case where
 		// hasError=false is definitionally C-correct.
 		if tree != nil && p.crecoveryEnteredErrorState && stopReason == ParseStopAccepted {
-			if root := tree.root; root != nil && root.hasError() && root.endByte >= expectedEOFByte {
-				if reconcileStaleHasErrorFlags(root, 0) {
+			if root := tree.root; root != nil && root.endByte >= expectedEOFByte {
+				if p.cNodeErrorCost(root) > 0 || reconcileStaleHasErrorFlags(root, 0) {
+					root.setHasError(true)
 					tree.resultErrorSummary = resultErrorSummaryPresent
 				} else {
 					tree.resultErrorSummary = resultErrorSummaryClean
@@ -6017,14 +6020,65 @@ func (p *Parser) parseInternal(source []byte, ts TokenSource, reuse *reuseCursor
 		pendingDispatch := false
 		pendingSharedToken := Token{}
 		pendingSteps := 0
+		splitSharedToken := Token{}
+		splitActive := false
 		advanceVersion := func(si int) int {
+			s := &stacks[si]
+			if splitActive && stackRelexActive && !s.shifted && !s.dead && !s.accepted && !s.cPaused {
+				replay := tok
+				s.cRecoverPendingToken = &replay
+				pendingSharedToken = splitSharedToken
+				pendingDispatch = true
+				stackRelexActive = false
+			}
+			if pendingDispatch && s.shifted && tok.StartByte >= pendingSharedToken.StartByte && tok.EndByte >= pendingSharedToken.EndByte && tok.EndByte > tok.StartByte {
+				tok = pendingSharedToken
+				s.cRecoverPendingToken = nil
+				pendingDispatch = false
+				stackRelexActive = false
+				splitActive = false
+				return si + 1
+			}
+			if pendingDispatch && !s.dead && !s.accepted && !s.cPaused && s.shifted && tok.StartByte >= pendingSharedToken.StartByte && tok.EndByte < pendingSharedToken.EndByte {
+				if !splitActive {
+					splitSharedToken = pendingSharedToken
+					splitActive = true
+				}
+				end := tok.EndByte
+				pt := tok.EndPoint
+				tok = Token{Symbol: splitSharedToken.Symbol, StartByte: end, EndByte: splitSharedToken.EndByte, StartPoint: pt, EndPoint: splitSharedToken.EndPoint, Text: string(source[end:splitSharedToken.EndByte])}
+				pendingDispatch = false
+				stackRelexActive = false
+				s.cRecoverPendingToken = nil
+				s.shifted = false
+				pendingSteps++
+				return si
+			}
+			if stackRelexActive && s.shifted && !s.dead && !s.accepted && !s.cPaused && tok.EndByte < stackRelexRestoreTok.EndByte {
+				if !splitActive {
+					splitSharedToken = stackRelexRestoreTok
+					splitActive = true
+				}
+				end := tok.EndByte
+				pt := tok.EndPoint
+				tok = Token{Symbol: splitSharedToken.Symbol, StartByte: end, EndByte: splitSharedToken.EndByte, StartPoint: pt, EndPoint: splitSharedToken.EndPoint, Text: string(source[end:splitSharedToken.EndByte])}
+				stackRelexActive = false
+				s.shifted = false
+				pendingSteps++
+				return si
+			}
+			if splitActive {
+				tok = splitSharedToken
+				stackRelexActive = false
+				splitActive = false
+			}
 			if !pendingDispatch {
 				return si + 1
 			}
 			tok = pendingSharedToken
 			stackRelexActive = false
 			pendingDispatch = false
-			s := &stacks[si]
+			s = &stacks[si]
 			if s.dead || s.accepted || s.cPaused {
 				s.cRecoverPendingToken = nil
 				return si + 1
@@ -6037,6 +6091,20 @@ func (p *Parser) parseInternal(source []byte, ts TokenSource, reuse *reuseCursor
 			return si
 		}
 		for si := 0; (si < numStacks || (packedVersionOrder && si < len(stacks))) && pendingSteps < maxConsecutivePrimaryReduces; si = advanceVersion(si) {
+			if pendingSteps > 0 {
+				if reason := p.parseStopReasonNow(); parseStopReasonIsTerminal(reason) {
+					return finalize(stacks, reason)
+				}
+				if nodeCount > maxNodes {
+					return finalize(stacks, ParseStopNodeLimit)
+				}
+				if stacks[si].depth() > maxDepth {
+					return finalize(stacks, ParseStopStackDepthLimit)
+				}
+				if reason := p.resultMaterializationStopReason(arena); resultMaterializationShouldStop(reason) {
+					return finalize(stacks, reason)
+				}
+			}
 			s := &stacks[si]
 			if stackRelexActive {
 				tok = stackRelexRestoreTok
@@ -6048,6 +6116,10 @@ func (p *Parser) parseInternal(source []byte, ts TokenSource, reuse *reuseCursor
 			// the only place this is set true).
 			p.reduceActionConflict = false
 			if s.dead || s.shifted {
+				continue
+			}
+			if (p.language.Name == "javascript" || p.language.Name == "typescript" || p.language.Name == "tsx") && tok.EndByte > tok.StartByte && s.byteOffset >= tok.EndByte && s.cRecoverPendingToken == nil {
+				s.shifted = true
 				continue
 			}
 			// Faithful C recovery port (parser_recover_c.go): an accepted
@@ -7089,6 +7161,10 @@ func (p *Parser) parseInternal(source []byte, ts TokenSource, reuse *reuseCursor
 				s := &stacks[i]
 				if s.dead || s.accepted || s.shifted || s.cPaused || s.depth() == 0 {
 					continue
+				}
+				if s.cRecoverPendingToken != nil {
+					terminalFrontierOK = false
+					break
 				}
 				actionIdx := p.contextualActionIndex(source, s.top().state, &tok)
 				if actionIdx == 0 || int(actionIdx) >= len(parseActions) {

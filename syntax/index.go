@@ -26,7 +26,9 @@ type indexedSpan struct {
 func NewIndex(nodes []Node) (*Index, error) {
 	x := &Index{byType: make(map[string][]int), spans: make([]indexedSpan, len(nodes))}
 	for i, n := range nodes {
-		if n.Type == "" || n.StartByte > n.EndByte ||
+		// A literal NUL terminal has an empty C node-type name.
+		invalidType := n.Type == "" && (i == 0 || n.Named || n.Extra || n.Missing || n.Error)
+		if invalidType || n.StartByte > n.EndByte ||
 			(i == 0 && n.Parent != -1) || (i > 0 && (n.Parent < 0 || n.Parent >= i)) {
 			return nil, errors.New("invalid snapshot node")
 		}
