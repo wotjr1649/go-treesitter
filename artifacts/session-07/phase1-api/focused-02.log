@@ -1,0 +1,12 @@
+=== RUN   TestExternalConsumer
+    parser_test.go:77: external consumer: fresh, edit, errors, cancellation, release OK
+    parser_test.go:91: external consumer: internal adapter import rejected
+--- PASS: TestExternalConsumer (1.38s)
+=== RUN   ExampleNew
+--- PASS: ExampleNew (0.09s)
+PASS
+ok  	github.com/wotjr1649/go-treesitter	1.627s
+=== RUN   TestUpstreamImportBoundary
+--- PASS: TestUpstreamImportBoundary (0.32s)
+PASS
+ok  	github.com/wotjr1649/go-treesitter/internal/boundary	0.837s

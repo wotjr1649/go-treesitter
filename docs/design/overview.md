@@ -9,6 +9,8 @@ Normative for module layout and layer boundaries. Decisions and their reasoning 
         consumer  (a product; not in this repository)
             │  depends only on this repository's own types
             ▼
+      treesitter.New()   public constructor; no upstream types exposed
+            │
       syntax      result / outcome / diagnostics / request types
             │     a one-method Parser seam, for fakes and for a future second implementation
             ▼
@@ -29,6 +31,7 @@ README.md              human entry point
 .gitattributes         MANDATORY before the first fixture lands (LF pinning)
 .gitignore
 go.mod
+parser.go              treesitter.New returns syntax.Parser
 
 syntax/                Result, Outcome, Diagnostics, Request, Parser seam
                        no dependency on gotreesitter, no I/O, no language semantics
@@ -43,8 +46,8 @@ artifacts/             evidence plane, append-only
 .github/workflows/     product + cross lanes
 ```
 
-Whether `syntax/` is exported or lives under `internal/` is an **open decision**; the layering is
-the same either way. See `docs/design/decisions/ADR-0004-parser-boundary-and-result-model.md`.
+`syntax/` and the root constructor are public import paths; the adapter remains
+internal. They are not versioned as a stable release yet. See ADR-0009.
 
 ## Boundary rules
 
