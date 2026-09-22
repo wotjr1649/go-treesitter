@@ -114,21 +114,21 @@ func TestOracleRecords(t *testing.T) {
 }
 
 func TestExtendedOracleRecords(t *testing.T) {
-	runOracleCorpus(t, false, "testdata/oracle/extended-cases.json", "testdata/oracle/windows-c-extended", "")
+	runOracleCorpus(t, false, "testdata/oracle/extended-cases.json", "testdata/oracle/windows-c-v2/extended", "")
 }
 
 func TestTypeScriptContextualOracleRecords(t *testing.T) {
-	runOracleCorpus(t, false, "testdata/oracle/typescript-contextual-cases.json", "testdata/oracle/windows-c-ts-contextual", "testdata/oracle/typescript-contextual-differences.json")
+	runOracleCorpus(t, false, "testdata/oracle/typescript-contextual-cases.json", "testdata/oracle/windows-c-v2/ts-contextual", "")
 }
 
 func TestCSharpRecoveryVariantOracleRecords(t *testing.T) {
-	runOracleCorpus(t, false, "testdata/oracle/csharp-recovery-cases.json", "testdata/oracle/windows-c-cs-recovery", "testdata/oracle/csharp-recovery-differences.json")
+	runOracleCorpus(t, false, "testdata/oracle/csharp-recovery-cases.json", "testdata/oracle/windows-c-v2/cs-recovery", "testdata/oracle/csharp-recovery-differences.json")
 }
 
 // Candidate mode is called only by the opt-in oracle_experiment build-tag test.
 // Product tests always require the unmodified module and recorded differences.
 func runOracleRecords(t *testing.T, candidate bool) {
-	runOracleCorpus(t, candidate, "testdata/oracle/cases.json", "testdata/oracle/windows-c", "testdata/oracle/known-differences.json")
+	runOracleCorpus(t, candidate, "testdata/oracle/cases.json", "testdata/oracle/windows-c-v2/base", "testdata/oracle/known-differences.json")
 }
 
 func runOracleCorpus(t *testing.T, candidate bool, casesPath, recordsDir, differencesPath string) {
@@ -150,6 +150,16 @@ func runOracleCorpus(t *testing.T, candidate bool, casesPath, recordsDir, differ
 	pins, err := provenance.Read()
 	if err != nil {
 		t.Fatal(err)
+	}
+	var patchInputs struct {
+		Commit string `json:"upstream_patch_commit"`
+		SHA256 string `json:"upstream_patch_sha256"`
+	}
+	patchJSON := read("testdata/oracle/typescript-patched/manifest.json", &patchInputs)
+	if pins.Oracle.TypeScriptPatch == nil ||
+		fmt.Sprintf("%x", sha256.Sum256(patchJSON)) != pins.Oracle.TypeScriptPatch.InputsSHA256 ||
+		patchInputs.Commit != pins.Oracle.TypeScriptPatch.Commit || patchInputs.SHA256 != pins.Oracle.TypeScriptPatch.SHA256 {
+		t.Fatal("TypeScript oracle patch identity mismatch")
 	}
 	var build struct {
 		Schema   int
@@ -358,7 +368,7 @@ func runOracleCorpus(t *testing.T, candidate bool, casesPath, recordsDir, differ
 					}
 					return
 				}
-			} else if c.Group == "KR-0001a" || c.Group == "KR-0001b" || c.Group == "KR-0003" || c.Group == "KR-0004" {
+			} else if c.Group == "KR-0001a" || c.Group == "KR-0001b" || c.Group == "KR-0004" {
 				t.Fatal("missing known-difference identity")
 			}
 			if c.Group == "KR-0001a" {

@@ -1,0 +1,159 @@
+{
+  "root": "D:\\AIDEV\\go-treesitter",
+  "branch": "session/07-product-hardening",
+  "start_head": "9e5c90ad4aaf0bcea59d229e6b6f0ab789893a76",
+  "start_status": "clean (observed before all task edits)",
+  "go_version": "go version go1.27.1 windows/amd64",
+  "go_env": {
+    "CGO_ENABLED": "0",
+    "GOARCH": "amd64",
+    "GOFLAGS": "",
+    "GOOS": "windows",
+    "GOPROXY": "off",
+    "GOTOOLCHAIN": "local",
+    "GOVERSION": "go1.27.1",
+    "GOWORK": "off"
+  },
+  "os": "Windows-11-10.0.26200-SP0",
+  "architecture": "AMD64",
+  "modules": [
+    "github.com/wotjr1649/go-treesitter",
+    "github.com/kr/pretty v0.1.0",
+    "github.com/odvcencio/gotreesitter v0.53.0",
+    "golang.org/x/sync v0.11.0",
+    "gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127",
+    "gopkg.in/yaml.v3 v3.0.1"
+  ],
+  "pins_at_receipt_time": {
+    "baseline": {
+      "module": "github.com/odvcencio/gotreesitter",
+      "version": "v0.53.0",
+      "tag": "f102332cca9dc45e841b9439d34ba5cc59f0b10f",
+      "commit": "c871b1f576866c40b1695677fe3512243e266d39"
+    },
+    "grammars": {
+      "go": {
+        "blob_sha256": "9cf914d26d962d1a62e7954f8b20b302337a44cb7d4a07218eec482c45a57a08",
+        "commit": "2346a3ab1bb3857b48b29d779a1ef9799a248cd7"
+      },
+      "python": {
+        "blob_sha256": "cde4a67dc6af6e1232dbbd1eab8618478d1d73727020e8a8002542390a452d37",
+        "commit": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64"
+      },
+      "javascript": {
+        "blob_sha256": "6706f93890f24d8ea90d6a140df5dde29c02ec8a3213bae16e8cc4df37e33ee0",
+        "commit": "58404d8cf191d69f2674a8fd507bd5776f46cb11"
+      },
+      "typescript": {
+        "blob_sha256": "46d8d4f7a0056db32e874500ae5b19170237e1628a63a9e3a401e0ee426d6126",
+        "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f"
+      },
+      "tsx": {
+        "blob_sha256": "bf8c490b0bbeb6d4150abce2edc193552e44b093893665dde69bd39e9e940e85",
+        "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f"
+      },
+      "c_sharp": {
+        "blob_sha256": "7ad425e89733339dde94e3c03b762ae478fb453b530493f5d62e1ae7537e1784",
+        "commit": "88366631d598ce6595ec655ce1591b315cffb14c"
+      }
+    },
+    "oracle": {
+      "runtime_version": "v0.25.1",
+      "runtime_commit": "f5afe475deb7c0bae6407fb776c76824f717bb61",
+      "transport_module": "github.com/tree-sitter/go-tree-sitter",
+      "transport_version": "v0.25.0",
+      "transport_commit": "adc13ffd8b2c0b01b878fda9f7c422ce0df5fad3",
+      "generator": "installed-or-checked-in",
+      "abi_policy": "runtime-compatible",
+      "build_flags": [
+        "-std=c11",
+        "-fPIC",
+        "-O2"
+      ],
+      "typescript_patch": {
+        "commit": "24e1d3b2b4409ee2ffa63e88abba51a40060e76e",
+        "sha256": "8d091351f8107d1546a8130d281f0ca8d6d959b11da66b7872d3e10f998340e9",
+        "inputs_sha256": "f6a5b51f728fb40ddd20aaf7170275bf9e1241f91fd572e90b2daed370b899a6"
+      }
+    }
+  },
+  "catalogs": {
+    "cases.json": {
+      "sha256": "7381b0cb27a9d84371cf52a5c5505519b4d3b4aebc8c4e9e923741e4f028d944",
+      "inputs": 50,
+      "edits": 0
+    },
+    "extended-cases.json": {
+      "sha256": "9b1448dde69d5e916cc04d95bb95f6ddf43a7fb9bc862eb261daa6b40e143f5b",
+      "inputs": 35,
+      "edits": 21
+    },
+    "typescript-contextual-cases.json": {
+      "sha256": "0430f2db7abcc0314e6ea2a6b2a4575cdfa63cdefd17f3ed787cd077ff1f3664",
+      "inputs": 8,
+      "edits": 0
+    },
+    "csharp-recovery-cases.json": {
+      "sha256": "b948a2ebb286a3bb8b0072e499e75c283472c3a3ca617b56775176cfa7a9a476",
+      "inputs": 1,
+      "edits": 0
+    }
+  },
+  "references": {
+    "gotreesitter": {
+      "head": "095a1876ae58053140033278f0863134c2b609cc",
+      "status": ""
+    },
+    "tree-sitter": {
+      "head": "5b951eff4f8b1431e933ed0fe45e48fcd4036a38",
+      "status": ""
+    }
+  },
+  "public_patch_ancestry": {
+    "24e1d3b2b4409ee2ffa63e88abba51a40060e76e": true,
+    "0376556": true
+  },
+  "runtime_blobs": {
+    "go": "9cf914d26d962d1a62e7954f8b20b302337a44cb7d4a07218eec482c45a57a08",
+    "python": "cde4a67dc6af6e1232dbbd1eab8618478d1d73727020e8a8002542390a452d37",
+    "javascript": "6706f93890f24d8ea90d6a140df5dde29c02ec8a3213bae16e8cc4df37e33ee0",
+    "typescript": "46d8d4f7a0056db32e874500ae5b19170237e1628a63a9e3a401e0ee426d6126",
+    "tsx": "bf8c490b0bbeb6d4150abce2edc193552e44b093893665dde69bd39e9e940e85",
+    "c_sharp": "7ad425e89733339dde94e3c03b762ae478fb453b530493f5d62e1ae7537e1784"
+  },
+  "release_approved_candidate": null,
+  "tracked_source_hashes": {
+    "experiments/v052-v053/internal/gtsadapter/probe_test.go": "8b84a165da8fe892b0d3c9643581065407e80c98b5b5b2af6f6a9532a7b7eb22",
+    "internal/boundary/boundary_test.go": "b3fe5efe41393289c9d21ad3b93911f839bc2ff390f6c158385dae3f3afd3eff",
+    "internal/gtsadapter/adapter.go": "cc52357b3a73ec3d0eb5887abff260573e9074a5e2cf26fb17da8b4ff102906a",
+    "internal/gtsadapter/adapter_test.go": "0e16a0394df59aaad5998e86a92c7d3432e08bebc159dc8f1f19038d548c35c9",
+    "internal/gtsadapter/corpus_test.go": "25d5212ab9c3438249c28d5fbf230240736469ee1111929042449767b3f69c0e",
+    "internal/gtsadapter/index_test.go": "4fb1f68d92f175d1300cff596b984c18221c608f4ff0f6793d1c348e2ee9f1cf",
+    "internal/gtsadapter/known_regressions_test.go": "672663a601cad3f260904848c7e3973ead86ceb2ff1387188fc1ed39b837fff5",
+    "internal/gtsadapter/native_oracle_test.go": "ae41e6f05e1b1e9b3a2c38f6401d0fa267d1cc662e9f74d73cfc891c74de8b5b",
+    "internal/gtsadapter/oracle_experiment_test.go": "419e0f066711a461d69e85d756330893915e93d88d2c822e14ad2e8f630d0eb5",
+    "internal/gtsadapter/oracle_test.go": "fe9113f91332eda47a226fe5c6eac0bb6fd539f4120bdc71c9142e9202fd3a0c",
+    "internal/gtsadapter/resources_test.go": "3f47b77740b94dd9003bbb6513757e47ccb84115d13ba4ca5709dbea8c47187e",
+    "internal/gtsadapter/smoke_test.go": "778b4e3ecd00cec0bf9f33893b9fa0ae15a60ab9de5a9129c88017aa8f0c3f68",
+    "internal/provenance/provenance.go": "716c967ad4fa8fcb27e5828d23e83913a117deb00ac86af7c509aec2503ed694",
+    "internal/provenance/provenance_test.go": "d1681f088c68b75f71a911a7b0b4ee877e92fafa27a86b9a56ac4700c7733a6b",
+    "internal/provenance/testdata/buildinfo/main.go": "cdd5521572f157e641b5bbbce05edd9e1dccee305befc019ad476db305a80fa9",
+    "parser.go": "010eb97f50b9d784796a43d9e0376e7fb505fbfe0cfbd31f258810cc144161d4",
+    "parser_test.go": "7b2384ee8a7a7ea5fe41b167dfde7a5c766a9b13c43166d2fcb344ffa197a5f2",
+    "syntax/diagnostics.go": "9b1b5e009681cc48d3bb09c784777e766651f3766fc7519b6d5af51bd3bf7080",
+    "syntax/index.go": "815a0b039ec294e015bde3b1d21c5be8a37bf6df03bbe6d855f8569e2e83045d",
+    "syntax/index_test.go": "5800170fcad932305fdbbcba8cc78fa40da4f20a1144cc95066124dca6d7d7f5",
+    "syntax/outcome.go": "2c914015df2bc9d61ac43f6c52832f3b9ecc95f390588e83d10cb5a0687ea159",
+    "syntax/parser.go": "64ee34d423a529f3e9aa2590384779c60380eee4a7a9edf4d90e4d5b70fcc67f",
+    "syntax/result.go": "f1fe1700e61377dc9e6cf24b234d2be2c8364648578b7dfad4490807b8a20418",
+    "syntax/result_test.go": "5a59cf78d25025e1f632422f2603c3b638cfc87e3e003210b6811ba137fb15b6",
+    "testdata/consumer/main.go": "b629ed07e75fdb8da94db18ededc273556fd76ad3f327f74765da690d4bca51e",
+    "tools/measure/main.go": "6cdb644f4a2cc7930a583bd8bad0121b1b783e9adace86d3044ee30363723d2a",
+    "tools/native-oracle/driver.c": "c6e25f61afff61ee60f177722f43f27448c1f205485e0595836f0fcd7ed40cb9",
+    "tools/native-oracle/identity.py": "28d7b5978ca1f2da5af7b48da7a85c90097f2bc8c6fba5dcb22a9ab8e19e03f3",
+    "tools/native-oracle/probe.c": "b2d3042833db521cd1aed1cd5bc4b51f434aa93662750204657dce0e30765272",
+    "tools/native-oracle/run.py": "4885efad47d3c88d2e875e9d605107f6d485904ef95e882c1941d2153c771404",
+    "tools/native-oracle/test_identity.py": "b4494cfc1088d143f25a2ef1f5c2245055af9cd1a210e26c5f2158cda120bac1",
+    "tools/native-oracle/test_run.py": "e646ef5b2711c00541db853c4708850e6fd927aa9b6bb2ce9b43d0232cca12ca"
+  }
+}

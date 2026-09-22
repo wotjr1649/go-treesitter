@@ -1,0 +1,14 @@
+{
+  "archive_sha256": "a7fc4a2f1b369542b14429c36a09a41d6db0bb0d2beec5844930b4a17c6ae3a6",
+  "files": 3275,
+  "changes": {
+    "grammars/runtime/javascript_scanner.go": {
+      "before": "0ea6fb03d2a8044020e48036b620499062120dc2592fa28170d3c3c53824f4f9",
+      "after": "1d911c110613f8eb0e9ee6683afe9d46ac63d7d8998cbc58b5146eaf854d6083"
+    },
+    "grammars/runtime/tsx_scanner.go": {
+      "before": "a10ec174eb9ca31b73e0fc6adae338912b902002b1bc1951a2890b4bf05b3fad",
+      "after": "3ba35b579ee71fac4ed0b30d56afd4c90c2363b4d56bc7e1e64bcd0e17c9f0d3"
+    }
+  }
+}

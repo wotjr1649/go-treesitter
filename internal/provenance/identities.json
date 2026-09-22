@@ -21,6 +21,11 @@
     "transport_commit": "adc13ffd8b2c0b01b878fda9f7c422ce0df5fad3",
     "generator": "installed-or-checked-in",
     "abi_policy": "runtime-compatible",
-    "build_flags": ["-std=c11", "-fPIC", "-O2"]
+    "build_flags": ["-std=c11", "-fPIC", "-O2"],
+    "typescript_patch": {
+      "commit": "24e1d3b2b4409ee2ffa63e88abba51a40060e76e",
+      "sha256": "8d091351f8107d1546a8130d281f0ca8d6d959b11da66b7872d3e10f998340e9",
+      "inputs_sha256": "f6a5b51f728fb40ddd20aaf7170275bf9e1241f91fd572e90b2daed370b899a6"
+    }
   }
 }

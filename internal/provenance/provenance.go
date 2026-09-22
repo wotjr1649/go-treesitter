@@ -22,14 +22,21 @@ type Grammar struct {
 }
 
 type Oracle struct {
-	RuntimeVersion   string   `json:"runtime_version"`
-	RuntimeCommit    string   `json:"runtime_commit"`
-	TransportModule  string   `json:"transport_module"`
-	TransportVersion string   `json:"transport_version"`
-	TransportCommit  string   `json:"transport_commit"`
-	Generator        string   `json:"generator"`
-	ABIPolicy        string   `json:"abi_policy"`
-	BuildFlags       []string `json:"build_flags"`
+	RuntimeVersion   string        `json:"runtime_version"`
+	RuntimeCommit    string        `json:"runtime_commit"`
+	TransportModule  string        `json:"transport_module"`
+	TransportVersion string        `json:"transport_version"`
+	TransportCommit  string        `json:"transport_commit"`
+	Generator        string        `json:"generator"`
+	ABIPolicy        string        `json:"abi_policy"`
+	BuildFlags       []string      `json:"build_flags"`
+	TypeScriptPatch  *GrammarPatch `json:"typescript_patch,omitempty"`
+}
+
+type GrammarPatch struct {
+	Commit       string `json:"commit"`
+	SHA256       string `json:"sha256"`
+	InputsSHA256 string `json:"inputs_sha256"`
 }
 
 type Identities struct {

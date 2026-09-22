@@ -1,15 +1,36 @@
 import io
 from contextlib import redirect_stdout
 import json
+import copy
 from pathlib import Path
+import shutil
 import tarfile
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import run
 
 
 class OracleBoundaryTest(unittest.TestCase):
+    def test_typescript_patch_inputs_are_bound_to_approved_identity(self):
+        pins = run.read_json(run.PINS)
+        source, _ = run.typescript_patch_inputs(pins)
+        with tempfile.TemporaryDirectory(dir=run.ROOT / '.scratch') as work:
+            root = Path(work)
+            destination = root / 'testdata/oracle/typescript-patched'
+            shutil.copytree(source, destination)
+            with patch.object(run, 'ROOT', root):
+                run.typescript_patch_inputs(pins)
+                altered = copy.deepcopy(pins)
+                altered['oracle']['typescript_patch']['commit'] = '0' * 40
+                with self.assertRaisesRegex(ValueError, 'provenance mismatch'):
+                    run.typescript_patch_inputs(altered)
+                scanner = destination / 'common/scanner.h'
+                scanner.write_bytes(scanner.read_bytes() + b'\n')
+                with self.assertRaisesRegex(ValueError, 'source changed'):
+                    run.typescript_patch_inputs(pins)
+
     def test_comparison_rejects_mutually_consistent_invalid_identity(self):
         # Re-hash the entire set after each mutation: checksums alone must not
         # make two stale or misbound receipts acceptable evidence.
@@ -22,8 +43,8 @@ class OracleBoundaryTest(unittest.TestCase):
                 cases = [c for c in run.read_json(run.ROOT / 'testdata/oracle/cases.json') if c['id'] == 'SM-GO']
                 cases_path = Path(work) / 'cases.json'
                 run.write_new(cases_path, cases)
-                build = run.read_json(run.ROOT / 'testdata/oracle/windows-c/build.json')
-                receipt = run.read_json(run.ROOT / 'testdata/oracle/windows-c/SM-GO.json')
+                build = run.read_json(run.ROOT / 'testdata/oracle/windows-c-v2/base/build.json')
+                receipt = run.read_json(run.ROOT / 'testdata/oracle/windows-c-v2/base/SM-GO.json')
                 if mutation == 'epoch':
                     build['pins']['oracle']['runtime_commit'] = '0' * 40
                 elif mutation == 'abi':
@@ -55,7 +76,7 @@ class OracleBoundaryTest(unittest.TestCase):
             for directory in directories:
                 directory.mkdir()
                 for name in ('build.json', 'SM-GO.json'):
-                    (directory / name).write_bytes((run.ROOT / 'testdata/oracle/windows-c' / name).read_bytes())
+                    (directory / name).write_bytes((run.ROOT / 'testdata/oracle/windows-c-v2/base' / name).read_bytes())
                 run.write_new(directory / 'set.json', {'schema': 1, 'cases_sha256': run.sha(cases_path.read_bytes()),
                               'files': {p.name: run.sha(p.read_bytes()) for p in directory.iterdir()}})
             with redirect_stdout(io.StringIO()):

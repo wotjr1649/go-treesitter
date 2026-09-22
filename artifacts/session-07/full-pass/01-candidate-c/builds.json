@@ -1,0 +1,106 @@
+{
+  "project_commit": "9e5c90ad4aaf0bcea59d229e6b6f0ab789893a76",
+  "runtime_commit": "f5afe475deb7c0bae6407fb776c76824f717bb61",
+  "grammar_commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f",
+  "source_archive_sha256": "96ce4d1b513767d414bcca408efd9b49879162cceecdbed79a88e8ad2184f385",
+  "upstream_patch_commit": "24e1d3b2b4409ee2ffa63e88abba51a40060e76e",
+  "upstream_patch_file_sha256": "8d091351f8107d1546a8130d281f0ca8d6d959b11da66b7872d3e10f998340e9",
+  "patch_applied_in_full": true,
+  "generator_version": "tree-sitter 0.27.0",
+  "generator_sha256": "9fbc4f285c876b1a38c7e9d5223a51fb7842255285cdd7db3ffb0ba3934f2662",
+  "javascript_base": {
+    "version": "0.23.1",
+    "resolved": "https://registry.npmjs.org/tree-sitter-javascript/-/tree-sitter-javascript-0.23.1.tgz",
+    "integrity": "sha512-/bnhbrTD9frUYHQTiYnPcxyHORIw157ERBa6dqzaKxvR/x3PC4Yzd+D1pZIMS6zNg2v3a8BZ0oK7jHqsQo9fWA==",
+    "hasInstallScript": true,
+    "dependencies": {
+      "node-addon-api": "^8.2.2",
+      "node-gyp-build": "^4.8.2"
+    },
+    "peerDependencies": {
+      "tree-sitter": "^0.21.1"
+    },
+    "peerDependenciesMeta": {
+      "tree-sitter": {
+        "optional": true
+      }
+    }
+  },
+  "javascript_grammar_sha256": "230e330dd914d94297e5e58d53942cd5debf9c069852da93b6a6b1daae1967dc",
+  "compiler": "gcc.exe (Rev3, Built by MSYS2 project) 16.2.0",
+  "compiler_sha256": "75e87953e9d04e8a5d81225397292e9f8ae599a0ed85f70ed175767577aaa9f6",
+  "driver_sha256": "da266f8c9aa6b298dead0e211ca3c64b648aebf5e6359de5ebe63ec4072a4425",
+  "flags": [
+    "-std=c11",
+    "-fPIC",
+    "-O2"
+  ],
+  "os": "windows",
+  "arch": "amd64",
+  "builds": {
+    "regenerated-unpatched-c": {
+      "artifacts": {
+        "typescript": {
+          "generator_mode": "generated",
+          "generator_version": "tree-sitter 0.27.0",
+          "abi": 15,
+          "runtime_abi_min": 13,
+          "runtime_abi_max": 15,
+          "runtime_header_sha256": "a363e2f2120178702374d8e34f8af9d3b7b2124a2c9e0cc33e57ded13db59b48",
+          "parser_sha256": "b10a0102ae8b90ff7f8446c9cf08fbf99cb4092a9a4afd3c3340f3594e8b7a5c",
+          "grammar_json_sha256": "fb5737b2364aa13f40726174f85cacd51878435966ef14bfe3c295bd7e8bf897",
+          "node_types_sha256": "10fc80f3b49f46aa6a64c805372359c08540fc8232934ef0f75f84a5cf91e000",
+          "executable_sha256": "6787c2163f678a7e6a04f5ecdcad2e31d04ace7ac1fb099449384dbd507bb2d8",
+          "executable": ".scratch\\full-pass\\builds\\regenerated-unpatched-c\\typescript.exe"
+        },
+        "tsx": {
+          "generator_mode": "generated",
+          "generator_version": "tree-sitter 0.27.0",
+          "abi": 15,
+          "runtime_abi_min": 13,
+          "runtime_abi_max": 15,
+          "runtime_header_sha256": "a363e2f2120178702374d8e34f8af9d3b7b2124a2c9e0cc33e57ded13db59b48",
+          "parser_sha256": "a0a9ac6dfe145762c89c39ccb1e1e895c0ca233a370c2e0eb06655f1cb3492ea",
+          "grammar_json_sha256": "6b5e63cc2aebf50901a3b068411bb54ffd625ab83e99fc9cc30850b2682ccb4f",
+          "node_types_sha256": "9a6b3b2c79875a36f9591627e33d5b2376b2b25352b38d5368efcc7b2fa4e01f",
+          "executable_sha256": "db9fd01d87eb179a3e9c41dbc8e3fe713cae17e517d03d5d8c3639bca213542e",
+          "executable": ".scratch\\full-pass\\builds\\regenerated-unpatched-c\\tsx.exe"
+        }
+      },
+      "define_grammar_sha256": "c2ac6894e0db6164f56dc339788d9da2da60ce1f81d888e6b74a74fc81db818f",
+      "scanner_sha256": "da66ef2bd14a3f7ea743e25ba068c6c9aae2c3509db200ff80c4a0e6116e564c"
+    },
+    "candidate-c": {
+      "artifacts": {
+        "typescript": {
+          "generator_mode": "generated",
+          "generator_version": "tree-sitter 0.27.0",
+          "abi": 15,
+          "runtime_abi_min": 13,
+          "runtime_abi_max": 15,
+          "runtime_header_sha256": "a363e2f2120178702374d8e34f8af9d3b7b2124a2c9e0cc33e57ded13db59b48",
+          "parser_sha256": "3e9fd57d477f0830937cab119680e04995a08d3b96e9f6ad9d27ca6a8fc939f6",
+          "grammar_json_sha256": "d40c26514f7dddb3eaf0b9668c0827ad827f5f7f1fe793edc011b13533a28cbd",
+          "node_types_sha256": "de21db8b55afd2de6e0861dc24b2e4b5b7b6bdc4fceccc15608e6335ab14810b",
+          "executable_sha256": "7803a12759159706adf1ca376d056fe8e3cb10e3c4a73cde0cd69e0243914c59",
+          "executable": ".scratch\\full-pass\\builds\\candidate-c\\typescript.exe"
+        },
+        "tsx": {
+          "generator_mode": "generated",
+          "generator_version": "tree-sitter 0.27.0",
+          "abi": 15,
+          "runtime_abi_min": 13,
+          "runtime_abi_max": 15,
+          "runtime_header_sha256": "a363e2f2120178702374d8e34f8af9d3b7b2124a2c9e0cc33e57ded13db59b48",
+          "parser_sha256": "751eab74ee13a4912e41d52fefcdcb69b7452d32f0e38e3cefc22f746cb10cc8",
+          "grammar_json_sha256": "2b62eb7494790bb1605e8eb31f9d4bba05dc1cabc2a0fbabd2ce7c04244d9828",
+          "node_types_sha256": "a6b9c39c04acb8a670ebec3e4b64dcb148c1e0a38b337a5b9702f582015cfe37",
+          "executable_sha256": "dc7db659d769473d2fe8a303a433ddc56f5a306f2602468a1fa1fd0758532dbd",
+          "executable": ".scratch\\full-pass\\builds\\candidate-c\\tsx.exe"
+        }
+      },
+      "define_grammar_sha256": "fa8ab2614cbc8ea382f8c67a28b052bfc02853c725acce04d676a45dbe67b406",
+      "scanner_sha256": "a48b7c326b464ccac290a0ad43b89f1e2dd22f8f3d7afb3efcc3b7fd56be7de8"
+    }
+  }
+}

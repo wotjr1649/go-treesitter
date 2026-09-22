@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "base_grammar_commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f",
+  "upstream_repository": "github.com/odvcencio/gotreesitter",
+  "upstream_patch_commit": "24e1d3b2b4409ee2ffa63e88abba51a40060e76e",
+  "upstream_patch_path": "grammars/patches/tree-sitter-typescript-import-type.patch",
+  "upstream_patch_sha256": "8d091351f8107d1546a8130d281f0ca8d6d959b11da66b7872d3e10f998340e9",
+  "applied_in_full": true,
+  "generator_version": "tree-sitter 0.27.0",
+  "generator_sha256": "9fbc4f285c876b1a38c7e9d5223a51fb7842255285cdd7db3ffb0ba3934f2662",
+  "javascript_base": {
+    "version": "0.23.1",
+    "resolved": "https://registry.npmjs.org/tree-sitter-javascript/-/tree-sitter-javascript-0.23.1.tgz",
+    "integrity": "sha512-/bnhbrTD9frUYHQTiYnPcxyHORIw157ERBa6dqzaKxvR/x3PC4Yzd+D1pZIMS6zNg2v3a8BZ0oK7jHqsQo9fWA==",
+    "hasInstallScript": true,
+    "dependencies": {
+      "node-addon-api": "^8.2.2",
+      "node-gyp-build": "^4.8.2"
+    },
+    "peerDependencies": {
+      "tree-sitter": "^0.21.1"
+    },
+    "peerDependenciesMeta": {
+      "tree-sitter": {
+        "optional": true
+      }
+    }
+  },
+  "javascript_grammar_sha256": "230e330dd914d94297e5e58d53942cd5debf9c069852da93b6a6b1daae1967dc",
+  "licenses": [
+    "LICENSES/tree-sitter-typescript.txt",
+    "LICENSES/tree-sitter-javascript.txt",
+    "LICENSES/gotreesitter.txt"
+  ],
+  "files": {
+    "common/scanner.h": "a48b7c326b464ccac290a0ad43b89f1e2dd22f8f3d7afb3efcc3b7fd56be7de8",
+    "typescript/src/grammar.json": "d40c26514f7dddb3eaf0b9668c0827ad827f5f7f1fe793edc011b13533a28cbd",
+    "typescript/src/scanner.c": "9125013b42cb888379d9be909f1d73dfb75a37626c2cdbf4122718a2b431a6d3",
+    "tsx/src/grammar.json": "2b62eb7494790bb1605e8eb31f9d4bba05dc1cabc2a0fbabd2ce7c04244d9828",
+    "tsx/src/scanner.c": "d563cd30b2f39718c9ae4292795c5ce03a2ad01954ba3a86ef84c2781a736673",
+    "upstream.patch": "8d091351f8107d1546a8130d281f0ca8d6d959b11da66b7872d3e10f998340e9"
+  }
+}

@@ -137,14 +137,38 @@ def source_locks():
     return locks
 
 
+def typescript_patch_inputs(pins):
+    directory = ROOT / 'testdata/oracle/typescript-patched'
+    patch = pins['oracle']['typescript_patch']
+    manifest = directory / 'manifest.json'
+    if sha(manifest.read_bytes()) != patch['inputs_sha256']:
+        raise ValueError('TypeScript patch input identity mismatch')
+    receipt = read_json(manifest)
+    if (receipt['schema'] != 1 or not receipt['applied_in_full'] or
+            receipt['upstream_patch_commit'] != patch['commit'] or
+            receipt['upstream_patch_sha256'] != patch['sha256'] or
+            receipt['base_grammar_commit'] != pins['grammars']['typescript']['commit'] or
+            receipt['base_grammar_commit'] != pins['grammars']['tsx']['commit'] or
+            sha((directory / 'upstream.patch').read_bytes()) != patch['sha256']):
+        raise ValueError('TypeScript patch provenance mismatch')
+    actual = {p.relative_to(directory).as_posix() for p in directory.rglob('*') if p.is_file()}
+    if actual != set(receipt['files']) | {'manifest.json'}:
+        raise ValueError('TypeScript patch file set changed')
+    for name, digest in receipt['files'].items():
+        if sha(bounded(directory / name, directory).read_bytes()) != digest:
+            raise ValueError('TypeScript patch source changed: ' + name)
+    return directory, receipt
+
+
 def build(output, regenerate=False):
     output = bounded(output)
     if output.exists():
         raise ValueError('build output already exists')
-    if regenerate and not shutil.which(os.environ.get('TREE_SITTER_CLI', 'tree-sitter')):
+    pins = read_json(PINS)
+    patched = 'typescript_patch' in pins['oracle']
+    if (regenerate or patched) and not shutil.which(os.environ.get('TREE_SITTER_CLI', 'tree-sitter')):
         raise ValueError('tree-sitter generator unavailable; prepared sources unchanged')
     locks = source_locks()
-    pins = read_json(PINS)
     compiler = shutil.which(os.environ.get('CC', 'gcc'))
     if not compiler:
         raise ValueError('C compiler unavailable')
@@ -156,15 +180,21 @@ def build(output, regenerate=False):
     records = {}
     if regenerate:
         for repo in REPOS:
-            if repo != 'runtime':
+            if repo != 'runtime' and not (patched and repo == 'typescript'):
                 shutil.copytree(WORK / repo, output / 'generated' / repo)
+    patch_receipt = None
+    if patched:
+        patch_source, patch_receipt = typescript_patch_inputs(pins)
+        shutil.copytree(patch_source, output / 'patched-typescript')
     for language in pins['grammars']:
         repo = 'typescript' if language == 'tsx' else language
         source = (output / 'generated' if regenerate else WORK) / repo
+        if patched and repo == 'typescript':
+            source = output / 'patched-typescript'
         if repo == 'typescript':
             source /= language
         source /= 'src'
-        artifact = (generate if regenerate else identity)(runtime / 'include/tree_sitter/api.h', source / 'parser.c')
+        artifact = (generate if regenerate or (patched and repo == 'typescript') else identity)(runtime / 'include/tree_sitter/api.h', source / 'parser.c')
         executable = output / (language + ('.exe' if os.name == 'nt' else ''))
         command = [compiler, *pins['oracle']['build_flags'], '-I' + str(runtime / 'include'),
                    '-I' + str(runtime / 'src'), '-I' + str(source),
@@ -179,9 +209,13 @@ def build(output, regenerate=False):
         print('built', language, artifact['abi'], flush=True)
     generated_files = {p.relative_to(output).as_posix(): sha(p.read_bytes())
                        for p in sorted((output / 'generated').rglob('*')) if p.is_file()} if regenerate else {}
+    if patched:
+        generated_files.update({p.relative_to(output).as_posix(): sha(p.read_bytes())
+            for p in sorted((output / 'patched-typescript').rglob('*')) if p.is_file()})
     if sha(Path(compiler).read_bytes()) != compiler_hash:
         raise ValueError('compiler changed during build')
     write_new(output / 'build.json', {'schema': 1, 'pins': pins, 'sources': locks, 'generated_sources': generated_files,
+              'typescript_patch': patch_receipt,
               'driver_sha256': sha(Path(__file__).with_name('driver.c').read_bytes()),
               'compiler': compiler_version, 'compiler_sha256': compiler_hash,
               'os': platform.system(), 'arch': platform.machine(), 'grammars': records})

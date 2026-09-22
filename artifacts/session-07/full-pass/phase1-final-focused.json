@@ -1,0 +1,31 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./internal/gtsadapter",
+    "-run",
+    "Oracle|TypeScriptMaintained",
+    "-count=1",
+    "-timeout",
+    "90s"
+  ],
+  "candidate_commit": "9e5c90ad4aaf0bcea59d229e6b6f0ab789893a76",
+  "status_before": " M THIRD_PARTY_NOTICES.md\n M docs/design/decisions/README.md\n M docs/reports/release-critical-status.md\n M docs/validation/known-regressions.md\n M docs/validation/workloads.md\n M internal/gtsadapter/oracle_experiment_test.go\n M internal/gtsadapter/oracle_test.go\n M internal/provenance/identities.json\n M internal/provenance/provenance.go\n M tools/native-oracle/README.md\n M tools/native-oracle/driver.c\n M tools/native-oracle/run.py\n M tools/native-oracle/test_run.py\n?? artifacts/session-07/full-pass/\n?? docs/design/decisions/ADR-0012-adopt-maintained-typescript-oracle-patch.md\n?? internal/gtsadapter/typescript_features_test.go\n?? testdata/oracle/typescript-patched/\n?? testdata/oracle/windows-c-v2/\n?? tools/native-oracle/check_edits.py\n",
+  "started_unix": 1790088188.606107,
+  "elapsed_seconds": 3.0601370334625244,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "60e068a66c71f3ce7c1b04dbe04e404e01e2d1eace07373dfe3fd0a8345f6889",
+    "go.sum": "87c97651162785c246dabcd3fdcd916cd7baabe2f8554bbdb31eea5ce9704cd6",
+    "internal/provenance/identities.json": "c6fc8f06a9e492e7a147fedb863272ecadca836460ab2c10bbec8f1bcd9a11f7"
+  },
+  "log_sha256": "6e888fd5547ea5175ee7edd3fe7fccbbad994d9314af7d04e43686a608919263"
+}

@@ -1,0 +1,31 @@
+{
+  "command": [
+    "go",
+    "build",
+    "-trimpath",
+    "-modfile=",
+    ".scratch/candidate.mod",
+    "-o",
+    ".scratch/full-pass/scanner-probe.exe",
+    "./.scratch/full-pass/probe.go"
+  ],
+  "candidate_commit": "9e5c90ad4aaf0bcea59d229e6b6f0ab789893a76",
+  "status_before": " M tools/native-oracle/driver.c\n?? artifacts/session-07/full-pass/\n?? tools/native-oracle/check_edits.py\n",
+  "started_unix": 1790087045.9850805,
+  "elapsed_seconds": 0.030091047286987305,
+  "exit": 1,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "60e068a66c71f3ce7c1b04dbe04e404e01e2d1eace07373dfe3fd0a8345f6889",
+    "go.sum": "87c97651162785c246dabcd3fdcd916cd7baabe2f8554bbdb31eea5ce9704cd6",
+    "internal/provenance/identities.json": "c190e01ce1fa283b3953d9ff613a5dbf9b57f8c5ace8820c72501b8ddeeed1a2"
+  },
+  "log_sha256": "b6113301449eff3447bf4a642f21846e78d19496f11a713fc353d10c23622e53"
+}

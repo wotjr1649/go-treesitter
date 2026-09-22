@@ -109,6 +109,14 @@ semicolon-separated control. Each exact source has a SHA-256 in the catalog.
 `windows-c-ts-contextual/` retains fresh C observations from Phase 2. Four
 differences are independently bound by KR-0003; the other four must agree.
 
+After explicit Candidate C adoption (ADR-0012), `windows-c-v2/` contains new
+native C executions for all four existing catalogs. The contextual cases now
+require exact agreement; original observations remain historical. The inline
+`TestTypeScriptMaintainedGrammarFeatures` covers the four patch features in
+both routes with 20 fresh repeats and one edit each. The separate 26-input
+Candidate C manifest, source hashes, full trees and runtime comparisons are
+retained under `artifacts/session-07/full-pass/01-candidate-c/`.
+
 `csharp-recovery-cases.json` holds the single `CS-excerpt-no-enum` derivative:
 remove the original excerpt's `internal enum` section through the next summary
 comment, retaining all other LF bytes. It retains the Newtonsoft MIT notice in

@@ -277,7 +277,17 @@ blocks in the full excerpt. This is a causal diagnosis, not a complete patch;
 neither diagnostic change is adopted. Exact traces, identities and rejected
 experiments are retained in that phase. The signature above is unchanged.
 
-## KR-0003 — TypeScript/TSX upstream grammar patch difference
+## KR-0003 — TypeScript/TSX upstream grammar patch difference (retired)
+
+Retired after the owner's explicit Candidate C approval during the full-pass
+execution. ADR-0012 adopts the entire maintained upstream patch for C while
+keeping the runtime and grammar base commits. New native C records under
+`windows-c-v2/` agree with the unchanged product for all eight contextual cases.
+The four patched features and controls additionally agree on 26 inputs, with
+20 fresh repeats per runtime and 26 Go plus 78 C edit comparisons. The original
+94-input campaign changes only the four registered contextual C differences.
+Exact receipts: `artifacts/session-07/full-pass/01-candidate-c/` and `01-adoption/`.
+The following original definition and signature files are preserved as history.
 
 | Field | Value |
 |---|---|
@@ -301,10 +311,10 @@ disagreement, not evidence that the Go port broke valid TypeScript. The earlier
 same-line `in` controls did not exercise the newline-sensitive scanner branch.
 
 Do not turn these clean Go parses into errors to imitate the unpatched C input.
-Do not add upstream's patch to C artifacts under the old identity. The present
-session changes neither side. Missing/changed signatures, a disappearing
-difference or an additional affected fixture fail the ratchet. This new record
-does not widen KR-0001 or KR-0002 and does not approve a release.
+The approved patch has a new identity and new records; it was not added under
+the old identity. Current tests require exact clean agreement instead of a
+known-difference exception. This retirement does not widen KR-0001 or KR-0002
+and does not approve a release.
 
 ## KR-0004 — C# source reconstruction hides a recovery error
 

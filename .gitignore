@@ -44,3 +44,8 @@ artifacts/private/
 /artifacts/session-07/phase2-correctness/csharp-reduction-matrix-*.json
 /artifacts/session-07/phase2-correctness/remaining-structure-*.json
 /artifacts/session-07/phase2-correctness/enum-raw-structure-*.json
+
+# Raw receipt bytes are retained in the phase's hashed output archive.
+/artifacts/session-07/full-pass/**/*.log
+/artifacts/session-07/full-pass/02-scanner/baseline.json
+/artifacts/session-07/full-pass/02-scanner/scanner.json

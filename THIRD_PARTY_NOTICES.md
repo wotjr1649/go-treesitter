@@ -25,3 +25,8 @@ larger catalog; its other grammars are outside this notice inventory and release
 assessment. The selected embedded build documented in the README includes the
 declared grammar set. The C oracle is development tooling and is not a C runtime
 dependency of the product library.
+
+The TypeScript oracle inputs under `testdata/oracle/typescript-patched/` are
+generated from the pinned TypeScript sources and their locked JavaScript base,
+with gotreesitter's complete maintained grammar patch. Their manifest records
+the upstream patch, generator, source hashes and applicable MIT notices above.

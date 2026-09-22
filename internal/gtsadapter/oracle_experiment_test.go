@@ -54,7 +54,7 @@ func TestOracleCandidateEdits(t *testing.T) {
 				if err != nil || !inc.Complete() || inc.Outcome != syntax.AcceptedClean {
 					t.Fatalf("candidate incremental incomplete: %+v", inc.Diagnostics)
 				}
-				data, err := os.ReadFile("../../testdata/oracle/windows-c/" + language.name + "-" + f.id + ".json")
+				data, err := os.ReadFile("../../testdata/oracle/windows-c-v2/base/" + language.name + "-" + f.id + ".json")
 				if err != nil {
 					t.Fatal(err)
 				}

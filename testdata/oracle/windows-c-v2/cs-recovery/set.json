@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "cases_sha256": "b948a2ebb286a3bb8b0072e499e75c283472c3a3ca617b56775176cfa7a9a476",
+  "files": {
+    "build.json": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+    "CS-excerpt-no-enum.json": "b4a35ddc5db4297ccf3f5fa691da41be1647fb96c5269a26f5283ee9e3fce130"
+  }
+}

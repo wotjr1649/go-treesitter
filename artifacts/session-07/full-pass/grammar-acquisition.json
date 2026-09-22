@@ -1,0 +1,25 @@
+{
+  "command": [
+    "python",
+    ".scratch/full-pass/acquire.py"
+  ],
+  "candidate_commit": "9e5c90ad4aaf0bcea59d229e6b6f0ab789893a76",
+  "status_before": "?? artifacts/session-07/full-pass/\n",
+  "started_unix": 1790086290.7143974,
+  "elapsed_seconds": 0.7531909942626953,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "60e068a66c71f3ce7c1b04dbe04e404e01e2d1eace07373dfe3fd0a8345f6889",
+    "go.sum": "87c97651162785c246dabcd3fdcd916cd7baabe2f8554bbdb31eea5ce9704cd6",
+    "internal/provenance/identities.json": "c190e01ce1fa283b3953d9ff613a5dbf9b57f8c5ace8820c72501b8ddeeed1a2"
+  },
+  "log_sha256": "27b4015c9c74974fb1fbca576080b0bfba8637bf2a94a57368fed59b94d961c4"
+}

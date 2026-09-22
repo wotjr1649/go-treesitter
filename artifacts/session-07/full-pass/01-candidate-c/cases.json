@@ -1,0 +1,314 @@
+[
+  {
+    "ID": "ts-import-type",
+    "Filename": "x.ts",
+    "Source": "type T = import(\"pkg\").Name;\n",
+    "Repeat": 20,
+    "Previous": "type T = string;\n",
+    "Edit": {
+      "StartByte": 9,
+      "OldEndByte": 15,
+      "NewEndByte": 27
+    }
+  },
+  {
+    "ID": "ts-typeof-import",
+    "Filename": "x.ts",
+    "Source": "type T = typeof import(\"pkg\");\n",
+    "Repeat": 20,
+    "Previous": "type T = string;\n",
+    "Edit": {
+      "StartByte": 9,
+      "OldEndByte": 15,
+      "NewEndByte": 29
+    }
+  },
+  {
+    "ID": "ts-variance",
+    "Filename": "x.ts",
+    "Source": "type Co<out T> = T; type Contra<in T> = (x: T) => void; type Inv<in out T> = T;\n",
+    "Repeat": 20,
+    "Previous": "type Co<T> = T;\n",
+    "Edit": {
+      "StartByte": 8,
+      "OldEndByte": 8,
+      "NewEndByte": 72
+    }
+  },
+  {
+    "ID": "ts-call-signatures",
+    "Filename": "x.ts",
+    "Source": "type Calls = {\n  <T>(value: T): T\n  <U>(value: U): U\n}\n",
+    "Repeat": 20,
+    "Previous": "type Calls = { <T>(value: T): T; }\n",
+    "Edit": {
+      "StartByte": 14,
+      "OldEndByte": 33,
+      "NewEndByte": 53
+    }
+  },
+  {
+    "ID": "ts-three-calls",
+    "Filename": "x.ts",
+    "Source": "type Calls = {\n  <T>(): T\n  <U>(): U\n  <V>(): V\n}\n",
+    "Repeat": 20,
+    "Previous": "type Calls = { <T>(): T }\n",
+    "Edit": {
+      "StartByte": 14,
+      "OldEndByte": 24,
+      "NewEndByte": 48
+    }
+  },
+  {
+    "ID": "ts-nested-calls",
+    "Filename": "x.ts",
+    "Source": "type Holder = { nested: {\n  <T>(): T\n  <U>(): U\n} }\n",
+    "Repeat": 20,
+    "Previous": "type Holder = { nested: { <T>(): T } }\n",
+    "Edit": {
+      "StartByte": 25,
+      "OldEndByte": 35,
+      "NewEndByte": 48
+    }
+  },
+  {
+    "ID": "ts-contextual-in",
+    "Filename": "x.ts",
+    "Source": "type Easing = {\n  default: string\n  in: string\n  out: string\n}\n",
+    "Repeat": 20,
+    "Previous": "type Easing = { default: string; in: string; out: string };\n",
+    "Edit": {
+      "StartByte": 15,
+      "OldEndByte": 59,
+      "NewEndByte": 62
+    }
+  },
+  {
+    "ID": "ts-optional-in",
+    "Filename": "x.ts",
+    "Source": "interface Easing {\n  default: string\n  in?: string\n}\n",
+    "Repeat": 20,
+    "Previous": "interface Easing { default: string; in?: string };\n",
+    "Edit": {
+      "StartByte": 18,
+      "OldEndByte": 50,
+      "NewEndByte": 52
+    }
+  },
+  {
+    "ID": "ts-binary-in-control",
+    "Filename": "x.ts",
+    "Source": "const result = key\n  in object;\n",
+    "Repeat": 20,
+    "Previous": "const result = key in object;\n",
+    "Edit": {
+      "StartByte": 18,
+      "OldEndByte": 18,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "ID": "ts-semicolon-control",
+    "Filename": "x.ts",
+    "Source": "type Easing = { default: string; in: string; out: string };\n",
+    "Repeat": 20,
+    "Previous": "type Easing = { default: string };\n",
+    "Edit": {
+      "StartByte": 31,
+      "OldEndByte": 31,
+      "NewEndByte": 56
+    }
+  },
+  {
+    "ID": "ts-constructor-control",
+    "Filename": "x.ts",
+    "Source": "type Factory = {\n  new <T>(): T\n  new <U>(): U\n}\n",
+    "Repeat": 20,
+    "Previous": "type Factory = { new <T>(): T };\n",
+    "Edit": {
+      "StartByte": 16,
+      "OldEndByte": 32,
+      "NewEndByte": 48
+    }
+  },
+  {
+    "ID": "ts-index-control",
+    "Filename": "x.ts",
+    "Source": "type Index = {\n  [key: string]: string\n  [key: number]: string\n}\n",
+    "Repeat": 20,
+    "Previous": "type Index = { [key: string]: string };\n",
+    "Edit": {
+      "StartByte": 14,
+      "OldEndByte": 39,
+      "NewEndByte": 64
+    }
+  },
+  {
+    "ID": "ts-generic-call-control",
+    "Filename": "x.ts",
+    "Source": "foo\n<number>(1)",
+    "Repeat": 20,
+    "Previous": "foo<number>(1)",
+    "Edit": {
+      "StartByte": 3,
+      "OldEndByte": 3,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "ID": "tsx-import-type",
+    "Filename": "x.tsx",
+    "Source": "type T = import(\"pkg\").Name;\n",
+    "Repeat": 20,
+    "Previous": "type T = string;\n",
+    "Edit": {
+      "StartByte": 9,
+      "OldEndByte": 15,
+      "NewEndByte": 27
+    }
+  },
+  {
+    "ID": "tsx-typeof-import",
+    "Filename": "x.tsx",
+    "Source": "type T = typeof import(\"pkg\");\n",
+    "Repeat": 20,
+    "Previous": "type T = string;\n",
+    "Edit": {
+      "StartByte": 9,
+      "OldEndByte": 15,
+      "NewEndByte": 29
+    }
+  },
+  {
+    "ID": "tsx-variance",
+    "Filename": "x.tsx",
+    "Source": "type Co<out T> = T; type Contra<in T> = (x: T) => void; type Inv<in out T> = T;\n",
+    "Repeat": 20,
+    "Previous": "type Co<T> = T;\n",
+    "Edit": {
+      "StartByte": 8,
+      "OldEndByte": 8,
+      "NewEndByte": 72
+    }
+  },
+  {
+    "ID": "tsx-call-signatures",
+    "Filename": "x.tsx",
+    "Source": "type Calls = {\n  <T>(value: T): T\n  <U>(value: U): U\n}\n",
+    "Repeat": 20,
+    "Previous": "type Calls = { <T>(value: T): T; }\n",
+    "Edit": {
+      "StartByte": 14,
+      "OldEndByte": 33,
+      "NewEndByte": 53
+    }
+  },
+  {
+    "ID": "tsx-three-calls",
+    "Filename": "x.tsx",
+    "Source": "type Calls = {\n  <T>(): T\n  <U>(): U\n  <V>(): V\n}\n",
+    "Repeat": 20,
+    "Previous": "type Calls = { <T>(): T }\n",
+    "Edit": {
+      "StartByte": 14,
+      "OldEndByte": 24,
+      "NewEndByte": 48
+    }
+  },
+  {
+    "ID": "tsx-nested-calls",
+    "Filename": "x.tsx",
+    "Source": "type Holder = { nested: {\n  <T>(): T\n  <U>(): U\n} }\n",
+    "Repeat": 20,
+    "Previous": "type Holder = { nested: { <T>(): T } }\n",
+    "Edit": {
+      "StartByte": 25,
+      "OldEndByte": 35,
+      "NewEndByte": 48
+    }
+  },
+  {
+    "ID": "tsx-contextual-in",
+    "Filename": "x.tsx",
+    "Source": "type Easing = {\n  default: string\n  in: string\n  out: string\n}\n",
+    "Repeat": 20,
+    "Previous": "type Easing = { default: string; in: string; out: string };\n",
+    "Edit": {
+      "StartByte": 15,
+      "OldEndByte": 59,
+      "NewEndByte": 62
+    }
+  },
+  {
+    "ID": "tsx-optional-in",
+    "Filename": "x.tsx",
+    "Source": "interface Easing {\n  default: string\n  in?: string\n}\n",
+    "Repeat": 20,
+    "Previous": "interface Easing { default: string; in?: string };\n",
+    "Edit": {
+      "StartByte": 18,
+      "OldEndByte": 50,
+      "NewEndByte": 52
+    }
+  },
+  {
+    "ID": "tsx-binary-in-control",
+    "Filename": "x.tsx",
+    "Source": "const result = key\n  in object;\n",
+    "Repeat": 20,
+    "Previous": "const result = key in object;\n",
+    "Edit": {
+      "StartByte": 18,
+      "OldEndByte": 18,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "ID": "tsx-semicolon-control",
+    "Filename": "x.tsx",
+    "Source": "type Easing = { default: string; in: string; out: string };\n",
+    "Repeat": 20,
+    "Previous": "type Easing = { default: string };\n",
+    "Edit": {
+      "StartByte": 31,
+      "OldEndByte": 31,
+      "NewEndByte": 56
+    }
+  },
+  {
+    "ID": "tsx-constructor-control",
+    "Filename": "x.tsx",
+    "Source": "type Factory = {\n  new <T>(): T\n  new <U>(): U\n}\n",
+    "Repeat": 20,
+    "Previous": "type Factory = { new <T>(): T };\n",
+    "Edit": {
+      "StartByte": 16,
+      "OldEndByte": 32,
+      "NewEndByte": 48
+    }
+  },
+  {
+    "ID": "tsx-index-control",
+    "Filename": "x.tsx",
+    "Source": "type Index = {\n  [key: string]: string\n  [key: number]: string\n}\n",
+    "Repeat": 20,
+    "Previous": "type Index = { [key: string]: string };\n",
+    "Edit": {
+      "StartByte": 14,
+      "OldEndByte": 39,
+      "NewEndByte": 64
+    }
+  },
+  {
+    "ID": "tsx-generic-call-control",
+    "Filename": "x.tsx",
+    "Source": "foo\n<number>(1)",
+    "Repeat": 20,
+    "Previous": "foo<number>(1)",
+    "Edit": {
+      "StartByte": 3,
+      "OldEndByte": 3,
+      "NewEndByte": 4
+    }
+  }
+]
