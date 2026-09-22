@@ -1,0 +1,14 @@
+{
+  "adapter_commit": "62efcf9",
+  "base_runtime": "v0.53.0",
+  "purpose": "test eager missing-sibling competition hypothesis and isolate C# structural reconstruction; not product candidates",
+  "variants": [
+    "defer-only",
+    "defer-no-compat",
+    "defer-structure"
+  ],
+  "files": {
+    ".scratch\\session07-probe\\core-defer.go.txt": "92385eca3e1a22187fa5c64c56d69fe1118ae04c543732ef4593175e851cb362",
+    ".scratch\\session07-probe\\csharp-native-errors.go.txt": "947a08bb22a6142e0b6ccfbc66735e27d2f6c62b1e98f7582980f3104f450fe3"
+  }
+}

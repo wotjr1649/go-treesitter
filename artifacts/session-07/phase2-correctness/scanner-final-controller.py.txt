@@ -1,0 +1,80 @@
+import hashlib,json,os,pathlib,subprocess,sys,zipfile
+root=pathlib.Path(__file__).resolve().parents[1]
+out=root/'artifacts/session-07/phase2-correctness'
+sha=lambda d:hashlib.sha256(d).hexdigest()
+canonical=lambda v:json.dumps(v,sort_keys=True,separators=(',',':')).encode()
+def save(name,value):
+    with (out/name).open('x',encoding='utf-8',newline='\n') as f:json.dump(value,f,ensure_ascii=False,indent=2);f.write('\n')
+if sys.argv[1]=='identity':
+    archive=root/'.scratch/modcache/cache/download/github.com/odvcencio/gotreesitter/@v/v0.53.0.zip'
+    prefix='github.com/odvcencio/gotreesitter@v0.53.0/'
+    with zipfile.ZipFile(archive) as z:original={n[len(prefix):]:sha(z.read(n)) for n in z.namelist()}
+    candidate=root/'.scratch/kr0001b-candidate'
+    actual={p.relative_to(candidate).as_posix():sha(p.read_bytes()) for p in candidate.rglob('*') if p.is_file()}
+    assert actual.keys()==original.keys()
+    changed={n:{'before':original[n],'after':actual[n]} for n in original if original[n]!=actual[n]}
+    assert set(changed)=={'grammars/runtime/javascript_scanner.go','grammars/runtime/tsx_scanner.go'}
+    guard=b"\t\t\tif lexer.Lookahead() == '=' {\n\t\t\t\treturn false\n\t\t\t}\n"
+    with zipfile.ZipFile(archive) as z:
+        for n in changed:
+            before=z.read(prefix+n);assert before.count(guard)==1
+            assert before.replace(guard,b'')==(candidate/n).read_bytes()
+    for folder in (root/'.scratch/session07-runtime',root/'.scratch/modcache/github.com/odvcencio/gotreesitter@v0.53.0'):
+        for n,h in original.items():assert sha((folder/n).read_bytes())==h,(folder.name,n)
+    overlays={}
+    work=root/'.scratch/session07-probe'
+    for p in work.glob('*.json'):
+        data=json.loads(p.read_text(encoding='utf-8'))
+        if not isinstance(data,dict) or 'Replace' not in data:continue
+        overlays[p.name]={k:{'backing':pathlib.Path(v).relative_to(root).as_posix(),'sha256':sha(pathlib.Path(v).read_bytes())} for k,v in data['Replace'].items()}
+    frozen={}
+    for p in work.glob('frozen-*.txt'):
+        relative={'frozen-internal-gtsadapter-adapter.go.txt':'internal/gtsadapter/adapter.go'}.get(p.name)
+        if relative is None:relative='syntax/'+p.name.removeprefix('frozen-syntax-').removesuffix('.txt')
+        expected=subprocess.check_output(['git','show','62efcf9:'+relative],cwd=root)
+        assert p.read_bytes()==expected,relative
+        frozen[relative]=sha(expected)
+    save('source-identities.json',{'archive_sha256':sha(archive.read_bytes()),'files':len(original),'original_tree_sha256':sha(canonical(original)),'scanner_candidate_tree_sha256':sha(canonical(actual)),'scanner_changes':changed,'diagnostic_runtime_copy':'pristine; overlays only','frozen_adapter_commit':'62efcf9','frozen_files':frozen,'overlays':overlays})
+    print('3275 original files match archive; scanner candidate changes exactly two guards; diagnostic overlays and frozen adapter bound')
+    sys.exit(0)
+
+assert sys.argv[1]=='compare'
+catalogs=['cases.json','extended-cases.json','typescript-contextual-cases.json','csharp-recovery-cases.json']
+cases=[c for name in catalogs for c in json.loads((root/('testdata/oracle/'+name)).read_text(encoding='utf-8'))]
+known={}
+for name in ('known-differences.json','typescript-contextual-differences.json','csharp-recovery-differences.json'):
+    known.update(json.loads((root/('testdata/oracle/'+name)).read_text(encoding='utf-8')))
+for c in cases:
+    if 'source' not in c:c['source']=(root/c['path']).read_bytes().decode('utf-8')
+    assert sha(c['source'].encode())==c['sha256']
+requests=[{'ID':c['id'],'Filename':c['filename'],'Source':c['source']} for c in cases]
+env={k:v for k,v in os.environ.items() if k.upper() in ('SYSTEMROOT','WINDIR','COMSPEC','PATHEXT','PATH','TEMP','TMP')}
+results={}; binaries={}
+for variant in ('baseline','candidate'):
+    exe=root/('.scratch/scanner-final-'+variant+'.exe');binaries[variant]=sha(exe.read_bytes())
+    p=subprocess.run([str(exe)],input=json.dumps(requests).encode(),capture_output=True,check=True,timeout=120,env=env)
+    results[variant]={r['ID']:r for r in map(json.loads,p.stdout.splitlines())}
+builddir=root/'.scratch/oracle/build-01'
+build=json.loads((builddir/'build.json').read_text(encoding='utf-8'))
+pins=json.loads((root/'internal/provenance/identities.json').read_text(encoding='utf-8'))
+assert build['pins']==pins
+rows=[];corrected=0
+digest=lambda n:sha(json.dumps(n,ensure_ascii=False,separators=(',',':')).encode())
+for c in cases:
+    artifact=build['grammars'][c['language']];exe=builddir/artifact['executable']
+    assert sha(exe.read_bytes())==artifact['executable_sha256']
+    native=json.loads(subprocess.run([str(exe)],input=c['source'].encode(),capture_output=True,check=True,timeout=15,env=env).stdout)
+    a,b=results['baseline'][c['id']],results['candidate'][c['id']]
+    assert not a['Error'] and not b['Error']
+    if c['id'] in known:
+        k=known[c['id']];assert (c['sha256'],digest(a['Nodes']),digest(native['nodes']))==(k['Source'],k['GoDigest'],k['CDigest'])
+    else:assert a['Nodes']==native['nodes'],c['id']
+    if c['group']=='KR-0001b':
+        assert b['Nodes']==native['nodes'] and b['Diagnostics']['Outcome']=='accepted_clean' and not native['has_error']
+        corrected+=1
+    else:assert a['Nodes']==b['Nodes'] and a['Diagnostics']['Outcome']==b['Diagnostics']['Outcome'],c['id']
+    if c['group']=='KR-0001a':assert native['has_error'] and b['Diagnostics']['Outcome']=='accepted_with_errors'
+    rows.append({'id':c['id'],'source_sha256':c['sha256'],'baseline_digest':digest(a['Nodes']),'candidate_digest':digest(b['Nodes']),'c_digest':digest(native['nodes']),'baseline_outcome':a['Diagnostics']['Outcome'],'candidate_outcome':b['Diagnostics']['Outcome'],'c_error':native['has_error'],'corrected':c['group']=='KR-0001b'})
+assert len(rows)==94 and corrected==4
+save('scanner-final-comparison.json',{'pins':pins,'c_build_sha256':sha((builddir/'build.json').read_bytes()),'go_binaries':binaries,'catalog_hashes':{n:sha((root/('testdata/oracle/'+n)).read_bytes()) for n in catalogs},'corrected':4,'unchanged':90,'rows':rows})
+print('94 baseline/candidate/fresh C comparisons; four equals inputs corrected; 90 unchanged including ampersands, KR-0002/3/4')

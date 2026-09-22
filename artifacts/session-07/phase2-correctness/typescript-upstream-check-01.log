@@ -1,0 +1,8 @@
+ts-newline-in Go accepted_clean C errors True equal False
+ts-newline-optional-in Go accepted_clean C errors True equal False
+ts-binary-in Go accepted_clean C errors False equal True
+ts-semicolon-in Go accepted_clean C errors False equal True
+tsx-newline-in Go accepted_clean C errors True equal False
+tsx-newline-optional-in Go accepted_clean C errors True equal False
+tsx-binary-in Go accepted_clean C errors False equal True
+tsx-semicolon-in Go accepted_clean C errors False equal True

@@ -1,0 +1,5 @@
+{
+  "changed_overlay": ".scratch\\session07-probe\\core-trace3.go.txt",
+  "sha256": "91e200a7e1166b30eedcc269aabeaa132131f51751e4b691831b171a9c753cf1",
+  "purpose": "observe competing stack status and position without changing decisions"
+}

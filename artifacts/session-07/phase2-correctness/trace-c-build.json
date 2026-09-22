@@ -1,0 +1,20 @@
+{
+  "command": [
+    "C:\\msys64\\ucrt64\\bin\\gcc.exe",
+    "-std=c11",
+    "-fPIC",
+    "-O2",
+    "-ID:\\AIDEV\\go-treesitter\\.scratch\\oracle\\runtime\\lib\\include",
+    "-ID:\\AIDEV\\go-treesitter\\.scratch\\oracle\\runtime\\lib\\src",
+    "-ID:\\AIDEV\\go-treesitter\\.scratch\\oracle\\c_sharp\\src",
+    "-DORACLE_LANGUAGE=tree_sitter_c_sharp",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\session07-probe\\trace-driver.c",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\oracle\\runtime\\lib\\src\\lib.c",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\oracle\\c_sharp\\src\\parser.c",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\oracle\\c_sharp\\src\\scanner.c",
+    "-o",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\session07-probe\\trace-c.exe"
+  ],
+  "compiler_sha256": "75e87953e9d04e8a5d81225397292e9f8ae599a0ed85f70ed175767577aaa9f6",
+  "executable_sha256": "3d49a5c9f9feabfe32a2c96cadbf93d0c35cfe0840ef1368d69a0b96de63740a"
+}

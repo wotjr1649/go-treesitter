@@ -117,6 +117,14 @@ func TestExtendedOracleRecords(t *testing.T) {
 	runOracleCorpus(t, false, "testdata/oracle/extended-cases.json", "testdata/oracle/windows-c-extended", "")
 }
 
+func TestTypeScriptContextualOracleRecords(t *testing.T) {
+	runOracleCorpus(t, false, "testdata/oracle/typescript-contextual-cases.json", "testdata/oracle/windows-c-ts-contextual", "testdata/oracle/typescript-contextual-differences.json")
+}
+
+func TestCSharpRecoveryVariantOracleRecords(t *testing.T) {
+	runOracleCorpus(t, false, "testdata/oracle/csharp-recovery-cases.json", "testdata/oracle/windows-c-cs-recovery", "testdata/oracle/csharp-recovery-differences.json")
+}
+
 // Candidate mode is called only by the opt-in oracle_experiment build-tag test.
 // Product tests always require the unmodified module and recorded differences.
 func runOracleRecords(t *testing.T, candidate bool) {
@@ -344,7 +352,13 @@ func runOracleCorpus(t *testing.T, candidate bool, casesPath, recordsDir, differ
 					}
 					return
 				}
-			} else if c.Group == "KR-0001a" || c.Group == "KR-0001b" {
+				if c.Group == "KR-0003" || c.Group == "KR-0004" {
+					if known.Record != c.Group || first < 0 || !receipt.HasError || result.HasError || result.HasMissing || result.Outcome != syntax.AcceptedClean {
+						t.Fatalf("%s clean-Go/error-C signature changed", c.Group)
+					}
+					return
+				}
+			} else if c.Group == "KR-0001a" || c.Group == "KR-0001b" || c.Group == "KR-0003" || c.Group == "KR-0004" {
 				t.Fatal("missing known-difference identity")
 			}
 			if c.Group == "KR-0001a" {

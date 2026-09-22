@@ -1,0 +1,55 @@
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[2]
+OUT = ROOT / 'artifacts/session-07/phase2-correctness'
+OUT.mkdir(parents=True, exist_ok=True)
+BUILD = ROOT / '.scratch/oracle/build-01'
+build = json.loads((BUILD / 'build.json').read_text(encoding='utf-8'))
+pins = json.loads((ROOT / 'internal/provenance/identities.json').read_text(encoding='utf-8'))
+assert build['pins'] == pins
+sha = lambda data: hashlib.sha256(data).hexdigest()
+digest = lambda nodes: sha(json.dumps(nodes, ensure_ascii=False, separators=(',', ':')).encode())
+excerpt = (ROOT / 'testdata/newtonsoft/JsonTextReader-excerpt.cs').read_text(encoding='utf-8')
+enum = 'internal enum ReadType {\nRead,\n#if HAVE_DATE_TIME_OFFSET\nReadAsDateTimeOffset,\n#endif\nReadAsBoolean\n}\n'
+cases = [
+    ('enum-simple', 'x.cs', 'internal enum ReadType { Read, ReadAsInt32 }\n'),
+    ('enum-preprocessor', 'x.cs', enum),
+    ('namespace-enum', 'x.cs', 'namespace N {\n' + enum + '}\n'),
+    ('excerpt-enum-only', 'x.cs', excerpt[:excerpt.index('    /// <summary>')] + '}\n'),
+    ('excerpt-original', 'x.cs', excerpt),
+    ('excerpt-no-directives', 'x.cs', ''.join(line for line in excerpt.splitlines(keepends=True) if not line.lstrip().startswith('#'))),
+    ('excerpt-no-enum', 'x.cs', excerpt[:excerpt.index('    internal enum')] + excerpt[excerpt.index('    /// <summary>'):]),
+    ('enum-incomplete', 'x.cs', 'internal enum ReadType { Read,\n'),
+    ('ts-property-in', 'x.ts', 'interface Easing { default: string; in: string; out: string; bounce: string }\n'),
+    ('ts-property-in-optional', 'x.ts', 'type T = { in?: number; };\n'),
+]
+requests = [{'ID': name, 'Filename': file, 'Source': source} for name, file, source in cases]
+variant = sys.argv[1] if len(sys.argv) > 1 else 'baseline'
+assert variant in ('baseline', 'csharp-no-compat', 'eof-only', 'eof-no-compat')
+exe = Path(__file__).with_name(variant + '.exe')
+env = {key: value for key, value in os.environ.items() if key.upper() in ('SYSTEMROOT', 'WINDIR', 'COMSPEC', 'PATHEXT', 'PATH', 'TEMP', 'TMP')}
+result = subprocess.run([str(exe)], input=json.dumps(requests).encode(), capture_output=True, check=True, timeout=90, env=env)
+go = {r['ID']: r for r in map(json.loads, result.stdout.splitlines())}
+rows = []
+for name, filename, source in cases:
+    lang = 'c_sharp' if filename.endswith('.cs') else 'typescript'
+    artifact = build['grammars'][lang]
+    c_exe = BUILD / artifact['executable']
+    assert sha(c_exe.read_bytes()) == artifact['executable_sha256']
+    c = json.loads(subprocess.run([str(c_exe)], input=source.encode(), capture_output=True, check=True, timeout=15, env=env).stdout)
+    g = go[name]
+    first = next((i for i, pair in enumerate(zip(g['Nodes'], c['nodes'])) if pair[0] != pair[1]), -1)
+    if first == -1 and len(g['Nodes']) != len(c['nodes']): first = min(len(g['Nodes']), len(c['nodes']))
+    row = dict(id=name, source=source, sha256=sha(source.encode()), go=g['Diagnostics'], c_error=c['has_error'], go_nodes=len(g['Nodes']), c_nodes=len(c['nodes']), go_digest=digest(g['Nodes']), c_digest=digest(c['nodes']), first=first,
+               go_first=g['Nodes'][first] if first >= 0 and first < len(g['Nodes']) else None, c_first=c['nodes'][first] if first >= 0 and first < len(c['nodes']) else None)
+    rows.append(row)
+    print(name, 'go=', g['Diagnostics']['Outcome'], 'Cerror=', c['has_error'], 'nodes=', len(g['Nodes']), len(c['nodes']), 'first=', first)
+output = 'reduced-comparison-01.json' if variant == 'baseline' else 'reduced-comparison-' + variant + '.json'
+with (OUT / output).open('x', encoding='utf-8', newline='\n') as f:
+    json.dump(dict(build_sha256=sha((BUILD/'build.json').read_bytes()), go_exe_sha256=sha(exe.read_bytes()), runs_per_input=1, comparisons=rows), f, ensure_ascii=False, indent=2)
+    f.write('\n')

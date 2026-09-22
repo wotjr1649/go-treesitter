@@ -1,0 +1,5 @@
+{
+  "changed_overlay": ".scratch\\session07-probe\\core-trace2.go.txt",
+  "sha256": "7337d24adbede9b941c3e2f53e8e3cce5d1919e2bbf246c0cc4864d9ebdfbd4c",
+  "purpose": "observe recovery election filtering without changing decisions"
+}

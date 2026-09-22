@@ -91,7 +91,7 @@ documents intentionally excluded from Git. Retained test evidence is under
 `artifacts/session-05/`, `artifacts/session-06/` and `artifacts/session-07/`. See `experiments/v052-v053/`
 for the older runtime comparison.
 
-Product tests include 85 source-bound C oracle records without invoking a C
+Product tests include 94 source-bound C oracle records without invoking a C
 compiler. [Oracle tooling](tools/native-oracle/README.md) documents producing
 new records, using an updated generator, and comparing artifacts before adoption.
 Generator selection has no release constant; runtime/grammar identities remain
@@ -100,6 +100,13 @@ records the candidate patch recommendation and its limits. The product runtime
 still contains the registered JSX/TSX and C# blockers.
 The separate extended catalog adds 35 fresh comparisons and 21 edit comparisons
 over all seven routes, including UTF-8/CRLF and wide sibling boundaries.
+Eight further TypeScript/TSX controls expose a separate limitation: upstream's
+Go grammar patch accepts newline-separated `in` properties, while the original
+C grammar in this oracle reports errors. KR-0003 retains those four exact
+differences; it does not reclassify valid TypeScript as erroneous.
+The C# recovery reduction in KR-0004 also shows that `accepted_clean` can hide
+upstream recovery differences. C# remains blocked for release despite the
+adapter's complete diagnostic checks.
 
 The library's own code is [MIT licensed](LICENSE). See
 [third-party notices](THIRD_PARTY_NOTICES.md) for the pinned runtime, assessed

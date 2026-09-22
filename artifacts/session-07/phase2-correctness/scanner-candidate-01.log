@@ -1,0 +1,20 @@
+=== RUN   TestOracleExperiment
+    oracle_test.go:160: candidate must resolve to the authorized isolated directory
+--- FAIL: TestOracleExperiment (0.03s)
+=== RUN   TestOracleCandidateEdits
+=== RUN   TestOracleCandidateEdits/tsx/F4
+    oracle_experiment_test.go:68: fixture=tsx-F4 source=00fb2b5a4c026746e65f819a40a4a1b4410006b400d0fffdf50fa06485ae15af C=990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83 incremental=990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83
+=== RUN   TestOracleCandidateEdits/tsx/F5
+    oracle_experiment_test.go:68: fixture=tsx-F5 source=c868254fda1dfbe6613fde4dca3538a1233e554464e172cbc9e2785a802ff2a7 C=dc7f9d674d44470e8b50b971694ebca281b2c7175ad89b6577f722b0d98d9bef incremental=dc7f9d674d44470e8b50b971694ebca281b2c7175ad89b6577f722b0d98d9bef
+=== RUN   TestOracleCandidateEdits/javascript/F4
+    oracle_experiment_test.go:68: fixture=javascript-F4 source=00fb2b5a4c026746e65f819a40a4a1b4410006b400d0fffdf50fa06485ae15af C=990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83 incremental=990fffc3e1affed45689c0dabfda8789069471aa4e643ed4d2e56ff0d3ae7d83
+=== RUN   TestOracleCandidateEdits/javascript/F5
+    oracle_experiment_test.go:68: fixture=javascript-F5 source=c868254fda1dfbe6613fde4dca3538a1233e554464e172cbc9e2785a802ff2a7 C=dc7f9d674d44470e8b50b971694ebca281b2c7175ad89b6577f722b0d98d9bef incremental=dc7f9d674d44470e8b50b971694ebca281b2c7175ad89b6577f722b0d98d9bef
+--- PASS: TestOracleCandidateEdits (0.08s)
+    --- PASS: TestOracleCandidateEdits/tsx/F4 (0.07s)
+    --- PASS: TestOracleCandidateEdits/tsx/F5 (0.00s)
+    --- PASS: TestOracleCandidateEdits/javascript/F4 (0.01s)
+    --- PASS: TestOracleCandidateEdits/javascript/F5 (0.00s)
+FAIL
+FAIL	github.com/wotjr1649/go-treesitter/internal/gtsadapter	0.222s
+FAIL

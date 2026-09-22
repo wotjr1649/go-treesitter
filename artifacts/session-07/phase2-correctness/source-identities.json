@@ -1,0 +1,265 @@
+{
+  "archive_sha256": "a7fc4a2f1b369542b14429c36a09a41d6db0bb0d2beec5844930b4a17c6ae3a6",
+  "files": 3275,
+  "original_tree_sha256": "f7ddf9cce6cd08fd84508f8cec1351f4dc61a043dd6b3ca0a2f15bf9e5597820",
+  "scanner_candidate_tree_sha256": "94009bdc398fbfa594a12f0f18c154cf078942559c4fc1d7a1a39cbf95c2896a",
+  "scanner_changes": {
+    "grammars/runtime/javascript_scanner.go": {
+      "before": "0ea6fb03d2a8044020e48036b620499062120dc2592fa28170d3c3c53824f4f9",
+      "after": "1d911c110613f8eb0e9ee6683afe9d46ac63d7d8998cbc58b5146eaf854d6083"
+    },
+    "grammars/runtime/tsx_scanner.go": {
+      "before": "a10ec174eb9ca31b73e0fc6adae338912b902002b1bc1951a2890b4bf05b3fad",
+      "after": "3ba35b579ee71fac4ed0b30d56afd4c90c2363b4d56bc7e1e64bcd0e17c9f0d3"
+    }
+  },
+  "diagnostic_runtime_copy": "pristine; overlays only",
+  "frozen_adapter_commit": "62efcf9",
+  "frozen_files": {
+    "internal/gtsadapter/adapter.go": "0af3030fac8d3f214946614731f7e8d0590a3a5b5715c37720d3bf385942da58",
+    "syntax/diagnostics.go": "274f441d9bda7fb2233e1bdfc05ce55f3b8ddeeed00b9064d3eebf578adba565",
+    "syntax/outcome.go": "2c914015df2bc9d61ac43f6c52832f3b9ecc95f390588e83d10cb5a0687ea159",
+    "syntax/parser.go": "ce3c25c5e9e91f7227e207c061b89d522af064ed428dd0f01b68ee7fd2c95e4a",
+    "syntax/result.go": "26297e6f9ee276d8e24a4f4292dda4437c611048ed58f03d3ba23bb9323c25b9"
+  },
+  "overlays": {
+    "csharp-no-compat.json": {
+      "D:\\AIDEV\\go-treesitter\\.scratch\\session07-runtime\\parser_result_csharp.go": {
+        "backing": ".scratch/session07-probe/csharp-no-compat.go.txt",
+        "sha256": "6d6793ec6e472529dbf3c0e079a3d1ea39b8b16f07d5e2387500e398b5be5522"
+      }
+    },
+    "defer-no-compat.json": {
+      "D:\\AIDEV\\go-treesitter\\internal\\gtsadapter\\adapter.go": {
+        "backing": ".scratch/session07-probe/frozen-internal-gtsadapter-adapter.go.txt",
+        "sha256": "0af3030fac8d3f214946614731f7e8d0590a3a5b5715c37720d3bf385942da58"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\diagnostics.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-diagnostics.go.txt",
+        "sha256": "274f441d9bda7fb2233e1bdfc05ce55f3b8ddeeed00b9064d3eebf578adba565"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\outcome.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-outcome.go.txt",
+        "sha256": "2c914015df2bc9d61ac43f6c52832f3b9ecc95f390588e83d10cb5a0687ea159"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\parser.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-parser.go.txt",
+        "sha256": "ce3c25c5e9e91f7227e207c061b89d522af064ed428dd0f01b68ee7fd2c95e4a"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\result.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-result.go.txt",
+        "sha256": "26297e6f9ee276d8e24a4f4292dda4437c611048ed58f03d3ba23bb9323c25b9"
+      },
+      "D:\\AIDEV\\go-treesitter\\.scratch\\session07-runtime\\parser_recover_c.go": {
+        "backing": ".scratch/session07-probe/core-defer.go.txt",
+        "sha256": "92385eca3e1a22187fa5c64c56d69fe1118ae04c543732ef4593175e851cb362"
+      },
+      "D:\\AIDEV\\go-treesitter\\.scratch\\session07-runtime\\parser_result_csharp.go": {
+        "backing": ".scratch/session07-probe/csharp-no-compat.go.txt",
+        "sha256": "6d6793ec6e472529dbf3c0e079a3d1ea39b8b16f07d5e2387500e398b5be5522"
+      }
+    },
+    "defer-only.json": {
+      "D:\\AIDEV\\go-treesitter\\internal\\gtsadapter\\adapter.go": {
+        "backing": ".scratch/session07-probe/frozen-internal-gtsadapter-adapter.go.txt",
+        "sha256": "0af3030fac8d3f214946614731f7e8d0590a3a5b5715c37720d3bf385942da58"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\diagnostics.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-diagnostics.go.txt",
+        "sha256": "274f441d9bda7fb2233e1bdfc05ce55f3b8ddeeed00b9064d3eebf578adba565"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\outcome.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-outcome.go.txt",
+        "sha256": "2c914015df2bc9d61ac43f6c52832f3b9ecc95f390588e83d10cb5a0687ea159"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\parser.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-parser.go.txt",
+        "sha256": "ce3c25c5e9e91f7227e207c061b89d522af064ed428dd0f01b68ee7fd2c95e4a"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\result.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-result.go.txt",
+        "sha256": "26297e6f9ee276d8e24a4f4292dda4437c611048ed58f03d3ba23bb9323c25b9"
+      },
+      "D:\\AIDEV\\go-treesitter\\.scratch\\session07-runtime\\parser_recover_c.go": {
+        "backing": ".scratch/session07-probe/core-defer.go.txt",
+        "sha256": "92385eca3e1a22187fa5c64c56d69fe1118ae04c543732ef4593175e851cb362"
+      }
+    },
+    "defer-structure.json": {
+      "D:\\AIDEV\\go-treesitter\\internal\\gtsadapter\\adapter.go": {
+        "backing": ".scratch/session07-probe/frozen-internal-gtsadapter-adapter.go.txt",
+        "sha256": "0af3030fac8d3f214946614731f7e8d0590a3a5b5715c37720d3bf385942da58"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\diagnostics.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-diagnostics.go.txt",
+        "sha256": "274f441d9bda7fb2233e1bdfc05ce55f3b8ddeeed00b9064d3eebf578adba565"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\outcome.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-outcome.go.txt",
+        "sha256": "2c914015df2bc9d61ac43f6c52832f3b9ecc95f390588e83d10cb5a0687ea159"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\parser.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-parser.go.txt",
+        "sha256": "ce3c25c5e9e91f7227e207c061b89d522af064ed428dd0f01b68ee7fd2c95e4a"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\result.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-result.go.txt",
+        "sha256": "26297e6f9ee276d8e24a4f4292dda4437c611048ed58f03d3ba23bb9323c25b9"
+      },
+      "D:\\AIDEV\\go-treesitter\\.scratch\\session07-runtime\\parser_recover_c.go": {
+        "backing": ".scratch/session07-probe/core-defer.go.txt",
+        "sha256": "92385eca3e1a22187fa5c64c56d69fe1118ae04c543732ef4593175e851cb362"
+      },
+      "D:\\AIDEV\\go-treesitter\\.scratch\\session07-runtime\\parser_result_csharp.go": {
+        "backing": ".scratch/session07-probe/csharp-native-errors.go.txt",
+        "sha256": "947a08bb22a6142e0b6ccfbc66735e27d2f6c62b1e98f7582980f3104f450fe3"
+      }
+    },
+    "eof-no-compat.json": {
+      "D:\\AIDEV\\go-treesitter\\internal\\gtsadapter\\adapter.go": {
+        "backing": ".scratch/session07-probe/frozen-internal-gtsadapter-adapter.go.txt",
+        "sha256": "0af3030fac8d3f214946614731f7e8d0590a3a5b5715c37720d3bf385942da58"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\diagnostics.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-diagnostics.go.txt",
+        "sha256": "274f441d9bda7fb2233e1bdfc05ce55f3b8ddeeed00b9064d3eebf578adba565"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\outcome.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-outcome.go.txt",
+        "sha256": "2c914015df2bc9d61ac43f6c52832f3b9ecc95f390588e83d10cb5a0687ea159"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\parser.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-parser.go.txt",
+        "sha256": "ce3c25c5e9e91f7227e207c061b89d522af064ed428dd0f01b68ee7fd2c95e4a"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\result.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-result.go.txt",
+        "sha256": "26297e6f9ee276d8e24a4f4292dda4437c611048ed58f03d3ba23bb9323c25b9"
+      },
+      "D:\\AIDEV\\go-treesitter\\.scratch\\session07-runtime\\parser_recover_c.go": {
+        "backing": ".scratch/session07-probe/core-eof.go.txt",
+        "sha256": "7d2f6e5ccbb938b5ef4b5dc9029616cb34f0c0fc7cdfdcb2517c3fc18ef7a493"
+      },
+      "D:\\AIDEV\\go-treesitter\\.scratch\\session07-runtime\\parser_result_csharp.go": {
+        "backing": ".scratch/session07-probe/csharp-no-compat.go.txt",
+        "sha256": "6d6793ec6e472529dbf3c0e079a3d1ea39b8b16f07d5e2387500e398b5be5522"
+      }
+    },
+    "eof-only.json": {
+      "D:\\AIDEV\\go-treesitter\\internal\\gtsadapter\\adapter.go": {
+        "backing": ".scratch/session07-probe/frozen-internal-gtsadapter-adapter.go.txt",
+        "sha256": "0af3030fac8d3f214946614731f7e8d0590a3a5b5715c37720d3bf385942da58"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\diagnostics.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-diagnostics.go.txt",
+        "sha256": "274f441d9bda7fb2233e1bdfc05ce55f3b8ddeeed00b9064d3eebf578adba565"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\outcome.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-outcome.go.txt",
+        "sha256": "2c914015df2bc9d61ac43f6c52832f3b9ecc95f390588e83d10cb5a0687ea159"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\parser.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-parser.go.txt",
+        "sha256": "ce3c25c5e9e91f7227e207c061b89d522af064ed428dd0f01b68ee7fd2c95e4a"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\result.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-result.go.txt",
+        "sha256": "26297e6f9ee276d8e24a4f4292dda4437c611048ed58f03d3ba23bb9323c25b9"
+      },
+      "D:\\AIDEV\\go-treesitter\\.scratch\\session07-runtime\\parser_recover_c.go": {
+        "backing": ".scratch/session07-probe/core-eof.go.txt",
+        "sha256": "7d2f6e5ccbb938b5ef4b5dc9029616cb34f0c0fc7cdfdcb2517c3fc18ef7a493"
+      }
+    },
+    "trace.json": {
+      "D:\\AIDEV\\go-treesitter\\internal\\gtsadapter\\adapter.go": {
+        "backing": ".scratch/session07-probe/frozen-internal-gtsadapter-adapter.go.txt",
+        "sha256": "0af3030fac8d3f214946614731f7e8d0590a3a5b5715c37720d3bf385942da58"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\diagnostics.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-diagnostics.go.txt",
+        "sha256": "274f441d9bda7fb2233e1bdfc05ce55f3b8ddeeed00b9064d3eebf578adba565"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\outcome.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-outcome.go.txt",
+        "sha256": "2c914015df2bc9d61ac43f6c52832f3b9ecc95f390588e83d10cb5a0687ea159"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\parser.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-parser.go.txt",
+        "sha256": "ce3c25c5e9e91f7227e207c061b89d522af064ed428dd0f01b68ee7fd2c95e4a"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\result.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-result.go.txt",
+        "sha256": "26297e6f9ee276d8e24a4f4292dda4437c611048ed58f03d3ba23bb9323c25b9"
+      },
+      "D:\\AIDEV\\go-treesitter\\.scratch\\session07-runtime\\parser_recover_c.go": {
+        "backing": ".scratch/session07-probe/core-trace.go.txt",
+        "sha256": "477e8ad6b8fffe64d3fde869ac3ae7adef39de27917ffc8860384273381993d8"
+      },
+      "D:\\AIDEV\\go-treesitter\\.scratch\\session07-runtime\\parser_result_csharp.go": {
+        "backing": ".scratch/session07-probe/csharp-no-compat.go.txt",
+        "sha256": "6d6793ec6e472529dbf3c0e079a3d1ea39b8b16f07d5e2387500e398b5be5522"
+      }
+    },
+    "trace2.json": {
+      "D:\\AIDEV\\go-treesitter\\internal\\gtsadapter\\adapter.go": {
+        "backing": ".scratch/session07-probe/frozen-internal-gtsadapter-adapter.go.txt",
+        "sha256": "0af3030fac8d3f214946614731f7e8d0590a3a5b5715c37720d3bf385942da58"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\diagnostics.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-diagnostics.go.txt",
+        "sha256": "274f441d9bda7fb2233e1bdfc05ce55f3b8ddeeed00b9064d3eebf578adba565"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\outcome.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-outcome.go.txt",
+        "sha256": "2c914015df2bc9d61ac43f6c52832f3b9ecc95f390588e83d10cb5a0687ea159"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\parser.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-parser.go.txt",
+        "sha256": "ce3c25c5e9e91f7227e207c061b89d522af064ed428dd0f01b68ee7fd2c95e4a"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\result.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-result.go.txt",
+        "sha256": "26297e6f9ee276d8e24a4f4292dda4437c611048ed58f03d3ba23bb9323c25b9"
+      },
+      "D:\\AIDEV\\go-treesitter\\.scratch\\session07-runtime\\parser_recover_c.go": {
+        "backing": ".scratch/session07-probe/core-trace2.go.txt",
+        "sha256": "7337d24adbede9b941c3e2f53e8e3cce5d1919e2bbf246c0cc4864d9ebdfbd4c"
+      },
+      "D:\\AIDEV\\go-treesitter\\.scratch\\session07-runtime\\parser_result_csharp.go": {
+        "backing": ".scratch/session07-probe/csharp-no-compat.go.txt",
+        "sha256": "6d6793ec6e472529dbf3c0e079a3d1ea39b8b16f07d5e2387500e398b5be5522"
+      }
+    },
+    "trace3.json": {
+      "D:\\AIDEV\\go-treesitter\\internal\\gtsadapter\\adapter.go": {
+        "backing": ".scratch/session07-probe/frozen-internal-gtsadapter-adapter.go.txt",
+        "sha256": "0af3030fac8d3f214946614731f7e8d0590a3a5b5715c37720d3bf385942da58"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\diagnostics.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-diagnostics.go.txt",
+        "sha256": "274f441d9bda7fb2233e1bdfc05ce55f3b8ddeeed00b9064d3eebf578adba565"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\outcome.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-outcome.go.txt",
+        "sha256": "2c914015df2bc9d61ac43f6c52832f3b9ecc95f390588e83d10cb5a0687ea159"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\parser.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-parser.go.txt",
+        "sha256": "ce3c25c5e9e91f7227e207c061b89d522af064ed428dd0f01b68ee7fd2c95e4a"
+      },
+      "D:\\AIDEV\\go-treesitter\\syntax\\result.go": {
+        "backing": ".scratch/session07-probe/frozen-syntax-result.go.txt",
+        "sha256": "26297e6f9ee276d8e24a4f4292dda4437c611048ed58f03d3ba23bb9323c25b9"
+      },
+      "D:\\AIDEV\\go-treesitter\\.scratch\\session07-runtime\\parser_recover_c.go": {
+        "backing": ".scratch/session07-probe/core-trace3.go.txt",
+        "sha256": "91e200a7e1166b30eedcc269aabeaa132131f51751e4b691831b171a9c753cf1"
+      },
+      "D:\\AIDEV\\go-treesitter\\.scratch\\session07-runtime\\parser_result_csharp.go": {
+        "backing": ".scratch/session07-probe/csharp-no-compat.go.txt",
+        "sha256": "6d6793ec6e472529dbf3c0e079a3d1ea39b8b16f07d5e2387500e398b5be5522"
+      }
+    }
+  }
+}

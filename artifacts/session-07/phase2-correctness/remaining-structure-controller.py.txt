@@ -1,0 +1,31 @@
+import difflib, hashlib, json, os, pathlib, subprocess
+root=pathlib.Path(__file__).resolve().parents[1]
+out=root/'artifacts/session-07/phase2-correctness'
+work=root/'.scratch/session07-probe'
+sha=lambda d:hashlib.sha256(d).hexdigest()
+source=(root/'testdata/newtonsoft/JsonTextReader-excerpt.cs').read_text(encoding='utf-8')
+cases=[('excerpt-original',source),('excerpt-no-enum',source[:source.index('    internal enum')]+source[source.index('    /// <summary>'):])]
+exe=work/'defer-structure.exe'
+env={k:v for k,v in os.environ.items() if k.upper() in ('SYSTEMROOT','WINDIR','COMSPEC','PATHEXT','PATH','TEMP','TMP')}
+result=subprocess.run([str(exe)],input=json.dumps([{'ID':n,'Filename':'x.cs','Source':s} for n,s in cases]).encode(),capture_output=True,check=True,timeout=90,env=env)
+go={r['ID']:r for r in map(json.loads,result.stdout.splitlines())}
+builddir=root/'.scratch/oracle/build-01'
+build=json.loads((builddir/'build.json').read_text(encoding='utf-8'))
+assert build['pins']==json.loads((root/'internal/provenance/identities.json').read_text(encoding='utf-8'))
+artifact=build['grammars']['c_sharp']; cexe=builddir/artifact['executable']
+assert sha(cexe.read_bytes())==artifact['executable_sha256']
+rows=[]
+for name,source in cases:
+    native=json.loads(subprocess.run([str(cexe)],input=source.encode(),capture_output=True,check=True,timeout=15,env=env).stdout)
+    a,b=go[name]['Nodes'],native['nodes']
+    key=lambda n:(n['Type'],n['StartByte'],n['EndByte'])
+    blocks=[]
+    for op,al,ah,bl,bh in difflib.SequenceMatcher(a=[key(n) for n in a],b=[key(n) for n in b],autojunk=False).get_opcodes():
+        if op!='equal': blocks.append({'operation':op,'go_indices':[al,ah],'c_indices':[bl,bh],'go':a[al:ah],'c':b[bl:bh]})
+    row={'id':name,'source_sha256':sha(source.encode()),'go':go[name],'c':native,'structural_blocks':blocks}
+    rows.append(row)
+    print(name,'nodes',len(a),len(b),'structural differences',len(blocks))
+    for block in blocks:
+        print(block['operation'],block['go_indices'],block['c_indices'],[key(n) for n in block['go']],[key(n) for n in block['c']])
+with (out/'remaining-structure-01.json').open('x',encoding='utf-8',newline='\n') as f:
+    json.dump({'variant':'diagnostic defer-structure; unsafe for adoption','go_exe_sha256':sha(exe.read_bytes()),'c_build_sha256':sha((builddir/'build.json').read_bytes()),'rows':rows},f,ensure_ascii=False,indent=2);f.write('\n')

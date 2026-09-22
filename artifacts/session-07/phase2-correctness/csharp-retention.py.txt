@@ -1,0 +1,12 @@
+import hashlib,json,pathlib
+root=pathlib.Path(__file__).resolve().parents[1]
+out=root/'artifacts/session-07/phase2-correctness'
+observed=json.loads((out/'reduced-comparison-01.json').read_text(encoding='utf-8'))
+row=next(r for r in observed['comparisons'] if r['id']=='excerpt-no-enum')
+assert row['go']['Outcome']=='accepted_clean' and row['c_error']
+assert hashlib.sha256(row['source'].encode()).hexdigest()==row['sha256']
+case={'id':'CS-excerpt-no-enum','language':'c_sharp','filename':'x.cs','group':'KR-0004','source':row['source'],'sha256':row['sha256']}
+differences={case['id']:{'Record':'KR-0004','Source':row['sha256'],'GoDigest':row['go_digest'],'CDigest':row['c_digest']}}
+for name,data in [('csharp-recovery-cases.json',[case]),('csharp-recovery-differences.json',differences)]:
+    with (root/('testdata/oracle/'+name)).open('x',encoding='utf-8',newline='\n') as f:json.dump(data,f,ensure_ascii=False,indent=2);f.write('\n')
+print('one MIT corpus derivative; accepted_clean/C error; exact source and trees retained')

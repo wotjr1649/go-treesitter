@@ -1,0 +1,262 @@
+{
+  "schema": 1,
+  "pins": {
+    "baseline": {
+      "module": "github.com/odvcencio/gotreesitter",
+      "version": "v0.53.0",
+      "tag": "f102332cca9dc45e841b9439d34ba5cc59f0b10f",
+      "commit": "c871b1f576866c40b1695677fe3512243e266d39"
+    },
+    "grammars": {
+      "go": {
+        "blob_sha256": "9cf914d26d962d1a62e7954f8b20b302337a44cb7d4a07218eec482c45a57a08",
+        "commit": "2346a3ab1bb3857b48b29d779a1ef9799a248cd7"
+      },
+      "python": {
+        "blob_sha256": "cde4a67dc6af6e1232dbbd1eab8618478d1d73727020e8a8002542390a452d37",
+        "commit": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64"
+      },
+      "javascript": {
+        "blob_sha256": "6706f93890f24d8ea90d6a140df5dde29c02ec8a3213bae16e8cc4df37e33ee0",
+        "commit": "58404d8cf191d69f2674a8fd507bd5776f46cb11"
+      },
+      "typescript": {
+        "blob_sha256": "46d8d4f7a0056db32e874500ae5b19170237e1628a63a9e3a401e0ee426d6126",
+        "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f"
+      },
+      "tsx": {
+        "blob_sha256": "bf8c490b0bbeb6d4150abce2edc193552e44b093893665dde69bd39e9e940e85",
+        "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f"
+      },
+      "c_sharp": {
+        "blob_sha256": "7ad425e89733339dde94e3c03b762ae478fb453b530493f5d62e1ae7537e1784",
+        "commit": "88366631d598ce6595ec655ce1591b315cffb14c"
+      }
+    },
+    "oracle": {
+      "runtime_version": "v0.25.1",
+      "runtime_commit": "f5afe475deb7c0bae6407fb776c76824f717bb61",
+      "transport_module": "github.com/tree-sitter/go-tree-sitter",
+      "transport_version": "v0.25.0",
+      "transport_commit": "adc13ffd8b2c0b01b878fda9f7c422ce0df5fad3",
+      "generator": "installed-or-checked-in",
+      "abi_policy": "runtime-compatible",
+      "build_flags": [
+        "-std=c11",
+        "-fPIC",
+        "-O2"
+      ]
+    }
+  },
+  "sources": {
+    "runtime": {
+      "repository": "tree-sitter/tree-sitter",
+      "commit": "f5afe475deb7c0bae6407fb776c76824f717bb61",
+      "archive_sha256": "c6dd1d78ef17ccd82b74e631cda2a669fc8e0d679b0f7aad8f89a55c63efd76b",
+      "files": {
+        "LICENSE": "5f9cf9fb6acb1972b35ae29119ce563bb60ec097656bc4b69b9bac2d04c7a147",
+        "lib/binding_web/lib/tree-sitter.c": "2e601cda485cd495cc9f4b57e49907ab6761c0524a1217b06cc2704d471f08d5",
+        "lib/include/tree_sitter/api.h": "a363e2f2120178702374d8e34f8af9d3b7b2124a2c9e0cc33e57ded13db59b48",
+        "lib/src/alloc.c": "c7d15b9015568f439af4adf28ead9e2bd14901221819276727c11227a29576da",
+        "lib/src/alloc.h": "2ad7cc5391be8043ffdcc111b9b21b7767f592790fc8389acb6fcee7fd1acb61",
+        "lib/src/array.h": "2ee1350009660a2dd5d116f9e9644d280f1703ef1c7b460d9d46a7f3dee1c816",
+        "lib/src/atomic.h": "bbc630cb913ac64274ce4412bc9d504174220323993f306ded74abe502867e74",
+        "lib/src/clock.h": "abd8fa83a805900f8e03b8b2b1abd47f9c7b8252f4401485c060348c407f5448",
+        "lib/src/error_costs.h": "0e8d1a21e0d60981e762989108231df6610d95591892f631c6c78a9ef831a2ab",
+        "lib/src/get_changed_ranges.c": "488d558e00412ebd244d6b69459e6d39e8c9d326afeff75ea7cc85ef02f7f4f9",
+        "lib/src/get_changed_ranges.h": "f394bd0b6fce006be460fd16cbea3cc96e248c810a4d97e8830463c29c85e4a5",
+        "lib/src/host.h": "e1982b9795b9c52b5ab564d8b9876189d65a97ca02f78351e1740b0985992fd2",
+        "lib/src/language.c": "52bc642d7a5e944c30daa9e4e5a78150105ebde5bde90167adb64b8928bbe37d",
+        "lib/src/language.h": "56e32fb53672609be6e8bfa7e6d0f92ef463fd53d2be910d169a07ee5f03df1b",
+        "lib/src/length.h": "7fc186fb4bf50233059e8be9ca68efe95e66d34ced4b8a8f38f14497352faeb1",
+        "lib/src/lexer.c": "56a418eb47351b85d8f73729fa756765e2d9b3c6873d6be8f240a2e7fad22431",
+        "lib/src/lexer.h": "7d76308f7a2d3246a3e28fb27698be928f848130d1bfacc39f9f623127671b74",
+        "lib/src/lib.c": "6bca070a6a70740c8e8af244af8a7311dbea09fbb60372376f5260facaf785f0",
+        "lib/src/node.c": "bfe9c7867881142600ad48570ef345dbb2b25319e61e1e08c7a15cc519dcb6a6",
+        "lib/src/parser.c": "c5dc79e198a74ae9b0e2b0a911e279fc54b2c8f99587f100e54d5862202f8010",
+        "lib/src/parser.h": "11b654fbba7770b1c710cc14b169be2deb5d89c0f87233d4605037c26c1ff657",
+        "lib/src/point.h": "0929027be2ff54627be560f3bafc1af59e81ac6d5a8d5864455601a0dbee50ff",
+        "lib/src/portable/endian.h": "adf9c91b7776b25156dbc981d6cff31dd2a77a602b97f661e9e635cd34f502ae",
+        "lib/src/query.c": "8c46dc807c99c10985dfba7fab314811ab78a32ddcf2efc62d1237fa1e7cf470",
+        "lib/src/reduce_action.h": "8f40396e431d7ff558694ca248eed1332b6cf6f7e6255f06cddfde78020bd308",
+        "lib/src/reusable_node.h": "10be747ea4c733ca181dc43d55d155ac8e5b8caa247079621cca0ce633347bfb",
+        "lib/src/stack.c": "9cb3cefa0d345ad853db7db8a3aa06af22cf7356d3b12727b16b981f70e7fd79",
+        "lib/src/stack.h": "2bbd54ad43def052af2eb449b789f6bbf87fc19c93dcd28633702ae1595ae7bb",
+        "lib/src/subtree.c": "ff23ad91856c1e7d00e4eaff31233d22cb7a0e29fb722e07b7dff0c0d7d160d8",
+        "lib/src/subtree.h": "9380a9984a3a071d6a32ed05f7fad8b8853afa991f0a36cc29ccb90f1e3a1a0f",
+        "lib/src/tree.c": "ef55fd2d34daad7e43605ba0469f6c67a9afb31963077e9c73f2fb0478e254bb",
+        "lib/src/tree.h": "60591fb35ca078a8bb323004ece0377ac4f4c6cdbd3c4473af6e2b97186e024b",
+        "lib/src/tree_cursor.c": "b6f4a16944a5bde973da360d09401c778932e20b378e582b4af1ee1b0c103481",
+        "lib/src/tree_cursor.h": "3e8d9671ab1397bcaeb3e0cbf153a61a99e214782b43c09e5cde5a01e8283a1a",
+        "lib/src/ts_assert.h": "ac1ec4b7ba388a9d8708feeb6c5c766b2927cecfd6db644b939772e1dc086526",
+        "lib/src/unicode.h": "6cf0ec5a54e72644e506cca20b854dc7c49249cb1cff0d806635a10c8efba340",
+        "lib/src/unicode/LICENSE": "6a18c5fac70d7860b57f5b72b4e2c9a1ba6b3d2741eef7ff9767c5379364f10d",
+        "lib/src/unicode/ptypes.h": "a87e9710c9cad7b08a945f4fb8b9d4629189897cc535f8ac927640c210a94b69",
+        "lib/src/unicode/umachine.h": "2d79c0903d9e73e247b948bc0a12b6a785257ca0273bddab56fb59561f8d7391",
+        "lib/src/unicode/urename.h": "a87e9710c9cad7b08a945f4fb8b9d4629189897cc535f8ac927640c210a94b69",
+        "lib/src/unicode/utf.h": "a87e9710c9cad7b08a945f4fb8b9d4629189897cc535f8ac927640c210a94b69",
+        "lib/src/unicode/utf16.h": "c370d9069f37fad2b53981c06dc648bbc21923db1655517a31bb237df4fba041",
+        "lib/src/unicode/utf8.h": "39651224b2ca2452359c7f3339f3cc0a841fe7db64f8a00c9c5ec19c0389645c",
+        "lib/src/wasm/stdlib.c": "043063df41a41f6598df26d9dc18581e622a58dfc92a796073459f2b6daf4ba6",
+        "lib/src/wasm/wasm-stdlib.h": "805520eb9fb1e590a1470d740f5afa29cd48aa4f681b887d171cef13ad600aca",
+        "lib/src/wasm_store.c": "8a75ab5bf0269cf2c885bc2fe537afa94ab811e32baef48110a11d917cff8215",
+        "lib/src/wasm_store.h": "4f70d0500b0775e5d862a8e7d191b3853d73378c65e020e01767838a18debe0e"
+      }
+    },
+    "go": {
+      "repository": "tree-sitter/tree-sitter-go",
+      "commit": "2346a3ab1bb3857b48b29d779a1ef9799a248cd7",
+      "archive_sha256": "94d08fc0f727a8dbe03203e2aaf1c5dc33a57e496b583049324eddc79769797b",
+      "files": {
+        "LICENSE": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+        "src/grammar.json": "0dcc665aa521a1b73a200be13b4e376780cca037d764a165f12864babfe28000",
+        "src/node-types.json": "8d77e723df0f0dfccb66d4571a5c3c17ecfb6c90959044c0992146b21f383bff",
+        "src/parser.c": "3dbf6ed1238b5dfcf2be4d2f2d4cb27a14d34f34d7784eccccbfd532fd4a6d85",
+        "src/tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+        "src/tree_sitter/array.h": "5bdf6ed1a78e3409fd443e085ca967a64c188a5d082aaf7f819bccd53a471c94",
+        "src/tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
+      }
+    },
+    "python": {
+      "repository": "tree-sitter/tree-sitter-python",
+      "commit": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64",
+      "archive_sha256": "43e71c4d0cbbd2350e83e0b2da3558eab09b8dc78153a8990508b0c9eec754e6",
+      "files": {
+        "LICENSE": "d724405ce238a22c0d35769c5a36b386ad5958192efe8bbb304fb2896254575f",
+        "src/grammar.json": "d933cfea6197e57354c9ec86888adbb95971b4372efef514b82e601b5067580d",
+        "src/node-types.json": "6d26089d798b66b9a68dd5f6e278cf1ea00b31537ac48a7efbbe5bb63094c473",
+        "src/parser.c": "53a7bd87ba22c4fdbb8566a2caf848a1478f3ac9d47a1b32677a71de75d75db6",
+        "src/scanner.c": "6db82134ac2d4c90a1a1475487a625cface02662ebda9b7478cad9c7147e9afe",
+        "src/tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+        "src/tree_sitter/array.h": "5bdf6ed1a78e3409fd443e085ca967a64c188a5d082aaf7f819bccd53a471c94",
+        "src/tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
+      }
+    },
+    "javascript": {
+      "repository": "tree-sitter/tree-sitter-javascript",
+      "commit": "58404d8cf191d69f2674a8fd507bd5776f46cb11",
+      "archive_sha256": "f3e51e9f7b129f62a817551ae22a878dac5c18d71c456d5ad73e9c82d687f33d",
+      "files": {
+        "LICENSE": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+        "src/grammar.json": "7d9364b824be9250ba023065784550475d277b9dc9a7d20f9bebe9e471c908c3",
+        "src/node-types.json": "188a8baa97018edaf63bf7ece372c07bc0d74d1301004bc8f211eb7dee5a6e70",
+        "src/parser.c": "67209ca7ef6e1a4f74e29e48b5928455f892fe1821a3960fbcd62f4e972f7384",
+        "src/scanner.c": "b3d3f64284d97bf80749c026862427782cf7ecc0b7dc094e6698ab311c9a42c7",
+        "src/tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+        "src/tree_sitter/array.h": "5bdf6ed1a78e3409fd443e085ca967a64c188a5d082aaf7f819bccd53a471c94",
+        "src/tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
+      }
+    },
+    "typescript": {
+      "repository": "tree-sitter/tree-sitter-typescript",
+      "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f",
+      "archive_sha256": "96ce4d1b513767d414bcca408efd9b49879162cceecdbed79a88e8ad2184f385",
+      "files": {
+        "LICENSE": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
+        "common/scanner.h": "da66ef2bd14a3f7ea743e25ba068c6c9aae2c3509db200ff80c4a0e6116e564c",
+        "tsx/src/grammar.json": "f98a7830b67be266c9e9effb673a5fc154ad6aa26f87f7c6d4a9191e09d8b357",
+        "tsx/src/node-types.json": "78b5789145286799a27a0a7ecc36cc1bcb151f94ec7fa631b248459867010c8c",
+        "tsx/src/parser.c": "1902cb53fa7ff5179df89b2eea863165e84c8cc866226419dc26921d8c055885",
+        "tsx/src/scanner.c": "d563cd30b2f39718c9ae4292795c5ce03a2ad01954ba3a86ef84c2781a736673",
+        "tsx/src/tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+        "tsx/src/tree_sitter/array.h": "4ff743903dc46f5db6aa54f31c6b4d160a8a9779e5b2ab1ee59ae7ebcd850ea1",
+        "tsx/src/tree_sitter/parser.h": "a1f6ef161fbaf48a0e10fca90ef5290a062462b307b3898aa562993853b9f80a",
+        "typescript/src/grammar.json": "99dc4b95424dff47c89acb50d5d3f25b081b07eaff43994b7881dccd4186b214",
+        "typescript/src/node-types.json": "c790a733fc756b54d4e54dceeb7d2d51e40d8b57136e70277753a75804cce3e3",
+        "typescript/src/parser.c": "74fe453edd70f4eae9af0a1050cbd7943d8971d59165b6aaebbaa0a0b716d1aa",
+        "typescript/src/scanner.c": "9125013b42cb888379d9be909f1d73dfb75a37626c2cdbf4122718a2b431a6d3",
+        "typescript/src/tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+        "typescript/src/tree_sitter/array.h": "4ff743903dc46f5db6aa54f31c6b4d160a8a9779e5b2ab1ee59ae7ebcd850ea1",
+        "typescript/src/tree_sitter/parser.h": "a1f6ef161fbaf48a0e10fca90ef5290a062462b307b3898aa562993853b9f80a"
+      }
+    },
+    "c_sharp": {
+      "repository": "tree-sitter/tree-sitter-c-sharp",
+      "commit": "88366631d598ce6595ec655ce1591b315cffb14c",
+      "archive_sha256": "85b60efe8b048e48eb5d801994bc575ccf6e6d3235347931b0995d56613a6f57",
+      "files": {
+        "LICENSE": "778fb7d63b8c1844da315648c02f325c4713a6f4a5d19644fd413421422776d3",
+        "src/grammar.json": "bc06b66a5760de961f4e0e4245aeb28d7cd79ba7c1d209581d21f4c8c37f311e",
+        "src/node-types.json": "3e6c0e6a1c8eaa81d694faf71e42ac2e9f4f2a61f29d190e6613ff3465670ad6",
+        "src/parser.c": "d1a24aa1157e19ed4cd0eb6980eeafe9959dbc85e72b7acc621443de3de8fe99",
+        "src/scanner.c": "00920daa0fdf3050d441475e8effe996b60ee8acc1bdbcbbc4c83d56a6987705",
+        "src/tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+        "src/tree_sitter/array.h": "4483dc3d37ab62fc8cabd5cfbd7de8267a2b1e3b12da3a90a5b8b324dacd5498",
+        "src/tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
+      }
+    }
+  },
+  "driver_sha256": "da266f8c9aa6b298dead0e211ca3c64b648aebf5e6359de5ebe63ec4072a4425",
+  "compiler": "gcc.EXE (Rev3, Built by MSYS2 project) 16.2.0",
+  "compiler_sha256": "75e87953e9d04e8a5d81225397292e9f8ae599a0ed85f70ed175767577aaa9f6",
+  "os": "Windows",
+  "arch": "AMD64",
+  "grammars": {
+    "go": {
+      "generator_mode": "checked-in",
+      "generator_version": null,
+      "abi": 15,
+      "runtime_abi_min": 13,
+      "runtime_abi_max": 15,
+      "runtime_header_sha256": "a363e2f2120178702374d8e34f8af9d3b7b2124a2c9e0cc33e57ded13db59b48",
+      "parser_sha256": "3dbf6ed1238b5dfcf2be4d2f2d4cb27a14d34f34d7784eccccbfd532fd4a6d85",
+      "executable": "go.exe",
+      "executable_sha256": "451e47ab0a25ae2798da2b8e099aa86e28a6c27a761c12c7a07f4a0db89c47d0"
+    },
+    "python": {
+      "generator_mode": "checked-in",
+      "generator_version": null,
+      "abi": 15,
+      "runtime_abi_min": 13,
+      "runtime_abi_max": 15,
+      "runtime_header_sha256": "a363e2f2120178702374d8e34f8af9d3b7b2124a2c9e0cc33e57ded13db59b48",
+      "parser_sha256": "53a7bd87ba22c4fdbb8566a2caf848a1478f3ac9d47a1b32677a71de75d75db6",
+      "executable": "python.exe",
+      "executable_sha256": "19a66ebed87a9d636656cd664f73e61639322521c119f9522b4823cb6607e52c"
+    },
+    "javascript": {
+      "generator_mode": "checked-in",
+      "generator_version": null,
+      "abi": 15,
+      "runtime_abi_min": 13,
+      "runtime_abi_max": 15,
+      "runtime_header_sha256": "a363e2f2120178702374d8e34f8af9d3b7b2124a2c9e0cc33e57ded13db59b48",
+      "parser_sha256": "67209ca7ef6e1a4f74e29e48b5928455f892fe1821a3960fbcd62f4e972f7384",
+      "executable": "javascript.exe",
+      "executable_sha256": "373320d8ea9c5c8c1ffce1d77524f667f7f96b88f94b55008292b7f3266e9c24"
+    },
+    "typescript": {
+      "generator_mode": "checked-in",
+      "generator_version": null,
+      "abi": 14,
+      "runtime_abi_min": 13,
+      "runtime_abi_max": 15,
+      "runtime_header_sha256": "a363e2f2120178702374d8e34f8af9d3b7b2124a2c9e0cc33e57ded13db59b48",
+      "parser_sha256": "74fe453edd70f4eae9af0a1050cbd7943d8971d59165b6aaebbaa0a0b716d1aa",
+      "executable": "typescript.exe",
+      "executable_sha256": "726bc4d8d9dd81669492f94a0ab72a5239607dab92b3a6c4d3b7af33e3892fcb"
+    },
+    "tsx": {
+      "generator_mode": "checked-in",
+      "generator_version": null,
+      "abi": 14,
+      "runtime_abi_min": 13,
+      "runtime_abi_max": 15,
+      "runtime_header_sha256": "a363e2f2120178702374d8e34f8af9d3b7b2124a2c9e0cc33e57ded13db59b48",
+      "parser_sha256": "1902cb53fa7ff5179df89b2eea863165e84c8cc866226419dc26921d8c055885",
+      "executable": "tsx.exe",
+      "executable_sha256": "52cf2c228ddda254410e6bfaa4408a493212662fa78663541d4da3942fb3171c"
+    },
+    "c_sharp": {
+      "generator_mode": "checked-in",
+      "generator_version": null,
+      "abi": 15,
+      "runtime_abi_min": 13,
+      "runtime_abi_max": 15,
+      "runtime_header_sha256": "a363e2f2120178702374d8e34f8af9d3b7b2124a2c9e0cc33e57ded13db59b48",
+      "parser_sha256": "d1a24aa1157e19ed4cd0eb6980eeafe9959dbc85e72b7acc621443de3de8fe99",
+      "executable": "c_sharp.exe",
+      "executable_sha256": "158b3768832e7748186f84a3bc0cd469b368d309ef32850590264722c36a57e1"
+    }
+  }
+}

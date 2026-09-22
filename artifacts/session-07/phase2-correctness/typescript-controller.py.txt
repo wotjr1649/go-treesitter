@@ -1,0 +1,30 @@
+import hashlib,json,os,pathlib,subprocess
+root=pathlib.Path(__file__).resolve().parents[1]
+out=root/'artifacts/session-07/phase2-correctness'
+sha=lambda b:hashlib.sha256(b).hexdigest()
+sources={
+    'newline-in':'type Easing = {\n  default: string\n  in: string\n  out: string\n}\n',
+    'newline-optional-in':'interface Easing {\n  default: string\n  in?: string\n}\n',
+    'binary-in':'const result = key\n  in object;\n',
+    'semicolon-in':'type Easing = { default: string; in: string; out: string };\n',
+}
+cases=[{'ID':lang+'-'+name,'Filename':'x.'+lang,'Source':source} for lang in ('ts','tsx') for name,source in sources.items()]
+env={k:v for k,v in os.environ.items() if k.upper() in ('SYSTEMROOT','WINDIR','COMSPEC','PATHEXT','PATH','TEMP','TMP')}
+gexe=root/'.scratch/session07-probe/baseline.exe'
+result=subprocess.run([str(gexe)],input=json.dumps(cases).encode(),capture_output=True,check=True,timeout=60,env=env)
+go={r['ID']:r for r in map(json.loads,result.stdout.splitlines())}
+builddir=root/'.scratch/oracle/build-01'
+build=json.loads((builddir/'build.json').read_text(encoding='utf-8'))
+assert build['pins']==json.loads((root/'internal/provenance/identities.json').read_text(encoding='utf-8'))
+rows=[]
+for case in cases:
+    language='typescript' if case['Filename']=='x.ts' else 'tsx'
+    artifact=build['grammars'][language]; exe=builddir/artifact['executable']
+    assert sha(exe.read_bytes())==artifact['executable_sha256']
+    native=json.loads(subprocess.run([str(exe)],input=case['Source'].encode(),capture_output=True,check=True,timeout=15,env=env).stdout)
+    g=go[case['ID']]
+    equal=g['Nodes']==native['nodes']
+    rows.append(case|{'source_sha256':sha(case['Source'].encode()),'go':g,'c':native,'equal':equal})
+    print(case['ID'],'Go',g['Diagnostics']['Outcome'],'C errors',native['has_error'],'equal',equal)
+with (out/'typescript-upstream-check-01.json').open('x',encoding='utf-8',newline='\n') as f:
+    json.dump({'go_exe_sha256':sha(gexe.read_bytes()),'c_build_sha256':sha((builddir/'build.json').read_bytes()),'rows':rows},f,ensure_ascii=False,indent=2);f.write('\n')

@@ -1,0 +1,37 @@
+[
+  {
+    "path": "defer-core.diff",
+    "sha256": "ea5995e49a55ba504cea63ad938857c01f938cfd3f78a8843c1de247cf3d986f",
+    "bytes": 1291
+  },
+  {
+    "path": "csharp-recovery-trace-01.json",
+    "sha256": "dc2069f4bda4b4c504ff78174644e8ef7c6d0f7955bd93aa3853a4004833d147",
+    "bytes": 112343
+  },
+  {
+    "path": "csharp-recovery-trace-02.json",
+    "sha256": "b73e3c3d4b687237d617e4cfb0ca3343faa572a81bd55a83fc4296d5b202d892",
+    "bytes": 117306
+  },
+  {
+    "path": "csharp-recovery-trace-03.json",
+    "sha256": "0c18515eb9284868b785e822ffa5d5ccc4ba1116a41da7f5326dfae0629ec055",
+    "bytes": 122952
+  },
+  {
+    "path": "csharp-reduction-matrix-01.json",
+    "sha256": "05dd2e8b4958dfbe99e8dee50de3f1c7fd4dffa432960cc2a3b990b3b534bd3a",
+    "bytes": 2191464
+  },
+  {
+    "path": "remaining-structure-01.json",
+    "sha256": "0a53dfb3d1f89cf040894392e5d6d4cc7038e0682d3fa77290bb7965a68495e8",
+    "bytes": 3989996
+  },
+  {
+    "path": "enum-raw-structure-01.json",
+    "sha256": "59482e5c8cdc177c8dbc0404de1ca10b12e2f17386b4c103464c68b17b0e99a7",
+    "bytes": 48804
+  }
+]

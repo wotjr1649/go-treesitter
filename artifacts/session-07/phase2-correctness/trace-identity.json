@@ -1,0 +1,15 @@
+{
+  "adapter_commit": "62efcf9",
+  "runtime": "v0.53.0",
+  "purpose": "trace reduced C# recovery; C# compatibility disabled in Go",
+  "overlays": {
+    "D:\\AIDEV\\go-treesitter\\.scratch\\session07-probe\\frozen-internal-gtsadapter-adapter.go.txt": "0af3030fac8d3f214946614731f7e8d0590a3a5b5715c37720d3bf385942da58",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\session07-probe\\frozen-syntax-diagnostics.go.txt": "274f441d9bda7fb2233e1bdfc05ce55f3b8ddeeed00b9064d3eebf578adba565",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\session07-probe\\frozen-syntax-outcome.go.txt": "2c914015df2bc9d61ac43f6c52832f3b9ecc95f390588e83d10cb5a0687ea159",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\session07-probe\\frozen-syntax-parser.go.txt": "ce3c25c5e9e91f7227e207c061b89d522af064ed428dd0f01b68ee7fd2c95e4a",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\session07-probe\\frozen-syntax-result.go.txt": "26297e6f9ee276d8e24a4f4292dda4437c611048ed58f03d3ba23bb9323c25b9",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\session07-probe\\core-trace.go.txt": "477e8ad6b8fffe64d3fde869ac3ae7adef39de27917ffc8860384273381993d8",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\session07-probe\\csharp-no-compat.go.txt": "6d6793ec6e472529dbf3c0e079a3d1ea39b8b16f07d5e2387500e398b5be5522"
+  },
+  "driver_sha256": "84e090285aa8cc89314614b7200ee903ffaac02efda877d6e9eef980878c80e1"
+}

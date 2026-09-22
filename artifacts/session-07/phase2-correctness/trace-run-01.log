@@ -1,0 +1,49 @@
+members-1-1
+HANDLE 34 35 14 6874 1
+MISSING 34 14 6783 182 7313 34 1
+HANDLE 43 45 1 7313 1
+HANDLE 34 35 14 6874 1
+MISSING 34 14 6783 182 7313 34 1
+HANDLE 43 45 1 7313 1
+
+detect_error
+recover_with_missing symbol:#endif, state:6979
+recover_to_previous state:6874, depth:2
+detect_error
+detect_error
+recover_to_previous state:5919, depth:2
+recover_to_previous state:7313, depth:2
+accept
+accept
+select_smaller_error symbol:compilation_unit, over_symbol:compilation_unit
+members-1-2
+HANDLE 34 35 14 6874 1
+MISSING 34 14 6783 182 7313 34 1
+HANDLE 43 45 1 7313 1
+HANDLE 34 35 14 6874 1
+MISSING 34 14 6783 182 7313 34 1
+HANDLE 43 45 1 7313 1
+
+detect_error
+recover_with_missing symbol:#endif, state:6979
+recover_to_previous state:6874, depth:2
+detect_error
+detect_error
+recover_to_previous state:5919, depth:2
+recover_to_previous state:7313, depth:2
+accept
+accept
+select_smaller_error symbol:compilation_unit, over_symbol:compilation_unit
+members-2-0
+HANDLE 38 39 14 6874 1
+MISSING 38 14 6783 182 7313 38 1
+HANDLE 40 46 182 5930 1
+HANDLE 38 39 14 6874 1
+MISSING 38 14 6783 182 7313 38 1
+HANDLE 40 46 182 5930 1
+
+detect_error
+recover_with_missing symbol:#endif, state:6979
+recover_to_previous state:6874, depth:2
+detect_error
+accept

@@ -1,0 +1,66 @@
+[
+  {
+    "id": "ts-newline-in",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "KR-0003",
+    "source": "type Easing = {\n  default: string\n  in: string\n  out: string\n}\n",
+    "sha256": "5ea3710f7074d1d368230ee1e7bdf20d855fa5e3e259f00b8dc59de61ea363a0"
+  },
+  {
+    "id": "ts-newline-optional-in",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "KR-0003",
+    "source": "interface Easing {\n  default: string\n  in?: string\n}\n",
+    "sha256": "2d9a64aab3c346b5c7555602956c354788ccb653dfc5679332219db6464a6855"
+  },
+  {
+    "id": "ts-binary-in",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "contextual-control",
+    "source": "const result = key\n  in object;\n",
+    "sha256": "89e94573313f662240db118ff1c0f6b09bd332873c544cb3fad5920c954b2c0b"
+  },
+  {
+    "id": "ts-semicolon-in",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "contextual-control",
+    "source": "type Easing = { default: string; in: string; out: string };\n",
+    "sha256": "e0d40be55bfa639775ab6fb7ea39cdbb0bfeed72742313057b058acfe8e02ae2"
+  },
+  {
+    "id": "tsx-newline-in",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "KR-0003",
+    "source": "type Easing = {\n  default: string\n  in: string\n  out: string\n}\n",
+    "sha256": "5ea3710f7074d1d368230ee1e7bdf20d855fa5e3e259f00b8dc59de61ea363a0"
+  },
+  {
+    "id": "tsx-newline-optional-in",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "KR-0003",
+    "source": "interface Easing {\n  default: string\n  in?: string\n}\n",
+    "sha256": "2d9a64aab3c346b5c7555602956c354788ccb653dfc5679332219db6464a6855"
+  },
+  {
+    "id": "tsx-binary-in",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "contextual-control",
+    "source": "const result = key\n  in object;\n",
+    "sha256": "89e94573313f662240db118ff1c0f6b09bd332873c544cb3fad5920c954b2c0b"
+  },
+  {
+    "id": "tsx-semicolon-in",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "contextual-control",
+    "source": "type Easing = { default: string; in: string; out: string };\n",
+    "sha256": "e0d40be55bfa639775ab6fb7ea39cdbb0bfeed72742313057b058acfe8e02ae2"
+  }
+]

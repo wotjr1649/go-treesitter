@@ -1,0 +1,10 @@
+enum-simple go= accepted_clean Cerror= False nodes= 14 14 first= -1
+enum-preprocessor go= accepted_with_errors Cerror= True nodes= 21 21 first= -1
+namespace-enum go= accepted_with_errors Cerror= True nodes= 27 27 first= -1
+excerpt-enum-only go= accepted_with_errors Cerror= True nodes= 23 55 first= 13
+excerpt-original go= accepted_with_errors Cerror= True nodes= 1919 2092 first= 5
+excerpt-no-directives go= accepted_clean Cerror= False nodes= 2056 2056 first= -1
+excerpt-no-enum go= accepted_clean Cerror= True nodes= 1910 2051 first= 5
+enum-incomplete go= accepted_with_errors Cerror= True nodes= 10 10 first= -1
+ts-property-in go= accepted_clean Cerror= False nodes= 34 34 first= -1
+ts-property-in-optional go= accepted_clean Cerror= False nodes= 17 17 first= -1

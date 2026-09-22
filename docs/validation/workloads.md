@@ -102,6 +102,19 @@ results and 21 incremental results against this set. This catalog does not
 change or widen any known-regression record. Bulk performance generators remain
 code-defined under Tier 4 rather than checked-in generated corpora.
 
+Session 07's separate `typescript-contextual-cases.json` adds eight authored LF
+inputs under this repository's MIT license. Each route (`.ts`, `.tsx`) contains
+newline-separated `in`, optional `in?`, binary `in` across a newline, and a
+semicolon-separated control. Each exact source has a SHA-256 in the catalog.
+`windows-c-ts-contextual/` retains fresh C observations from Phase 2. Four
+differences are independently bound by KR-0003; the other four must agree.
+
+`csharp-recovery-cases.json` holds the single `CS-excerpt-no-enum` derivative:
+remove the original excerpt's `internal enum` section through the next summary
+comment, retaining all other LF bytes. It retains the Newtonsoft MIT notice in
+`testdata/newtonsoft/LICENSE.md` and has its own exact source hash. The native C
+record is in `windows-c-cs-recovery/`; KR-0004 owns its distinct signature.
+
 ## What is deliberately absent
 
 - No fixture is copied from `code-map-memo`'s `.work/` run directories at runtime. If bytes are

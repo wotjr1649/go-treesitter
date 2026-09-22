@@ -1,0 +1,18 @@
+{
+  "base": "v0.53.0",
+  "adapter_commit": "62efcf9",
+  "variants": [
+    "eof-only",
+    "eof-no-compat"
+  ],
+  "backing_files": {
+    "D:\\AIDEV\\go-treesitter\\.scratch\\session07-probe\\frozen-internal-gtsadapter-adapter.go.txt": "0af3030fac8d3f214946614731f7e8d0590a3a5b5715c37720d3bf385942da58",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\session07-probe\\frozen-syntax-diagnostics.go.txt": "274f441d9bda7fb2233e1bdfc05ce55f3b8ddeeed00b9064d3eebf578adba565",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\session07-probe\\frozen-syntax-outcome.go.txt": "2c914015df2bc9d61ac43f6c52832f3b9ecc95f390588e83d10cb5a0687ea159",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\session07-probe\\frozen-syntax-parser.go.txt": "ce3c25c5e9e91f7227e207c061b89d522af064ed428dd0f01b68ee7fd2c95e4a",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\session07-probe\\frozen-syntax-result.go.txt": "26297e6f9ee276d8e24a4f4292dda4437c611048ed58f03d3ba23bb9323c25b9",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\session07-probe\\core-eof.go.txt": "7d2f6e5ccbb938b5ef4b5dc9029616cb34f0c0fc7cdfdcb2517c3fc18ef7a493",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\session07-probe\\csharp-no-compat.go.txt": "6d6793ec6e472529dbf3c0e079a3d1ea39b8b16f07d5e2387500e398b5be5522"
+  },
+  "purpose": "test public issue 1056 EOF sentinel/Accept hypothesis; not product adoption"
+}

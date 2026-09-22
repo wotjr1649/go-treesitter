@@ -35,3 +35,12 @@ artifacts/private/
 .local/
 .envrc
 .netrc
+
+# Rejected C# diagnostic implementation stays local; its observations are retained.
+/artifacts/session-07/phase2-correctness/defer-core.diff
+
+# Internal recovery traces are local investigation data, separate from testdata gates.
+/artifacts/session-07/phase2-correctness/csharp-recovery-trace-*.json
+/artifacts/session-07/phase2-correctness/csharp-reduction-matrix-*.json
+/artifacts/session-07/phase2-correctness/remaining-structure-*.json
+/artifacts/session-07/phase2-correctness/enum-raw-structure-*.json

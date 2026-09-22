@@ -1,63 +1,64 @@
 # Release-Critical status board
 
-Current state, not a promise. Updated when a gate moves; never used as evidence by itself.
-Gate definitions: `docs/specs/validation.md`. Baseline: `docs/specs/baseline-provenance.md`.
+Current state, not a promise. Gate definitions: `docs/specs/validation.md`.
+Baseline: unchanged, see `docs/specs/baseline-provenance.md` and identities.json.
+Last updated: 2026-09-22, Session 07.
 
-**Last updated:** 2026-09-22 (Session 06) · **Baseline:** unchanged, see identities.json.
+Development and Integration are green with exact known-difference ratchets.
+The public constructor and external-module consumer now exercise the result
+contract end to end. Release-Critical and Release have not passed.
 
-## Per-language state
+| Language | Development | Release-Critical | Current limitation |
+|---|---|---|---|
+| Go | green | not fully assessed | Registered fresh/edit snapshots agree with C for represented fields; finite corpus only. |
+| Python | green | not fully assessed | Registered fresh/edit snapshots agree with C; broader release corpus pending. |
+| JavaScript `.js` | green | not fully assessed | Registered fresh/edit controls agree; JSX text limitation is listed separately. |
+| TypeScript `.ts` | green, ratcheted | **red** | KR-0003: upstream Go grammar patch differs from original C grammar on newline `in` properties. |
+| JSX | green, ratcheted | **red** | KR-0001b `=` defect remains in the product runtime. |
+| TSX | green, ratcheted | **red** | KR-0001b and KR-0003. |
+| C# | green, ratcheted | **red** | KR-0002 recovered-tree difference and KR-0004 false-clean source reconstruction. |
 
-| Language | State | Development gate | Release-Critical gate | Notes |
-|---|---|---|---|---|
-| Go | `READY_FOR_NEXT_GATE` | green | not fully assessed | Phase 2 registered smoke tree equals C for represented fields, E5. |
-| Python | `READY_FOR_NEXT_GATE` | green | not fully assessed | Phase 2 registered smoke tree equals C, E5; larger corpus pending. |
-| JavaScript `.js` | `READY_FOR_NEXT_GATE` | green | not fully assessed | Phase 2 `.js` route equals C, E5; this smoke contains JSX. |
-| TypeScript `.ts` | `READY_FOR_NEXT_GATE` | green | not fully assessed | Phase 2 smoke and generic-arrow controls equal C, E5. |
-| C# | `BLOCKED_UPSTREAM` | green (ratcheted) | **red** | Phase 2: two corpus files equal C; excerpt recovery differs, KR-0002, E5. |
-| **JSX** | `BLOCKED_UPSTREAM` | green (ratcheted) | **red** | Phase 2 KR-0001b differential E5; product patch not adopted. |
-| **TSX** | `BLOCKED_UPSTREAM` | green (ratcheted) | **red** | Phase 2 KR-0001b differential E5; product patch not adopted. |
+All seven routes remain in scope. No blocked language was removed to pass a
+gate. Bare `&` remains erroneous in C and Go (KR-0001a); making it clean would
+break the characterization. No language has passed the full release assessment.
 
-`READY_FOR_NEXT_GATE` means "nothing known blocks moving to the next gate", **not** "passed".
-No language has passed the full Release-Critical gate. The 50-input oracle lane
-is a foundation for broader fresh-corpus, incremental and recovery coverage.
+## Independent phase evidence
 
-## Blocked ≠ removed
-
-All seven routes remain **in** the intended Release-Critical scope. The red languages are blocked by an upstream
-defect with a signature-matched ratchet. Removing them from scope would be a user-owned decision and
-a contract change — it is not something an implementation session may do to get a gate green.
-
-## Platform state
-
-| Platform | State |
+| Session 07 phase | What it establishes |
 |---|---|
-| `windows/amd64` | Tier-1. Phase 5 CGO-free build/vet/tests passed, E3. |
-| `windows/arm64` | CGO-free build passed; execution NOT_RUN. |
-| `linux`, `darwin`, `wasip1` | Out of first-release scope; no Session 06 execution claim. Linux/container is NOT_RUN. |
+| Phase 1 | Public API and actual external consumer, E3. |
+| Phase 2 | Fresh 94-input baseline/candidate/C comparison; four `=` inputs corrected only in the isolated scanner candidate, 90 snapshots unchanged. New KR-0003/4 retain their own C records and signatures, E5. C# diagnostic patches remain unsuitable for adoption. |
+| Phase 3 | Retained input/snapshot/work/memory admission limits, cancellation, ownership and worker tests; bounded fuzz and race diagnostics remain separately labeled. |
+| Phase 4 | 35 additional fresh C records and 21 incremental/fresh/C comparisons, E5; independent ABI/epoch/input checks reject coherent stale metadata. |
+| Phase 5 search | Optional immutable position/type index and five-sample lookup measurements on the declared Go workload, E4. |
+| Phase 5 bundle | Existing selected-grammar tags reduce one measured executable's size; C# parse cost remains high. |
+| Phase 5 runtime | Separate duplicate-cost-call candidate: measured allocation reduction; unchanged snapshots on its fixed 85-case set. It was not combined with the scanner patch or adopted. |
+| Phase 6 | MIT/notices, product graph and ordinary PE checks, consumer execution and CGO-free cross-links. Other native targets and remote CI remain NOT_RUN. |
 
-## Open items carried forward
+These are separate observations. A candidate or measurement does not inherit a
+different phase's result. Full commands, input hashes, failed attempts and limits
+are under `artifacts/session-07/` in the named phase.
 
-| ID | Item | Owner |
-|---|---|---|
-| `KR-0001a` | Bare `&` remains erroneous in both grammars' C and Go outputs, Phase 2 E5; recovered trees differ. | Do not make it clean. |
-| `KR-0001b` | Product ratchet active. Separate Phase 3 candidate corrects four inputs with 46 other Go snapshots unchanged. | Product adoption remains separate. |
-| `KR-0002` | C# excerpt: Go HasMissing=true/HasError=false; C has ERROR nodes and a different namespace end. Raw runtime reproduces Go shape. | Deeper recovery cause remains open. |
-| `KC-0001` | Existing corpus-specific compact declines remain characteristics, not scanner-patch targets. | upstream |
-| `OI-0001` | Earlier route-dependent HasError allegation remains unreproduced. Current C recovery difference has its own KR-0002 record. | upstream recovery investigation |
-| — | WP2: 50 checked-in records, exact inventory/build/input identities and Windows product comparisons implemented. | broader release corpus remains WP4/WP5 |
-| — | Phase 4 actually regenerates six grammars using a task-local CLI and compares 50 fresh C results per artifact set. | No generator release constant or epoch migration. |
+## Platform and packaging
 
-Fork recommendation: retain the minimal patch candidate and its retirement plan,
-prefer upstream contribution, and decide product adoption separately. An open issue
-without replies does not establish that upstream is not tracking it. No remote
-fork, push or product substitution occurred. Remote CI execution is NOT_RUN.
+| Target | State |
+|---|---|
+| Windows AMD64 | CGO=0 build, consumer execution, default/subset regression and vet passed, E3. Product graph excludes runtime/cgo; ordinary PE imports kernel32.dll only. |
+| Windows ARM64 | Ordinary CGO=0 executable linked; native execution NOT_RUN. |
+| Linux AMD64, Darwin ARM64, wasip1/wasm | Ordinary CGO=0 executables linked; execution NOT_RUN; outside first-release platform scope. |
+| Hosted CI / Linux C container | NOT_RUN. Windows native C is the executed oracle transport. |
 
-Evidence is phase-local under `artifacts/session-06/`. Phase 2 compares the
-baseline, Phase 3 evaluates the isolated patch, Phase 4 compares generator
-artifacts, and Phase 5 records the closing product regression. None implies
-query/supertype metadata coverage or release approval.
+Own code is MIT. Notices cover the runtime, six assessed grammars, C oracle and
+licensed corpus. The broader upstream default aggregate grammar catalog still
+needs a complete notice inventory for release; the selected assessed bundle is
+documented. Memory admission is not a hard process-RSS cap. Grammar caches,
+source copies, snapshots and aggregate worker memory need application budgets.
 
-## Update rule
+Prefer an upstream contribution for the small scanner fix. The C# scheduler and
+reconstruction changes require further upstream correction. TypeScript grammar
+patch reconciliation is a separate explicit oracle decision. Neither a remote
+fork nor a product runtime replacement was made. A local Go replace directive
+would not propagate to consuming modules. No release is approved.
 
-Update this file when a gate changes state, a ratchet is added or retired, or the baseline moves.
-Do not update it to record a single test run — that belongs in an `artifacts/handoff/` document.
+Update this board when a gate changes, a record is added/retired, or the baseline
+moves. Individual test runs belong in phase evidence.

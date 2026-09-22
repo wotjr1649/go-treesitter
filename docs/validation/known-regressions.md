@@ -261,12 +261,72 @@ C-comparison claim is made. Product baseline remains unchanged.
 The first Go missing node is `;` after `internal enum ReadType`, while C reports
 ERROR nodes later in the excerpt, including conditional enum members. The input
 does contain an enum body: no claim that it is an incomplete enum or invalid C#
-source is made. The exact internal recovery cause remains open. The difference
+source is made. Full recovery correction remains open. The difference
 originates in the pinned runtime, not the adapter; it is not a route-performance
 finding. The other two C# files agree for all represented node fields.
 
 The new register is separate from KR-0001 and does not widen it. Any changed
 digest, disappearing difference, new affected fixture or missing input fails.
+
+Session 07 Phase 2 independently narrowed the enum recovery difference to an
+eagerly advanced missing-token sibling competing before the equivalent native
+C version would be eligible. C# source reconstruction then rewrites the tree
+and can hide error state. A scheduling ablation plus a narrower reconstruction
+guard makes the enum-only control agree, but leaves 19 structural difference
+blocks in the full excerpt. This is a causal diagnosis, not a complete patch;
+neither diagnostic change is adopted. Exact traces, identities and rejected
+experiments are retained in that phase. The signature above is unchanged.
+
+## KR-0003 — TypeScript/TSX upstream grammar patch difference
+
+| Field | Value |
+|---|---|
+| Related upstream work | gotreesitter #1108, merged PR #1112; merge commit is an ancestor of the pinned baseline |
+| Baseline | Unchanged identities.json, including the existing TypeScript/TSX blobs |
+| Fixtures | `testdata/oracle/typescript-contextual-cases.json`, eight authored LF sources with per-source hashes |
+| Affected set | `ts-newline-in`, `ts-newline-optional-in`, `tsx-newline-in`, `tsx-newline-optional-in` only |
+| Go state | accepted_clean, accepted, full root, no error or missing nodes |
+| C state | full root with errors; ordered snapshot differs |
+| Controls | binary `in` across a newline and semicolon-separated `in` properties, in both routes, remain clean and equal |
+| Exact signatures | Four source/Go/C hashes in `testdata/oracle/typescript-contextual-differences.json` |
+| Evidence | Session 07 Phase 2, fresh Windows C execution and retained product test, E5 |
+| Release impact | TypeScript and TSX Release-Critical remain red until oracle policy and upstream grammar differences are resolved |
+| Retirement | Explicitly authorized grammar/oracle reconciliation followed by fresh exact comparisons; never silently add a C patch or make valid Go input erroneous |
+
+The upstream runtime includes a maintained TypeScript grammar/scanner patch.
+Its own C harness applies that patch too. Our current C receipts identify the
+original pinned grammar sources without that patch. PR #1112 explicitly limits
+its comparison to patched C. Consequently this record is a grammar-definition
+disagreement, not evidence that the Go port broke valid TypeScript. The earlier
+same-line `in` controls did not exercise the newline-sensitive scanner branch.
+
+Do not turn these clean Go parses into errors to imitate the unpatched C input.
+Do not add upstream's patch to C artifacts under the old identity. The present
+session changes neither side. Missing/changed signatures, a disappearing
+difference or an additional affected fixture fail the ratchet. This new record
+does not widen KR-0001 or KR-0002 and does not approve a release.
+
+## KR-0004 — C# source reconstruction hides a recovery error
+
+| Field | Value |
+|---|---|
+| Upstream issue | None filed; local bounded diagnosis, separate from KR-0002 |
+| Baseline | Unchanged identities.json and C# blob |
+| Fixture | `CS-excerpt-no-enum` in `testdata/oracle/csharp-recovery-cases.json`; original MIT excerpt with only the enum section removed |
+| Go state | accepted_clean, accepted, full root, HasError=false, HasMissing=false; 1,910 nodes |
+| C state | full root, HasError=true; 2,051 nodes |
+| Exact signature | Source and ordered Go/C hashes in `testdata/oracle/csharp-recovery-differences.json` |
+| Controls | Original excerpt retains KR-0002; directive-free diagnostic control remains clean and equal |
+| Evidence | Session 07 Phase 2, fresh native C and retained product comparison, E5 |
+| Release impact | C# Release-Critical remains red; accepted_clean is not a C# correctness guarantee on affected recovery shapes |
+| Retirement | Authorized runtime correction preserves actual recovery errors and matches C for this fixture plus affected controls; preserve this historical record |
+
+Disabling C# compatibility reconstruction exposes errors but still yields a
+different ordered tree. Reconstructing a plausible declaration structure is
+therefore not a safe correction. Neither an adapter rewrite nor a source-specific
+exception is adopted. The fixture is a reduction of the same licensed corpus,
+but its exact source and failure signature are a new record rather than an
+expansion of KR-0002. Every changed or disappearing signature fails the test.
 
 ## Known characteristics (not regressions, not defects)
 

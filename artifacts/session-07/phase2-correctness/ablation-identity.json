@@ -1,0 +1,8 @@
+{
+  "base_version": "v0.53.0",
+  "archive_sha256": "a7fc4a2f1b369542b14429c36a09a41d6db0bb0d2beec5844930b4a17c6ae3a6",
+  "files": 3275,
+  "changed_upstream_disk_files": 0,
+  "overlay_source_sha256": "6d6793ec6e472529dbf3c0e079a3d1ea39b8b16f07d5e2387500e398b5be5522",
+  "purpose": "diagnostic ablation; never a product candidate"
+}

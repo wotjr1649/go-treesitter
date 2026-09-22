@@ -1,0 +1,23 @@
+import hashlib,json,pathlib,sys
+root=pathlib.Path(__file__).resolve().parents[1]
+out=root/'artifacts/session-07/phase2-correctness'
+observed=json.loads((out/'typescript-upstream-check-01.json').read_text(encoding='utf-8'))
+sha=lambda data:hashlib.sha256(data).hexdigest()
+def save(path,value):
+    with path.open('x',encoding='utf-8',newline='\n') as f:json.dump(value,f,ensure_ascii=False,indent=2);f.write('\n')
+if sys.argv[1]=='cases':
+    cases=[]
+    for row in observed['rows']:
+        cases.append({'id':row['ID'],'language':'typescript' if row['Filename']=='x.ts' else 'tsx','filename':row['Filename'],'group':'KR-0003' if not row['equal'] else 'contextual-control','source':row['Source'],'sha256':row['source_sha256']})
+    save(root/'testdata/oracle/typescript-contextual-cases.json',cases)
+    print('8 authored LF cases; 4 contextual differences and 4 controls')
+elif sys.argv[1]=='differences':
+    differences={}
+    for row in observed['rows']:
+        if row['equal']:continue
+        digest=lambda nodes:sha(json.dumps(nodes,ensure_ascii=False,separators=(',',':')).encode())
+        differences[row['ID']]={'Record':'KR-0003','Source':row['source_sha256'],'GoDigest':digest(row['go']['Nodes']),'CDigest':digest(row['c']['nodes'])}
+    assert len(differences)==4
+    save(root/'testdata/oracle/typescript-contextual-differences.json',differences)
+    print('4 exact signatures retained; existing known records unchanged')
+else:raise ValueError('mode')
