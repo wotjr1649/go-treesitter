@@ -27,12 +27,24 @@ The actual producer version, executable hash, generated sources, ABI, compiler
 and binary are recorded. Unsupported ABI or CLI behavior fails the build.
 A successful generation does not automatically adopt a new digest set.
 
+Compare an existing and a newly produced set without adopting either:
+
+```powershell
+python tools/native-oracle/run.py compare --left testdata/oracle/windows-c --right .scratch/oracle/records-new
+```
+
+The command checks both inventories and identities, reports the first ordered
+difference, and fails on a changed tree or error state. Different producers and
+ABIs keep their separate build identities even when all snapshots are equal.
+
 Add a fixture by registering its exact UTF-8 source or licensed testdata path,
 hash, grammar, and filename in `cases.json`, then produce and review new records.
 The C driver limits inputs to 4 MiB, parsing to 10 seconds, tree depth to 4096
 and nodes to one million; the parent enforces an additional process timeout.
 
 `python -m unittest discover -s tools/native-oracle -v` checks tooling boundaries.
-The installed generator was unavailable in the Session 06 environment; actual
-regeneration is NOT_RUN, and no synthetic parser output substitutes for it.
+Session 06 initially found no installed CLI. Its later Phase 4 used a task-local
+official portable CLI to exercise actual JSON regeneration, six C builds and
+the 50-input comparison. The actual version is in that phase's receipt, never
+a version constant in the runner. No synthetic parser output substitutes for it.
 Linux and remote CI execution have independent receipts when run.

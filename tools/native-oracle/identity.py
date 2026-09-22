@@ -32,6 +32,8 @@ def generate(runtime_header, parser):
     command = shutil.which(os.environ.get('TREE_SITTER_CLI', 'tree-sitter'))
     if not command:
         raise ValueError('tree-sitter generator unavailable')
+    command = str(Path(command).resolve())
+    command_hash = hashlib.sha256(Path(command).read_bytes()).hexdigest()
     version = subprocess.check_output([command, '--version'], text=True, timeout=10).strip()
     if not version:
         raise ValueError('generator returned no version identity')
@@ -43,7 +45,9 @@ def generate(runtime_header, parser):
     subprocess.run([command, 'generate', '--abi', abi, str(grammar)],
                    cwd=parser.parent.parent, check=True, timeout=120)
     result = identity(runtime_header, parser, version)
-    result['generator_executable_sha256'] = hashlib.sha256(Path(command).read_bytes()).hexdigest()
+    if hashlib.sha256(Path(command).read_bytes()).hexdigest() != command_hash:
+        raise ValueError('generator changed during execution')
+    result['generator_executable_sha256'] = command_hash
     return result
 
 

@@ -1,4 +1,5 @@
 import io
+from contextlib import redirect_stdout
 import json
 from pathlib import Path
 import tarfile
@@ -9,6 +10,35 @@ import run
 
 
 class OracleBoundaryTest(unittest.TestCase):
+    def test_comparison_detects_tampering_and_semantic_change(self):
+        with tempfile.TemporaryDirectory(dir=run.ROOT / '.scratch') as work:
+            directories = [Path(work) / side for side in ('left', 'right')]
+            cases_path = Path(work) / 'cases.json'
+            run.write_new(cases_path, [c for c in run.read_json(run.ROOT / 'testdata/oracle/cases.json') if c['id'] == 'SM-GO'])
+            for directory in directories:
+                directory.mkdir()
+                for name in ('build.json', 'SM-GO.json'):
+                    (directory / name).write_bytes((run.ROOT / 'testdata/oracle/windows-c' / name).read_bytes())
+                run.write_new(directory / 'set.json', {'schema': 1, 'cases_sha256': run.sha(cases_path.read_bytes()),
+                              'files': {p.name: run.sha(p.read_bytes()) for p in directory.iterdir()}})
+            with redirect_stdout(io.StringIO()):
+                self.assertTrue(run.compare(*directories, cases_path))
+            record = directories[1] / 'SM-GO.json'
+            data = run.read_json(record)
+            data['has_error'] = True
+            record.write_text(json.dumps(data), encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'record file changed'):
+                run.compare(*directories, cases_path)
+            index_path = directories[1] / 'set.json'
+            index = run.read_json(index_path)
+            index['files']['SM-GO.json'] = run.sha(record.read_bytes())
+            index_path.write_text(json.dumps(index), encoding='utf-8')
+            with redirect_stdout(io.StringIO()):
+                self.assertFalse(run.compare(*directories, cases_path))
+            cases_path.write_text('[]', encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'fixture identity mismatch'):
+                run.compare(*directories, cases_path)
+
     def test_archive_and_fixture_boundaries(self):
         with tempfile.TemporaryDirectory(dir=run.ROOT / '.scratch') as work:
             folder = Path(work)

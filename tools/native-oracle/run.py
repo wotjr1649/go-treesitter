@@ -12,6 +12,7 @@ import platform
 import re
 import shutil
 import subprocess
+import sys
 import tarfile
 import urllib.request
 
@@ -147,6 +148,8 @@ def build(output, regenerate=False):
     compiler = shutil.which(os.environ.get('CC', 'gcc'))
     if not compiler:
         raise ValueError('C compiler unavailable')
+    compiler = str(Path(compiler).resolve())
+    compiler_hash = sha(Path(compiler).read_bytes())
     compiler_version = subprocess.check_output([compiler, '--version'], timeout=10).decode().splitlines()[0]
     runtime = WORK / 'runtime/lib'
     output.mkdir(parents=True)
@@ -176,9 +179,11 @@ def build(output, regenerate=False):
         print('built', language, artifact['abi'], flush=True)
     generated_files = {p.relative_to(output).as_posix(): sha(p.read_bytes())
                        for p in sorted((output / 'generated').rglob('*')) if p.is_file()} if regenerate else {}
+    if sha(Path(compiler).read_bytes()) != compiler_hash:
+        raise ValueError('compiler changed during build')
     write_new(output / 'build.json', {'schema': 1, 'pins': pins, 'sources': locks, 'generated_sources': generated_files,
               'driver_sha256': sha(Path(__file__).with_name('driver.c').read_bytes()),
-              'compiler': compiler_version, 'compiler_sha256': sha(Path(compiler).read_bytes()),
+              'compiler': compiler_version, 'compiler_sha256': compiler_hash,
               'os': platform.system(), 'arch': platform.machine(), 'grammars': records})
 
 
@@ -191,7 +196,12 @@ def fixtures(path):
         seen.add(case['id'])
         if ('source' in case) == ('path' in case):
             raise ValueError('fixture needs exactly one source')
-        data = case['source'].encode('utf-8') if 'source' in case else bounded(ROOT / case['path']).read_bytes()
+        if 'source' in case:
+            data = case['source'].encode('utf-8')
+        else:
+            path = bounded(ROOT / case['path'], ROOT / 'testdata')
+            with path.open('rb') as stream:
+                data = stream.read(4 * 1024 * 1024 + 1)
         data.decode('utf-8')
         if len(data) > 4 * 1024 * 1024 or sha(data) != case['sha256']:
             raise ValueError('fixture size/hash mismatch: ' + case['id'])
@@ -227,13 +237,68 @@ def record(build_dir, cases_path, output):
     print('recorded', len(cases), 'fixtures', flush=True)
 
 
+def compare(left, right, cases_path=ROOT / 'testdata/oracle/cases.json'):
+    """Compare complete records without transferring one build's identity."""
+    def load(directory):
+        directory = bounded(directory)
+        index = read_json(directory / 'set.json')
+        if index['schema'] != 1 or {p.name for p in directory.iterdir()} != set(index['files']) | {'set.json'}:
+            raise ValueError('record inventory changed')
+        records = {}
+        build_hash = index['files']['build.json']
+        for name, digest in index['files'].items():
+            path = bounded(directory / name, directory)
+            if sha(path.read_bytes()) != digest:
+                raise ValueError('record file changed')
+            if name == 'build.json':
+                continue
+            r = read_json(path)
+            if (r['build_sha256'] != build_hash or r['schema'] != 1 or
+                    r['start'] != 0 or r['end'] != r['input_bytes'] or not r['nodes'] or
+                    r['nodes_sha256'] != sha(json.dumps(r['nodes'], ensure_ascii=False, separators=(',', ':')).encode())):
+                raise ValueError('invalid or incomplete C receipt')
+            if r['fixture'] in records or name != r['fixture'] + '.json':
+                raise ValueError('duplicate/invalid C fixture')
+            records[r['fixture']] = r
+        return index, read_json(directory / 'build.json'), records
+    li, lb, lr = load(left)
+    ri, rb, rr = load(right)
+    cases = {c['id']: c for c, _ in fixtures(cases_path)}
+    if (not cases or li['cases_sha256'] != ri['cases_sha256'] or
+            li['cases_sha256'] != sha(cases_path.read_bytes()) or lb['pins'] != rb['pins'] or
+            lr.keys() != rr.keys() or lr.keys() != cases.keys()):
+        raise ValueError('comparison epoch/fixture identity mismatch')
+    rows = []
+    for name, a in lr.items():
+        b = rr[name]
+        if a['source_sha256'] != cases[name]['sha256'] or a['language'] != cases[name]['language']:
+            raise ValueError('comparison catalog identity mismatch')
+        if any(a[key] != b[key] for key in ('language', 'source_sha256', 'input_bytes')):
+            raise ValueError('comparison input identity mismatch')
+        first = next((i for i, (x, y) in enumerate(zip(a['nodes'], b['nodes'])) if x != y), -1)
+        if first < 0 and len(a['nodes']) != len(b['nodes']):
+            first = min(len(a['nodes']), len(b['nodes']))
+        row = {'fixture': name, 'source_sha256': a['source_sha256'],
+               'left_digest': a['nodes_sha256'], 'right_digest': b['nodes_sha256'],
+               'equal': first == -1 and a['has_error'] == b['has_error'], 'first_difference': first}
+        if first >= 0:
+            row.update(left=a['nodes'][first] if first < len(a['nodes']) else None,
+                       right=b['nodes'][first] if first < len(b['nodes']) else None)
+        rows.append(row)
+    print(json.dumps({'left_build': li['files']['build.json'], 'right_build': ri['files']['build.json'],
+                      'comparisons': rows}, ensure_ascii=False, indent=2))
+    return all(row['equal'] for row in rows)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=['prepare', 'build', 'record'])
+    parser.add_argument('action', choices=['prepare', 'build', 'record', 'compare'])
     parser.add_argument('--build', type=Path)
     parser.add_argument('--cases', type=Path, default=ROOT / 'testdata/oracle/cases.json')
     parser.add_argument('--output', type=Path)
     parser.add_argument('--generate', action='store_true', help='regenerate copied grammar JSON with the currently resolved CLI')
+    parser.add_argument('--left', type=Path)
+    parser.add_argument('--right', type=Path)
     args = parser.parse_args()
     if args.action == 'prepare':
         prepare()
@@ -241,5 +306,7 @@ if __name__ == '__main__':
         build(args.output, args.generate)
     elif args.action == 'record' and args.build and args.output:
         record(args.build, args.cases, args.output)
+    elif args.action == 'compare' and args.left and args.right:
+        sys.exit(0 if compare(args.left, args.right, args.cases) else 1)
     else:
         parser.error('build needs --output; record needs --build and --output')

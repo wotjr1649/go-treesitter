@@ -1,0 +1,9 @@
+Warning: rule `_type` is both a supertype and inlined. the supertype is ignored.
+built go 15
+Warning: rule `_simple_statement` is both a supertype and inlined. the supertype is ignored.
+Warning: rule `_compound_statement` is both a supertype and inlined. the supertype is ignored.
+built python 15
+built javascript 15
+built typescript 15
+built tsx 15
+built c_sharp 15
