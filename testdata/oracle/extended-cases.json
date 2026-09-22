@@ -1,0 +1,408 @@
+[
+  {
+    "id": "EXT-GO",
+    "language": "go",
+    "filename": "x.go",
+    "group": "extended",
+    "source": "package p\r\n// π\r\nfunc target(x int) int { return x + 1 }\r\n",
+    "sha256": "de27d1746b340363db6a6ef978a227749fad2c2f71cea89fd48f9d7cf83a2821"
+  },
+  {
+    "id": "EXT-GO-RENAME",
+    "language": "go",
+    "filename": "x.go",
+    "group": "extended",
+    "source": "package p\r\n// π\r\nfunc renamed(x int) int { return x + 1 }\r\n",
+    "sha256": "0a125f2db17a8e5d2d1979a8c6fa7322121b2f184f330f8271f5861cf78503af",
+    "previous": "EXT-GO",
+    "edit": {
+      "StartByte": 23,
+      "OldEndByte": 29,
+      "NewEndByte": 30
+    }
+  },
+  {
+    "id": "EXT-GO-INSERT",
+    "language": "go",
+    "filename": "x.go",
+    "group": "extended",
+    "source": "package p\r\n// 추가\r\n// π\r\nfunc target(x int) int { return x + 1 }\r\n",
+    "sha256": "e0c91411c5a070c49c7b27b686bb6015ae3d0f75eaa5fd8e9c922f8f2e75cf98",
+    "previous": "EXT-GO",
+    "edit": {
+      "StartByte": 11,
+      "OldEndByte": 11,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "EXT-GO-DELETE",
+    "language": "go",
+    "filename": "x.go",
+    "group": "extended",
+    "source": "package p\r\n// π\r\nfunc target(x int) int { return x + 1 }",
+    "sha256": "dd42bbf4bf57097270a8ac2bdf25d71ae9533744f50597eec4c63ff4e52a29fb",
+    "previous": "EXT-GO",
+    "edit": {
+      "StartByte": 57,
+      "OldEndByte": 59,
+      "NewEndByte": 57
+    }
+  },
+  {
+    "id": "EXT-GO-WIDE",
+    "language": "go",
+    "filename": "x.go",
+    "group": "extended",
+    "source": "// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\npackage p\n// π\nfunc target(x int) int { return x + 1 }\n",
+    "sha256": "a9844a8dcdc0a79dfebe9f03992de26c4f2467e94c9858427a7266cc396597ba"
+  },
+  {
+    "id": "EXT-PY",
+    "language": "python",
+    "filename": "x.py",
+    "group": "extended",
+    "source": "# π\r\ndef target(x):\r\n    return x + 1\r\n",
+    "sha256": "ad40d61ac60a1ebb918272ee3d7830749dd2d0d9775580f71b2e04cfe8f4ec24"
+  },
+  {
+    "id": "EXT-PY-RENAME",
+    "language": "python",
+    "filename": "x.py",
+    "group": "extended",
+    "source": "# π\r\ndef renamed(x):\r\n    return x + 1\r\n",
+    "sha256": "b8d4e569bb4d9aeff51a834a616faed3600efdebce773ecbed734c8725443c35",
+    "previous": "EXT-PY",
+    "edit": {
+      "StartByte": 10,
+      "OldEndByte": 16,
+      "NewEndByte": 17
+    }
+  },
+  {
+    "id": "EXT-PY-INSERT",
+    "language": "python",
+    "filename": "x.py",
+    "group": "extended",
+    "source": "# π\r\n# 추가\r\ndef target(x):\r\n    return x + 1\r\n",
+    "sha256": "2c20cd432e36e6b9d8c07c95e23b05faad84dcc3ed97fa1882fcfb3569ecf9c8",
+    "previous": "EXT-PY",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 6,
+      "NewEndByte": 16
+    }
+  },
+  {
+    "id": "EXT-PY-DELETE",
+    "language": "python",
+    "filename": "x.py",
+    "group": "extended",
+    "source": "# π\r\ndef target(x):\r\n    return x + 1",
+    "sha256": "df781285a28f7ed24bcbe91a41beda8cd5a06b24b6d201ebdb7578ff4b029b26",
+    "previous": "EXT-PY",
+    "edit": {
+      "StartByte": 38,
+      "OldEndByte": 40,
+      "NewEndByte": 38
+    }
+  },
+  {
+    "id": "EXT-PY-WIDE",
+    "language": "python",
+    "filename": "x.py",
+    "group": "extended",
+    "source": "# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# item\n# π\ndef target(x):\n    return x + 1\n",
+    "sha256": "2ae296327fc063ad02eab9da9c03771b5f23fe2ea19cf34c15a5d42459dd9d53"
+  },
+  {
+    "id": "EXT-JS",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "extended",
+    "source": "// π\r\nconst target = x => x + 1;\r\n",
+    "sha256": "721bf030a406d80f06f547bfbfb93501dcea5b9f28cee2cab4497813f6942131"
+  },
+  {
+    "id": "EXT-JS-RENAME",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "extended",
+    "source": "// π\r\nconst renamed = x => x + 1;\r\n",
+    "sha256": "ed34e104c146c880a9e4487d15e750f9ef7708c7c7465bb2eafb9004cedf9f5d",
+    "previous": "EXT-JS",
+    "edit": {
+      "StartByte": 13,
+      "OldEndByte": 19,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "EXT-JS-INSERT",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "extended",
+    "source": "// π\r\n// 추가\r\nconst target = x => x + 1;\r\n",
+    "sha256": "2b2d846e0bce8a292c5c37ba50c840ac3e3c89c1f403da92d28e21939b27232f",
+    "previous": "EXT-JS",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 7,
+      "NewEndByte": 18
+    }
+  },
+  {
+    "id": "EXT-JS-DELETE",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "extended",
+    "source": "// π\r\nconst target = x => x + 1;",
+    "sha256": "428cf2207b40d92f2296050cc72af00fbec4af82c4e6573e6869747c65f67396",
+    "previous": "EXT-JS",
+    "edit": {
+      "StartByte": 33,
+      "OldEndByte": 35,
+      "NewEndByte": 33
+    }
+  },
+  {
+    "id": "EXT-JS-WIDE",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "extended",
+    "source": "// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// π\nconst target = x => x + 1;\n",
+    "sha256": "ae796dcb9c3f4bf922bb3d1fae8fe193f8319cebd2f55d40a75712b3d70e9ecb"
+  },
+  {
+    "id": "EXT-JSX",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "extended",
+    "source": "// π\r\nconst target = () => <span title=\"é\">hello</span>;\r\n",
+    "sha256": "41ee2d58215625980797bd974378c605867d713505405f80823398a747b64125"
+  },
+  {
+    "id": "EXT-JSX-RENAME",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "extended",
+    "source": "// π\r\nconst renamed = () => <span title=\"é\">hello</span>;\r\n",
+    "sha256": "733658a50392d9e082da3dc97e9c672ceae408e11fa93b80a83fdbbe37a745ac",
+    "previous": "EXT-JSX",
+    "edit": {
+      "StartByte": 13,
+      "OldEndByte": 19,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "EXT-JSX-INSERT",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "extended",
+    "source": "// π\r\n// 추가\r\nconst target = () => <span title=\"é\">hello</span>;\r\n",
+    "sha256": "e50b5741dc7a24385f8fe3d158cbe2c4b1209a8889966e95923cc9716f2e3ec3",
+    "previous": "EXT-JSX",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 7,
+      "NewEndByte": 18
+    }
+  },
+  {
+    "id": "EXT-JSX-DELETE",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "extended",
+    "source": "// π\r\nconst target = () => <span title=\"é\">hello</span>;",
+    "sha256": "f2306d0cafbefb19a2e61b1f7b9ec058fe19ce19a7d8d56a64d739e9fc86e280",
+    "previous": "EXT-JSX",
+    "edit": {
+      "StartByte": 58,
+      "OldEndByte": 60,
+      "NewEndByte": 58
+    }
+  },
+  {
+    "id": "EXT-JSX-WIDE",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "extended",
+    "source": "// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// π\nconst target = () => <span title=\"é\">hello</span>;\n",
+    "sha256": "0f5407bee55a34294c09957f61e4992a5857e2f97b5e6ae73724d96f016d43ae"
+  },
+  {
+    "id": "EXT-TS",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "extended",
+    "source": "// π\r\ntype T = typeof a.b;\r\nconst target: number = 1;\r\n",
+    "sha256": "9b3344189b94b3e04b7bf6b6256f0a9f165269843707d1351b42143e8a8576dc"
+  },
+  {
+    "id": "EXT-TS-RENAME",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "extended",
+    "source": "// π\r\ntype T = typeof a.b;\r\nconst renamed: number = 1;\r\n",
+    "sha256": "174efdcb10679aaf7cc396c1d43d24ba3f1ce94ee50549dd9b9df7ded61bc7e5",
+    "previous": "EXT-TS",
+    "edit": {
+      "StartByte": 35,
+      "OldEndByte": 41,
+      "NewEndByte": 42
+    }
+  },
+  {
+    "id": "EXT-TS-INSERT",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "extended",
+    "source": "// π\r\n// 추가\r\ntype T = typeof a.b;\r\nconst target: number = 1;\r\n",
+    "sha256": "43b92b197f63aff5eccffac15fc29e58b03eea9dd9e935873a395ddf43a2c4be",
+    "previous": "EXT-TS",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 7,
+      "NewEndByte": 18
+    }
+  },
+  {
+    "id": "EXT-TS-DELETE",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "extended",
+    "source": "// π\r\ntype T = typeof a.b;\r\nconst target: number = 1;",
+    "sha256": "ed8a3ae80892b7c14341d21f798d21432e3efebf1ad9fa7c84288f9eada56967",
+    "previous": "EXT-TS",
+    "edit": {
+      "StartByte": 54,
+      "OldEndByte": 56,
+      "NewEndByte": 54
+    }
+  },
+  {
+    "id": "EXT-TS-WIDE",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "extended",
+    "source": "// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// π\ntype T = typeof a.b;\nconst target: number = 1;\n",
+    "sha256": "f84bafa440f5d4e924477ac7c3c7d7fdfd8e72932d43ae791d1e377e8d4401e5"
+  },
+  {
+    "id": "EXT-TSX",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "extended",
+    "source": "// π\r\nconst target = (x: number) => <span>{x}</span>;\r\n",
+    "sha256": "ccb4e80a64ed589464c2dcbe845762a63329dd370d3ce096ea451657faccbac1"
+  },
+  {
+    "id": "EXT-TSX-RENAME",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "extended",
+    "source": "// π\r\nconst renamed = (x: number) => <span>{x}</span>;\r\n",
+    "sha256": "a7583c9090d7f7a9392390ae7aeb3aefb0f0d154744432f1f67f2c4787554953",
+    "previous": "EXT-TSX",
+    "edit": {
+      "StartByte": 13,
+      "OldEndByte": 19,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "EXT-TSX-INSERT",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "extended",
+    "source": "// π\r\n// 추가\r\nconst target = (x: number) => <span>{x}</span>;\r\n",
+    "sha256": "2b4f463913e48015091c1544f8c7cc2d218faf95c6e6d501c19e62a521e5149a",
+    "previous": "EXT-TSX",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 7,
+      "NewEndByte": 18
+    }
+  },
+  {
+    "id": "EXT-TSX-DELETE",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "extended",
+    "source": "// π\r\nconst target = (x: number) => <span>{x}</span>;",
+    "sha256": "a6a6528c32289dc6c25dad3ba26a4849eaf56d5a839da4d91ba29a5147f13ed5",
+    "previous": "EXT-TSX",
+    "edit": {
+      "StartByte": 54,
+      "OldEndByte": 56,
+      "NewEndByte": 54
+    }
+  },
+  {
+    "id": "EXT-TSX-WIDE",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "extended",
+    "source": "// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// π\nconst target = (x: number) => <span>{x}</span>;\n",
+    "sha256": "c4db4657b34a454eb8555277a5b4d05cd63f8f17003bdfb1cc005d898bc5cca2"
+  },
+  {
+    "id": "EXT-CS",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "extended",
+    "source": "// π\r\nclass target { public int F(int x) => x + 1; }\r\n",
+    "sha256": "8de5a99c2ebaf4d7d70547ecdf706aeca9e6c012c7ad261d464ffab8343f34cd"
+  },
+  {
+    "id": "EXT-CS-RENAME",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "extended",
+    "source": "// π\r\nclass renamed { public int F(int x) => x + 1; }\r\n",
+    "sha256": "86d10656ad8b0e9ea9e8c45c2ee9d62e7cca21bd4a11671bf3407730246880dc",
+    "previous": "EXT-CS",
+    "edit": {
+      "StartByte": 13,
+      "OldEndByte": 19,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "EXT-CS-INSERT",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "extended",
+    "source": "// π\r\n// 추가\r\nclass target { public int F(int x) => x + 1; }\r\n",
+    "sha256": "34f19f9994ee544a6726890d4c425a9db8b51d68f6e47c3608e29d380a85f0b2",
+    "previous": "EXT-CS",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 7,
+      "NewEndByte": 18
+    }
+  },
+  {
+    "id": "EXT-CS-DELETE",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "extended",
+    "source": "// π\r\nclass target { public int F(int x) => x + 1; }",
+    "sha256": "db433158b159bb2f21088d5a7b8414041f6bda86fcaa996a0bd0c489c6342130",
+    "previous": "EXT-CS",
+    "edit": {
+      "StartByte": 53,
+      "OldEndByte": 55,
+      "NewEndByte": 53
+    }
+  },
+  {
+    "id": "EXT-CS-WIDE",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "extended",
+    "source": "// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// item\n// π\nclass target { public int F(int x) => x + 1; }\n",
+    "sha256": "293fa5bba36eda4b5a213993650bc37d94523a176cc319856547d468418ee28c"
+  }
+]

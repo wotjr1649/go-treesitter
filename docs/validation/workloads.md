@@ -87,6 +87,21 @@ The JSON identifies each exact UTF-8 byte sequence without newline conversion.
 manifest. These are oracle observations, not assertions that the Go runtime
 agrees. Every comparison must check identities and completeness before trees.
 
+Session 07 adds a separate `testdata/oracle/extended-cases.json` catalog with
+35 repository-authored fixed inputs (30,072 UTF-8 bytes in total). For each of
+the seven routes it contains a UTF-8/CRLF base, length-changing identifier
+rename, UTF-8 comment-row insertion, trailing-CRLF deletion, and a fixed
+513-comment sibling boundary input. CRLF is intentional source content encoded
+inside LF JSON; source SHA-256 checks include those CR bytes. The TypeScript
+base includes `type T = typeof a.b` to exercise field/alias edges. The three
+edit variants identify their exact previous fixture and byte ranges.
+
+`testdata/oracle/windows-c-extended/` stores the independently executed Session
+07 C records and their own build identity. Product tests compare 35 fresh
+results and 21 incremental results against this set. This catalog does not
+change or widen any known-regression record. Bulk performance generators remain
+code-defined under Tier 4 rather than checked-in generated corpora.
+
 ## What is deliberately absent
 
 - No fixture is copied from `code-map-memo`'s `.work/` run directories at runtime. If bytes are

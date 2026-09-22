@@ -72,10 +72,12 @@ documents intentionally excluded from Git. Retained test evidence is under
 `artifacts/session-05/` and `artifacts/session-06/`. See `experiments/v052-v053/`
 for the older runtime comparison.
 
-Product tests include 50 source-bound C oracle records without invoking a C
+Product tests include 85 source-bound C oracle records without invoking a C
 compiler. [Oracle tooling](tools/native-oracle/README.md) documents producing
 new records, using an updated generator, and comparing artifacts before adoption.
 Generator selection has no release constant; runtime/grammar identities remain
 pinned. The [isolated scanner evaluation](artifacts/session-06/phase3/patch-decision.md)
 records the candidate patch recommendation and its limits. The product runtime
 still contains the registered JSX/TSX and C# blockers.
+The separate extended catalog adds 35 fresh comparisons and 21 edit comparisons
+over all seven routes, including UTF-8/CRLF and wide sibling boundaries.

@@ -24,6 +24,8 @@ import (
 type oracleCase struct {
 	ID, Language, Filename, Group, SHA256 string
 	Source, Path                          *string
+	Previous                              string
+	Edit                                  *syntax.Edit
 }
 
 type oracleRecord struct {
@@ -39,6 +41,19 @@ type oracleRecord struct {
 	Nodes             []syntax.Node
 }
 
+type oracleABI struct {
+	Min    int    `json:"runtime_abi_min"`
+	Max    int    `json:"runtime_abi_max"`
+	Header string `json:"runtime_header_sha256"`
+}
+
+func checkOracleABI(abi int, artifact, anchor oracleABI) error {
+	if artifact != anchor || abi < anchor.Min || abi > anchor.Max {
+		return fmt.Errorf("oracle runtime ABI identity mismatch")
+	}
+	return nil
+}
+
 func nodeDigest(nodes []syntax.Node) string {
 	var buffer bytes.Buffer
 	encoder := json.NewEncoder(&buffer)
@@ -47,6 +62,30 @@ func nodeDigest(nodes []syntax.Node) string {
 		panic(err) // Only fixed scalar fields are encoded.
 	}
 	return fmt.Sprintf("%x", sha256.Sum256(bytes.TrimSuffix(buffer.Bytes(), []byte{'\n'})))
+}
+
+func logNodeDifference(t *testing.T, label string, left, right []syntax.Node) int {
+	t.Helper()
+	first := -1
+	for i := 0; i < min(len(left), len(right)); i++ {
+		if left[i] != right[i] {
+			first = i
+			break
+		}
+	}
+	if first < 0 && len(left) != len(right) {
+		first = min(len(left), len(right))
+	}
+	t.Logf("%s left_len=%d right_len=%d left_digest=%s right_digest=%s first=%d", label, len(left), len(right), nodeDigest(left), nodeDigest(right), first)
+	if first >= 0 {
+		if first < len(left) {
+			t.Logf("left[%d]=%+v", first, left[first])
+		}
+		if first < len(right) {
+			t.Logf("right[%d]=%+v", first, right[first])
+		}
+	}
+	return first
 }
 
 func validateOracle(c oracleCase, source []byte, r oracleRecord, buildHash string, abi int) error {
@@ -74,9 +113,17 @@ func TestOracleRecords(t *testing.T) {
 	runOracleRecords(t, false)
 }
 
+func TestExtendedOracleRecords(t *testing.T) {
+	runOracleCorpus(t, false, "testdata/oracle/extended-cases.json", "testdata/oracle/windows-c-extended", "")
+}
+
 // Candidate mode is called only by the opt-in oracle_experiment build-tag test.
 // Product tests always require the unmodified module and recorded differences.
 func runOracleRecords(t *testing.T, candidate bool) {
+	runOracleCorpus(t, candidate, "testdata/oracle/cases.json", "testdata/oracle/windows-c", "testdata/oracle/known-differences.json")
+}
+
+func runOracleCorpus(t *testing.T, candidate bool, casesPath, recordsDir, differencesPath string) {
 	root, err := filepath.Abs(filepath.Join("..", ".."))
 	if err != nil {
 		t.Fatal(err)
@@ -100,11 +147,32 @@ func runOracleRecords(t *testing.T, candidate bool) {
 		Schema   int
 		Pins     provenance.Identities
 		OS       string
-		Grammars map[string]struct{ ABI int }
+		Grammars map[string]struct {
+			ABI int
+			oracleABI
+		}
 	}
-	manifest := read("testdata/oracle/windows-c/build.json", &build)
+	manifest := read(recordsDir+"/build.json", &build)
 	if build.Schema != 1 || build.OS != "Windows" || !reflect.DeepEqual(build.Pins, pins) || len(build.Grammars) != len(pins.Grammars) {
 		t.Fatal("oracle epoch/build identity mismatch")
+	}
+	var anchor struct {
+		Schema        int
+		RuntimeCommit string `json:"runtime_commit"`
+		oracleABI
+	}
+	read("testdata/oracle/runtime-abi.json", &anchor)
+	if anchor.Schema != 1 || anchor.RuntimeCommit != pins.Oracle.RuntimeCommit {
+		t.Fatal("oracle ABI anchor epoch mismatch")
+	}
+	for language := range pins.Grammars {
+		artifact, exists := build.Grammars[language]
+		if !exists {
+			t.Fatal("missing oracle grammar")
+		}
+		if err := checkOracleABI(artifact.ABI, artifact.oracleABI, anchor.oracleABI); err != nil {
+			t.Fatal(err)
+		}
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
@@ -133,17 +201,17 @@ func runOracleRecords(t *testing.T, candidate bool) {
 		}
 	}
 	var cases []oracleCase
-	casesJSON := read("testdata/oracle/cases.json", &cases)
+	casesJSON := read(casesPath, &cases)
 	var set struct {
 		Schema      int
 		CasesSHA256 string `json:"cases_sha256"`
 		Files       map[string]string
 	}
-	read("testdata/oracle/windows-c/set.json", &set)
+	read(recordsDir+"/set.json", &set)
 	if set.Schema != 1 || set.CasesSHA256 != fmt.Sprintf("%x", sha256.Sum256(casesJSON)) || len(set.Files) != len(cases)+1 {
 		t.Fatal("fixture inventory identity mismatch")
 	}
-	entries, err := os.ReadDir(filepath.Join(root, "testdata/oracle/windows-c"))
+	entries, err := os.ReadDir(filepath.Join(root, recordsDir))
 	if err != nil || len(entries) != len(set.Files)+1 {
 		t.Fatal("oracle file set changed")
 	}
@@ -151,7 +219,7 @@ func runOracleRecords(t *testing.T, candidate bool) {
 		if filepath.Base(name) != name {
 			t.Fatal("invalid record path")
 		}
-		data, err := os.ReadFile(filepath.Join(root, "testdata/oracle/windows-c", name))
+		data, err := os.ReadFile(filepath.Join(root, recordsDir, name))
 		if err != nil || fmt.Sprintf("%x", sha256.Sum256(data)) != hash {
 			t.Fatalf("record file identity mismatch: %s", name)
 		}
@@ -159,11 +227,17 @@ func runOracleRecords(t *testing.T, candidate bool) {
 	var differences map[string]struct {
 		Record, Source, GoDigest, CDigest string
 	}
-	read("testdata/oracle/known-differences.json", &differences)
+	if differencesPath != "" {
+		read(differencesPath, &differences)
+	}
 	if len(cases) == 0 {
 		t.Fatal("missing fixture set")
 	}
 	seen := map[string]bool{}
+	byID := map[string]oracleCase{}
+	for _, c := range cases {
+		byID[c.ID] = c
+	}
 	idPattern := regexp.MustCompile(`^[A-Za-z0-9_-]+$`)
 	buildHash := fmt.Sprintf("%x", sha256.Sum256(manifest))
 	for _, c := range cases {
@@ -193,7 +267,7 @@ func runOracleRecords(t *testing.T, candidate bool) {
 				}
 			}
 			var receipt oracleRecord
-			read("testdata/oracle/windows-c/"+c.ID+".json", &receipt)
+			read(recordsDir+"/"+c.ID+".json", &receipt)
 			if err := validateOracle(c, source, receipt, buildHash, build.Grammars[c.Language].ABI); err != nil {
 				t.Fatal(err)
 			}
@@ -205,6 +279,36 @@ func runOracleRecords(t *testing.T, candidate bool) {
 				t.Fatalf("incomplete Go receipt: %+v error=%T", result.Diagnostics, err)
 			}
 			goNodes := result.Tree.Nodes()
+			if (c.Previous == "") != (c.Edit == nil) {
+				t.Fatal("incomplete edit fixture")
+			}
+			if c.Previous != "" {
+				previous, ok := byID[c.Previous]
+				if !ok || previous.Source == nil || previous.Language != c.Language ||
+					fmt.Sprintf("%x", sha256.Sum256([]byte(*previous.Source))) != previous.SHA256 {
+					t.Fatal("invalid previous fixture identity")
+				}
+				old, err := (Adapter{}).Parse(context.Background(), syntax.Request{Filename: previous.Filename, Source: []byte(*previous.Source), Timeout: 10 * time.Second})
+				if old.Tree != nil {
+					defer old.Tree.Close()
+				}
+				if err != nil || !old.Complete() || old.Outcome != syntax.AcceptedClean {
+					t.Fatal("incomplete previous tree")
+				}
+				inc, err := (Adapter{}).Parse(context.Background(), syntax.Request{Filename: c.Filename, Source: source, Previous: old.Tree, Edit: c.Edit, Timeout: 10 * time.Second})
+				if inc.Tree != nil {
+					defer inc.Tree.Close()
+				}
+				if err != nil || !inc.Complete() {
+					t.Fatalf("incomplete incremental tree: %+v", inc.Diagnostics)
+				}
+				t.Logf("incremental source=%s nodes=%d digest=%s diagnostics=%+v", c.SHA256, len(inc.Tree.Nodes()), nodeDigest(inc.Tree.Nodes()), inc.Diagnostics)
+				incFresh := logNodeDifference(t, "incremental/fresh", inc.Tree.Nodes(), goNodes)
+				incC := logNodeDifference(t, "incremental/C", inc.Tree.Nodes(), receipt.Nodes)
+				if incFresh >= 0 || incC >= 0 || (inc.HasError || inc.HasMissing) != receipt.HasError {
+					t.Fatal("incremental/fresh/C ordered tree or error-state difference")
+				}
+			}
 			first := -1
 			for i := 0; i < min(len(goNodes), len(receipt.Nodes)); i++ {
 				if goNodes[i] != receipt.Nodes[i] {
@@ -293,6 +397,18 @@ func TestCSharpRecoveryOrigin(t *testing.T) {
 }
 
 func TestOracleRejectsChangedEvidence(t *testing.T) {
+	anchor := oracleABI{Min: 13, Max: 15, Header: "fixed-header"}
+	if err := checkOracleABI(15, anchor, anchor); err != nil {
+		t.Fatal(err)
+	}
+	for _, artifact := range []oracleABI{{Min: 999, Max: 999, Header: "fixed-header"}, {Min: 13, Max: 15, Header: "changed-header"}} {
+		if checkOracleABI(artifact.Max, artifact, anchor) == nil {
+			t.Fatal("coherently changed ABI accepted")
+		}
+	}
+	if checkOracleABI(16, anchor, anchor) == nil {
+		t.Fatal("unsupported ABI accepted")
+	}
 	source := []byte("x")
 	c := oracleCase{ID: "check", Language: "go", SHA256: fmt.Sprintf("%x", sha256.Sum256(source))}
 	r := oracleRecord{Schema: 1, Fixture: c.ID, Language: c.Language, ABI: 15, InputBytes: 1, SourceSHA256: c.SHA256, BuildSHA256: "build", End: 1, Nodes: []syntax.Node{{Type: "root", Parent: -1, EndByte: 1}}}
