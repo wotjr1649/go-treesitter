@@ -27,6 +27,7 @@ type Result struct {
 // Complete checks the whole completion receipt, not just the root span.
 func (r Result) Complete() bool {
 	return (r.Outcome == AcceptedClean || r.Outcome == AcceptedWithErrors) &&
-		r.RootPresent && r.RootStartByte == 0 && uint64(r.RootEndByte) == uint64(r.InputBytes) &&
+		r.RootPresent && r.RootStartByte <= r.RootEndByte && uint64(r.RootEndByte) == uint64(r.InputBytes) &&
+		uint64(r.LastTokenEndByte) == uint64(r.InputBytes) && r.ExpectedEOFByte == uint64(r.InputBytes) &&
 		!r.StoppedEarly && !r.Truncated && r.StopReason == "accepted" && r.SnapshotComplete
 }

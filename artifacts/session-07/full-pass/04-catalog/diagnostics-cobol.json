@@ -1,0 +1,70 @@
+{
+  "source": "       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.\n",
+  "source_sha256": "d540ed839caebff4cd99d42a6ee98fecf01bea18c33df5f51ea21033fa057ee6",
+  "exit": 1,
+  "receipt": {
+    "Language": "cobol",
+    "SourceSHA256": "d540ed839caebff4cd99d42a6ee98fecf01bea18c33df5f51ea21033fa057ee6",
+    "Fresh": [
+      {
+        "Complete": false,
+        "Outcome": "early_stop",
+        "HasError": false,
+        "HasMissing": false,
+        "StopReason": "accepted",
+        "Digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "Nodes": 0
+      }
+    ],
+    "Deterministic": true,
+    "Clean": false,
+    "EditEqual": false,
+    "Cancellation": true,
+    "Admission": true,
+    "Errors": [
+      "edit_equal",
+      "fresh_clean"
+    ],
+    "FailureDiagnostics": [
+      {
+        "Outcome": "early_stop",
+        "Language": "cobol",
+        "InputBytes": 58,
+        "StopReason": "accepted",
+        "StoppedEarly": false,
+        "RootPresent": true,
+        "RootStartByte": 7,
+        "RootEndByte": 58,
+        "HasError": false,
+        "HasMissing": false,
+        "ErrorType": "*errors.errorString",
+        "DeadlineApplied": true,
+        "TokensConsumed": 13,
+        "LastTokenEndByte": 58,
+        "ExpectedEOFByte": 58,
+        "Iterations": 0,
+        "IterationLimit": 0,
+        "Nodes": 17,
+        "NodeLimit": 0,
+        "PeakStackDepth": 0,
+        "StackDepthLimit": 0,
+        "ArenaBytes": 0,
+        "ScratchBytes": 0,
+        "MemoryBudgetBytes": 0,
+        "Truncated": false,
+        "Route": "compact",
+        "FallbackReason": "",
+        "ReuseReason": "",
+        "ReusedOldTree": false,
+        "FallbackDetailAvailable": false,
+        "SnapshotComplete": true,
+        "SnapshotNodes": 7,
+        "SnapshotNodeLimit": 100000,
+        "InputLimitBytes": 1048576,
+        "LimitReason": ""
+      }
+    ],
+    "EditIncremental": null,
+    "EditFresh": null
+  }
+}

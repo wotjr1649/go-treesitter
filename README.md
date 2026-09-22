@@ -89,6 +89,13 @@ workload; available routes are `go`, `py`, `js`, `jsx`, `ts`, `tsx` and `cs`.
 The tool reports Go heap metrics, not OS RSS, and separates first-use grammar
 loading from subsequent parse API calls. Default builds keep upstream's catalog.
 
+[Basic catalog checks](tools/catalog/README.md) cover all 206 grammars with
+three fresh runs, determinism, incremental edits, cancellation and input limits.
+This coverage is separate from the seven Release-Critical C oracle gates.
+Completion preserves grammar-owned root coordinates and requires the runtime's
+actual and expected EOF receipts; the retained COBOL controls also compare all
+ordered nodes with the pinned C oracle.
+
 `docs/prompts/`, `docs/specs/`, `docs/plans/`, and `artifacts/handoff/` are local
 documents intentionally excluded from Git. Retained test evidence is under
 `artifacts/session-05/`, `artifacts/session-06/` and `artifacts/session-07/`. See `experiments/v052-v053/`

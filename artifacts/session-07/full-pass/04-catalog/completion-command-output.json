@@ -1,0 +1,61 @@
+{
+  "archive_sha256": "e36bdf1eb51471335760074fb436d9a289bd9bcc16cdbde8a6b919a9d194956f",
+  "entries": {
+    "eof-coverage-tests.log": {
+      "bytes": 433410,
+      "sha256": "27d4575157e79c195115c7ad4a7c000ac9e71fda4b3b18ca54c8e990f8d3c549"
+    },
+    "cobol-completion-witness.log": {
+      "bytes": 121,
+      "sha256": "faf62ae251efd9815bd57110a61bae5f87f6b2eb920fde49ea4d6f931da007e0"
+    },
+    "cobol-baseline-check.log": {
+      "bytes": 941,
+      "sha256": "670706cc4225d91137d73a0cadc2fa50de640a3ad59c92b028d687806a86c112"
+    },
+    "catalog-basic.log": {
+      "bytes": 2024,
+      "sha256": "8dafbb2ad89c2886b7541eaacbfa5ec9a9fd133dff80f4f7b94dbad93286da93"
+    },
+    "catalog-diagnostics.log": {
+      "bytes": 2956,
+      "sha256": "9e15816532a9a9c7c4b61e6dd2082cf672fa1ad5227d5a69129db92ea6d25891"
+    },
+    "catalog-after-fixes.log": {
+      "bytes": 78,
+      "sha256": "630f4cf107cc9dad813e8950b62a8b9556fdcb219a78712e72b698a4528c498e"
+    },
+    "catalog-retained-runner.log": {
+      "bytes": 45,
+      "sha256": "c023e22150d9929ce99751d0621bd89fe32672f362e83d7044fccf0a2ee28ae6"
+    },
+    "cobol-c-oracle.log": {
+      "bytes": 774,
+      "sha256": "e52fa84c240958f4c72f65a5a4b2d86cbbe6f8950e403abd57ce1bcbc2a86725"
+    },
+    "04-catalog/build.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "04-catalog/build-diagnostics.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "04-catalog/build-after-fixes.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "04-catalog/gofmt-diagnostics.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "04-catalog/build-cobol-oracle.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "04-catalog/cobol-baseline-witness.log": {
+      "bytes": 807,
+      "sha256": "6a0d86f8dbbfef375535db547d0370b421686cc6d2fb8e28002696aea833f948"
+    }
+  }
+}

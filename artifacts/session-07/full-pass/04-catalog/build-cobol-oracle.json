@@ -1,0 +1,36 @@
+{
+  "command": [
+    "C:/msys64/ucrt64/bin/gcc.exe",
+    "-std=c11",
+    "-O0",
+    "-ID:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\additional-grammars\\cobol\\src",
+    "-ID:\\AIDEV\\go-treesitter\\.scratch\\oracle\\runtime\\lib\\include",
+    "-ID:\\AIDEV\\go-treesitter\\.scratch\\oracle\\runtime\\lib\\src",
+    "-DORACLE_LANGUAGE=tree_sitter_COBOL",
+    "D:\\AIDEV\\go-treesitter\\tools\\native-oracle\\driver.c",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\oracle\\runtime\\lib\\src\\lib.c",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\additional-grammars\\cobol\\src\\parser.c",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\additional-grammars\\cobol\\src\\scanner.c",
+    "-o",
+    "D:\\AIDEV\\go-treesitter\\.scratch\\full-pass\\additional-grammars\\cobol\\cobol.exe"
+  ],
+  "candidate_commit": "66d73759492a0b56729821d2ae23dc38b2a225dc",
+  "status_before": "?? artifacts/session-07/full-pass/02-product-runtime/catalog-notices/\n?? artifacts/session-07/full-pass/03-csharp-exact-selection/\n?? artifacts/session-07/full-pass/03-csharp-order/\n?? artifacts/session-07/full-pass/03-csharp-pattern-trace/\n?? artifacts/session-07/full-pass/03-csharp-pending-raw/\n?? artifacts/session-07/full-pass/03-csharp-pending/\n?? artifacts/session-07/full-pass/03-csharp-preserve-errors/\n?? artifacts/session-07/full-pass/03-csharp-recovered-conflicts/\n?? artifacts/session-07/full-pass/03-csharp-repeat-order/\n?? artifacts/session-07/full-pass/03-csharp-selection-trace/\n?? artifacts/session-07/full-pass/03-csharp-transaction-candidate/\n?? artifacts/session-07/full-pass/03-csharp-transaction-raw/\n?? artifacts/session-07/full-pass/04-catalog/\n?? artifacts/session-07/full-pass/additional-grammar-acquisition.json\n?? artifacts/session-07/full-pass/c-family-skip-candidate.json\n?? artifacts/session-07/full-pass/c-family-skip-v2.json\n?? artifacts/session-07/full-pass/catalog-basic.json\n?? artifacts/session-07/full-pass/catalog-diagnostics.json\n?? artifacts/session-07/full-pass/catalog-final-paths.json\n?? artifacts/session-07/full-pass/catalog-notice-acquisition.json\n?? artifacts/session-07/full-pass/catalog-notice-followup.json\n?? artifacts/session-07/full-pass/catalog-notice-metadata.json\n?? artifacts/session-07/full-pass/csharp-exact-selection.json\n?? artifacts/session-07/full-pass/csharp-minimal-patterns.json\n?? artifacts/session-07/full-pass/csharp-order-experiment.json\n?? artifacts/session-07/full-pass/csharp-pattern-trace.json\n?? artifacts/session-07/full-pass/csharp-pending-experiment-02.json\n?? artifacts/session-07/full-pass/csharp-pending-experiment.json\n?? artifacts/session-07/full-pass/csharp-pending-raw.json\n?? artifacts/session-07/full-pass/csharp-preprocessor-cases.json\n?? artifacts/session-07/full-pass/csharp-preserve-errors.json\n?? artifacts/session-07/full-pass/csharp-recovered-conflicts.json\n?? artifacts/session-07/full-pass/csharp-repeat-order.json\n?? artifacts/session-07/full-pass/csharp-selection-trace.json\n?? artifacts/session-07/full-pass/csharp-transaction-candidate.json\n?? artifacts/session-07/full-pass/csharp-transaction-observe.json\n?? artifacts/session-07/full-pass/csharp-transaction-raw.json\n?? artifacts/session-07/full-pass/csharp-zero-reduction.json\n?? tools/catalog/\n",
+  "started_unix": 1790093932.401246,
+  "elapsed_seconds": 5.458883285522461,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "a22b115ed06bcf57acf319b30b9d1a6f7d4fa5ce9b14d50a52592f1b7c7d7b4f"
+  },
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

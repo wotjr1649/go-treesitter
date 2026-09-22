@@ -186,7 +186,9 @@ func (Adapter) Parse(ctx context.Context, req syntax.Request) (syntax.Result, er
 		d.Outcome = syntax.EarlyStop
 	case !d.RootPresent:
 		d.Outcome = syntax.InvariantViolation
-	case d.RootStartByte != 0 || uint64(d.RootEndByte) != uint64(len(source)) || d.StopReason != string(gts.ParseStopAccepted):
+	case d.RootStartByte > d.RootEndByte || uint64(d.RootEndByte) != uint64(len(source)) ||
+		uint64(d.LastTokenEndByte) != uint64(len(source)) || d.ExpectedEOFByte != uint64(len(source)) ||
+		d.StopReason != string(gts.ParseStopAccepted):
 		d.Outcome = syntax.EarlyStop
 	case errors.Is(snapshotErr, errSnapshotLimit) || errors.Is(snapshotErr, errRuntimeMemory):
 		d.Outcome = syntax.ResourceLimit
