@@ -28,5 +28,5 @@ type Result struct {
 func (r Result) Complete() bool {
 	return (r.Outcome == AcceptedClean || r.Outcome == AcceptedWithErrors) &&
 		r.RootPresent && r.RootStartByte == 0 && uint64(r.RootEndByte) == uint64(r.InputBytes) &&
-		!r.StoppedEarly && !r.Truncated && r.StopReason == "accepted"
+		!r.StoppedEarly && !r.Truncated && r.StopReason == "accepted" && r.SnapshotComplete
 }

@@ -14,7 +14,8 @@ type Diagnostics struct {
 	ErrorType                                   string
 	DeadlineApplied                             bool
 	TokensConsumed                              uint64
-	LastTokenEndByte, ExpectedEOFByte           uint32
+	LastTokenEndByte                            uint32
+	ExpectedEOFByte                             uint64
 	Iterations, IterationLimit                  int
 	Nodes, NodeLimit                            int
 	PeakStackDepth, StackDepthLimit             int
@@ -25,4 +26,10 @@ type Diagnostics struct {
 	ReusedOldTree                               bool
 	// Fresh-route fallback detail is not available per parse upstream.
 	FallbackDetailAvailable bool
+	// SnapshotComplete distinguishes an inspected tree from a stopped walk.
+	// LimitReason is adapter-owned; StopReason remains the raw runtime value.
+	SnapshotComplete                 bool
+	SnapshotNodes, SnapshotNodeLimit int
+	InputLimitBytes                  int
+	LimitReason                      string
 }

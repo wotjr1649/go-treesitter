@@ -13,7 +13,7 @@ func TestOutcomeAndCompleteness(t *testing.T) {
 		t.Fatal("open outcome set")
 	}
 	good := Diagnostics{Outcome: AcceptedClean, InputBytes: 8, RootPresent: true,
-		RootEndByte: 8, StopReason: "accepted"}
+		RootEndByte: 8, StopReason: "accepted", SnapshotComplete: true}
 	if !(Result{Diagnostics: good}).Complete() {
 		t.Fatal("complete receipt rejected")
 	}
@@ -24,6 +24,7 @@ func TestOutcomeAndCompleteness(t *testing.T) {
 		func(d *Diagnostics) { d.StopReason = "timeout" },
 		func(d *Diagnostics) { d.RootPresent = false },
 		func(d *Diagnostics) { d.RootEndByte = 7 },
+		func(d *Diagnostics) { d.SnapshotComplete = false },
 	} {
 		d := good
 		mutate(&d)

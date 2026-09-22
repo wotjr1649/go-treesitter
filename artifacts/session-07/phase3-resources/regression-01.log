@@ -1,0 +1,11 @@
+ok  	github.com/wotjr1649/go-treesitter	5.465s
+ok  	github.com/wotjr1649/go-treesitter/internal/boundary	2.711s
+--- FAIL: TestRequestBudgets (0.00s)
+    --- FAIL: TestRequestBudgets/memory (0.00s)
+        resources_test.go:36: diagnostics={Outcome:accepted_clean Language:go InputBytes:48 StopReason:accepted StoppedEarly:false RootPresent:true RootStartByte:0 RootEndByte:48 HasError:false HasMissing:false ErrorType: DeadlineApplied:true TokensConsumed:20 LastTokenEndByte:48 ExpectedEOFByte:48 Iterations:21 IterationLimit:10000 Nodes:38 NodeLimit:300000 PeakStackDepth:14 StackDepthLimit:1000 ArenaBytes:7664904 ScratchBytes:7506096 MemoryBudgetBytes:1 Truncated:false Route:classic FallbackReason: ReuseReason: ReusedOldTree:false FallbackDetailAvailable:false SnapshotComplete:true SnapshotNodes:29 SnapshotNodeLimit:0 InputLimitBytes:0 LimitReason:} error=<nil>
+        resources_test.go:38: resource limit did not propagate
+FAIL
+FAIL	github.com/wotjr1649/go-treesitter/internal/gtsadapter	5.497s
+ok  	github.com/wotjr1649/go-treesitter/internal/provenance	5.288s
+ok  	github.com/wotjr1649/go-treesitter/syntax	0.768s
+FAIL

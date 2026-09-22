@@ -1,0 +1,12 @@
+fuzz: elapsed: 0s, gathering baseline coverage: 0/5 completed
+fuzz: elapsed: 0s, gathering baseline coverage: 5/5 completed, now fuzzing with 2 workers
+fuzz: elapsed: 3s, execs: 3678 (1226/sec), new interesting: 17 (total: 22)
+fuzz: elapsed: 6s, execs: 7301 (1208/sec), new interesting: 30 (total: 35)
+fuzz: elapsed: 9s, execs: 11606 (1435/sec), new interesting: 47 (total: 52)
+fuzz: elapsed: 12s, execs: 13311 (568/sec), new interesting: 52 (total: 57)
+fuzz: elapsed: 15s, execs: 15777 (822/sec), new interesting: 57 (total: 62)
+fuzz: elapsed: 18s, execs: 16682 (302/sec), new interesting: 60 (total: 65)
+fuzz: elapsed: 21s, execs: 17308 (209/sec), new interesting: 61 (total: 66)
+fuzz: elapsed: 21s, execs: 17308 (0/sec), new interesting: 61 (total: 66)
+PASS
+ok  	github.com/wotjr1649/go-treesitter/internal/gtsadapter	21.254s

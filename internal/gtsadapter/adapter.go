@@ -41,12 +41,30 @@ func (t *tree) Close() {
 
 func (Adapter) Parse(ctx context.Context, req syntax.Request) (syntax.Result, error) {
 	d := syntax.Diagnostics{InputBytes: len(req.Source), Language: req.Language,
-		ExpectedEOFByte: uint32(len(req.Source)), Route: "not_run"}
+		ExpectedEOFByte: uint64(len(req.Source)), Route: "not_run",
+		InputLimitBytes: req.Limits.MaxInputBytes, SnapshotNodeLimit: req.Limits.MaxSnapshotNodes}
+	if ctx == nil {
+		d.Outcome = syntax.NotRun
+		return failed(d, errors.New("nil parse context"))
+	}
+	if err := ctx.Err(); err != nil {
+		d.Outcome = syntax.Cancelled
+		return failed(d, err)
+	}
+	limits := req.Limits
+	if req.Timeout < 0 || limits.MaxInputBytes < 0 || limits.MaxSnapshotNodes < 0 || limits.MemoryBudgetBytes < 0 || limits.IterationLimit < 0 || limits.NodeLimit < 0 || limits.StackDepthLimit < 0 {
+		d.Outcome = syntax.NotRun
+		return failed(d, errors.New("negative parse limit"))
+	}
+	if limits.MaxInputBytes > 0 && len(req.Source) > limits.MaxInputBytes {
+		d.Outcome, d.LimitReason = syntax.ResourceLimit, "input_bytes"
+		return failed(d, errors.New(string(d.Outcome)))
+	}
 	entry := grammars.DetectLanguageByName(req.Language)
 	if req.Language == "" {
 		entry = grammars.DetectLanguage(filepath.ToSlash(req.Filename))
 	}
-	valid := utf8.Valid(req.Source) && uint64(len(req.Source)) <= math.MaxUint32 && entry != nil
+	valid := uint64(len(req.Source)) <= math.MaxUint32 && utf8.Valid(req.Source) && entry != nil
 	if entry != nil {
 		d.Language = entry.Name
 	}
@@ -59,6 +77,8 @@ func (Adapter) Parse(ctx context.Context, req syntax.Request) (syntax.Result, er
 	if valid && ctx.Err() == nil {
 		lang = entry.Language() // Grammar loading is outside the parse timeout.
 		p := gts.NewParser(lang)
+		p.SetMemoryBudgetBytes(limits.MemoryBudgetBytes)
+		p.SetParseWorkLimits(gts.ParseWorkLimits{IterationLimit: limits.IterationLimit, NodeLimit: limits.NodeLimit, StackDepthLimit: limits.StackDepthLimit})
 		source = bytes.Clone(req.Source)
 		old, editErr := prepareEdit(req, lang)
 		parseErr = editErr
@@ -99,21 +119,34 @@ func (Adapter) Parse(ctx context.Context, req syntax.Request) (syntax.Result, er
 		d.ErrorType = fmt.Sprintf("%T", parseErr)
 	}
 	var nodes []syntax.Node
+	var snapshotErr error
 	if raw != nil {
+		rt := raw.ParseRuntime()
+		// The runtime charges growth beyond retained slabs. Admit a result only
+		// when its reported arena/scratch footprint fits the caller's budget too.
+		memoryExceeded := limits.MemoryBudgetBytes > 0 &&
+			(rt.ArenaBytesAllocated > limits.MemoryBudgetBytes || rt.ScratchBytesAllocated > limits.MemoryBudgetBytes-rt.ArenaBytesAllocated)
 		root := raw.RootNode()
 		if root != nil {
 			d.RootPresent = true
 			d.RootStartByte, d.RootEndByte = root.StartByte(), root.EndByte()
 			d.HasError = root.HasError()
-			nodes = snapshot(root, lang)
+			if memoryExceeded {
+				snapshotErr, d.LimitReason = errRuntimeMemory, "runtime_memory"
+			} else {
+				nodes, snapshotErr = boundedSnapshot(ctx, root, lang, limits.MaxSnapshotNodes)
+			}
+			d.SnapshotNodes, d.SnapshotComplete = len(nodes), snapshotErr == nil
+			if errors.Is(snapshotErr, errSnapshotLimit) {
+				d.LimitReason = "snapshot_nodes"
+			}
 			for _, n := range nodes {
 				d.HasMissing = d.HasMissing || n.Missing
 			}
 		}
-		rt := raw.ParseRuntime()
 		d.StopReason, d.StoppedEarly = string(rt.StopReason), raw.ParseStoppedEarly()
 		d.TokensConsumed, d.LastTokenEndByte = rt.TokensConsumed, rt.LastTokenEndByte
-		d.ExpectedEOFByte = rt.ExpectedEOFByte
+		d.ExpectedEOFByte = uint64(rt.ExpectedEOFByte)
 		d.Iterations, d.IterationLimit = rt.Iterations, rt.IterationLimit
 		d.Nodes, d.NodeLimit = rt.NodesAllocated, rt.NodeLimit
 		d.PeakStackDepth, d.StackDepthLimit = rt.PeakStackDepth, rt.StackDepthLimit
@@ -155,6 +188,10 @@ func (Adapter) Parse(ctx context.Context, req syntax.Request) (syntax.Result, er
 		d.Outcome = syntax.InvariantViolation
 	case d.RootStartByte != 0 || uint64(d.RootEndByte) != uint64(len(source)) || d.StopReason != string(gts.ParseStopAccepted):
 		d.Outcome = syntax.EarlyStop
+	case errors.Is(snapshotErr, errSnapshotLimit) || errors.Is(snapshotErr, errRuntimeMemory):
+		d.Outcome = syntax.ResourceLimit
+	case snapshotErr != nil:
+		d.Outcome = syntax.InvariantViolation
 	case d.HasError || d.HasMissing:
 		d.Outcome = syntax.AcceptedWithErrors
 	default:
@@ -173,7 +210,19 @@ func (Adapter) Parse(ctx context.Context, req syntax.Request) (syntax.Result, er
 		result.Tree = &tree{nodes: nodes}
 		return result, nil
 	}
-	return result, errors.New(string(d.Outcome))
+	if err := ctx.Err(); err != nil {
+		return failed(d, err)
+	}
+	return failed(d, errors.New(string(d.Outcome)))
+}
+
+// Preserve an upstream error type when available, otherwise record our own.
+// Error text never enters the receipt, because upstream text may contain source.
+func failed(d syntax.Diagnostics, err error) (syntax.Result, error) {
+	if d.ErrorType == "" {
+		d.ErrorType = fmt.Sprintf("%T", err)
+	}
+	return syntax.Result{Diagnostics: d}, err
 }
 
 func prepareEdit(req syntax.Request, lang *gts.Language) (*gts.Tree, error) {
@@ -181,7 +230,7 @@ func prepareEdit(req syntax.Request, lang *gts.Language) (*gts.Tree, error) {
 		return nil, nil
 	}
 	old, ok := req.Previous.(*tree)
-	if !ok || old.raw == nil || old.edited || old.lang != lang || req.Edit == nil {
+	if !ok || old == nil || old.raw == nil || old.edited || old.lang != lang || req.Edit == nil {
 		return nil, errors.New("invalid previous tree")
 	}
 	e := req.Edit
@@ -210,23 +259,53 @@ func point(prefix []byte) gts.Point {
 }
 
 func snapshot(root *gts.Node, lang *gts.Language) []syntax.Node {
-	type visit struct {
-		node   *gts.Node
-		parent int
-		field  string
-	}
-	stack := []visit{{root, -1, ""}}
-	var nodes []syntax.Node
-	for len(stack) > 0 {
-		v := stack[len(stack)-1]
-		stack = stack[:len(stack)-1]
-		n := v.node
-		start, end := n.StartPoint(), n.EndPoint()
-		index := len(nodes)
-		nodes = append(nodes, syntax.Node{Type: n.Type(lang), Field: v.field, Parent: v.parent, Named: n.IsNamed(), Extra: n.IsExtra(), Missing: n.IsMissing(), Error: n.IsError(), StartByte: n.StartByte(), EndByte: n.EndByte(), StartPoint: syntax.Point{Row: start.Row, Column: start.Column}, EndPoint: syntax.Point{Row: end.Row, Column: end.Column}})
-		for i := n.ChildCount() - 1; i >= 0; i-- {
-			stack = append(stack, visit{n.Child(i), index, n.FieldNameForChild(i, lang)})
-		}
+	nodes, err := boundedSnapshot(context.Background(), root, lang, 0)
+	if err != nil {
+		panic(err) // Test-only full snapshot of an existing runtime tree.
 	}
 	return nodes
+}
+
+var errSnapshotLimit = errors.New("snapshot node limit")
+var errRuntimeMemory = errors.New("runtime memory receipt exceeds limit")
+
+// Keep traversal state proportional to depth, including for very wide roots.
+// Holding every sibling on a stack would defeat a small MaxSnapshotNodes cap.
+func boundedSnapshot(ctx context.Context, root *gts.Node, lang *gts.Language, limit int) ([]syntax.Node, error) {
+	type frame struct {
+		node             *gts.Node
+		parent           int
+		field            string
+		index, nextChild int
+	}
+	stack := []frame{{node: root, parent: -1, index: -1}}
+	var nodes []syntax.Node
+	for len(stack) > 0 {
+		v := &stack[len(stack)-1]
+		if v.index == -1 {
+			if len(nodes)%256 == 0 {
+				if err := ctx.Err(); err != nil {
+					return nodes, err
+				}
+			}
+			if limit > 0 && len(nodes) == limit {
+				return nodes, errSnapshotLimit
+			}
+			n := v.node
+			if n == nil {
+				return nodes, errors.New("nil snapshot node")
+			}
+			start, end := n.StartPoint(), n.EndPoint()
+			v.index = len(nodes)
+			nodes = append(nodes, syntax.Node{Type: n.Type(lang), Field: v.field, Parent: v.parent, Named: n.IsNamed(), Extra: n.IsExtra(), Missing: n.IsMissing(), Error: n.IsError(), StartByte: n.StartByte(), EndByte: n.EndByte(), StartPoint: syntax.Point{Row: start.Row, Column: start.Column}, EndPoint: syntax.Point{Row: end.Row, Column: end.Column}})
+		}
+		if v.nextChild == v.node.ChildCount() {
+			stack = stack[:len(stack)-1]
+			continue
+		}
+		i := v.nextChild
+		v.nextChild++
+		stack = append(stack, frame{node: v.node.Child(i), parent: v.index, field: v.node.FieldNameForChild(i, lang), index: -1})
+	}
+	return nodes, nil
 }

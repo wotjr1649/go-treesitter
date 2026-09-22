@@ -37,6 +37,18 @@ error outcomes, cancellation and tree release from a separate Go module.
 Keep each tree on one worker; close every returned tree. The API remains
 unreleased and may change before the first version tag.
 
+For bounded inputs, set `Request.Limits`, for example
+`syntax.Limits{MaxInputBytes: 8 << 20, MaxSnapshotNodes: 100_000,
+MemoryBudgetBytes: 64 << 20}`. Runtime memory and work limits are checked at
+parser checkpoints; they are not a hard process-memory cap and may change the
+runtime route. Grammar caches, source copies and snapshots are outside that
+runtime memory threshold. Context cancellation covers snapshot construction.
+An explicit memory budget also rejects results whose reported arena plus
+scratch footprint exceeds it, even if the upstream growth check accepted them.
+`Timeout` covers the parse API, excluding grammar loading. Negative limits or
+timeouts are rejected as `not_run`; a local cap reports `resource_limit` and
+an adapter-owned `LimitReason` without changing the raw runtime `StopReason`.
+
 Run the Windows product checks with:
 
 ```powershell

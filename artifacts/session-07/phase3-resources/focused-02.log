@@ -1,0 +1,29 @@
+=== RUN   TestRequestBudgets
+=== RUN   TestRequestBudgets/input
+    resources_test.go:36: diagnostics={Outcome:resource_limit Language: InputBytes:48 StopReason: StoppedEarly:false RootPresent:false RootStartByte:0 RootEndByte:0 HasError:false HasMissing:false ErrorType: DeadlineApplied:false TokensConsumed:0 LastTokenEndByte:0 ExpectedEOFByte:48 Iterations:0 IterationLimit:0 Nodes:0 NodeLimit:0 PeakStackDepth:0 StackDepthLimit:0 ArenaBytes:0 ScratchBytes:0 MemoryBudgetBytes:0 Truncated:false Route:not_run FallbackReason: ReuseReason: ReusedOldTree:false FallbackDetailAvailable:false SnapshotComplete:false SnapshotNodes:0 SnapshotNodeLimit:0 InputLimitBytes:47 LimitReason:input_bytes} error=*errors.errorString
+=== RUN   TestRequestBudgets/snapshot
+    resources_test.go:36: diagnostics={Outcome:resource_limit Language:go InputBytes:48 StopReason:accepted StoppedEarly:false RootPresent:true RootStartByte:0 RootEndByte:48 HasError:false HasMissing:false ErrorType: DeadlineApplied:true TokensConsumed:20 LastTokenEndByte:48 ExpectedEOFByte:48 Iterations:0 IterationLimit:0 Nodes:40 NodeLimit:0 PeakStackDepth:0 StackDepthLimit:0 ArenaBytes:0 ScratchBytes:0 MemoryBudgetBytes:0 Truncated:false Route:compact FallbackReason: ReuseReason: ReusedOldTree:false FallbackDetailAvailable:false SnapshotComplete:false SnapshotNodes:5 SnapshotNodeLimit:5 InputLimitBytes:0 LimitReason:snapshot_nodes} error=*errors.errorString
+=== RUN   TestRequestBudgets/iterations
+    resources_test.go:36: diagnostics={Outcome:resource_limit Language:go InputBytes:48 StopReason:iteration_limit StoppedEarly:true RootPresent:true RootStartByte:0 RootEndByte:7 HasError:false HasMissing:false ErrorType: DeadlineApplied:true TokensConsumed:1 LastTokenEndByte:7 ExpectedEOFByte:48 Iterations:1 IterationLimit:1 Nodes:1 NodeLimit:300000 PeakStackDepth:1 StackDepthLimit:1000 ArenaBytes:2938912 ScratchBytes:1769472 MemoryBudgetBytes:536870912 Truncated:true Route:classic FallbackReason: ReuseReason: ReusedOldTree:false FallbackDetailAvailable:false SnapshotComplete:true SnapshotNodes:2 SnapshotNodeLimit:0 InputLimitBytes:0 LimitReason:} error=*errors.errorString
+=== RUN   TestRequestBudgets/nodes
+    resources_test.go:36: diagnostics={Outcome:resource_limit Language:go InputBytes:48 StopReason:node_limit StoppedEarly:true RootPresent:true RootStartByte:0 RootEndByte:9 HasError:false HasMissing:false ErrorType: DeadlineApplied:true TokensConsumed:2 LastTokenEndByte:9 ExpectedEOFByte:48 Iterations:3 IterationLimit:10000 Nodes:2 NodeLimit:1 PeakStackDepth:3 StackDepthLimit:1000 ArenaBytes:2938912 ScratchBytes:1769472 MemoryBudgetBytes:536870912 Truncated:true Route:classic FallbackReason: ReuseReason: ReusedOldTree:false FallbackDetailAvailable:false SnapshotComplete:true SnapshotNodes:3 SnapshotNodeLimit:0 InputLimitBytes:0 LimitReason:} error=*errors.errorString
+=== RUN   TestRequestBudgets/stack
+    resources_test.go:36: diagnostics={Outcome:resource_limit Language:go InputBytes:48 StopReason:stack_depth_limit StoppedEarly:true RootPresent:true RootStartByte:0 RootEndByte:7 HasError:false HasMissing:false ErrorType: DeadlineApplied:true TokensConsumed:1 LastTokenEndByte:7 ExpectedEOFByte:48 Iterations:2 IterationLimit:10000 Nodes:1 NodeLimit:300000 PeakStackDepth:2 StackDepthLimit:1 ArenaBytes:2938912 ScratchBytes:1769472 MemoryBudgetBytes:536870912 Truncated:true Route:classic FallbackReason: ReuseReason: ReusedOldTree:false FallbackDetailAvailable:false SnapshotComplete:true SnapshotNodes:2 SnapshotNodeLimit:0 InputLimitBytes:0 LimitReason:} error=*errors.errorString
+=== RUN   TestRequestBudgets/memory
+    resources_test.go:36: diagnostics={Outcome:resource_limit Language:go InputBytes:48 StopReason:memory_budget StoppedEarly:true RootPresent:true RootStartByte:0 RootEndByte:48 HasError:true HasMissing:false ErrorType: DeadlineApplied:true TokensConsumed:20 LastTokenEndByte:48 ExpectedEOFByte:48 Iterations:21 IterationLimit:10000 Nodes:38 NodeLimit:300000 PeakStackDepth:14 StackDepthLimit:1000 ArenaBytes:2938912 ScratchBytes:3866656 MemoryBudgetBytes:1 Truncated:false Route:classic FallbackReason: ReuseReason: ReusedOldTree:false FallbackDetailAvailable:false SnapshotComplete:false SnapshotNodes:0 SnapshotNodeLimit:0 InputLimitBytes:0 LimitReason:runtime_memory} error=*errors.errorString
+--- PASS: TestRequestBudgets (0.10s)
+    --- PASS: TestRequestBudgets/input (0.00s)
+    --- PASS: TestRequestBudgets/snapshot (0.10s)
+    --- PASS: TestRequestBudgets/iterations (0.00s)
+    --- PASS: TestRequestBudgets/nodes (0.00s)
+    --- PASS: TestRequestBudgets/stack (0.00s)
+    --- PASS: TestRequestBudgets/memory (0.00s)
+=== RUN   TestMemoryReceiptAfterWarmup
+    resources_test.go:65: run=0 stop=accepted arena=2938912 scratch=3866656 local=runtime_memory
+    resources_test.go:65: run=1 stop=accepted arena=2938912 scratch=3866656 local=runtime_memory
+    resources_test.go:65: run=2 stop=accepted arena=2938912 scratch=3866656 local=runtime_memory
+--- PASS: TestMemoryReceiptAfterWarmup (0.00s)
+=== RUN   TestNestedInputStopsAtWorkLimit
+--- PASS: TestNestedInputStopsAtWorkLimit (0.00s)
+PASS
+ok  	github.com/wotjr1649/go-treesitter/internal/gtsadapter	0.230s
