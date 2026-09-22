@@ -1,0 +1,4 @@
+=== RUN   TestCleanRegressionPinTsxJsxElement
+--- PASS: TestCleanRegressionPinTsxJsxElement (0.07s)
+PASS
+ok  	github.com/odvcencio/gotreesitter/grammars	0.203s

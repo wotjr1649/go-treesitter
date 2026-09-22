@@ -71,6 +71,12 @@ func validateOracle(c oracleCase, source []byte, r oracleRecord, buildHash strin
 }
 
 func TestOracleRecords(t *testing.T) {
+	runOracleRecords(t, false)
+}
+
+// Candidate mode is called only by the opt-in oracle_experiment build-tag test.
+// Product tests always require the unmodified module and recorded differences.
+func runOracleRecords(t *testing.T, candidate bool) {
 	root, err := filepath.Abs(filepath.Join("..", ".."))
 	if err != nil {
 		t.Fatal(err)
@@ -108,14 +114,18 @@ func TestOracleRecords(t *testing.T) {
 	}
 	var module struct {
 		Version, Dir string
-		Replace      any
+		Replace      *struct{ Path, Dir string }
 	}
 	if err := json.Unmarshal(moduleJSON, &module); err != nil {
 		t.Fatal(err)
 	}
-	if module.Version != pins.Baseline.Version || module.Replace != nil {
+	if module.Version != pins.Baseline.Version || (!candidate && module.Replace != nil) {
 		t.Fatal("product module identity mismatch")
 	}
+	if candidate && (module.Replace == nil || !strings.EqualFold(filepath.Clean(module.Dir), filepath.Join(root, ".scratch", "kr0001b-candidate"))) {
+		t.Fatal("candidate must resolve to the authorized isolated directory")
+	}
+	t.Logf("runtime version=%s candidate=%t", module.Version, candidate)
 	for language, grammar := range pins.Grammars {
 		blob, err := os.ReadFile(filepath.Join(module.Dir, "grammars", "grammar_blobs", language+".bin"))
 		if err != nil || fmt.Sprintf("%x", sha256.Sum256(blob)) != grammar.BlobSHA256 {
@@ -213,6 +223,12 @@ func TestOracleRecords(t *testing.T) {
 				if first < len(receipt.Nodes) {
 					t.Logf("C[%d]=%+v", first, receipt.Nodes[first])
 				}
+			}
+			if candidate && c.Group == "KR-0001b" {
+				if first >= 0 || receipt.HasError || result.Outcome != syntax.AcceptedClean {
+					t.Fatal("candidate does not correct the equals case")
+				}
+				return
 			}
 			if known, ok := differences[c.ID]; ok {
 				if known.Source != c.SHA256 || known.CDigest != receipt.NodesSHA256 || known.GoDigest != nodeDigest(goNodes) {

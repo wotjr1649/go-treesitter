@@ -1,0 +1,6 @@
+=== RUN   TestJavaScriptExternalScannerBindsPositionally
+--- PASS: TestJavaScriptExternalScannerBindsPositionally (0.00s)
+=== RUN   TestTsxExternalScannerBindsPositionally
+--- PASS: TestTsxExternalScannerBindsPositionally (0.00s)
+PASS
+ok  	github.com/odvcencio/gotreesitter/grammars/runtime	0.101s

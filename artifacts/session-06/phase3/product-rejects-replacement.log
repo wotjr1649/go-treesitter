@@ -1,0 +1,5 @@
+--- FAIL: TestOracleRecords (0.02s)
+    oracle_test.go:123: product module identity mismatch
+FAIL
+FAIL	github.com/wotjr1649/go-treesitter/internal/gtsadapter	0.127s
+FAIL

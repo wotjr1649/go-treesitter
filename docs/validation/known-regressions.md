@@ -30,7 +30,7 @@ share a record, because "fixing" the first would *break* C agreement.
 | Record | Symptom | Cause | Verdict |
 |---|---|---|---|
 | `KR-0001a` | bare `&` | grammar requires `&…;`; the C scanner stops at `&` too | **C-faithful.** Not a defect of this runtime. |
-| `KR-0001b` | bare `=` after a leading identifier | a heuristic that exists **only** in the Go port | **Confirmed TSX divergence (E5).** JavaScript remains source-level E1. |
+| `KR-0001b` | bare `=` after a leading identifier | a heuristic that exists **only** in the Go port | **Both TSX and JavaScript differential evidence E5**, Session 06 Phase 2. |
 
 The original report compared against `tsc` 5.9.3, **not** against C tree-sitter. Comparing to a
 different oracle and reporting the difference as a runtime defect is exactly the evidence error
@@ -89,7 +89,7 @@ Witness shape for `const a = <p>a & b</p>;` under `tsx`:
 |---|---|
 | **Upstream issue** | `odvcencio/gotreesitter#1242` (partially) — and, properly, a `tree-sitter-javascript` grammar question |
 | **Fixtures** | F1, F2, F3 |
-| **Verdict** | TSX F1–F3 have errors in both runtimes (E5). Their recovered-tree shapes differ; only the error-state characterization agrees. |
+| **Verdict** | Both TSX and JavaScript F1–F3 have errors in both runtimes (E5, Session 06 Phase 2). Recovered-tree shapes differ; the error-state characterization agrees. |
 
 ### Root cause
 
@@ -144,13 +144,13 @@ change in this repository or in gotreesitter's runtime.
 
 ---
 
-## KR-0001b — bare `=` after a leading identifier (TSX divergence)
+## KR-0001b — bare `=` after a leading identifier (TSX and JavaScript divergence)
 
 | Field | Value |
 |---|---|
 | **Upstream issue** | `odvcencio/gotreesitter#1242` (partially) |
 | **Fixtures** | F4, F5 |
-| **Verdict** | **Confirmed for TSX at E5.** The native C probe parses F4/F5 cleanly; pinned Go reports errors. JavaScript's cause remains E1; its Go failures are retained at E3. |
+| **Verdict** | **E5 in both grammars**, Session 06 Phase 2. C parses F4/F5 cleanly; pinned Go reports errors. |
 
 ### Root cause
 
@@ -191,8 +191,11 @@ ABI 14 sources are identified by commit/hash and accepted by the pinned runtime'
 
 Evidence: `artifacts/session-05/phase2/native-manifest.json`, native output and
 differential logs. The earlier identity-blocked attempt is retained separately.
-JavaScript C execution and the effects of changing the slash/whitespace guards
-remain untested. **No patch or fork is authorized by this result.**
+That Session 05 run did not execute JavaScript C. Session 06's separate Phase 2
+does. No patch or fork authority follows from a test result itself.
+The user separately authorized the Phase 3 isolated local patch experiment.
+Its four corrected inputs and 46 unchanged snapshots are recorded in that phase;
+the product dependency and active KR-0001b ratchet remain unchanged.
 
 ### Fork-trigger evaluation (as of this record)
 
