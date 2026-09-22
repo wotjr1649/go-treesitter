@@ -1,0 +1,65 @@
+{
+  "archive_sha256": "4157b6d89a1eff8d8f83a69a17c55853302b2fa13347dbb3f2a38094ee97130b",
+  "files": {
+    "runtime-import.log": {
+      "sha256": "a406ce01b1bc19189c2d8c40d7bfa22c1d718e18c4cc7499d5a1bf70c297cca2",
+      "bytes": 32
+    },
+    "runtime-inventory.log": {
+      "sha256": "0fb6d11eecead71b499cf79fc2bde1e4ec61dc9e1d412a2350aaff0676a606bf",
+      "bytes": 696
+    },
+    "bundled-focused.log": {
+      "sha256": "1fb25a26ab808799149964d6bafe1926154db3d8ec4873800f2cb4b780a6357d",
+      "bytes": 8365
+    },
+    "bundled-product.log": {
+      "sha256": "06ff2496d8a5fdb73b5016941780c14c353196073f456b18dae9e0e10dc70fe6",
+      "bytes": 175996
+    },
+    "bundled-oracle-fixed.log": {
+      "sha256": "73003c3edfc33be7ac872a4e10a2a070c223f503dd5b721fcae387e378f25b1b",
+      "bytes": 290215
+    },
+    "bundled-consumer-fixed.log": {
+      "sha256": "5d7bb39e738d33f84549c94d775e17128ec8ea99a5bdb77c875e7a1c2f77d4f8",
+      "bytes": 1732
+    },
+    "bundled-final-product.log": {
+      "sha256": "57f1d52ed1109f6e68582d41d72f31825dc7647638c1822c923775553dd41b87",
+      "bytes": 416066
+    },
+    "bundled-subset.log": {
+      "sha256": "1c721f99c823878a6a48ae0f7d68fe56cb736474debe5358725468baf489d317",
+      "bytes": 405995
+    },
+    "bundled-tooling.log": {
+      "sha256": "f8d3504f23f66a8ee7e167ce89ccc68e7b139f557c11e8e6784eed8512f468a0",
+      "bytes": 961
+    },
+    "bundled-tamper.log": {
+      "sha256": "4620e00270398dbfb57c211b0ad6d8ed55fb3f83d7d1f52aef49b6c0fef21cd9",
+      "bytes": 2638
+    },
+    "bundled-vet.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "bundled-reproduction.log": {
+      "sha256": "f589215c2fc34d433186dbc2b769b5443d38fc9a11e80de945229232e4f1a7fb",
+      "bytes": 79
+    },
+    "bundled-campaign.log": {
+      "sha256": "c99993c1bdfa0bd83d2a77419f022cb5998ba01481ad7423c37bd3ebff89e9a8",
+      "bytes": 119
+    },
+    "02-product-runtime/probe-build.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "02-product-runtime/results.json": {
+      "sha256": "edb4a7595a487c0eefcf6a22591827e7eb98b5deefeb450f306e4c383d3975c6",
+      "bytes": 5885775
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "command": [
+    "python",
+    ".scratch/full-pass/reproduce-carrier.py"
+  ],
+  "candidate_commit": "c9996dc43b3c13fd4c832e4d20a599fce6445c5b",
+  "status_before": " M AGENTS.md\n M README.md\n M THIRD_PARTY_NOTICES.md\n M docs/design/decisions/ADR-0001-strategy-a-pinned-upstream-dependency.md\n M docs/design/overview.md\n M docs/reports/release-critical-status.md\n M docs/validation/known-regressions.md\n M go.mod\n M go.sum\n M internal/boundary/boundary_test.go\n M internal/gtsadapter/adapter.go\n M internal/gtsadapter/known_regressions_test.go\n D internal/gtsadapter/oracle_experiment_test.go\n M internal/gtsadapter/oracle_test.go\n M internal/provenance/identities.json\n M internal/provenance/provenance.go\n M internal/provenance/provenance_test.go\n M internal/provenance/testdata/buildinfo/main.go\n M parser_test.go\n M testdata/consumer/main.go\n M tools/native-oracle/README.md\n M tools/native-oracle/run.py\n?? artifacts/session-07/full-pass/02-product-runtime/\n?? artifacts/session-07/full-pass/03-csharp-order/\n?? artifacts/session-07/full-pass/03-csharp-pending/\n?? artifacts/session-07/full-pass/bundled-campaign.json\n?? artifacts/session-07/full-pass/bundled-consumer-fixed.json\n?? artifacts/session-07/full-pass/bundled-final-product.json\n?? artifacts/session-07/full-pass/bundled-focused.json\n?? artifacts/session-07/full-pass/bundled-oracle-fixed.json\n?? artifacts/session-07/full-pass/bundled-product.json\n?? artifacts/session-07/full-pass/bundled-subset.json\n?? artifacts/session-07/full-pass/bundled-tooling.json\n?? artifacts/session-07/full-pass/catalog-final-paths.json\n?? artifacts/session-07/full-pass/catalog-notice-acquisition.json\n?? artifacts/session-07/full-pass/catalog-notice-followup.json\n?? artifacts/session-07/full-pass/catalog-notice-metadata.json\n?? artifacts/session-07/full-pass/csharp-order-experiment.json\n?? artifacts/session-07/full-pass/csharp-pending-experiment-02.json\n?? artifacts/session-07/full-pass/csharp-pending-experiment.json\n?? artifacts/session-07/full-pass/runtime-import.json\n?? artifacts/session-07/full-pass/runtime-inventory.json\n?? docs/design/decisions/ADR-0013-bundle-the-approved-runtime.md\n?? internal/gtsadapter/jsx_text_test.go\n?? internal/provenance/runtime.go\n?? internal/provenance/runtime.json\n?? internal/runtime/\n?? testdata/oracle/active-differences.json\n?? tools/runtime-bundle/\n",
+  "started_unix": 1790090963.558701,
+  "elapsed_seconds": 25.397672176361084,
+  "exit": 0,
+  "cwd": "D:\\AIDEV\\go-treesitter",
+  "go": "go version go1.27.1 windows/amd64",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  },
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "1ace27e3fc74c1d371b8d452c64b6a80dad260c99d4ab2afc451d31df162f370"
+  },
+  "log_sha256": "f589215c2fc34d433186dbc2b769b5443d38fc9a11e80de945229232e4f1a7fb"
+}

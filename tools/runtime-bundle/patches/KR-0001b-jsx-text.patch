@@ -1,0 +1,24 @@
+--- a/grammars/runtime/javascript_scanner.go
++++ b/grammars/runtime/javascript_scanner.go
+@@ -520,9 +520,6 @@
+ 			for unicode.IsSpace(lexer.Lookahead()) {
+ 				lexer.Advance(false)
+ 			}
+-			if lexer.Lookahead() == '=' {
+-				return false
+-			}
+ 			sawText = true
+ 			onlyWhitespace = false
+ 			continue
+--- a/grammars/runtime/tsx_scanner.go
++++ b/grammars/runtime/tsx_scanner.go
+@@ -455,9 +455,6 @@
+ 			for unicode.IsSpace(lexer.Lookahead()) {
+ 				lexer.Advance(false)
+ 			}
+-			if lexer.Lookahead() == '=' {
+-				return false
+-			}
+ 			sawText = true
+ 			onlyWhitespace = false
+ 			continue

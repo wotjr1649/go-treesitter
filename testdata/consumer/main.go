@@ -13,6 +13,14 @@ import (
 
 func main() {
 	p := treesitter.New()
+	for _, filename := range []string{"x.jsx", "x.tsx"} {
+		fixed, err := p.Parse(context.Background(), syntax.Request{Filename: filename,
+			Source: []byte("const d = <p>a = b</p>;"), Timeout: time.Second})
+		if err != nil || !fixed.Complete() || fixed.Outcome != syntax.AcceptedClean || fixed.Tree == nil {
+			panic("bundled scanner fix missing from consumer module")
+		}
+		fixed.Tree.Close()
+	}
 	before := []byte("package p\nfunc f() int { return 1 }\n")
 	first, err := p.Parse(context.Background(), syntax.Request{Filename: "x.go", Source: before, Timeout: time.Second})
 	if err != nil || !first.Complete() || first.Outcome != syntax.AcceptedClean {

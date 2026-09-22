@@ -15,19 +15,16 @@ func main() {
 		panic("invalid embedded identities")
 	}
 	info, ok := debug.ReadBuildInfo()
-	if ok {
+	if ok && len(ids.Runtime.ManifestSHA256) == 64 {
 		for _, dep := range info.Deps {
-			if dep.Path != ids.Baseline.Module {
-				continue
-			}
-			if dep.Version != ids.Baseline.Version || dep.Replace != nil {
-				fmt.Printf("identity mismatch: resolved %s, expected %s, replacement=%t\n", dep.Version, ids.Baseline.Version, dep.Replace != nil)
+			if dep.Path == ids.Baseline.Module || dep.Replace != nil {
+				fmt.Printf("unexpected external runtime or replacement: %s\n", dep.Path)
 				os.Exit(1)
 			}
-			fmt.Printf("%s %s\n", dep.Path, dep.Version)
-			return
 		}
+		fmt.Printf("bundled %s origin=%s %s manifest=%s\n", ids.Runtime.Module, ids.Baseline.Module, ids.Baseline.Version, ids.Runtime.ManifestSHA256)
+		return
 	}
-	fmt.Println("baseline dependency missing from build information")
+	fmt.Println("runtime identity or build information missing")
 	os.Exit(1)
 }

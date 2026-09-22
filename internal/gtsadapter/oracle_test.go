@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -15,9 +14,9 @@ import (
 	"testing"
 	"time"
 
-	gts "github.com/odvcencio/gotreesitter"
-	"github.com/odvcencio/gotreesitter/grammars"
 	"github.com/wotjr1649/go-treesitter/internal/provenance"
+	gts "github.com/wotjr1649/go-treesitter/internal/runtime"
+	"github.com/wotjr1649/go-treesitter/internal/runtime/grammars"
 	"github.com/wotjr1649/go-treesitter/syntax"
 )
 
@@ -110,28 +109,26 @@ func validateOracle(c oracleCase, source []byte, r oracleRecord, buildHash strin
 }
 
 func TestOracleRecords(t *testing.T) {
-	runOracleRecords(t, false)
+	runOracleRecords(t)
 }
 
 func TestExtendedOracleRecords(t *testing.T) {
-	runOracleCorpus(t, false, "testdata/oracle/extended-cases.json", "testdata/oracle/windows-c-v2/extended", "")
+	runOracleCorpus(t, "testdata/oracle/extended-cases.json", "testdata/oracle/windows-c-v2/extended", "")
 }
 
 func TestTypeScriptContextualOracleRecords(t *testing.T) {
-	runOracleCorpus(t, false, "testdata/oracle/typescript-contextual-cases.json", "testdata/oracle/windows-c-v2/ts-contextual", "")
+	runOracleCorpus(t, "testdata/oracle/typescript-contextual-cases.json", "testdata/oracle/windows-c-v2/ts-contextual", "")
 }
 
 func TestCSharpRecoveryVariantOracleRecords(t *testing.T) {
-	runOracleCorpus(t, false, "testdata/oracle/csharp-recovery-cases.json", "testdata/oracle/windows-c-v2/cs-recovery", "testdata/oracle/csharp-recovery-differences.json")
+	runOracleCorpus(t, "testdata/oracle/csharp-recovery-cases.json", "testdata/oracle/windows-c-v2/cs-recovery", "testdata/oracle/csharp-recovery-differences.json")
 }
 
-// Candidate mode is called only by the opt-in oracle_experiment build-tag test.
-// Product tests always require the unmodified module and recorded differences.
-func runOracleRecords(t *testing.T, candidate bool) {
-	runOracleCorpus(t, candidate, "testdata/oracle/cases.json", "testdata/oracle/windows-c-v2/base", "testdata/oracle/known-differences.json")
+func runOracleRecords(t *testing.T) {
+	runOracleCorpus(t, "testdata/oracle/cases.json", "testdata/oracle/windows-c-v2/base", "testdata/oracle/active-differences.json")
 }
 
-func runOracleCorpus(t *testing.T, candidate bool, casesPath, recordsDir, differencesPath string) {
+func runOracleCorpus(t *testing.T, casesPath, recordsDir, differencesPath string) {
 	root, err := filepath.Abs(filepath.Join("..", ".."))
 	if err != nil {
 		t.Fatal(err)
@@ -171,7 +168,11 @@ func runOracleCorpus(t *testing.T, candidate bool, casesPath, recordsDir, differ
 		}
 	}
 	manifest := read(recordsDir+"/build.json", &build)
-	if build.Schema != 1 || build.OS != "Windows" || !reflect.DeepEqual(build.Pins, pins) || len(build.Grammars) != len(pins.Grammars) {
+	// C generation depends on the upstream origin, grammar and oracle epoch.
+	// The separately verified Go carrier is not an input to the C build.
+	if build.Schema != 1 || build.OS != "Windows" || build.Pins.Baseline != pins.Baseline ||
+		!reflect.DeepEqual(build.Pins.Grammars, pins.Grammars) || !reflect.DeepEqual(build.Pins.Oracle, pins.Oracle) ||
+		len(build.Grammars) != len(pins.Grammars) {
 		t.Fatal("oracle epoch/build identity mismatch")
 	}
 	var anchor struct {
@@ -192,28 +193,12 @@ func runOracleCorpus(t *testing.T, candidate bool, casesPath, recordsDir, differ
 			t.Fatal(err)
 		}
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
-	moduleJSON, err := exec.CommandContext(ctx, "go", "list", "-m", "-json", pins.Baseline.Module).Output()
-	if err != nil {
+	if err := provenance.VerifyRuntime(root); err != nil {
 		t.Fatal(err)
 	}
-	var module struct {
-		Version, Dir string
-		Replace      *struct{ Path, Dir string }
-	}
-	if err := json.Unmarshal(moduleJSON, &module); err != nil {
-		t.Fatal(err)
-	}
-	if module.Version != pins.Baseline.Version || (!candidate && module.Replace != nil) {
-		t.Fatal("product module identity mismatch")
-	}
-	if candidate && (module.Replace == nil || !strings.EqualFold(filepath.Clean(module.Dir), filepath.Join(root, ".scratch", "kr0001b-candidate"))) {
-		t.Fatal("candidate must resolve to the authorized isolated directory")
-	}
-	t.Logf("runtime version=%s candidate=%t", module.Version, candidate)
+	t.Logf("runtime origin=%s manifest=%s", pins.Baseline.Version, pins.Runtime.ManifestSHA256)
 	for language, grammar := range pins.Grammars {
-		blob, err := os.ReadFile(filepath.Join(module.Dir, "grammars", "grammar_blobs", language+".bin"))
+		blob, err := os.ReadFile(filepath.Join(root, "internal/runtime/grammars", "grammar_blobs", language+".bin"))
 		if err != nil || fmt.Sprintf("%x", sha256.Sum256(blob)) != grammar.BlobSHA256 {
 			t.Fatalf("grammar identity mismatch: %s", language)
 		}
@@ -346,9 +331,9 @@ func runOracleCorpus(t *testing.T, candidate bool, casesPath, recordsDir, differ
 					t.Logf("C[%d]=%+v", first, receipt.Nodes[first])
 				}
 			}
-			if candidate && c.Group == "KR-0001b" {
+			if c.Group == "KR-0001b" {
 				if first >= 0 || receipt.HasError || result.Outcome != syntax.AcceptedClean {
-					t.Fatal("candidate does not correct the equals case")
+					t.Fatal("bundled scanner regressed on JSX equals text")
 				}
 				return
 			}
@@ -368,7 +353,7 @@ func runOracleCorpus(t *testing.T, candidate bool, casesPath, recordsDir, differ
 					}
 					return
 				}
-			} else if c.Group == "KR-0001a" || c.Group == "KR-0001b" || c.Group == "KR-0004" {
+			} else if c.Group == "KR-0001a" || c.Group == "KR-0004" {
 				t.Fatal("missing known-difference identity")
 			}
 			if c.Group == "KR-0001a" {
@@ -376,12 +361,6 @@ func runOracleCorpus(t *testing.T, candidate bool, casesPath, recordsDir, differ
 					t.Fatal("NEW REGRESSION: bare ampersand characterization")
 				}
 				return // Recovered-shape differences are explicitly documented for these inputs.
-			}
-			if c.Group == "KR-0001b" {
-				if receipt.HasError || result.Outcome != syntax.AcceptedWithErrors || !result.HasError {
-					t.Fatal("STALE or NEW REGRESSION: equals differential")
-				}
-				return
 			}
 			if first >= 0 {
 				t.Fatal("unregistered ordered tree difference")

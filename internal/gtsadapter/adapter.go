@@ -12,8 +12,8 @@ import (
 	"time"
 	"unicode/utf8"
 
-	gts "github.com/odvcencio/gotreesitter"
-	"github.com/odvcencio/gotreesitter/grammars"
+	gts "github.com/wotjr1649/go-treesitter/internal/runtime"
+	"github.com/wotjr1649/go-treesitter/internal/runtime/grammars"
 	"github.com/wotjr1649/go-treesitter/syntax"
 )
 

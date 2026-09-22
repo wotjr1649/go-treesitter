@@ -144,7 +144,20 @@ change in this repository or in gotreesitter's runtime.
 
 ---
 
-## KR-0001b — bare `=` after a leading identifier (TSX and JavaScript divergence)
+## KR-0001b — retired: bare `=` after a leading identifier
+
+**Retired 2026-09-23 in the approved internal carrier (ADR-0013).** The two
+three-line scanner guards are removed. Fresh product C comparisons pass for
+F4/F5 in both JSX and TSX, and retained edit tests agree with C (E5). The new
+94-input carrier campaign exactly matches the isolated scanner candidate,
+including 20 fresh repeats per ordinary input, 100 per C# regression and all
+21 catalog edits. A separate versioned-module consumer with no replace also
+executes the correction (E3). Evidence: `artifacts/session-07/full-pass/02-product-runtime/`.
+
+The historical failure and original source-bound records below are preserved.
+Current tests require F4/F5 to be clean with C-identical nodes; bare `&`
+characterization remains unchanged. Patch retirement means a separately
+approved upstream baseline passes these same tests without the carried patch.
 
 | Field | Value |
 |---|---|
@@ -213,13 +226,13 @@ Creating a fork remains a user-owned decision.
 
 ### Required test behaviour
 
-Assert that F4–F5 currently produce `accepted_with_errors`, tagged as a **divergence ratchet**
+At the unmodified historical baseline, F4–F5 produced `accepted_with_errors`, tagged as a **divergence ratchet**
 rather than as accepted behaviour. If they become clean, that is the fix landing — investigate and
 retire, do not silently pass.
 
 ### Release impact
 
-Release-Critical gate **red** for JSX and TSX until resolved.
+This record no longer blocks JSX or TSX in the approved internal carrier.
 
 ### Retirement condition
 

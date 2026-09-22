@@ -17,14 +17,14 @@ var regressionFixtures = []struct {
 	{"F1", "const a = <p>Org & Team</p>;", 16, 18},
 	{"F2", "const b = <p>AT&T</p>;", 16, 18},
 	{"F3", "const c = <p>&</p>;", 18, 17},
-	{"F4", "const d = <p>a = b</p>;", 17, 15},
-	{"F5", "const e = <code>k=v</code>;", 17, 15},
+	{"F4", "const d = <p>a = b</p>;", 17, 17},
+	{"F5", "const e = <code>k=v</code>;", 17, 17},
 	{"F6", "const f = <p>x &amp; y</p>;", 19, 19},
 	{"F7", "const g = <p>plain</p>;", 17, 17},
 }
 
 func TestKR0001aCharacterization(t *testing.T) { regressionCases(t, 0, 3, "KR-0001a") }
-func TestKR0001bDivergence(t *testing.T)       { regressionCases(t, 3, 5, "KR-0001b") }
+func TestKR0001bResolved(t *testing.T)         { regressionCases(t, 3, 5, "KR-0001b-resolved") }
 func TestKR0001Controls(t *testing.T)          { regressionCases(t, 5, 7, "controls") }
 
 func regressionCases(t *testing.T, start, end int, record string) {
@@ -53,17 +53,14 @@ func regressionCases(t *testing.T, start, end int, record string) {
 				if file == "x.jsx" {
 					wantCount = f.javascript
 				}
-				if record == "controls" {
+				if record != "KR-0001a" {
 					if err != nil || r.Outcome != syntax.AcceptedClean || !r.Complete() || count != wantCount {
 						t.Fatal("REGRESSION EXPANSION: clean control changed")
 					}
 					return
 				}
 				if r.Outcome == syntax.AcceptedClean {
-					if record == "KR-0001a" {
-						t.Fatal("NEW REGRESSION KR-0001a: bare ampersand became clean; oracle-characterization drift")
-					}
-					t.Fatal("STALE KR-0001b: equals failure disappeared; investigate and retire the record")
+					t.Fatal("NEW REGRESSION KR-0001a: bare ampersand became clean; oracle-characterization drift")
 				}
 				if err != nil || r.Outcome != syntax.AcceptedWithErrors || !r.Complete() || !r.HasError || count != wantCount {
 					t.Fatalf("NEW REGRESSION %s: signature changed; expected %d nodes", record, wantCount)

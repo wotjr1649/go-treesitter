@@ -3,7 +3,8 @@
 The Windows product test reads `testdata/oracle/windows-c-v2/` with CGO disabled.
 It requires no compiler, Python, generator, container or network. Records carry
 the source identity, build identity, complete ordered nodes, and their digest.
-Known differences have exact Go and C hashes in `known-differences.json`.
+Active differences have exact Go and C hashes in `active-differences.json`;
+the original `known-differences.json` preserves the pre-patch failures.
 Changing either side fails the ratchet; an unregistered difference fails too.
 
 Produce records from the repository root with an installed C compiler:

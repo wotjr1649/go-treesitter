@@ -1,0 +1,10 @@
+{
+  "files": 1527,
+  "manifest_equal": true,
+  "every_file_equal": true,
+  "rejected": [
+    "existing-output",
+    "changed-archive"
+  ],
+  "manifest_sha256": "d35a3de216578357f35f694e5b96d4c1cc8e2f9acd99aa86fdbbb1b9740c3983"
+}

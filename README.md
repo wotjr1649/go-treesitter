@@ -1,6 +1,6 @@
 # go-treesitter
 
-A Go syntax-analysis layer over a pinned `gotreesitter` runtime, with explicit
+A Go syntax-analysis layer over an internally bundled, pinned `gotreesitter` runtime, with explicit
 parse outcomes, an adapter boundary, and Windows-native CGO-free validation.
 
 This repository owns syntax results and their evidence. Language semantics,
@@ -8,7 +8,9 @@ code graphs, and downstream application policy belong to consumers.
 
 Start with [AGENTS.md](AGENTS.md) and the [documentation map](docs/README.md).
 The [status board](docs/reports/release-critical-status.md) separates development
-use from release approval. No release is approved yet.
+use from release approval. The first version will be `v0.0.1`; release gates are
+still being completed. The module includes its approved runtime patches and
+needs no consumer `replace` directive or external runtime dependency.
 
 Create a parser through the public package; the implementation stays internal:
 
@@ -33,7 +35,8 @@ if result.Outcome == syntax.AcceptedWithErrors {
 
 `syntax` is `github.com/wotjr1649/go-treesitter/syntax`. The runnable
 [external consumer](testdata/consumer/main.go) exercises fresh parsing, an edit,
-error outcomes, cancellation and tree release from a separate Go module.
+error outcomes, cancellation, tree release and the JSX/TSX scanner correction
+from a separate Go module, installed through a local versioned module proxy.
 Keep each tree on one worker; close every returned tree. The API remains
 unreleased and may change before the first version tag.
 
@@ -96,14 +99,14 @@ compiler. [Oracle tooling](tools/native-oracle/README.md) documents producing
 new records, using an updated generator, and comparing artifacts before adoption.
 Generator selection has no release constant; runtime/grammar identities remain
 pinned. The [isolated scanner evaluation](artifacts/session-06/phase3/patch-decision.md)
-records the candidate patch recommendation and its limits. The product runtime
-still contains the registered JSX/TSX and C# blockers.
+records the original candidate recommendation and its limits. The approved
+[internal runtime](tools/runtime-bundle/README.md) now carries that six-line
+scanner correction; KR-0001b is retired after product and consumer validation.
 The separate extended catalog adds 35 fresh comparisons and 21 edit comparisons
 over all seven routes, including UTF-8/CRLF and wide sibling boundaries.
-Eight further TypeScript/TSX controls expose a separate limitation: upstream's
-Go grammar patch accepts newline-separated `in` properties, while the original
-C grammar in this oracle reports errors. KR-0003 retains those four exact
-differences; it does not reclassify valid TypeScript as erroneous.
+Eight further TypeScript/TSX controls now agree with the officially adopted C
+grammar built with the complete maintained upstream patch. KR-0003 is retired;
+the original unpatched C evidence is preserved.
 The C# recovery reduction in KR-0004 also shows that `accepted_clean` can hide
 upstream recovery differences. C# remains blocked for release despite the
 adapter's complete diagnostic checks.

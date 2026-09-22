@@ -6,11 +6,12 @@ If a rule is host-specific, it says so.
 
 ## What this repository is
 
-A Go syntax-analysis layer built on a **pinned upstream** `gotreesitter` runtime.
+A Go syntax-analysis layer built on an internal carrier of a **pinned upstream**
+`gotreesitter` runtime, with owner-approved patches (ADR-0013).
 It owns: a stable parser/result contract, Windows-native validation, provenance binding,
 and an adapter that keeps upstream types out of consumer code.
 
-It is **not**: a fork of `gotreesitter`, a re-implementation of tree-sitter, a code-graph or
+It is **not**: a re-implementation of tree-sitter, a code-graph or
 semantic-resolution product, or a place for downstream application logic.
 
 ## Read what your task touches
@@ -40,10 +41,10 @@ When a handoff and a `docs/` contract disagree, **the contract wins**; fix the c
 - `D:\AIDEV\code-map-memo` is a separate downstream product. Read-only from here.
 - Windows native is Tier-1. Production and release paths stay **CGO-free** (`CGO_ENABLED=0`).
   CGO and `-race` belong to diagnostic lanes only, and a diagnostic lane never decides a product gate.
-- The upstream dependency version and the oracle epoch are **pinned**. Do not upgrade either as a
+- The upstream origin version and the oracle epoch are **pinned**. Do not upgrade either as a
   side effect of other work. See `docs/specs/baseline-provenance.md` and `docs/specs/oracle.md`.
-- Only the adapter package may import `github.com/odvcencio/gotreesitter`. Everything else uses
-  this repository's own types.
+- Only the adapter may import `internal/runtime` from outside that carrier. Public packages
+  use this repository's own types. Preserve the carrier's source manifest and patch inventory.
 
 ## Evidence discipline
 
@@ -72,7 +73,8 @@ Do **not** do these without explicit authority in the task prompt:
 
 - push, tag, release, or any remote write;
 - modify `_ref` or `code-map-memo`;
-- create a fork of `gotreesitter`, or patch its source;
+- create a separate fork, or modify an upstream checkout/module cache; approved internal
+  runtime maintenance follows `docs/design/decisions/ADR-0013-bundle-the-approved-runtime.md`;
 - change the pinned baseline or the oracle epoch;
 - change the Release-Critical language scope;
 - destructive Git (`reset --hard`, `clean -fd`, history rewrite) or discarding unrelated user work.

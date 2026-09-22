@@ -2,7 +2,7 @@
 
 Current state, not a promise. Gate definitions: `docs/specs/validation.md`.
 Baseline: unchanged, see `docs/specs/baseline-provenance.md` and identities.json.
-Last updated: 2026-09-22, Session 07.
+Last updated: 2026-09-23, Session 07.
 
 Development and Integration are green with exact known-difference ratchets.
 The public constructor and external-module consumer now exercise the result
@@ -14,8 +14,8 @@ contract end to end. Release-Critical and Release have not passed.
 | Python | green | not fully assessed | Registered fresh/edit snapshots agree with C; broader release corpus pending. |
 | JavaScript `.js` | green | not fully assessed | Registered fresh/edit controls agree; JSX text limitation is listed separately. |
 | TypeScript `.ts` | green | not fully assessed | KR-0003 retired after explicit full-patch Candidate C adoption; registered fresh/edit trees agree with the new C artifacts. |
-| JSX | green, ratcheted | **red** | KR-0001b `=` defect remains in the product runtime. |
-| TSX | green, ratcheted | **red** | KR-0001b remains; KR-0003 is retired. |
+| JSX | green | not fully assessed | KR-0001b retired in the approved internal runtime; fresh/edit C comparisons pass. |
+| TSX | green | not fully assessed | KR-0001b and KR-0003 retired; full release assessment pending. |
 | C# | green, ratcheted | **red** | KR-0002 recovered-tree difference and KR-0004 false-clean source reconstruction. |
 
 All seven routes remain in scope. No blocked language was removed to pass a
@@ -54,11 +54,14 @@ needs a complete notice inventory for release; the selected assessed bundle is
 documented. Memory admission is not a hard process-RSS cap. Grammar caches,
 source copies, snapshots and aggregate worker memory need application budgets.
 
-Prefer an upstream contribution for the small scanner fix. The C# scheduler and
-reconstruction changes require further upstream correction. TypeScript grammar
-patch reconciliation was explicitly approved and is recorded in ADR-0012. Neither a remote
-fork nor a product runtime replacement was made. A local Go replace directive
-would not propagate to consuming modules. No release is approved.
+The owner approved an internal carrier of the pinned runtime with minimal fixes,
+documented in ADR-0013. KR-0001b is now applied to the product and a fresh
+94-input campaign matches the isolated scanner candidate in every observation;
+86 exact C trees, six preserved bare-ampersand recovery shapes and two C#
+regressions remain. The external consumer installs a local `v0.0.1` module ZIP
+without replace. The initial release version is `v0.0.1`, not a release claim.
+KR-0002 and KR-0004 still require correction and independent evidence. TypeScript
+full-patch adoption is recorded in ADR-0012. No remote write or release was made.
 
 Update this board when a gate changes, a record is added/retired, or the baseline
 moves. Individual test runs belong in phase evidence.

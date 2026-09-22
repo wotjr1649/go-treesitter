@@ -1,0 +1,21 @@
+{
+  "runtime_files": 1527,
+  "index_equals_manifest": true,
+  "diff_check_exit": 2,
+  "warnings": [
+    "internal/runtime/grammars/linguist_gen.go:1475: new blank line at EOF.",
+    "tools/runtime-bundle/patches/KR-0001b-jsx-text.patch:4: space before tab in indent.",
+    "tools/runtime-bundle/patches/KR-0001b-jsx-text.patch:5: space before tab in indent.",
+    "tools/runtime-bundle/patches/KR-0001b-jsx-text.patch:6: space before tab in indent.",
+    "tools/runtime-bundle/patches/KR-0001b-jsx-text.patch:10: space before tab in indent.",
+    "tools/runtime-bundle/patches/KR-0001b-jsx-text.patch:11: space before tab in indent.",
+    "tools/runtime-bundle/patches/KR-0001b-jsx-text.patch:12: space before tab in indent.",
+    "tools/runtime-bundle/patches/KR-0001b-jsx-text.patch:16: space before tab in indent.",
+    "tools/runtime-bundle/patches/KR-0001b-jsx-text.patch:17: space before tab in indent.",
+    "tools/runtime-bundle/patches/KR-0001b-jsx-text.patch:18: space before tab in indent.",
+    "tools/runtime-bundle/patches/KR-0001b-jsx-text.patch:22: space before tab in indent.",
+    "tools/runtime-bundle/patches/KR-0001b-jsx-text.patch:23: space before tab in indent.",
+    "tools/runtime-bundle/patches/KR-0001b-jsx-text.patch:24: space before tab in indent."
+  ],
+  "classification": "One unchanged upstream generated EOF blank; twelve unified-diff context marker lines. No own-source whitespace warning."
+}

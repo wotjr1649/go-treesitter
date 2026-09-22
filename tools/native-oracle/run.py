@@ -36,6 +36,12 @@ def read_json(path):
     return json.loads(path.read_text(encoding='utf-8'))
 
 
+def oracle_pins():
+    # Go's internal carrier is independently bound and is not a C build input.
+    pins = read_json(PINS)
+    return {key: pins[key] for key in ('baseline', 'grammars', 'oracle')}
+
+
 def write_new(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open('x', encoding='utf-8', newline='\n') as stream:
@@ -97,7 +103,7 @@ def unpack(data, destination, repo):
 
 
 def prepare():
-    pins = read_json(PINS)
+    pins = oracle_pins()
     for name, repo in REPOS.items():
         commit = (pins['oracle']['runtime_commit'] if name == 'runtime'
                   else pins['grammars'][name]['commit'])
@@ -120,7 +126,7 @@ def prepare():
 
 
 def source_locks():
-    pins = read_json(PINS)
+    pins = oracle_pins()
     locks = {}
     for name in REPOS:
         lock = read_json(WORK / (name + '.json'))
@@ -164,7 +170,7 @@ def build(output, regenerate=False):
     output = bounded(output)
     if output.exists():
         raise ValueError('build output already exists')
-    pins = read_json(PINS)
+    pins = oracle_pins()
     patched = 'typescript_patch' in pins['oracle']
     if (regenerate or patched) and not shutil.which(os.environ.get('TREE_SITTER_CLI', 'tree-sitter')):
         raise ValueError('tree-sitter generator unavailable; prepared sources unchanged')
@@ -248,7 +254,7 @@ def record(build_dir, cases_path, output):
         raise ValueError('record output already exists; evidence is immutable')
     build_dir = bounded(build_dir)
     manifest = read_json(build_dir / 'build.json')
-    if manifest['pins'] != read_json(PINS):
+    if manifest['pins'] != oracle_pins():
         raise ValueError('build epoch changed')
     cases = list(fixtures(cases_path))
     manifest_hash = sha((build_dir / 'build.json').read_bytes())
@@ -273,7 +279,7 @@ def record(build_dir, cases_path, output):
 
 def compare(left, right, cases_path=ROOT / 'testdata/oracle/cases.json'):
     """Compare complete records without transferring one build's identity."""
-    pins = read_json(PINS)
+    pins = oracle_pins()
     runtime_abi = read_json(ROOT / 'testdata/oracle/runtime-abi.json')
     if runtime_abi['schema'] != 1 or runtime_abi['runtime_commit'] != pins['oracle']['runtime_commit']:
         raise ValueError('runtime ABI anchor epoch mismatch')

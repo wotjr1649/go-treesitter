@@ -5,7 +5,7 @@ the project owner. Third-party works retain their original copyright notices.
 
 | Component | Use | Original notice |
 |---|---|---|
-| gotreesitter | Pinned Go runtime dependency | [MIT](LICENSES/gotreesitter.txt) |
+| gotreesitter | Pinned sources bundled under `internal/runtime`, with identified patches | [MIT](LICENSES/gotreesitter.txt) |
 | tree-sitter | Separate native C oracle tooling | [MIT](LICENSES/tree-sitter.txt) |
 | tree-sitter-go | Go grammar | [MIT](LICENSES/tree-sitter-go.txt) |
 | tree-sitter-python | Python grammar | [MIT](LICENSES/tree-sitter-python.txt) |
@@ -25,6 +25,11 @@ larger catalog; its other grammars are outside this notice inventory and release
 assessment. The selected embedded build documented in the README includes the
 declared grammar set. The C oracle is development tooling and is not a C runtime
 dependency of the product library.
+
+The internal runtime also retains the original MIT notice at
+`internal/runtime/LICENSE`. Its complete source and transformation inventory is
+`internal/provenance/runtime.json`; it does not relabel upstream work as original
+project code. The full default catalog's notice audit remains a release item.
 
 The TypeScript oracle inputs under `testdata/oracle/typescript-patched/` are
 generated from the pinned TypeScript sources and their locked JavaScript base,

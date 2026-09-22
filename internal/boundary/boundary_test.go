@@ -11,6 +11,7 @@ import (
 )
 
 const allowedImporter = "github.com/wotjr1649/go-treesitter/internal/gtsadapter"
+const runtimePrefix = "github.com/wotjr1649/go-treesitter/internal/runtime"
 
 func TestUpstreamImportBoundary(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -36,7 +37,12 @@ func TestUpstreamImportBoundary(t *testing.T) {
 		}
 		for _, group := range [][]string{pkg.Imports, pkg.TestImports, pkg.XTestImports} {
 			for _, dependency := range group {
-				if (dependency == "github.com/odvcencio/gotreesitter" || strings.HasPrefix(dependency, "github.com/odvcencio/gotreesitter/")) && pkg.ImportPath != allowedImporter {
+				if dependency == "github.com/odvcencio/gotreesitter" || strings.HasPrefix(dependency, "github.com/odvcencio/gotreesitter/") {
+					t.Errorf("external upstream import remains: %s imports %s", pkg.ImportPath, dependency)
+				}
+				bundled := dependency == runtimePrefix || strings.HasPrefix(dependency, runtimePrefix+"/")
+				inside := pkg.ImportPath == runtimePrefix || strings.HasPrefix(pkg.ImportPath, runtimePrefix+"/")
+				if bundled && !inside && pkg.ImportPath != allowedImporter {
 					t.Errorf("boundary violation: %s imports %s; only %s is allowed", pkg.ImportPath, dependency, allowedImporter)
 				}
 			}

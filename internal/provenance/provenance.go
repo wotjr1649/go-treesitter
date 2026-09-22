@@ -41,8 +41,16 @@ type GrammarPatch struct {
 
 type Identities struct {
 	Baseline Baseline           `json:"baseline"`
+	Runtime  Runtime            `json:"runtime"`
 	Grammars map[string]Grammar `json:"grammars"`
 	Oracle   Oracle             `json:"oracle"`
+}
+
+// Runtime identifies the relocated, patched sources compiled into this module.
+// Baseline separately identifies their unmodified upstream origin.
+type Runtime struct {
+	Module         string `json:"module"`
+	ManifestSHA256 string `json:"manifest_sha256"`
 }
 
 func Read() (Identities, error) {

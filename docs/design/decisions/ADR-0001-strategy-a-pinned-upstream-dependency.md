@@ -1,6 +1,10 @@
 # ADR-0001 — Strategy A: pinned upstream dependency, fork as escalation
 
-**Status:** Accepted · 2026-09-22
+**Status:** Superseded in part by ADR-0013 · 2026-09-23
+
+The owner approved distributing the pinned source origin with minimal fixes
+inside this repository. ADR-0013 replaces the no-owned-runtime and local-replace
+decisions below. This document retains the original decision and rationale.
 
 ## Context
 

@@ -14,10 +14,10 @@ Normative for module layout and layer boundaries. Decisions and their reasoning 
       syntax      result / outcome / diagnostics / request types
             │     a one-method Parser seam, for fakes and for a future second implementation
             ▼
-  internal/gtsadapter   the ONLY package that imports github.com/odvcencio/gotreesitter
+  internal/gtsadapter   the ONLY importer outside the internal runtime carrier
             │
             ▼
-   gotreesitter v0.53.0  (pinned; see docs/specs/baseline-provenance.md)
+   internal/runtime  (pinned origin + approved patches; ADR-0013)
             ▲
             │ compared against
    oracle digests  ← produced in an identified C oracle lane (docs/specs/oracle.md)
@@ -37,7 +37,8 @@ syntax/                Result, Outcome, Diagnostics, Request, Parser seam
                        no dependency on gotreesitter, no I/O, no language semantics
 
 internal/
-  gtsadapter/          maps gotreesitter state -> syntax.Result. The only importer of upstream.
+  gtsadapter/          maps runtime state -> syntax.Result. The only external carrier importer.
+  runtime/             identified upstream production sources + approved patches
   provenance/          identities.json (source of truth) + typed accessors + binding test
 
 testdata/              external fixtures, LF-pinned, hashed in docs/validation/workloads.md
@@ -55,7 +56,7 @@ See ADR-0011 for ownership and cost.
 ## Boundary rules
 
 1. **Single import point.** Only `internal/gtsadapter` may import
-   `github.com/odvcencio/gotreesitter`. Enforce this with a test, not prose — a test that inspects
+   `internal/runtime` from outside that carrier. Enforce this with a test, not prose — a test that inspects
    the package graph and fails on any other importer. Prose boundaries erode; a failing test does not.
 2. **No upstream types cross the boundary.** `syntax` exposes this repository's own types.
    An upstream `*Tree` may be carried as an opaque handle; its methods are not re-exported.
@@ -64,8 +65,8 @@ See ADR-0011 for ownership and cost.
 4. **No downstream policy in this repository.** We make "incomplete" unambiguous; we do not decide
    whether a consumer publishes, keeps the previous state, or marks it stale.
 5. **CGO only in diagnostic and oracle lanes.** The product path must build and run with
-   `CGO_ENABLED=0`. The upstream module graph already guarantees this — upstream confines CGO to a
-   separate module — and we must not reintroduce it.
+   `CGO_ENABLED=0`. The carrier contains only Go product sources; graph and consumer checks must
+   keep C-dependent packages outside the product.
 
 ## Chosen pattern, in one line
 
@@ -76,9 +77,10 @@ Why this and not the alternatives is recorded in ADR-0004. The short version: th
 forced this design is entirely about *result state* (a parse that reports success while returning a
 broken tree), not about *swappable backends*. Build the thing the evidence demands.
 
-## What changes if a fork ever happens
+## Runtime distribution
 
-A fork is a **build-time** substitution (`replace` in `go.mod`), not a runtime strategy.
-The adapter does not change shape; only which module it compiles against changes.
-That is precisely why no plugin or registry machinery is needed now.
-Fork topology and triggers: `docs/design/decisions/ADR-0001-strategy-a-pinned-upstream-dependency.md`.
+The owner-approved internal carrier distributes the tested patches as part of
+the ordinary Go module. It uses no consumer replace directive or runtime backend
+selector. Its source/patch manifest, import boundary and lifecycle are described
+in ADR-0013. The first project version will be `v0.0.1`; a version plan does not
+establish release readiness.

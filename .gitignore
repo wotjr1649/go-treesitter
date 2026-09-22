@@ -49,3 +49,4 @@ artifacts/private/
 /artifacts/session-07/full-pass/**/*.log
 /artifacts/session-07/full-pass/02-scanner/baseline.json
 /artifacts/session-07/full-pass/02-scanner/scanner.json
+/artifacts/session-07/full-pass/02-product-runtime/results.json

@@ -27,5 +27,9 @@
       "sha256": "8d091351f8107d1546a8130d281f0ca8d6d959b11da66b7872d3e10f998340e9",
       "inputs_sha256": "f6a5b51f728fb40ddd20aaf7170275bf9e1241f91fd572e90b2daed370b899a6"
     }
+  },
+  "runtime": {
+    "module": "github.com/wotjr1649/go-treesitter/internal/runtime",
+    "manifest_sha256": "d35a3de216578357f35f694e5b96d4c1cc8e2f9acd99aa86fdbbb1b9740c3983"
   }
 }
