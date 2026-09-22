@@ -1,0 +1,45 @@
+import hashlib,json,pathlib,re,subprocess
+root=pathlib.Path(__file__).resolve().parents[1]
+out=root/'artifacts/session-07/closing'
+out.mkdir(parents=True,exist_ok=True)
+start='823992f4bc2f0ff976247d027dc6d10d99cebb4b'
+def git(*args):return subprocess.check_output(['git',*args],cwd=root).decode('utf-8')
+assert git('branch','--show-current').strip()=='session/07-product-hardening'
+assert git('rev-parse','main').strip()=='2f809b5f855cced1c17420636136f7744173a3d0'
+assert not git('remote').strip()
+assert not git('diff',start,'HEAD','--','go.mod','go.sum','internal/provenance/identities.json')
+assert not git('diff') and not git('diff','--cached')
+private=('docs/prompts/','docs/specs/','docs/plans/','artifacts/handoff/','.scratch/','artifacts/private/','.local/')
+tracked=git('ls-files','-z').split('\0')
+assert not any(p.startswith(private) for p in tracked)
+assert not any(row.partition(' ')[2].startswith(private[:4]) for row in git('rev-list','--objects','--all').splitlines())
+for p in ['docs/prompts/example.md','docs/specs/example.md','docs/plans/example.md','artifacts/handoff/example.md','sample.pprof','sample.dmp','artifacts/session-07/phase2-correctness/defer-core.diff','artifacts/session-07/phase2-correctness/csharp-recovery-trace-01.json']:
+    assert subprocess.run(['git','check-ignore','-q','--',p],cwd=root).returncode==0,p
+whitespace=subprocess.run(['git','diff','--check',start,'HEAD'],cwd=root,capture_output=True,text=True)
+headers=[s for s in whitespace.stdout.splitlines() if re.match(r'.*:\d+: ',s)]
+assert len(headers)==15,headers
+expected={'artifacts/session-07/phase4-oracle/integrity-red-01.log':1,'artifacts/session-07/phase5-runtime/candidate.diff':12,'artifacts/session-07/phase6-package/binary-buildinfo-01.log':2}
+assert {p:sum(s.startswith(p+':') for s in headers) for p in expected}==expected
+references={}
+for name,head in [('gotreesitter','095a1876ae58053140033278f0863134c2b609cc'),('tree-sitter','5b951eff4f8b1431e933ed0fe45e48fcd4036a38')]:
+    p=root.parent/'_ref'/name
+    actual=subprocess.check_output(['git','-C',str(p),'rev-parse','HEAD']).decode().strip()
+    assert actual.startswith(head)
+    assert not subprocess.check_output(['git','-C',str(p),'status','--porcelain','-z'])
+    references[name]=actual
+phases=[]
+for p in sorted((root/'artifacts/session-07').glob('phase*/commands.jsonl')):
+    rows=[json.loads(s) for s in p.read_text(encoding='utf-8-sig').splitlines()]
+    for row in rows:assert (p.parent/(row['name']+'.log')).is_file()
+    phases.append({'phase':p.parent.name,'commands':len(rows),'nonzero_exits':[{'name':r['name'],'exit':r['exit'],'expected_exit':r['expected_exit']} for r in rows if r['exit']!=0]})
+changed=git('diff','--name-only',start,'HEAD','-z').split('\0')
+credential=re.compile(rb'(?:gh[pousr]_[A-Za-z0-9]{30,}|AKIA[0-9A-Z]{16}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----)')
+hits=0
+for name in changed:
+    if not name:continue
+    p=root/name
+    if p.is_file():hits+=bool(credential.search(p.read_bytes()))
+assert hits==0,'possible credential requires redacted review'
+value={'head':git('rev-parse','HEAD').strip(),'main':git('rev-parse','main').strip(),'branch':git('branch','--show-current').strip(),'unit_commits':git('log','--format=%h %s',start+'..HEAD').splitlines(),'baseline_changed':False,'remote_count':0,'tracked_private_paths':0,'reachable_private_history_paths':0,'reference_heads':references,'explained_raw_evidence_whitespace':expected,'credential_pattern_hits':hits,'credential_scan_limit':'selected obvious credential patterns only; not a universal secret-detection guarantee','phase_command_index':phases,'code_map_memo':'no mutation performed; unrelated working state was not absorbed'}
+with (out/'audit.json').open('x',encoding='utf-8',newline='\n') as f:json.dump(value,f,ensure_ascii=False,indent=2);f.write('\n')
+print(json.dumps(value,ensure_ascii=False,indent=2))

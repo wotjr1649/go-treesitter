@@ -1,0 +1,134 @@
+{
+  "head": "6a560716bfa63bc830b4607c76c23dc48e1d8967",
+  "main": "2f809b5f855cced1c17420636136f7744173a3d0",
+  "branch": "session/07-product-hardening",
+  "unit_commits": [
+    "6a56071 test(recovery): retain grammar and false-clean C# differences",
+    "23e75d3 build(package): add MIT notices and expand Windows validation",
+    "2db162b perf(experiment): retain duplicate recovery-cost elimination results",
+    "a8fb815 perf(build): measure and document the selected embedded grammar bundle",
+    "f4d67af test(oracle): cover UTF-8 edits and wide trees across seven routes",
+    "05978e4 feat(syntax): index AST positions and node types for repeated lookup",
+    "50d1239 fix(oracle): bind comparisons to current runtime and fixture identities",
+    "0833b9c feat(parser): bound requests and retain complete failure receipts",
+    "62efcf9 feat(api): expose parser construction to external consumers"
+  ],
+  "baseline_changed": false,
+  "remote_count": 0,
+  "tracked_private_paths": 0,
+  "reachable_private_history_paths": 0,
+  "reference_heads": {
+    "gotreesitter": "095a1876ae58053140033278f0863134c2b609cc",
+    "tree-sitter": "5b951eff4f8b1431e933ed0fe45e48fcd4036a38"
+  },
+  "explained_raw_evidence_whitespace": {
+    "artifacts/session-07/phase4-oracle/integrity-red-01.log": 1,
+    "artifacts/session-07/phase5-runtime/candidate.diff": 12,
+    "artifacts/session-07/phase6-package/binary-buildinfo-01.log": 2
+  },
+  "credential_pattern_hits": 0,
+  "credential_scan_limit": "selected obvious credential patterns only; not a universal secret-detection guarantee",
+  "phase_command_index": [
+    {
+      "phase": "phase1-api",
+      "commands": 5,
+      "nonzero_exits": []
+    },
+    {
+      "phase": "phase2-correctness",
+      "commands": 49,
+      "nonzero_exits": [
+        {
+          "name": "scanner-candidate-01",
+          "exit": 1,
+          "expected_exit": 0
+        },
+        {
+          "name": "contextual-focused-01",
+          "exit": 1,
+          "expected_exit": 1
+        }
+      ]
+    },
+    {
+      "phase": "phase3-resources",
+      "commands": 15,
+      "nonzero_exits": [
+        {
+          "name": "regression-01",
+          "exit": 1,
+          "expected_exit": 0
+        },
+        {
+          "name": "race-02",
+          "exit": 1,
+          "expected_exit": 0
+        }
+      ]
+    },
+    {
+      "phase": "phase4-corpus",
+      "commands": 6,
+      "nonzero_exits": []
+    },
+    {
+      "phase": "phase4-oracle",
+      "commands": 5,
+      "nonzero_exits": [
+        {
+          "name": "integrity-red-01",
+          "exit": 1,
+          "expected_exit": 1
+        },
+        {
+          "name": "integrity-green-01",
+          "exit": 1,
+          "expected_exit": 0
+        }
+      ]
+    },
+    {
+      "phase": "phase5-bundle",
+      "commands": 12,
+      "nonzero_exits": [
+        {
+          "name": "measurements-01",
+          "exit": 1,
+          "expected_exit": 0
+        },
+        {
+          "name": "invalid-count-01",
+          "exit": 2,
+          "expected_exit": 2
+        },
+        {
+          "name": "invalid-language-01",
+          "exit": 2,
+          "expected_exit": 2
+        }
+      ]
+    },
+    {
+      "phase": "phase5-runtime",
+      "commands": 8,
+      "nonzero_exits": []
+    },
+    {
+      "phase": "phase5-search",
+      "commands": 6,
+      "nonzero_exits": []
+    },
+    {
+      "phase": "phase6-package",
+      "commands": 17,
+      "nonzero_exits": [
+        {
+          "name": "license-ignore-workflow-01",
+          "exit": 1,
+          "expected_exit": 0
+        }
+      ]
+    }
+  ],
+  "code_map_memo": "no mutation performed; unrelated working state was not absorbed"
+}
