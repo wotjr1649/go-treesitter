@@ -44,13 +44,23 @@ referenced standard texts are included. Those standard texts are reference
 terms, not newly invented upstream copyright notices. Elsa's original source
 header and author notice are also retained.
 
-**Open release question:** `brightscript` and `cooklang` declare ISC in
-`package.json` and MIT in `Cargo.toml` at their fixed commits. Neither has an
-original license file in its complete Git tree. The inventory preserves both
-declarations as `LicenseRef-Upstream-MIT-ISC-Conflict`; it does not select one
-or assert an unrecorded dual-license grant. Their local parsing support remains
-in the 206-case campaign, while release license clearance needs an upstream
-clarification. No publication is authorized by this inventory.
+This distribution includes grammar artifacts derived from
+[tree-sitter-brightscript](https://github.com/ajdelcimmuto/tree-sitter-brightscript/tree/253fdfaa23814cb46c2d5fc19049fa0f2f62c6da)
+and [tree-sitter-cooklang](https://github.com/addcninblue/tree-sitter-cooklang/tree/4ebe237c1cf64cf3826fc249e9ec0988fe07e58e).
+At these pinned commits, each `package.json` declares ISC and each `Cargo.toml`
+declares MIT. Their unmodified metadata declarations are preserved under
+[`LICENSES/grammars/`](LICENSES/grammars/), and the reference
+[ISC](LICENSES/standard/ISC.txt) and [MIT](LICENSES/standard/MIT.txt) license
+texts are included. This notice records those declarations and does not change
+the upstream rights holders' licenses.
+
+**Open release question:** Neither fixed repository contains an original license
+file in its complete Git tree. The inventory preserves both declarations as
+`LicenseRef-Upstream-MIT-ISC-Conflict`. This identifier records a metadata
+mismatch; it does not select one license or assert an unrecorded dual-license
+grant. Their local parsing support remains in the 206-case campaign, while
+release license clearance needs an upstream clarification. No publication is
+authorized by this inventory.
 
 The TypeScript oracle inputs under `testdata/oracle/typescript-patched/` are
 generated from the pinned TypeScript sources and their locked JavaScript base,
