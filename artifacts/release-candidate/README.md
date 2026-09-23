@@ -1,6 +1,10 @@
 # Release candidate evidence
 
-These records are selected historical observations, not a new Release pass.
+This directory contains selected historical measurements and commit-bound
+candidate checks. It does not assert a Release pass.
+`native-e4e6a56/` also retains the fresh native CI and local packaging receipts
+for `e4e6a56bc5ee0e6a5a283381e2c929dea48ae2c4`. Both Windows product jobs and
+the race diagnostic passed; the two license declarations keep Release blocked.
 The current verdict and limitations are in
 [the status board](../../docs/reports/release-critical-status.md).
 

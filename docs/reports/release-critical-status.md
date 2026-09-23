@@ -54,9 +54,9 @@ reasons are enumerated in `artifacts/release-candidate/historical/fallbacks.json
 |---|---|
 | Windows AMD64 native | PASS: CGO=0 build/tests/consumer execution. |
 | Product dependency/PE audit | PASS: 137 dependency packages, zero CgoFiles, no runtime/cgo; ordinary PE imports kernel32.dll only. |
-| Windows ARM64 | CGO=0 native build, vet, product/C-record tests and selected-grammar tests PASS in the first hosted run; the remaining native CI steps did not run after the oracle-tool test failure. |
+| Windows ARM64 | PASS at `e4e6a56`: all native CGO=0 product, recorded-C, selected-grammar, oracle-tool, runtime-invariant, official-ZIP consumer and 206-entry catalog steps completed. |
 | Linux AMD64, Darwin ARM64, wasip1/wasm | CGO=0 cross-link PASS; execution NOT_RUN and outside first-release native scope. |
-| Hosted CI | First run FAILED in Python oracle-tool tests on both architectures because a fresh checkout had no `.scratch` directory. Race diagnostics passed. The initialization fix passes six Python tests. The curated candidate schedules full native packaging and catalog checks; inspect its exact-commit workflow result before claiming completion. |
+| Hosted CI | At `e4e6a56`, both native product jobs and the race diagnostic PASS. The workflow remains FAILED solely because the separate license gate reports the two unresolved upstream declarations. No product step was skipped. |
 | License release gate | BLOCKED_EXTERNAL: Brightscript and Cooklang conflict between ISC and MIT declarations. |
 
 Own code remains MIT. The optional GPL module contains caddy, disassembly and
@@ -76,10 +76,20 @@ and vet. See [the receipt](../../artifacts/release-candidate/precommit.json).
 
 The Windows workflow runs official module ZIP and empty-cache consumer checks
 on both native architectures, including all 206 basic catalog cases against
-the packaged modules. The independent license job intentionally remains failing
-until the two upstream declarations are resolved. No gate is waived by another
-job passing. Existing published session history is a separate disclosure surface;
-the curated branch does not erase it. No main merge, tag or release was performed.
+the packaged modules. [Run 35804758357](https://github.com/wotjr1649/go-treesitter/actions/runs/35804758357)
+completed these checks at `e4e6a56bc5ee0e6a5a283381e2c929dea48ae2c4`.
+[Its retained receipts](../../artifacts/release-candidate/native-e4e6a56/index.json)
+bind the candidate, toolchains, executables, module graphs and downloadable CI
+artifacts. The local, hosted AMD64 and hosted ARM64 ZIP hashes match exactly:
+main `e914918acd95eb85e58eae6adca26fcf0853e53b93f41d49bd610259c620a239`,
+GPL `ec4e23ff5684793cc9a0e2b11a37923e11450fda8bd96dee8cb72411724ce56d`.
+These are that commit's ZIP identities; documentation-only commits produce new
+ZIPs and their own workflow receipts.
+
+The independent license job remains failing until the two upstream declarations
+are resolved. No gate is waived by another job passing. Existing published
+session history is a separate disclosure surface; the curated branch does not
+erase it. No main merge, tag or release was performed.
 
 MemoryBudgetBytes covers parser-managed accounting, not total process
 RSS; grammar caches, source copies, snapshots and concurrent workers require

@@ -1,0 +1,81 @@
+{
+  "candidate_commit": "e4e6a56bc5ee0e6a5a283381e2c929dea48ae2c4",
+  "run_url": "https://github.com/wotjr1649/go-treesitter/actions/runs/35804758357",
+  "workflow_conclusion": "failure",
+  "jobs": [
+    {
+      "name": "race",
+      "conclusion": "success",
+      "url": "https://github.com/wotjr1649/go-treesitter/actions/runs/35804758357/job/107002943240"
+    },
+    {
+      "name": "licenses",
+      "conclusion": "failure",
+      "url": "https://github.com/wotjr1649/go-treesitter/actions/runs/35804758357/job/107002943426"
+    },
+    {
+      "name": "product (windows-11-arm, arm64)",
+      "conclusion": "success",
+      "url": "https://github.com/wotjr1649/go-treesitter/actions/runs/35804758357/job/107002943527"
+    },
+    {
+      "name": "product (windows-latest, amd64)",
+      "conclusion": "success",
+      "url": "https://github.com/wotjr1649/go-treesitter/actions/runs/35804758357/job/107002943831"
+    }
+  ],
+  "receipts": [
+    {
+      "path": "packaging-amd64.json",
+      "sha256": "66aed6d6cdae175261a684b98f8af2f1712a624066e97d8264a20853dee3827e"
+    },
+    {
+      "path": "packaging-arm64.json",
+      "sha256": "6050d58d4a0b33bd2acc5f5534cac7c47c45d02b123a7499cdb8ef129625b914"
+    },
+    {
+      "path": "licenses.json",
+      "sha256": "10c1039aa8f76a3181b3b35ed024958edf284cdf08d0352de1441496797817e7"
+    },
+    {
+      "path": "packaging-local.json",
+      "sha256": "362f996b3e91c6b0c6e9c786ea8086803adce1563c39ef04efd827956d62dfa8"
+    }
+  ],
+  "artifact_downloads": [
+    {
+      "name": "licenses",
+      "id": 10727960110,
+      "archive_sha256": "573f05e791ab645ce5aff86e095346b02d27ec1d077ff592ef14a110fb60b4c5",
+      "receipt_sha256": "10c1039aa8f76a3181b3b35ed024958edf284cdf08d0352de1441496797817e7",
+      "github_digest": "sha256:573f05e791ab645ce5aff86e095346b02d27ec1d077ff592ef14a110fb60b4c5"
+    },
+    {
+      "name": "packaging-amd64",
+      "id": 10727576961,
+      "archive_sha256": "d848e820f7e058dbfc86960570c553b0821d8917f53b6505420076a98766ac7c",
+      "receipt_sha256": "66aed6d6cdae175261a684b98f8af2f1712a624066e97d8264a20853dee3827e",
+      "github_digest": "sha256:d848e820f7e058dbfc86960570c553b0821d8917f53b6505420076a98766ac7c"
+    },
+    {
+      "name": "packaging-arm64",
+      "id": 10726439903,
+      "archive_sha256": "2536ab6cea16d57c59fb33e0ec170fe010b27d337df1659b5da382f19212c857",
+      "receipt_sha256": "6050d58d4a0b33bd2acc5f5534cac7c47c45d02b123a7499cdb8ef129625b914",
+      "github_digest": "sha256:2536ab6cea16d57c59fb33e0ec170fe010b27d337df1659b5da382f19212c857"
+    }
+  ],
+  "log_sha256": "c50783935c37b5fa8ba4853b7523b19ff03bd326f6dd63a2f3b8bf7d866ad06e",
+  "module_zip_identity": "Local Windows AMD64, Hosted Windows AMD64 and Hosted Windows ARM64 ZIP SHA-256 values are identical for both modules.",
+  "release_verdict": "BLOCKED_EXTERNAL",
+  "release_blockers": [
+    "brightscript: applicable ISC/MIT declaration and copyright notice require upstream clarification",
+    "cooklang: applicable ISC/MIT declaration and copyright notice require upstream clarification"
+  ],
+  "limitations": [
+    "No tag or release has been published.",
+    "Main remains unmerged.",
+    "Earlier public session history remains a separate disclosure surface.",
+    "Native platform scope is Windows; other platforms were link-checked only."
+  ]
+}

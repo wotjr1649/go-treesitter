@@ -134,7 +134,9 @@ Performance and memory measurements, controlled fallback reasons and remaining
 release blockers are recorded in the [status board](docs/reports/release-critical-status.md)
 and [selected evidence](artifacts/release-candidate/README.md).
 Brightscript and Cooklang still have conflicting upstream ISC/MIT declarations;
-native Windows ARM64 and hosted CI execution remain required for release.
+these are the remaining Release blockers. The curated candidate's native Windows
+AMD64 and ARM64 product jobs, including official-ZIP consumers and 206 basic
+grammar checks, passed; see the commit-bound receipts in the status board.
 
 The library's own code is [MIT licensed](LICENSE). See
 [third-party notices](THIRD_PARTY_NOTICES.md) for the pinned runtime, all catalog
