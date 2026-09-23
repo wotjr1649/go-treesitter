@@ -1,0 +1,147 @@
+{
+  "record_kind": "public projection of local pre-commit receipts",
+  "historical_product_commit": "23d6885ebe8709616614c89ffb6511ea815fb23f",
+  "production_digest": "d50d1152b10dae6d3b576baaa5449727d782696998aab9cf758537cd5391896d",
+  "production_files_matched": 1807,
+  "test_metadata_changes": {
+    "experiments/v052-v053/internal/gtsadapter/probe_test.go": "private historical experiment omitted",
+    "testdata/oracle/catalog-cobol.json": "build_receipt pointer only; C trees and identities unchanged",
+    "tools/native-oracle/README.md": "stale active-difference documentation corrected",
+    "tools/native-oracle/test_run.py": "create scratch directory in fresh checkouts"
+  },
+  "tests": {
+    "product": 911,
+    "subset": 895,
+    "oracle_python": 6,
+    "packaging_boundary": 1,
+    "private_invariants": 4
+  },
+  "runs": [
+    {
+      "check": "tool-build",
+      "command": [
+        "go",
+        "-C",
+        "tools/modulezip",
+        "build",
+        "-mod=readonly",
+        "-trimpath",
+        "-o",
+        "../../.scratch/modulezip.exe",
+        "."
+      ],
+      "exit": 0,
+      "seconds": 1.394,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lane": "windows/amd64 CGO_ENABLED=0; offline"
+    },
+    {
+      "check": "packaging-unit",
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/release",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "exit": 0,
+      "seconds": 0.131,
+      "log_sha256": "16e9914153830aed22474387441ca29b76dfcff317f1d42b9498ec48ab797a67",
+      "lane": "windows/amd64 CGO_ENABLED=0; offline"
+    },
+    {
+      "check": "oracle-unit",
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/native-oracle",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "exit": 0,
+      "seconds": 0.579,
+      "log_sha256": "96d2c59171a552a40e532f4169c1e9aad6871d0054526b31133aa8029f92a2e5",
+      "lane": "windows/amd64 CGO_ENABLED=0; offline"
+    },
+    {
+      "check": "product",
+      "command": [
+        "go",
+        "test",
+        "./...",
+        "-count=1",
+        "-timeout=120s",
+        "-json"
+      ],
+      "exit": 0,
+      "seconds": 64.549,
+      "log_sha256": "a72e0dee3d675027227476e5bec3537ad3ed812340a0ccbedd5b6f8d11795525",
+      "lane": "windows/amd64 CGO_ENABLED=0; offline"
+    },
+    {
+      "check": "subset",
+      "command": [
+        "go",
+        "test",
+        "-tags",
+        "grammar_subset,grammar_subset_go,grammar_subset_python,grammar_subset_javascript,grammar_subset_typescript,grammar_subset_tsx,grammar_subset_c_sharp",
+        "./...",
+        "-count=1",
+        "-timeout=120s",
+        "-json"
+      ],
+      "exit": 0,
+      "seconds": 36.472,
+      "log_sha256": "bc5ed6f673bdf4154f543edc14f79ae23dffbcd26e6cd27e6981cc0bda5c2b9d",
+      "lane": "windows/amd64 CGO_ENABLED=0; offline"
+    },
+    {
+      "check": "invariants",
+      "command": [
+        "python",
+        "tools/runtime-bundle/check.py"
+      ],
+      "exit": 0,
+      "seconds": 8.734,
+      "log_sha256": "7a76886f1ed96d614a50f840f9733acf60443f5772ab72844f0ae3e2ab807416",
+      "lane": "windows/amd64 CGO_ENABLED=0; offline"
+    },
+    {
+      "check": "vet",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit": 0,
+      "seconds": 2.181,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lane": "windows/amd64 CGO_ENABLED=0; offline"
+    },
+    {
+      "check": "licenses",
+      "command": [
+        "python",
+        "tools/licenses/check.py"
+      ],
+      "exit": 1,
+      "seconds": 0.067,
+      "log_sha256": "10c1039aa8f76a3181b3b35ed024958edf284cdf08d0352de1441496797817e7",
+      "lane": "windows/amd64 CGO_ENABLED=0; offline"
+    }
+  ],
+  "release": "BLOCKED_EXTERNAL: Brightscript and Cooklang license clarification; native candidate Hosted CI not yet observed",
+  "limits": "Raw local logs remain archived; their hashes identify them. Packaging CLI and native ARM64 will be checked after the candidate is committed.",
+  "omitted_fields": [
+    "absolute working directories"
+  ],
+  "command_normalization": "Python executable installation paths replaced by python; original receipts are retained locally."
+}

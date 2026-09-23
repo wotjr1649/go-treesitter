@@ -1,0 +1,458 @@
+[
+  {
+    "id": "CS-before-clean",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "clean",
+    "source": "class Before {}\n",
+    "sha256": "84c144a5bd7ab732cb9c440175d4e4ac52598deb86381f9ba15844af656d03fd"
+  },
+  {
+    "id": "CS-members-0-0",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\n#if X\nB,\n#endif\n\n} }\n",
+    "sha256": "3f03217ae617f470d2b10fe9108182467a6ab343bec6fc31c7482c01d5d79f06",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 44
+    }
+  },
+  {
+    "id": "CS-members-0-1",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\n#if X\nB,\n#endif\nC0\n} }\n",
+    "sha256": "293e10217cd576180e690cb622c3bc0a35ddb68da59cadce77e580ff2354977d",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 46
+    }
+  },
+  {
+    "id": "CS-members-0-2",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\n#if X\nB,\n#endif\nC0,\nC1\n} }\n",
+    "sha256": "0438b7f57d7fbfa3d1431e433b0b00d76038625087abe2ec59ef65a04e40fb83",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 50
+    }
+  },
+  {
+    "id": "CS-members-0-3",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\n#if X\nB,\n#endif\nC0,\nC1,\nC2\n} }\n",
+    "sha256": "3809a56fb452cec9691a795732fb84a5a815c4516ef3bbbb488f2b8dbd2b9512",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 54
+    }
+  },
+  {
+    "id": "CS-members-1-0",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\n#if X\nB,\n#endif\n\n} }\n",
+    "sha256": "78d3b5d1a598c2e959d42ab3526509508585b3136e7dd0d50af5d9cc4e8e4183",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 48
+    }
+  },
+  {
+    "id": "CS-members-1-1",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\n#if X\nB,\n#endif\nC0\n} }\n",
+    "sha256": "0835b1be5e5d4066adaa25f015c40cc73cf5bcd452a8db59f294359161e80549",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 50
+    }
+  },
+  {
+    "id": "CS-members-1-2",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\n#if X\nB,\n#endif\nC0,\nC1\n} }\n",
+    "sha256": "627acd7e4bb8270e119ee2d8aaece7d107957d12cd42cccd94b5ac68b0c73f9f",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 54
+    }
+  },
+  {
+    "id": "CS-members-1-3",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\n#if X\nB,\n#endif\nC0,\nC1,\nC2\n} }\n",
+    "sha256": "2464be7f453bb3a87da63c23995ae75d52bbca3b83312502beef48befe79f827",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 58
+    }
+  },
+  {
+    "id": "CS-members-2-0",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\n#if X\nB,\n#endif\n\n} }\n",
+    "sha256": "19ad29e29df224543766a618626399c776ec54e1f015dd0663fcd66fd7cc2048",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 52
+    }
+  },
+  {
+    "id": "CS-members-2-1",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\n#if X\nB,\n#endif\nC0\n} }\n",
+    "sha256": "13644f8caa0b80e6d00a93443a08094517c3e9ea19fa856aede6ccc6929667fd",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 54
+    }
+  },
+  {
+    "id": "CS-members-2-2",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\n#if X\nB,\n#endif\nC0,\nC1\n} }\n",
+    "sha256": "3fd5a711b42a9c9f4e20343c7b75ffa1274cd589b5780cc4d80cf882b0d927fe",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 58
+    }
+  },
+  {
+    "id": "CS-members-2-3",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\n#if X\nB,\n#endif\nC0,\nC1,\nC2\n} }\n",
+    "sha256": "8b653872a706e602dc0f30740265d6ac0f0fbb87df080e512066ea84dbcb79a7",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 62
+    }
+  },
+  {
+    "id": "CS-members-3-0",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\n#if X\nB,\n#endif\n\n} }\n",
+    "sha256": "c5c4bc3bdf9a174164385f61448377bd6bd0c110ecc539ab1aed505962676917",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 56
+    }
+  },
+  {
+    "id": "CS-members-3-1",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\n#if X\nB,\n#endif\nC0\n} }\n",
+    "sha256": "225bddf38c47cfa6044302f9a37f2de8bbc5f9b31ac16870f3003209f6d9cf50",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 58
+    }
+  },
+  {
+    "id": "CS-members-3-2",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\n#if X\nB,\n#endif\nC0,\nC1\n} }\n",
+    "sha256": "2af387da13602580f57b8b88c78d08a247d64264306f6d2d98b8ee9b2e77c8cc",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 62
+    }
+  },
+  {
+    "id": "CS-members-3-3",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\n#if X\nB,\n#endif\nC0,\nC1,\nC2\n} }\n",
+    "sha256": "b52269fc313f50235a2e4184a5cc0343eb1ceb843b3f9f03016da0f9789c4701",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 66
+    }
+  },
+  {
+    "id": "CS-members-4-0",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\nA3,\n#if X\nB,\n#endif\n\n} }\n",
+    "sha256": "36b280b77c4c200ee88e113fb86c7f2454138254d57babe4d1fd8f3a6c703346",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 60
+    }
+  },
+  {
+    "id": "CS-members-4-1",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\nA3,\n#if X\nB,\n#endif\nC0\n} }\n",
+    "sha256": "9063d633496e1ae32039b6f081f4a3a911ad6783a6d873ea812bc94fc245d4a3",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 62
+    }
+  },
+  {
+    "id": "CS-members-4-2",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\nA3,\n#if X\nB,\n#endif\nC0,\nC1\n} }\n",
+    "sha256": "55aa271550283538204a3e2d9cd42f417cf827bdd9f1fcc9b34c7bec84f6c86c",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 66
+    }
+  },
+  {
+    "id": "CS-members-4-3",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\nA3,\n#if X\nB,\n#endif\nC0,\nC1,\nC2\n} }\n",
+    "sha256": "0681c39ebbafe41dda9d0e5f07eb4ad1f598735b659de2917efbef81ac8c3d97",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 70
+    }
+  },
+  {
+    "id": "CS-members-5-0",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\nA3,\nA4,\n#if X\nB,\n#endif\n\n} }\n",
+    "sha256": "1504bbce7c465b4c08f485a90ee484b67970c8348d39fb7bef3b4918d818d7c5",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 64
+    }
+  },
+  {
+    "id": "CS-members-5-1",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\nA3,\nA4,\n#if X\nB,\n#endif\nC0\n} }\n",
+    "sha256": "60000ef76f6c2dc55b0a523b6934270b7dbf6c06174d45e0ffa6c6e861e51ce6",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 66
+    }
+  },
+  {
+    "id": "CS-members-5-2",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\nA3,\nA4,\n#if X\nB,\n#endif\nC0,\nC1\n} }\n",
+    "sha256": "8c3a90546cb439173e6a07ce39072e941aff39ab1e03240b590a0d6e1667dac9",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 70
+    }
+  },
+  {
+    "id": "CS-members-5-3",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\nA3,\nA4,\n#if X\nB,\n#endif\nC0,\nC1,\nC2\n} }\n",
+    "sha256": "ca0a4fbaefb5e7913405ec9cb1d1e5eb7b5d3b6cb3e287bc522264f007941519",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 74
+    }
+  },
+  {
+    "id": "CS-members-6-0",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\nA3,\nA4,\nA5,\n#if X\nB,\n#endif\n\n} }\n",
+    "sha256": "7e7eb8319b1a1dde132afa6a1776f4c62877fdd618d65fe2ecc1bc8dbfafb83f",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 68
+    }
+  },
+  {
+    "id": "CS-members-6-1",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\nA3,\nA4,\nA5,\n#if X\nB,\n#endif\nC0\n} }\n",
+    "sha256": "f6b8dcab9cd4739a07664f3dc47010283711c45dc9e6f7598983ecffeca8bb0b",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 70
+    }
+  },
+  {
+    "id": "CS-members-6-2",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\nA3,\nA4,\nA5,\n#if X\nB,\n#endif\nC0,\nC1\n} }\n",
+    "sha256": "30573e0959d7d0592d74c28b2e1ed87692b0c7afdf9719fcf24ca2e4c1baacf2",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 74
+    }
+  },
+  {
+    "id": "CS-members-6-3",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\nA3,\nA4,\nA5,\n#if X\nB,\n#endif\nC0,\nC1,\nC2\n} }\n",
+    "sha256": "2a55933364b663ce1a61786031478ce8d3ca6239792c4c2213e3f097eea1824d",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 78
+    }
+  },
+  {
+    "id": "CS-members-7-0",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\nA3,\nA4,\nA5,\nA6,\n#if X\nB,\n#endif\n\n} }\n",
+    "sha256": "88c483d0e27146f024cbdae4e21e7e740bd0f6eb83e62b5796c9822627ca966c",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 72
+    }
+  },
+  {
+    "id": "CS-members-7-1",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\nA3,\nA4,\nA5,\nA6,\n#if X\nB,\n#endif\nC0\n} }\n",
+    "sha256": "d474129f31500d0c163a21c4a9d90861160708ca32e38e04fffb37067a1a4d7c",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 74
+    }
+  },
+  {
+    "id": "CS-members-7-2",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\nA3,\nA4,\nA5,\nA6,\n#if X\nB,\n#endif\nC0,\nC1\n} }\n",
+    "sha256": "22778425aaee227a8bcbcca67c0318543a51d249984fbf35af640489135a3f5f",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 78
+    }
+  },
+  {
+    "id": "CS-members-7-3",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "recovery",
+    "source": "namespace N { enum E {\nA0,\nA1,\nA2,\nA3,\nA4,\nA5,\nA6,\n#if X\nB,\n#endif\nC0,\nC1,\nC2\n} }\n",
+    "sha256": "3d6d942810e3482600a46a0d28924d6bb6f298908b6174ce7bd46f1c14ab2272",
+    "previous": "CS-before-clean",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 16,
+      "NewEndByte": 82
+    }
+  }
+]

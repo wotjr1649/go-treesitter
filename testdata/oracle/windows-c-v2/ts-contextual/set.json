@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "cases_sha256": "0430f2db7abcc0314e6ea2a6b2a4575cdfa63cdefd17f3ed787cd077ff1f3664",
+  "files": {
+    "build.json": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+    "ts-binary-in.json": "80b2330edcaa0f2a2cb1067d84c6f88b657c4648168701670d7949f5a6431cc0",
+    "ts-newline-in.json": "19c5731d3eedb741b5a1f9fa5ca12a78e3f530dd93ebc18185050eb85e16aa01",
+    "ts-newline-optional-in.json": "bd2d16297ff8215088a9b18c8ea7190fdb60dade55e1bacaf0e9a48caedbd8d9",
+    "ts-semicolon-in.json": "2ff807ece64b3747e61e158303dfedbfebd76f0f4834e844fe4f7aa7ba6190a7",
+    "tsx-binary-in.json": "425b85d921fdc344051937d9870034049e823a4d28c806048883d48fc0d7ab43",
+    "tsx-newline-in.json": "9f3dbce4aa0ba1b920ee28e571a6d6e52c7e5cc5bb786bceb9e1f15567a42897",
+    "tsx-newline-optional-in.json": "ff2779e13df771582f8f57452f00a8f6d4a13232b2f0574eb1c3b32afd50bd2b",
+    "tsx-semicolon-in.json": "3af819dbaeb31a98eddb8f8459fe752d4dc0eb7e9e60a0a86ae9785c8b5c7746"
+  }
+}

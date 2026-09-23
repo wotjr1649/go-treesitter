@@ -1,0 +1,33 @@
+--- a/parser_recover_c.go
++++ b/parser_recover_c.go
+@@ -5664,10 +5664,10 @@
+ //
+ //   - It only runs where the stack would otherwise pause with no action, so a
+ //     parse in which every stack accepts the shared token pays nothing.
+-//   - It requires the re-lexed token to cover exactly the shared token's byte
+-//     span. Same span means a stack that adopts it advances to the same offset
+-//     as every stack that took the shared token, so the versions stay in
+-//     lockstep and no caller has to reason about a ragged frontier.
++//   - Ordinary grammars require the same byte span. JS-family internal tokens
++//     and stateless JSX text may split or extend it: the dispatch loop replays
++//     a shorter token's remainder and skips already-consumed shared tokens for
++//     a version that advanced farther. Stateful external tokens keep exact spans.
+ //   - It requires the stack's state to have a real action for the re-lexed
+ //     symbol, so a failed probe leaves the existing pause path untouched.
+ //   - It runs the internal DFA only. The external scanner is never re-entered,
+@@ -5714,11 +5714,11 @@
+ 	if !ok || relexed.Symbol == 0 || relexed.Symbol == tok.Symbol {
+ 		return tok, false
+ 	}
+-	// JS-family recovery can split an internal token into shorter tokens.
+-	// The dispatch loop replays its remainder before advancing the shared
+-	// stream. Other grammars and external scanner tokens require exact spans.
++	// JS-family versions can require a different token width (for example a
++	// string fragment versus a number). Dispatch reconciles the byte frontier.
++	// Other grammars and stateful external scanner tokens require exact spans.
+ 	if relexed.StartByte != tok.StartByte || relexed.EndByte != tok.EndByte {
+-		if (lang.Name != "javascript" && lang.Name != "typescript" && lang.Name != "tsx") || (tok.ExternalScannerToken && !statelessJSXTextToken(lang, tok)) || relexed.StartByte < tok.StartByte || relexed.EndByte > tok.EndByte || relexed.EndByte <= relexed.StartByte {
++		if (lang.Name != "javascript" && lang.Name != "typescript" && lang.Name != "tsx") || (tok.ExternalScannerToken && !statelessJSXTextToken(lang, tok)) || relexed.StartByte < tok.StartByte || relexed.EndByte <= relexed.StartByte {
+ 			return tok, false
+ 		}
+ 	}

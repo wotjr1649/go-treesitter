@@ -1,0 +1,370 @@
+[
+  {
+    "id": "GO-before-plain",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar café = 1\n",
+    "sha256": "d8efdd5db10e4a233e631c8130f571cefeee7c436fcfdc383401cb6489115bdf"
+  },
+  {
+    "id": "GO-recovery-plain-seed",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "packag#i#000 p\nvar café = 1\n",
+    "sha256": "98865ef61dc1dbdee029955a62a949c133b10e3f5c8cf36f0c82f4e63a84d4ac",
+    "previous": "GO-before-plain",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-plain-rename",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "packag#z#111 p\nvar café = 1\n",
+    "sha256": "c2c88947c555c66632ff2a4e9d3c79b14a37efedca4cf0faab73e407e1641b0f",
+    "previous": "GO-before-plain",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-plain-unicode",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "packag#λ#1 p\nvar café = 1\n",
+    "sha256": "fde2181f3ced0ec5a18cc9f8c5bfd6ae81933173489a678db50ff7aefb0d266d",
+    "previous": "GO-before-plain",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 11
+    }
+  },
+  {
+    "id": "GO-recovery-plain-at",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "packag@i@000 p\nvar café = 1\n",
+    "sha256": "8f936b10d2e1c8c63e7184c24aa3bdc62f092467b44b5f35b2dde682539e0302",
+    "previous": "GO-before-plain",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-plain-question",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "packag?i?000 p\nvar café = 1\n",
+    "sha256": "9f6e846272ecf9447cbacd4486d4b452aebec5df573493eac111884bf39f162b",
+    "previous": "GO-before-plain",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-plain-long",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "packag#i#000000 p\nvar café = 1\n",
+    "sha256": "f9d34b7f471d6802088ffcfd758dea31710b19860d71b40bfacd309dc60e5db4",
+    "previous": "GO-before-plain",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 15
+    }
+  },
+  {
+    "id": "GO-before-leading",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "\npackage p\nvar café = 1\n",
+    "sha256": "7015ae6dd147090e729300bcaf2d97f32c0c3021890ad3e77d186418bc11a0fd"
+  },
+  {
+    "id": "GO-recovery-leading-seed",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "\npackag#i#000 p\nvar café = 1\n",
+    "sha256": "175fe2a9fc55d47237958ab438da1212fb298f580990bde151fe7fe33e2589cb",
+    "previous": "GO-before-leading",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 8,
+      "NewEndByte": 13
+    }
+  },
+  {
+    "id": "GO-recovery-leading-rename",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "\npackag#z#111 p\nvar café = 1\n",
+    "sha256": "cba26dc35df7c1cc46235f9ef52f4782a83052497c6900ff351bbf9e22ea3e45",
+    "previous": "GO-before-leading",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 8,
+      "NewEndByte": 13
+    }
+  },
+  {
+    "id": "GO-recovery-leading-unicode",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "\npackag#λ#1 p\nvar café = 1\n",
+    "sha256": "7f84dc8383532541366a5f493b0b6338c5711f90a4c216de948af25799f58944",
+    "previous": "GO-before-leading",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 8,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-leading-at",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "\npackag@i@000 p\nvar café = 1\n",
+    "sha256": "85f415c937d0aec15f1efded59eb6a535be096a111113f2a03b523b650e696fb",
+    "previous": "GO-before-leading",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 8,
+      "NewEndByte": 13
+    }
+  },
+  {
+    "id": "GO-recovery-leading-question",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "\npackag?i?000 p\nvar café = 1\n",
+    "sha256": "7d32ad82faa4c69737682af35f1123d6d37fc593d9e84fae8b38d2a4d19c36d4",
+    "previous": "GO-before-leading",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 8,
+      "NewEndByte": 13
+    }
+  },
+  {
+    "id": "GO-recovery-leading-long",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "\npackag#i#000000 p\nvar café = 1\n",
+    "sha256": "f87b2bc1935304ff9c30797dbccb183884056788c7d6ed8c16d6fd87e8e0a091",
+    "previous": "GO-before-leading",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 8,
+      "NewEndByte": 16
+    }
+  },
+  {
+    "id": "GO-before-comment",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "// header\npackage p\nvar café = 1\n",
+    "sha256": "49292f6a967eab9cf7f90284a98c857d4325a8813656b61528751733d7cee784"
+  },
+  {
+    "id": "GO-recovery-comment-seed",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "// header\npackag#i#000 p\nvar café = 1\n",
+    "sha256": "b44bf23b641fac932af2c043ba3332164a58e1ea48fd20f52efabf901e8b068f",
+    "previous": "GO-before-comment",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 17,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "GO-recovery-comment-rename",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "// header\npackag#z#111 p\nvar café = 1\n",
+    "sha256": "eb46a55e60c5e5ed6b8eddfbca5358c65a92b3c0a74b533abf2095fdb38f303b",
+    "previous": "GO-before-comment",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 17,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "GO-recovery-comment-unicode",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "// header\npackag#λ#1 p\nvar café = 1\n",
+    "sha256": "83778879f777ab0f15e2c51fbe2e53504ccaccafd4f14f8d49fb4148c43017fe",
+    "previous": "GO-before-comment",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 17,
+      "NewEndByte": 21
+    }
+  },
+  {
+    "id": "GO-recovery-comment-at",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "// header\npackag@i@000 p\nvar café = 1\n",
+    "sha256": "e21aa67af89be3d2472c6cd655a76def03b6eb237acfc9f52e61db81c7661a3d",
+    "previous": "GO-before-comment",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 17,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "GO-recovery-comment-question",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "// header\npackag?i?000 p\nvar café = 1\n",
+    "sha256": "fabeff70fbb7f91b6c759b8c3c377a26f92b34f4aa83449786980e63ffacb9df",
+    "previous": "GO-before-comment",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 17,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "GO-recovery-comment-long",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "// header\npackag#i#000000 p\nvar café = 1\n",
+    "sha256": "51252232d7d35848949ddd3645e45a184e68ce3b6bbec12ddde4137fa9649f22",
+    "previous": "GO-before-comment",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 17,
+      "NewEndByte": 25
+    }
+  },
+  {
+    "id": "GO-before-crlf",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\r\nvar café = 1\r\n",
+    "sha256": "9784aea6f523b4b348696511ea38e9b412cb3d464e0bf89cc42e7d9e142307ba"
+  },
+  {
+    "id": "GO-recovery-crlf-seed",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "packag#i#000 p\r\nvar café = 1\r\n",
+    "sha256": "24d8bc86ed9b448a3a008231a334544f19487154f1dad702a0ce58a81fbe1fbe",
+    "previous": "GO-before-crlf",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-crlf-rename",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "packag#z#111 p\r\nvar café = 1\r\n",
+    "sha256": "ad07ecc72573be6943938e65bd7fa4a4b37b359bdb0a3c58d928ca353b1a5b8e",
+    "previous": "GO-before-crlf",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-crlf-unicode",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "packag#λ#1 p\r\nvar café = 1\r\n",
+    "sha256": "f018e1a89430ed612274b4159ba6b25d9996ef14f08646eefd94198d0d29f10c",
+    "previous": "GO-before-crlf",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 11
+    }
+  },
+  {
+    "id": "GO-recovery-crlf-at",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "packag@i@000 p\r\nvar café = 1\r\n",
+    "sha256": "5661118aad363b9c8fb4a786127e8c3be6189613c955141cb5ad19b666e2a74e",
+    "previous": "GO-before-crlf",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-crlf-question",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "packag?i?000 p\r\nvar café = 1\r\n",
+    "sha256": "9cd7cc0cfbe9fa1a92f1b76f27950c20268f8b400c64d6ecb7d43376ca76fa28",
+    "previous": "GO-before-crlf",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-crlf-long",
+    "language": "go",
+    "filename": "x.go",
+    "group": "recovery-order",
+    "source": "packag#i#000000 p\r\nvar café = 1\r\n",
+    "sha256": "72526859504d0c53e9289e0d61de59114cc7664208ec63bdf86d79db9a566845",
+    "previous": "GO-before-crlf",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 15
+    }
+  }
+]

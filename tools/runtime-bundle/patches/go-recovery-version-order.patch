@@ -1,0 +1,16 @@
+--- a/grammars/runtime/runtime_profiles.go
++++ b/grammars/runtime/runtime_profiles.go
+@@ -73,9 +73,10 @@
+ 	// against the production parser and the tree-sitter C oracle.
+ 	// The owned EOF bundle requires its executed recovery route before publication.
+ 	"go": {
+-		blobSHA256:                 mustRuntimeProfileSHA256("9cf914d26d962d1a62e7954f8b20b302337a44cb7d4a07218eec482c45a57a08"),
+-		compactConvergedSplitDrops: true,
+-		compactOwnedEOFRecovery:    true,
++		compactPackedGSSVersionOrder: true,
++		blobSHA256:                   mustRuntimeProfileSHA256("9cf914d26d962d1a62e7954f8b20b302337a44cb7d4a07218eec482c45a57a08"),
++		compactConvergedSplitDrops:   true,
++		compactOwnedEOFRecovery:      true,
+ 	},
+ 	// YAML's irreducible flow opener has one direct no-action EOF lineage whose
+ 	// C result is the recover_eof ERROR root. Keep this gate independent from

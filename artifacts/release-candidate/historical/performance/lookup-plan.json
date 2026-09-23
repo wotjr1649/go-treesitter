@@ -1,0 +1,51 @@
+{
+  "tasks": [
+    [
+      "candidate",
+      1
+    ],
+    [
+      "baseline",
+      1
+    ],
+    [
+      "baseline",
+      2
+    ],
+    [
+      "candidate",
+      2
+    ],
+    [
+      "candidate",
+      3
+    ],
+    [
+      "baseline",
+      3
+    ],
+    [
+      "candidate",
+      4
+    ],
+    [
+      "baseline",
+      4
+    ],
+    [
+      "baseline",
+      5
+    ],
+    [
+      "candidate",
+      5
+    ]
+  ],
+  "query_iterations": 1000000,
+  "index_iterations": 1000,
+  "reason": "The 40-operation query/index samples had wide intervals; predeclare a longer fixed sample, retain both series.",
+  "binaries": {
+    "baseline": "b70acc98ad189a4764ed72350ee4e701c13b8b59b4f9f8c132806067c400495a",
+    "candidate": "6d4e2d157cf81a861554ac786ef2c9d85c55a96224b92a332bcc48be1b79e86d"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "status": "BLOCKED_EXTERNAL",
+  "inventory_sha256": "9403ec5a3293c0dbcbb4f176ee4ea8faa61929bb1f1601ce72ed4b4eeb721251",
+  "grammars": 206,
+  "unresolved": [
+    {
+      "grammar": "brightscript",
+      "commit": "253fdfaa23814cb46c2d5fc19049fa0f2f62c6da",
+      "declarations": [
+        "ISC",
+        "MIT"
+      ],
+      "source": "https://raw.githubusercontent.com/ajdelcimmuto/tree-sitter-brightscript/253fdfaa23814cb46c2d5fc19049fa0f2f62c6da/package.json",
+      "additional_evidence": [
+        {
+          "path": "LICENSES/grammars/brightscript-Cargo.toml",
+          "source": "https://raw.githubusercontent.com/ajdelcimmuto/tree-sitter-brightscript/253fdfaa23814cb46c2d5fc19049fa0f2f62c6da/Cargo.toml",
+          "sha256": "37310875902014562c194fc5b019aca6fa23c8ab3b1db991505a29297cf89acb"
+        }
+      ]
+    },
+    {
+      "grammar": "cooklang",
+      "commit": "4ebe237c1cf64cf3826fc249e9ec0988fe07e58e",
+      "declarations": [
+        "ISC",
+        "MIT"
+      ],
+      "source": "https://raw.githubusercontent.com/addcninblue/tree-sitter-cooklang/4ebe237c1cf64cf3826fc249e9ec0988fe07e58e/package.json",
+      "additional_evidence": [
+        {
+          "path": "LICENSES/grammars/cooklang-Cargo.toml",
+          "source": "https://raw.githubusercontent.com/addcninblue/tree-sitter-cooklang/4ebe237c1cf64cf3826fc249e9ec0988fe07e58e/Cargo.toml",
+          "sha256": "f297c2c62a4ac27c6413c4417380e95467aab3b3352ce59d4a3102b659476225"
+        }
+      ]
+    }
+  ],
+  "resolution": "Upstream rights holders must clarify the conflicting ISC/MIT declarations and provide an applicable notice; no license is invented here."
+}

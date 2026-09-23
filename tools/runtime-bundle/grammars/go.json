@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "language": "go",
+  "grammar_commit": "2346a3ab1bb3857b48b29d779a1ef9799a248cd7",
+  "origin_blob_sha256": "9cf914d26d962d1a62e7954f8b20b302337a44cb7d4a07218eec482c45a57a08",
+  "product_blob_sha256": "81f9b19b5886ac11646c713c0c531bd835fc026d363437ba29b28ac2faabea9a",
+  "c_parser_sha256": "3dbf6ed1238b5dfcf2be4d2f2d4cb27a14d34f34d7784eccccbfd532fd4a6d85",
+  "source_archive": {
+    "path": "tools/runtime-bundle/grammars/go-source.zip",
+    "sha256": "6b7f7181fd284f84a2a01602d96759002ca56ac3edcaab404eefe56ace087127",
+    "files": {
+      "LICENSE": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+      "src/parser.c": "3dbf6ed1238b5dfcf2be4d2f2d4cb27a14d34f34d7784eccccbfd532fd4a6d85"
+    }
+  },
+  "converter": {
+    "baseline": {
+      "module": "github.com/odvcencio/gotreesitter",
+      "version": "v0.53.0",
+      "tag": "f102332cca9dc45e841b9439d34ba5cc59f0b10f",
+      "commit": "c871b1f576866c40b1695677fe3512243e266d39"
+    },
+    "module_archive_sha256": "a7fc4a2f1b369542b14429c36a09a41d6db0bb0d2beec5844930b4a17c6ae3a6",
+    "package": "cmd/ts2go",
+    "command": [
+      "ts2go",
+      "-input",
+      "src/parser.c",
+      "-output",
+      "output/go.go",
+      "-name",
+      "go"
+    ]
+  },
+  "reproduction_evidence": "artifacts/session-07/full-pass/06-correctness/go-c-tables-byte-reproduction.json"
+}

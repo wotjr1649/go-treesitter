@@ -1,0 +1,86 @@
+{
+  "record_kind": "selected historical fields; not a new execution",
+  "original_sha256": "d91e83c92b978e874adc7abc051364f7faebf947292aa1097ee08fd7da085187",
+  "candidate_commit": "23d6885ebe8709616614c89ffb6511ea815fb23f",
+  "runtime_manifest_sha256": "5d1f526c35e223341914cbfada8abe1c4c49d52824a09950bde05d331ff41e46",
+  "c_records": 688,
+  "edits": 439,
+  "large_go_nodes": 57348,
+  "catalog_basic": 206,
+  "tests": {
+    "product": {
+      "passed_tests": 911,
+      "failed": [],
+      "skipped": [
+        "github.com/wotjr1649/go-treesitter/internal/runtime",
+        "github.com/wotjr1649/go-treesitter/internal/runtime/grammars",
+        "github.com/wotjr1649/go-treesitter/internal/runtime/grammars/internal/pythonruntime",
+        "github.com/wotjr1649/go-treesitter/internal/runtime/grammars/internal/standaloneregistry",
+        "github.com/wotjr1649/go-treesitter/internal/runtime/grammars/runtime",
+        "github.com/wotjr1649/go-treesitter/internal/runtime/internal/luapattern",
+        "github.com/wotjr1649/go-treesitter/internal/runtime/internal/parsercorephase0",
+        "github.com/wotjr1649/go-treesitter/tools/catalog",
+        "github.com/wotjr1649/go-treesitter/tools/measure"
+      ]
+    },
+    "subset": {
+      "passed_tests": 895,
+      "failed": [],
+      "skipped": [
+        "github.com/wotjr1649/go-treesitter/internal/runtime",
+        "github.com/wotjr1649/go-treesitter/internal/runtime/grammars",
+        "github.com/wotjr1649/go-treesitter/internal/runtime/grammars/internal/pythonruntime",
+        "github.com/wotjr1649/go-treesitter/internal/runtime/grammars/internal/standaloneregistry",
+        "github.com/wotjr1649/go-treesitter/internal/runtime/grammars/runtime",
+        "github.com/wotjr1649/go-treesitter/internal/runtime/internal/luapattern",
+        "github.com/wotjr1649/go-treesitter/internal/runtime/internal/parsercorephase0",
+        "github.com/wotjr1649/go-treesitter/tools/catalog",
+        "github.com/wotjr1649/go-treesitter/tools/measure"
+      ]
+    },
+    "race": {
+      "passed_tests": 66,
+      "failed": [],
+      "skipped": []
+    },
+    "private": {
+      "passed_tests": 4,
+      "failed": [],
+      "skipped": []
+    }
+  },
+  "fuzz": {
+    "edit": {
+      "executions": 16378,
+      "duration_seconds": 60,
+      "parallel": 2
+    },
+    "bounded": {
+      "executions": 49059,
+      "duration_seconds": 60,
+      "parallel": 2
+    }
+  },
+  "memory": {
+    "cycles": 193,
+    "parses": 3281,
+    "seconds": 58.928,
+    "post_gc_heap_range": [
+      83966168,
+      83967832
+    ],
+    "peak_working_set": 295403520,
+    "after_scavenge_working_set": 102858752,
+    "peak_arena": 23646312,
+    "peak_scratch": 8272920,
+    "peak_stack_depth": 53,
+    "tree_open_close_equal": true,
+    "goroutines": 1,
+    "total_allocated": 50106520064
+  },
+  "external_consumer_c_records": 100,
+  "external_consumer_module_counts": [
+    2,
+    3
+  ]
+}

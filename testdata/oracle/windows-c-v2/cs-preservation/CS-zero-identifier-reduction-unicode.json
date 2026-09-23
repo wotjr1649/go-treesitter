@@ -1,0 +1,319 @@
+{
+  "abi": 15,
+  "input_bytes": 74,
+  "has_error": true,
+  "start": 0,
+  "end": 74,
+  "nodes": [
+    {
+      "Type": "compilation_unit",
+      "Field": "",
+      "Parent": -1,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 0,
+      "EndByte": 74,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 3,
+        "Column": 0
+      }
+    },
+    {
+      "Type": "ERROR",
+      "Field": "",
+      "Parent": 0,
+      "Named": true,
+      "Extra": true,
+      "Missing": false,
+      "Error": true,
+      "StartByte": 0,
+      "EndByte": 73,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 2,
+        "Column": 45
+      }
+    },
+    {
+      "Type": "namespace",
+      "Field": "",
+      "Parent": 1,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 0,
+      "EndByte": 9,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 9
+      }
+    },
+    {
+      "Type": "qualified_name",
+      "Field": "",
+      "Parent": 1,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 10,
+      "EndByte": 25,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 10
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 25
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "qualifier",
+      "Parent": 3,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 10,
+      "EndByte": 20,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 10
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 20
+      }
+    },
+    {
+      "Type": ".",
+      "Field": "",
+      "Parent": 3,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 20,
+      "EndByte": 21,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 20
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 21
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "name",
+      "Parent": 3,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 21,
+      "EndByte": 25,
+      "StartPoint": {
+        "Row": 0,
+        "Column": 21
+      },
+      "EndPoint": {
+        "Row": 0,
+        "Column": 25
+      }
+    },
+    {
+      "Type": "{",
+      "Field": "",
+      "Parent": 1,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 26,
+      "EndByte": 27,
+      "StartPoint": {
+        "Row": 1,
+        "Column": 0
+      },
+      "EndPoint": {
+        "Row": 1,
+        "Column": 1
+      }
+    },
+    {
+      "Type": "field_declaration",
+      "Field": "",
+      "Parent": 1,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 56,
+      "EndByte": 73,
+      "StartPoint": {
+        "Row": 2,
+        "Column": 28
+      },
+      "EndPoint": {
+        "Row": 2,
+        "Column": 45
+      }
+    },
+    {
+      "Type": "variable_declaration",
+      "Field": "",
+      "Parent": 8,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 56,
+      "EndByte": 72,
+      "StartPoint": {
+        "Row": 2,
+        "Column": 28
+      },
+      "EndPoint": {
+        "Row": 2,
+        "Column": 44
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "type",
+      "Parent": 9,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 56,
+      "EndByte": 62,
+      "StartPoint": {
+        "Row": 2,
+        "Column": 28
+      },
+      "EndPoint": {
+        "Row": 2,
+        "Column": 34
+      }
+    },
+    {
+      "Type": "ERROR",
+      "Field": "",
+      "Parent": 9,
+      "Named": true,
+      "Extra": true,
+      "Missing": false,
+      "Error": true,
+      "StartByte": 63,
+      "EndByte": 64,
+      "StartPoint": {
+        "Row": 2,
+        "Column": 35
+      },
+      "EndPoint": {
+        "Row": 2,
+        "Column": 36
+      }
+    },
+    {
+      "Type": "=",
+      "Field": "",
+      "Parent": 11,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 63,
+      "EndByte": 64,
+      "StartPoint": {
+        "Row": 2,
+        "Column": 35
+      },
+      "EndPoint": {
+        "Row": 2,
+        "Column": 36
+      }
+    },
+    {
+      "Type": "variable_declarator",
+      "Field": "",
+      "Parent": 9,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 65,
+      "EndByte": 72,
+      "StartPoint": {
+        "Row": 2,
+        "Column": 37
+      },
+      "EndPoint": {
+        "Row": 2,
+        "Column": 44
+      }
+    },
+    {
+      "Type": "identifier",
+      "Field": "name",
+      "Parent": 13,
+      "Named": true,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 65,
+      "EndByte": 72,
+      "StartPoint": {
+        "Row": 2,
+        "Column": 37
+      },
+      "EndPoint": {
+        "Row": 2,
+        "Column": 44
+      }
+    },
+    {
+      "Type": ";",
+      "Field": "",
+      "Parent": 8,
+      "Named": false,
+      "Extra": false,
+      "Missing": false,
+      "Error": false,
+      "StartByte": 72,
+      "EndByte": 73,
+      "StartPoint": {
+        "Row": 2,
+        "Column": 44
+      },
+      "EndPoint": {
+        "Row": 2,
+        "Column": 45
+      }
+    }
+  ],
+  "schema": 1,
+  "fixture": "CS-zero-identifier-reduction-unicode",
+  "language": "c_sharp",
+  "source_sha256": "63130e931e424ae94a87626adc8040fe40feb11ac519113a41817ccbf3fc57be",
+  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "nodes_sha256": "131c9bc205b4f5bee1f89d108524ef84105568bc750106e1775d5fe92d111ed7"
+}

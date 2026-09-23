@@ -1,0 +1,36 @@
+{
+  "baseline": {
+    "module": "github.com/odvcencio/gotreesitter",
+    "version": "v0.53.0",
+    "tag": "f102332cca9dc45e841b9439d34ba5cc59f0b10f",
+    "commit": "c871b1f576866c40b1695677fe3512243e266d39"
+  },
+  "grammars": {
+    "go": {"blob_sha256": "9cf914d26d962d1a62e7954f8b20b302337a44cb7d4a07218eec482c45a57a08", "commit": "2346a3ab1bb3857b48b29d779a1ef9799a248cd7"},
+    "python": {"blob_sha256": "cde4a67dc6af6e1232dbbd1eab8618478d1d73727020e8a8002542390a452d37", "commit": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64"},
+    "javascript": {"blob_sha256": "6706f93890f24d8ea90d6a140df5dde29c02ec8a3213bae16e8cc4df37e33ee0", "commit": "58404d8cf191d69f2674a8fd507bd5776f46cb11"},
+    "typescript": {"blob_sha256": "46d8d4f7a0056db32e874500ae5b19170237e1628a63a9e3a401e0ee426d6126", "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f"},
+    "tsx": {"blob_sha256": "bf8c490b0bbeb6d4150abce2edc193552e44b093893665dde69bd39e9e940e85", "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f"},
+    "c_sharp": {"blob_sha256": "7ad425e89733339dde94e3c03b762ae478fb453b530493f5d62e1ae7537e1784", "commit": "88366631d598ce6595ec655ce1591b315cffb14c"}
+  },
+  "oracle": {
+    "runtime_version": "v0.25.1",
+    "runtime_commit": "f5afe475deb7c0bae6407fb776c76824f717bb61",
+    "transport_module": "github.com/tree-sitter/go-tree-sitter",
+    "transport_version": "v0.25.0",
+    "transport_commit": "adc13ffd8b2c0b01b878fda9f7c422ce0df5fad3",
+    "generator": "installed-or-checked-in",
+    "abi_policy": "runtime-compatible",
+    "build_flags": ["-std=c11", "-fPIC", "-O2"],
+    "typescript_patch": {
+      "commit": "24e1d3b2b4409ee2ffa63e88abba51a40060e76e",
+      "sha256": "8d091351f8107d1546a8130d281f0ca8d6d959b11da66b7872d3e10f998340e9",
+      "inputs_sha256": "f6a5b51f728fb40ddd20aaf7170275bf9e1241f91fd572e90b2daed370b899a6"
+    }
+  },
+  "runtime": {
+    "module": "github.com/wotjr1649/go-treesitter/internal/runtime",
+    "manifest_sha256": "5d1f526c35e223341914cbfada8abe1c4c49d52824a09950bde05d331ff41e46",
+    "grammar_blobs": {"go": "81f9b19b5886ac11646c713c0c531bd835fc026d363437ba29b28ac2faabea9a"}
+  }
+}

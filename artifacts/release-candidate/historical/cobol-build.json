@@ -1,0 +1,39 @@
+{
+  "record_kind": "public projection of an original execution receipt",
+  "original_sha256": "712cc1d887651a6f5859dc6d6629ff7298b1898ba8702e26c056b52bec838fd8",
+  "candidate_commit": "66d73759492a0b56729821d2ae23dc38b2a225dc",
+  "exit": 0,
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "portable_reproduction_command": [
+    "gcc",
+    "-std=c11",
+    "-O0",
+    "-I${REPOSITORY}/.scratch/full-pass/additional-grammars/cobol/src",
+    "-I${REPOSITORY}/.scratch/oracle/runtime/lib/include",
+    "-I${REPOSITORY}/.scratch/oracle/runtime/lib/src",
+    "-DORACLE_LANGUAGE=tree_sitter_COBOL",
+    "${REPOSITORY}/tools/native-oracle/driver.c",
+    "${REPOSITORY}/.scratch/oracle/runtime/lib/src/lib.c",
+    "${REPOSITORY}/.scratch/full-pass/additional-grammars/cobol/src/parser.c",
+    "${REPOSITORY}/.scratch/full-pass/additional-grammars/cobol/src/scanner.c",
+    "-o",
+    "${REPOSITORY}/.scratch/full-pass/additional-grammars/cobol/cobol.exe"
+  ],
+  "command_note": "Executable installation and repository prefix normalized; original receipt remains in local archive.",
+  "omitted_fields": [
+    "absolute working directory",
+    "unrelated worktree status",
+    "wall-clock timing"
+  ],
+  "inputs": {
+    "go.mod": "6f2983179749d59bd3990eefb39e578731ad08d70045c1ff8880bf81e8d45761",
+    "go.sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "internal/provenance/identities.json": "a22b115ed06bcf57acf319b30b9d1a6f7d4fa5ce9b14d50a52592f1b7c7d7b4f"
+  },
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "4",
+    "GOPROXY": "off",
+    "GOWORK": "off"
+  }
+}

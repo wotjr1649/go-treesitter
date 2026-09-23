@@ -1,0 +1,5 @@
+go test fuzz v1
+byte('D')
+uint16(22)
+uint16(51)
+[]byte("(")

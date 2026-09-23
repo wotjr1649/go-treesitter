@@ -1,0 +1,14 @@
+--- a/incremental.go
++++ b/incremental.go
+@@ -1189,8 +1189,10 @@
+ 			return 0, false
+ 		}
+ 
++		// Reuse must not choose one branch of a shift/reduce conflict.
++		// Normal dispatch owns those reductions and competing versions.
+ 		action := p.lookupAction(state, n.Symbol())
+-		if action == nil || len(action.Actions) == 0 {
++		if action == nil || len(action.Actions) != 1 {
+ 			return 0, false
+ 		}
+ 		var uniqueShiftState StateID

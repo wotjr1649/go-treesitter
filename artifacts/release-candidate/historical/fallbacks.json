@@ -1,0 +1,51 @@
+[
+  {
+    "mode": "edit",
+    "route": "classic",
+    "fallback": "",
+    "reuse_reason": "external_scanner_prefix_frontier_unproven",
+    "cases": 3
+  },
+  {
+    "mode": "edit",
+    "route": "classic",
+    "fallback": "",
+    "reuse_reason": "external_scanner_unsupported",
+    "cases": 75
+  },
+  {
+    "mode": "edit",
+    "route": "classic",
+    "fallback": "",
+    "reuse_reason": "incremental_parse_full_retry",
+    "cases": 1
+  },
+  {
+    "mode": "edit",
+    "route": "classic",
+    "fallback": "accept_without_materialization: accepted-root-leading-gap: accepted derivation's own root span started at byte 1, after source's first non-trivia byte 0",
+    "reuse_reason": "",
+    "cases": 1
+  },
+  {
+    "mode": "edit",
+    "route": "classic",
+    "fallback": "compact incremental parse found no authenticated subtree",
+    "reuse_reason": "",
+    "cases": 95
+  },
+  {
+    "mode": "edit",
+    "route": "classic",
+    "fallback": "compact incremental reuse requires one clean shared-lexer version",
+    "reuse_reason": "",
+    "cases": 33
+  },
+  {
+    "mode": "edit",
+    "route": "classic",
+    "fallback": "parser-core fresh-full runner did not accept EOF",
+    "reuse_reason": "",
+    "cases": 139
+  }
+]

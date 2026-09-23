@@ -1,0 +1,26 @@
+{
+  "ts-newline-in": {
+    "Record": "KR-0003",
+    "Source": "5ea3710f7074d1d368230ee1e7bdf20d855fa5e3e259f00b8dc59de61ea363a0",
+    "GoDigest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+    "CDigest": "528038d5d6a65c89fb173fb2f6691d8484f259b5c897904419411ffc9c8b614e"
+  },
+  "ts-newline-optional-in": {
+    "Record": "KR-0003",
+    "Source": "2d9a64aab3c346b5c7555602956c354788ccb653dfc5679332219db6464a6855",
+    "GoDigest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+    "CDigest": "e42a2fa214cbbcbd4d1024c247274cd9d5338a3d8240e9b59d84250d077c763e"
+  },
+  "tsx-newline-in": {
+    "Record": "KR-0003",
+    "Source": "5ea3710f7074d1d368230ee1e7bdf20d855fa5e3e259f00b8dc59de61ea363a0",
+    "GoDigest": "cebfe4e4e3ff3382b766fc84536353531f2f1c796bee2520bf719ce75c60793d",
+    "CDigest": "528038d5d6a65c89fb173fb2f6691d8484f259b5c897904419411ffc9c8b614e"
+  },
+  "tsx-newline-optional-in": {
+    "Record": "KR-0003",
+    "Source": "2d9a64aab3c346b5c7555602956c354788ccb653dfc5679332219db6464a6855",
+    "GoDigest": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654",
+    "CDigest": "e42a2fa214cbbcbd4d1024c247274cd9d5338a3d8240e9b59d84250d077c763e"
+  }
+}

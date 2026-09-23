@@ -1,0 +1,48 @@
+{
+  "baseline": {
+    "module": "github.com/odvcencio/gotreesitter",
+    "version": "v0.53.0",
+    "tag": "f102332cca9dc45e841b9439d34ba5cc59f0b10f",
+    "commit": "c871b1f576866c40b1695677fe3512243e266d39"
+  },
+  "archive_sha256": "a7fc4a2f1b369542b14429c36a09a41d6db0bb0d2beec5844930b4a17c6ae3a6",
+  "internal_module": "github.com/wotjr1649/go-treesitter/internal/runtime",
+  "packages": [
+    ".",
+    "internal/luapattern",
+    "internal/parsercorephase0",
+    "grammars",
+    "grammars/runtime",
+    "grammars/internal/standaloneregistry",
+    "grammars/internal/pythonruntime"
+  ],
+  "assets": [
+    "LICENSE",
+    "grammars/languages.lock",
+    "testdata/result_compat_ownership_v1.json"
+  ],
+  "file_count": 1527,
+  "patches": [
+    "KR-0001b-jsx-text.patch",
+    "catalog-c-family-lexer-reuse.patch",
+    "KR-0002-csharp-recovery-transaction.patch",
+    "KR-0004-csharp-preserve-recovery-errors.patch",
+    "catalog-optional-blob-providers.patch",
+    "go-recovery-version-order.patch",
+    "recovery-lookahead-and-eof.patch",
+    "recovery-variable-token-width.patch",
+    "recovery-cost-memo.patch",
+    "incremental-leaf-conflict.patch",
+    "recovery-raw-child-memo.patch"
+  ],
+  "inputs": [
+    {
+      "path": "tools/runtime-bundle/grammars/go.json",
+      "sha256": "ac5df100bf51e2d791e085f45ea45fc8384148892856315f705d80b4bc8cd6ec"
+    },
+    {
+      "path": "tools/runtime-bundle/grammars/go-source.zip",
+      "sha256": "6b7f7181fd284f84a2a01602d96759002ca56ac3edcaab404eefe56ace087127"
+    }
+  ]
+}

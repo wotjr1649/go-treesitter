@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "runtime_commit": "f5afe475deb7c0bae6407fb776c76824f717bb61",
+  "runtime_header_sha256": "a363e2f2120178702374d8e34f8af9d3b7b2124a2c9e0cc33e57ded13db59b48",
+  "runtime_abi_min": 13,
+  "runtime_abi_max": 15
+}

@@ -1,0 +1,5436 @@
+[
+  {
+    "id": "RH-before-8955a0144ae6706c",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar café = 1\n",
+    "sha256": "d8efdd5db10e4a233e631c8130f571cefeee7c436fcfdc383401cb6489115bdf"
+  },
+  {
+    "id": "GO-recovery-plain-seed",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "packag#i#000 p\nvar café = 1\n",
+    "sha256": "98865ef61dc1dbdee029955a62a949c133b10e3f5c8cf36f0c82f4e63a84d4ac",
+    "previous": "RH-before-8955a0144ae6706c",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-plain-rename",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "packag#z#111 p\nvar café = 1\n",
+    "sha256": "c2c88947c555c66632ff2a4e9d3c79b14a37efedca4cf0faab73e407e1641b0f",
+    "previous": "RH-before-8955a0144ae6706c",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-plain-unicode",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "packag#λ#1 p\nvar café = 1\n",
+    "sha256": "fde2181f3ced0ec5a18cc9f8c5bfd6ae81933173489a678db50ff7aefb0d266d",
+    "previous": "RH-before-8955a0144ae6706c",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 11
+    }
+  },
+  {
+    "id": "GO-recovery-plain-at",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "packag@i@000 p\nvar café = 1\n",
+    "sha256": "8f936b10d2e1c8c63e7184c24aa3bdc62f092467b44b5f35b2dde682539e0302",
+    "previous": "RH-before-8955a0144ae6706c",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-plain-question",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "packag?i?000 p\nvar café = 1\n",
+    "sha256": "9f6e846272ecf9447cbacd4486d4b452aebec5df573493eac111884bf39f162b",
+    "previous": "RH-before-8955a0144ae6706c",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-plain-long",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "packag#i#000000 p\nvar café = 1\n",
+    "sha256": "f9d34b7f471d6802088ffcfd758dea31710b19860d71b40bfacd309dc60e5db4",
+    "previous": "RH-before-8955a0144ae6706c",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 15
+    }
+  },
+  {
+    "id": "RH-before-7243ba136b7894e9",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "\npackage p\nvar café = 1\n",
+    "sha256": "7015ae6dd147090e729300bcaf2d97f32c0c3021890ad3e77d186418bc11a0fd"
+  },
+  {
+    "id": "GO-recovery-leading-seed",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "\npackag#i#000 p\nvar café = 1\n",
+    "sha256": "175fe2a9fc55d47237958ab438da1212fb298f580990bde151fe7fe33e2589cb",
+    "previous": "RH-before-7243ba136b7894e9",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 8,
+      "NewEndByte": 13
+    }
+  },
+  {
+    "id": "GO-recovery-leading-rename",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "\npackag#z#111 p\nvar café = 1\n",
+    "sha256": "cba26dc35df7c1cc46235f9ef52f4782a83052497c6900ff351bbf9e22ea3e45",
+    "previous": "RH-before-7243ba136b7894e9",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 8,
+      "NewEndByte": 13
+    }
+  },
+  {
+    "id": "GO-recovery-leading-unicode",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "\npackag#λ#1 p\nvar café = 1\n",
+    "sha256": "7f84dc8383532541366a5f493b0b6338c5711f90a4c216de948af25799f58944",
+    "previous": "RH-before-7243ba136b7894e9",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 8,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-leading-at",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "\npackag@i@000 p\nvar café = 1\n",
+    "sha256": "85f415c937d0aec15f1efded59eb6a535be096a111113f2a03b523b650e696fb",
+    "previous": "RH-before-7243ba136b7894e9",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 8,
+      "NewEndByte": 13
+    }
+  },
+  {
+    "id": "GO-recovery-leading-question",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "\npackag?i?000 p\nvar café = 1\n",
+    "sha256": "7d32ad82faa4c69737682af35f1123d6d37fc593d9e84fae8b38d2a4d19c36d4",
+    "previous": "RH-before-7243ba136b7894e9",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 8,
+      "NewEndByte": 13
+    }
+  },
+  {
+    "id": "GO-recovery-leading-long",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "\npackag#i#000000 p\nvar café = 1\n",
+    "sha256": "f87b2bc1935304ff9c30797dbccb183884056788c7d6ed8c16d6fd87e8e0a091",
+    "previous": "RH-before-7243ba136b7894e9",
+    "edit": {
+      "StartByte": 7,
+      "OldEndByte": 8,
+      "NewEndByte": 16
+    }
+  },
+  {
+    "id": "RH-before-1181876b1b94a74d",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "// header\npackage p\nvar café = 1\n",
+    "sha256": "49292f6a967eab9cf7f90284a98c857d4325a8813656b61528751733d7cee784"
+  },
+  {
+    "id": "GO-recovery-comment-seed",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\npackag#i#000 p\nvar café = 1\n",
+    "sha256": "b44bf23b641fac932af2c043ba3332164a58e1ea48fd20f52efabf901e8b068f",
+    "previous": "RH-before-1181876b1b94a74d",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 17,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "GO-recovery-comment-rename",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\npackag#z#111 p\nvar café = 1\n",
+    "sha256": "eb46a55e60c5e5ed6b8eddfbca5358c65a92b3c0a74b533abf2095fdb38f303b",
+    "previous": "RH-before-1181876b1b94a74d",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 17,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "GO-recovery-comment-unicode",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\npackag#λ#1 p\nvar café = 1\n",
+    "sha256": "83778879f777ab0f15e2c51fbe2e53504ccaccafd4f14f8d49fb4148c43017fe",
+    "previous": "RH-before-1181876b1b94a74d",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 17,
+      "NewEndByte": 21
+    }
+  },
+  {
+    "id": "GO-recovery-comment-at",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\npackag@i@000 p\nvar café = 1\n",
+    "sha256": "e21aa67af89be3d2472c6cd655a76def03b6eb237acfc9f52e61db81c7661a3d",
+    "previous": "RH-before-1181876b1b94a74d",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 17,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "GO-recovery-comment-question",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\npackag?i?000 p\nvar café = 1\n",
+    "sha256": "fabeff70fbb7f91b6c759b8c3c377a26f92b34f4aa83449786980e63ffacb9df",
+    "previous": "RH-before-1181876b1b94a74d",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 17,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "GO-recovery-comment-long",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\npackag#i#000000 p\nvar café = 1\n",
+    "sha256": "51252232d7d35848949ddd3645e45a184e68ce3b6bbec12ddde4137fa9649f22",
+    "previous": "RH-before-1181876b1b94a74d",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 17,
+      "NewEndByte": 25
+    }
+  },
+  {
+    "id": "RH-before-9250d93c86e4d9cf",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\r\nvar café = 1\r\n",
+    "sha256": "9784aea6f523b4b348696511ea38e9b412cb3d464e0bf89cc42e7d9e142307ba"
+  },
+  {
+    "id": "GO-recovery-crlf-seed",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "packag#i#000 p\r\nvar café = 1\r\n",
+    "sha256": "24d8bc86ed9b448a3a008231a334544f19487154f1dad702a0ce58a81fbe1fbe",
+    "previous": "RH-before-9250d93c86e4d9cf",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-crlf-rename",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "packag#z#111 p\r\nvar café = 1\r\n",
+    "sha256": "ad07ecc72573be6943938e65bd7fa4a4b37b359bdb0a3c58d928ca353b1a5b8e",
+    "previous": "RH-before-9250d93c86e4d9cf",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-crlf-unicode",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "packag#λ#1 p\r\nvar café = 1\r\n",
+    "sha256": "f018e1a89430ed612274b4159ba6b25d9996ef14f08646eefd94198d0d29f10c",
+    "previous": "RH-before-9250d93c86e4d9cf",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 11
+    }
+  },
+  {
+    "id": "GO-recovery-crlf-at",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "packag@i@000 p\r\nvar café = 1\r\n",
+    "sha256": "5661118aad363b9c8fb4a786127e8c3be6189613c955141cb5ad19b666e2a74e",
+    "previous": "RH-before-9250d93c86e4d9cf",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-crlf-question",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "packag?i?000 p\r\nvar café = 1\r\n",
+    "sha256": "9cd7cc0cfbe9fa1a92f1b76f27950c20268f8b400c64d6ecb7d43376ca76fa28",
+    "previous": "RH-before-9250d93c86e4d9cf",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 12
+    }
+  },
+  {
+    "id": "GO-recovery-crlf-long",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "packag#i#000000 p\r\nvar café = 1\r\n",
+    "sha256": "72526859504d0c53e9289e0d61de59114cc7664208ec63bdf86d79db9a566845",
+    "previous": "RH-before-9250d93c86e4d9cf",
+    "edit": {
+      "StartByte": 6,
+      "OldEndByte": 7,
+      "NewEndByte": 15
+    }
+  },
+  {
+    "id": "GO-keyword-plain-not",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "pac!ge p\nvar café = 1\n",
+    "sha256": "b45a56cef53c6be55d7df39965b6ecb384868078cc17952b67e938abf00bf08a",
+    "previous": "RH-before-8955a0144ae6706c",
+    "edit": {
+      "StartByte": 3,
+      "OldEndByte": 5,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "id": "GO-keyword-plain-plus",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "pac+ge p\nvar café = 1\n",
+    "sha256": "1b54dcf25ebefda2c9594b5903c859920012c49dc71849f2efb981aa5599895b",
+    "previous": "RH-before-8955a0144ae6706c",
+    "edit": {
+      "StartByte": 3,
+      "OldEndByte": 5,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "id": "GO-keyword-plain-minus",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "pac-ge p\nvar café = 1\n",
+    "sha256": "0513c05ffcee4db05c2b35fcb4001f64ec362e5a805ea44cfc9f048a08cfe28f",
+    "previous": "RH-before-8955a0144ae6706c",
+    "edit": {
+      "StartByte": 3,
+      "OldEndByte": 5,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "id": "GO-keyword-plain-xor",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "pac^ge p\nvar café = 1\n",
+    "sha256": "d06e0934711da3ec2526fefc12125a7032499445ac0d42afd3e084ed332aa8a1",
+    "previous": "RH-before-8955a0144ae6706c",
+    "edit": {
+      "StartByte": 3,
+      "OldEndByte": 5,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "id": "GO-keyword-plain-star",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "pac*ge p\nvar café = 1\n",
+    "sha256": "004cfd48d734c5f07b6066f38a242449344830d88c4a40f4cf7a4263080ed38b",
+    "previous": "RH-before-8955a0144ae6706c",
+    "edit": {
+      "StartByte": 3,
+      "OldEndByte": 5,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "id": "GO-keyword-plain-and",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "pac&ge p\nvar café = 1\n",
+    "sha256": "cb8f59141cd3549aaea2ded4b88e09c979c2395fc8feef8c3712dd36eb925132",
+    "previous": "RH-before-8955a0144ae6706c",
+    "edit": {
+      "StartByte": 3,
+      "OldEndByte": 5,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "id": "GO-keyword-leading-not",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "\npac!ge p\nvar café = 1\n",
+    "sha256": "fbc493338d6cc69618b894010983ede19da4051a7112523a77ed4fa3380c893d",
+    "previous": "RH-before-7243ba136b7894e9",
+    "edit": {
+      "StartByte": 4,
+      "OldEndByte": 6,
+      "NewEndByte": 5
+    }
+  },
+  {
+    "id": "GO-keyword-leading-plus",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "\npac+ge p\nvar café = 1\n",
+    "sha256": "e9c4c8d2045229a31ebb8b4b7d52dac1fd7bc5722ae31f12a9808b1f0bdd5ef6",
+    "previous": "RH-before-7243ba136b7894e9",
+    "edit": {
+      "StartByte": 4,
+      "OldEndByte": 6,
+      "NewEndByte": 5
+    }
+  },
+  {
+    "id": "GO-keyword-leading-minus",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "\npac-ge p\nvar café = 1\n",
+    "sha256": "64a317cc7ad87267382c93b1202a66b3d71095c11d1a1c4092f2a4272d1bc782",
+    "previous": "RH-before-7243ba136b7894e9",
+    "edit": {
+      "StartByte": 4,
+      "OldEndByte": 6,
+      "NewEndByte": 5
+    }
+  },
+  {
+    "id": "GO-keyword-leading-xor",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "\npac^ge p\nvar café = 1\n",
+    "sha256": "847cb64e6af3620f605c3106a8b6cbab38f5cd47352a931ea51685927a161987",
+    "previous": "RH-before-7243ba136b7894e9",
+    "edit": {
+      "StartByte": 4,
+      "OldEndByte": 6,
+      "NewEndByte": 5
+    }
+  },
+  {
+    "id": "GO-keyword-leading-star",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "\npac*ge p\nvar café = 1\n",
+    "sha256": "639f14c869ca213ed403a15cd5888ceaa98c211cad5cb7ea5ddf215da783baca",
+    "previous": "RH-before-7243ba136b7894e9",
+    "edit": {
+      "StartByte": 4,
+      "OldEndByte": 6,
+      "NewEndByte": 5
+    }
+  },
+  {
+    "id": "GO-keyword-leading-and",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "\npac&ge p\nvar café = 1\n",
+    "sha256": "4257f29930583557b71e85e8fc8d9db73d69294043d96c11f336821977b28b1b",
+    "previous": "RH-before-7243ba136b7894e9",
+    "edit": {
+      "StartByte": 4,
+      "OldEndByte": 6,
+      "NewEndByte": 5
+    }
+  },
+  {
+    "id": "GO-keyword-comment-not",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\npac!ge p\nvar café = 1\n",
+    "sha256": "5aa6f7ab43b5bea4129838a05019a1875c08e90501eaad2e5a6b75d1bb6442ca",
+    "previous": "RH-before-1181876b1b94a74d",
+    "edit": {
+      "StartByte": 13,
+      "OldEndByte": 15,
+      "NewEndByte": 14
+    }
+  },
+  {
+    "id": "GO-keyword-comment-plus",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\npac+ge p\nvar café = 1\n",
+    "sha256": "9774642f07a6ee58dc3353bfaa77457637fd038b6aa1f0ce5554a528d559fb19",
+    "previous": "RH-before-1181876b1b94a74d",
+    "edit": {
+      "StartByte": 13,
+      "OldEndByte": 15,
+      "NewEndByte": 14
+    }
+  },
+  {
+    "id": "GO-keyword-comment-minus",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\npac-ge p\nvar café = 1\n",
+    "sha256": "89a8e0d6d3849583636a3bed809c9ab7937704a83997a33179edaaafebd404b9",
+    "previous": "RH-before-1181876b1b94a74d",
+    "edit": {
+      "StartByte": 13,
+      "OldEndByte": 15,
+      "NewEndByte": 14
+    }
+  },
+  {
+    "id": "GO-keyword-comment-xor",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\npac^ge p\nvar café = 1\n",
+    "sha256": "e13bdd2577665d0ce8cbd5ab64cd525a21c947e734bf16efede4a87484963f35",
+    "previous": "RH-before-1181876b1b94a74d",
+    "edit": {
+      "StartByte": 13,
+      "OldEndByte": 15,
+      "NewEndByte": 14
+    }
+  },
+  {
+    "id": "GO-keyword-comment-star",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\npac*ge p\nvar café = 1\n",
+    "sha256": "c075cc6d9488b123e48334de24e2e3162f64c2508677e5284c3b21eddc91757b",
+    "previous": "RH-before-1181876b1b94a74d",
+    "edit": {
+      "StartByte": 13,
+      "OldEndByte": 15,
+      "NewEndByte": 14
+    }
+  },
+  {
+    "id": "GO-keyword-comment-and",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\npac&ge p\nvar café = 1\n",
+    "sha256": "9e410c8a92d83bf2d60ccd693ac07eaa26f11cce2bd3a4c5bbfdc29ec38e4653",
+    "previous": "RH-before-1181876b1b94a74d",
+    "edit": {
+      "StartByte": 13,
+      "OldEndByte": 15,
+      "NewEndByte": 14
+    }
+  },
+  {
+    "id": "GO-keyword-crlf-not",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "pac!ge p\r\nvar café = 1\r\n",
+    "sha256": "9f6df119249bf3ca4f4e791568255d5621073c99573669915b214eaff09e46c2",
+    "previous": "RH-before-9250d93c86e4d9cf",
+    "edit": {
+      "StartByte": 3,
+      "OldEndByte": 5,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "id": "GO-keyword-crlf-plus",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "pac+ge p\r\nvar café = 1\r\n",
+    "sha256": "819898313cccc8cfd9172a7d6e6760cdd2866ae5a647677293823bec1555c30a",
+    "previous": "RH-before-9250d93c86e4d9cf",
+    "edit": {
+      "StartByte": 3,
+      "OldEndByte": 5,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "id": "GO-keyword-crlf-minus",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "pac-ge p\r\nvar café = 1\r\n",
+    "sha256": "2fda9acb98619094c18a92858bc5baa9d286bbf2061455b5f814c39d000004c4",
+    "previous": "RH-before-9250d93c86e4d9cf",
+    "edit": {
+      "StartByte": 3,
+      "OldEndByte": 5,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "id": "GO-keyword-crlf-xor",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "pac^ge p\r\nvar café = 1\r\n",
+    "sha256": "ac516368dc3ce717af92549b77fb31f902a50ae52c08af9e7e645b23bbc7fe16",
+    "previous": "RH-before-9250d93c86e4d9cf",
+    "edit": {
+      "StartByte": 3,
+      "OldEndByte": 5,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "id": "GO-keyword-crlf-star",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "pac*ge p\r\nvar café = 1\r\n",
+    "sha256": "fcae3a210a9679124621533c0e1b509aced11cc74a37397216dcd9df4e3d2b73",
+    "previous": "RH-before-9250d93c86e4d9cf",
+    "edit": {
+      "StartByte": 3,
+      "OldEndByte": 5,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "id": "GO-keyword-crlf-and",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "pac&ge p\r\nvar café = 1\r\n",
+    "sha256": "0eb7560b61b55ae61f888f2adafaec162859d50afce4bde4a9037d859be1a57b",
+    "previous": "RH-before-9250d93c86e4d9cf",
+    "edit": {
+      "StartByte": 3,
+      "OldEndByte": 5,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "id": "RH-before-21c25207c367e078",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar café = 1",
+    "sha256": "10fcff290efb323bba305a6462b0f61fe05a0d3abb2d166576e04b90d263373d"
+  },
+  {
+    "id": "GO-keyword-eof",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "pac!ge p\nvar café = 1",
+    "sha256": "a6cbe114d8d9828b8284b8d14d55e6884edc3ae6ece5c31779c796e6ec42a423",
+    "previous": "RH-before-21c25207c367e078",
+    "edit": {
+      "StartByte": 3,
+      "OldEndByte": 5,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "id": "RH-before-68af437886d88dfc",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p; var café = 1;",
+    "sha256": "a72446aa32bfd8a64ea2bdf291c0754513c0ec44fd22cf65a8d194ed8cb92db2"
+  },
+  {
+    "id": "GO-keyword-semicolon",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "pac!ge p; var café = 1;",
+    "sha256": "8668a121f4d76dcf74494db3215a5c7a0b6934615ef01cdf3dbacb77eec37872",
+    "previous": "RH-before-68af437886d88dfc",
+    "edit": {
+      "StartByte": 3,
+      "OldEndByte": 5,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "id": "RH-before-40e7da0188fcf48b",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\n\nvar café = 1\n",
+    "sha256": "7bdd5be6570305a19063714d16efbfadd91afdf4d6876ca5e6abff325e294268"
+  },
+  {
+    "id": "GO-keyword-emptyline",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "pac!ge p\n\nvar café = 1\n",
+    "sha256": "865af566ddaf6941986c3156c554f4c96cb97b7cbdec17772a472821c25d59dd",
+    "previous": "RH-before-40e7da0188fcf48b",
+    "edit": {
+      "StartByte": 3,
+      "OldEndByte": 5,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "id": "RH-before-eaaff108af131923",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nconst café = 1\n",
+    "sha256": "6de98533a132742cec7795aef73c646de7d8c4c3201bd48d0086eee0540c2d63"
+  },
+  {
+    "id": "GO-keyword-keyword",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "pac!ge p\nconst café = 1\n",
+    "sha256": "3d0ceb8730fc9469de38ec34a07c9171d30682d4308edddfd6a1bfcd70d9609e",
+    "previous": "RH-before-eaaff108af131923",
+    "edit": {
+      "StartByte": 3,
+      "OldEndByte": 5,
+      "NewEndByte": 4
+    }
+  },
+  {
+    "id": "GO-third",
+    "language": "go",
+    "filename": "x.go",
+    "group": "ts-split-pending-campaign",
+    "source": "package p\nvar c#A A)fé = 1\n",
+    "sha256": "40b5a42547ddd83a734e0dc017f6233c569e2bf069340bcf6a4a3ced64005501",
+    "previous": "RH-before-8955a0144ae6706c",
+    "edit": {
+      "StartByte": 15,
+      "OldEndByte": 16,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "RH-before-5398f0b8321673b4",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "clean",
+    "source": "const value: number = 1;\n",
+    "sha256": "5967d633a6670814c4b5e0a8c889eb5c0e51155258d35d68a476eb1717e6e2ee"
+  },
+  {
+    "id": "TS-alias-ts-plain-0",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-split-pending-campaign",
+    "source": "const value: nu(mber = 1;\n",
+    "sha256": "0df68101408f739efb01c18dc0c3d9655fa600d4fbf63d8f27b1dd7172e25517",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 15,
+      "OldEndByte": 15,
+      "NewEndByte": 16
+    }
+  },
+  {
+    "id": "RH-before-2158d1a57069da1c",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "clean",
+    "source": "const value: Widget = 1;\n",
+    "sha256": "4f0d3fb7e37122da7fe07fbadff83347eb7eb76bd0d4e78d240d8da2cbf46cf4"
+  },
+  {
+    "id": "TS-alias-ts-plain-1",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-split-pending-campaign",
+    "source": "const value: Wi(dget = 1;\n",
+    "sha256": "103a4ee08b42d6f778d533dea8adbad4e2bb3409498f3c7042df7e4b0cb39a52",
+    "previous": "RH-before-2158d1a57069da1c",
+    "edit": {
+      "StartByte": 15,
+      "OldEndByte": 15,
+      "NewEndByte": 16
+    }
+  },
+  {
+    "id": "RH-before-b9cac485915ac60e",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "clean",
+    "source": "const value: 한글종류 = 1;\n",
+    "sha256": "5bed5080e3bdbae162c0eb5f3538a0709635eb0ca107001956bbd222db0306fe"
+  },
+  {
+    "id": "TS-alias-ts-plain-2",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-split-pending-campaign",
+    "source": "const value: 한글(종류 = 1;\n",
+    "sha256": "de0334baac4f340694528a803a919646c8c46e02ceda613d5e567221b0444dc5",
+    "previous": "RH-before-b9cac485915ac60e",
+    "edit": {
+      "StartByte": 19,
+      "OldEndByte": 19,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "RH-before-1c04448af4146814",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "clean",
+    "source": "// header\nconst value: number = 1;\n",
+    "sha256": "c0fdcde8a89d23b90e53e4813bfd06b6672f7a4270122434924823b5ca799c4f"
+  },
+  {
+    "id": "TS-alias-ts-comment-3",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\nconst value: nu(mber = 1;\n",
+    "sha256": "019673ff60bf233e8aca91e6f89296c0e10dbace2ee5da33a34a6f5fde382f08",
+    "previous": "RH-before-1c04448af4146814",
+    "edit": {
+      "StartByte": 25,
+      "OldEndByte": 25,
+      "NewEndByte": 26
+    }
+  },
+  {
+    "id": "RH-before-6e3295a2fc72c787",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "clean",
+    "source": "// header\nconst value: Widget = 1;\n",
+    "sha256": "f94291bca6ebcb87e660097a0668d481a3a38463679504d4480ba1321efa000f"
+  },
+  {
+    "id": "TS-alias-ts-comment-4",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\nconst value: Wi(dget = 1;\n",
+    "sha256": "9d4fe73627d96fad54f44c7aef3985edd851b1b611874e8a906e459f7863bb2f",
+    "previous": "RH-before-6e3295a2fc72c787",
+    "edit": {
+      "StartByte": 25,
+      "OldEndByte": 25,
+      "NewEndByte": 26
+    }
+  },
+  {
+    "id": "RH-before-7c0e343b743d2b9b",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "clean",
+    "source": "// header\nconst value: 한글종류 = 1;\n",
+    "sha256": "488eeb9a0e7f158a0c6205a7b33bd8d7230245414d0fa6304e25408367e65749"
+  },
+  {
+    "id": "TS-alias-ts-comment-5",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\nconst value: 한글(종류 = 1;\n",
+    "sha256": "217f611ee990bce7bde74f8fe77a80ca4345a9fdcd5f55bdb65acbf46f6a2085",
+    "previous": "RH-before-7c0e343b743d2b9b",
+    "edit": {
+      "StartByte": 29,
+      "OldEndByte": 29,
+      "NewEndByte": 30
+    }
+  },
+  {
+    "id": "RH-before-0583eeda549d7a03",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "clean",
+    "source": "const value: number = 1;\r\n",
+    "sha256": "31fa3f967aca5ddd18ff9cfeeaa9ae84c50a8fdcfa81ac621e2eb0cdbdab3d8c"
+  },
+  {
+    "id": "TS-alias-ts-crlf-6",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-split-pending-campaign",
+    "source": "const value: nu(mber = 1;\r\n",
+    "sha256": "927f772ad7c4006ee48087d6293571559741fff65b33a465cffe412f6ecf4738",
+    "previous": "RH-before-0583eeda549d7a03",
+    "edit": {
+      "StartByte": 15,
+      "OldEndByte": 15,
+      "NewEndByte": 16
+    }
+  },
+  {
+    "id": "RH-before-e2716a0e554934f5",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "clean",
+    "source": "const value: Widget = 1;\r\n",
+    "sha256": "2566de2a1a1f75d60cca5ef7a353b22e1280f0a5d92fbd3f5bc652ea20731c61"
+  },
+  {
+    "id": "TS-alias-ts-crlf-7",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-split-pending-campaign",
+    "source": "const value: Wi(dget = 1;\r\n",
+    "sha256": "4cb320df1778e4ff3262a4f417ae99a085664a0c60bd02754011b103db841dac",
+    "previous": "RH-before-e2716a0e554934f5",
+    "edit": {
+      "StartByte": 15,
+      "OldEndByte": 15,
+      "NewEndByte": 16
+    }
+  },
+  {
+    "id": "RH-before-829547c715044bd5",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "clean",
+    "source": "const value: 한글종류 = 1;\r\n",
+    "sha256": "1c4d650046abff8a6f3a7de4bb459b0b5d4cb479af293e1a18a9cc112afa15eb"
+  },
+  {
+    "id": "TS-alias-ts-crlf-8",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-split-pending-campaign",
+    "source": "const value: 한글(종류 = 1;\r\n",
+    "sha256": "a93908a6bbfaa27e8626aed2a536c15f09b76ee775ecfc3fb11a901fe11034f4",
+    "previous": "RH-before-829547c715044bd5",
+    "edit": {
+      "StartByte": 19,
+      "OldEndByte": 19,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "RH-before-0bb7a6064d4576e7",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "clean",
+    "source": "  const value: number = 1;\n",
+    "sha256": "df4f8ef4d11d28fde1419dae97e7f1e4e56ee381149f8af5e10b2a2cf172de0e"
+  },
+  {
+    "id": "TS-alias-ts-space-9",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-split-pending-campaign",
+    "source": "  const value: nu(mber = 1;\n",
+    "sha256": "b6cb98ab672e2220d20e60d06e78e600aa615d159761925f20424e1512ce9ffc",
+    "previous": "RH-before-0bb7a6064d4576e7",
+    "edit": {
+      "StartByte": 17,
+      "OldEndByte": 17,
+      "NewEndByte": 18
+    }
+  },
+  {
+    "id": "RH-before-0451e5eb572e53e2",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "clean",
+    "source": "  const value: Widget = 1;\n",
+    "sha256": "6c27cfb7b5350f4518283a7cdb25c610078249980f9a4245c3b356ac0bd3a370"
+  },
+  {
+    "id": "TS-alias-ts-space-10",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-split-pending-campaign",
+    "source": "  const value: Wi(dget = 1;\n",
+    "sha256": "1955bffde6248e4a32b8a0806502f0a4603705dc70b3ee8e8c6964faeaac9dbd",
+    "previous": "RH-before-0451e5eb572e53e2",
+    "edit": {
+      "StartByte": 17,
+      "OldEndByte": 17,
+      "NewEndByte": 18
+    }
+  },
+  {
+    "id": "RH-before-bbde1d45c1c2c939",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "clean",
+    "source": "  const value: 한글종류 = 1;\n",
+    "sha256": "4455b33e957dcd08b40778af2eaabfbb3419555da1dfb490c77b8b80665bac79"
+  },
+  {
+    "id": "TS-alias-ts-space-11",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-split-pending-campaign",
+    "source": "  const value: 한글(종류 = 1;\n",
+    "sha256": "7e939a9f886f17718a2e7d19ddfa1d53c5125a3d71284ffc6ab7cdc2bfecf51f",
+    "previous": "RH-before-bbde1d45c1c2c939",
+    "edit": {
+      "StartByte": 21,
+      "OldEndByte": 21,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-e1a21f36832656b4",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "const value: number = 1;\n",
+    "sha256": "5967d633a6670814c4b5e0a8c889eb5c0e51155258d35d68a476eb1717e6e2ee"
+  },
+  {
+    "id": "TS-alias-tsx-plain-12",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "ts-split-pending-campaign",
+    "source": "const value: nu(mber = 1;\n",
+    "sha256": "0df68101408f739efb01c18dc0c3d9655fa600d4fbf63d8f27b1dd7172e25517",
+    "previous": "RH-before-e1a21f36832656b4",
+    "edit": {
+      "StartByte": 15,
+      "OldEndByte": 15,
+      "NewEndByte": 16
+    }
+  },
+  {
+    "id": "RH-before-2e19b18cf3065d01",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "const value: Widget = 1;\n",
+    "sha256": "4f0d3fb7e37122da7fe07fbadff83347eb7eb76bd0d4e78d240d8da2cbf46cf4"
+  },
+  {
+    "id": "TS-alias-tsx-plain-13",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "ts-split-pending-campaign",
+    "source": "const value: Wi(dget = 1;\n",
+    "sha256": "103a4ee08b42d6f778d533dea8adbad4e2bb3409498f3c7042df7e4b0cb39a52",
+    "previous": "RH-before-2e19b18cf3065d01",
+    "edit": {
+      "StartByte": 15,
+      "OldEndByte": 15,
+      "NewEndByte": 16
+    }
+  },
+  {
+    "id": "RH-before-dc0c1adfcbff79c1",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "const value: 한글종류 = 1;\n",
+    "sha256": "5bed5080e3bdbae162c0eb5f3538a0709635eb0ca107001956bbd222db0306fe"
+  },
+  {
+    "id": "TS-alias-tsx-plain-14",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "ts-split-pending-campaign",
+    "source": "const value: 한글(종류 = 1;\n",
+    "sha256": "de0334baac4f340694528a803a919646c8c46e02ceda613d5e567221b0444dc5",
+    "previous": "RH-before-dc0c1adfcbff79c1",
+    "edit": {
+      "StartByte": 19,
+      "OldEndByte": 19,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "RH-before-d351b745d45f110d",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "// header\nconst value: number = 1;\n",
+    "sha256": "c0fdcde8a89d23b90e53e4813bfd06b6672f7a4270122434924823b5ca799c4f"
+  },
+  {
+    "id": "TS-alias-tsx-comment-15",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\nconst value: nu(mber = 1;\n",
+    "sha256": "019673ff60bf233e8aca91e6f89296c0e10dbace2ee5da33a34a6f5fde382f08",
+    "previous": "RH-before-d351b745d45f110d",
+    "edit": {
+      "StartByte": 25,
+      "OldEndByte": 25,
+      "NewEndByte": 26
+    }
+  },
+  {
+    "id": "RH-before-cca68410cc29a13f",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "// header\nconst value: Widget = 1;\n",
+    "sha256": "f94291bca6ebcb87e660097a0668d481a3a38463679504d4480ba1321efa000f"
+  },
+  {
+    "id": "TS-alias-tsx-comment-16",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\nconst value: Wi(dget = 1;\n",
+    "sha256": "9d4fe73627d96fad54f44c7aef3985edd851b1b611874e8a906e459f7863bb2f",
+    "previous": "RH-before-cca68410cc29a13f",
+    "edit": {
+      "StartByte": 25,
+      "OldEndByte": 25,
+      "NewEndByte": 26
+    }
+  },
+  {
+    "id": "RH-before-bc836a6d718a2787",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "// header\nconst value: 한글종류 = 1;\n",
+    "sha256": "488eeb9a0e7f158a0c6205a7b33bd8d7230245414d0fa6304e25408367e65749"
+  },
+  {
+    "id": "TS-alias-tsx-comment-17",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "ts-split-pending-campaign",
+    "source": "// header\nconst value: 한글(종류 = 1;\n",
+    "sha256": "217f611ee990bce7bde74f8fe77a80ca4345a9fdcd5f55bdb65acbf46f6a2085",
+    "previous": "RH-before-bc836a6d718a2787",
+    "edit": {
+      "StartByte": 29,
+      "OldEndByte": 29,
+      "NewEndByte": 30
+    }
+  },
+  {
+    "id": "RH-before-c1184446d13c9319",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "const value: number = 1;\r\n",
+    "sha256": "31fa3f967aca5ddd18ff9cfeeaa9ae84c50a8fdcfa81ac621e2eb0cdbdab3d8c"
+  },
+  {
+    "id": "TS-alias-tsx-crlf-18",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "ts-split-pending-campaign",
+    "source": "const value: nu(mber = 1;\r\n",
+    "sha256": "927f772ad7c4006ee48087d6293571559741fff65b33a465cffe412f6ecf4738",
+    "previous": "RH-before-c1184446d13c9319",
+    "edit": {
+      "StartByte": 15,
+      "OldEndByte": 15,
+      "NewEndByte": 16
+    }
+  },
+  {
+    "id": "RH-before-2d37bc91f964c2b1",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "const value: Widget = 1;\r\n",
+    "sha256": "2566de2a1a1f75d60cca5ef7a353b22e1280f0a5d92fbd3f5bc652ea20731c61"
+  },
+  {
+    "id": "TS-alias-tsx-crlf-19",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "ts-split-pending-campaign",
+    "source": "const value: Wi(dget = 1;\r\n",
+    "sha256": "4cb320df1778e4ff3262a4f417ae99a085664a0c60bd02754011b103db841dac",
+    "previous": "RH-before-2d37bc91f964c2b1",
+    "edit": {
+      "StartByte": 15,
+      "OldEndByte": 15,
+      "NewEndByte": 16
+    }
+  },
+  {
+    "id": "RH-before-58279e1146ada3c1",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "const value: 한글종류 = 1;\r\n",
+    "sha256": "1c4d650046abff8a6f3a7de4bb459b0b5d4cb479af293e1a18a9cc112afa15eb"
+  },
+  {
+    "id": "TS-alias-tsx-crlf-20",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "ts-split-pending-campaign",
+    "source": "const value: 한글(종류 = 1;\r\n",
+    "sha256": "a93908a6bbfaa27e8626aed2a536c15f09b76ee775ecfc3fb11a901fe11034f4",
+    "previous": "RH-before-58279e1146ada3c1",
+    "edit": {
+      "StartByte": 19,
+      "OldEndByte": 19,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "RH-before-a6801f4e71c6d3fa",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "  const value: number = 1;\n",
+    "sha256": "df4f8ef4d11d28fde1419dae97e7f1e4e56ee381149f8af5e10b2a2cf172de0e"
+  },
+  {
+    "id": "TS-alias-tsx-space-21",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "ts-split-pending-campaign",
+    "source": "  const value: nu(mber = 1;\n",
+    "sha256": "b6cb98ab672e2220d20e60d06e78e600aa615d159761925f20424e1512ce9ffc",
+    "previous": "RH-before-a6801f4e71c6d3fa",
+    "edit": {
+      "StartByte": 17,
+      "OldEndByte": 17,
+      "NewEndByte": 18
+    }
+  },
+  {
+    "id": "RH-before-d5a2913330860715",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "  const value: Widget = 1;\n",
+    "sha256": "6c27cfb7b5350f4518283a7cdb25c610078249980f9a4245c3b356ac0bd3a370"
+  },
+  {
+    "id": "TS-alias-tsx-space-22",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "ts-split-pending-campaign",
+    "source": "  const value: Wi(dget = 1;\n",
+    "sha256": "1955bffde6248e4a32b8a0806502f0a4603705dc70b3ee8e8c6964faeaac9dbd",
+    "previous": "RH-before-d5a2913330860715",
+    "edit": {
+      "StartByte": 17,
+      "OldEndByte": 17,
+      "NewEndByte": 18
+    }
+  },
+  {
+    "id": "RH-before-6c85545c06f354c6",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "  const value: 한글종류 = 1;\n",
+    "sha256": "4455b33e957dcd08b40778af2eaabfbb3419555da1dfb490c77b8b80665bac79"
+  },
+  {
+    "id": "TS-alias-tsx-space-23",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "ts-split-pending-campaign",
+    "source": "  const value: 한글(종류 = 1;\n",
+    "sha256": "7e939a9f886f17718a2e7d19ddfa1d53c5125a3d71284ffc6ab7cdc2bfecf51f",
+    "previous": "RH-before-6c85545c06f354c6",
+    "edit": {
+      "StartByte": 21,
+      "OldEndByte": 21,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-bc61754bdafd2883",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "const View = () => <p>a = b &amp; 한글</p>;\n",
+    "sha256": "d81088d25751b6c61ac50b69155d9a806fb278f979cc16f7905b292aa5377374"
+  },
+  {
+    "id": "TSX-fuzz-second",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "ts-split-pending-campaign",
+    "source": "const Vi#A A,w = () => <p>a = b &amp; 한글</p>;\n",
+    "sha256": "523b29451c372467e57d710907be79923b58f16fee77f7af35716a94086ad6fe",
+    "previous": "RH-before-bc61754bdafd2883",
+    "edit": {
+      "StartByte": 8,
+      "OldEndByte": 9,
+      "NewEndByte": 13
+    }
+  },
+  {
+    "id": "TS-string-fuzz",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-split-pending-campaign",
+    "source": "const value: number \"= 1;\n",
+    "sha256": "2b9a782265dbb40b6f73a382f71d819ad5ab625538383e9be23929ed136a074f",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 20,
+      "NewEndByte": 21
+    }
+  },
+  {
+    "id": "RH-before-e8f203eabe384ea5",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = 1\n",
+    "sha256": "b7ef33434e323989470b5fd7edb32ca29e300ce2fdc1e4d8bea5149f1fe1ff08"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-0-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = 1",
+    "sha256": "0a4655d9e4343aebb266a3b764d18bdfe5c2b5ba5e3578745f941557d67b573a",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 19,
+      "OldEndByte": 20,
+      "NewEndByte": 19
+    }
+  },
+  {
+    "id": "RH-before-70a6239bfe1ddcd6",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = 1 // end\n",
+    "sha256": "55e97ee018badbfdb1e31414da8253d0dd9927da23864dc4a8922369f275bf99"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-0-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = 1 // end",
+    "sha256": "21cbe44d4a1d47b3c494f4340984553deaf95cd006748ca6fc700bb5eb500bcd",
+    "previous": "RH-before-70a6239bfe1ddcd6",
+    "edit": {
+      "StartByte": 26,
+      "OldEndByte": 27,
+      "NewEndByte": 26
+    }
+  },
+  {
+    "id": "RH-before-4abc9e392b1e3182",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = 1\n\n",
+    "sha256": "a40d7986fbfbe6a32c1da0e41ef752314c4ba6c0b27b7141ec807b16647ac0d3"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-0-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = 1\n",
+    "sha256": "b7ef33434e323989470b5fd7edb32ca29e300ce2fdc1e4d8bea5149f1fe1ff08",
+    "previous": "RH-before-4abc9e392b1e3182",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 21,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "RH-before-1f97c2658a3b80be",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = 1;\n",
+    "sha256": "bda7eca1e0c138474d4ab96b60d76d2cb2ef78001250538722ef3da106c6155e"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-0-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = 1;",
+    "sha256": "e4ac077be4c7bc73dfd2be8c43c8f44c0ab5eadff61ab2a045e012ff04c7986d",
+    "previous": "RH-before-1f97c2658a3b80be",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 21,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "RH-before-b9b81f0828dd9bfd",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x int\n",
+    "sha256": "8adbe412bd49260289322d47d0be4461372bdd3ab916f4e77e9fd39a41e9ebfd"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-1-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x int",
+    "sha256": "7f535c5f765009b2df5b6908790a4fc6f8c5ea85c577c9c9cc03d4cfa5cd4462",
+    "previous": "RH-before-b9b81f0828dd9bfd",
+    "edit": {
+      "StartByte": 19,
+      "OldEndByte": 20,
+      "NewEndByte": 19
+    }
+  },
+  {
+    "id": "RH-before-8403380d79fc6fcd",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x int // end\n",
+    "sha256": "2e9fe2f710d5ea2459097768712bc732938e300b6c88c3d6ef434a2f13cd8e55"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-1-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x int // end",
+    "sha256": "4aa457daaf1fc5c8ce6cff4e48e9a5ac550083a470bb9c767193aa5eca466963",
+    "previous": "RH-before-8403380d79fc6fcd",
+    "edit": {
+      "StartByte": 26,
+      "OldEndByte": 27,
+      "NewEndByte": 26
+    }
+  },
+  {
+    "id": "RH-before-de793f6539f21502",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x int\n\n",
+    "sha256": "7529eaa005b39a876cdf706f468b6026ca42fa006d26cb064430627cd1eaebbd"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-1-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x int\n",
+    "sha256": "8adbe412bd49260289322d47d0be4461372bdd3ab916f4e77e9fd39a41e9ebfd",
+    "previous": "RH-before-de793f6539f21502",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 21,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "RH-before-8c9a00266b45ed89",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x int;\n",
+    "sha256": "cd09607e86227fc376baafd65738ee5c9b944b930ae14dff7a36a7d101dc426c"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-1-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x int;",
+    "sha256": "dd7bdf083bdb5589b3bc0fb837603b40440113c6dfa9ac64a1dad52f01022bb5",
+    "previous": "RH-before-8c9a00266b45ed89",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 21,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "RH-before-4e45621653f177f5",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = y\n",
+    "sha256": "5f929a024c6a62583cd9ccb721fedd03db15f0381c08ac443e2c6af72bd68bc0"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-2-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = y",
+    "sha256": "5acdb254243c484f8d0de020f1c6a75255ddd1272b6bff7d8c7e30dcf8fd4a59",
+    "previous": "RH-before-4e45621653f177f5",
+    "edit": {
+      "StartByte": 19,
+      "OldEndByte": 20,
+      "NewEndByte": 19
+    }
+  },
+  {
+    "id": "RH-before-26472df8bc07114d",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = y // end\n",
+    "sha256": "8b4300d36d44edad6f97930ffb5fbac14bd77b3864a8b44e4c24b269ac1f7125"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-2-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = y // end",
+    "sha256": "b3e90e4ed351042aa4a3bef80d6580f26edfd9502a15cd2c443f5a5f7873be0c",
+    "previous": "RH-before-26472df8bc07114d",
+    "edit": {
+      "StartByte": 26,
+      "OldEndByte": 27,
+      "NewEndByte": 26
+    }
+  },
+  {
+    "id": "RH-before-e461ea50e7bb26f9",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = y\n\n",
+    "sha256": "fe875d9e1f86edc10012294e14e87ebe3e7225b8c9abb61142d53d8f464ff8ea"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-2-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = y\n",
+    "sha256": "5f929a024c6a62583cd9ccb721fedd03db15f0381c08ac443e2c6af72bd68bc0",
+    "previous": "RH-before-e461ea50e7bb26f9",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 21,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "RH-before-da16f54abebb2d0e",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = y;\n",
+    "sha256": "08ec5dd34643b5a5a3e6fd45f8c56c790a2b92c1e6907d40d18dbd314b28dee5"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-2-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = y;",
+    "sha256": "1b31ad48fa6f1190fc6f304e0c55de06355b4bac8f39a3772a0d6d81b3b932e0",
+    "previous": "RH-before-da16f54abebb2d0e",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 21,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "RH-before-18e3ab5bc1a0bf62",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = true\n",
+    "sha256": "3c647847bf7c23770f14b3174aefa778b34139b9dee271a66412ef6c52b5f9ee"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-3-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = true",
+    "sha256": "1f7ce3c974565d72697194d3b5d2c80e3c4fba94fc9be34fa6da4d4c0df2bac5",
+    "previous": "RH-before-18e3ab5bc1a0bf62",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-e38a9b2a7bd74f23",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = true // end\n",
+    "sha256": "050ab91630e58d999a587fd4fe3df72bcf13b41c44b473366cc92a4e8b00eaea"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-3-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = true // end",
+    "sha256": "127471771474a1087dd45a3c275376e6fcedb1c0a46a752550a2d037d79a258a",
+    "previous": "RH-before-e38a9b2a7bd74f23",
+    "edit": {
+      "StartByte": 29,
+      "OldEndByte": 30,
+      "NewEndByte": 29
+    }
+  },
+  {
+    "id": "RH-before-9fbb41e3248dd021",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = true\n\n",
+    "sha256": "09b3c4c44e61808373fa1472248598c2cd342405da892c47a170e47c7efdab94"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-3-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = true\n",
+    "sha256": "3c647847bf7c23770f14b3174aefa778b34139b9dee271a66412ef6c52b5f9ee",
+    "previous": "RH-before-9fbb41e3248dd021",
+    "edit": {
+      "StartByte": 23,
+      "OldEndByte": 24,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "RH-before-902694bdbb8406c5",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = true;\n",
+    "sha256": "d6424bd8ac664a37cdc39fe2d2bab9b90fee1bcfc60204d499b0ad81989d94c7"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-3-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = true;",
+    "sha256": "b0eecc55ce8ba2ffbceb0767c345f66b0b3b9243fa5bf2bd4fe0ac5633d7a01b",
+    "previous": "RH-before-902694bdbb8406c5",
+    "edit": {
+      "StartByte": 23,
+      "OldEndByte": 24,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "RH-before-7836dcf540dd603c",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = nil\n",
+    "sha256": "17b7f405e80c36253ebc7c9031e0c0c6e654f2328c077c506da8d9efe7e81fc4"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-4-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = nil",
+    "sha256": "c403d1c53465e176d9d9ddee19e0c79b675b3f686b8ec715153d82118d13ef89",
+    "previous": "RH-before-7836dcf540dd603c",
+    "edit": {
+      "StartByte": 21,
+      "OldEndByte": 22,
+      "NewEndByte": 21
+    }
+  },
+  {
+    "id": "RH-before-d31199e086800c68",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = nil // end\n",
+    "sha256": "5107f2d784bb0e3819d610dfa63a08ee186eab82d5de780ec84b0f6d006cd1f4"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-4-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = nil // end",
+    "sha256": "2499ce26b39378bd4f092bdb05f1a66d52eee0a4c4ba3138c6f444c18db6c6dd",
+    "previous": "RH-before-d31199e086800c68",
+    "edit": {
+      "StartByte": 28,
+      "OldEndByte": 29,
+      "NewEndByte": 28
+    }
+  },
+  {
+    "id": "RH-before-d4bd6608c8aeb0f6",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = nil\n\n",
+    "sha256": "2edd48988ff4af69c3e9da4fe7ef0b46b1dc48fd67d5eb4d0d5f8586c5a30d4e"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-4-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = nil\n",
+    "sha256": "17b7f405e80c36253ebc7c9031e0c0c6e654f2328c077c506da8d9efe7e81fc4",
+    "previous": "RH-before-d4bd6608c8aeb0f6",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-d94f7989877b35a8",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = nil;\n",
+    "sha256": "6cc51aeff352507675c2d1c93151866c9c638793ac5d933e6ad46eb1f731df39"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-4-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = nil;",
+    "sha256": "3c9d4f0ceffdfa226121d8758a17690d9a9c967e9b402b8d5d1024cdc4686f5f",
+    "previous": "RH-before-d94f7989877b35a8",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-2d5d48bc43949930",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = \"s\"\n",
+    "sha256": "a5a95c15fc7cfb738bc9627bba5aca7568b2fe77c4faaa060c2088e2c945a7ec"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-5-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = \"s\"",
+    "sha256": "cc9aeebc217f93ac225cebf277ed24aefd93cb1f5cbe4ede07a079dc0d75842f",
+    "previous": "RH-before-2d5d48bc43949930",
+    "edit": {
+      "StartByte": 21,
+      "OldEndByte": 22,
+      "NewEndByte": 21
+    }
+  },
+  {
+    "id": "RH-before-897f0673e442d411",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = \"s\" // end\n",
+    "sha256": "b3f97898ddfa54af4747b85a00761e297a72b516e7e8b9876800de07598ac48e"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-5-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = \"s\" // end",
+    "sha256": "c8e98dbfb8cb3586dc57e126165904b48d54ec6dea5cae23f71b2c1bf6f9ae19",
+    "previous": "RH-before-897f0673e442d411",
+    "edit": {
+      "StartByte": 28,
+      "OldEndByte": 29,
+      "NewEndByte": 28
+    }
+  },
+  {
+    "id": "RH-before-fbc40e4c982b5f37",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = \"s\"\n\n",
+    "sha256": "7ab4fe129d0bd921005e581f65f84d263f1524249b7ece7a2eb842f7a98c928e"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-5-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = \"s\"\n",
+    "sha256": "a5a95c15fc7cfb738bc9627bba5aca7568b2fe77c4faaa060c2088e2c945a7ec",
+    "previous": "RH-before-fbc40e4c982b5f37",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-0559def39b12f94a",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = \"s\";\n",
+    "sha256": "60d5628f8a060e39a9b9eff9c95019995804fe6846fb7b560ee42a1d146423ec"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-5-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = \"s\";",
+    "sha256": "faf4898cd997f672d43421446b3ab3dba70e05a4105a5e09898141a5709bed6f",
+    "previous": "RH-before-0559def39b12f94a",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-7a88c07ffd2fbc97",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = []int{}\n",
+    "sha256": "4edf4fc880abff208d8372a978cf8d018485112cd1ddaeba7b51f613d4e4075b"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-6-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = []int{}",
+    "sha256": "3ee2765417aef9e71495714d1c435108c36681a0f5b08f8f5d0178e28f41dc27",
+    "previous": "RH-before-7a88c07ffd2fbc97",
+    "edit": {
+      "StartByte": 25,
+      "OldEndByte": 26,
+      "NewEndByte": 25
+    }
+  },
+  {
+    "id": "RH-before-5fbba21d76f5ef9b",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = []int{} // end\n",
+    "sha256": "bf5aea83718cbc9949a9b21f7e4328e4dd523385c8c5fc0de52eea33071c3a80"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-6-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = []int{} // end",
+    "sha256": "4d3af400d1a075c6aa0c7eb4f1f703e01569dcfc9c4185f7c23367e4bce1c4eb",
+    "previous": "RH-before-5fbba21d76f5ef9b",
+    "edit": {
+      "StartByte": 32,
+      "OldEndByte": 33,
+      "NewEndByte": 32
+    }
+  },
+  {
+    "id": "RH-before-2f0dd5ceb23e8a4e",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = []int{}\n\n",
+    "sha256": "5ee2ecb22dd3d82055fe85725e501d084884712612b6f90e1ec5ca536fa8877a"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-6-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = []int{}\n",
+    "sha256": "4edf4fc880abff208d8372a978cf8d018485112cd1ddaeba7b51f613d4e4075b",
+    "previous": "RH-before-2f0dd5ceb23e8a4e",
+    "edit": {
+      "StartByte": 26,
+      "OldEndByte": 27,
+      "NewEndByte": 26
+    }
+  },
+  {
+    "id": "RH-before-b7fff30b21db474b",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = []int{};\n",
+    "sha256": "839ad10fc619e38e066a7fd9c7a697c8deafe82517f5edf5901163f7b1ed4393"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-6-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = []int{};",
+    "sha256": "68584fff0c8ceae9d8e586a5f933e7fe3605637076f4316c252308cf85b89d7c",
+    "previous": "RH-before-b7fff30b21db474b",
+    "edit": {
+      "StartByte": 26,
+      "OldEndByte": 27,
+      "NewEndByte": 26
+    }
+  },
+  {
+    "id": "RH-before-7b6ab1738c58937e",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = f()\n",
+    "sha256": "fe051b3f176e744144cad457be55eb0500f73e4c5d39977ca5ca5ada217d93a2"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-7-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = f()",
+    "sha256": "5f066a5880614f608e65354e30ab7c05540d9a24a662ecd7a07e00b7547f585f",
+    "previous": "RH-before-7b6ab1738c58937e",
+    "edit": {
+      "StartByte": 21,
+      "OldEndByte": 22,
+      "NewEndByte": 21
+    }
+  },
+  {
+    "id": "RH-before-7e422e0c7d330a86",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = f() // end\n",
+    "sha256": "0081e81f13d9390e49de614b40a40eabaf2f032eee36680a1c3d6a420eebc0c3"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-7-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = f() // end",
+    "sha256": "74878341cd73c46042811f850783c3cf5493cc0836002ad5cfbf36fa19c229dc",
+    "previous": "RH-before-7e422e0c7d330a86",
+    "edit": {
+      "StartByte": 28,
+      "OldEndByte": 29,
+      "NewEndByte": 28
+    }
+  },
+  {
+    "id": "RH-before-6240420f5e56dfd7",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = f()\n\n",
+    "sha256": "73fc9a4947af3346b758232deb925d63b54e08a5edf58897b6316b59db097864"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-7-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = f()\n",
+    "sha256": "fe051b3f176e744144cad457be55eb0500f73e4c5d39977ca5ca5ada217d93a2",
+    "previous": "RH-before-6240420f5e56dfd7",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-203f11f84fff8c8c",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = f();\n",
+    "sha256": "94d52f2c845e53f503016db39af9d6f189dd3ff4e35d89abff050747a44d5f09"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-7-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = f();",
+    "sha256": "950587d2171ee03d33c094e4aa4447c0a34aed13029c565f428cdd8cce187b18",
+    "previous": "RH-before-203f11f84fff8c8c",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-36525e7e296ea34f",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = a.b\n",
+    "sha256": "154b700635c8dce33ac1fd86da0fb174fbc820a0622e35268a416ed09b31ca58"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-8-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = a.b",
+    "sha256": "62a72db96ca5ea1ae08619357bae22996c3bd1369329f8b35c299a4b83996128",
+    "previous": "RH-before-36525e7e296ea34f",
+    "edit": {
+      "StartByte": 21,
+      "OldEndByte": 22,
+      "NewEndByte": 21
+    }
+  },
+  {
+    "id": "RH-before-58df9dae8f2982ed",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = a.b // end\n",
+    "sha256": "bb4bf3a4270bd532d2633f5261ec3c064681c689df65d54c7503473e84cf0b41"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-8-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = a.b // end",
+    "sha256": "c9a62d3b69db37f21b68420765781bc0a84788fd7e5cfadcf7afecf5ed415f78",
+    "previous": "RH-before-58df9dae8f2982ed",
+    "edit": {
+      "StartByte": 28,
+      "OldEndByte": 29,
+      "NewEndByte": 28
+    }
+  },
+  {
+    "id": "RH-before-340526da0196bb4c",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = a.b\n\n",
+    "sha256": "fc3f9fa845bde6635c0c45d12930ad4f223ad4855a5b0ce0c269ded1d99a8977"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-8-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = a.b\n",
+    "sha256": "154b700635c8dce33ac1fd86da0fb174fbc820a0622e35268a416ed09b31ca58",
+    "previous": "RH-before-340526da0196bb4c",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-385658d4bcbcb85f",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = a.b;\n",
+    "sha256": "37f70dd11f59ee6b276663dc6e95bb5f042da27f4a600007265a2b307c89022d"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-8-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = a.b;",
+    "sha256": "77d0b6f8647483464545c4a4c503989aff897698b8eae765afc385c9f42f4082",
+    "previous": "RH-before-385658d4bcbcb85f",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-e293cf735decef60",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = (1)\n",
+    "sha256": "b01471c8ce8250c2b79163777df77323636048b138196792390b2da7482cc772"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-9-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = (1)",
+    "sha256": "6aed55d8e44f0887d7273fe3a8c359aec38ff9bc708076cc23cecf8fbee79b6b",
+    "previous": "RH-before-e293cf735decef60",
+    "edit": {
+      "StartByte": 21,
+      "OldEndByte": 22,
+      "NewEndByte": 21
+    }
+  },
+  {
+    "id": "RH-before-e2f5f7696c77d108",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = (1) // end\n",
+    "sha256": "66e0d60f235a1e3fe297d2c37d5e9436a9508146a1587e6f1536feecf4a21200"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-9-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = (1) // end",
+    "sha256": "6f17e9247a935a705bb0fe55d40dc9bb8f2bf803a2d7413469a5fa128a8eeb87",
+    "previous": "RH-before-e2f5f7696c77d108",
+    "edit": {
+      "StartByte": 28,
+      "OldEndByte": 29,
+      "NewEndByte": 28
+    }
+  },
+  {
+    "id": "RH-before-1241e7b88e2e7d4f",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = (1)\n\n",
+    "sha256": "33fd6d155ee5f341ea911a474fa98951d0cf776009dd83fdea619b0f5438d65a"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-9-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = (1)\n",
+    "sha256": "b01471c8ce8250c2b79163777df77323636048b138196792390b2da7482cc772",
+    "previous": "RH-before-1241e7b88e2e7d4f",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-89fa0db04c996ae4",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = (1);\n",
+    "sha256": "88b5f818bb9d9d1eae8b4eab530879129db34f1668bd650248999343260fa070"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-9-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = (1);",
+    "sha256": "b537043f170a135e91111d0e057c9602070f5b55cde9c9a3afcdc9e58e89342e",
+    "previous": "RH-before-89fa0db04c996ae4",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-cb2b8ea1f5078409",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = func() {}\n",
+    "sha256": "e8f02ba3b88f502027f53a352a048c23e1fdaf934bda9fabd5e5b17bedb9e9c6"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-10-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = func() {}",
+    "sha256": "fc0a6218e8f7c545606ef67273fa587151f5070a9b705966085dca495f88f027",
+    "previous": "RH-before-cb2b8ea1f5078409",
+    "edit": {
+      "StartByte": 27,
+      "OldEndByte": 28,
+      "NewEndByte": 27
+    }
+  },
+  {
+    "id": "RH-before-d7dec307637cb242",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = func() {} // end\n",
+    "sha256": "ce72fca784a794c9a89ca4e88338859f6a50531c76c5c888147cf8ecf668e1b1"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-10-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = func() {} // end",
+    "sha256": "3213f7b521e035871874873827bd38e76a522a19912a66100e281f77791ae285",
+    "previous": "RH-before-d7dec307637cb242",
+    "edit": {
+      "StartByte": 34,
+      "OldEndByte": 35,
+      "NewEndByte": 34
+    }
+  },
+  {
+    "id": "RH-before-c91fd922e598e86b",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = func() {}\n\n",
+    "sha256": "59b6a4dbe05c38aae9447a89652e0258c2781b27255b37947f132c62841a492c"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-10-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = func() {}\n",
+    "sha256": "e8f02ba3b88f502027f53a352a048c23e1fdaf934bda9fabd5e5b17bedb9e9c6",
+    "previous": "RH-before-c91fd922e598e86b",
+    "edit": {
+      "StartByte": 28,
+      "OldEndByte": 29,
+      "NewEndByte": 28
+    }
+  },
+  {
+    "id": "RH-before-7c4196c8efba7d77",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = func() {};\n",
+    "sha256": "a8ead294b19e55ce8b89680aee7ca3be5f11de20f955b733771113a6a0627cfe"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-10-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = func() {};",
+    "sha256": "96238816775fad0d3c025079de520177561511d44a0bac4f78a4052eb3f10a64",
+    "previous": "RH-before-7c4196c8efba7d77",
+    "edit": {
+      "StartByte": 28,
+      "OldEndByte": 29,
+      "NewEndByte": 28
+    }
+  },
+  {
+    "id": "RH-before-9f5d1dc6d12febfd",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = -1\n",
+    "sha256": "407777daef3c160f23a8c37f59e035d4bff2da12caf87dea7bea1aab1be79f4c"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-11-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = -1",
+    "sha256": "bc3e7ab0f5f575033c67486e664c538026c0ce2ecaaacefc8094588146cbf3aa",
+    "previous": "RH-before-9f5d1dc6d12febfd",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 21,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "RH-before-580077ea94510bee",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = -1 // end\n",
+    "sha256": "0c2753f23d95248a5f0b6b14d7838824d95dc46e4ceb6fa59ff80782709a5adc"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-11-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = -1 // end",
+    "sha256": "94e1ef8486eb030d5e9a5ca74ea51a78f2454c939dbbffe90e8f28c0137c50e3",
+    "previous": "RH-before-580077ea94510bee",
+    "edit": {
+      "StartByte": 27,
+      "OldEndByte": 28,
+      "NewEndByte": 27
+    }
+  },
+  {
+    "id": "RH-before-fa8dc3d3267d38c3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = -1\n\n",
+    "sha256": "abc6604a143cef924882ec4a4f7c106bc63966b7c311ac827f8592515248d256"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-11-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = -1\n",
+    "sha256": "407777daef3c160f23a8c37f59e035d4bff2da12caf87dea7bea1aab1be79f4c",
+    "previous": "RH-before-fa8dc3d3267d38c3",
+    "edit": {
+      "StartByte": 21,
+      "OldEndByte": 22,
+      "NewEndByte": 21
+    }
+  },
+  {
+    "id": "RH-before-edfda301ded919f6",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = -1;\n",
+    "sha256": "3121fd29de186d5c922b1ac363c2bb5804947b4e8750020e2c338e3dfe727ac2"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-11-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = -1;",
+    "sha256": "72ef888c9cda3674df4def90f69dbab2036b886815210c5ffe2ace3d48cb8f30",
+    "previous": "RH-before-edfda301ded919f6",
+    "edit": {
+      "StartByte": 21,
+      "OldEndByte": 22,
+      "NewEndByte": 21
+    }
+  },
+  {
+    "id": "RH-before-c151ccb1eaf56e8f",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x, y = 1, 2\n",
+    "sha256": "0f5128eb4c1a6ea83eb53217468a3176bd99611667a160c99e13cb93fc3507b0"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-12-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x, y = 1, 2",
+    "sha256": "cf4d15038559bba80b897e70c80f492ce02d7002dc85d2e038fffd87b9e515fa",
+    "previous": "RH-before-c151ccb1eaf56e8f",
+    "edit": {
+      "StartByte": 25,
+      "OldEndByte": 26,
+      "NewEndByte": 25
+    }
+  },
+  {
+    "id": "RH-before-329369964d0301ca",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x, y = 1, 2 // end\n",
+    "sha256": "3483c341a6bb0f2d55f9df2ecd828af71a51cff234677e5cd15f88d20fa72ae1"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-12-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x, y = 1, 2 // end",
+    "sha256": "179fd1a8a8d6f82d5d4f347f3164e81ff09ee094effa6f1876a6710f67040cb9",
+    "previous": "RH-before-329369964d0301ca",
+    "edit": {
+      "StartByte": 32,
+      "OldEndByte": 33,
+      "NewEndByte": 32
+    }
+  },
+  {
+    "id": "RH-before-282f9e58b6d7f967",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x, y = 1, 2\n\n",
+    "sha256": "b79355fa40019a066730066ce3faac4ff57c88944b9a13ff41658707db616056"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-12-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x, y = 1, 2\n",
+    "sha256": "0f5128eb4c1a6ea83eb53217468a3176bd99611667a160c99e13cb93fc3507b0",
+    "previous": "RH-before-282f9e58b6d7f967",
+    "edit": {
+      "StartByte": 26,
+      "OldEndByte": 27,
+      "NewEndByte": 26
+    }
+  },
+  {
+    "id": "RH-before-7216f331d00703ae",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x, y = 1, 2;\n",
+    "sha256": "bb295ed675db275b70b6c7ac5715cd81882e485b5240c17533da63593b2e90aa"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-12-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x, y = 1, 2;",
+    "sha256": "f5fa09efe915fbcd6f6af51c5e4c201153f4ad9b20035edd93bac44a0794549f",
+    "previous": "RH-before-7216f331d00703ae",
+    "edit": {
+      "StartByte": 26,
+      "OldEndByte": 27,
+      "NewEndByte": 26
+    }
+  },
+  {
+    "id": "RH-before-207474429e55bdb0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x int = 1\n",
+    "sha256": "9b8b6c840a77a6b8fd84ac143701b8e7b923cfb32b6156f7dc88056c92fd43d2"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-13-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x int = 1",
+    "sha256": "cf1bd35e13f686eba0b075b061a1db18d6b8676075358615cd06f3d83156a9cc",
+    "previous": "RH-before-207474429e55bdb0",
+    "edit": {
+      "StartByte": 23,
+      "OldEndByte": 24,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "RH-before-0eca4ed166a1324a",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x int = 1 // end\n",
+    "sha256": "751dc9d679db7ead4fd6bc4ed14aef6f358150855ba968be3c191df96329a7d9"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-13-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x int = 1 // end",
+    "sha256": "d0f5b8df89d95b0cac2f7de7494d26f6eaa03d3318bfcb33c2edf16a64095c31",
+    "previous": "RH-before-0eca4ed166a1324a",
+    "edit": {
+      "StartByte": 30,
+      "OldEndByte": 31,
+      "NewEndByte": 30
+    }
+  },
+  {
+    "id": "RH-before-6eb6d56244e5418c",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x int = 1\n\n",
+    "sha256": "7413b2a02535c0d5cb3e57e620cef421573fa6d7a883ce295e7da81307075984"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-13-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x int = 1\n",
+    "sha256": "9b8b6c840a77a6b8fd84ac143701b8e7b923cfb32b6156f7dc88056c92fd43d2",
+    "previous": "RH-before-6eb6d56244e5418c",
+    "edit": {
+      "StartByte": 24,
+      "OldEndByte": 25,
+      "NewEndByte": 24
+    }
+  },
+  {
+    "id": "RH-before-cf06ddbd64cab39a",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x int = 1;\n",
+    "sha256": "01dba27280c41646bf8cedfe2fe44131684cb9d3576362bec052617b42387ee6"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-13-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x int = 1;",
+    "sha256": "5477e5a3c2114f25cb50e04407c07e3bbd031f2d0334a2a6c55f254f05cc79c0",
+    "previous": "RH-before-cf06ddbd64cab39a",
+    "edit": {
+      "StartByte": 24,
+      "OldEndByte": 25,
+      "NewEndByte": 24
+    }
+  },
+  {
+    "id": "RH-before-490cb4899a79c525",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar (x = 1\n)\n",
+    "sha256": "c7acf7cb35971f01bfee2767c8d981f84165b6be941d6185e0ef56ab4e9d9307"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-14-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar (x = 1\n)",
+    "sha256": "4e1f7c6cfe65741abe9b596ed1d1abcb34d51d80c8dc3a1d9b597951ec8c43d9",
+    "previous": "RH-before-490cb4899a79c525",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-667e5fc95d2b2b4d",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar (x = 1\n) // end\n",
+    "sha256": "e9e3be4504c75c8bae9bc0dc69463aa2dbe0273f59ca8b1d204bf2134bb2c025"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-14-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar (x = 1\n) // end",
+    "sha256": "5f235a47239c65d2829c7b41d0d59ecfb2bd06e66d4e78dd9eb9651b013a1179",
+    "previous": "RH-before-667e5fc95d2b2b4d",
+    "edit": {
+      "StartByte": 29,
+      "OldEndByte": 30,
+      "NewEndByte": 29
+    }
+  },
+  {
+    "id": "RH-before-95c45e18913a5989",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar (x = 1\n)\n\n",
+    "sha256": "e11b789dbf31f86b92668dd36ce4fa107a7763c1750597e22852c7a65cc2bcdb"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-14-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar (x = 1\n)\n",
+    "sha256": "c7acf7cb35971f01bfee2767c8d981f84165b6be941d6185e0ef56ab4e9d9307",
+    "previous": "RH-before-95c45e18913a5989",
+    "edit": {
+      "StartByte": 23,
+      "OldEndByte": 24,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "RH-before-2554430d4c69af0a",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar (x = 1\n);\n",
+    "sha256": "228b82d08089916bc3b11420299f744cb2262e36f6fd85293c3497fadb5360c9"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-14-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar (x = 1\n);",
+    "sha256": "9fd77cfc0f75c15bb14679ee53d3b66081dc1d4bcd12f856b1265645ce0df6cc",
+    "previous": "RH-before-2554430d4c69af0a",
+    "edit": {
+      "StartByte": 23,
+      "OldEndByte": 24,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "RH-before-8cf0b9e481904472",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar (x int\n)\n",
+    "sha256": "9e98e2e7736f01e6ee6deba308483d212a3bf24f975fa3e4c997bf9280903631"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-15-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar (x int\n)",
+    "sha256": "ea62aaded16e6568fc4fa07bba3e1213d8a91b431e38ba52383da7f9641fc421",
+    "previous": "RH-before-8cf0b9e481904472",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-a084ee859d51b8e8",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar (x int\n) // end\n",
+    "sha256": "eb3d357d47003c728c660a91fee85e4fedba2cdc009c1b0a49957afceb769ae6"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-15-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar (x int\n) // end",
+    "sha256": "21f23f52d8714c1f91de27b5b51a0f2cd03c0071ef7231bd568c296e84b7a930",
+    "previous": "RH-before-a084ee859d51b8e8",
+    "edit": {
+      "StartByte": 29,
+      "OldEndByte": 30,
+      "NewEndByte": 29
+    }
+  },
+  {
+    "id": "RH-before-a8a32b4c33e99c26",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar (x int\n)\n\n",
+    "sha256": "a4c56cbf1ea33ea2d289c2f81988f2f0285a3ef011abbb6d499de11ba991264a"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-15-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar (x int\n)\n",
+    "sha256": "9e98e2e7736f01e6ee6deba308483d212a3bf24f975fa3e4c997bf9280903631",
+    "previous": "RH-before-a8a32b4c33e99c26",
+    "edit": {
+      "StartByte": 23,
+      "OldEndByte": 24,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "RH-before-9efcd84a5fab9992",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar (x int\n);\n",
+    "sha256": "00bc0a23f12084068aa34b39c4a2e956faad2ecbb35ec3e1b2d2cf92ba97e677"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-15-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar (x int\n);",
+    "sha256": "2b54ee1f5ff8acf12b0fdc6933bdf7ffbb34fa2171036dad47fdbd8527741e78",
+    "previous": "RH-before-9efcd84a5fab9992",
+    "edit": {
+      "StartByte": 23,
+      "OldEndByte": 24,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "RH-before-bdce3bf1ff503798",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nconst x = 1\n",
+    "sha256": "ea6b9b1360f4ad8a438c9bc86262d81343921b5107d42585f147ccf8021c8faa"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-16-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nconst x = 1",
+    "sha256": "60755e5f651a578c98ef2c7409a2cb575fd8af376914e183ba993db5b87432dc",
+    "previous": "RH-before-bdce3bf1ff503798",
+    "edit": {
+      "StartByte": 21,
+      "OldEndByte": 22,
+      "NewEndByte": 21
+    }
+  },
+  {
+    "id": "RH-before-a4e7ebb26dc4ea86",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nconst x = 1 // end\n",
+    "sha256": "2817c8685e20d5ed4971ef91c89d183c1cb3dbd007f371f0bb9a9edcbbc353d9"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-16-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nconst x = 1 // end",
+    "sha256": "5766fe76e7025f4a8730460811e2aa86cd0137b5e86ab0dd171ad50bb5f43128",
+    "previous": "RH-before-a4e7ebb26dc4ea86",
+    "edit": {
+      "StartByte": 28,
+      "OldEndByte": 29,
+      "NewEndByte": 28
+    }
+  },
+  {
+    "id": "RH-before-a85aa9efc46d4f7e",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nconst x = 1\n\n",
+    "sha256": "08626b8459f7cfbb1662f6c1360cf051d3dab49204c9fe6cbe0fdfea7900e469"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-16-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nconst x = 1\n",
+    "sha256": "ea6b9b1360f4ad8a438c9bc86262d81343921b5107d42585f147ccf8021c8faa",
+    "previous": "RH-before-a85aa9efc46d4f7e",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-bb7e251722570d48",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nconst x = 1;\n",
+    "sha256": "610df68e128fbdced5e90c8980708d847303e9613e9b983242a866464e58d126"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-16-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nconst x = 1;",
+    "sha256": "6044682d17fb64ecc344157892f0f62cbb20b352bd4bfb51aeb32d25b559a607",
+    "previous": "RH-before-bb7e251722570d48",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-09c412dc9b1ec3b0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nconst x int = 1\n",
+    "sha256": "46a3aa8276bdcfa87892776d53e5cd92f42d6337ce35e17f3dec54f6e8521d2d"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-17-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nconst x int = 1",
+    "sha256": "02e70a3d8501445809aa12925532544cba90bf25d9d2d279f5cf653c579445c8",
+    "previous": "RH-before-09c412dc9b1ec3b0",
+    "edit": {
+      "StartByte": 25,
+      "OldEndByte": 26,
+      "NewEndByte": 25
+    }
+  },
+  {
+    "id": "RH-before-09d8886d5ac2a5df",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nconst x int = 1 // end\n",
+    "sha256": "4afc847e31326853df03c05eacc0d94585e291ce937e5b63b5bf77524d9f122c"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-17-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nconst x int = 1 // end",
+    "sha256": "4f7391c41fd9c76675b3a504e3da9beb9052e0f33cd4a028b3233b0a388a089b",
+    "previous": "RH-before-09d8886d5ac2a5df",
+    "edit": {
+      "StartByte": 32,
+      "OldEndByte": 33,
+      "NewEndByte": 32
+    }
+  },
+  {
+    "id": "RH-before-7669f743aa0a3a5f",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nconst x int = 1\n\n",
+    "sha256": "f713ceed8c1a9d8c71622a536d16f2cabbd06b39ff8f64fe81d8c0deccf727d0"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-17-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nconst x int = 1\n",
+    "sha256": "46a3aa8276bdcfa87892776d53e5cd92f42d6337ce35e17f3dec54f6e8521d2d",
+    "previous": "RH-before-7669f743aa0a3a5f",
+    "edit": {
+      "StartByte": 26,
+      "OldEndByte": 27,
+      "NewEndByte": 26
+    }
+  },
+  {
+    "id": "RH-before-53a399e60633821a",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nconst x int = 1;\n",
+    "sha256": "2a6e011852d4ee5c6101ee311c043c6db87daad1f833bf1efafeb14cd4bd39af"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-17-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nconst x int = 1;",
+    "sha256": "d7f37d0576f9a95443c994b7823bf11957e52912617b31490ee715b28003593d",
+    "previous": "RH-before-53a399e60633821a",
+    "edit": {
+      "StartByte": 26,
+      "OldEndByte": 27,
+      "NewEndByte": 26
+    }
+  },
+  {
+    "id": "RH-before-7370405c72e0ae03",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\ntype T int\n",
+    "sha256": "89557113c540b724688bfd844aac737f7585e149f703368744266425667affba"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-18-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\ntype T int",
+    "sha256": "a595eea7e228b32eb7d2c74bbb086a8583ce64dc30a651de358d4773a8d9bb17",
+    "previous": "RH-before-7370405c72e0ae03",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 21,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "RH-before-6382cc17347cea30",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\ntype T int // end\n",
+    "sha256": "d404a11f48d49400e1e5dbf304a46980c08173c4520ca70630922a5bdd55535a"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-18-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\ntype T int // end",
+    "sha256": "39d4c11c42fdf569101a607eeb51d40552a5c7a1602bb4b9922b4d9cbc0a3a93",
+    "previous": "RH-before-6382cc17347cea30",
+    "edit": {
+      "StartByte": 27,
+      "OldEndByte": 28,
+      "NewEndByte": 27
+    }
+  },
+  {
+    "id": "RH-before-6717728dbfdbe655",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\ntype T int\n\n",
+    "sha256": "9b2210ba59fb0a2001a56b5052198d539a9e94909e1c5128814c84aa59b07357"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-18-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\ntype T int\n",
+    "sha256": "89557113c540b724688bfd844aac737f7585e149f703368744266425667affba",
+    "previous": "RH-before-6717728dbfdbe655",
+    "edit": {
+      "StartByte": 21,
+      "OldEndByte": 22,
+      "NewEndByte": 21
+    }
+  },
+  {
+    "id": "RH-before-6044c1218684e154",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\ntype T int;\n",
+    "sha256": "dcfc9bdf0a689cf92858b09d87f03462d48c0321a54b83525c241fd6266e234f"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-18-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\ntype T int;",
+    "sha256": "3098664a7a38ebef5051428b183a4871f2eb1c48b3c48361f31bcd559cf0e5a6",
+    "previous": "RH-before-6044c1218684e154",
+    "edit": {
+      "StartByte": 21,
+      "OldEndByte": 22,
+      "NewEndByte": 21
+    }
+  },
+  {
+    "id": "RH-before-1fc0487386a5f362",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\ntype T = int\n",
+    "sha256": "36a30f2cec06fedf601d69ff355aa3ecc454be74aa76afb72dfa5e62e6d2445f"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-19-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\ntype T = int",
+    "sha256": "9bc16e733a96d14dd65ea3de2343e9dc3ad7c7fadf6e79bdf59dd529b7f6e5a5",
+    "previous": "RH-before-1fc0487386a5f362",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-be50ea6ac5a38a84",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\ntype T = int // end\n",
+    "sha256": "b5477b4ff9ac85afe50374b098b4c47c7f79900e1e166d3468eca7c906c6feb1"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-19-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\ntype T = int // end",
+    "sha256": "609fde052fb6d0d06f115d29da7685b581416f553d5c570b59e909e8f50b03b7",
+    "previous": "RH-before-be50ea6ac5a38a84",
+    "edit": {
+      "StartByte": 29,
+      "OldEndByte": 30,
+      "NewEndByte": 29
+    }
+  },
+  {
+    "id": "RH-before-3ba81819ddc39b81",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\ntype T = int\n\n",
+    "sha256": "ee5d7d9f1fb0a155d0433de8c8099402d26ecb5421fa0b3501d4d2c9006091c1"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-19-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\ntype T = int\n",
+    "sha256": "36a30f2cec06fedf601d69ff355aa3ecc454be74aa76afb72dfa5e62e6d2445f",
+    "previous": "RH-before-3ba81819ddc39b81",
+    "edit": {
+      "StartByte": 23,
+      "OldEndByte": 24,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "RH-before-c08d81782918e957",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\ntype T = int;\n",
+    "sha256": "076a6e8031b31563347a82ef85aa3848bab8865c4ffa5e2f3690de17691eecd4"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-19-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\ntype T = int;",
+    "sha256": "dc36235acaafe6c989f6a4e35554cab9440a3ed15c4d6f895d3c9535d4b5eb16",
+    "previous": "RH-before-c08d81782918e957",
+    "edit": {
+      "StartByte": 23,
+      "OldEndByte": 24,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "RH-before-94a170dd3a5faa18",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nfunc f() {}\n",
+    "sha256": "65e49cb173f22ac74d7c9bf4d839fc0a7644c736ab0bd21feb525ef3208ce4a2"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-20-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nfunc f() {}",
+    "sha256": "5dc3c6b3662d1373492d2be74e7442fb70db35d1ace5a518cef8c94ae83b4842",
+    "previous": "RH-before-94a170dd3a5faa18",
+    "edit": {
+      "StartByte": 21,
+      "OldEndByte": 22,
+      "NewEndByte": 21
+    }
+  },
+  {
+    "id": "RH-before-ee612ff4c7a96e18",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nfunc f() {} // end\n",
+    "sha256": "704b55e6335ed45f25bd886aecc80212e37f71b3d4ada4f5a44c2f7a2ea663ba"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-20-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nfunc f() {} // end",
+    "sha256": "c2b230c42238aaa9d0b1e0f1db4d4dc3e15af4ca71d16d33b145edc6c641449d",
+    "previous": "RH-before-ee612ff4c7a96e18",
+    "edit": {
+      "StartByte": 28,
+      "OldEndByte": 29,
+      "NewEndByte": 28
+    }
+  },
+  {
+    "id": "RH-before-978898f7696d2dce",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nfunc f() {}\n\n",
+    "sha256": "be626661fc21d632aca89f5cb5a7c8b6207564df2eaf25d4507bbd9b9ea5ab56"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-20-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nfunc f() {}\n",
+    "sha256": "65e49cb173f22ac74d7c9bf4d839fc0a7644c736ab0bd21feb525ef3208ce4a2",
+    "previous": "RH-before-978898f7696d2dce",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-c26de2fd29210de9",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nfunc f() {};\n",
+    "sha256": "90b18a6bd511366b0c80294b773c8a9bff278fa15d291c177df4bd202bd79dec"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-20-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nfunc f() {};",
+    "sha256": "226799bb7074896e5d0a5c25306588b1b579aa1110c412fa8df21c40df3abbe1",
+    "previous": "RH-before-c26de2fd29210de9",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-21b8f8a190eee006",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nimport \"fmt\"\n",
+    "sha256": "87416e20feac0488c54ef6fc4d23e25a3d9314774188bcb96cc5176875f7b9c1"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-21-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nimport \"fmt\"",
+    "sha256": "aa69c4536002d3da24d3512827c120e5e3dbdd049834a1ba9979268ed5382ae5",
+    "previous": "RH-before-21b8f8a190eee006",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-3ab01b20bd60a7b2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nimport \"fmt\" // end\n",
+    "sha256": "fbaf90f51ac757b27d50b28e1aa6b5935f09d644152ca99627f54840ad07b00c"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-21-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nimport \"fmt\" // end",
+    "sha256": "feb91d779d750218c4445e6af97ea1f9317003a8c46d767745b7a8238d59993e",
+    "previous": "RH-before-3ab01b20bd60a7b2",
+    "edit": {
+      "StartByte": 29,
+      "OldEndByte": 30,
+      "NewEndByte": 29
+    }
+  },
+  {
+    "id": "RH-before-12f6b30cbc2f65c2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nimport \"fmt\"\n\n",
+    "sha256": "81d8c6234f89a88a52b81e8376e866a26ffb6003445a722718ee01675b46d83b"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-21-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nimport \"fmt\"\n",
+    "sha256": "87416e20feac0488c54ef6fc4d23e25a3d9314774188bcb96cc5176875f7b9c1",
+    "previous": "RH-before-12f6b30cbc2f65c2",
+    "edit": {
+      "StartByte": 23,
+      "OldEndByte": 24,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "RH-before-ade719a33f91b95b",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nimport \"fmt\";\n",
+    "sha256": "6ef9f14ee4b34204be18fead8c9a328ee382de44ef7194213018d94676f2d9e4"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-21-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nimport \"fmt\";",
+    "sha256": "647966fdf7095dfffe71eb311194d9e9007749af277a40bf8edf3a67284b532d",
+    "previous": "RH-before-ade719a33f91b95b",
+    "edit": {
+      "StartByte": 23,
+      "OldEndByte": 24,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "RH-before-3d3458e15b407373",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = map[string]int{}\n",
+    "sha256": "c08a40a68bd64cbc2f04187afe0530cf0b29f034efe97f9d1410c580e25f7cc0"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-22-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = map[string]int{}",
+    "sha256": "d2dffa8488f3ad3d97ce65b75d2a82bc58ba5b7f0f94516703197d21a6725f64",
+    "previous": "RH-before-3d3458e15b407373",
+    "edit": {
+      "StartByte": 34,
+      "OldEndByte": 35,
+      "NewEndByte": 34
+    }
+  },
+  {
+    "id": "RH-before-8c8aaa0e743bc19f",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = map[string]int{} // end\n",
+    "sha256": "6e677da9b6f52a6fcddc2aaecc6d0daa87a9dc16e0c487b2cd4c3ac373185f62"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-22-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = map[string]int{} // end",
+    "sha256": "6d6b5e7b7094d42a8bee54b7e4bca4a1e59c6cf0f257b9d9f177b488ad7f21a3",
+    "previous": "RH-before-8c8aaa0e743bc19f",
+    "edit": {
+      "StartByte": 41,
+      "OldEndByte": 42,
+      "NewEndByte": 41
+    }
+  },
+  {
+    "id": "RH-before-d8fb13d852e5d01e",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = map[string]int{}\n\n",
+    "sha256": "ba0d35dc1dc6b01cf32a100dec59c4f2d7c4aa2b5afc93d8b8836bf6f352d4d6"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-22-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = map[string]int{}\n",
+    "sha256": "c08a40a68bd64cbc2f04187afe0530cf0b29f034efe97f9d1410c580e25f7cc0",
+    "previous": "RH-before-d8fb13d852e5d01e",
+    "edit": {
+      "StartByte": 35,
+      "OldEndByte": 36,
+      "NewEndByte": 35
+    }
+  },
+  {
+    "id": "RH-before-06062a7aa02920a9",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = map[string]int{};\n",
+    "sha256": "267ab0cfca9ebab1fb9ce470c96c68008eedfbb752cbcc9e4a3e3560dd233831"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-22-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = map[string]int{};",
+    "sha256": "71cc00cfb310052031ca113ecd86a8d8d39a0ad6d7ebc43b9afb65e80f6b30a8",
+    "previous": "RH-before-06062a7aa02920a9",
+    "edit": {
+      "StartByte": 35,
+      "OldEndByte": 36,
+      "NewEndByte": 35
+    }
+  },
+  {
+    "id": "RH-before-b4648bb3acd65170",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = a[0]\n",
+    "sha256": "48401cba843fbf2cb6043eb92b99064f3767a3c71afd3bfe2853777aac7f300e"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-23-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = a[0]",
+    "sha256": "55a3e69f5ad74d3aed2e8d3f139d2d750d320c505615e3d25df2391c895612fe",
+    "previous": "RH-before-b4648bb3acd65170",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-f3b31b7b4b093912",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = a[0] // end\n",
+    "sha256": "c9a4debfa02c4cfaa62603fa7babf4fceeacecb8e98a124adfd658c3f5fa6c57"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-23-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = a[0] // end",
+    "sha256": "8fbfead707c114293ac906f6f2e2686aa055c3d6a3b04abfc3fa8cdb5de72b07",
+    "previous": "RH-before-f3b31b7b4b093912",
+    "edit": {
+      "StartByte": 29,
+      "OldEndByte": 30,
+      "NewEndByte": 29
+    }
+  },
+  {
+    "id": "RH-before-deadd194e30b7baf",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = a[0]\n\n",
+    "sha256": "3151e8d7669f29e753dbb52d8d22b39dd00e78d26f7b44707cfce3158ab781b8"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-23-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = a[0]\n",
+    "sha256": "48401cba843fbf2cb6043eb92b99064f3767a3c71afd3bfe2853777aac7f300e",
+    "previous": "RH-before-deadd194e30b7baf",
+    "edit": {
+      "StartByte": 23,
+      "OldEndByte": 24,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "RH-before-49f7ed3f7fc7bf3f",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = a[0];\n",
+    "sha256": "043195b956a76d72937b12e9f20e267cd141c099301207c43acf88f08fa3189a"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-23-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = a[0];",
+    "sha256": "30417912af4f31ba53a1c7a83fa7193e5dd69da6bd1007470c10f30e79aec8cb",
+    "previous": "RH-before-49f7ed3f7fc7bf3f",
+    "edit": {
+      "StartByte": 23,
+      "OldEndByte": 24,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "RH-before-5db6dbd0736c22d6",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = a + b\n",
+    "sha256": "06e106e3fce943dff7b38c7d4c08682b2182259558b4882e9de31b4ee0fdfbab"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-24-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = a + b",
+    "sha256": "ad6b570d29f24d146d967aa2f169e7f839beebfcc601aa81f76a5ee27a189f47",
+    "previous": "RH-before-5db6dbd0736c22d6",
+    "edit": {
+      "StartByte": 23,
+      "OldEndByte": 24,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "RH-before-75b12bea971a08e4",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = a + b // end\n",
+    "sha256": "e4884907d61b95c0e1d66ed45e93f28acb9541fba51bf57f3167926682634d2e"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-24-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = a + b // end",
+    "sha256": "61e4dfb8acf56bda06dfe1094cabe090952eb4a820652dfcdda9f578862b075f",
+    "previous": "RH-before-75b12bea971a08e4",
+    "edit": {
+      "StartByte": 30,
+      "OldEndByte": 31,
+      "NewEndByte": 30
+    }
+  },
+  {
+    "id": "RH-before-44e9e8e96b75bb09",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = a + b\n\n",
+    "sha256": "5e6afabe141d37ad0ec52d6ea7bc1b2533847b3f9bc4a69ca29aae6e3fa22c96"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-24-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = a + b\n",
+    "sha256": "06e106e3fce943dff7b38c7d4c08682b2182259558b4882e9de31b4ee0fdfbab",
+    "previous": "RH-before-44e9e8e96b75bb09",
+    "edit": {
+      "StartByte": 24,
+      "OldEndByte": 25,
+      "NewEndByte": 24
+    }
+  },
+  {
+    "id": "RH-before-8c9f4f290a1016b5",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = a + b;\n",
+    "sha256": "3c4658ecd482c8432bd991436453e333d11ff001555b0d68d541f694c71b55f5"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-24-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = a + b;",
+    "sha256": "ee97a5f41a7abe663b46df7ea0a14789288833e087767113d8be9d210c679f75",
+    "previous": "RH-before-8c9f4f290a1016b5",
+    "edit": {
+      "StartByte": 24,
+      "OldEndByte": 25,
+      "NewEndByte": 24
+    }
+  },
+  {
+    "id": "RH-before-b9d4d96b29930641",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = new(int)\n",
+    "sha256": "1d85d1240c0bb53a03e77279fe6350a1a019804301579dbea30385e1c52c7797"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-25-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = new(int)",
+    "sha256": "0847a7242890079139374fed25d6c0f49355423806d8cf851081f46c43f338d7",
+    "previous": "RH-before-b9d4d96b29930641",
+    "edit": {
+      "StartByte": 26,
+      "OldEndByte": 27,
+      "NewEndByte": 26
+    }
+  },
+  {
+    "id": "RH-before-c36a8132760f2959",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = new(int) // end\n",
+    "sha256": "04c58630e98f0840f223acaad9aa64e52b92fcb642fb75ecbb1f1a846a8da836"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-25-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = new(int) // end",
+    "sha256": "fd9cd1883e8a9b305ec7c856edde52bf783ae82a8f7f1a72478f0e1255d8b1f4",
+    "previous": "RH-before-c36a8132760f2959",
+    "edit": {
+      "StartByte": 33,
+      "OldEndByte": 34,
+      "NewEndByte": 33
+    }
+  },
+  {
+    "id": "RH-before-8b8d456d4f0203f6",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = new(int)\n\n",
+    "sha256": "e607b1f57ffbcac42aabbf6e6a61d5229f657b23d3d35b76b4164c125808d545"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-25-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = new(int)\n",
+    "sha256": "1d85d1240c0bb53a03e77279fe6350a1a019804301579dbea30385e1c52c7797",
+    "previous": "RH-before-8b8d456d4f0203f6",
+    "edit": {
+      "StartByte": 27,
+      "OldEndByte": 28,
+      "NewEndByte": 27
+    }
+  },
+  {
+    "id": "RH-before-2db600d6289f0831",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = new(int);\n",
+    "sha256": "94b07a0243d7af970fe815acb8d9bdac2b3bf90fabd61ffcd307c2b488fc08ba"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-25-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = new(int);",
+    "sha256": "ed41d0242d44c0e218981ef96a5cc4ed4ddbb97f3dd7065405d84a61bb930007",
+    "previous": "RH-before-2db600d6289f0831",
+    "edit": {
+      "StartByte": 27,
+      "OldEndByte": 28,
+      "NewEndByte": 27
+    }
+  },
+  {
+    "id": "RH-before-8cda5243cd8e285c",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = struct{x int}{}\n",
+    "sha256": "b157e4e5decde3fee865d08382444bf120a948fa0d892be91c67cf5533c8bff8"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-26-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = struct{x int}{}",
+    "sha256": "378e2040bf61a79626e97c2bb97f35d6d34b1d2606ab877e61f06699647c4ae5",
+    "previous": "RH-before-8cda5243cd8e285c",
+    "edit": {
+      "StartByte": 33,
+      "OldEndByte": 34,
+      "NewEndByte": 33
+    }
+  },
+  {
+    "id": "RH-before-e65b25d470baaa5f",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = struct{x int}{} // end\n",
+    "sha256": "5e463e42e017be600aebe5aad0851bffb9fa4a5601a81946f096b9d14237658d"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-26-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = struct{x int}{} // end",
+    "sha256": "a6d7736304f9e607f9936651ca60e484289d7b43bdcf5e8ec162a115b593e83d",
+    "previous": "RH-before-e65b25d470baaa5f",
+    "edit": {
+      "StartByte": 40,
+      "OldEndByte": 41,
+      "NewEndByte": 40
+    }
+  },
+  {
+    "id": "RH-before-67f0fa591e5a4612",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = struct{x int}{}\n\n",
+    "sha256": "34cdf180b329c891f12d41664cb3850bbec549029c033ca31f53355e488e6578"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-26-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = struct{x int}{}\n",
+    "sha256": "b157e4e5decde3fee865d08382444bf120a948fa0d892be91c67cf5533c8bff8",
+    "previous": "RH-before-67f0fa591e5a4612",
+    "edit": {
+      "StartByte": 34,
+      "OldEndByte": 35,
+      "NewEndByte": 34
+    }
+  },
+  {
+    "id": "RH-before-3f9ab3886715776a",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nvar x = struct{x int}{};\n",
+    "sha256": "c3619c956b823b69fa82b54636c0426bcfbfd31b999066e6b4c11e38c9bf047f"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-26-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nvar x = struct{x int}{};",
+    "sha256": "fc68e5dbf4cbb3174137309585738ac33f23a9e252ed69ac420451e8ccfb6549",
+    "previous": "RH-before-3f9ab3886715776a",
+    "edit": {
+      "StartByte": 34,
+      "OldEndByte": 35,
+      "NewEndByte": 34
+    }
+  },
+  {
+    "id": "RH-before-26b8fea94ffc1e8a",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nf()\n",
+    "sha256": "ad89788015c14ac0757b3151fd41f1d4820454397603e24156ae8a68846d8dd8"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-27-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nf()",
+    "sha256": "f0578d45845426a7b20e6433941ea0d555bec9d135f7137d6903b6db456fb429",
+    "previous": "RH-before-26b8fea94ffc1e8a",
+    "edit": {
+      "StartByte": 13,
+      "OldEndByte": 14,
+      "NewEndByte": 13
+    }
+  },
+  {
+    "id": "RH-before-2d96589376801032",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nf() // end\n",
+    "sha256": "6fb108ef656a91498a432ba7c079b5291a3ef3344d1f9d1c86d1766351696d94"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-27-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nf() // end",
+    "sha256": "2ba5ed36d1f42342a49bb13bb0f3f58bb2b242061411c08cef09900680420a1c",
+    "previous": "RH-before-2d96589376801032",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 21,
+      "NewEndByte": 20
+    }
+  },
+  {
+    "id": "RH-before-a17468bdfd1f8cea",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nf()\n\n",
+    "sha256": "43bd3fac0e445fcc8188df2b1a358d64679758498142a50c2a4fd060214b464e"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-27-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nf()\n",
+    "sha256": "ad89788015c14ac0757b3151fd41f1d4820454397603e24156ae8a68846d8dd8",
+    "previous": "RH-before-a17468bdfd1f8cea",
+    "edit": {
+      "StartByte": 14,
+      "OldEndByte": 15,
+      "NewEndByte": 14
+    }
+  },
+  {
+    "id": "RH-before-0dbbc8ee639123f7",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nf();\n",
+    "sha256": "5578d32d14d81042aa0a5ef467662c849d1fa3c9e28f0f124849512f288dcd1d"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-27-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nf();",
+    "sha256": "076e94cdd814ef628cc9efb43cccfd4b33ab0a6c449810fae004d03b4ed56dc8",
+    "previous": "RH-before-0dbbc8ee639123f7",
+    "edit": {
+      "StartByte": 14,
+      "OldEndByte": 15,
+      "NewEndByte": 14
+    }
+  },
+  {
+    "id": "RH-before-528ff30870f507c0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nx := 1\n",
+    "sha256": "247ede0d3f57ff4aef3c6be733855892b92ed98afd6dd742b59ffe52094fd68e"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-28-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nx := 1",
+    "sha256": "8d0b54ced2ad72bed148b215dd4ac3e2d7d5759d967a651002a5af282737952c",
+    "previous": "RH-before-528ff30870f507c0",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 17,
+      "NewEndByte": 16
+    }
+  },
+  {
+    "id": "RH-before-99a837d9fa4fb186",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nx := 1 // end\n",
+    "sha256": "8b8607a9aa707922ff59c0f4d6d918afee81b5191652a5f24622554076ffbfe8"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-28-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nx := 1 // end",
+    "sha256": "19560023090a3726e8335db5939aa0fc4f24f7e2974c0cff2eeb4348c477e385",
+    "previous": "RH-before-99a837d9fa4fb186",
+    "edit": {
+      "StartByte": 23,
+      "OldEndByte": 24,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "RH-before-01708832697cbb9f",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nx := 1\n\n",
+    "sha256": "c4cfdc82c192bef756e9fae256d2ccabdd04bf4ebe77dc987235d5d5e797dbba"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-28-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nx := 1\n",
+    "sha256": "247ede0d3f57ff4aef3c6be733855892b92ed98afd6dd742b59ffe52094fd68e",
+    "previous": "RH-before-01708832697cbb9f",
+    "edit": {
+      "StartByte": 17,
+      "OldEndByte": 18,
+      "NewEndByte": 17
+    }
+  },
+  {
+    "id": "RH-before-6af28835d2010d3b",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nx := 1;\n",
+    "sha256": "24ae958459a8592faf7c74caa9a20f16700f0364de664a660fdeb47d07d89a43"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-28-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nx := 1;",
+    "sha256": "9b2700827de5293594b63e91d87eec5269c033dce5e16f8e9ac57c02f06e8e3e",
+    "previous": "RH-before-6af28835d2010d3b",
+    "edit": {
+      "StartByte": 17,
+      "OldEndByte": 18,
+      "NewEndByte": 17
+    }
+  },
+  {
+    "id": "RH-before-8a4e08bce89bf94b",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nx = 1\n",
+    "sha256": "83f15b28604ff5b7ab5a064329ae8b916e301fb9eed4f2d51a22e05f3698b55c"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-29-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nx = 1",
+    "sha256": "d7728668984df153662b7cc2b9fe8fbefbe5e44dee979e2cac72129e2e09dfaf",
+    "previous": "RH-before-8a4e08bce89bf94b",
+    "edit": {
+      "StartByte": 15,
+      "OldEndByte": 16,
+      "NewEndByte": 15
+    }
+  },
+  {
+    "id": "RH-before-6e7b89b04374dfd6",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nx = 1 // end\n",
+    "sha256": "b0b988086f96e4eede0ce471cd80bafc118dc5ac4546fff4ad66d79190158e14"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-29-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nx = 1 // end",
+    "sha256": "7da29882470dc6215add556bede1363490a7dbdf4948c4cd963876d8436bfdaa",
+    "previous": "RH-before-6e7b89b04374dfd6",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "RH-before-37ba24f46b962aa8",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nx = 1\n\n",
+    "sha256": "216bc7df087884f3043ccbcac1a766bf1da6a7cdf3ff6cdb0ce0770fb68dd8ea"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-29-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nx = 1\n",
+    "sha256": "83f15b28604ff5b7ab5a064329ae8b916e301fb9eed4f2d51a22e05f3698b55c",
+    "previous": "RH-before-37ba24f46b962aa8",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 17,
+      "NewEndByte": 16
+    }
+  },
+  {
+    "id": "RH-before-d32269c2d7696aed",
+    "language": "go",
+    "filename": "x.go",
+    "group": "clean",
+    "source": "package p\nx = 1;\n",
+    "sha256": "487e34d435eb54a08a015600fce8fd3954a8a608a88c6d974f4e6b90b6b5d804"
+  },
+  {
+    "id": "Go-EOF-valid-expanded-29-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "go-c-eof-expanded-cases",
+    "source": "package p\nx = 1;",
+    "sha256": "37d404b68c293426e43e514c155a420e285a955afdd1f69e775e8d0a5ff41eca",
+    "previous": "RH-before-d32269c2d7696aed",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 17,
+      "NewEndByte": 16
+    }
+  },
+  {
+    "id": "prefix-x-go-0",
+    "language": "go",
+    "filename": "x.go",
+    "group": "leading-prefix-cases",
+    "source": " package p\nvar x = 1\n",
+    "sha256": "e1a3b99115184a0f931545ff2b8426e412c4ec3dfa051e8d7854300b2665e19a",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-go-1",
+    "language": "go",
+    "filename": "x.go",
+    "group": "leading-prefix-cases",
+    "source": "\tpackage p\nvar x = 1\n",
+    "sha256": "806e03be3dcf473b1f804e9132f8b217c048ccb1a3cf0acd375f9d5ea1961d61",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-go-2",
+    "language": "go",
+    "filename": "x.go",
+    "group": "leading-prefix-cases",
+    "source": "\npackage p\nvar x = 1\n",
+    "sha256": "348ac434d66a000b58acbb4e52e6ae050af140b48224c59ee070e3385ff97405",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-go-3",
+    "language": "go",
+    "filename": "x.go",
+    "group": "leading-prefix-cases",
+    "source": "\rpackage p\nvar x = 1\n",
+    "sha256": "8c7b848d3cfdc8fe4dfa1d040b876a97597e3bc4107aaa061ef7982298f16121",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-go-4",
+    "language": "go",
+    "filename": "x.go",
+    "group": "leading-prefix-cases",
+    "source": "\fpackage p\nvar x = 1\n",
+    "sha256": "a2476040f2fb173b0cfd59cf64983a1a510bf4f35470a6f13d465de6b0b153ca",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-go-5",
+    "language": "go",
+    "filename": "x.go",
+    "group": "leading-prefix-cases",
+    "source": "\u000bpackage p\nvar x = 1\n",
+    "sha256": "a70726fe1d77f7bee99288c71e0d2bde6dc162488d43c0211c074d4c7dcab958",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-go-6",
+    "language": "go",
+    "filename": "x.go",
+    "group": "leading-prefix-cases",
+    "source": "\u0000package p\nvar x = 1\n",
+    "sha256": "9222b0dc514c44f8b2fbaa816af1465244a167ac497e1f41bd6a3fa44c727fcb",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-go-7",
+    "language": "go",
+    "filename": "x.go",
+    "group": "leading-prefix-cases",
+    "source": "\u0001package p\nvar x = 1\n",
+    "sha256": "f631856d0de976b46674aca2d085614c8ac94bb356487dec9e3d6ce1da88ab9e",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-go-8",
+    "language": "go",
+    "filename": "x.go",
+    "group": "leading-prefix-cases",
+    "source": "package p\nvar x = 1\n",
+    "sha256": "89fb40132f83268d75634125e7370c2fdaa169c8607d3beaf60b47cd424e402e",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 2
+    }
+  },
+  {
+    "id": "prefix-x-go-9",
+    "language": "go",
+    "filename": "x.go",
+    "group": "leading-prefix-cases",
+    "source": " package p\nvar x = 1\n",
+    "sha256": "532c0a90373dc27b21a1cff509b03f62b5469437cdd07a657d1991be09ec219a",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 2
+    }
+  },
+  {
+    "id": "prefix-x-go-10",
+    "language": "go",
+    "filename": "x.go",
+    "group": "leading-prefix-cases",
+    "source": " package p\nvar x = 1\n",
+    "sha256": "2ea55a4052b46fd93ea716bce560aade48253787c3073efafdb6d8939e594be2",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-go-11",
+    "language": "go",
+    "filename": "x.go",
+    "group": "leading-prefix-cases",
+    "source": " package p\nvar x = 1\n",
+    "sha256": "a91e0532f481c94171f2fefb00c7e7f8d6c387fc910525b1cc087957bd5c9ce5",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-go-12",
+    "language": "go",
+    "filename": "x.go",
+    "group": "leading-prefix-cases",
+    "source": "​package p\nvar x = 1\n",
+    "sha256": "55ac3f77262080393d6ef5eff43aa18afc382a4b68ff0199407fd5e23be6817f",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-go-13",
+    "language": "go",
+    "filename": "x.go",
+    "group": "leading-prefix-cases",
+    "source": " package p\nvar x = 1\n",
+    "sha256": "51e1caf2e7c0a2fef2d6876a573a1819c84cc425c36ed376d4df555aa7dae99a",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-go-14",
+    "language": "go",
+    "filename": "x.go",
+    "group": "leading-prefix-cases",
+    "source": " package p\nvar x = 1\n",
+    "sha256": "a8c5e23c1b341f5912fab79027ac92b361d906573f34a5e91f09d3549bf1fb31",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-go-15",
+    "language": "go",
+    "filename": "x.go",
+    "group": "leading-prefix-cases",
+    "source": "﻿package p\nvar x = 1\n",
+    "sha256": "a2a858ebdcfe67226c034412b01b4c92a3b04a3a4059d7151363680691296484",
+    "previous": "RH-before-e8f203eabe384ea5",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "RH-before-204145703586ac99",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "clean",
+    "source": "const value = 1;\n",
+    "sha256": "8de5c07db8deb3b75dedd9b5bc999669936cea181ae0033c27c4e2071a6e434d"
+  },
+  {
+    "id": "prefix-x-js-0",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "leading-prefix-cases",
+    "source": " const value = 1;\n",
+    "sha256": "a58b93239736e94507f9dd319c52aef8f8b6e60c0b457cbc3ffaf78d4edbc8f9",
+    "previous": "RH-before-204145703586ac99",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-js-1",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "leading-prefix-cases",
+    "source": "\tconst value = 1;\n",
+    "sha256": "665cbd127d080332d5deddc55f0c6eeae435e09beedf6d6e39cd15d0a25966d9",
+    "previous": "RH-before-204145703586ac99",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-js-2",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "leading-prefix-cases",
+    "source": "\nconst value = 1;\n",
+    "sha256": "1079790eeb5eff6fe1ba54a995030195d5ddcc7a3fb565c2789c6789dbafc262",
+    "previous": "RH-before-204145703586ac99",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-js-3",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "leading-prefix-cases",
+    "source": "\rconst value = 1;\n",
+    "sha256": "3825b099aca55bf274bb98e4d3e2136e5183aa2056265065e49cab357cf4f47b",
+    "previous": "RH-before-204145703586ac99",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-js-4",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "leading-prefix-cases",
+    "source": "\fconst value = 1;\n",
+    "sha256": "421f9c299c329db762107adcaeff5707ef1b9465f98f9455217d4621664276b6",
+    "previous": "RH-before-204145703586ac99",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-js-5",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "leading-prefix-cases",
+    "source": "\u000bconst value = 1;\n",
+    "sha256": "e85331b99166daec5b59a15219c5a5c3cee4c1caaf6a13bd362ade7da50fbca7",
+    "previous": "RH-before-204145703586ac99",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-js-6",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "leading-prefix-cases",
+    "source": "\u0000const value = 1;\n",
+    "sha256": "596811d4ac2745c37e0c795236857792bbbaf57bd7d08740ed0f8fe2d759d10a",
+    "previous": "RH-before-204145703586ac99",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-js-7",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "leading-prefix-cases",
+    "source": "\u0001const value = 1;\n",
+    "sha256": "c4251db735509d660f538d5d5abf57067b72d46e789f0c4ba042b8bc04cdbb59",
+    "previous": "RH-before-204145703586ac99",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-js-8",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "leading-prefix-cases",
+    "source": "const value = 1;\n",
+    "sha256": "85054e69613d4e5b50a68c3cd33343f9a74fb96867d8c0aa513577b6a100f52d",
+    "previous": "RH-before-204145703586ac99",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 2
+    }
+  },
+  {
+    "id": "prefix-x-js-9",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "leading-prefix-cases",
+    "source": " const value = 1;\n",
+    "sha256": "0a27f808cad6f6b2aca0cd1092c75444ca2312f6cc3a27fa9ea54b29921a0799",
+    "previous": "RH-before-204145703586ac99",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 2
+    }
+  },
+  {
+    "id": "prefix-x-js-10",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "leading-prefix-cases",
+    "source": " const value = 1;\n",
+    "sha256": "c5138a880fdd43e82202a589b8c63bdf4a31d5a457f83a5525ee69314b3270ab",
+    "previous": "RH-before-204145703586ac99",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-js-11",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "leading-prefix-cases",
+    "source": " const value = 1;\n",
+    "sha256": "43eb85bb6d7b776540646d96c170619ed22b2ac46e5eb3bb2d42189f91bc4523",
+    "previous": "RH-before-204145703586ac99",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-js-12",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "leading-prefix-cases",
+    "source": "​const value = 1;\n",
+    "sha256": "25672d6f7da6e6885d89ad8de6a33e5d3a339fa0302a6a23a0e779c0badbb319",
+    "previous": "RH-before-204145703586ac99",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-js-13",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "leading-prefix-cases",
+    "source": " const value = 1;\n",
+    "sha256": "4d22bd3de790f3468ff1473bc8512389b72fcb5819b9a6f17d6274517f80ba56",
+    "previous": "RH-before-204145703586ac99",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-js-14",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "leading-prefix-cases",
+    "source": " const value = 1;\n",
+    "sha256": "d9f7199cc65c2f4931519d31ca54ed4ea8ec718c98d323c56498856450e55915",
+    "previous": "RH-before-204145703586ac99",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-js-15",
+    "language": "javascript",
+    "filename": "x.js",
+    "group": "leading-prefix-cases",
+    "source": "﻿const value = 1;\n",
+    "sha256": "bc2485224b42dcd176178050306b1a4acc4bd79e0eff8efd62c71cdae85a0e6b",
+    "previous": "RH-before-204145703586ac99",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "RH-before-fe60f1b649d8b9ba",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "clean",
+    "source": "const View = () => <p>x</p>;\n",
+    "sha256": "e753a96c8b824b4dc13d452e01ff26976af66316a0aeefa30763b066615a34a5"
+  },
+  {
+    "id": "prefix-x-jsx-0",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "leading-prefix-cases",
+    "source": " const View = () => <p>x</p>;\n",
+    "sha256": "7e3a1bf92b8db791038a954bc6d324f5eb2ccaabdd4ba31048d73b844faf8a61",
+    "previous": "RH-before-fe60f1b649d8b9ba",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-jsx-1",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "leading-prefix-cases",
+    "source": "\tconst View = () => <p>x</p>;\n",
+    "sha256": "0831eb871166e093f8067f7314a2439e0b5a6644fe7b65104b32c01ba2d56c9f",
+    "previous": "RH-before-fe60f1b649d8b9ba",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-jsx-2",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "leading-prefix-cases",
+    "source": "\nconst View = () => <p>x</p>;\n",
+    "sha256": "1ad33aa35635d714a958f4b6ef6b06102c7776adbdaa1f7969693e92c7032fd0",
+    "previous": "RH-before-fe60f1b649d8b9ba",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-jsx-3",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "leading-prefix-cases",
+    "source": "\rconst View = () => <p>x</p>;\n",
+    "sha256": "50c1c0602178506e96c92cd780e0af805ba58fbe76470e958b5373983f2f434a",
+    "previous": "RH-before-fe60f1b649d8b9ba",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-jsx-4",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "leading-prefix-cases",
+    "source": "\fconst View = () => <p>x</p>;\n",
+    "sha256": "43c52f86293f91037bc14f17f546282423fce5a39ecba4e1510211778118c09f",
+    "previous": "RH-before-fe60f1b649d8b9ba",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-jsx-5",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "leading-prefix-cases",
+    "source": "\u000bconst View = () => <p>x</p>;\n",
+    "sha256": "9fdee440ca6bb237f87e0a5d45192e4391d7205d61b6cd8914f056e80a2494a0",
+    "previous": "RH-before-fe60f1b649d8b9ba",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-jsx-6",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "leading-prefix-cases",
+    "source": "\u0000const View = () => <p>x</p>;\n",
+    "sha256": "718beb1fc73bc7f4199b70c0fadcefc628d8fbc3971e6c36a18c7d1a56637505",
+    "previous": "RH-before-fe60f1b649d8b9ba",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-jsx-7",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "leading-prefix-cases",
+    "source": "\u0001const View = () => <p>x</p>;\n",
+    "sha256": "d27f3a3930b2095626bff957df3b828d955016bf6eede6ee05290e8745345f3d",
+    "previous": "RH-before-fe60f1b649d8b9ba",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-jsx-8",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "leading-prefix-cases",
+    "source": "const View = () => <p>x</p>;\n",
+    "sha256": "687664eae193ed7aedc5385f4933dda2f75a30e0ec86bde291b696c01a705a52",
+    "previous": "RH-before-fe60f1b649d8b9ba",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 2
+    }
+  },
+  {
+    "id": "prefix-x-jsx-9",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "leading-prefix-cases",
+    "source": " const View = () => <p>x</p>;\n",
+    "sha256": "5382b5f265797bf773ed4df25e8bcc04067965f1669ee1e4f5e5ddaaad57cc8b",
+    "previous": "RH-before-fe60f1b649d8b9ba",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 2
+    }
+  },
+  {
+    "id": "prefix-x-jsx-10",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "leading-prefix-cases",
+    "source": " const View = () => <p>x</p>;\n",
+    "sha256": "13fa4a1c48f5cdf51ecf95e7381bd3010923fb4895e9e9a4f3170adfdf0ffa6f",
+    "previous": "RH-before-fe60f1b649d8b9ba",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-jsx-11",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "leading-prefix-cases",
+    "source": " const View = () => <p>x</p>;\n",
+    "sha256": "8fcccb0a087fd6c6e055cb632a970490cb539dd3573c68ae24074731f7873221",
+    "previous": "RH-before-fe60f1b649d8b9ba",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-jsx-12",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "leading-prefix-cases",
+    "source": "​const View = () => <p>x</p>;\n",
+    "sha256": "0fc41c11e60a749b29e26c8d3e66e682b6e1fa3ee38bfd1492edab3f4fa080bc",
+    "previous": "RH-before-fe60f1b649d8b9ba",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-jsx-13",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "leading-prefix-cases",
+    "source": " const View = () => <p>x</p>;\n",
+    "sha256": "7836e3fa8f5b3e10b7debdb109cfa2cd2d947c38eeae15ad63107692b21f683e",
+    "previous": "RH-before-fe60f1b649d8b9ba",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-jsx-14",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "leading-prefix-cases",
+    "source": " const View = () => <p>x</p>;\n",
+    "sha256": "167c35ca2273fd9ec05e3feee9f31238009e842d13c9fdd6a90b448efa51f3a6",
+    "previous": "RH-before-fe60f1b649d8b9ba",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-jsx-15",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "leading-prefix-cases",
+    "source": "﻿const View = () => <p>x</p>;\n",
+    "sha256": "d591031a9437ab83db657cafe659bd86e60553b634f1966cb25589f3cdae2355",
+    "previous": "RH-before-fe60f1b649d8b9ba",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-ts-0",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "leading-prefix-cases",
+    "source": " const value: number = 1;\n",
+    "sha256": "188a7fbd4009e4b1f383f6052e051cbd3af99f74872bae8eba58bdf9dea5e557",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-ts-1",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "leading-prefix-cases",
+    "source": "\tconst value: number = 1;\n",
+    "sha256": "770b309506df73157c401230642fc34086b1974c836a0184856f9f2298948be1",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-ts-2",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "leading-prefix-cases",
+    "source": "\nconst value: number = 1;\n",
+    "sha256": "8d999d30b9a8848c8f1c6346bac655d520a0f99793d39424bd93adc8757e7f4e",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-ts-3",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "leading-prefix-cases",
+    "source": "\rconst value: number = 1;\n",
+    "sha256": "23fa35816e188d647bab1b8dc65d82f2f5b0f17ba06d3cf229996e89c0000f2a",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-ts-4",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "leading-prefix-cases",
+    "source": "\fconst value: number = 1;\n",
+    "sha256": "0c15f4d6472503878fe484779b959be05118ff96efe5dcc1eeeff8fc23466fc6",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-ts-5",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "leading-prefix-cases",
+    "source": "\u000bconst value: number = 1;\n",
+    "sha256": "128d19a2d3d0a95d7b6e6bbec37135202a192decb3869075ab305bc97df6608f",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-ts-6",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "leading-prefix-cases",
+    "source": "\u0000const value: number = 1;\n",
+    "sha256": "fb6337e3fb040e5d6255e940e9605087a7c4331f8cba997222e00f460bc46407",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-ts-7",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "leading-prefix-cases",
+    "source": "\u0001const value: number = 1;\n",
+    "sha256": "0ca52be8ce29fce8017aa3ba2eeffec9d6cf89d4dc01a84869f8490373e7b9ff",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-ts-8",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "leading-prefix-cases",
+    "source": "const value: number = 1;\n",
+    "sha256": "50c7d6c708e7e8385ea2d92525b70e7629cd68f8c5f306110e53233184c26730",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 2
+    }
+  },
+  {
+    "id": "prefix-x-ts-9",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "leading-prefix-cases",
+    "source": " const value: number = 1;\n",
+    "sha256": "52f61e5d1e8a81f25466b3bc5663584427b8b6c95f21a5c51b628b293f8a7dd8",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 2
+    }
+  },
+  {
+    "id": "prefix-x-ts-10",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "leading-prefix-cases",
+    "source": " const value: number = 1;\n",
+    "sha256": "5d79216420397506b72c88fc71e8463e1b7a02baca3e15208d299d3839112791",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-ts-11",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "leading-prefix-cases",
+    "source": " const value: number = 1;\n",
+    "sha256": "46f1fb895d04674de8b1349f0c0177134e84c0fa5243a58614ce4709b4b80583",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-ts-12",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "leading-prefix-cases",
+    "source": "​const value: number = 1;\n",
+    "sha256": "ce02c71c10d0e1f82895b22988544f82c3c00dece540790afaf7eb8e65cb56b6",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-ts-13",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "leading-prefix-cases",
+    "source": " const value: number = 1;\n",
+    "sha256": "8b16d1650645da2b94a53d76f64e2659f2eeedc7c0e370103a880c88cb597d7a",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-ts-14",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "leading-prefix-cases",
+    "source": " const value: number = 1;\n",
+    "sha256": "0a8ba25ec01ec9a36f987ebaa7cb1887fb5b8d000cb6d60aec51b10fdf115628",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-ts-15",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "leading-prefix-cases",
+    "source": "﻿const value: number = 1;\n",
+    "sha256": "6532bce292e27ce093a1eef95a139ea62b96c9c273a7d3ab51415599158ff7bc",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "RH-before-1360b8e45099a303",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "const View = () => <p>x</p>;\n",
+    "sha256": "e753a96c8b824b4dc13d452e01ff26976af66316a0aeefa30763b066615a34a5"
+  },
+  {
+    "id": "prefix-x-tsx-0",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "leading-prefix-cases",
+    "source": " const View = () => <p>x</p>;\n",
+    "sha256": "7e3a1bf92b8db791038a954bc6d324f5eb2ccaabdd4ba31048d73b844faf8a61",
+    "previous": "RH-before-1360b8e45099a303",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-tsx-1",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "leading-prefix-cases",
+    "source": "\tconst View = () => <p>x</p>;\n",
+    "sha256": "0831eb871166e093f8067f7314a2439e0b5a6644fe7b65104b32c01ba2d56c9f",
+    "previous": "RH-before-1360b8e45099a303",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-tsx-2",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "leading-prefix-cases",
+    "source": "\nconst View = () => <p>x</p>;\n",
+    "sha256": "1ad33aa35635d714a958f4b6ef6b06102c7776adbdaa1f7969693e92c7032fd0",
+    "previous": "RH-before-1360b8e45099a303",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-tsx-3",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "leading-prefix-cases",
+    "source": "\rconst View = () => <p>x</p>;\n",
+    "sha256": "50c1c0602178506e96c92cd780e0af805ba58fbe76470e958b5373983f2f434a",
+    "previous": "RH-before-1360b8e45099a303",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-tsx-4",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "leading-prefix-cases",
+    "source": "\fconst View = () => <p>x</p>;\n",
+    "sha256": "43c52f86293f91037bc14f17f546282423fce5a39ecba4e1510211778118c09f",
+    "previous": "RH-before-1360b8e45099a303",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-tsx-5",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "leading-prefix-cases",
+    "source": "\u000bconst View = () => <p>x</p>;\n",
+    "sha256": "9fdee440ca6bb237f87e0a5d45192e4391d7205d61b6cd8914f056e80a2494a0",
+    "previous": "RH-before-1360b8e45099a303",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-tsx-6",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "leading-prefix-cases",
+    "source": "\u0000const View = () => <p>x</p>;\n",
+    "sha256": "718beb1fc73bc7f4199b70c0fadcefc628d8fbc3971e6c36a18c7d1a56637505",
+    "previous": "RH-before-1360b8e45099a303",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-tsx-7",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "leading-prefix-cases",
+    "source": "\u0001const View = () => <p>x</p>;\n",
+    "sha256": "d27f3a3930b2095626bff957df3b828d955016bf6eede6ee05290e8745345f3d",
+    "previous": "RH-before-1360b8e45099a303",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 1
+    }
+  },
+  {
+    "id": "prefix-x-tsx-8",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "leading-prefix-cases",
+    "source": "const View = () => <p>x</p>;\n",
+    "sha256": "687664eae193ed7aedc5385f4933dda2f75a30e0ec86bde291b696c01a705a52",
+    "previous": "RH-before-1360b8e45099a303",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 2
+    }
+  },
+  {
+    "id": "prefix-x-tsx-9",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "leading-prefix-cases",
+    "source": " const View = () => <p>x</p>;\n",
+    "sha256": "5382b5f265797bf773ed4df25e8bcc04067965f1669ee1e4f5e5ddaaad57cc8b",
+    "previous": "RH-before-1360b8e45099a303",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 2
+    }
+  },
+  {
+    "id": "prefix-x-tsx-10",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "leading-prefix-cases",
+    "source": " const View = () => <p>x</p>;\n",
+    "sha256": "13fa4a1c48f5cdf51ecf95e7381bd3010923fb4895e9e9a4f3170adfdf0ffa6f",
+    "previous": "RH-before-1360b8e45099a303",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-tsx-11",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "leading-prefix-cases",
+    "source": " const View = () => <p>x</p>;\n",
+    "sha256": "8fcccb0a087fd6c6e055cb632a970490cb539dd3573c68ae24074731f7873221",
+    "previous": "RH-before-1360b8e45099a303",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-tsx-12",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "leading-prefix-cases",
+    "source": "​const View = () => <p>x</p>;\n",
+    "sha256": "0fc41c11e60a749b29e26c8d3e66e682b6e1fa3ee38bfd1492edab3f4fa080bc",
+    "previous": "RH-before-1360b8e45099a303",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-tsx-13",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "leading-prefix-cases",
+    "source": " const View = () => <p>x</p>;\n",
+    "sha256": "7836e3fa8f5b3e10b7debdb109cfa2cd2d947c38eeae15ad63107692b21f683e",
+    "previous": "RH-before-1360b8e45099a303",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-tsx-14",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "leading-prefix-cases",
+    "source": " const View = () => <p>x</p>;\n",
+    "sha256": "167c35ca2273fd9ec05e3feee9f31238009e842d13c9fdd6a90b448efa51f3a6",
+    "previous": "RH-before-1360b8e45099a303",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "prefix-x-tsx-15",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "leading-prefix-cases",
+    "source": "﻿const View = () => <p>x</p>;\n",
+    "sha256": "d591031a9437ab83db657cafe659bd86e60553b634f1966cb25589f3cdae2355",
+    "previous": "RH-before-1360b8e45099a303",
+    "edit": {
+      "StartByte": 0,
+      "OldEndByte": 0,
+      "NewEndByte": 3
+    }
+  },
+  {
+    "id": "TS-string-expand-0",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-string-expanded-cases",
+    "source": "const value: number \"0= 1;\n",
+    "sha256": "38dfb4d04651d6137cd7a042c01bf41d71108ef6cbcd0bc41d237e9c1384456b",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 20,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "TS-string-expand-2",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-string-expanded-cases",
+    "source": "const value: number \"12= 1;\n",
+    "sha256": "150d1967f6aa65d9f1c97ebf13e5725816e707e889325b828c01a5d2f79043af",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 20,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "TS-string-expand-3",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-string-expanded-cases",
+    "source": "const value: number '0= 1;\n",
+    "sha256": "e460ef0ac3807d758422cc78e75ea48e5e04b381ca82ab6d78d0bc056a84cab8",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 20,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "TS-string-expand-4",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-string-expanded-cases",
+    "source": "const value: number `0= 1;\n",
+    "sha256": "d73f04558d93aa0cca12f0663ea7a3f7708ca86acbb07bd0d3c9ba204dde4af8",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 20,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "TS-string-expand-5",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-string-expanded-cases",
+    "source": "const value: number \"a= 1;\n",
+    "sha256": "65a39127ded46eba20f78db5cbe22255358101aa24950d7db9b5498087495efe",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 20,
+      "NewEndByte": 22
+    }
+  },
+  {
+    "id": "TS-string-expand-6",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-string-expanded-cases",
+    "source": "const value: number \"\\n= 1;\n",
+    "sha256": "f73a119e3787ed296244340b2a70b57f98d27ec93e35c23e86c147a37c591088",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 20,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "TS-string-expand-7",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-string-expanded-cases",
+    "source": "const value: number \"=0= 1;\n",
+    "sha256": "72ded1a187d36a4693b3c3b8b018933dd936364ddae826cf43554edf026098dc",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 20,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "TS-string-expand-8",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "ts-string-expanded-cases",
+    "source": "const value: number \"1;= 1;\n",
+    "sha256": "606ee8ab6c721f1412edae35a130869eab17f07cfdd161fb768b821b1a2050f5",
+    "previous": "RH-before-5398f0b8321673b4",
+    "edit": {
+      "StartByte": 20,
+      "OldEndByte": 20,
+      "NewEndByte": 23
+    }
+  },
+  {
+    "id": "RH-before-0ea4429b19aa5876",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "const a = <p>Org &amp; Team</p>;",
+    "sha256": "556a0abf3222da4b371dd5e13f4e474e64002ad939c744a646c86fa04532dd74"
+  },
+  {
+    "id": "tsx-F1",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "bare-amp-cases",
+    "source": "const a = <p>Org & Team</p>;",
+    "sha256": "efd1f1afadcb0a0721f4cb1334c41d5d8c1306eb3e059d43f4ca025e5f31706a",
+    "previous": "RH-before-0ea4429b19aa5876",
+    "edit": {
+      "StartByte": 18,
+      "OldEndByte": 22,
+      "NewEndByte": 18
+    }
+  },
+  {
+    "id": "RH-before-c7a701a2b6da1734",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "const b = <p>AT&amp;T</p>;",
+    "sha256": "abe94cd1191f1e1fab80276264f6f1604770a9b601bccfa57aca605a7388d757"
+  },
+  {
+    "id": "tsx-F2",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "bare-amp-cases",
+    "source": "const b = <p>AT&T</p>;",
+    "sha256": "64a8995a210895b9beb7d5d59f04aff12461314928d622c3523e1bde2092e8e3",
+    "previous": "RH-before-c7a701a2b6da1734",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 20,
+      "NewEndByte": 16
+    }
+  },
+  {
+    "id": "RH-before-9ce36ead8d9377bd",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "clean",
+    "source": "const c = <p>&amp;</p>;",
+    "sha256": "0f6cb1346032682a2e5fb1d4ae34c8eb28fa4d443eea046ca0891458b94c0a43"
+  },
+  {
+    "id": "tsx-F3",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "bare-amp-cases",
+    "source": "const c = <p>&</p>;",
+    "sha256": "7cfe8fb425960bf47c9a2a48c734772700de3dd0da691bd087b1f5cb3417769a",
+    "previous": "RH-before-9ce36ead8d9377bd",
+    "edit": {
+      "StartByte": 14,
+      "OldEndByte": 18,
+      "NewEndByte": 14
+    }
+  },
+  {
+    "id": "RH-before-bf669ff587db75cc",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "clean",
+    "source": "const a = <p>Org &amp; Team</p>;",
+    "sha256": "556a0abf3222da4b371dd5e13f4e474e64002ad939c744a646c86fa04532dd74"
+  },
+  {
+    "id": "javascript-F1",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "bare-amp-cases",
+    "source": "const a = <p>Org & Team</p>;",
+    "sha256": "efd1f1afadcb0a0721f4cb1334c41d5d8c1306eb3e059d43f4ca025e5f31706a",
+    "previous": "RH-before-bf669ff587db75cc",
+    "edit": {
+      "StartByte": 18,
+      "OldEndByte": 22,
+      "NewEndByte": 18
+    }
+  },
+  {
+    "id": "RH-before-13be89882a23d03b",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "clean",
+    "source": "const b = <p>AT&amp;T</p>;",
+    "sha256": "abe94cd1191f1e1fab80276264f6f1604770a9b601bccfa57aca605a7388d757"
+  },
+  {
+    "id": "javascript-F2",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "bare-amp-cases",
+    "source": "const b = <p>AT&T</p>;",
+    "sha256": "64a8995a210895b9beb7d5d59f04aff12461314928d622c3523e1bde2092e8e3",
+    "previous": "RH-before-13be89882a23d03b",
+    "edit": {
+      "StartByte": 16,
+      "OldEndByte": 20,
+      "NewEndByte": 16
+    }
+  },
+  {
+    "id": "RH-before-ccfef46f990b6434",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "clean",
+    "source": "const c = <p>&amp;</p>;",
+    "sha256": "0f6cb1346032682a2e5fb1d4ae34c8eb28fa4d443eea046ca0891458b94c0a43"
+  },
+  {
+    "id": "javascript-F3",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "bare-amp-cases",
+    "source": "const c = <p>&</p>;",
+    "sha256": "7cfe8fb425960bf47c9a2a48c734772700de3dd0da691bd087b1f5cb3417769a",
+    "previous": "RH-before-ccfef46f990b6434",
+    "edit": {
+      "StartByte": 14,
+      "OldEndByte": 18,
+      "NewEndByte": 14
+    }
+  },
+  {
+    "id": "RH-before-6a3dfe0299d678a1",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "clean",
+    "source": "const View = () => <p>a = b &amp; 한글</p>;\n",
+    "sha256": "d81088d25751b6c61ac50b69155d9a806fb278f979cc16f7905b292aa5377374"
+  },
+  {
+    "id": "JSX-tail-hash",
+    "language": "javascript",
+    "filename": "x.jsx",
+    "group": "jsx-hash-cases",
+    "source": "const View = () => <p>a = b &amp; 한글</p>#\n",
+    "sha256": "a304317e1feabf8fbff2d3868f523b05541f91eb6a9f9129985b5af9188c3712",
+    "previous": "RH-before-6a3dfe0299d678a1",
+    "edit": {
+      "StartByte": 44,
+      "OldEndByte": 45,
+      "NewEndByte": 45
+    }
+  },
+  {
+    "id": "TSX-text-paren",
+    "language": "tsx",
+    "filename": "x.tsx",
+    "group": "tsx-paren-cases",
+    "source": "const View = () => <p>( = b &amp; 한글</p>;\n",
+    "sha256": "0421c6a2a552f5a9f1f138e0b3d3be7af7572bab2382afea484a90e9a229ddab",
+    "previous": "RH-before-bc61754bdafd2883",
+    "edit": {
+      "StartByte": 22,
+      "OldEndByte": 23,
+      "NewEndByte": 23
+    }
+  }
+]

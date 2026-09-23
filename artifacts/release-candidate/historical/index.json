@@ -1,0 +1,45 @@
+{
+  "record_kind": "unchanged selected historical files",
+  "files": [
+    {
+      "path": "artifacts/release-candidate/historical/identity.json",
+      "sha256": "63f932beb3a51776a9da68907aae833f470ed3f83c7b4c8b3cdc518a9daefe24",
+      "original_path": "artifacts/session-07/full-pass/11-release/identity.json"
+    },
+    {
+      "path": "artifacts/release-candidate/historical/oracle/summary.json",
+      "sha256": "4ad3058ad29e249dbb744cd3859ec3f441cd943a8b301da95ad566aae02aa967",
+      "original_path": "artifacts/session-07/full-pass/11-release/oracle/summary.json"
+    },
+    {
+      "path": "artifacts/release-candidate/historical/fallbacks.json",
+      "sha256": "9a56b2556fa4d497234cb343ef0dcc4c7a16cb66bb5a33664a88b447088548d9",
+      "original_path": "artifacts/session-07/full-pass/11-release/fallbacks.json"
+    },
+    {
+      "path": "artifacts/release-candidate/historical/performance/comparison.json",
+      "sha256": "9342c7d4b21660b2f1807502821d5394078cbb4319b24df8cda5a08a6d6aabdd",
+      "original_path": "artifacts/session-07/full-pass/11-release/performance/comparison.json"
+    },
+    {
+      "path": "artifacts/release-candidate/historical/performance/lookup-comparison.json",
+      "sha256": "9071d8dce9ddb84ec89159b3639a1b707236b012e3573248b402abf9015c552e",
+      "original_path": "artifacts/session-07/full-pass/11-release/performance/lookup-comparison.json"
+    },
+    {
+      "path": "artifacts/release-candidate/historical/performance/plan.json",
+      "sha256": "51c5c069cd20915b6bc22eed1d618d15ed3c9f8674d1c383b64ffd7583f4d0fb",
+      "original_path": "artifacts/session-07/full-pass/11-release/performance/plan.json"
+    },
+    {
+      "path": "artifacts/release-candidate/historical/performance/lookup-plan.json",
+      "sha256": "64c7caadd830277263e70846915297d95cc63f3210892ac3c86144b7b9e847f6",
+      "original_path": "artifacts/session-07/full-pass/11-release/performance/lookup-plan.json"
+    },
+    {
+      "path": "artifacts/release-candidate/historical/license-summary.json",
+      "sha256": "354431fdb10154200206167f611febc97593f8cf04bce2a58e347690f7d23811",
+      "original_path": "artifacts/session-07/full-pass/11-release/license-summary.json"
+    }
+  ]
+}
