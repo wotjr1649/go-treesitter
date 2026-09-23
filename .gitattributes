@@ -12,3 +12,5 @@
 *.zip -text
 *.png -text
 *.pdf -text
+# Preserve the exact bytes whose hashes identify downloaded CI receipts.
+artifacts/release-candidate/native-*/licenses.json -text
