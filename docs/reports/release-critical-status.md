@@ -1,9 +1,11 @@
 # Release-Critical status board
 
 Updated 2026-10-23 (ADR-0017). **Release is not yet executed.** Brightscript
-and Cooklang are no longer distributed, so the license gate passes for the
-204-grammar candidate locally; this commit's hosted CI is NOT_RUN and
-publication remains held by the owner. Development, Integration and the retained
+and Cooklang are no longer distributed. At `d6c802a` the whole Windows workflow
+passed for the first time ([run 39949173766](https://github.com/wotjr1649/go-treesitter/actions/runs/39949173766)):
+native AMD64 and ARM64 product jobs, the license gate (204 grammars) and the race
+diagnostic. Main creation, default-branch change, old-ref removal and tags
+remain held by the owner. Development, Integration and the retained
 seven-route Release-Critical correctness gates pass on this carrier
 (`0f32d229…`): a local Windows AMD64 CGO=0 rerun passed all 911 product
 test/subtest results, including the recorded C comparisons. This is finite-corpus
@@ -64,10 +66,10 @@ reasons are enumerated in `artifacts/release-candidate/historical/fallbacks.json
 |---|---|
 | Windows AMD64 native | PASS: CGO=0 build/tests/consumer execution, rerun locally for the ADR-0017 carrier. |
 | Product dependency/PE audit | PASS: 137 dependency packages, zero CgoFiles, no runtime/cgo; ordinary PE imports kernel32.dll only. |
-| Windows ARM64 | PASS at `e4e6a56`: all native CGO=0 product, recorded-C, selected-grammar, oracle-tool, runtime-invariant, official-ZIP consumer and 206-entry catalog steps completed. |
+| Windows ARM64 | PASS natively at `d6c802a` and earlier at `e4e6a56`: all native CGO=0 product, recorded-C, selected-grammar, oracle-tool, runtime-invariant, official-ZIP consumer and 206-entry catalog steps completed. |
 | Linux AMD64, Darwin ARM64, wasip1/wasm | CGO=0 cross-link PASS; execution NOT_RUN and outside first-release native scope. |
-| Hosted CI | At `e4e6a56`, both native product jobs and the race diagnostic PASS; that workflow FAILED solely on the license gate. NOT_RUN for the ADR-0017 commit. |
-| License release gate | PASS locally for 204 grammars after ADR-0017 excluded Brightscript and Cooklang; hosted NOT_RUN. |
+| Hosted CI | PASS at `d6c802a`: all four jobs ([receipts](../../artifacts/release-candidate/native-d6c802a/index.json)). At `e4e6a56` it failed only on the license gate. |
+| License release gate | PASS for 204 grammars, local and hosted at `d6c802a` (ADR-0017). |
 
 Own code remains MIT. The optional GPL module contains caddy, disassembly and
 jq with source archives and notices. All 204 inventory rows have identified

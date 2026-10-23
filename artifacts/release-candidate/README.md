@@ -9,6 +9,10 @@ The current verdict and limitations are in
 [the status board](../../docs/reports/release-critical-status.md).
 ADR-0017 (2026-10-23) later excluded both grammars; the license gate no longer
 reports them.
+`native-d6c802a/` retains the receipts of the first fully passing workflow
+(run 39949173766): main ZIP `ab7349577b4a93a2f686c3c69072fa1f12cc4d4a35dc02ed878bf62682b7467c`
+and GPL ZIP `0d5e64719f69a85f8e7c5f2004f35f04b2c765fe2052887f26bf7754f6922489`,
+identical in the local, hosted AMD64 and hosted ARM64 checks.
 
 `historical/identity.json` binds the measured product and benchmark inputs to
 `23d6885ebe8709616614c89ffb6511ea815fb23f`. `historical/index.json` records hashes
