@@ -97,8 +97,8 @@ payload. Including the optional module brings its GPL distribution terms.
 
 [Basic catalog checks](tools/catalog/README.md) cover all 204 grammars with
 three fresh runs, determinism, incremental edits, cancellation and input limits.
-This coverage is separate from the seven Release-Critical C oracle gates, which
-the catalog grammars do not have. Before v1, the availability and default
+This coverage is separate from the seven Release-Critical C oracle gates; the
+grammars outside those routes do not have that gate. Before v1, the availability and default
 handling of other grammars may change; see the
 [consumer contract](docs/specs/parser-result.md#language-availability).
 Completion preserves grammar-owned root coordinates and requires the runtime's

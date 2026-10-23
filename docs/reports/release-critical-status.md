@@ -11,7 +11,10 @@ E5 evidence for those routes only, not proof for all source programs or for the
 other grammars, which have the basic check. [Selected evidence](../../artifacts/release-candidate/README.md).
 
 The historical measured product source commit is `23d6885ebe8709616614c89ffb6511ea815fb23f`.
-The curated candidate preserves all 1,807 files in that production identity.
+At `e4e6a56` the curated candidate preserved all 1,807 files of that production
+identity. ADR-0017 deletes 15 of them and changes 11 (carrier, provenance,
+catalog and tooling), so the historical measurements below stay bound to
+`23d6885` and are not transferred to this candidate.
 Runtime origin remains `gotreesitter v0.53.0`; the internal carrier manifest is
 `0f32d22943e7e636f1ccdf03ec677871f67f81bc22db106a739d88a950ffa6e6` (ADR-0017;
 the receipts below at `e4e6a56` bind the earlier
