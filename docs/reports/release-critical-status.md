@@ -4,8 +4,9 @@ Updated 2026-10-23 (ADR-0017). **Release is not yet executed.** Brightscript
 and Cooklang are no longer distributed. At `d6c802a` the whole Windows workflow
 passed for the first time ([run 39949173766](https://github.com/wotjr1649/go-treesitter/actions/runs/39949173766)):
 native AMD64 and ARM64 product jobs, the license gate (204 grammars) and the race
-diagnostic. Main creation, default-branch change, old-ref removal and tags
-remain held by the owner. Development, Integration and the retained
+diagnostic. On 2026-10-23 the owner made `main` (this curated history) the
+default branch and removed the old `session/07-product-hardening` ref; its
+commits stay reachable by SHA and in earlier copies. Tags remain held. Development, Integration and the retained
 seven-route Release-Critical correctness gates pass on this carrier
 (`0f32d229…`): a local Windows AMD64 CGO=0 rerun passed all 911 product
 test/subtest results, including the recorded C comparisons. This is finite-corpus
