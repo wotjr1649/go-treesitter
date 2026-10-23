@@ -152,7 +152,7 @@ def main():
         label = 'gpl' if optional else 'main'
         consumer = directory / ('consumer-' + label)
         consumer.mkdir()
-        mod = f'module example.com/release-consumer\n\ngo 1.27.1\n\nrequire {MODULE} {VERSION}\n'
+        mod = f'module example.com/release-consumer\n\ngo 1.27.2\n\nrequire {MODULE} {VERSION}\n'
         if optional:
             mod += f'require {MODULE}/grammars/gpl {VERSION}\n'
         (consumer / 'go.mod').write_text(mod, encoding='utf-8', newline='\n')

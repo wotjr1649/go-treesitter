@@ -4,7 +4,7 @@
   "upstream_version": "v0.53.0",
   "runtime_manifest_sha256": "0f32d22943e7e636f1ccdf03ec677871f67f81bc22db106a739d88a950ffa6e6",
   "files": {
-    "go.mod": "4bd7f63f76393f8941ef41db599c6d61aa34c224171c53ddd52846cfec222b94",
+    "go.mod": "a56c2891a449da75ab8f92e9526dd0ff58adadfa0bbc73910c849fd59c381254",
     "gpl.go": "b7b661a8ee735c9f736d125e8fbdb412bdf449d32ee00ba4175773305b26fa53",
     "gpl_test.go": "a250cb037bee7ff92b636b14e2a09e8912380efb91489b0def47f07e1a08bcac",
     "internal/gtsadapter/caddy_external_lex_states_gen.go": "672db8f5300b353329dc0363d0d9bad8eb0b9c0ad90a5a325cc4076fb8da876c",
