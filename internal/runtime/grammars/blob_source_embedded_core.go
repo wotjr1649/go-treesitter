@@ -71,14 +71,12 @@ import "embed"
 //go:embed grammar_blobs/bicep.bin
 //go:embed grammar_blobs/bitbake.bin
 //go:embed grammar_blobs/blade.bin
-//go:embed grammar_blobs/brightscript.bin
 //go:embed grammar_blobs/cairo.bin
 //go:embed grammar_blobs/capnp.bin
 //go:embed grammar_blobs/chatito.bin
 //go:embed grammar_blobs/circom.bin
 //go:embed grammar_blobs/comment.bin
 //go:embed grammar_blobs/commonlisp.bin
-//go:embed grammar_blobs/cooklang.bin
 //go:embed grammar_blobs/corn.bin
 //go:embed grammar_blobs/cpon.bin
 //go:embed grammar_blobs/csv.bin

@@ -1,14 +1,21 @@
 # Release-Critical status board
 
-Updated 2026-09-23, Session 07. **Release is BLOCKED_EXTERNAL.** Development,
-Integration and the retained seven-route Release-Critical correctness gates
-pass. This is finite-corpus E5 evidence, not proof for all source programs or
-all 206 grammars. [Selected evidence](../../artifacts/release-candidate/README.md).
+Updated 2026-10-23 (ADR-0017). **Release is not yet executed.** Brightscript
+and Cooklang are no longer distributed, so the license gate passes for the
+204-grammar candidate locally; this commit's hosted CI is NOT_RUN and
+publication remains held by the owner. Development, Integration and the retained
+seven-route Release-Critical correctness gates pass on this carrier
+(`0f32d229…`): a local Windows AMD64 CGO=0 rerun passed all 911 product
+test/subtest results, including the recorded C comparisons. This is finite-corpus
+E5 evidence for those routes only, not proof for all source programs or for the
+other grammars, which have the basic check. [Selected evidence](../../artifacts/release-candidate/README.md).
 
 The historical measured product source commit is `23d6885ebe8709616614c89ffb6511ea815fb23f`.
 The curated candidate preserves all 1,807 files in that production identity.
 Runtime origin remains `gotreesitter v0.53.0`; the internal carrier manifest is
-`5d1f526c35e223341914cbfada8abe1c4c49d52824a09950bde05d331ff41e46`.
+`0f32d22943e7e636f1ccdf03ec677871f67f81bc22db106a739d88a950ffa6e6` (ADR-0017;
+the receipts below at `e4e6a56` bind the earlier
+`5d1f526c35e223341914cbfada8abe1c4c49d52824a09950bde05d331ff41e46`).
 The Go product blob now derives from the already pinned C tables (ADR-0015).
 C runtime v0.25.1 and grammar base commits remain pinned. Candidate C's complete
 TypeScript patch remains the approved C artifact (ADR-0012).
@@ -33,8 +40,8 @@ reasons are enumerated in `artifacts/release-candidate/historical/fallbacks.json
 - 688 C records, 439 edited records; repeated fresh recovery observations and
   three native C executions per record. One additional 8,192-declaration Go
   edit agrees with C over all 57,348 ordered nodes.
-- 206 basic grammar checks: 203 in the base module and 3 in the optional GPL
-  module; three fresh runs, edit/fresh equality, cancellation, admission and
+- 206 basic grammar checks at `e4e6a56`, before ADR-0017: 203 in the base
+  module and 3 in the optional GPL module; three fresh runs, edit/fresh equality, cancellation, admission and
   close. This does not certify C parity for the entire catalog.
 - Product and selected-grammar suites, vet, oracle-tool tests, four private
   runtime invariants, 66 race test/subtest results and two 60-second fuzz runs.
@@ -52,17 +59,16 @@ reasons are enumerated in `artifacts/release-candidate/historical/fallbacks.json
 
 | Gate | State |
 |---|---|
-| Windows AMD64 native | PASS: CGO=0 build/tests/consumer execution. |
+| Windows AMD64 native | PASS: CGO=0 build/tests/consumer execution, rerun locally for the ADR-0017 carrier. |
 | Product dependency/PE audit | PASS: 137 dependency packages, zero CgoFiles, no runtime/cgo; ordinary PE imports kernel32.dll only. |
 | Windows ARM64 | PASS at `e4e6a56`: all native CGO=0 product, recorded-C, selected-grammar, oracle-tool, runtime-invariant, official-ZIP consumer and 206-entry catalog steps completed. |
 | Linux AMD64, Darwin ARM64, wasip1/wasm | CGO=0 cross-link PASS; execution NOT_RUN and outside first-release native scope. |
-| Hosted CI | At `e4e6a56`, both native product jobs and the race diagnostic PASS. The workflow remains FAILED solely because the separate license gate reports the two unresolved upstream declarations. No product step was skipped. |
-| License release gate | BLOCKED_EXTERNAL: Brightscript and Cooklang conflict between ISC and MIT declarations. |
+| Hosted CI | At `e4e6a56`, both native product jobs and the race diagnostic PASS; that workflow FAILED solely on the license gate. NOT_RUN for the ADR-0017 commit. |
+| License release gate | PASS locally for 204 grammars after ADR-0017 excluded Brightscript and Cooklang; hosted NOT_RUN. |
 
 Own code remains MIT. The optional GPL module contains caddy, disassembly and
-jq with source archives and notices. All 206 inventory rows have identified
-license evidence, but the two conflicting declarations need rights-holder
-clarification before release. A local candidate ZIP is not publication approval.
+jq with source archives and notices. All 204 inventory rows have identified
+license evidence. A local candidate ZIP is not publication approval.
 
 The initial version remains `v0.0.1`. The owner authorized publication of
 `session/07-product-hardening` at `2494b35499a3b87281e6837de0f9820a28a6f7ec`.
@@ -75,8 +81,8 @@ oracle-tool tests, one packaging boundary test, four private runtime invariants
 and vet. See [the receipt](../../artifacts/release-candidate/precommit.json).
 
 The Windows workflow runs official module ZIP and empty-cache consumer checks
-on both native architectures, including all 206 basic catalog cases against
-the packaged modules. [Run 35804758357](https://github.com/wotjr1649/go-treesitter/actions/runs/35804758357)
+on both native architectures, including every basic catalog case against the
+packaged modules (206 at `e4e6a56`; 204 after ADR-0017). [Run 35804758357](https://github.com/wotjr1649/go-treesitter/actions/runs/35804758357)
 completed these checks at `e4e6a56bc5ee0e6a5a283381e2c929dea48ae2c4`.
 [Its retained receipts](../../artifacts/release-candidate/native-e4e6a56/index.json)
 bind the candidate, toolchains, executables, module graphs and downloadable CI
@@ -86,8 +92,7 @@ GPL `ec4e23ff5684793cc9a0e2b11a37923e11450fda8bd96dee8cb72411724ce56d`.
 These are that commit's ZIP identities; documentation-only commits produce new
 ZIPs and their own workflow receipts.
 
-The independent license job remains failing until the two upstream declarations
-are resolved. No gate is waived by another job passing. Existing published
+No gate is waived by another job passing. Existing published
 session history is a separate disclosure surface; the curated branch does not
 erase it. No main merge, tag or release was performed.
 

@@ -15,9 +15,9 @@ by Go 1.27.1. Only building this tool may fetch that public dependency. It is
 excluded from both product module ZIPs and from consumer dependency graphs.
 
 The packaging check uses `zip.CreateFromVCS` and `zip.CheckZip`, validates
-notices/provenance and the 203+3 grammar split, then builds and executes the
+notices/provenance and the 201+3 grammar split, the absence of excluded grammars, then builds and executes the
 retained consumers through a local file proxy with fresh module caches and no
-replace directives. It rejects CGO dependencies and executes all 206 basic
+replace directives. It rejects CGO dependencies and executes all 204 basic
 catalog cases against those same packaged modules. Scratch outputs and failure
 logs remain local; `artifacts/release-ci/packaging.json` contains the reviewed
 public receipt. It refuses to overwrite that receipt. A fresh checkout supplies

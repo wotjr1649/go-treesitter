@@ -9,7 +9,7 @@
   "archive_sha256": "a7fc4a2f1b369542b14429c36a09a41d6db0bb0d2beec5844930b4a17c6ae3a6",
   "source_sha256": "be56e7e129deb4facfa3abef51ac1055d546be5dc349fee2e461423ce1a89ccd",
   "importer_sha256": "de1808ce4f6e8f972d8098f948b468b521aa8a99eae7e14bb05729af8be44d4c",
-  "separator_sha256": "834555a032637f7b690c4582ffb06500cabf27fbbd1604fb900ab1e8ce19d388",
+  "separator_sha256": "96d9b7ba096f70af48743d0969802db844147034140f840620d8acf45311745e",
   "internal_module": "github.com/wotjr1649/go-treesitter/internal/runtime",
   "patches": [
     {
@@ -69,23 +69,34 @@
   ],
   "separated_files": {
     "grammars/caddy_scanner.go": "da088db95ba5f111630d26df386132147c0bfa1c37fd8427a8f504626d504f53",
+    "grammars/cooklang_scanner.go": "7490bf234bfc8d09fcf78b609c62776a417402b6783244b0f6712ef559f5a006",
     "grammars/disassembly_scanner.go": "b43627811e61757f6d7d3a2352c5a7d67582f26bdc30c8d9c9687423fd6b9c81",
+    "grammars/grammar_blobs/brightscript.bin": "52e12712ce9da627c198613023e56d3d508d2b73366bbe8f82cb54a4079286c3",
     "grammars/grammar_blobs/caddy.bin": "e1af0dcba90bca6949ac1a2756e1a6db2271061b40570b9a7fa2ada29478f6fa",
+    "grammars/grammar_blobs/cooklang.bin": "2fd57f20461bcc0830fd14420cd06ad08750dd3cbbc440670e63056d59b3692a",
     "grammars/grammar_blobs/disassembly.bin": "4fecdd8a984595d391b005cc17016ad2621d6548c86746c647b41ac6da7312de",
     "grammars/grammar_blobs/jq.bin": "da99dda1ffe813f439168944c6b8eae3658a06533b8e10e36115131313a755c3",
     "grammars/runtime/caddy_external_lex_states_gen.go": "01d84085ec61e3f87e3e080d4a133aab64f74de9b4b551764f6360d15a9abc71",
     "grammars/runtime/caddy_scanner.go": "c5503d0fb13803b6a5acba7fa3556b76f5c193d0230c6dcfb5c0f560860f8f8e",
+    "grammars/runtime/cooklang_external_lex_states_gen.go": "d4b033233a75ee8af5b248db298ee0e25eb82753033bfeda96f59dbd7f402725",
+    "grammars/runtime/cooklang_scanner.go": "8d47300af34185685fb728a861a0100f9324752286fe5abd2aed00a65d05287d",
     "grammars/runtime/disassembly_external_lex_states_gen.go": "ce27b27da38c90b21f05444806e46b18cc189dab181009a91f827426ac96c233",
     "grammars/runtime/disassembly_scanner.go": "0b886145123ff21d61077041503b6ff05ea370622e1ae9ea6f5fd90f6211db9b",
     "grammars/runtime/support_caddy.go": "980c538d1fb08349180009b444453a7f056af4919f2550ef7d6f3888a8a98125",
+    "grammars/runtime/support_cooklang.go": "b524cf874568e30a5e5b187913bbecdcecc31b347cfe874276a04d3a443383dc",
     "grammars/runtime/support_disassembly.go": "c3d6ca51bcc90035ed359a1bc6047d5f7cb730ed7b1ce4c5013171510189c7e7",
+    "grammars/z_subset_blob_embed_brightscript.go": "e40c7928730248917f79d43e122d88f406879ac686aa15893efb3c48b968084d",
     "grammars/z_subset_blob_embed_caddy.go": "0fe22daf3b70b48e6fd435e13892d625e12f361e30b1e384924e497d6eb8c77b",
+    "grammars/z_subset_blob_embed_cooklang.go": "a9114fce4b63f24aea63019322d23db6e2ac4841d3bbd4892c4f351323d82e46",
     "grammars/z_subset_blob_embed_disassembly.go": "e70cd7abea5a6d7af5ff67f21d0b4d2ce73d0c690fdf399ab801bf2a2b58a409",
     "grammars/z_subset_blob_embed_jq.go": "eeb0a36c73abff1311ef00b5dbeb3d2e13df1207ebfddf1eaba8148c2d8b7892",
+    "grammars/z_subset_registry_register_brightscript.go": "25cdfeedf1cd033ccdbf26d101658de03626ca032004b835b9584d2abf976196",
     "grammars/z_subset_registry_register_caddy.go": "7e0cba0743f1cb4be4129a471a9e650d8249eef137dce15e323a019851a7985a",
+    "grammars/z_subset_registry_register_cooklang.go": "bcec0bf475ed33251b6ca937a66beadf42ea55549ea8541cefb782fef6d01f92",
     "grammars/z_subset_registry_register_disassembly.go": "045a9a0677cd23e825c82c00ab044ca6a3bafdc277015de7a7ed378e4b1bfd65",
     "grammars/z_subset_registry_register_jq.go": "061661368945f2c05502e2e0e34f2e2dbe1b524540e485547210566a2a076bbc",
     "grammars/z_subset_scanner_register_caddy.go": "97454fa1f6923aa0e20c01d059732119758e40c9e8e4c3865ea3a4a7dfd5ede1",
+    "grammars/z_subset_scanner_register_cooklang.go": "6e67cc9049b87a18e72221b80b8448152f81c04814440ecd57b2982d561b4d2e",
     "grammars/z_subset_scanner_register_disassembly.go": "f1e35736d76c9ad0d74ff2056c7afc4a997b21b0be1503f6b04d9c0e88e94f83"
   },
   "files": {
@@ -247,7 +258,7 @@
     },
     "grammars/blob_source_embedded_core.go": {
       "origin_sha256": "0925c0b20dd0d560c051a6e589ae27745ebfe8be3b5aede0d430d0005cf212eb",
-      "sha256": "2b8cba1e2c9a76970355fa791a69872feab0869e982f99e4a1c4ac1a945f2648"
+      "sha256": "c78bdc38394fc08829c2442914dd16b53740ec2ddd0283ae3331a7ee6a3c2d2c"
     },
     "grammars/blob_source_external.go": {
       "origin_sha256": "4408a64644348e3416c203d5f9403c8738eb926548c40511b14bd03d68e49710",
@@ -284,10 +295,6 @@
     "grammars/comment_scanner.go": {
       "origin_sha256": "ff8c7be8b2382c094e681c75b08b2671251bd1e96435e6e530d71e98adc66bde",
       "sha256": "cbff146f8f933620bef6046820d8108a67e5e781f24e9fbec21959c92aabedff"
-    },
-    "grammars/cooklang_scanner.go": {
-      "origin_sha256": "7490bf234bfc8d09fcf78b609c62776a417402b6783244b0f6712ef559f5a006",
-      "sha256": "35c347e6e14d60ff546c765b84d5e4397020eccb014a706980629c49d54d6203"
     },
     "grammars/core100_languages.go": {
       "origin_sha256": "bc85ad8c8b17bcbc392e8eec4ca3eadb33d0554abd3c2c15219214d6ca9d07b3",
@@ -363,7 +370,7 @@
     },
     "grammars/embedded_grammars_gen.go": {
       "origin_sha256": "5a80126c1d91823f86085e70116c539823521e986ae15809f770bdd38b588f3a",
-      "sha256": "0f3bfb1847cbae8fe07dbc970640727cf92195a1615856aae3487dee69bc3198"
+      "sha256": "68caae5c56c7974982536ca4cb15643b48db9b44586f74ce5703bc3aaec5877f"
     },
     "grammars/embedded_loader.go": {
       "origin_sha256": "3234d677885104c4523bdd5183320f7a87defda81e0fb426961c84437d9f5f9d",
@@ -501,10 +508,6 @@
       "origin_sha256": "abc9abd60f3fe0dd0131507be955803a1498af7c3f78aa93a50388dcb49d60b1",
       "sha256": "abc9abd60f3fe0dd0131507be955803a1498af7c3f78aa93a50388dcb49d60b1"
     },
-    "grammars/grammar_blobs/brightscript.bin": {
-      "origin_sha256": "52e12712ce9da627c198613023e56d3d508d2b73366bbe8f82cb54a4079286c3",
-      "sha256": "52e12712ce9da627c198613023e56d3d508d2b73366bbe8f82cb54a4079286c3"
-    },
     "grammars/grammar_blobs/c.bin": {
       "origin_sha256": "9aee42825fd1446ce5b754951db26edadcdba5d2f26b61578a30e87ed2dbbd3c",
       "sha256": "9aee42825fd1446ce5b754951db26edadcdba5d2f26b61578a30e87ed2dbbd3c"
@@ -548,10 +551,6 @@
     "grammars/grammar_blobs/commonlisp.bin": {
       "origin_sha256": "28d5672312619242d060996f5387a2301da39577a746ea584cc19a05e3630464",
       "sha256": "28d5672312619242d060996f5387a2301da39577a746ea584cc19a05e3630464"
-    },
-    "grammars/grammar_blobs/cooklang.bin": {
-      "origin_sha256": "2fd57f20461bcc0830fd14420cd06ad08750dd3cbbc440670e63056d59b3692a",
-      "sha256": "2fd57f20461bcc0830fd14420cd06ad08750dd3cbbc440670e63056d59b3692a"
     },
     "grammars/grammar_blobs/corn.bin": {
       "origin_sha256": "572d8ab570eed967ee643fcc0d9cb5c77874896a5fbd822d4f82cb6e37ffa573",
@@ -1499,7 +1498,7 @@
     },
     "grammars/registry_builtin_gen.go": {
       "origin_sha256": "6de81fc61ec9e66722afa2002bf7c6a432c5c6a0430cff1b387415fd7c90919d",
-      "sha256": "d2b989b4baae840418850deaf8a50eb4f7e0c35aa07b78066eee66ad972fffa2"
+      "sha256": "773c8cad51ac6cabf5cb4ca11c308c408d2b79b3b078d973a4db0d6456b0337a"
     },
     "grammars/registry_builtin_subset.go": {
       "origin_sha256": "9115b232aebcf090bef6facefe4908309cfebbc81f353a0fbf67181af18b270f",
@@ -1611,7 +1610,7 @@
     },
     "grammars/runtime/builtin_scanners_gen.go": {
       "origin_sha256": "7a35af74cc3603e3e77c0b9b849039ff17f9600f10bf997671d901b670480be4",
-      "sha256": "4dfe7992ab798840d2d59dd6a36fd60fcaa83282db4036918a388fed541760cb"
+      "sha256": "f98e4771e718b519aa65b49e9d3cbb04e43b40c9e24a5d7d9fc635aaee4b831a"
     },
     "grammars/runtime/c_lexer.go": {
       "origin_sha256": "ec8011cb876d7ec6ae45a3542e696b286349bced62868f8eb53d278390bdd8c5",
@@ -1648,14 +1647,6 @@
     "grammars/runtime/comment_scanner.go": {
       "origin_sha256": "9da018a32c59c857b473c3451051fb0886fa3943966ee179385f94f7e0921d76",
       "sha256": "99be4ad658e73d76c64c18a980da61cba15340788345517085b8cfd2141c319c"
-    },
-    "grammars/runtime/cooklang_external_lex_states_gen.go": {
-      "origin_sha256": "d4b033233a75ee8af5b248db298ee0e25eb82753033bfeda96f59dbd7f402725",
-      "sha256": "d4b033233a75ee8af5b248db298ee0e25eb82753033bfeda96f59dbd7f402725"
-    },
-    "grammars/runtime/cooklang_scanner.go": {
-      "origin_sha256": "8d47300af34185685fb728a861a0100f9324752286fe5abd2aed00a65d05287d",
-      "sha256": "dea5cd61f4f3df808cc42dc868cb18095fcd1324f7b62bbdc3fe7b08fa95d606"
     },
     "grammars/runtime/cpp_external_lex_states_gen.go": {
       "origin_sha256": "f990cd9badac35325dac28b00ad8c4fe779ebc5044415464a9e609d96dbc74e1",
@@ -2376,10 +2367,6 @@
     "grammars/runtime/support_comment.go": {
       "origin_sha256": "c9ec32b9613347f51c6822ac1883cb4fac9a0b97297101feaff093b8fc2bbcba",
       "sha256": "c9ec32b9613347f51c6822ac1883cb4fac9a0b97297101feaff093b8fc2bbcba"
-    },
-    "grammars/runtime/support_cooklang.go": {
-      "origin_sha256": "b524cf874568e30a5e5b187913bbecdcecc31b347cfe874276a04d3a443383dc",
-      "sha256": "b524cf874568e30a5e5b187913bbecdcecc31b347cfe874276a04d3a443383dc"
     },
     "grammars/runtime/support_cpp.go": {
       "origin_sha256": "c5e59859aa7ab8ea12fd4abec1a7380ce1c0070c118e023eecf46ab9f3e3b784",
@@ -3133,10 +3120,6 @@
       "origin_sha256": "c68ac45e1f09ea5dce7817235f5738ba69963e9302336d3978ec52e4e49304b3",
       "sha256": "c68ac45e1f09ea5dce7817235f5738ba69963e9302336d3978ec52e4e49304b3"
     },
-    "grammars/z_subset_blob_embed_brightscript.go": {
-      "origin_sha256": "e40c7928730248917f79d43e122d88f406879ac686aa15893efb3c48b968084d",
-      "sha256": "e40c7928730248917f79d43e122d88f406879ac686aa15893efb3c48b968084d"
-    },
     "grammars/z_subset_blob_embed_c.go": {
       "origin_sha256": "355da251d3813178134fbaf0f1b27f8742fb86092a3918c255678c05755baed9",
       "sha256": "355da251d3813178134fbaf0f1b27f8742fb86092a3918c255678c05755baed9"
@@ -3180,10 +3163,6 @@
     "grammars/z_subset_blob_embed_commonlisp.go": {
       "origin_sha256": "657a244271d6f8ac178920b7f46b53448f7b17e874bb80bbc89e89bb6a17ca96",
       "sha256": "657a244271d6f8ac178920b7f46b53448f7b17e874bb80bbc89e89bb6a17ca96"
-    },
-    "grammars/z_subset_blob_embed_cooklang.go": {
-      "origin_sha256": "a9114fce4b63f24aea63019322d23db6e2ac4841d3bbd4892c4f351323d82e46",
-      "sha256": "a9114fce4b63f24aea63019322d23db6e2ac4841d3bbd4892c4f351323d82e46"
     },
     "grammars/z_subset_blob_embed_corn.go": {
       "origin_sha256": "d0393452c773318baec8e93c001b17a48ff1707bec2549bd589ee6fe500a232d",
@@ -3945,10 +3924,6 @@
       "origin_sha256": "8e2fc77028cd588d42a873b6ff664f13a974e2a74a1b27e5b3170f39fdef49a4",
       "sha256": "8e2fc77028cd588d42a873b6ff664f13a974e2a74a1b27e5b3170f39fdef49a4"
     },
-    "grammars/z_subset_registry_register_brightscript.go": {
-      "origin_sha256": "25cdfeedf1cd033ccdbf26d101658de03626ca032004b835b9584d2abf976196",
-      "sha256": "25cdfeedf1cd033ccdbf26d101658de03626ca032004b835b9584d2abf976196"
-    },
     "grammars/z_subset_registry_register_c.go": {
       "origin_sha256": "c4287361bb592d5dc9c5023e46af00504dd6ee9f4b0a8abd720bf0898515f32a",
       "sha256": "c4287361bb592d5dc9c5023e46af00504dd6ee9f4b0a8abd720bf0898515f32a"
@@ -3992,10 +3967,6 @@
     "grammars/z_subset_registry_register_commonlisp.go": {
       "origin_sha256": "829b75defeddefcef262ca16efe401c91ffb1fae7f9d74012da7333309bd60c8",
       "sha256": "829b75defeddefcef262ca16efe401c91ffb1fae7f9d74012da7333309bd60c8"
-    },
-    "grammars/z_subset_registry_register_cooklang.go": {
-      "origin_sha256": "bcec0bf475ed33251b6ca937a66beadf42ea55549ea8541cefb782fef6d01f92",
-      "sha256": "bcec0bf475ed33251b6ca937a66beadf42ea55549ea8541cefb782fef6d01f92"
     },
     "grammars/z_subset_registry_register_corn.go": {
       "origin_sha256": "84975a0148263057588cb7240762a929b80d0ca5c6eee19300e6d2f69a0df5e1",
@@ -4752,10 +4723,6 @@
     "grammars/z_subset_scanner_register_comment.go": {
       "origin_sha256": "5406b4511aa02d24dcd13dbe105d1e972217ba22357b499d5828e08552f1175d",
       "sha256": "b5a33702f43db102277fc2eb317496af8c5a57a8fe114445c89570535c72bc88"
-    },
-    "grammars/z_subset_scanner_register_cooklang.go": {
-      "origin_sha256": "6e67cc9049b87a18e72221b80b8448152f81c04814440ecd57b2982d561b4d2e",
-      "sha256": "1fd7ce739f1f9ce75f1960ba5a469ce103194ab8ae4be21cc4a56b93d162e6bf"
     },
     "grammars/z_subset_scanner_register_cpp.go": {
       "origin_sha256": "94129e1318fdfbd5c33f8fb17c20625b1ddac7a8a42992972d691959f70fea52",

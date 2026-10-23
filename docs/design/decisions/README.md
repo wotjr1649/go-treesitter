@@ -50,3 +50,4 @@ understand whether the contract is still right.
 | 0014 | Separate GPL grammar distribution | Accepted |
 | 0015 | Derived Go grammar and recovery | Accepted |
 | 0016 | Curated publication and release evidence | Accepted |
+| 0017 | Exclude unclear grammars; assurance by release scope | Accepted |

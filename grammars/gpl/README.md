@@ -1,8 +1,8 @@
 # Optional GPL grammars
 
 This separate `v0.0.1` module adds the original pinned `caddy`, `disassembly`
-and `jq` grammars. Together with the base module's 203 grammars, it retains the
-206-language catalog. Import it explicitly:
+and `jq` grammars. Together with the base module's 201 grammars, it completes the
+204-language catalog. Import it explicitly:
 
 ```go
 import (

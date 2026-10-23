@@ -84,11 +84,6 @@ func BladeLanguage() *gotreesitter.Language {
 	return loadEmbeddedLanguage("blade.bin")
 }
 
-// BrightscriptLanguage returns the brightscript language definition.
-func BrightscriptLanguage() *gotreesitter.Language {
-	return loadEmbeddedLanguage("brightscript.bin")
-}
-
 // CLanguage returns the c language definition.
 func CLanguage() *gotreesitter.Language {
 	return loadEmbeddedLanguage("c.bin")
@@ -142,11 +137,6 @@ func CommentLanguage() *gotreesitter.Language {
 // CommonlispLanguage returns the commonlisp language definition.
 func CommonlispLanguage() *gotreesitter.Language {
 	return loadEmbeddedLanguage("commonlisp.bin")
-}
-
-// CooklangLanguage returns the cooklang language definition.
-func CooklangLanguage() *gotreesitter.Language {
-	return loadEmbeddedLanguage("cooklang.bin")
 }
 
 // CornLanguage returns the corn language definition.

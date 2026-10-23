@@ -1,6 +1,7 @@
 # ADR-0014 — Preserve 206 grammars with a separate GPL module
 
-**Status:** Implements the owner's selected MIT-centered distribution policy · 2026-09-23
+**Status:** Implements the owner's selected MIT-centered distribution policy · 2026-09-23 ·
+amended by ADR-0017 (Brightscript and Cooklang excluded; 204 grammars, 201 in the base)
 
 The pinned catalog contains GPL caddy, disassembly and jq grammars. Replacing
 them would change parser identities and behavior; a comparable permissive

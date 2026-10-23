@@ -63,7 +63,10 @@ def check_archive(archive, module, optional):
     else:
         require(not any(n.startswith('grammars/gpl/') for n in names), 'GPL module leaked into base ZIP')
         require(sum(n.startswith('internal/runtime/grammars/grammar_blobs/') and n.endswith('.bin')
-                    for n in names) == 203, 'base grammar count changed')
+                    for n in names) == 201, 'base grammar count changed')
+        require(not any(n.startswith('internal/runtime/grammars/') and
+                        any(x in n.rsplit('/', 1)[-1] for x in ('brightscript', 'cooklang'))
+                        for n in names), 'excluded grammar entered the base ZIP')  # ADR-0017
         required = ['LICENSES/catalog.json', 'tools/runtime-bundle/grammars/go-source.zip',
                     'tools/runtime-bundle/grammars/go.json', 'internal/provenance/runtime.json']
         subdir = ''
@@ -157,14 +160,14 @@ def main():
         run('catalog-build-' + label, ['go', 'build', '-mod=readonly', '-trimpath', '-o', str(catalog_exe), './catalog'], consumer, current)
         catalog_exes.append(catalog_exe)
     catalog_output = directory / 'catalog.json'
-    run('catalog-206', [sys.executable, 'tools/catalog/check.py', '--executable', str(catalog_exes[0]),
+    run('catalog-204', [sys.executable, 'tools/catalog/check.py', '--executable', str(catalog_exes[0]),
                        '--gpl-executable', str(catalog_exes[1]), '--output', str(catalog_output)])
     catalog = json.loads(catalog_output.read_text(encoding='utf-8'))
-    require(len(catalog['rows']) == 206 and all(r['exit'] == 0 for r in catalog['rows']), 'incomplete catalog gate')
+    require(len(catalog['rows']) == 204 and all(r['exit'] == 0 for r in catalog['rows']), 'incomplete catalog gate')
     result = {'status': 'PASS', 'candidate_commit': head, 'environment': platform,
               'modulezip_sha256': sha(helper.read_bytes()), 'modules': modules,
               'consumers': consumers, 'executions': executions,
-              'catalog_basic': {'passed': 206, 'receipt_sha256': sha(catalog_output.read_bytes()),
+              'catalog_basic': {'passed': 204, 'receipt_sha256': sha(catalog_output.read_bytes()),
                                 'cases_sha256': catalog['cases_sha256']},
               'network': 'task-local file proxy only; no replace directives'}
     output = ROOT / 'artifacts/release-ci/packaging.json'

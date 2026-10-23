@@ -45,8 +45,9 @@ Grammar and fixture notices are covered separately in `THIRD_PARTY_NOTICES.md`.
 
 `separate.py` mechanically removes the three GPL grammars from the main carrier
 and generates their optional adapter with `--optional-output NEW_DIRECTORY`.
-It separates 19 files plus aggregate registry, loader and embed declarations;
-the main carrier has 1,508 files. The same pinned blobs, scanners and queries
+It separates 19 files plus aggregate registry, loader and embed declarations.
+It also drops the 11 Brightscript and Cooklang files and their registrations
+without an optional payload (ADR-0017); the main carrier has 1,497 files. The same pinned blobs, scanners and queries
 are preserved in the nested `grammars/gpl` module. The main manifest binds the
 separator and excluded origin hashes. `catalog-optional-blob-providers.patch`
 lets an explicitly registered blob use the existing cache and scanner binding

@@ -7,6 +7,8 @@ for `e4e6a56bc5ee0e6a5a283381e2c929dea48ae2c4`. Both Windows product jobs and
 the race diagnostic passed; the two license declarations keep Release blocked.
 The current verdict and limitations are in
 [the status board](../../docs/reports/release-critical-status.md).
+ADR-0017 (2026-10-23) later excluded both grammars; the license gate no longer
+reports them.
 
 `historical/identity.json` binds the measured product and benchmark inputs to
 `23d6885ebe8709616614c89ffb6511ea815fb23f`. `historical/index.json` records hashes

@@ -20,7 +20,6 @@ func RegisterBuiltinScanners() {
 	RegisterCmakeSupport()
 	RegisterCobolSupport()
 	RegisterCommentSupport()
-	RegisterCooklangSupport()
 	RegisterCppSupport()
 	RegisterCrystalSupport()
 	RegisterCssSupport()

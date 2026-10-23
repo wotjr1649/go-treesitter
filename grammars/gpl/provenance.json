@@ -2,7 +2,7 @@
   "schema": 1,
   "upstream_module": "github.com/odvcencio/gotreesitter",
   "upstream_version": "v0.53.0",
-  "runtime_manifest_sha256": "5d1f526c35e223341914cbfada8abe1c4c49d52824a09950bde05d331ff41e46",
+  "runtime_manifest_sha256": "0f32d22943e7e636f1ccdf03ec677871f67f81bc22db106a739d88a950ffa6e6",
   "files": {
     "go.mod": "4bd7f63f76393f8941ef41db599c6d61aa34c224171c53ddd52846cfec222b94",
     "gpl.go": "b7b661a8ee735c9f736d125e8fbdb412bdf449d32ee00ba4175773305b26fa53",
@@ -23,7 +23,7 @@
     "LICENSES/jq.txt": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
     "LICENSES/tree-sitter-go.txt": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
     "provenance_test.go": "83554ce813cd2f6367ca1d466ab5f104197983de5ed64f0cf577e00d0644e499",
-    "README.md": "02a91409641a3636a2e5f4b67dc204b66b13333ced146cacb07c8565411c672d",
+    "README.md": "908c0adb16a69e5daecad3b266d7ec9c34eae015eab3dc50f364b83547c7ec05",
     "sources/caddy-LICENSE.txt": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
     "sources/caddy.zip": "c57e2b279d4e217da1f3f8761be2298ff0effb83b6547e106b6aaa1dd16c1909",
     "sources/disassembly-LICENSE.txt": "e35d3f1564252703ca39544794a9b436888b993c49e50a3a1166eb06060496ff",

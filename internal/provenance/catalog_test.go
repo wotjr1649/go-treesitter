@@ -69,8 +69,13 @@ func TestCatalogLicenseInventory(t *testing.T) {
 		}
 		check(file{"internal/runtime/grammars/grammar_blobs/" + row.Grammar + ".bin", row.BlobSHA256})
 	}
-	if len(seen) != 206 || counts["main"] != 203 || counts["gpl"] != 3 {
+	if len(seen) != 204 || counts["main"] != 201 || counts["gpl"] != 3 {
 		t.Fatalf("catalog distribution changed: %v", counts)
+	}
+	for _, name := range []string{"brightscript", "cooklang"} { // excluded by ADR-0017
+		if _, err := os.Stat("../runtime/grammars/grammar_blobs/" + name + ".bin"); seen[name] || !os.IsNotExist(err) {
+			t.Fatalf("excluded grammar entered the distribution: %s", name)
+		}
 	}
 	for _, f := range append(catalog.StandardTexts, catalog.CorrespondingSources...) {
 		check(f)

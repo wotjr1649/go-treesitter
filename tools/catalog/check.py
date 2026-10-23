@@ -24,8 +24,8 @@ def main():
     gpl_executable = options.gpl_executable.resolve(strict=True) if options.gpl_executable else executable
     inputs = options.cases.read_bytes()
     cases = json.loads(inputs)['cases']
-    if len(cases) != 206 or len({case['language'] for case in cases}) != 206:
-        parser.error('expected the complete 206-language catalog')
+    if len(cases) != 204 or len({case['language'] for case in cases}) != 204:
+        parser.error('expected the complete 204-language catalog')
     for case in cases:
         if sha(case['source'].encode()) != case['sha256']:
             parser.error('input hash mismatch: ' + case['language'])

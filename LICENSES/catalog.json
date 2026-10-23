@@ -237,32 +237,6 @@
       "blob_sha256": "abc9abd60f3fe0dd0131507be955803a1498af7c3f78aa93a50388dcb49d60b1"
     },
     {
-      "grammar": "brightscript",
-      "repository": "https://github.com/ajdelcimmuto/tree-sitter-brightscript",
-      "commit": "253fdfaa23814cb46c2d5fc19049fa0f2f62c6da",
-      "license": "LicenseRef-Upstream-MIT-ISC-Conflict",
-      "distribution": "main",
-      "basis": "spdx_declaration",
-      "source": "https://raw.githubusercontent.com/ajdelcimmuto/tree-sitter-brightscript/253fdfaa23814cb46c2d5fc19049fa0f2f62c6da/package.json",
-      "notice": {
-        "path": "LICENSES/grammars/brightscript.json",
-        "sha256": "b00698d77b3f33c4097e6c94e87ae80854ba41bbf32fc826270b7db13a7dfa20"
-      },
-      "blob_sha256": "52e12712ce9da627c198613023e56d3d508d2b73366bbe8f82cb54a4079286c3",
-      "additional_evidence": [
-        {
-          "path": "LICENSES/grammars/brightscript-Cargo.toml",
-          "source": "https://raw.githubusercontent.com/ajdelcimmuto/tree-sitter-brightscript/253fdfaa23814cb46c2d5fc19049fa0f2f62c6da/Cargo.toml",
-          "sha256": "37310875902014562c194fc5b019aca6fa23c8ab3b1db991505a29297cf89acb"
-        }
-      ],
-      "declared_licenses": [
-        "ISC",
-        "MIT"
-      ],
-      "review_status": "requires_upstream_clarification"
-    },
-    {
       "grammar": "c",
       "repository": "https://github.com/tree-sitter/tree-sitter-c",
       "commit": "ae19b676b13bdcc13b7665397e6d9b14975473dd",
@@ -429,32 +403,6 @@
         "sha256": "00bb7f417416e8233ae465209e72eaa6162d53b061add7d9bed0238552a6fa0c"
       },
       "blob_sha256": "28d5672312619242d060996f5387a2301da39577a746ea584cc19a05e3630464"
-    },
-    {
-      "grammar": "cooklang",
-      "repository": "https://github.com/addcninblue/tree-sitter-cooklang",
-      "commit": "4ebe237c1cf64cf3826fc249e9ec0988fe07e58e",
-      "license": "LicenseRef-Upstream-MIT-ISC-Conflict",
-      "distribution": "main",
-      "basis": "spdx_declaration",
-      "source": "https://raw.githubusercontent.com/addcninblue/tree-sitter-cooklang/4ebe237c1cf64cf3826fc249e9ec0988fe07e58e/package.json",
-      "notice": {
-        "path": "LICENSES/grammars/cooklang.json",
-        "sha256": "2fa5f1721e6fb20f6b40a3bbf9d6fbe197460bbd168a5fb4cd339833917f6cfe"
-      },
-      "blob_sha256": "2fd57f20461bcc0830fd14420cd06ad08750dd3cbbc440670e63056d59b3692a",
-      "additional_evidence": [
-        {
-          "path": "LICENSES/grammars/cooklang-Cargo.toml",
-          "source": "https://raw.githubusercontent.com/addcninblue/tree-sitter-cooklang/4ebe237c1cf64cf3826fc249e9ec0988fe07e58e/Cargo.toml",
-          "sha256": "f297c2c62a4ac27c6413c4417380e95467aab3b3352ce59d4a3102b659476225"
-        }
-      ],
-      "declared_licenses": [
-        "ISC",
-        "MIT"
-      ],
-      "review_status": "requires_upstream_clarification"
     },
     {
       "grammar": "corn",

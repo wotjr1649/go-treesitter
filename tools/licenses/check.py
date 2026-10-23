@@ -5,7 +5,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 catalog = json.loads((ROOT / 'LICENSES/catalog.json').read_text(encoding='utf-8'))
 rows = catalog['rows']
-if len(rows) != 206 or len({r['grammar'] for r in rows}) != 206:
+if len(rows) != 204 or len({r['grammar'] for r in rows}) != 204:
     raise ValueError('the complete license inventory is required')
 blocked = [{'grammar': row['grammar'], 'commit': row['commit'],
             'declarations': row['declared_licenses'], 'source': row['source'],

@@ -83,11 +83,6 @@
       "sha256": "506bba65aec9b003d02b5abc55dd0db8480ebd2a22ba0b361ebbfe87c8366d19"
     },
     {
-      "language": "brightscript",
-      "source": "sub main()\nend sub\n",
-      "sha256": "51114b4954df4d5caf8585b355ec02a10c0351b0f5be549dec99fbde51ef54a7"
-    },
-    {
       "language": "c",
       "source": "int main(void) { return 0; }\n",
       "sha256": "2ad75d95660563887d8d3f1d0ae1dcf18c2379cbd83a5c72f5ab276351ee6949"
@@ -146,11 +141,6 @@
       "language": "commonlisp",
       "source": "(defun f () 1)\n",
       "sha256": "c94cb25939e4c13f10d49a366304d97200880d9438d94003e668c24e270313c6"
-    },
-    {
-      "language": "cooklang",
-      "source": "Add @salt{1%tsp}\n",
-      "sha256": "c31fe39c742b150ec7daec33319e21b39511207fa10fe97d04deac94a31db43e"
     },
     {
       "language": "corn",

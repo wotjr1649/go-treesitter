@@ -87,15 +87,20 @@ workload; available routes are `go`, `py`, `js`, `jsx`, `ts`, `tsx` and `cs`.
 The tool reports Go heap metrics, not OS RSS, and separates first-use grammar
 loading from subsequent parse API calls.
 
-The base module contains 203 grammars. The separate
+The base module contains 201 grammars. The separate
 [`grammars/gpl`](grammars/gpl/README.md) module adds the pinned `caddy`,
-`disassembly` and `jq` grammars by a side-effect import, preserving 206 total.
+`disassembly` and `jq` grammars by a side-effect import, for 204 total.
+Brightscript and Cooklang are not distributed because their upstream license
+declarations conflict ([ADR-0017](docs/design/decisions/ADR-0017-exclude-unclear-grammars-and-assurance-tiers.md)).
 The base module has no dependency on that module and its ZIP excludes the GPL
 payload. Including the optional module brings its GPL distribution terms.
 
-[Basic catalog checks](tools/catalog/README.md) cover all 206 grammars with
+[Basic catalog checks](tools/catalog/README.md) cover all 204 grammars with
 three fresh runs, determinism, incremental edits, cancellation and input limits.
-This coverage is separate from the seven Release-Critical C oracle gates.
+This coverage is separate from the seven Release-Critical C oracle gates, which
+the catalog grammars do not have. Before v1, the availability and default
+handling of other grammars may change; see the
+[consumer contract](docs/specs/parser-result.md#language-availability).
 Completion preserves grammar-owned root coordinates and requires the runtime's
 actual and expected EOF receipts; the retained COBOL controls also compare all
 ordered nodes with the pinned C oracle.
@@ -133,10 +138,9 @@ same pinned C grammar, with distinct origin and product identities (ADR-0015).
 Performance and memory measurements, controlled fallback reasons and remaining
 release blockers are recorded in the [status board](docs/reports/release-critical-status.md)
 and [selected evidence](artifacts/release-candidate/README.md).
-Brightscript and Cooklang still have conflicting upstream ISC/MIT declarations;
-these are the remaining Release blockers. The curated candidate's native Windows
-AMD64 and ARM64 product jobs, including official-ZIP consumers and 206 basic
-grammar checks, passed; see the commit-bound receipts in the status board.
+The curated candidate's native Windows AMD64 and ARM64 product jobs at
+`e4e6a56`, including official-ZIP consumers and the then 206 basic grammar
+checks, passed; see the commit-bound receipts in the status board.
 
 The library's own code is [MIT licensed](LICENSE). See
 [third-party notices](THIRD_PARTY_NOTICES.md) for the pinned runtime, all catalog

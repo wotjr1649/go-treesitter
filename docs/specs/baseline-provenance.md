@@ -73,10 +73,12 @@ rerunning its affected checks. This is distinct from changing the upstream origi
 See ADR-0013 and `tools/runtime-bundle/README.md` for reproduction and retirement.
 
 ADR-0014 separates 19 GPL-specific files and three aggregate registrations into
-the optional grammar module. The main carrier has 1,508 files; its manifest
-also binds the separator and excluded original hashes. The optional module's
-`provenance.json` binds its generated files, notices and corresponding sources.
-The 206 grammar origins, upstream module origin and C-oracle epoch are unchanged.
+the optional grammar module. ADR-0017 drops the 11 Brightscript and Cooklang
+files and their registrations. The main carrier has 1,497 files; its manifest
+also binds the separator and the original hashes of all 30 files outside it.
+The optional module's `provenance.json` binds its generated files, notices and
+corresponding sources. The upstream module origin (whose `languages.lock` still
+lists 206 grammars) and the C-oracle epoch are unchanged; 204 are distributed.
 
 The Go recovery-order patch also enables the existing C version transaction
 for the exact Go blob above. Its fresh/edit C witnesses and minimized fuzz seed

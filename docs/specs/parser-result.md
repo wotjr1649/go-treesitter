@@ -169,6 +169,13 @@ When comparing two trees or two derived fact sets:
   If per-parse routing information is required under concurrency, that is an upstream request, not a
   local workaround.
 
+## Language availability
+
+The release's C-oracle gate covers only the seven Release-Critical routes; other grammars have
+the basic catalog check plus any retained regression controls (`docs/reports/release-critical-status.md`). No result states an
+assurance level. Before v1, which grammars outside those routes are available, and whether
+`New()` parses them by default, may change without a compatibility promise (ADR-0017).
+
 ## Scope boundary
 
 This layer resolves **syntax**. It does not resolve names, scopes, overloads, types, imports, or any

@@ -117,13 +117,6 @@ func registerBuiltinLanguages() {
 		HighlightQuery: "; inherits: html\n\n[\n  (directive)\n  (directive_start)\n  (directive_end)\n] @tag\n\n[\n  (php_tag)\n  (php_end_tag)\n  \"{{\"\n  \"}}\"\n  \"{!!\"\n  \"!!}\"\n  \"(\"\n  \")\"\n] @punctuation.bracket\n",
 	})
 	Register(LangEntry{
-		Name:           "brightscript",
-		Extensions:     []string{".brs"},
-		Language:       BrightscriptLanguage,
-		GrammarSource:  GrammarSourceTS2GoBlob,
-		HighlightQuery: "; Identifiers\n(identifier) @variable\n\n; Function declaration\n(function_statement\n  name: (identifier) @function)\n\n; Sub declaration\n(sub_statement\n  name: (identifier) @function)\n\n[\n  (sub_start)\n  (function_start)\n  (end_sub)\n  (end_function)\n] @keyword.function\n\n; Parameters\n(parameter\n  name: (identifier) @variable.parameter)\n\n; Types\n(type_specifier) @type\n\n; Variables\n; Base variable in variable declarator (immediate child of prefix_exp)\n(variable_declarator\n  (prefix_exp\n    (identifier) @variable\n    (#not-has-ancestor? @variable prefix_exp)))\n\n; Properties in variable declarator\n(variable_declarator\n  (prefix_exp)\n  (identifier) @property)\n\n(multiplicative_expression\n  operator: (_) @keyword.operator)\n\n(logical_not_expression\n  operator: (_) @keyword.operator)\n\n(logical_expression\n  operator: (_) @keyword.operator)\n\n; Property access\n; First identifier in a chain (base variable)\n(prefix_exp\n  .\n  (identifier) @variable\n  (#not-has-ancestor? @variable prefix_exp))\n\n; All other identifiers in a chain (properties)\n(prefix_exp\n  (prefix_exp)\n  (identifier) @property)\n\n; Function calls\n(function_call\n  function: (prefix_exp\n    (identifier) @function.call))\n\n; Statements\n[\n  (if_start)\n  (else)\n  (else_if)\n  (end_if)\n  (then)\n  (conditional_compl_end_if)\n] @keyword.conditional\n\n[\n  (for_start)\n  (while_start)\n  (for_each)\n  (for_in)\n  (for_to)\n  (for_step)\n  (end_for)\n  (end_while)\n  (exit_while_statement)\n  (exit_for_statement)\n] @keyword.repeat\n\n; Statements\n[\n  (try_start)\n  (try_catch)\n  (throw)\n  (end_try)\n] @keyword.exception\n\n(return) @keyword.return\n\n(print) @function.builtin\n\n(constant) @constant\n\n; Operators\n[\n  \"=\"\n  \"<>\"\n  \"<\"\n  \"<=\"\n  \">\"\n  \">=\"\n  \"+\"\n  \"-\"\n  \"*\"\n  \"/\"\n] @operator\n\n; Literals\n(boolean) @boolean\n\n(number) @number\n\n(string) @string\n\n(invalid) @constant.builtin\n\n; Comments\n(comment) @comment @spell\n\n; Punctuation\n[\n  \"(\"\n  \")\"\n  \"[\"\n  \"]\"\n  \"{\"\n  \"}\"\n  \"?[\"\n] @punctuation.bracket\n\n[\n  \".\"\n  \",\"\n  \"?.\"\n] @punctuation.delimiter\n\n; Special highlights for library statements\n(library_statement) @keyword.import\n\n(library_statement\n  path: (string) @module)\n\n; Array and associative array literals\n(array) @constructor\n\n(assoc_array) @constructor\n\n(assoc_array_element\n  key: (identifier) @property)\n\n; Increment/decrement operators\n[\n  (prefix_increment_expression)\n  (prefix_decrement_expression)\n  (postfix_increment_expression)\n  (postfix_decrement_expression)\n] @operator\n\n; Comparison operators\n(comparison_expression\n  [\n    \"=\"\n    \"<>\"\n    \"<\"\n    \"<=\"\n    \">\"\n    \">=\"\n  ] @operator)\n\n(as) @keyword.operator\n",
-	})
-	Register(LangEntry{
 		Name:           "c",
 		Extensions:     []string{".c", ".h"},
 		Language:       CLanguage,
@@ -198,13 +191,6 @@ func registerBuiltinLanguages() {
 		Language:       CommonlispLanguage,
 		GrammarSource:  GrammarSourceTS2GoBlob,
 		HighlightQuery: "(sym_lit) @symbol\n",
-	})
-	Register(LangEntry{
-		Name:           "cooklang",
-		Extensions:     []string{".cook"},
-		Language:       CooklangLanguage,
-		GrammarSource:  GrammarSourceTS2GoBlob,
-		HighlightQuery: "(metadata) @comment\n\n(comment) @comment @spell\n\n[\n  \"{\"\n  \"}\"\n] @punctuation.bracket\n\n\"%\" @punctuation.special\n\n(ingredient\n  \"@\" @punctuation.delimiter\n  (name)? @string.special.symbol\n  (amount\n    (quantity)? @number\n    (units)? @constant)?)\n\n(timer\n  \"~\" @punctuation.delimiter\n  (name)? @string.special.symbol\n  (amount\n    (quantity)? @number\n    (units)? @constant)?)\n\n(cookware\n  \"#\" @punctuation.delimiter\n  (name)? @string.special.symbol\n  (amount\n    (quantity)? @number\n    (units)? @constant)?)\n",
 	})
 	Register(LangEntry{
 		Name:           "corn",

@@ -3,7 +3,7 @@
 The public candidate contains the API and implementation, maintained runtime
 patches, grammar artifacts, source/patch identities, licenses, retained tests
 and fixtures, reproducible tools, CI, technical contracts and selected evidence.
-Keep the seven-route C oracle gate and the complete 206-entry basic catalog.
+Keep the seven-route C oracle gate and the complete 204-entry basic catalog (ADR-0017).
 
 Session prompts, private handoffs, raw investigation output, temporary checkouts,
 build caches, profiles, dumps and personal machine/account configuration stay
