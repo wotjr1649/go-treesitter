@@ -89,6 +89,7 @@ Never widen a record to absorb a new failure. Open a new record.
 | Identity mismatch (hash, version, blob, lane) | Stop the comparison. Repair provenance before interpreting. |
 | Required environment unavailable | Mark `NOT_RUN` / `BLOCKED`. Never substitute a weaker check. |
 | A measurement is noisy | Report the spread. Do **not** re-run until it looks good. |
+| A local test times out on a loaded host | Keep the failure. Record the commit, Go version, command, measured CPU load and output with `tools/lane/record.py`, then compare on the same commit with `go test -p 1` for a declared number of runs. A hosted pass does not erase the local failure. |
 | Three attempts, same goal, no new evidence | Stop. Change layer, or report the blocker. |
 
 Declare the number of runs **before** running. A benchmark is never repeated until it passes.
