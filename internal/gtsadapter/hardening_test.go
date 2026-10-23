@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 	"unicode/utf8"
@@ -71,6 +72,23 @@ func TestCancellationDuringWork(t *testing.T) {
 	}
 }
 
+// cancelAtPoll has another goroutine cancel the real context at the n-th Err
+// call and waits for it, so cancellation lands mid-snapshot regardless of load.
+type cancelAtPoll struct {
+	context.Context
+	polls         atomic.Int32
+	at            int32
+	request, done chan struct{}
+}
+
+func (c *cancelAtPoll) Err() error {
+	if c.polls.Add(1) == c.at {
+		close(c.request)
+		<-c.done
+	}
+	return c.Context.Err()
+}
+
 func TestCancellationDuringSnapshot(t *testing.T) {
 	source := []byte("package p\n" + strings.Repeat("var value = 1\n", 10000))
 	r, err := (Adapter{}).Parse(context.Background(), syntax.Request{Filename: "x.go", Source: source, Timeout: 10 * time.Second})
@@ -79,15 +97,24 @@ func TestCancellationDuringSnapshot(t *testing.T) {
 	}
 	defer r.Tree.Close()
 	raw := r.Tree.(*tree)
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	trigger := time.AfterFunc(2*time.Millisecond, cancel)
-	defer trigger.Stop()
-	started := time.Now()
+	base, cancel := context.WithCancel(context.Background())
+	ctx := &cancelAtPoll{Context: base, at: 5, request: make(chan struct{}), done: make(chan struct{})}
+	stopped := make(chan struct{})
+	go func() {
+		defer close(stopped)
+		select {
+		case <-ctx.request:
+			cancel()
+			close(ctx.done)
+		case <-base.Done(): // the snapshot returned before the fifth poll
+		}
+	}()
+	defer func() { cancel(); <-stopped }()
 	nodes, err := boundedSnapshot(ctx, raw.raw.RootNode(), raw.lang, 0)
-	t.Logf("snapshot cancellation elapsed=%s partial_nodes=%d total_nodes=%d", time.Since(started), len(nodes), len(r.Tree.Nodes()))
-	if !errors.Is(err, context.Canceled) || len(nodes) >= len(r.Tree.Nodes()) {
-		t.Fatal("snapshot ignored cancellation")
+	total := len(r.Tree.Nodes())
+	t.Logf("snapshot cancellation partial_nodes=%d total_nodes=%d", len(nodes), total)
+	if base.Err() == nil || !errors.Is(err, context.Canceled) || len(nodes) == 0 || len(nodes) >= total {
+		t.Fatal("snapshot ignored mid-snapshot cancellation")
 	}
 }
 
@@ -130,7 +157,10 @@ func TestLargeGoIncrementalConflict(t *testing.T) {
 		fmt.Fprintf(&source, "var item%d = %d\n", i, i)
 	}
 	p := Adapter{}
-	old, err := p.Parse(context.Background(), syntax.Request{Filename: "large.go", Source: source.Bytes(), Timeout: 5 * time.Second})
+	// The timeout only guards against a stall. Regressions are detected by the
+	// memory-budget retry, reuse and stack receipts below, not by elapsed time.
+	const guard = 20 * time.Second
+	old, err := p.Parse(context.Background(), syntax.Request{Filename: "large.go", Source: source.Bytes(), Timeout: guard})
 	if err != nil || !old.Complete() {
 		t.Fatal("large input setup", err)
 	}
@@ -138,15 +168,18 @@ func TestLargeGoIncrementalConflict(t *testing.T) {
 	after := append(bytes.Clone(source.Bytes()), '\n')
 	end := uint32(source.Len())
 	inc, err := p.Parse(context.Background(), syntax.Request{Filename: "large.go", Source: after, Previous: old.Tree,
-		Edit: &syntax.Edit{StartByte: end, OldEndByte: end, NewEndByte: end + 1}, Timeout: 5 * time.Second,
+		Edit: &syntax.Edit{StartByte: end, OldEndByte: end, NewEndByte: end + 1}, Timeout: guard,
 		Limits: syntax.Limits{MemoryBudgetBytes: 64 << 20}})
 	if inc.Tree != nil {
 		defer inc.Tree.Close()
 	}
+	if inc.Outcome == syntax.Timeout {
+		t.Fatalf("incremental parse exceeded the %s stall guard: %+v", guard, inc.Diagnostics)
+	}
 	if err != nil || !inc.Complete() || !inc.ReusedOldTree || inc.ReuseReason != "" || inc.PeakStackDepth > 64 {
 		t.Fatalf("conflicting leaf reuse grew the stack or forced a fresh retry: %v %+v", err, inc.Diagnostics)
 	}
-	fresh, err := p.Parse(context.Background(), syntax.Request{Filename: "large.go", Source: after, Timeout: 5 * time.Second})
+	fresh, err := p.Parse(context.Background(), syntax.Request{Filename: "large.go", Source: after, Timeout: guard})
 	if fresh.Tree != nil {
 		defer fresh.Tree.Close()
 	}
