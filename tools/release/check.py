@@ -76,14 +76,30 @@ def check_archive(archive, module, optional):
     return names, archive.read(prefix + 'go.mod')
 
 
+def base_env():
+    return {k: v for k, v in os.environ.items() if k.upper() in
+            ('SYSTEMROOT', 'WINDIR', 'COMSPEC', 'PATHEXT', 'PATH')}
+
+
+def regular_checkout(root):
+    """Mirror golang.org/x/mod zip.isGitRepo, which rejects linked git worktrees."""
+    root = str(root)
+    result = subprocess.run(['git', 'rev-parse', '--git-dir'], cwd=root, capture_output=True, text=True,
+                            env=dict(base_env(), PWD=root))
+    git_dir = result.stdout.strip()
+    if not os.path.isabs(git_dir):
+        git_dir = os.path.join(root, git_dir)
+    return result.returncode == 0 and os.path.normpath(git_dir) == os.path.normpath(os.path.join(root, '.git'))
+
+
 def main():
     require(len(sys.argv) == 2, 'usage: python tools/release/check.py PATH_TO_MODULEZIP')
+    require(regular_checkout(ROOT), 'run from a regular clone: zip.CreateFromVCS rejects linked git worktrees')
     helper = Path(sys.argv[1]).resolve()
     scratch = ROOT / '.scratch'
     scratch.mkdir(exist_ok=True)
     directory = Path(tempfile.mkdtemp(prefix='release-check-', dir=scratch))
-    env = {k: v for k, v in os.environ.items() if k.upper() in
-           ('SYSTEMROOT', 'WINDIR', 'COMSPEC', 'PATHEXT', 'PATH')}
+    env = base_env()
     env.update(CGO_ENABLED='0', GOENV='off', GOFLAGS='', GOWORK='off', GOTOOLCHAIN='local',
                GOPROXY='off', GOSUMDB='off', GONOPROXY='none', GOPRIVATE='', GONOSUMDB='',
                GOCACHE=str(scratch / 'release-build-cache'), GOMODCACHE=str(directory / 'unused-cache'),

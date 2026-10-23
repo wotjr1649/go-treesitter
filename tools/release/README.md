@@ -1,6 +1,7 @@
 # Candidate packaging check
 
-Run from a clean committed Windows checkout with Go 1.27.1, Python and Git:
+Run from a clean committed Windows clone with Go 1.27.1, Python and Git. A linked
+`git worktree` is rejected because `zip.CreateFromVCS` requires `<root>/.git`:
 
 ```powershell
 New-Item -ItemType Directory -Force .scratch | Out-Null
