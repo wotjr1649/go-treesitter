@@ -466,6 +466,6 @@
   "fixture": "prefix-x-jsx-6",
   "language": "javascript",
   "source_sha256": "718beb1fc73bc7f4199b70c0fadcefc628d8fbc3971e6c36a18c7d1a56637505",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "5860b8ca567e267a0e400143df29236794c0167bdb10e19069c0f56c606912e4"
 }

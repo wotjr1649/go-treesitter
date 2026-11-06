@@ -4,9 +4,7 @@ package gotreesitter
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"errors"
-	"fmt"
 	"math"
 	"reflect"
 	"unsafe"
@@ -29,15 +27,8 @@ type diagnosticParserCoreVersionLexerSnapshot struct {
 	compact        *core.Core
 	coreGeneration uint64
 	language       *Language
-	scanner        diagnosticParserCoreVersionLexerScannerContract
-	// checkpointIdentity authenticates the scanner and grammar that produced
-	// this snapshot when the scanner exposes the identity-bearing checkpoint
-	// capability. Legacy checkpointed scanners keep this optional because
-	// internal DFA ownership does not require a grammar identity.
-	checkpointIdentity         [32]byte
-	checkpointIdentityRequired bool
-	checkpointIdentityValid    bool // Published snapshots set this exactly when required.
-	dfa                        dfaRelexSnapshot
+	metadata       *core.FrozenValue[diagnosticParserCoreVersionLexerMetadata]
+	dfa            dfaRelexSnapshot
 
 	beforeCheckpoint      core.CheckpointID
 	afterCheckpoint       core.CheckpointID
@@ -45,6 +36,15 @@ type diagnosticParserCoreVersionLexerSnapshot struct {
 	afterCheckpointBytes  []byte
 	beforeCheckpointInfo  DiagnosticParserCoreScannerCheckpoint
 	afterCheckpointInfo   DiagnosticParserCoreScannerCheckpoint
+}
+
+// diagnosticParserCoreVersionLexerMetadata is shared only as an immutable
+// value. Each snapshot keeps its core generation and mutable cursor private.
+type diagnosticParserCoreVersionLexerMetadata struct {
+	scanner                    diagnosticParserCoreVersionLexerScannerContract
+	checkpointIdentity         [32]byte
+	checkpointIdentityRequired bool
+	checkpointIdentityValid    bool
 }
 
 // diagnosticParserCoreVersionLexerScannerContract is comparable and remains
@@ -60,16 +60,7 @@ type diagnosticParserCoreVersionLexerScannerContract struct {
 }
 
 func diagnosticParserCoreVersionLexerScannerFingerprint(scanner ExternalScanner) [32]byte {
-	if scanner == nil {
-		return [32]byte{}
-	}
-	typeID := reflect.TypeOf(scanner)
-	// Pointer scanners carry their identity in the pointer. Avoid hashing their
-	// mutable pointee, because scanner state belongs in Create's payload.
-	if value := reflect.ValueOf(scanner); value.IsValid() && value.Kind() == reflect.Pointer {
-		return sha256.Sum256([]byte(fmt.Sprintf("%s@%x", typeID, value.Pointer())))
-	}
-	return sha256.Sum256([]byte(fmt.Sprintf("%T:%#v", scanner, scanner)))
+	return core.ScannerFingerprint(scanner)
 }
 
 func diagnosticParserCoreVersionLexerScannerContractForLanguage(language *Language) (diagnosticParserCoreVersionLexerScannerContract, error) {
@@ -126,10 +117,7 @@ func diagnosticParserCoreVersionLexerSnapshotEqual(
 	return left.compact == right.compact &&
 		left.coreGeneration == right.coreGeneration &&
 		left.language == right.language &&
-		left.scanner.equal(right.scanner) &&
-		left.checkpointIdentity == right.checkpointIdentity &&
-		left.checkpointIdentityRequired == right.checkpointIdentityRequired &&
-		left.checkpointIdentityValid == right.checkpointIdentityValid &&
+		left.metadata.Value() == right.metadata.Value() &&
 		left.dfa.equal(right.dfa) &&
 		left.beforeCheckpoint == right.beforeCheckpoint &&
 		left.afterCheckpoint == right.afterCheckpoint &&
@@ -141,14 +129,30 @@ func diagnosticParserCoreVersionLexerSnapshotEqual(
 
 // diagnosticParserCoreVersionLexerRequestEqual compares lexer request state,
 // excluding scheduler lifecycle provenance such as election and creation IDs.
+//
+// state (the parser state the request was originally validated against) is
+// deliberately excluded from this comparison. Two owned headers can each
+// reduce their own way to the identical (token, scanner snapshot) pair
+// through different, independently-reduced chains of parser states -- an
+// ordinary GLR convergence, not a bug -- while their own cached requests
+// keep whatever state each header happened to hold when it first issued the
+// request, since a pending request survives unchanged across a header's own
+// later reduce-only dispatches (a reduction never re-requests the still
+// unconsumed token). Comparing that frozen field would report two requests
+// as different solely because they were issued at different moments in each
+// header's own history, even when the token and every scanner snapshot they
+// captured are byte-for-byte identical -- the only two headers this
+// equality check exists to identify as mergeable. state cannot mask a real
+// difference here regardless: any parser state that would have driven the
+// scanner to a genuinely different result already shows up in token or in
+// before/after, both still compared below.
 func diagnosticParserCoreVersionLexerRequestEqual(
 	left, right *diagnosticParserCoreVersionLexerRequest,
 ) bool {
 	if left == nil || right == nil {
 		return left == right
 	}
-	return left.state == right.state &&
-		tokensSameLex(left.token, right.token) &&
+	return tokensSameLex(left.token, right.token) &&
 		diagnosticParserCoreVersionLexerSnapshotEqual(left.before, right.before) &&
 		left.beforeCheckpoint == right.beforeCheckpoint &&
 		diagnosticParserCoreVersionLexerSnapshotEqual(left.after, right.after) &&
@@ -238,31 +242,23 @@ func copyDiagnosticParserCoreVersionCheckpoint(
 	owner core.SchedulerTransactionToken,
 	id core.CheckpointID,
 ) ([]byte, DiagnosticParserCoreScannerCheckpoint, error) {
+	return copyDiagnosticParserCoreVersionCheckpointWithPrivateCopy(compact, owner, id, nil)
+}
+
+func copyDiagnosticParserCoreVersionCheckpointWithPrivateCopy(
+	compact *core.Core,
+	owner core.SchedulerTransactionToken,
+	id core.CheckpointID,
+	private []byte,
+) ([]byte, DiagnosticParserCoreScannerCheckpoint, error) {
 	if compact == nil {
 		return nil, DiagnosticParserCoreScannerCheckpoint{}, errors.New("parser-core phase zero: version lexer checkpoint requires a core")
 	}
-	if id == 0 {
-		// Checkpoint ID zero means that the scanner has no serialized state.
-		// Authenticate the owner even when no bytes need copying. Keep its
-		// metadata explicit so callers can distinguish it from a missing
-		// non-zero checkpoint identity.
-		if _, _, ok := compact.CheckpointReceiptOwned(owner, id); !ok {
-			return nil, DiagnosticParserCoreScannerCheckpoint{}, errDiagnosticParserCoreUnknownCheckpointIdentity
-		}
-		return nil, parserCoreEmptyCheckpoint, nil
-	}
-	length, digest, ok := compact.CheckpointReceiptOwned(owner, id)
+	copy, ok := compact.PrivateCheckpointCopyOwned(owner, id, private)
 	if !ok {
 		return nil, DiagnosticParserCoreScannerCheckpoint{}, errDiagnosticParserCoreUnknownCheckpointIdentity
 	}
-	bytes, ok := compact.CopyCheckpointBytesOwned(owner, id, nil)
-	if !ok || uint64(len(bytes)) != uint64(length) {
-		return nil, DiagnosticParserCoreScannerCheckpoint{}, errors.New("parser-core phase zero: version lexer checkpoint bytes are unavailable")
-	}
-	if sha256.Sum256(bytes) != digest {
-		return nil, DiagnosticParserCoreScannerCheckpoint{}, errors.New("parser-core phase zero: version lexer checkpoint digest does not match its bytes")
-	}
-	return bytes, DiagnosticParserCoreScannerCheckpoint{Length: int(length), SHA256: digest}, nil
+	return copy.Bytes, DiagnosticParserCoreScannerCheckpoint{Length: int(copy.Length), SHA256: copy.SHA256}, nil
 }
 
 // newDiagnosticParserCoreVersionLexerSnapshot creates an owned snapshot from
@@ -277,6 +273,14 @@ func newDiagnosticParserCoreVersionLexerSnapshot(
 	beforeCheckpoint core.CheckpointID,
 	afterCheckpoint core.CheckpointID,
 ) (*diagnosticParserCoreVersionLexerSnapshot, error) {
+	return newDiagnosticParserCoreVersionLexerSnapshotWithMetadata(compact, language, owner, dfa, beforeCheckpoint, afterCheckpoint, nil)
+}
+
+func newDiagnosticParserCoreVersionLexerSnapshotWithMetadata(
+	compact *core.Core, language *Language, owner core.SchedulerTransactionToken,
+	dfa dfaRelexSnapshot, beforeCheckpoint, afterCheckpoint core.CheckpointID,
+	previous *core.FrozenValue[diagnosticParserCoreVersionLexerMetadata],
+) (*diagnosticParserCoreVersionLexerSnapshot, error) {
 	scanner, err := diagnosticParserCoreVersionLexerScannerContractForLanguage(language)
 	if err != nil {
 		return nil, err
@@ -287,11 +291,22 @@ func newDiagnosticParserCoreVersionLexerSnapshot(
 	if scanner.present && len(dfa.externalPayload) == 0 && !scanner.stateless {
 		return nil, errors.New("parser-core phase zero: version lexer snapshot cannot represent external scanner state")
 	}
-	beforeBytes, beforeInfo, err := copyDiagnosticParserCoreVersionCheckpoint(compact, owner, beforeCheckpoint)
+	// Authenticate both handles before allocating the private DFA copy.
+	if compact == nil {
+		return nil, errors.New("parser-core phase zero: version lexer checkpoint requires a core")
+	}
+	if _, _, ok := compact.CheckpointReceiptOwned(owner, beforeCheckpoint); !ok {
+		return nil, errDiagnosticParserCoreUnknownCheckpointIdentity
+	}
+	if _, _, ok := compact.CheckpointReceiptOwned(owner, afterCheckpoint); !ok {
+		return nil, errDiagnosticParserCoreUnknownCheckpointIdentity
+	}
+	dfa = cloneDiagnosticParserCoreDFARelexSnapshot(dfa)
+	afterBytes, afterInfo, err := copyDiagnosticParserCoreVersionCheckpointWithPrivateCopy(compact, owner, afterCheckpoint, dfa.externalPayload)
 	if err != nil {
 		return nil, err
 	}
-	afterBytes, afterInfo, err := copyDiagnosticParserCoreVersionCheckpoint(compact, owner, afterCheckpoint)
+	beforeBytes, beforeInfo, err := copyDiagnosticParserCoreVersionCheckpointWithPrivateCopy(compact, owner, beforeCheckpoint, afterBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -304,20 +319,20 @@ func newDiagnosticParserCoreVersionLexerSnapshot(
 		return nil, errors.New("parser-core phase zero: version lexer snapshot requires a complete checkpoint identity")
 	}
 	return &diagnosticParserCoreVersionLexerSnapshot{
-		compact:                    compact,
-		coreGeneration:             generation,
-		language:                   language,
-		scanner:                    scanner,
-		checkpointIdentity:         checkpointIdentity,
-		checkpointIdentityRequired: checkpointIdentityRequired,
-		checkpointIdentityValid:    checkpointIdentityValid,
-		dfa:                        cloneDiagnosticParserCoreDFARelexSnapshot(dfa),
-		beforeCheckpoint:           beforeCheckpoint,
-		afterCheckpoint:            afterCheckpoint,
-		beforeCheckpointBytes:      beforeBytes,
-		afterCheckpointBytes:       afterBytes,
-		beforeCheckpointInfo:       beforeInfo,
-		afterCheckpointInfo:        afterInfo,
+		compact:        compact,
+		coreGeneration: generation,
+		language:       language,
+		metadata: core.ReuseFrozenValue(previous, diagnosticParserCoreVersionLexerMetadata{
+			scanner: scanner, checkpointIdentity: checkpointIdentity,
+			checkpointIdentityRequired: checkpointIdentityRequired, checkpointIdentityValid: checkpointIdentityValid,
+		}),
+		dfa:                   dfa,
+		beforeCheckpoint:      beforeCheckpoint,
+		afterCheckpoint:       afterCheckpoint,
+		beforeCheckpointBytes: beforeBytes,
+		afterCheckpointBytes:  afterBytes,
+		beforeCheckpointInfo:  beforeInfo,
+		afterCheckpointInfo:   afterInfo,
 	}, nil
 }
 
@@ -341,19 +356,20 @@ func (s *diagnosticParserCoreVersionLexerSnapshot) validateDestination(compact *
 	if s.language != language {
 		return errors.New("parser-core phase zero: version lexer snapshot belongs to a different Language")
 	}
+	metadata := s.metadata.Value()
 	scanner, err := diagnosticParserCoreVersionLexerScannerContractForLanguage(language)
 	if err != nil {
 		return err
 	}
-	if !s.scanner.equal(scanner) {
+	if !metadata.scanner.equal(scanner) {
 		return errors.New("parser-core phase zero: version lexer snapshot scanner contract changed")
 	}
 	identity, identityRequired, identityValid := diagnosticParserCoreVersionLexerCheckpointIdentity(language)
-	if s.checkpointIdentityRequired != identityRequired {
+	if metadata.checkpointIdentityRequired != identityRequired {
 		return errors.New("parser-core phase zero: version lexer snapshot checkpoint capability changed")
 	}
-	if s.checkpointIdentityRequired &&
-		(!s.checkpointIdentityValid || !identityValid || identity != s.checkpointIdentity) {
+	if metadata.checkpointIdentityRequired &&
+		(!metadata.checkpointIdentityValid || !identityValid || identity != metadata.checkpointIdentity) {
 		return errors.New("parser-core phase zero: version lexer snapshot checkpoint identity changed")
 	}
 	if err := s.validateGeneration(); err != nil {
@@ -372,10 +388,10 @@ func validateDiagnosticParserCoreVersionLexerCheckpoint(
 	compact *core.Core,
 	id core.CheckpointID,
 	bytes []byte,
-	info DiagnosticParserCoreScannerCheckpoint,
+	info *DiagnosticParserCoreScannerCheckpoint,
 ) error {
 	if id == 0 {
-		if len(bytes) != 0 || info != parserCoreEmptyCheckpoint {
+		if len(bytes) != 0 || *info != parserCoreEmptyCheckpoint {
 			return errors.New("parser-core phase zero: version lexer empty checkpoint metadata changed")
 		}
 		return nil
@@ -383,12 +399,15 @@ func validateDiagnosticParserCoreVersionLexerCheckpoint(
 	if compact == nil {
 		return errors.New("parser-core phase zero: version lexer checkpoint has no core")
 	}
-	if info != parserCoreCheckpoint(bytes) {
+	if info.Length != len(bytes) {
 		return errors.New("parser-core phase zero: version lexer checkpoint metadata does not match its bytes")
 	}
-	length, digest, ok := compact.CheckpointReceipt(id)
-	if !ok || uint64(len(bytes)) != uint64(length) || digest != info.SHA256 {
+	match := compact.MatchCheckpointPrivateCopy(id, bytes, &info.SHA256)
+	if match == core.CheckpointCopyUnknown {
 		return errDiagnosticParserCoreUnknownCheckpointIdentity
+	}
+	if match != core.CheckpointCopyExact {
+		return errors.New("parser-core phase zero: version lexer checkpoint metadata does not match its bytes")
 	}
 	return nil
 }
@@ -402,10 +421,10 @@ func (s *diagnosticParserCoreVersionLexerSnapshot) validate() error {
 	if err := s.validateDestination(s.compact, s.language); err != nil {
 		return err
 	}
-	if err := validateDiagnosticParserCoreVersionLexerCheckpoint(s.compact, s.beforeCheckpoint, s.beforeCheckpointBytes, s.beforeCheckpointInfo); err != nil {
+	if err := validateDiagnosticParserCoreVersionLexerCheckpoint(s.compact, s.beforeCheckpoint, s.beforeCheckpointBytes, &s.beforeCheckpointInfo); err != nil {
 		return err
 	}
-	return validateDiagnosticParserCoreVersionLexerCheckpoint(s.compact, s.afterCheckpoint, s.afterCheckpointBytes, s.afterCheckpointInfo)
+	return validateDiagnosticParserCoreVersionLexerCheckpoint(s.compact, s.afterCheckpoint, s.afterCheckpointBytes, &s.afterCheckpointInfo)
 }
 
 func (h *diagnosticParserCoreHeader) installVersionLexerSnapshot(snapshot *diagnosticParserCoreVersionLexerSnapshot) {
@@ -503,16 +522,16 @@ func (s *diagnosticParserCoreVersionLexerSnapshot) restore(compact *core.Core, d
 	if d.hasExternalScanner != s.dfa.externalScannerPresent {
 		return errors.New("parser-core phase zero: version lexer snapshot target scanner presence changed")
 	}
-	if d.hasExternalScanner && len(s.dfa.externalPayload) == 0 && !s.scanner.stateless {
+	if d.hasExternalScanner && len(s.dfa.externalPayload) == 0 && !s.metadata.Value().scanner.stateless {
 		return errors.New("parser-core phase zero: version lexer snapshot target scanner state is unrepresentable")
 	}
 	if len(s.dfa.externalPayload) > externalScannerSerializationBufferSize {
 		return errors.New("parser-core phase zero: version lexer snapshot target scanner state exceeds its bound")
 	}
-	if err := validateDiagnosticParserCoreVersionLexerCheckpoint(s.compact, s.beforeCheckpoint, s.beforeCheckpointBytes, s.beforeCheckpointInfo); err != nil {
+	if err := validateDiagnosticParserCoreVersionLexerCheckpoint(s.compact, s.beforeCheckpoint, s.beforeCheckpointBytes, &s.beforeCheckpointInfo); err != nil {
 		return err
 	}
-	if err := validateDiagnosticParserCoreVersionLexerCheckpoint(s.compact, s.afterCheckpoint, s.afterCheckpointBytes, s.afterCheckpointInfo); err != nil {
+	if err := validateDiagnosticParserCoreVersionLexerCheckpoint(s.compact, s.afterCheckpoint, s.afterCheckpointBytes, &s.afterCheckpointInfo); err != nil {
 		return err
 	}
 	s.dfa.restore(d)
@@ -543,6 +562,12 @@ func diagnosticParserCoreVersionLexerSnapshotFootprintBytes(snapshot *diagnostic
 	// dfa is embedded in the snapshot record, so sizeof(snapshot) already
 	// includes its scalar fields and slice headers.
 	total := uint64(unsafe.Sizeof(*snapshot))
+	// Conservatively charge the shared holder once per snapshot. Sharing cannot
+	// bypass the existing per-version memory budget.
+	if snapshot.metadata != nil {
+		total += uint64(unsafe.Sizeof(*snapshot.metadata))
+	}
+
 	add := func(count int, size uintptr) {
 		if count <= 0 || size == 0 || total == math.MaxUint64 {
 			return

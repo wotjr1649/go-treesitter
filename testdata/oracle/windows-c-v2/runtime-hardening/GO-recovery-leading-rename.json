@@ -314,6 +314,6 @@
   "fixture": "GO-recovery-leading-rename",
   "language": "go",
   "source_sha256": "cba26dc35df7c1cc46235f9ef52f4782a83052497c6900ff351bbf9e22ea3e45",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "23d50630ecdf55bb18cd6988bd0878109c1d11b75d68a03d653591a9e00c8e39"
 }

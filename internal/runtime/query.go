@@ -207,14 +207,30 @@ type QueryCapture struct {
 	// TextOverride, when non-empty, replaces the node's source text for
 	// downstream consumers. It is set by the #strip! directive.
 	TextOverride string
+	// hasRangeOverride, when true, means the four fields below replace the
+	// node's own byte and point range for downstream consumers. It is set by
+	// the #offset! directive.
+	hasRangeOverride   bool
+	startByteOverride  uint32
+	endByteOverride    uint32
+	startPointOverride Point
+	endPointOverride   Point
 }
 
 // Text returns the effective text for this capture. If TextOverride is set
-// (e.g. by the #strip! directive), it is returned. Otherwise the node's
-// source text is returned.
+// (e.g. by the #strip! directive), it is returned. Otherwise, if the
+// #offset! directive adjusted the capture's range, the source text for that
+// adjusted range is returned. Otherwise the node's own source text is
+// returned.
 func (c QueryCapture) Text(source []byte) string {
 	if c.TextOverride != "" {
 		return c.TextOverride
+	}
+	if c.hasRangeOverride {
+		if source == nil || c.endByteOverride < c.startByteOverride || int(c.endByteOverride) > len(source) {
+			return ""
+		}
+		return string(source[c.startByteOverride:c.endByteOverride])
 	}
 	if c.Node == nil {
 		return ""
@@ -222,9 +238,53 @@ func (c QueryCapture) Text(source []byte) string {
 	return c.Node.Text(source)
 }
 
-// UTF16Range returns this capture's node range in UTF-16 code-unit
-// coordinates for trees produced by UTF-16 parse APIs.
+// ByteRange returns the effective start and end byte offsets for this
+// capture. If the #offset! directive adjusted the capture, the adjusted
+// range is returned; otherwise the underlying node's own byte range is
+// returned.
+func (c QueryCapture) ByteRange() (start, end uint32) {
+	if c.hasRangeOverride {
+		return c.startByteOverride, c.endByteOverride
+	}
+	if c.Node == nil {
+		return 0, 0
+	}
+	return c.Node.StartByte(), c.Node.EndByte()
+}
+
+// PointRange returns the effective start and end point for this capture, the
+// same way ByteRange returns byte offsets.
+func (c QueryCapture) PointRange() (start, end Point) {
+	if c.hasRangeOverride {
+		return c.startPointOverride, c.endPointOverride
+	}
+	if c.Node == nil {
+		return Point{}, Point{}
+	}
+	return c.Node.StartPoint(), c.Node.EndPoint()
+}
+
+// Range returns this capture's effective range as a Range value. It composes
+// ByteRange and PointRange, so it honors a range adjusted by the #offset!
+// directive the same way both do. Callers that only need the resulting
+// Range value, such as an outline or a tags consumer, use this instead of
+// reading the range off the underlying node.
+func (c QueryCapture) Range() Range {
+	startByte, endByte := c.ByteRange()
+	startPoint, endPoint := c.PointRange()
+	return Range{StartByte: startByte, EndByte: endByte, StartPoint: startPoint, EndPoint: endPoint}
+}
+
+// UTF16Range returns this capture's effective range in UTF-16 code-unit
+// coordinates for trees produced by UTF-16 parse APIs. It honors a range
+// adjusted by the #offset! directive the same way ByteRange does.
 func (c QueryCapture) UTF16Range(tree *Tree) (UTF16Range, bool) {
+	if c.hasRangeOverride {
+		if tree == nil {
+			return UTF16Range{}, false
+		}
+		return tree.UTF16RangeForByteRange(c.startByteOverride, c.endByteOverride)
+	}
 	if c.Node == nil {
 		return UTF16Range{}, false
 	}
@@ -595,7 +655,7 @@ func (q *Query) executeNodeIntoBuffer(root *Node, lang *Language, source []byte,
 	)
 	buf.matches = slices.Grow(buf.matches, len(buf.readerMatches))
 	for _, match := range buf.readerMatches {
-		buf.matches = append(buf.matches, QueryMatch{PatternIndex: match.PatternIndex, Captures: match.Captures})
+		buf.matches = append(buf.matches, QueryMatch(match))
 	}
 	return buf.matches
 }
@@ -1171,7 +1231,8 @@ func (q *Query) PropertyPredicatesForPattern(patternIndex uint32) ([]QueryProper
 }
 
 // IsPatternRooted reports whether the pattern has exactly one root step at
-// depth 0. Rooted patterns start matching from a single concrete root.
+// depth 0 and that step is not quantified. Quantified roots span siblings.
+// Rooted patterns start matching from a single concrete root.
 func (q *Query) IsPatternRooted(patternIndex uint32) bool {
 	if q == nil {
 		return false
@@ -1190,7 +1251,7 @@ func (q *Query) IsPatternRooted(patternIndex uint32) bool {
 			rootCount++
 		}
 	}
-	return rootCount == 1
+	return rootCount == 1 && steps[0].quantifier == queryQuantifierOne
 }
 
 // IsPatternNonLocal reports whether the pattern can begin at multiple roots.

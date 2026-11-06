@@ -162,6 +162,6 @@
   "fixture": "prefix-x-js-12",
   "language": "javascript",
   "source_sha256": "25672d6f7da6e6885d89ad8de6a33e5d3a339fa0302a6a23a0e779c0badbb319",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "12974310896f1a968d596e654475ec95c598c080a0c69e0134d221933377bb9a"
 }

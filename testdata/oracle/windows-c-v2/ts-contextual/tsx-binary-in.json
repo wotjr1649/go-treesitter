@@ -219,6 +219,6 @@
   "fixture": "tsx-binary-in",
   "language": "tsx",
   "source_sha256": "89e94573313f662240db118ff1c0f6b09bd332873c544cb3fad5920c954b2c0b",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "4a2911f2ff44dd18b0c41f7379f5306216c7d8b5e79ab71ba82e9d96a31d0c07"
 }

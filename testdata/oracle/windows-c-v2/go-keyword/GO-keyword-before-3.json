@@ -219,6 +219,6 @@
   "fixture": "GO-keyword-before-3",
   "language": "go",
   "source_sha256": "9784aea6f523b4b348696511ea38e9b412cb3d464e0bf89cc42e7d9e142307ba",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "6ddaf4b8cc452e2005cc4d1ef3130f86d3259eddcc497602548a09fc730bf2c3"
 }

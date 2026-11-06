@@ -333,6 +333,6 @@
   "fixture": "EXT-PY-RENAME",
   "language": "python",
   "source_sha256": "b8d4e569bb4d9aeff51a834a616faed3600efdebce773ecbed734c8725443c35",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "119168a3555889e2bca93e50ff9304d9fe35944ec9b952a83cf68299d9adbfc2"
 }

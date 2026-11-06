@@ -1,6 +1,6 @@
 # Candidate packaging check
 
-Run from a clean committed Windows clone with Go 1.27.1, Python and Git. A linked
+Run from a clean committed Windows clone with Go 1.27.2, Python and Git. A linked
 `git worktree` is rejected because `zip.CreateFromVCS` requires `<root>/.git`:
 
 ```powershell
@@ -12,7 +12,7 @@ python tools/licenses/check.py
 ```
 
 The nested `tools/modulezip` module pins the `golang.org/x/mod` revision used
-by Go 1.27.1. Only building this tool may fetch that public dependency. It is
+by Go 1.27.2. Only building this tool may fetch that public dependency. It is
 excluded from both product module ZIPs and from consumer dependency graphs.
 
 The packaging check uses `zip.CreateFromVCS` and `zip.CheckZip`, validates

@@ -561,6 +561,6 @@
   "fixture": "ts-semicolon-in",
   "language": "typescript",
   "source_sha256": "e0d40be55bfa639775ab6fb7ea39cdbb0bfeed72742313057b058acfe8e02ae2",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "76bd1d2a04af4fee26705e28d8e12ab9e4635d00a0aef8ac1f6ec2db60ad4d1b"
 }

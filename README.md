@@ -116,9 +116,11 @@ across the seven core routes, without invoking a C compiler.
 [Oracle tooling](tools/native-oracle/README.md) documents producing
 new records, using an updated generator, and comparing artifacts before adoption.
 Generator selection has no release constant; runtime/grammar identities remain
-pinned. Original scanner failures remain in the retained oracle records. The approved
-[internal runtime](tools/runtime-bundle/README.md) now carries that six-line
-scanner correction; KR-0001b is retired after product and consumer validation.
+pinned. Original scanner failures remain in the retained oracle records. The
+upstream scanners of the current [internal runtime](tools/runtime-bundle/README.md)
+no longer contain the two Go-only guards, and the carrier no longer applies its
+earlier six-line correction patch; KR-0001b stays retired and its controls still
+require C agreement.
 The separate extended catalog adds 35 fresh comparisons and 21 edit comparisons
 over all seven routes, including UTF-8/CRLF and wide sibling boundaries.
 Eight further TypeScript/TSX controls now agree with the officially adopted C

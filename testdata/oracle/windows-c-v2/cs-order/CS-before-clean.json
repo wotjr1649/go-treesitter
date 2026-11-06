@@ -143,6 +143,6 @@
   "fixture": "CS-before-clean",
   "language": "c_sharp",
   "source_sha256": "84c144a5bd7ab732cb9c440175d4e4ac52598deb86381f9ba15844af656d03fd",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "8cdad0599987c9eabb5494d9193b04430798f6261553f8fc04bbd6504b978e67"
 }

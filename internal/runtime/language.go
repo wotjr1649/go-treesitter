@@ -10,6 +10,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"unsafe"
+
+	"github.com/wotjr1649/go-treesitter/internal/runtime/internal/sched"
 )
 
 // Symbol is a grammar symbol ID (terminal or nonterminal).
@@ -61,9 +63,10 @@ type ParseActionEntry struct {
 
 // LexState is one state in the table-driven lexer DFA.
 type LexState struct {
-	AcceptToken    Symbol // 0 if this state doesn't accept
+	AcceptToken    Symbol // 0 unless this state accepts a non-end token
 	AcceptPriority int16  // lower = higher priority (0 for ts2go blobs = longest-match)
 	Skip           bool   // true if accepted chars are whitespace
+	AcceptEOF      bool   // true if this state accepts the end token at end of input
 	Default        int    // default next state (-1 if none)
 	EOF            int    // state on EOF (-1 if none)
 	Transitions    []LexTransition
@@ -234,6 +237,12 @@ type CheckpointedExternalScanner interface {
 	UsesExternalScannerCheckpoints() bool
 }
 
+// checkpointedNonLeafReusePolicy lets a checkpointed scanner decline composite
+// subtree reuse when its state transitions cannot be inferred from tree nodes.
+type checkpointedNonLeafReusePolicy interface {
+	SupportsCheckpointedNonLeafReuse() bool
+}
+
 // IncrementalPrefixFrontierExternalScanner is an optional refinement for a
 // checkpointed scanner whose state can depend on reductions before the next
 // top-level sibling. A changed-length or changed-point edit before that
@@ -361,6 +370,9 @@ const (
 	// processed" is "highest symbol id" for this shape. See
 	// declaredReduceReduceHighestSymbolConflictChoice.
 	ConflictPolicyDeclaredReduceReduceHighestSymbol
+	// ConflictPolicyDeclaredSelfReduceReduceLongest keeps the wider production
+	// in a certified same-symbol conflict with equal precedence and field maps.
+	ConflictPolicyDeclaredSelfReduceReduceLongest
 )
 
 // ConflictPolicy describes one table row/lookahead conflict that can be
@@ -423,6 +435,25 @@ const (
 	// by the first retry ladder is authoritative. The parser retains that exact
 	// selected tree and does not schedule the extra external-scanner retry.
 	ExternalScannerFullParseRetrySkipRepeat
+)
+
+// LegacyMergeAdmissionPolicy selects Go-only refusals that the legacy GLR
+// merge drops for one grammar artifact. tree-sitter C's ts_stack_can_merge
+// compares only version status, head state, byte position, error cost, and
+// external scanner state. The zero value keeps every Go-only refusal.
+type LegacyMergeAdmissionPolicy uint8
+
+const (
+	// LegacyMergeAdmitDynamicPrecedence merges versions whose cumulative
+	// dynamic precedence differs, as C does. The merged version keeps the
+	// higher precedence, and reduce-time and result-time selection order the
+	// packed alternatives by precedence.
+	LegacyMergeAdmitDynamicPrecedence LegacyMergeAdmissionPolicy = 1 << iota
+
+	// LegacyMergeAdmitMixedRepresentation merges a flat version into a
+	// graph-structured version at the same head. C keeps every version in its
+	// stack graph, so it has no representation gate.
+	LegacyMergeAdmitMixedRepresentation
 )
 
 // FullParseAcceptedErrorRetryProfile certifies narrow full-parse retry
@@ -654,6 +685,10 @@ type Language struct {
 	// produced this Language. Keep it private so blob encoding stays stable.
 	grammarBlobSHA256      [32]byte
 	grammarBlobSHA256Valid bool
+	// blobInfo records the version header LoadLanguage found (or did not
+	// find) on the blob that produced this Language. See BlobInfo and
+	// LanguageBlobInfo in language_blob_version_header.go.
+	blobInfo LanguageBlobInfo
 	// ImmediateTokens is a bitmask of symbol IDs that are token.immediate() tokens.
 	// When the lexer matches one of these after consuming whitespace, the match
 	// should be rejected — immediate tokens must match at the original position.
@@ -757,11 +792,10 @@ type Language struct {
 	corridorProgram     any   // *ParserCoreCorridorProgram under the default build
 	corridorProgramErr  error // the compile error, memoized alongside corridorProgram
 
-	// parserDerivedOnce memoizes the per-language derived parser tables that
-	// NewParser previously rebuilt on every call. The tables are pure functions
-	// of the decoded grammar tables (ParseTable, SmallParseTable, ParseActions,
-	// SymbolMetadata), which are immutable after decode. The cache lives on the
-	// Language for the same retention reason as compactTables above.
+	// parserDerivedOnce memoizes the per-language parser tables that NewParser
+	// previously rebuilt on every call. The tables come from decoded grammar
+	// tables and remain read-only after build. The cache lives on the Language
+	// for the same retention reason as compactTables above.
 	parserDerivedOnce sync.Once
 	parserDerived     *parserDerivedTables
 
@@ -809,6 +843,17 @@ type Language struct {
 	// one also enables this behavior for a fresh full parse.
 	FullParseGSSConvergenceEnabled bool
 
+	// RecoveryStackVersionOrderEnabled opts a certified artifact into C physical
+	// version dispatch, closed ERROR link merging, pause progress, and captured
+	// subtree costs. False retains the conservative recovery representation.
+	RecoveryStackVersionOrderEnabled bool
+
+	// RecoveryMissingVersionTurnsCertified permits deferring an eagerly shifted
+	// missing-token version until C would visit its physical version. Built-in
+	// artifacts receive this only through an exact-blob profile with locked-C
+	// recovery witnesses. False retains the conservative cost competition.
+	RecoveryMissingVersionTurnsCertified bool
+
 	// NativeResultCompatibility identifies result-tree shapes produced natively
 	// by this exact language artifact. Zero keeps conservative post-parse
 	// compatibility fallbacks for legacy blobs, generated grammars, caller-built
@@ -854,6 +899,13 @@ type Language struct {
 	// and stale artifacts retain the false default.
 	CompactMixedGSSMergeCertified bool
 
+	// LegacyMergeAdmission drops selected Go-only refusals from the legacy
+	// GLR merge for one grammar artifact. Exact built-in profiles set bits
+	// only after locked-C parity and counter receipts hold for that artifact.
+	// Custom, adapted, and stale artifacts keep the zero value, which keeps
+	// every refusal.
+	LegacyMergeAdmission LegacyMergeAdmissionPolicy
+
 	// CompactLexerSkippedPrefixTilingCertified permits an internal compact
 	// reduction gap when the next accepted terminal carries exact DFA evidence
 	// for the complete skipped prefix. Exact built-in profiles set this only
@@ -876,6 +928,11 @@ type Language struct {
 	// certify the complete bundle. Custom, adapted, and stale artifacts retain
 	// the false default.
 	CompactPackedGSSVersionOrderCertified bool
+
+	// ConflictActionVersionOrderCertified gives the last conflict action
+	// the source version priority while retaining every alternative. Exact grammar
+	// profiles certify this narrower order without packed deterministic reductions.
+	ConflictActionVersionOrderCertified bool
 
 	// CompactStrategy2ErrorRegionCertified permits the compact fresh-full route
 	// to attempt native strategy-2 recovery (error-region absorb and
@@ -1005,6 +1062,10 @@ type Language struct {
 	// grammars/runtime_profiles.go). Custom, adapted, and generated languages
 	// default to zero and are unaffected.
 	LineContinuationEscapeByte byte
+
+	// Keep runtime ownership in the cold tail so existing field offsets stay
+	// unchanged on both the compact and legacy routes.
+	compactRunnerPool sched.RuntimePool
 }
 
 type symbolNameNamedKey struct {
@@ -1224,12 +1285,36 @@ func (l *Language) Version() uint32 {
 	return l.LanguageVersion
 }
 
-// GrammarBlobSHA256 returns the exact compressed grammar blob identity.
+// GrammarBlobSHA256 returns the exact compressed grammar blob identity: the
+// SHA-256 of the bytes LoadLanguage was called with. It is the mechanism for
+// pinning a grammar: a consumer that needs a specific blob's exact behavior
+// (rather than "whichever blob this build happens to embed") should record
+// this hash alongside the release it certified against and compare it after
+// every embed/vendor update, so a silent grammar swap — same file name,
+// different bytes — fails a check instead of changing behavior unnoticed.
+// See also BlobInfo for the blob's declared generator and version metadata,
+// which is a weaker, informational signal: two different blobs can carry the
+// same declared version, but never the same SHA-256.
 func (l *Language) GrammarBlobSHA256() ([32]byte, bool) {
 	if l == nil || !l.grammarBlobSHA256Valid {
 		return [32]byte{}, false
 	}
 	return l.grammarBlobSHA256, true
+}
+
+// BlobInfo returns the version metadata LoadLanguage recorded when it loaded
+// this Language. The zero value (HasHeader == false) means either the blob
+// predates the version header, came from a producer that does not write one,
+// or this Language was never loaded through LoadLanguage at all (e.g. a
+// static ts2go source-generated Language, or an in-memory grammargen
+// Language that was never round-tripped through a blob). LoadLanguage still
+// loads a headerless blob for compatibility; callers that want a stronger
+// guarantee can check HasHeader and warn or reject.
+func (l *Language) BlobInfo() LanguageBlobInfo {
+	if l == nil {
+		return LanguageBlobInfo{}
+	}
+	return l.blobInfo
 }
 
 func compactRecoverEOFArtifactConfigured(l *Language) bool {
@@ -1730,9 +1815,13 @@ func (l *Language) SupertypeChildren(sym Symbol) []Symbol {
 	return l.SupertypeMapEntries[start : start+length]
 }
 
-// FieldByName returns the field ID for a given name, or (0, false) if not found.
-// Builds an internal map on first call for O(1) subsequent lookups.
+// FieldByName returns the field ID for a given name, or (0, false) if not
+// found. Returns (0, false) for a nil Language. Builds an internal map on
+// first call for O(1) subsequent lookups.
 func (l *Language) FieldByName(name string) (FieldID, bool) {
+	if l == nil {
+		return 0, false
+	}
 	l.fieldMapOnce.Do(func() {
 		l.fieldNameMap = make(map[string]FieldID, len(l.FieldNames))
 		for i, fn := range l.FieldNames {

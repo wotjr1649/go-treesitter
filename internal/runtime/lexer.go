@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"unicode/utf8"
 	"unsafe"
+
+	"github.com/wotjr1649/go-treesitter/internal/runtime/internal/incr"
 )
 
 var utf8BOM = []byte{0xef, 0xbb, 0xbf}
@@ -30,8 +32,8 @@ type Token struct {
 	lexerLookaheadEndByte uint32
 	// missingStackRef is a one-based index into the parser's missing-stack
 	// anchor table, which records the stack position before padding for a
-	// synthetic recovery token. Lexed input leaves it zero, so the anchor's
-	// twelve bytes stay out of every lexed token.
+	// synthetic recovery token. Real/EOF tokens normally leave it zero; all
+	// bits set marks a dropped unlexable prefix until token commitment.
 	missingStackRef uint32
 	// ExternalScannerStartByte is the byte offset where that scanner call
 	// began, before scanner-side skip advances moved StartByte forward.
@@ -44,7 +46,7 @@ type Token struct {
 	NoLookahead bool
 	// ExternalScannerToken marks tokens produced by an external scanner.
 	ExternalScannerToken bool
-	// lexFlags packs the five unexported provenance bits; see tokenLexFlags.
+	// lexFlags packs the unexported provenance bits; see tokenLexFlags.
 	lexFlags tokenLexFlags
 }
 
@@ -68,6 +70,20 @@ const (
 	tokenFlagInternalDFALexed
 	// tokenFlagKeyword records the keyword promotion path.
 	tokenFlagKeyword
+	// tokenFlagDependsOnColumn records that the external scanner read
+	// ExternalLexer.Column while it produced this token, so the token's
+	// identity depends on its code-point column. It mirrors C
+	// tree-sitter's Lexer.did_get_column (lexer.h), which parser.c copies
+	// into called_get_column for a successful external scan only. Internal
+	// DFA tokens never carry it.
+	tokenFlagDependsOnColumn
+	// tokenFlagErrorModeRetried records a normal DFA failure followed by
+	// ERROR_STATE lexing. The token source must retry the external scanner
+	// in that mode before accepting the internal fallback token.
+	tokenFlagErrorModeRetried
+	// tokenFlagExternalErrorFallback marks an external token accepted after
+	// normal DFA lexing failed and the source retried in ERROR_STATE.
+	tokenFlagExternalErrorFallback
 )
 
 // lexFlagIf returns flag when on is true and zero otherwise.
@@ -89,8 +105,14 @@ func (t *Token) setLexFlag(flag tokenLexFlags, on bool) {
 func (t Token) missingDependencyExact() bool { return t.lexFlags&tokenFlagMissingDependencyExact != 0 }
 func (t Token) lexerSkippedPrefix() bool     { return t.lexFlags&tokenFlagSkippedPrefix != 0 }
 func (t Token) lexerErrorModeLexed() bool    { return t.lexFlags&tokenFlagErrorModeLexed != 0 }
-func (t Token) lexerInternalDFALexed() bool  { return t.lexFlags&tokenFlagInternalDFALexed != 0 }
-func (t Token) isKeyword() bool              { return t.lexFlags&tokenFlagKeyword != 0 }
+func (t Token) lexerDroppedInput() bool      { return !t.Missing && t.missingStackRef == ^uint32(0) }
+
+func (t Token) lexerInternalDFALexed() bool { return t.lexFlags&tokenFlagInternalDFALexed != 0 }
+func (t Token) isKeyword() bool             { return t.lexFlags&tokenFlagKeyword != 0 }
+
+// dependsOnColumn reports whether the external scanner read the code-point
+// column while it produced this token. See tokenFlagDependsOnColumn.
+func (t Token) dependsOnColumn() bool { return t.lexFlags&tokenFlagDependsOnColumn != 0 }
 
 func bytesToStringNoCopy(b []byte) string {
 	if len(b) == 0 {
@@ -104,6 +126,7 @@ type Lexer struct {
 	// The source owns this aggregate. Lexer snapshots share it so rollback
 	// cannot erase reads from failed or discarded primitive scans.
 	tokenInvariantReadSpanMax *uint32
+	reuseReads                *incr.Reads
 
 	states           []LexState
 	asciiTable       [][128]int32 // ASCII fast-path transition table (nil = not available)
@@ -185,22 +208,38 @@ func (l *Lexer) nextWithFrontier(startState uint32, emitErrorRuns bool, lookahea
 	// lexing; capture it for the errorModeRetry branch below.
 	callStartPos, callStartRow, callStartCol := l.pos, l.row, l.col
 	callStartRangeIdx := l.includedRangeIdx
-	skippedPrefix := false
+	const (
+		prefixSkipped uint8 = 1 << iota
+		prefixFailed
+	)
+	var prefixState uint8
 	for {
 		// EOF check.
 		if l.atLogicalEOF() {
 			if eofToken, ok := l.scan(startState, l.pos, l.row, l.col); ok && eofToken.Symbol != 0 {
 				return eofToken
 			}
+
 			lookaheadEndByte = maxUint32(lookaheadEndByte, l.lookaheadEndByteAt(l.pos, false))
 			recordTokenInvariantReadSpan(l.tokenInvariantReadSpanMax, l.pos, l.lookaheadEndByteAt(l.pos, false))
-			return Token{
+			tok := Token{
 				StartByte:             uint32(l.pos),
 				EndByte:               uint32(l.pos),
 				StartPoint:            Point{Row: l.row, Column: l.col},
 				EndPoint:              Point{Row: l.row, Column: l.col},
 				lexerLookaheadEndByte: lookaheadEndByte,
 			}
+			if prefixState&prefixFailed != 0 {
+				tok.missingStackRef = ^uint32(0)
+			}
+			// EOF retains proof of grammar-owned skips, just like a real
+			// token. A failed scan must not certify discarded input as
+			// padding, even if a later skip reaches EOF.
+			if prefixState == prefixSkipped {
+				tok.setLexFlag(tokenFlagSkippedPrefix, true)
+				tok.lexerSkippedPrefixStart = uint32(callStartPos)
+			}
+			return tok
 		}
 
 		tokenStartPos := l.pos
@@ -216,21 +255,25 @@ func (l *Lexer) nextWithFrontier(startState uint32, emitErrorRuns bool, lookahea
 				// advanced past the skipped content to prevent an
 				// infinite loop on zero-width skip matches.
 				if l.pos <= tokenStartPos {
-					skippedPrefix = false
+					prefixState &^= prefixSkipped
+					prefixState |= prefixFailed
 					l.skipOneRune()
 				} else {
-					skippedPrefix = true
+					prefixState |= prefixSkipped
 				}
 				continue
 			}
-			if skippedPrefix {
+			if prefixState&prefixSkipped != 0 {
 				tok.setLexFlag(tokenFlagSkippedPrefix, true)
 				tok.lexerSkippedPrefixStart = uint32(callStartPos)
 			}
 			tok.lexerLookaheadEndByte = lookaheadEndByte
+			if prefixState&prefixFailed != 0 {
+				tok.missingStackRef = ^uint32(0)
+			}
 			return tok
 		}
-		skippedPrefix = false
+		prefixState &^= prefixSkipped
 
 		if emitErrorRuns && l.hasErrorRunLexState && l.errorModeRetry && startState != l.errorRunLexState {
 			// Faithful C error-recovery port: ts_parser__lex retries a failed
@@ -241,12 +284,15 @@ func (l *Lexer) nextWithFrontier(startState uint32, emitErrorRuns bool, lookahea
 			// the error-run branch below on failure instead of recursing.
 			l.pos, l.row, l.col = callStartPos, callStartRow, callStartCol
 			l.includedRangeIdx = callStartRangeIdx
-			return l.nextWithFrontier(l.errorRunLexState, true, lookaheadEndByte)
+			tok := l.nextWithFrontier(l.errorRunLexState, true, lookaheadEndByte)
+			tok.setLexFlag(tokenFlagErrorModeRetried, true)
+			return tok
 		}
 		if emitErrorRuns && l.hasErrorRunLexState && !l.canLexAt(l.errorRunLexState, tokenStartPos, tokenStartRow, tokenStartCol, &lookaheadEndByte) {
 			return l.errorRunToken(&lookaheadEndByte)
 		}
 		// No accepting state was found. Skip one rune as error recovery.
+		prefixState |= prefixFailed
 		l.skipOneRune()
 	}
 }
@@ -356,6 +402,9 @@ func (l *Lexer) scanInto(startState uint32, startPos int, startRow, startCol uin
 	if l.tokenInvariantReadSpanMax != nil {
 		recordTokenInvariantReadSpan(l.tokenInvariantReadSpanMax, startPos, tokenInvariantExaminedEnd(l.source, tok.lexerLookaheadEndByte))
 	}
+	if l.reuseReads != nil {
+		l.reuseReads.Record(startPos, tokenInvariantExaminedEnd(l.source, tok.lexerLookaheadEndByte))
+	}
 	return ok
 }
 
@@ -421,7 +470,7 @@ func (l *Lexer) scanContiguousInto(startState uint32, startPos int, startRow, st
 		}
 		st := &l.states[int(curState)]
 
-		if st.AcceptToken > 0 || st.Skip {
+		if st.AcceptToken > 0 || st.Skip || (st.AcceptEOF && scanPos >= len(l.source)) {
 			// Reject immediate tokens that matched after whitespace was
 			// consumed. Immediate tokens must match at the original position.
 			isImmediate := st.AcceptToken > 0 && int(st.AcceptToken) < len(l.immediateTokens) && l.immediateTokens[st.AcceptToken]
@@ -429,7 +478,7 @@ func (l *Lexer) scanContiguousInto(startState uint32, startPos int, startRow, st
 			zeroWidthVisible := st.AcceptToken > 0 && scanPos == tokenStartPos && !l.allowsZeroWidthToken(st.AcceptToken)
 			if !(isImmediate && skippedWhitespace) && !zeroWidthVisible {
 				newPrio := st.AcceptPriority
-				if acceptPos < 0 || newPrio < acceptPriorityBest || (newPrio == acceptPriorityBest && scanPos > acceptPos) {
+				if acceptPos < 0 || newPrio < acceptPriorityBest || (newPrio == acceptPriorityBest && scanPos >= acceptPos) {
 					acceptPos = scanPos
 					acceptRow = scanRow
 					acceptCol = scanCol
@@ -515,20 +564,8 @@ func (l *Lexer) scanContiguousInto(startState uint32, startPos int, startRow, st
 	}
 
 	if acceptPos < 0 && eofHops > 0 {
-		// The DFA walk reached true EOF mid-scan and exhausted the per-state
-		// EOF-transition chain (tree-sitter's universal "if (eof) ADVANCE(...)"
-		// escape hatch, e.g. C case87 -> case99 in a compiled grammar's ts_lex)
-		// without any state along the way registering a real accept. In C
-		// tree-sitter, the chain's terminal state always calls
-		// ACCEPT_TOKEN(ts_builtin_sym_end) before END_STATE(), so a partially
-		// matched multi-character token (like AWK's "\\\n" line-continuation
-		// extras, which SKIPs the backslash before discovering there's no
-		// following newline) is silently absorbed as trivia at true EOF
-		// instead of failing the lex. Mirror that: accept an empty/skip token
-		// at the position reached (after any SKIP-consumed prefix). This only
-		// fires when nothing else was accepted along the path, so it can't
-		// override a real token match (e.g. an identifier ending at EOF
-		// accepts before its state's EOF check would ever run).
+		// Older blobs omit end-token acceptance. Preserve their EOF-chain
+		// fallback when no state records an acceptance.
 		acceptPos = scanPos
 		acceptRow = scanRow
 		acceptCol = scanCol
@@ -656,9 +693,6 @@ func (l *Lexer) allowsZeroWidthToken(sym Symbol) bool {
 	return int(sym) < len(l.zeroWidthTokens) && l.zeroWidthTokens[sym]
 }
 
-// A generated C DFA sees rune zero at EOF. An explicit EOF branch takes
-// precedence; otherwise a transition containing zero can accept a zero-width
-// terminal. Callers bound EOF hops and never advance the physical position.
 func lexerEOFState(state *LexState) int {
 	if state.EOF >= 0 {
 		return state.EOF

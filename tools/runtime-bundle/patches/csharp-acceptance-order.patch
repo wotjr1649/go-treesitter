@@ -1,0 +1,125 @@
+diff --git a/glr.go b/glr.go
+--- a/glr.go
++++ b/glr.go
+@@ -72,6 +72,8 @@
+ 	dead bool
+ 	// accepted is set when the stack reaches a ParseActionAccept.
+ 	accepted bool
++	// C uses acceptance time to resolve equal positive-cost trees.
++	cAcceptOrder uint64
+ 	// shifted is set when this stack consumed the current token via a SHIFT
+ 	// action in a GLR fork that also produced REDUCE actions. When the
+ 	// reducing stacks cause the same token to be re-processed, shifted
+@@ -712,6 +714,7 @@
+ 			cRec:                       s.cRec.clone(),
+ 			cRecoverMissingGroup:       s.cRecoverMissingGroup,
+ 			cRecoveryDispatchPending:   s.cRecoveryDispatchPending,
++			cAcceptOrder:               s.cAcceptOrder,
+ 			diagnosticTopology:         s.diagnosticTopology,
+ 			cNodeBaseline:              s.cNodeBaseline,
+ 			cEntryAggGen:               s.cEntryAggGen,
+@@ -735,6 +738,7 @@
+ 		cRec:                       s.cRec.clone(),
+ 		cRecoverMissingGroup:       s.cRecoverMissingGroup,
+ 		cRecoveryDispatchPending:   s.cRecoveryDispatchPending,
++		cAcceptOrder:               s.cAcceptOrder,
+ 		diagnosticTopology:         s.diagnosticTopology,
+ 		cNodeBaseline:              s.cNodeBaseline,
+ 		cEntryAggGen:               s.cEntryAggGen,
+@@ -761,6 +765,7 @@
+ 		cRec:                       s.cRec.clone(),
+ 		cRecoverMissingGroup:       s.cRecoverMissingGroup,
+ 		cRecoveryDispatchPending:   s.cRecoveryDispatchPending,
++		cAcceptOrder:               s.cAcceptOrder,
+ 		diagnosticTopology:         s.diagnosticTopology,
+ 		cNodeBaseline:              s.cNodeBaseline,
+ 		cEntryAggGen:               s.cEntryAggGen,
+diff --git a/parser.go b/parser.go
+--- a/parser.go
++++ b/parser.go
+@@ -22,6 +22,7 @@
+ // Parser is not safe for concurrent use. Use one parser per goroutine, a
+ // ParserPool, or guard shared parser instances with external synchronization.
+ type Parser struct {
++	cNextAcceptOrder    uint64
+ 	language            *Language
+ 	reuseCursor         reuseCursor
+ 	reuseScratch        reuseScratch
+@@ -2917,7 +2918,7 @@
+ 			if semanticPhaseTraceActive() {
+ 				semanticPhaseTraceRecordActionExecution(p, s, tok, act, 0, "eof-prefix-accept", false)
+ 			}
+-			s.accepted = true
++			p.acceptStack(s)
+ 			if workCountInstrumentationEnabled {
+ 				workCountTopologyRecordActionResult(s)
+ 			}
+@@ -5747,6 +5748,7 @@
+ 		return finalizeRecoveredNodes(nodes), true
+ 	}
+ 
++	p.cNextAcceptOrder = 0
+ 	stacks, maxStacksSeen = p.newInitialParseStacks(scratch, reuse, timing, len(source))
+ 	if workCountInstrumentationEnabled && len(stacks) != 0 {
+ 		workCountTopologyRecordInitialVersion(&stacks[0]) // work-count-assembly: topology initial-version seam
+diff --git a/parser_recover_c.go b/parser_recover_c.go
+--- a/parser_recover_c.go
++++ b/parser_recover_c.go
+@@ -4877,7 +4877,7 @@
+ 	if debugRecoveryCycleChecks {
+ 		debugRecoveryCheckNodeAcyclic(p, arena, "recover-eof-accept-root", root)
+ 	}
+-	v.accepted = true
++	p.acceptStack(v)
+ 	v.shifted = true
+ 	workCountTopologyRetireVersion(v)
+ }
+diff --git a/parser_reduce.go b/parser_reduce.go
+--- a/parser_reduce.go
++++ b/parser_reduce.go
+@@ -2926,12 +2926,20 @@
+ 	}
+ }
+ 
++func (p *Parser) acceptStack(s *glrStack) {
++	if !s.accepted && p != nil {
++		p.cNextAcceptOrder++
++		s.cAcceptOrder = p.cNextAcceptOrder
++	}
++	s.accepted = true
++}
++
+ func (p *Parser) applyAcceptAction(s *glrStack, tok Token, arena *nodeArena) {
+ 	if arena != nil && arena.legacyReuseReads != nil {
+ 		arena.legacyReuseReads.CommitDroppedInput(tok.lexerDroppedInput())
+ 	}
+ 	workCountRecordAccept()
+-	s.accepted = true
++	p.acceptStack(s)
+ 	workCountRecordAcceptedHead(p, s, "parse-action accept")
+ 	if p != nil && p.glrTrace {
+ 		fmt.Printf("      -> ACCEPT\n")
+@@ -2944,7 +2952,7 @@
+ 		if arena != nil && arena.legacyReuseReads != nil {
+ 			arena.legacyReuseReads.CommitDroppedInput(tok.lexerDroppedInput())
+ 		}
+-		s.accepted = true
++		p.acceptStack(s)
+ 		workCountRecordAcceptedHead(p, s, "EOF recovery accepted head")
+ 		return
+ 	}
+diff --git a/parser_result.go b/parser_result.go
+--- a/parser_result.go
++++ b/parser_result.go
+@@ -603,6 +603,11 @@
+ 			}
+ 			return -1
+ 		} else if ac > 0 {
++			if a.cAcceptOrder != 0 && b.cAcceptOrder != 0 && a.cAcceptOrder != b.cAcceptOrder {
++				if a.cAcceptOrder < b.cAcceptOrder {
++					return -1
++				}
++			}
+ 			return 1
+ 		}
+ 	}

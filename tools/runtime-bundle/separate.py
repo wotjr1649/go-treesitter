@@ -14,15 +14,29 @@ def owned(stem, langs):
                stem.endswith('_' + lang) for lang in langs)
 
 
+def optional_scanner_binding(files):
+    """Copy only the package-local binding helper into the optional adapter."""
+    path = 'grammars/runtime/external_scanner_binding.go'
+    try:
+        data = files[path]
+    except KeyError as error:
+        raise ValueError('missing optional scanner binding source: ' + path) from error
+    data, count = re.subn(rb'(?m)^package grammarruntime$', b'package gtsadapter', data, count=1)
+    if count != 1:
+        raise ValueError('optional scanner binding package drift: ' + path)
+    return {path.rsplit('/', 1)[-1]: data}
+
+
 def separate(files, module):
     """Return the main carrier and optional adapter payload, from reviewed bytes."""
     main = dict(files)
-    optional = {}
+    optional = optional_scanner_binding(files)
     for name, data in files.items():
         if not name.startswith('grammars/'):
             continue
         stem = name.rsplit('/', 1)[-1].split('.')[0]
-        if owned(stem, EXCLUDED):
+        # Upstream's gotreesitter_no_copyleft stubs are unused: the GPL module owns these grammars.
+        if owned(stem, EXCLUDED) or (owned(stem, GPL) and stem.endswith('_no_copyleft_stub')):
             del main[name]
         elif owned(stem, GPL):
             del main[name]
@@ -84,6 +98,9 @@ import (
 var blobs embed.FS
 
 var RegisterExternalLexStates = grammars.RegisterExternalLexStates
+type ExternalScannerSourceFile = grammarruntime.ExternalScannerSourceFile
+type ExternalScannerSpec = grammarruntime.ExternalScannerSpec
+var RegisterExternalScannerSpec = grammarruntime.RegisterExternalScannerSpec
 
 func loader(name string) func() *gotreesitter.Language {
     return func() *gotreesitter.Language { return grammarruntime.Language(name) }
@@ -98,6 +115,6 @@ func init() {
     grammars.RegisterExternalScanner("caddy", CaddyExternalScanner{})
     grammars.RegisterExternalScanner("disassembly", DisassemblyExternalScanner{})
 ''').encode() + b''.join(entries) + b'}\n'
-    if len(optional) != 8 or len(files) - len(main) != 30:  # 19 GPL + 11 excluded
+    if len(optional) != 9 or len(files) - len(main) != 34:  # 1 scanner binding + 19 GPL + 4 stubs + 11 excluded
         raise ValueError('GPL file inventory drift')
     return main, optional

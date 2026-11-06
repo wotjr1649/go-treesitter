@@ -1,22 +1,44 @@
 package gotreesitter
 
 type PerfCounters struct {
-	MergeCalls                           uint64
-	MergeDeadPruned                      uint64
-	MergePerKeyOverflow                  uint64
-	MergeReplacements                    uint64
-	StackEquivalentCalls                 uint64
-	StackEquivalentTrue                  uint64
-	StackEqHashMissSkips                 uint64
-	StackCompareCalls                    uint64
-	ConflictRR                           uint64
-	ConflictRS                           uint64
-	ConflictOther                        uint64
-	ForkCount                            uint64
-	FirstConflictToken                   uint64
-	MaxConcurrentStacks                  uint64
-	LexBytes                             uint64
-	LexTokens                            uint64
+	MergeCalls           uint64
+	MergeDeadPruned      uint64
+	MergePerKeyOverflow  uint64
+	MergeReplacements    uint64
+	StackEquivalentCalls uint64
+	StackEquivalentTrue  uint64
+	StackEqHashMissSkips uint64
+	StackCompareCalls    uint64
+	ConflictRR           uint64
+	ConflictRS           uint64
+	ConflictOther        uint64
+	ForkCount            uint64
+	FirstConflictToken   uint64
+	MaxConcurrentStacks  uint64
+	// GSSCanReachVisits counts gssNode visits inside gssNodeCanReach's DFS
+	// (glr.go), across every call in the parse. A fixed nesting depth that
+	// forks and merges on every token should keep this roughly linear in
+	// token count once depth-based pruning is in effect; before the prune it
+	// grows with the stack depth on every call, i.e. superlinearly.
+	GSSCanReachVisits uint64
+	// ShapePrefixWalkSteps counts the GSS nodes gssMaterializingShapePrefix
+	// (glr.go) had to hash because no cached prefix covered them, across the
+	// parse. A fixed nesting depth that forks and merges on every token
+	// should keep this roughly linear in token count; when every successful
+	// merge invalidated the whole cache it grew with the spine depth on every
+	// head hash, i.e. superlinearly (issue #454).
+	ShapePrefixWalkSteps uint64
+	// ShapePrefixEpochBumps counts full shape-prefix cache invalidations
+	// (glrMergeScratch.bumpShapePrefixEpoch) across the parse.
+	ShapePrefixEpochBumps uint64
+	LexBytes              uint64
+	LexTokens             uint64
+	// ProbeLexBytes and ProbeLexTokens count the compact EOF scanner
+	// quiescence probe's own lexing (proveCompactEOFScannerQuiescence,
+	// parsercore_phase0_eof_scanner_quiescence.go), kept apart from
+	// LexBytes/LexTokens, which name the parse's own token stream only.
+	ProbeLexBytes                        uint64
+	ProbeLexTokens                       uint64
 	ReuseNodesVisited                    uint64
 	ReuseNodesPushed                     uint64
 	ReuseNodesPopped                     uint64

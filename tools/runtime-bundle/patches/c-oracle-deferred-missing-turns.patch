@@ -1,0 +1,23 @@
+diff --git a/parser_recover_c.go b/parser_recover_c.go
+--- a/parser_recover_c.go
++++ b/parser_recover_c.go
+@@ -4697,7 +4697,7 @@
+ 				if (*stacks)[i].dead || (*stacks)[i].accepted {
+ 					continue
+ 				}
+-				if group.eagerMissingShiftEnd == pos && (*stacks)[i].cRecoverMissingGroup == group && (*stacks)[i].cRecoveryDispatchPending == recoveryturn.Resync && (*stacks)[i].byteOffset == pos {
++				if group.eagerMissingShiftEnd == pos && (*stacks)[i].cRecoverMissingGroup == group && (*stacks)[i].cRecoveryDispatchPending.DefersRecoveryCompetition(p.language.RecoveryMissingVersionTurnsCertified, p.compactPackedGSSVersionOrderEnabled()) && (*stacks)[i].byteOffset == pos {
+ 					continue
+ 				}
+ 				competitorPosition := (*stacks)[i].byteOffset
+diff --git a/grammars/runtime/runtime_profiles.go b/grammars/runtime/runtime_profiles.go
+--- a/grammars/runtime/runtime_profiles.go
++++ b/grammars/runtime/runtime_profiles.go
+@@ -242,6 +242,7 @@
+ 		automaticForestMemoryAllowance:    javascriptAutomaticForestMemoryAllowance,
+ 		compactConvergedSplitDrops:        true,
+ 		compactStrategy2ErrorRegion:       true,
++		recoveryMissingVersionTurns:       true,
+ 		compactS3MixedShiftReduceStates:   []gotreesitter.StateID{1042},
+ 		compactMissingTokenInsertion:      true,
+ 		compactRecoveryTrailingRetirement: true,

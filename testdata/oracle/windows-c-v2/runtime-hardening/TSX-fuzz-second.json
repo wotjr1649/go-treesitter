@@ -580,6 +580,6 @@
   "fixture": "TSX-fuzz-second",
   "language": "tsx",
   "source_sha256": "523b29451c372467e57d710907be79923b58f16fee77f7af35716a94086ad6fe",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "b436b55b9a03fd86b0098733cf8a8ad5106c81503884cf69c6e8355042fb1b70"
 }

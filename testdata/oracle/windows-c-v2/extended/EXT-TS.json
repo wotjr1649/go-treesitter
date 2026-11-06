@@ -466,6 +466,6 @@
   "fixture": "EXT-TS",
   "language": "typescript",
   "source_sha256": "9b3344189b94b3e04b7bf6b6256f0a9f165269843707d1351b42143e8a8576dc",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "2af931e503bdf49ad0be376cab50e28765c1465508afbec2f305f726491c7543"
 }

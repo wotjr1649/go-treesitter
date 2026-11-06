@@ -266,6 +266,15 @@ func NewAuthzedTokenSourceOrEOF(src []byte, lang *gotreesitter.Language) gotrees
 	return ts
 }
 
+// RebuildTokenSource provides an independent stream for incremental recovery
+// verification without carrying cursor, pending-token, or parser state.
+func (ts *AuthzedTokenSource) RebuildTokenSource(src []byte, lang *gotreesitter.Language) (gotreesitter.TokenSource, error) {
+	if lang == nil && ts != nil {
+		lang = ts.lang
+	}
+	return NewAuthzedTokenSource(src, lang)
+}
+
 // Reset reinitializes this token source for a new source buffer.
 func (ts *AuthzedTokenSource) Reset(src []byte) {
 	ts.src = src
@@ -280,6 +289,13 @@ func (ts *AuthzedTokenSource) Reset(src []byte) {
 // SupportsIncrementalReuse reports that AuthzedTokenSource preserves stable
 // token boundaries across edits and supports deterministic SkipToByte behavior.
 func (ts *AuthzedTokenSource) SupportsIncrementalReuse() bool {
+	return true
+}
+
+// SupportsIncrementalReuseFromErrorTree opts AuthzedTokenSource in to subtree
+// reuse from a previous parse that contains errors. Its recovery path on those
+// edits is covered by TestAuthzedTokenSourceIncrementalRetryHandlesAssociativityFirstByteToggle.
+func (ts *AuthzedTokenSource) SupportsIncrementalReuseFromErrorTree() bool {
 	return true
 }
 

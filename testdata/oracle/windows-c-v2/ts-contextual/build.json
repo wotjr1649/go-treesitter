@@ -3,13 +3,13 @@
   "pins": {
     "baseline": {
       "module": "github.com/odvcencio/gotreesitter",
-      "version": "v0.53.0",
-      "tag": "f102332cca9dc45e841b9439d34ba5cc59f0b10f",
-      "commit": "c871b1f576866c40b1695677fe3512243e266d39"
+      "version": "v0.56.0",
+      "tag": "7a1e5770e16d607a1f4dc3a6f8ce28342d0de187",
+      "commit": "ac4e027e02525e9d1d005c54ed5e54979271e4ed"
     },
     "grammars": {
       "go": {
-        "blob_sha256": "9cf914d26d962d1a62e7954f8b20b302337a44cb7d4a07218eec482c45a57a08",
+        "blob_sha256": "df63fc35604c4e4e7a484abde9eb2110b61640045601c23991723f323a48310d",
         "commit": "2346a3ab1bb3857b48b29d779a1ef9799a248cd7"
       },
       "python": {
@@ -21,16 +21,16 @@
         "commit": "58404d8cf191d69f2674a8fd507bd5776f46cb11"
       },
       "typescript": {
-        "blob_sha256": "46d8d4f7a0056db32e874500ae5b19170237e1628a63a9e3a401e0ee426d6126",
+        "blob_sha256": "1b6ace3de973196290411c0347013b9f2cc2385171c77dcf375e355f3c2cc90c",
         "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f"
       },
       "tsx": {
-        "blob_sha256": "bf8c490b0bbeb6d4150abce2edc193552e44b093893665dde69bd39e9e940e85",
+        "blob_sha256": "419002e62f0bbaf9a7f7bdc0fbe58799bf6ca94038550ccde33695c16859d984",
         "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f"
       },
       "c_sharp": {
-        "blob_sha256": "7ad425e89733339dde94e3c03b762ae478fb453b530493f5d62e1ae7537e1784",
-        "commit": "88366631d598ce6595ec655ce1591b315cffb14c"
+        "blob_sha256": "198db0d7544ae78c6ba533889e972d4371bdbcaba5d438e6f51e6cb95fff9bcf",
+        "commit": "9150f7d56bb47f1a809fa23623f1ba1413e93fa9"
       }
     },
     "oracle": {
@@ -177,16 +177,16 @@
     },
     "c_sharp": {
       "repository": "tree-sitter/tree-sitter-c-sharp",
-      "commit": "88366631d598ce6595ec655ce1591b315cffb14c",
-      "archive_sha256": "85b60efe8b048e48eb5d801994bc575ccf6e6d3235347931b0995d56613a6f57",
+      "commit": "9150f7d56bb47f1a809fa23623f1ba1413e93fa9",
+      "archive_sha256": "ac466e77381c60c877c5d90e929dd49051d02b5aadf9a562aafa388e495311a5",
       "files": {
         "LICENSE": "778fb7d63b8c1844da315648c02f325c4713a6f4a5d19644fd413421422776d3",
-        "src/grammar.json": "bc06b66a5760de961f4e0e4245aeb28d7cd79ba7c1d209581d21f4c8c37f311e",
-        "src/node-types.json": "3e6c0e6a1c8eaa81d694faf71e42ac2e9f4f2a61f29d190e6613ff3465670ad6",
-        "src/parser.c": "d1a24aa1157e19ed4cd0eb6980eeafe9959dbc85e72b7acc621443de3de8fe99",
-        "src/scanner.c": "00920daa0fdf3050d441475e8effe996b60ee8acc1bdbcbbc4c83d56a6987705",
+        "src/grammar.json": "f63299656c0072ff9f2b18a54bfba31541e54bcbc20c0b091e0e19189c7ef593",
+        "src/node-types.json": "54bf9fa925bac6fcdc05e0221ae8d4a62c155eb43ccd72b5bc2a4bdbebb7997e",
+        "src/parser.c": "2549deeed0c8aeb84f42f9ccd3cf9de047a0c609387075a97784fddb2d1770cd",
+        "src/scanner.c": "2ee1241a6a275e72a06838f5df927700bd405c16b48f986e2c33d1264cae4818",
         "src/tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
-        "src/tree_sitter/array.h": "4483dc3d37ab62fc8cabd5cfbd7de8267a2b1e3b12da3a90a5b8b324dacd5498",
+        "src/tree_sitter/array.h": "5bdf6ed1a78e3409fd443e085ca967a64c188a5d082aaf7f819bccd53a471c94",
         "src/tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
       }
     }
@@ -268,7 +268,7 @@
       "runtime_header_sha256": "a363e2f2120178702374d8e34f8af9d3b7b2124a2c9e0cc33e57ded13db59b48",
       "parser_sha256": "3dbf6ed1238b5dfcf2be4d2f2d4cb27a14d34f34d7784eccccbfd532fd4a6d85",
       "executable": "go.exe",
-      "executable_sha256": "4910a998c4109c0519e7b002811f3fec4dbe95f5d8c07c109f80fc37c9eb8b53"
+      "executable_sha256": "4ef5407a9f2b21223359ead3c4dbbccded7a9acc097d79bc7970040579dfc851"
     },
     "python": {
       "generator_mode": "checked-in",
@@ -279,7 +279,7 @@
       "runtime_header_sha256": "a363e2f2120178702374d8e34f8af9d3b7b2124a2c9e0cc33e57ded13db59b48",
       "parser_sha256": "53a7bd87ba22c4fdbb8566a2caf848a1478f3ac9d47a1b32677a71de75d75db6",
       "executable": "python.exe",
-      "executable_sha256": "46b532fea392281aea9eabb957abfba05278429bad792406c57192c48b453f9e"
+      "executable_sha256": "0fb831426e532a1c20c7920308f42afbb73d7f4ce1590920b568b948f34c6da6"
     },
     "javascript": {
       "generator_mode": "checked-in",
@@ -290,7 +290,7 @@
       "runtime_header_sha256": "a363e2f2120178702374d8e34f8af9d3b7b2124a2c9e0cc33e57ded13db59b48",
       "parser_sha256": "67209ca7ef6e1a4f74e29e48b5928455f892fe1821a3960fbcd62f4e972f7384",
       "executable": "javascript.exe",
-      "executable_sha256": "006b159dfb193302fe297bfb7e6694ad6ab9a2d4d8c384f0a9812ca7754d4575"
+      "executable_sha256": "2c127c798c4ea3baeb1c89d816e8a4f1909480907b3780c027cebf6b56816263"
     },
     "typescript": {
       "generator_mode": "generated",
@@ -302,7 +302,7 @@
       "parser_sha256": "3e9fd57d477f0830937cab119680e04995a08d3b96e9f6ad9d27ca6a8fc939f6",
       "generator_executable_sha256": "9fbc4f285c876b1a38c7e9d5223a51fb7842255285cdd7db3ffb0ba3934f2662",
       "executable": "typescript.exe",
-      "executable_sha256": "d554e36d2b94ee7a0c918d6e9578ba821fc23eb9eec0200b31fc28328e81f196"
+      "executable_sha256": "1b9be4c93ca11a1c54382c491852e18dd4e72cd7dcca70b7c9b5ecd659d9a413"
     },
     "tsx": {
       "generator_mode": "generated",
@@ -314,7 +314,7 @@
       "parser_sha256": "751eab74ee13a4912e41d52fefcdcb69b7452d32f0e38e3cefc22f746cb10cc8",
       "generator_executable_sha256": "9fbc4f285c876b1a38c7e9d5223a51fb7842255285cdd7db3ffb0ba3934f2662",
       "executable": "tsx.exe",
-      "executable_sha256": "7b48bd12779672620cbc7a6402e80865e15e9c32d74860ac5d8416d01244a227"
+      "executable_sha256": "a0eee7ddee665cb83634e106733d2b3ba04ebaa9e31b9aecae17081e3fd1f79b"
     },
     "c_sharp": {
       "generator_mode": "checked-in",
@@ -323,9 +323,9 @@
       "runtime_abi_min": 13,
       "runtime_abi_max": 15,
       "runtime_header_sha256": "a363e2f2120178702374d8e34f8af9d3b7b2124a2c9e0cc33e57ded13db59b48",
-      "parser_sha256": "d1a24aa1157e19ed4cd0eb6980eeafe9959dbc85e72b7acc621443de3de8fe99",
+      "parser_sha256": "2549deeed0c8aeb84f42f9ccd3cf9de047a0c609387075a97784fddb2d1770cd",
       "executable": "c_sharp.exe",
-      "executable_sha256": "fad674c4632b7436101878d85c354fdbe9af717edac1a4c352ae9b579b901abb"
+      "executable_sha256": "a8bb9fde9e7a5bcbc800ab637a9d5138f352f765d282b07829ea0bd41649d026"
     }
   }
 }

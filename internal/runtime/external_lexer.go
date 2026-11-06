@@ -2,6 +2,11 @@ package gotreesitter
 
 import "unicode/utf8"
 
+// byteOrderMarkRune is the decoded rune value of a UTF-8 byte order mark
+// (the bytes 0xEF 0xBB 0xBF). C tree-sitter excludes it from the column
+// count when it is the first character of the source.
+const byteOrderMarkRune = '\uFEFF'
+
 // ExternalLexer is the scanner-facing lexer API used by external scanners.
 // It mirrors the essential tree-sitter scanner API: lookahead, advance,
 // mark_end, and result_symbol.
@@ -16,6 +21,21 @@ type ExternalLexer struct {
 	point      Point
 	endPoint   Point
 	endMarked  bool
+
+	// columnData caches the number of code points seen since the start of
+	// the current line, matching C tree-sitter's column_data cache. It is
+	// invalid after any positional jump (reset, clearSource) and gets
+	// recomputed lazily the next time Column() runs. Advance, AdvanceSpaces,
+	// and AdvanceUntilNewline keep it up to date in place when it is valid.
+	columnDataValid bool
+	columnData      uint32
+
+	// didGetColumn records that this scan attempt read Column at least
+	// once. It mirrors C tree-sitter's Lexer.did_get_column (lexer.h:34),
+	// which ts_lexer__get_column sets (lexer.c:324) and ts_lexer_start
+	// clears at the start of every scan attempt (lexer.c:434). reset is
+	// this runtime's ts_lexer_start, so it clears the field.
+	didGetColumn bool
 
 	// advancedContent is set when Advance(false) is called at least once.
 	// It is only used to preserve an explicit MarkEnd position when later
@@ -35,6 +55,9 @@ type ExternalLexer struct {
 type externalReadFrontier struct {
 	lookahead uint32
 	examined  uint32
+	// Forward byte dependencies cannot certify source reads before a scan.
+	// Keep this outside value-copy rollback, like the examined frontier.
+	nonlocal bool
 }
 
 func (l *ExternalLexer) clearSource() {
@@ -59,6 +82,9 @@ func (l *ExternalLexer) reset(source []byte, pos int, row, col uint32) {
 	l.resultSymbol = 0
 	l.hasResult = false
 	l.lookaheadEndByte = 0
+	l.columnDataValid = false
+	l.columnData = 0
+	l.didGetColumn = false
 }
 
 func newExternalLexer(source []byte, pos int, row, col uint32) *ExternalLexer {
@@ -100,6 +126,9 @@ func (l *ExternalLexer) Lookahead() rune {
 // the current position plus the valid-symbol set, not on bytes before it. A
 // scanner that calls Previous() must not claim StatelessExternalScanner.
 func (l *ExternalLexer) Previous() rune {
+	if l != nil && l.readFrontier != nil {
+		l.readFrontier.nonlocal = true
+	}
 	if l == nil || l.pos <= 0 || l.pos > len(l.source) {
 		return 0
 	}
@@ -121,12 +150,18 @@ func (l *ExternalLexer) Advance(skip bool) {
 	if b >= utf8.RuneSelf {
 		r, size = utf8.DecodeRune(l.source[l.pos:])
 	}
+	isBOM := l.pos == 0 && r == byteOrderMarkRune
 	l.pos += size
 	l.recordReadFrontier()
 	if r == '\n' {
 		l.point.Row++
 		l.point.Column = 0
+		l.columnData = 0
+		l.columnDataValid = true
 	} else {
+		if l.columnDataValid && !isBOM {
+			l.columnData++
+		}
 		l.point.Column += uint32(size)
 	}
 
@@ -163,6 +198,9 @@ func (l *ExternalLexer) AdvanceSpaces(skip bool) int {
 	l.recordReadFrontier()
 	n := l.pos - start
 	l.point.Column += uint32(n)
+	if l.columnDataValid {
+		l.columnData += uint32(n)
+	}
 	if skip {
 		l.startPos = l.pos
 		l.startPoint = l.point
@@ -191,6 +229,13 @@ func (l *ExternalLexer) AdvanceUntilNewline(skip bool) int {
 	l.recordReadFrontier()
 	n := l.pos - start
 	l.point.Column += uint32(n)
+	if l.columnDataValid {
+		segment := l.source[start:l.pos]
+		if start == 0 && hasBOMPrefix(segment) {
+			segment = segment[3:]
+		}
+		l.columnData += uint32(utf8.RuneCount(segment))
+	}
 	if skip {
 		l.startPos = l.pos
 		l.startPoint = l.point
@@ -239,17 +284,117 @@ func (l *ExternalLexer) lookaheadEndByteAtCursor() uint32 {
 	return uint32(frontier)
 }
 
+// recordReadFrontier updates the observer's frontier/examined maxima for the
+// current cursor position. It is called on essentially every ExternalLexer
+// primitive (Lookahead, Advance, AdvanceSpaces, AdvanceUntilNewline, and at
+// EOF), including more than once per position when a scanner peeks or marks
+// without advancing in between -- a benchmark host's harness measured that
+// recomputing lookaheadEndByteAtCursor's decode plus both maxUint32 updates
+// on every one of those calls costs YAML 25% flat.
+//
+// The lazy skip below must reproduce EXACTLY what the eager form above always
+// computed: the running max of lookaheadEndByteAtCursor(pos) over every call.
+// A skip is only sound when THIS position's contribution provably cannot
+// exceed what an earlier call already recorded -- earlier meaning temporally
+// earlier, not necessarily at a smaller pos, since a scanner can roll back
+// its cursor after a speculative read (rf outlives any single value-copy of
+// the ExternalLexer; see the readFrontier field doc comment).
+// lookaheadEndByteAtCursor's own frontier for a given pos is exactly pos+1
+// for an ASCII byte (or at EOF, where there is no byte to decode) and can
+// reach pos+5 for a non-ASCII lead byte that turns out to be invalid UTF-8 --
+// and that penalty was never evaluated for THIS pos if the previously
+// recorded max came from decoding a DIFFERENT, farther-ahead position. So:
+//
+//   - ASCII byte at pos, or pos at/past EOF: the contribution is exactly
+//     pos+1, no ambiguity, so skip once the recorded frontier already
+//     reaches pos+1. This covers the common cases -- a repeated peek at an
+//     unchanged pos, and backtracking into ASCII territory an earlier
+//     forward scan already covered -- with one cheap byte read.
+//   - Non-ASCII byte at pos: skip only once the recorded frontier already
+//     clears pos+5, the worst case regardless of this byte's actual
+//     validity. Otherwise fall through to the exact computation.
+
+// recordReadFrontierObserverForTest, when non-nil, is called with the cursor
+// position on every recordReadFrontier invocation, including one the lazy
+// skip below short-circuits. It exists solely so an external differential
+// test (external_lexer_frontier_differential_test.go) can independently
+// replay the exact position sequence a real scan visits through the eager
+// formula and compare the result against the lazy path's actual output. It
+// is nil outside that test, costing one nil check per call.
+var recordReadFrontierObserverForTest func(pos int)
+
 func (l *ExternalLexer) recordReadFrontier() {
-	if l.readFrontier != nil {
-		frontier := l.lookaheadEndByteAtCursor()
-		l.readFrontier.lookahead = maxUint32(l.readFrontier.lookahead, frontier)
-		l.readFrontier.examined = maxUint32(l.readFrontier.examined, tokenInvariantExaminedEnd(l.source, frontier))
+	if recordReadFrontierObserverForTest != nil {
+		recordReadFrontierObserverForTest(l.pos)
 	}
+	rf := l.readFrontier
+	if rf == nil {
+		return
+	}
+	pos := l.pos
+	if pos < 0 {
+		pos = 0
+	}
+	deterministic := pos >= len(l.source) || l.source[pos] < utf8.RuneSelf
+	if deterministic {
+		if uint64(pos)+1 <= uint64(rf.lookahead) {
+			return
+		}
+	} else if uint64(pos)+5 <= uint64(rf.lookahead) {
+		return
+	}
+	frontier := l.lookaheadEndByteAtCursor()
+	rf.lookahead = maxUint32(rf.lookahead, frontier)
+	rf.examined = maxUint32(rf.examined, tokenInvariantExaminedEnd(l.source, frontier))
 }
 
-// Column returns the current column (0-based) at the scanner cursor.
+// Column returns the number of code points since the start of the current
+// line at the scanner cursor (0-based), matching C tree-sitter's
+// ts_lexer__get_column. This is a code-point count, not a byte offset:
+// each multi-byte UTF-8 rune before the cursor on this line counts once. A
+// leading byte order mark at the very start of the source does not count.
+// Token StartPoint/EndPoint columns remain byte offsets; use those for byte
+// positions and Column only for code-point-based scanner logic (for example,
+// fixed-column layouts).
 func (l *ExternalLexer) Column() uint32 {
-	return l.point.Column
+	if l.readFrontier != nil {
+		l.readFrontier.nonlocal = true
+	}
+	l.didGetColumn = true
+	if !l.columnDataValid {
+		l.computeColumnData()
+	}
+	return l.columnData
+}
+
+// computeColumnData recomputes columnData by walking the current line's
+// bytes from its start up to the cursor, mirroring C's lazy recomputation
+// in ts_lexer__get_column: back up to the line start, then count code
+// points up to the goal byte.
+func (l *ExternalLexer) computeColumnData() {
+	lineStart := l.pos - int(l.point.Column)
+	if lineStart < 0 {
+		lineStart = 0
+	}
+	end := l.pos
+	if end > len(l.source) {
+		end = len(l.source)
+	}
+	if lineStart > end {
+		lineStart = end
+	}
+	segment := l.source[lineStart:end]
+	if lineStart == 0 && hasBOMPrefix(segment) {
+		segment = segment[3:]
+	}
+	l.columnData = uint32(utf8.RuneCount(segment))
+	l.columnDataValid = true
+}
+
+// hasBOMPrefix reports whether b starts with the UTF-8 byte order mark
+// (0xEF 0xBB 0xBF).
+func hasBOMPrefix(b []byte) bool {
+	return len(b) >= 3 && b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF
 }
 
 // GetColumn returns the current column (0-based) at the scanner cursor.
@@ -265,6 +410,9 @@ func (l *ExternalLexer) GetColumn() uint32 {
 func (l *ExternalLexer) HasPreviousBytes(text string) bool {
 	if text == "" {
 		return true
+	}
+	if l.readFrontier != nil {
+		l.readFrontier.nonlocal = true
 	}
 	start := l.pos - len(text)
 	if start < 0 {
@@ -309,6 +457,7 @@ func (l *ExternalLexer) token() (Token, bool) {
 			StartPoint:            endPoint,
 			EndPoint:              endPoint,
 			lexerLookaheadEndByte: lookaheadEndByte,
+			lexFlags:              lexFlagIf(l.didGetColumn, tokenFlagDependsOnColumn),
 		}, true
 	}
 
@@ -324,5 +473,6 @@ func (l *ExternalLexer) token() (Token, bool) {
 		StartPoint:            l.startPoint,
 		EndPoint:              endPoint,
 		lexerLookaheadEndByte: lookaheadEndByte,
+		lexFlags:              lexFlagIf(l.didGetColumn, tokenFlagDependsOnColumn),
 	}, true
 }

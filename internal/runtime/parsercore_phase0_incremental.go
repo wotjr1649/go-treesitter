@@ -8,6 +8,7 @@ import (
 	"unsafe"
 
 	core "github.com/wotjr1649/go-treesitter/internal/runtime/internal/parsercorephase0"
+	"github.com/wotjr1649/go-treesitter/internal/runtime/internal/sched"
 )
 
 func (p *Parser) recordLegacyParserEntry() {
@@ -70,9 +71,11 @@ var errCompactIncrementalReuseUnauthenticatedCandidates = errors.New(
 	"compact incremental reuse declined: in-scope candidates were offered but not authenticated")
 
 func (p *Parser) attemptCompactIncrementalParse(source []byte, oldTree *Tree, timing *incrementalParseTiming) (*Tree, string, bool) {
-	if oldTree == nil || oldTree.language != p.language || !oldTree.compactMaterialized ||
-		oldTree.incrementalReuseDisabled || len(oldTree.edits) == 0 ||
-		oldTree.root == nil || oldTree.root.HasError() || p.recoveryInitialOnly ||
+	// The capability table decides whether compact can reuse this old tree and
+	// scanner. The scanner check runs after the token-invariant probe below,
+	// because that probe is legacy reuse and serves stateful scanners too.
+	reuseModes := p.schedOldTreeModes(oldTree)
+	if reuseModes&sched.OldTreeReuse != 0 || p.recoveryInitialOnly ||
 		!p.admissionCandidateFullParseEligible(nil, true) {
 		return nil, "", false
 	}
@@ -93,11 +96,8 @@ func (p *Parser) attemptCompactIncrementalParse(source []byte, oldTree *Tree, ti
 			timing.reuseNanos += probeNanos
 		}
 	}
-	if p.language.ExternalScanner != nil {
-		stateless, ok := p.language.ExternalScanner.(StatelessExternalScanner)
-		if !ok || !stateless.ExternalScannerIsStateless() {
-			return nil, "", false
-		}
+	if reuseModes&sched.ScannerStateReuse != 0 {
+		return nil, "", false
 	}
 	started := time.Now()
 	if timing != nil {
@@ -105,10 +105,11 @@ func (p *Parser) attemptCompactIncrementalParse(source []byte, oldTree *Tree, ti
 	}
 	endBudget := p.enterParseBudget()
 	defer endBudget()
-	runner, err := p.acquireAdmissionCandidateRunner()
+	runner, borrowed, err := p.borrowAdmissionCandidateRunner()
 	if err != nil {
 		return nil, err.Error(), false
 	}
+	defer p.returnAdmissionCandidateRunner(runner, borrowed)
 	oldTree.ensureParentLinks()
 	p.reuseMu.Lock()
 	defer p.reuseMu.Unlock()
@@ -157,7 +158,7 @@ func (p *Parser) attemptCompactIncrementalParse(source []byte, oldTree *Tree, ti
 	tree.ensureParentLinks()
 	if timing != nil {
 		timing.oldTreeReuseRoute = true
-		timing.newNodes = uint64(tree.parseRuntime.NodesAllocated)
+		timing.newNodes = uint64(tree.rawParseRuntime().NodesAllocated)
 		timing.selectResult(tree)
 	}
 	return tree, "", false
@@ -262,7 +263,7 @@ func (s *compactIncrementalReuseSession) candidateInScope(p *Parser, node *Node,
 func (s *compactIncrementalReuseSession) candidateState(p *Parser, node *Node, state StateID, offset uint32, lookahead Token) (StateID, bool) {
 	if node == nil || node.ChildCount() == 0 || node.IsExtra() || node.HasError() ||
 		node.dirty() || node.isFragile() || !compactNodeMayBeReused(node) ||
-		!compactNodeStateProofAvailable(node) || node.PreGotoState() != state ||
+		!compactNodeStateProofAvailable(node) || !s.dependencyUnchanged(node) || node.PreGotoState() != state ||
 		(!s.cursor.topLevelSiblingBlockSpliceEligible(node) && !s.nestedCandidateScopeEligible(p, node, lookahead)) ||
 		!s.cursor.nodeBytesUnchanged(node.StartByte(), node.EndByte()) ||
 		!reuseSubtreeGapIsParserPadding(s.cursor.newSource, offset, node.StartByte(), p.lineContinuationEscapeByte()) {
@@ -280,7 +281,7 @@ func (s *compactIncrementalReuseSession) nestedCandidateScopeEligible(p *Parser,
 	if s.oldTree == nil || node.parent == nil || node.parent.parent != s.oldTree.root ||
 		!node.parent.dirty() || !node.isCompactMaterialized() ||
 		uint32(node.symbol) < p.language.TokenCount || !p.isVisibleSymbol(node.symbol) ||
-		s.cursor.rightBoundaryTouchedByEdit(node.EndByte()) || !s.nestedDependencyUnchanged(node) {
+		s.cursor.rightBoundaryTouchedByEdit(node.EndByte()) || !s.dependencyUnchanged(node) {
 		return false
 	}
 	leaf := leftmostLeaf(node)

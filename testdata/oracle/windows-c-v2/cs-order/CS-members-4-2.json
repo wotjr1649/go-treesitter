@@ -713,6 +713,6 @@
   "fixture": "CS-members-4-2",
   "language": "c_sharp",
   "source_sha256": "55aa271550283538204a3e2d9cd42f417cf827bdd9f1fcc9b34c7bec84f6c86c",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "00d315fb6bd171e3e55962c341398776360cc335f79892012ae2172d972f2571"
 }

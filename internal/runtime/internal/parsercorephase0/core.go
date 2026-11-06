@@ -496,8 +496,10 @@ type nodeLineageRecord struct {
 	// graph node. Recovery discontinuity merges compare it before they add a
 	// null edge. Keep it in lineage metadata so nodeRecord stays size-stable.
 	storedErrorCost uint32
-	dropCohortRefs  DropCohortRefSet
-	set             AlternativeSet
+	// Zero means no references. Nonzero indices name immutable sets shared
+	// by lineage copies, so every node need not embed the 72-byte set.
+	dropCohortRefIndex uint32
+	set                AlternativeSet
 	// transition only, deleted at stage 3 cleanup (spec.b4b-alternative-set.v1
 	// section 3.2):
 	lineage   uint16
@@ -510,25 +512,21 @@ type nodeLineageRecord struct {
 	blended bool
 }
 
-// Field order groups the two uint32 members (node, owner, setSpillRef)
-// before the trailing byte/uint16-sized fields: setSpillRef needs 4-byte
-// alignment, so declaring it after the 1-byte setCount/setFlags pair (as an
-// earlier revision did) forced 2 bytes of mid-struct padding that this order
-// avoids, matching journal-append-site field order 1:1 (every
-// nodeLineageJournal append already names every field, so this reorder is
-// layout-only and touches no call site).
+// Journal reference indices alongside the scalar metadata. Ordinary owner or
+// cost updates do not copy proof sets; rollback restores the index and the
+// checkpoint's immutable reference arena.
 type nodeLineageMutation struct {
-	node            NodeID
-	owner           uint32
-	dropCohortRefs  DropCohortRefSet
-	setSpillRef     uint32
-	setCount        uint8
-	setFlags        uint8
-	lineage         uint16
-	rank            CleanPathRankSelection
-	converged       bool
-	blended         bool
-	storedErrorCost uint32
+	node               NodeID
+	owner              uint32
+	dropCohortRefIndex uint32
+	setSpillRef        uint32
+	setCount           uint8
+	setFlags           uint8
+	lineage            uint16
+	rank               CleanPathRankSelection
+	converged          bool
+	blended            bool
+	storedErrorCost    uint32
 }
 
 // alternativeSetInlineCapacity is the fixed inline member width of
@@ -537,28 +535,13 @@ type nodeLineageMutation struct {
 // would exceed it stops recording new members and reports Overflowed.
 // spec.b4b-alternative-set.v1 section 3.2, open question 5.
 //
-// v2 widened one packed member from uint16 (event only) to uint32 (event,
-// branch), doubling AlternativeSet's inline array from 8 to 16 bytes and,
-// with it, every by-value container that embeds a set (nodeLineageRecord,
-// ReductionOutput, and diagnosticParserCoreHeader's two copies) -- paid on
-// every header canonicalize double-buffer copy, rollback scratch snapshot,
-// and reduction-output propagation, whether or not that particular set is
-// ever populated (b4b-width-repair audit, 2026-08). 4 was never a load-
-// bearing width: the canonical-fixture census (four fixtures, 8537 converged
-// -split elections) shows 8519/8537 (99.8%) already touch a spilled set by
-// election time and 8424/8537 (98.7%) are already Overflowed at the hard
-// cap, so the inline/spill boundary is nearly vestigial in steady state.
-// Lowering it to 2 -- matching "canonical reductions produce one output 95%
-// of the time and at most two observed" (packAlternativeSetMember's doc
-// comment; census maxBranch=1 on all four fixtures) so a fresh establishment
-// plus one sibling union still never spills -- restores AlternativeSet's
-// inline array to its pre-v2 8 bytes (2 members x 4 bytes, vs. the original
-// 4 members x 2 bytes) at the same total 16-byte struct size, with no change
-// to member encoding, hard cap, or any observable membership: spilled
-// storage is exact and zero-alloc once warm (alternativeSetInsert/
-// alternativeSetMembers already treat inline and spilled uniformly).
+// A singleton stays inline. Larger sets use the existing exact append-only
+// spill arena. The narrower view reduces copies in version headers, graph
+// lineage records and reduction handoffs; the cost is spilling two-member
+// sets earlier. Member encoding, the hard cap, overflow behavior and rollback
+// remain unchanged. See the real-corpus matrix for the measured tradeoff.
 const (
-	alternativeSetInlineCapacity = 2
+	alternativeSetInlineCapacity = 1
 	alternativeSetHardCap        = 32
 )
 
@@ -1135,6 +1118,9 @@ type CondenseCandidate struct {
 	ErrorCost     uint32
 	MergeIdentity uint16
 	Shifted       bool
+	// Independent keeps an incompatible lexer owner live for freshness and
+	// provenance checks, while excluding it from this dispatch's graph merges.
+	Independent bool
 }
 
 // Derivation is one retained exact root-to-head path after local shallow-link
@@ -1301,6 +1287,7 @@ type Core struct {
 	diagnostics        diagnosticOptions
 	nodes              []nodeRecord
 	nodeLineages       []nodeLineageRecord
+	nodeLineageRefSets []DropCohortRefSet
 	nodeCheckpoints    []CheckpointID
 	links              []linkRecord
 
@@ -1343,7 +1330,7 @@ type Core struct {
 	// nodeLineageJournal; a rolled-back or superseded segment leaks arena
 	// space until then, bounded by alternativeSetHardCap per record.
 	alternativeSpillArena          []uint32
-	dropCohortRefSpill             []DropCohortRef
+	dropCohortRefSpill             []dropCohortRefRecord
 	dropCohortActions              []dropCohortActionIdentity
 	dropCohortRecords              []dropCohortRecord
 	dropCohortMembers              []dropCohortMember
@@ -1520,6 +1507,7 @@ type diagnosticOptions struct {
 }
 
 type checkpoint struct {
+	nodeLineageRefSets                                                        []DropCohortRefSet
 	nodes, nodeLineages, nodeCheckpoints, links, subtrees, externalProvenance int
 	missingLeafProvenance                                                     int
 	lexerSkippedPrefixes                                                      int
@@ -1586,7 +1574,7 @@ type checkpoint struct {
 	dropCohortReservationsCap                                                 int
 	dropCohortLinkRefIndexesHeader                                            []uint32
 	dropCohortLinkRefJournalHeader                                            []dropCohortLinkRefMutation
-	dropCohortRefSpillHeader                                                  []DropCohortRef
+	dropCohortRefSpillHeader                                                  []dropCohortRefRecord
 	dropCohortActionsHeader                                                   []dropCohortActionIdentity
 	dropCohortRecordsHeader                                                   []dropCohortRecord
 	dropCohortMembersHeader                                                   []dropCohortMember
@@ -1642,7 +1630,8 @@ func (c *Core) markInto(mark *checkpoint) {
 	c.nextTransaction++
 	*mark = checkpoint{
 		nodes: len(c.nodes), nodeLineages: len(c.nodeLineages),
-		links: len(c.links), subtrees: len(c.subtrees),
+		nodeLineageRefSets: c.nodeLineageRefSets,
+		links:              len(c.links), subtrees: len(c.subtrees),
 		nodeCheckpoints:                 len(c.nodeCheckpoints),
 		externalProvenance:              len(c.externalProvenance),
 		missingLeafProvenance:           len(c.missingLeafProvenance),
@@ -1756,6 +1745,7 @@ func (c *Core) restoreCheckpoint(mark *checkpoint) {
 	c.classificationPhase++
 	c.nodes = c.nodes[:mark.nodes]
 	c.nodeLineages = c.nodeLineages[:mark.nodeLineages]
+	c.nodeLineageRefSets = mark.nodeLineageRefSets
 	c.nodeCheckpoints = c.nodeCheckpoints[:mark.nodeCheckpoints]
 	c.links = c.links[:mark.links]
 	c.subtrees = c.subtrees[:mark.subtrees]
@@ -1796,7 +1786,7 @@ func (c *Core) restoreCheckpoint(mark *checkpoint) {
 		}
 		c.nodeLineages[nodeIndex].owner = mutation.owner
 		c.nodeLineages[nodeIndex].storedErrorCost = mutation.storedErrorCost
-		c.nodeLineages[nodeIndex].dropCohortRefs = mutation.dropCohortRefs
+		c.nodeLineages[nodeIndex].dropCohortRefIndex = mutation.dropCohortRefIndex
 		c.nodeLineages[nodeIndex].set.count = mutation.setCount
 		c.nodeLineages[nodeIndex].set.flags = mutation.setFlags
 		c.nodeLineages[nodeIndex].set.spillRef = mutation.setSpillRef
@@ -1972,6 +1962,7 @@ func (c *Core) RunFreshSchedulerSession(fn func(SchedulerTransactionToken) error
 	if err := c.advanceDropCohortEpoch(); err != nil {
 		return err
 	}
+	c.reductionScratch.pressureSeen = false
 	frame.clearInactive()
 	frame.epoch++
 	c.nextTransaction++
@@ -1984,6 +1975,7 @@ func (c *Core) RunFreshSchedulerSession(fn func(SchedulerTransactionToken) error
 		// Historical certificate authentication is scoped to this fresh session.
 		// Clear the policy before invalidating the owner frame on every exit.
 		c.historicalCertificateAuthentication = false
+		c.reductionScratch.pressureSeen = false
 		if recovered != nil {
 			frame.clearInactive()
 			_ = c.ResetReleasingRetention()
@@ -2377,6 +2369,7 @@ func (c *Core) Reset() error {
 	}
 	c.nodes = c.nodes[:0]
 	c.nodeLineages = c.nodeLineages[:0]
+	c.nodeLineageRefSets = c.nodeLineageRefSets[:0]
 	c.nodeCheckpoints = c.nodeCheckpoints[:0]
 	c.links = c.links[:0]
 	clear(c.dropCohortLinkRefIndexes)
@@ -2451,6 +2444,7 @@ func (c *Core) Reset() error {
 	c.work = Work{}
 	c.popScratch.resetLogical()
 	c.reductionScratch.finish()
+	c.reductionScratch.pressureSeen = false
 	c.historicalNodeScratch = c.historicalNodeScratch[:0]
 	c.derivationSummaryScratch.finish()
 	c.metadataConstructionAuthenticated = true
@@ -3065,6 +3059,10 @@ type reductionBoundaryOutput struct {
 // without hashing. Unusual wider reductions spill to an indexed map while the
 // slice remains the authoritative stable output order.
 type reductionOutputScratch struct {
+	selectCleanChildren bool
+	// Once a fresh session needs child selection, keep resolving eligible
+	// reconvergences through acceptance. Reset at the session boundary.
+	pressureSeen        bool
 	boundaries          []reductionBoundaryOutput
 	boundaryByKey       map[boundaryKey]int
 	batchParents        []SubtreeID
@@ -3075,6 +3073,7 @@ type reductionOutputScratch struct {
 }
 
 func (s *reductionOutputScratch) begin() {
+	s.selectCleanChildren = false
 	s.boundaries = s.boundaries[:0]
 	s.batchParents = s.batchParents[:0]
 	s.structuralPositions = s.structuralPositions[:0]
@@ -3084,6 +3083,7 @@ func (s *reductionOutputScratch) begin() {
 }
 
 func (s *reductionOutputScratch) finish() {
+	s.selectCleanChildren = false
 	s.boundaries = s.boundaries[:0]
 	s.batchParents = s.batchParents[:0]
 	s.structuralPositions = s.structuralPositions[:0]
@@ -3631,7 +3631,6 @@ const (
 type condenseOutcome struct {
 	head                          Head
 	change                        condenseChange
-	historicalDropCohortRefs      DropCohortRefSet
 	historicalBoundarySplit       bool
 	historicalConvergedSplit      bool
 	historicalForestDeterministic bool
@@ -3639,8 +3638,10 @@ type condenseOutcome struct {
 	historicalLineage             uint16
 	// historicalNode is the dead predecessor's NodeID, captured before
 	// condenseWithOutcomeAtomic clears oldID below. Its nodeLineage record
-	// (and alternative set) persists for the rest of the parse, so callers
-	// can read it back through NodeLineageAlternativeSet for dead-node
+	// (including alternative and drop-cohort reference sets) persists for the
+	// rest of the parse. Callers read those sets only when importing history,
+	// instead of copying an empty reference set on every fresh boundary. The
+	// node ID also supports NodeLineageAlternativeSet for dead-node
 	// import (spec.b4b-alternative-set.v1 section 4). Populated whenever
 	// historicalBoundarySplit is true, regardless of which branch below
 	// computed the scalar historical fields.
@@ -3682,6 +3683,11 @@ func (c *Core) condenseWithOutcomeAtomic(key boundaryKey, in linkInput) (condens
 		return condenseOutcome{}, err
 	}
 	probe, oldID := c.boundaries.probe(boundaryIdentityFromKey(key))
+	if probe.found && c.condenseNodeHasIndependentOwner(oldID) {
+		// This is a live sibling, not a dead boundary being resurrected. Its
+		// lookahead history cannot be imported into this version's output.
+		return c.condenseDirectAppend(key, probe, prev, in, storedErrorCost)
+	}
 	if !probe.found {
 		// No incumbent has ever published this boundary in the current
 		// frontier: exactly one candidate exists (the incoming link), so no
@@ -3715,7 +3721,6 @@ func (c *Core) condenseWithOutcomeAtomic(key boundaryKey, in linkInput) (condens
 	var historicalCleanPathRank CleanPathRankSelection
 	var historicalLineage uint16
 	var historicalNode NodeID
-	var historicalDropCohortRefs DropCohortRefSet
 	historicalConvergedSplit := false
 	historicalForestDeterministic := false
 	if probe.found && !c.condenseNodeIsLive(oldID) {
@@ -3737,7 +3742,6 @@ func (c *Core) condenseWithOutcomeAtomic(key boundaryKey, in linkInput) (condens
 			historicalLineage = old.lineage
 			historicalConvergedSplit = old.converged
 		}
-		historicalDropCohortRefs = old.dropCohortRefs
 		oldID = 0
 	}
 	// buildOutcome stamps a returned condenseOutcome with the historical
@@ -3750,7 +3754,6 @@ func (c *Core) condenseWithOutcomeAtomic(key boundaryKey, in linkInput) (condens
 	buildOutcome := func(head Head, change condenseChange) condenseOutcome {
 		return condenseOutcome{
 			head: head, change: change,
-			historicalDropCohortRefs:      historicalDropCohortRefs,
 			historicalBoundarySplit:       historicalBoundarySplit,
 			historicalConvergedSplit:      historicalConvergedSplit,
 			historicalForestDeterministic: historicalForestDeterministic,
@@ -3877,6 +3880,29 @@ func (c *Core) condenseWithOutcomeAtomic(key boundaryKey, in linkInput) (condens
 					}
 					return buildOutcome(head, condenseUpdated), err
 				default:
+					comparison, selected, err := c.compareReconvergedReductionChildren(oldLinks[incumbent], in)
+					if err != nil {
+						return condenseOutcome{}, err
+					}
+					if selected {
+						if comparison <= 0 {
+							c.recordLinkUnionDuplicateNoop()
+							if phase0AEnabled {
+								phase0AObserveCandidateDrop(c, key, in, oldID, incumbent, phase0ATransitionPrecedenceDrop)
+							}
+							return buildOutcome(Head{Node: oldID}, condenseUnchanged), nil
+						}
+						if phase0AEnabled {
+							phase0ABeginReplacement(c, key, in, oldID, incumbent)
+						}
+						head, err := c.replaceBoundaryLink(key, probe, oldID, old, oldLinks, incumbent, in)
+						if err != nil {
+							c.recordLinkUnionRejected()
+						} else {
+							c.recordLinkUnionPrecedenceReplaced()
+						}
+						return buildOutcome(head, condenseUpdated), err
+					}
 					// A precedence tie between two structurally different same-span
 					// payloads. Dynamic precedence cannot rank them, and the compact
 					// route does not own production's error-cost and structural

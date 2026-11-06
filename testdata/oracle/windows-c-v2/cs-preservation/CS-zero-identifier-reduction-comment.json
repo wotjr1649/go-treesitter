@@ -333,6 +333,6 @@
   "fixture": "CS-zero-identifier-reduction-comment",
   "language": "c_sharp",
   "source_sha256": "e651b98429ff7742b2687574a0d67d7324f6397368a5738d7531c8db4da468d2",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "f539bc306a176ff2b3193fe6c75ffebf818da04ba867cf1ccfb066fe4e0d2da7"
 }

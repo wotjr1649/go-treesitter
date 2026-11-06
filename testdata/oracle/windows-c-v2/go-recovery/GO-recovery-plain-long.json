@@ -314,6 +314,6 @@
   "fixture": "GO-recovery-plain-long",
   "language": "go",
   "source_sha256": "f9d34b7f471d6802088ffcfd758dea31710b19860d71b40bfacd309dc60e5db4",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "67ce9f4cf9c761ba25fef6a65c7418af3b1743c81e684b6771666c1fd6ae5028"
 }

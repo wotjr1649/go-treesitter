@@ -1,0 +1,381 @@
+diff --git a/glr.go b/glr.go
+--- a/glr.go
++++ b/glr.go
+@@ -103,6 +103,9 @@
+ 	// lockstep token loop uses this to avoid letting an already-advanced
+ 	// sibling suppress that group's Strategy 1 recovery.
+ 	cRecoverMissingGroup *cRecGroup
++	// cRecoverPendingToken queues this version's lookahead for the next
++	// shared-token dispatch, including when ERROR_STATE lexed a different width.
++	cRecoverPendingToken *Token
+ 	// diagnosticTopology carries a version identity only in gts_workcount
+ 	// builds. The production type is zero-sized, so it does not change the
+ 	// parser stack layout. Ordinary Go value copies preserve the identity;
+@@ -696,6 +699,17 @@
+ 	return s.entries[len(s.entries)-1]
+ }
+ 
++func (s *glrStack) clearCRecoverPendingToken(tok Token) {
++	if s == nil || s.cRecoverPendingToken == nil {
++		return
++	}
++	pending := s.cRecoverPendingToken
++	if pending.Symbol == tok.Symbol && pending.StartByte == tok.StartByte && pending.EndByte == tok.EndByte &&
++		pending.ExternalScannerToken == tok.ExternalScannerToken {
++		s.cRecoverPendingToken = nil
++	}
++}
++
+ func (s *glrStack) clone() glrStack {
+ 	workCountRecordVersionCreation()
+ 	if s.gss.head == nil && len(s.entries) > 0 {
+@@ -713,6 +727,7 @@
+ 			branchOrder:                s.branchOrder,
+ 			cRec:                       s.cRec.clone(),
+ 			cRecoverMissingGroup:       s.cRecoverMissingGroup,
++			cRecoverPendingToken:       s.cRecoverPendingToken,
+ 			cRecoveryDispatchPending:   s.cRecoveryDispatchPending,
+ 			cAcceptOrder:               s.cAcceptOrder,
+ 			diagnosticTopology:         s.diagnosticTopology,
+@@ -737,6 +752,7 @@
+ 		branchOrder:                s.branchOrder,
+ 		cRec:                       s.cRec.clone(),
+ 		cRecoverMissingGroup:       s.cRecoverMissingGroup,
++		cRecoverPendingToken:       s.cRecoverPendingToken,
+ 		cRecoveryDispatchPending:   s.cRecoveryDispatchPending,
+ 		cAcceptOrder:               s.cAcceptOrder,
+ 		diagnosticTopology:         s.diagnosticTopology,
+@@ -764,6 +780,7 @@
+ 		branchOrder:                s.branchOrder,
+ 		cRec:                       s.cRec.clone(),
+ 		cRecoverMissingGroup:       s.cRecoverMissingGroup,
++		cRecoverPendingToken:       s.cRecoverPendingToken,
+ 		cRecoveryDispatchPending:   s.cRecoveryDispatchPending,
+ 		cAcceptOrder:               s.cAcceptOrder,
+ 		diagnosticTopology:         s.diagnosticTopology,
+diff --git a/parser.go b/parser.go
+--- a/parser.go
++++ b/parser.go
+@@ -6307,6 +6307,7 @@
+ 		consumeCurrentToken := func(s *glrStack) {
+ 			if s != nil {
+ 				s.shifted = true
++				s.clearCRecoverPendingToken(tok)
+ 			}
+ 			dispatchConsumedCurrentToken = true
+ 			needToken = true
+@@ -6412,7 +6413,51 @@
+ 		stackRelexRestoreTok := Token{}
+ 		stackRelexActive := false
+ 		packedVersionOrder := p.compactPackedGSSVersionOrderEnabled() || (p.language.RecoveryStackVersionOrderEnabled && p.errorCostCompetitionEnabled() && p.crecoveryEnteredErrorState && p.crecoveryCostCompetitionRelevant && !tok.NoLookahead)
+-		for si := 0; si < numStacks || (packedVersionOrder && si < len(stacks)); si++ {
++		pendingDispatch := false
++		pendingSharedToken := Token{}
++		pendingSteps := 0
++		advanceVersion := func(si int) int {
++			s := &stacks[si]
++			if pendingDispatch && s.shifted && tok.StartByte <= pendingSharedToken.StartByte && tok.EndByte >= pendingSharedToken.EndByte && tok.EndByte > tok.StartByte {
++				tok = pendingSharedToken
++				s.cRecoverPendingToken = nil
++				pendingDispatch = false
++				stackRelexActive = false
++				return si + 1
++			}
++			if !pendingDispatch {
++				return si + 1
++			}
++			tok = pendingSharedToken
++			stackRelexActive = false
++			pendingDispatch = false
++			s = &stacks[si]
++			if s.dead || s.accepted || s.cPaused {
++				s.cRecoverPendingToken = nil
++				return si + 1
++			}
++			if s.shifted {
++				s.cRecoverPendingToken = nil
++				s.shifted = false
++			}
++			pendingSteps++
++			return si
++		}
++		for si := 0; (si < numStacks || (packedVersionOrder && si < len(stacks))) && pendingSteps < maxConsecutivePrimaryReduces; si = advanceVersion(si) {
++			if pendingSteps > 0 {
++				if reason := p.parseStopReasonNow(); parseStopReasonIsTerminal(reason) {
++					return finalize(stacks, reason)
++				}
++				if nodeCount > maxNodes {
++					return finalize(stacks, ParseStopNodeLimit)
++				}
++				if stacks[si].depth() > maxDepth {
++					return finalize(stacks, ParseStopStackDepthLimit)
++				}
++				if reason := p.resultMaterializationStopReason(arena); resultMaterializationShouldStop(reason) {
++					return finalize(stacks, reason)
++				}
++			}
+ 			s := &stacks[si]
+ 			if stackRelexActive {
+ 				tok = stackRelexRestoreTok
+@@ -6441,6 +6486,14 @@
+ 			if s.cPaused {
+ 				continue
+ 			}
++			if (p.language.Name == "javascript" || p.language.Name == "typescript" || p.language.Name == "tsx") &&
++				!tok.ExternalScannerToken && tok.EndByte > tok.StartByte && s.byteOffset >= tok.EndByte && s.cRecoverPendingToken == nil {
++				// Another branch already consumed this shared byte range inside a
++				// longer C-recovery lookahead. Keep the version in step until the
++				// shared lexer reaches its own frontier.
++				s.shifted = true
++				continue
++			}
+ 			if s.cRecoveryDispatchPending != recoveryturn.None && s.cRecoverMissingGroup != nil &&
+ 				s.byteOffset >= s.cRecoverMissingGroup.eagerMissingShiftEnd {
+ 				// C has now reached this physical missing-token version too.
+@@ -6449,6 +6502,11 @@
+ 					s.cRecoverMissingGroup = nil
+ 				}
+ 				s.cRecoveryDispatchPending = recoveryturn.None
++			}
++			if s.cRecoverPendingToken != nil {
++				pendingDispatch = true
++				pendingSharedToken = tok
++				tok = *s.cRecoverPendingToken
+ 			}
+ 			// Faithful C recovery port (parser_recover_c.go): a stack already
+ 			// in the C error state dispatches through ts_parser__recover
+@@ -6471,9 +6529,14 @@
+ 				}
+ 			}
+ 			currentState := s.top().state
+-			stackRelexRestoreTok = tok
+-			stackRelexActive = relexScannerPadding(currentState)
++			if !stackRelexActive {
++				stackRelexRestoreTok = tok
++				stackRelexActive = relexScannerPadding(currentState)
++			}
+ 			if relexKeyword(currentState) {
++				if !stackRelexActive {
++					stackRelexRestoreTok = tok
++				}
+ 				stackRelexActive = true
+ 			}
+ 			noteStopDiagnosticStack(s)
+@@ -7433,6 +7496,9 @@
+ 				}
+ 			}
+ 		}
++		if pendingSteps >= maxConsecutivePrimaryReduces {
++			return finalize(stacks, ParseStopIterationLimit)
++		}
+ 		// The last stack in the loop may have dispatched on its own re-lexed
+ 		// tokenization; restore the shared lookahead before anything after the
+ 		// dispatch loop reads it.
+@@ -7595,6 +7661,12 @@
+ 				s := &stacks[i]
+ 				if s.dead || s.accepted || s.shifted || s.cPaused || s.depth() == 0 {
+ 					continue
++				}
++				if s.cRecoverPendingToken != nil {
++					// This version must dispatch its elected C lookahead before the
++					// shared-token frontier can process the current token for it.
++					terminalFrontierOK = false
++					break
+ 				}
+ 				relexScannerPadding(s.top().state)
+ 				relexKeyword(s.top().state)
+diff --git a/parser_recover_c.go b/parser_recover_c.go
+--- a/parser_recover_c.go
++++ b/parser_recover_c.go
+@@ -4222,12 +4222,26 @@
+ 		if v.dead || v.cRec == nil || v.cRec.group != group {
+ 			continue
+ 		}
++		beforeRecover := len(*stacks)
+ 		res, forked, reason := p.cRecover(stacks, v, source, tok, nodeCount, arena, entryScratch, gssScratch, trackChildErrors)
+ 		if reason != ParseStopNone {
+ 			return cRecHalted, needsRedispatch || forked, reason
+ 		}
+ 		v = &(*stacks)[i]
+ 		if forked {
++			if p.language.Name == "javascript" || p.language.Name == "typescript" || p.language.Name == "tsx" {
++				for j := beforeRecover; j < len(*stacks); j++ {
++					fork := &(*stacks)[j]
++					if fork.cRecoverPendingToken == nil {
++						replay := tok
++						fork.cRecoverPendingToken = &replay
++					}
++					pending := fork.cRecoverPendingToken
++					widerInternalLookahead := pending != nil && !pending.ExternalScannerToken && !tok.ExternalScannerToken &&
++						pending.StartByte == tok.StartByte && pending.EndByte > tok.EndByte
++					fork.shifted = !widerInternalLookahead
++				}
++			}
+ 			needsRedispatch = true
+ 		}
+ 		if first {
+@@ -4470,8 +4484,14 @@
+ 	return count
+ }
+ 
+-// cRecoverElectionLookaheadSymbol returns the lookahead symbol C's
+-// ts_parser__recover strategy-1 summary scan would test. C lexes each stack
++// cRecoverElectionLookaheadSymbol is the symbol-only compatibility view of
++// cRecoverElectionLookahead.
++func (p *Parser) cRecoverElectionLookaheadSymbol(source []byte, member *glrStack, tok Token) Symbol {
++	return p.cRecoverElectionLookahead(source, member, tok).Symbol
++}
++
++// cRecoverElectionLookahead returns the lookahead C's ts_parser__recover
++// strategy-1 summary scan would test. C lexes each stack
+ // version with its own state's lex mode: an absorbing version sits at
+ // ERROR_STATE, so its lookahead comes from LexModes[0] (the most permissive
+ // mode, longest match). This engine lexes ONE shared token per iteration,
+@@ -4490,39 +4510,41 @@
+ // shared symbol (C: `end` / error-subtree lookaheads — the caller's guards
+ // handle those). When the shared token was already produced by error-mode
+ // lexing (DFA source with every live stack absorbing) the relex is skipped.
+-func (p *Parser) cRecoverElectionLookaheadSymbol(source []byte, member *glrStack, tok Token) Symbol {
++func (p *Parser) cRecoverElectionLookahead(source []byte, member *glrStack, tok Token) Token {
+ 	if tok.Symbol == 0 || tok.Symbol == errorSymbol || tok.Missing {
+-		return tok.Symbol
++		return tok
+ 	}
+ 	if p == nil || p.language == nil || member == nil || len(source) == 0 {
+-		return tok.Symbol
++		return tok
+ 	}
+ 	if p.cRecoverSharedTokenErrorModeLexed {
+-		return tok.Symbol
++		return tok
+ 	}
+ 	lang := p.language
+ 	if len(lang.LexModes) == 0 || len(lang.LexStates) == 0 {
+-		return tok.Symbol
++		return tok
+ 	}
+ 	ls := lang.LexModes[0].LexStateIndex()
+ 	if ls == noLookaheadLexState || int(ls) >= len(lang.LexStates) {
+-		return tok.Symbol
++		return tok
+ 	}
+ 	pos := member.byteOffset
+ 	if pos > tok.StartByte {
+ 		// The shared token begins before the group position (should not
+ 		// happen for the current token); trust the shared identity.
+-		return tok.Symbol
++		return tok
+ 	}
+ 	if int(pos) >= len(source) {
+-		return tok.Symbol
+-	}
++		return tok
++	}
++	point := cStackPosPoint(member)
+ 	lx := Lexer{
+ 		states:              lang.LexStates,
+ 		asciiTable:          lang.LexAsciiTable(),
+ 		source:              source,
+ 		pos:                 int(pos),
+-		row:                 cStackPosRow(member),
++		row:                 point.Row,
++		col:                 point.Column,
+ 		immediateTokens:     lang.ImmediateTokens,
+ 		zeroWidthTokens:     lang.ZeroWidthTokens,
+ 		errorRunLexState:    uint32(ls),
+@@ -4535,9 +4557,9 @@
+ 	if relexed.Symbol == 0 && relexed.StartByte == relexed.EndByte {
+ 		// Whitespace-only tail: C would see `end` here while the shared
+ 		// token disagrees; don't fabricate an EOF election.
+-		return tok.Symbol
+-	}
+-	return relexed.Symbol
++		return tok
++	}
++	return relexed
+ }
+ 
+ // cRecoverStrategy1Election runs the C summary scan once per token across all
+@@ -4635,7 +4657,8 @@
+ 	}
+ 	// C's absorbing version lexes its own lookahead in error mode; judge the
+ 	// election with that identity, not the shared normal-mode token's.
+-	electionSym := p.cRecoverElectionLookaheadSymbol(source, &(*stacks)[m0], tok)
++	electionToken := p.cRecoverElectionLookahead(source, &(*stacks)[m0], tok)
++	electionSym := electionToken.Symbol
+ 	if electionSym == errorSymbol {
+ 		// C skips strategy 1 for error-subtree lookaheads.
+ 		return false, false, ParseStopNone
+@@ -4742,6 +4765,12 @@
+ 						return false, false, reason
+ 					}
+ 					fork.branchOrder = (*stacks)[mi].branchOrder
++					if (p.language.Name == "javascript" || p.language.Name == "typescript" || p.language.Name == "tsx") && len(p.included) == 0 &&
++						!tok.ExternalScannerToken && !electionToken.ExternalScannerToken &&
++						electionToken.StartByte == tok.StartByte && electionToken.EndByte > tok.EndByte {
++						replay := electionToken
++						fork.cRecoverPendingToken = &replay
++					}
+ 					if p.closedRecoveryHistoriesCertified() && tok.EndByte > tok.StartByte && group.eagerMissingShiftEnd == tok.EndByte {
+ 						fork.cRecoverMissingGroup = group
+ 						fork.cRecoveryDispatchPending = recoveryturn.Resync
+@@ -6130,16 +6159,15 @@
+ // neither probe's result ever leaks sideways to a stack that does accept the
+ // original symbol.
+ //
+-// Both probes are deliberately narrow, so neither can disturb the lockstep
++// Both probes are deliberately narrow, so neither can disturb the shared
+ // token loop the rest of the engine relies on:
+ //
+ //   - Both only run where the stack would otherwise pause with no action, so
+ //     a parse in which every stack accepts the shared token pays nothing.
+ //   - The DFA probe requires the re-lexed token to cover exactly the shared
+-//     token's byte span. Same span means a stack that adopts it advances to
+-//     the same offset as every stack that took the shared token, so the
+-//     versions stay in lockstep and no caller has to reason about a ragged
+-//     frontier.
++//     token's byte span. Strategy-1 C recovery separately queues a wider
++//     internal JS-family ERROR_STATE lookahead for its new version; external
++//     scanner tokens and ordinary re-lexes keep the exact-span requirement.
+ //   - The DFA probe requires the stack's state to have a real action for the
+ //     re-lexed symbol, so a failed probe leaves the existing pause path
+ //     untouched. It runs the internal DFA only: it never touches the
+@@ -6232,9 +6260,8 @@
+ 		if dts != nil && dts.lexer.reuseReads != nil {
+ 			dts.lexer.reuseReads.Record(probeStart, tokenInvariantExaminedEnd(source, relexed.lexerLookaheadEndByte))
+ 		}
+-		// Exact-span requirement: this is what keeps the shared-token loop in
+-		// lockstep. A shorter or longer re-lex would leave this stack at a
+-		// different byte offset than its siblings.
++		// Re-lexes remain span-exact. C-recovery's own wider ERROR_STATE
++		// lookahead is queued separately by cRecoverStrategy1Election.
+ 		if ok && relexed.Symbol != 0 && relexed.Symbol != tok.Symbol &&
+ 			relexed.StartByte == tok.StartByte && relexed.EndByte == tok.EndByte &&
+ 			(p.stateHasActionForSymbol(state, relexed.Symbol) || (p.language.RecoveryStackVersionOrderEnabled && dts == nil && relexed.Symbol == lang.KeywordCaptureToken && !p.isNamedSymbol(tok.Symbol) && int(tok.Symbol) < len(lang.SymbolNames) && lang.SymbolNames[tok.Symbol] == string(source[tok.StartByte:tok.EndByte]))) {
+diff --git a/parser_reduce.go b/parser_reduce.go
+--- a/parser_reduce.go
++++ b/parser_reduce.go
+@@ -2829,6 +2829,7 @@
+ 				// the right one to apply here too. Skip the re-record.
+ 				p.pushStackNode(s, targetState, canonical, entryScratch, gssScratch)
+ 				s.shifted = true
++				s.clearCRecoverPendingToken(tok)
+ 				*nodeCount++
+ 				if p != nil && p.glrTrace {
+ 					fmt.Printf("      -> SHIFT[intern-hit] new_state=%d depth=%d\n", targetState, s.depth())
+@@ -2879,6 +2880,7 @@
+ 		p.pushStackNode(s, targetState, leaf, entryScratch, gssScratch)
+ 	}
+ 	s.shifted = true
++	s.clearCRecoverPendingToken(tok)
+ 	*nodeCount++
+ 	if p != nil && p.glrTrace {
+ 		fmt.Printf("      -> SHIFT new_state=%d depth=%d\n", targetState, s.depth())
+@@ -2940,6 +2942,7 @@
+ 	}
+ 	workCountRecordAccept()
+ 	p.acceptStack(s)
++	s.clearCRecoverPendingToken(tok)
+ 	workCountRecordAcceptedHead(p, s, "parse-action accept")
+ 	if p != nil && p.glrTrace {
+ 		fmt.Printf("      -> ACCEPT\n")

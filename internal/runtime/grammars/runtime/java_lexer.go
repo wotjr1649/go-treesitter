@@ -3,6 +3,7 @@
 package grammarruntime
 
 import (
+	"bytes"
 	"fmt"
 	"sync"
 
@@ -111,6 +112,46 @@ func NewJavaTokenSourceOrEOF(src []byte, lang *gotreesitter.Language) gotreesitt
 	return ts
 }
 
+// RebuildTokenSource supplies an independent stream for fresh recovery checks.
+func (ts *JavaTokenSource) RebuildTokenSource(src []byte, lang *gotreesitter.Language) (gotreesitter.TokenSource, error) {
+	if lang == nil {
+		lang = ts.lang
+	}
+	return NewJavaTokenSource(src, lang)
+}
+
+// EOFExtraTokenAppendInvariant authenticates growth inside an existing EOF
+// line comment. commentToken reads its body without consulting parser state.
+// Earlier contextual probes stop at the unchanged first slash; backward probes
+// run only before this final token, so none can observe the appended byte.
+func (ts *JavaTokenSource) EOFExtraTokenAppendInvariant(oldSource, source []byte, symbol uint16, start uint32) bool {
+	if ts == nil || ts.lineCommentSymbol == 0 || symbol != uint16(ts.lineCommentSymbol) ||
+		uint64(start)+2 > uint64(len(oldSource)) || uint64(start)+2 > uint64(len(source)) ||
+		!bytes.Equal(ts.src, source) || !bytes.HasPrefix(oldSource[start:], []byte("//")) {
+		return false
+	}
+	return !bytes.ContainsAny(oldSource[start:], "\r\n") && !bytes.ContainsAny(source[start:], "\r\n")
+}
+
+// EOFExtraTokenProofID identifies this lexer's keyword and close-angle policy.
+// An embedded wrapper must explicitly opt in; promoted methods cannot prove
+// the wrapper preserves this lexer's token election.
+func (ts *JavaTokenSource) EOFExtraTokenProofID(language any) uint8 {
+	lang, ok := language.(*gotreesitter.Language)
+	if ts == nil || !ok || lang == nil || lang != ts.lang {
+		return 0
+	}
+	return 1
+}
+
+// EOFExtraTokenBackendMatches binds the proof to the actual token source.
+// Embedding promotes proof methods even when a wrapper overrides Next, so
+// preserving wrappers must explicitly authenticate themselves.
+func (ts *JavaTokenSource) EOFExtraTokenBackendMatches(backend any) bool {
+	actual, ok := backend.(*JavaTokenSource)
+	return ts != nil && ok && actual == ts
+}
+
 // Reset reinitializes this token source for a new source buffer.
 func (ts *JavaTokenSource) Reset(src []byte) {
 	ts.src = src
@@ -205,6 +246,36 @@ func (ts *JavaTokenSource) SkipToByte(offset uint32) gotreesitter.Token {
 		target = len(ts.src)
 	}
 
+	// scanDelimitedBody and textBlockStringToken lex string/char/text-block
+	// bodies eagerly: the opening-delimiter Next() call that enters them
+	// advances ts.cur past the WHOLE body in one pass and queues every
+	// remaining piece (content fragments, escape sequences, the closing
+	// delimiter) in ts.pending. ts.cur.offset can therefore sit well ahead of
+	// any of those pieces' own start bytes.
+	//
+	// Incremental reuse resumes lexing at a reused leaf's end byte, and a
+	// reused leaf is often exactly one of those already-queued pieces (for
+	// example a string-fragment run the edit never touched). Before this
+	// check, that target landed behind ts.cur.offset, took the "skip
+	// backward" branch below, and unconditionally cleared ts.pending -- so
+	// the still-valid escape-sequence/closing-delimiter tokens for that
+	// literal were discarded and top-level dispatch resumed mid-literal with
+	// no idea it was inside one, misreading its remaining bytes as ordinary
+	// source (see grammars/runtime/c_lexer.go's identical CTokenSource fix,
+	// issue #454 §6, for the mechanism in full).
+	//
+	// The already-queued pending tokens are exact re-derivations of this
+	// literal's tail (scanDelimitedBody/textBlockStringToken never depend on
+	// anything past the literal's own bytes), so resuming from within them is
+	// always sound: drop any pending token that finishes at or before target
+	// and, when the next one starts exactly there, return it directly instead
+	// of re-lexing.
+	if len(ts.pending) > 0 && target <= ts.cur.offset {
+		if tok, ok := ts.resumePendingAt(target); ok {
+			return tok
+		}
+	}
+
 	ts.pending = nil
 	ts.done = false
 
@@ -219,6 +290,25 @@ func (ts *JavaTokenSource) SkipToByte(offset uint32) gotreesitter.Token {
 		return ts.eofToken()
 	}
 	return ts.Next()
+}
+
+// resumePendingAt drops queued pending tokens that end at or before target
+// and, when the remaining queue's head starts exactly at target, returns it.
+// ok is false when no pending token boundary matches target exactly, and the
+// caller must fall back to the ordinary reset-and-relex path; pending token
+// boundaries always come from this same lexer's own scan of these bytes, so
+// an exact match is the expected case whenever target is a reused leaf's
+// recorded end byte inside the still-queued span.
+func (ts *JavaTokenSource) resumePendingAt(target int) (gotreesitter.Token, bool) {
+	for len(ts.pending) > 0 && int(ts.pending[0].EndByte) <= target {
+		ts.pending = ts.pending[1:]
+	}
+	if len(ts.pending) == 0 || int(ts.pending[0].StartByte) != target {
+		return gotreesitter.Token{}, false
+	}
+	tok := ts.pending[0]
+	ts.pending = ts.pending[1:]
+	return tok, true
 }
 
 func (ts *JavaTokenSource) buildSymbolTables() {

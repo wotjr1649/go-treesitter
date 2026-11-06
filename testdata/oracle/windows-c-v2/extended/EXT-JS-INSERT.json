@@ -314,6 +314,6 @@
   "fixture": "EXT-JS-INSERT",
   "language": "javascript",
   "source_sha256": "2b2d846e0bce8a292c5c37ba50c840ac3e3c89c1f403da92d28e21939b27232f",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "c803b8f6de43b105845d22360aea0d6b3c71b5a8e09503b59cb10c856a7f7fbf"
 }

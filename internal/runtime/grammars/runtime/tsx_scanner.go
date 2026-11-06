@@ -111,8 +111,10 @@ func (TsxExternalScanner) Serialize(payload any, buf []byte) int { return 0 }
 func (TsxExternalScanner) Deserialize(payload any, buf []byte)   {}
 func (TsxExternalScanner) SupportsIncrementalReuse() bool        { return true }
 
-// Scan depends only on source, position and valid symbols; Create has no payload.
-func (TsxExternalScanner) ExternalScannerIsStateless() bool { return true }
+// Scan is stateless and reads source through forward lexer operations. Failed
+// probes participate in the same read history as successful tokens.
+func (TsxExternalScanner) SupportsLargeStatelessReadDependencies() bool { return true }
+func (TsxExternalScanner) ExternalScannerIsStateless() bool             { return true }
 
 // symbolTable returns the per-Language-bound result-symbol table, falling
 // back to the pinned defaults when Scan is invoked on an unbound scanner
@@ -435,7 +437,23 @@ func tsxScanJsxText(lexer *gotreesitter.ExternalLexer, symbols *[tsxTokenCount]g
 	onlyWhitespace := true
 
 	for lexer.Lookahead() != 0 && lexer.Lookahead() != '<' && lexer.Lookahead() != '>' &&
-		lexer.Lookahead() != '{' && lexer.Lookahead() != '}' && lexer.Lookahead() != '&' {
+		lexer.Lookahead() != '{' && lexer.Lookahead() != '}' {
+		if lexer.Lookahead() == '&' {
+			lexer.MarkEnd()
+			if tsxScanHTMLCharacterReference(lexer) {
+				// A full html_character_reference (for example "&amp;")
+				// follows. Stop the text token here so that token can lex
+				// the entity, same as before this fix.
+				lexer.SetResultSymbol(symbols[tsxTokJsxText])
+				return sawText
+			}
+			// C stops JSX text at '&'; leave invalid references for grammar recovery.
+			if !sawText {
+				return false
+			}
+			lexer.SetResultSymbol(symbols[tsxTokJsxText])
+			return true
+		}
 		if lexer.Lookahead() == '/' && onlyWhitespace {
 			lexer.Advance(false)
 			if lexer.Lookahead() == '>' {
@@ -480,6 +498,64 @@ func tsxScanJsxText(lexer *gotreesitter.ExternalLexer, symbols *[tsxTokenCount]g
 	lexer.MarkEnd()
 	lexer.SetResultSymbol(symbols[tsxTokJsxText])
 	return sawText
+}
+
+// tsxScanHTMLCharacterReference reports whether the lexer, positioned at
+// '&', is looking at a complete html_character_reference as defined in
+// grammargen/tsx_grammar.go:
+//
+//	&(#([xX][0-9a-fA-F]{1,6}|[0-9]{1,5})|[A-Za-z]{1,30});
+//
+// It always consumes at least '&'. Callers mark the token boundary first so
+// invalid references can be left to the grammar.
+func tsxScanHTMLCharacterReference(lexer *gotreesitter.ExternalLexer) bool {
+	lexer.Advance(false) // '&'
+	if lexer.Lookahead() == '#' {
+		lexer.Advance(false)
+		if lexer.Lookahead() == 'x' || lexer.Lookahead() == 'X' {
+			lexer.Advance(false)
+			n := 0
+			for isTsxHexDigit(lexer.Lookahead()) && n < 6 {
+				lexer.Advance(false)
+				n++
+			}
+			if n == 0 || lexer.Lookahead() != ';' {
+				return false
+			}
+			lexer.Advance(false)
+			return true
+		}
+		n := 0
+		for isTsxASCIIDigit(lexer.Lookahead()) && n < 5 {
+			lexer.Advance(false)
+			n++
+		}
+		if n == 0 || lexer.Lookahead() != ';' {
+			return false
+		}
+		lexer.Advance(false)
+		return true
+	}
+	n := 0
+	for isTsxASCIILetter(lexer.Lookahead()) && n < 30 {
+		lexer.Advance(false)
+		n++
+	}
+	if n == 0 || lexer.Lookahead() != ';' {
+		return false
+	}
+	lexer.Advance(false)
+	return true
+}
+
+func isTsxASCIIDigit(r rune) bool { return r >= '0' && r <= '9' }
+
+func isTsxASCIILetter(r rune) bool {
+	return (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z')
+}
+
+func isTsxHexDigit(r rune) bool {
+	return isTsxASCIIDigit(r) || (r >= 'a' && r <= 'f') || (r >= 'A' && r <= 'F')
 }
 
 func tsxValid(vs []bool, i int) bool { return i < len(vs) && vs[i] }

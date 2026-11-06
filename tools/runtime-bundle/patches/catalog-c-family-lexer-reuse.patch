@@ -1,6 +1,8 @@
+diff --git a/grammars/runtime/c_lexer.go b/grammars/runtime/c_lexer.go
+index 5701ebb..93a8c35 100644
 --- a/grammars/runtime/c_lexer.go
 +++ b/grammars/runtime/c_lexer.go
-@@ -389,6 +389,20 @@
+@@ -449,6 +449,20 @@ func (ts *CTokenSource) SkipToByte(offset uint32) gotreesitter.Token {
  	if target > len(ts.src) {
  		target = len(ts.src)
  	}
@@ -19,5 +21,5 @@
 +		}
 +	}
  
- 	ts.pending = nil
- 	ts.done = false
+ 	// scanDelimitedBody (string/char literal bodies) lexes eagerly: the
+ 	// opening-quote Next() call that enters it advances ts.cur past the

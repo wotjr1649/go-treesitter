@@ -542,6 +542,6 @@
   "fixture": "tsx-namespace-attribute",
   "language": "tsx",
   "source_sha256": "f6646fa99ff433dc096782ea96e8e52f3d81d419293df84164a064f4551973c4",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "61a48cb617426ea409fbcf053ed5a9a04b54fb18788f77108c009c9359391f03"
 }

@@ -2,6 +2,8 @@
 
 package gotreesitter
 
+import core "github.com/wotjr1649/go-treesitter/internal/runtime/internal/parsercorephase0"
+
 // compactArenaReserveCapBytes bounds how much record-arena capacity one parse
 // may reserve up front (Core.ReserveRecordArenas,
 // internal/parsercorephase0/arena_reserve.go).
@@ -72,4 +74,25 @@ func (d *dfaTokenSource) sourceLength() int {
 		return 0
 	}
 	return len(d.lexer.source)
+}
+
+// compactStagedArenaReserve splits the record-arena reserve into two steps.
+// The first step, before the seed, reserves a small source-proportional base.
+// The scheduler takes the whole-source reserve only after enough source
+// progress. The progress window can exceed the initial capacity estimate:
+// early declines then allocate less, while dense prefixes can grow normally.
+type compactStagedArenaReserve struct {
+	sourceBytes int
+	prefixBytes int
+	maxBytes    uint64
+	// growAt is the token start byte that triggers the whole-source reserve.
+	// Zero means the reserve already covers the whole source.
+	growAt uint32
+}
+
+func newCompactStagedArenaReserve(sourceBytes int, maxBytes uint64) compactStagedArenaReserve {
+	prefix, growAt := core.RecordArenaReservePlan(sourceBytes)
+	return compactStagedArenaReserve{
+		sourceBytes: sourceBytes, prefixBytes: prefix, maxBytes: maxBytes, growAt: growAt,
+	}
 }

@@ -7,6 +7,9 @@ import (
 	"sync"
 	"time"
 	"unsafe"
+
+	"github.com/wotjr1649/go-treesitter/internal/runtime/internal/incr"
+	"github.com/wotjr1649/go-treesitter/internal/runtime/internal/sched"
 )
 
 // GSS-FOREST REWRITE (perf/glr-gss-forest) — the only safe cut at the #1
@@ -357,12 +360,25 @@ func forestProgressExtra(frontier, work, nextFrontier []*gssForestNode, curIndex
 // never hides a decline by running the production parser. Exported so
 // out-of-tree benchmarks and validation in packages that attach external
 // scanners (e.g. grammars) can drive it; not part of the stable API.
+//
+//go:noinline
 func (p *Parser) ParseForestExperimental(source []byte) (*Tree, bool) {
-	p.resetRecoveryRuntimeTelemetryDetailed()
-	return p.parseForestExperimental(source)
+	result, _ := sched.Parse(p.schedCall(sched.ForestRoute, nil), func(sched.Request) (forestParseResult, error) {
+		p.resetRecoveryRuntimeTelemetryDetailed()
+		tree, ok := p.parseForestExperimental(source, false)
+		return forestParseResult{tree: tree, ok: ok}, nil
+	})
+	return result.tree, result.ok
 }
 
-func (p *Parser) parseForestExperimental(source []byte) (*Tree, bool) {
+// forestParseResult carries the result of ParseForestExperimental through
+// sched.Parse.
+type forestParseResult struct {
+	tree *Tree
+	ok   bool
+}
+
+func (p *Parser) parseForestExperimental(source []byte, cleanOnly bool) (*Tree, bool) {
 	// Every other public parse entry point (parser_api.go: Parse,
 	// ParseWithTokenSource, ParseIncremental...) establishes the
 	// timeout/cancellation deadline via enterParseBudget before doing any
@@ -381,13 +397,14 @@ func (p *Parser) parseForestExperimental(source []byte) (*Tree, bool) {
 		return nil, false
 	}
 	arena := acquireNodeArena(arenaClassFull)
+	arena.ownership.BeginFresh()
 	incrementalReuseProven := forestIncrementalReuseProven(p.language)
 	// A forest tree whose scanner class is not admitted can never consume
 	// these checkpoints incrementally. Avoid allocating checkpoint storage for
 	// a diagnostic success or decline that is guaranteed to disable reuse.
 	captureExternalCheckpoints := incrementalReuseProven && languageUsesExternalScannerCheckpoints(p.language)
 	var lexicalReadSpan uint32
-	root, ok := p.parseForest(arena, source, captureExternalCheckpoints, parseMemoryBudgetForParser(p, len(source)), &lexicalReadSpan)
+	root, ok := p.parseForestWithMode(arena, source, captureExternalCheckpoints, parseMemoryBudgetForParser(p, len(source)), &lexicalReadSpan, cleanOnly)
 	if !ok || root == nil {
 		arena.Release()
 		return nil, false
@@ -411,7 +428,7 @@ func (p *Parser) parseForestExperimental(source []byte) (*Tree, bool) {
 	// is only ever non-empty when that census flag is set (see
 	// dispatcherArmCensus), so this is a no-op field copy in every ordinary
 	// parse.
-	p.copyNormalizationStats(tree.rawParseRuntime())
+	p.copyNormalizationStats(tree.ensureParseRuntime())
 	tree.captureTokenInvariantReadSpanValue(lexicalReadSpan)
 	tree.forestFastPath = true
 	if !incrementalReuseProven {
@@ -430,12 +447,18 @@ func (p *Parser) maybeReplaceRecoveredTreeWithForest(source []byte, tree *Tree) 
 	if p.language == nil || p.language.ExternalScanner != nil || len(p.language.ExternalSymbols) != 0 || len(p.included) != 0 {
 		return tree, false
 	}
+	// The forest rescue's public-node check cannot authenticate hidden
+	// MISSING tokens retained by the selected recovery production. Keep
+	// that result rather than replacing its error with an unproven clean tree.
+	if tree.resultErrorSummary == resultErrorSummaryHiddenMissing {
+		return tree, false
+	}
 	root := rawRootOrNil(tree)
 	if root == nil || !root.HasErrorOrMissing() {
 		return tree, false
 	}
 
-	candidate, ok := p.parseForestExperimental(source)
+	candidate, ok := p.parseForestCleanRescue(source)
 	if !ok || candidate == nil {
 		return tree, false
 	}
@@ -447,6 +470,10 @@ func (p *Parser) maybeReplaceRecoveredTreeWithForest(source []byte, tree *Tree) 
 	}
 	tree.Release()
 	return candidate, true
+}
+
+func (p *Parser) parseForestCleanRescue(source []byte) (*Tree, bool) {
+	return p.parseForestExperimental(source, true)
 }
 
 func (p *Parser) maybeReplaceRecoveredTokenSourceTreeWithForest(source []byte, tree *Tree, ts TokenSource) (*Tree, bool) {
@@ -698,6 +725,7 @@ func (p *Parser) tryForestFastPath(source []byte) *Tree {
 		progress.beginDetail(time.Now(), "forest_arena_acquire_begin", "forest_arena_acquire_end", 0, 0, Token{}, false, nil, 0, 0, 0, true, 0, 0, "")
 	}
 	arena := acquireNodeArena(arenaClassFull)
+	arena.ownership.BeginFresh()
 	incrementalReuseProven := forestIncrementalReuseProven(p.language)
 	captureExternalCheckpoints := incrementalReuseProven && languageUsesExternalScannerCheckpoints(p.language)
 	if progress.enabled {
@@ -718,6 +746,14 @@ func (p *Parser) tryForestFastPath(source []byte) *Tree {
 		if progress.enabled {
 			progress.emit(time.Now(), "forest_try_decline", 0, 0, Token{}, false, nil, 0, 0, 0, true, 0, 0, fmt.Sprintf("reason=parse_forest_failed ok=%t root_present=%t decline_reason=%s", ok, root != nil, p.forestDeclineReason))
 		}
+		arena.Release()
+		return nil
+	}
+	// An empty forest root has no leaf carrying the EOF skip proof.
+	// Let the native lexer establish its span across grammar-owned padding.
+	if len(source) > 0 && root.ChildCount() == 0 && !root.HasError() &&
+		bytesAreParserPaddingInIncludedRanges(source, 0, uint32(len(source)), nil, p.lineContinuationEscapeByte()) {
+		p.recordForestDecline("empty_root_eof_skip_unproven", Token{StartByte: uint32(len(source))}, nil)
 		arena.Release()
 		return nil
 	}
@@ -776,6 +812,10 @@ func (p *Parser) tryForestFastPath(source []byte) *Tree {
 	}
 	p.normalizeReturnedTreeForParse(tree, source)
 	tree.captureTokenInvariantReadSpanValue(lexicalReadSpan)
+	tree.prepareLegacyReuseDependencies()
+	if arena.legacyReuseReads.CertifiedForestAttributes() && !root.HasError() {
+		tree.resultErrorSummary = resultErrorSummaryClean
+	}
 	// Diagnostic-only: see the matching comment in ParseForestExperimental.
 	// finalizeForestRoot (above, via finalizeResultRoot) and
 	// normalizeReturnedTreeForParse (immediately above) can each run the
@@ -784,7 +824,7 @@ func (p *Parser) tryForestFastPath(source []byte) *Tree {
 	// stats, so this copy has to happen after both calls, not just once
 	// up front. No-op unless GTS_DISPATCHER_CENSUS populated
 	// p.normalizationStats.
-	p.copyNormalizationStats(tree.rawParseRuntime())
+	p.copyNormalizationStats(tree.ensureParseRuntime())
 	if progress.enabled {
 		progress.endDetail(time.Now(), "forest_normalize_end", 0, 0, Token{}, false, nil, 0, 0, 0, false, 0, 0, fmt.Sprintf("root_end=%d", root.EndByte()))
 		progress.emit(time.Now(), "forest_try_success", 0, 0, Token{}, false, nil, 0, 0, 0, false, 0, 0, fmt.Sprintf("root_end=%d", root.EndByte()))
@@ -3276,6 +3316,10 @@ func (s *gssForestNodeSlab) retainedBytes() int {
 // GOT_GLR_FOREST flag dispatches into; parity-iteration (extras, recovery,
 // external scanners, full GLR-lexing) is layered on this core.
 func (p *Parser) parseForest(arena *nodeArena, source []byte, captureExternalCheckpoints bool, memoryBudget int64, lexicalReadSpan *uint32) (*Node, bool) {
+	return p.parseForestWithMode(arena, source, captureExternalCheckpoints, memoryBudget, lexicalReadSpan, false)
+}
+
+func (p *Parser) parseForestWithMode(arena *nodeArena, source []byte, captureExternalCheckpoints bool, memoryBudget int64, lexicalReadSpan *uint32, cleanOnly bool) (*Node, bool) {
 	if lexicalReadSpan != nil {
 		*lexicalReadSpan = 0
 	}
@@ -3334,6 +3378,10 @@ func (p *Parser) parseForest(arena *nodeArena, source []byte, captureExternalChe
 	if restoreRuntimeMemoryBudget.parser != nil {
 		defer restoreRuntimeMemoryBudget.restore()
 	}
+	previousReads := ts.lexer.reuseReads
+	arena.beginLegacyReuseReads(ts, source)
+	arena.legacyReuseReads.CertifyForestAttributes()
+	defer func() { ts.lexer.reuseReads = previousReads }()
 
 	// Honor the same caller-configured timeout/cancellation the production
 	// loop enforces (parser.go's `for iter := ...` checks p.parseStopReasonNow()
@@ -3594,7 +3642,12 @@ func (p *Parser) parseForest(arena *nodeArena, source []byte, captureExternalChe
 							forestProgressExtra(frontier, work, nextFrontier, curIndex, nextIndex, processEpoch, recoverCount, reducer, accepted,
 								fmt.Sprintf("state=%d reduce_symbol=%d child_count=%d production_id=%d dynamic_precedence=%d", node.state, act.Symbol, cc, act.ProductionID, act.DynamicPrecedence)))
 					}
+					popVisits := 0
 					reducer.reduce(node, cc, func(children []stackEntry, childScore int, popTo *gssForestNode, noExtras bool) {
+						popVisits++
+						if popVisits > 1 {
+							arena.legacyReuseReads.Abstain()
+						}
 						if reducer.capped {
 							return
 						}
@@ -3742,6 +3795,14 @@ func (p *Parser) parseForest(arena *nodeArena, source []byte, captureExternalChe
 						// re-pushed on top.
 						parent.preGotoState = popTo.state
 						parent.parseState = gotoState
+						reduceFragile := incr.ReductionFragile(parent.EndByte(), parentEnd, len(frontier), len(node.links), len(nodeActions), popVisits)
+						if len(childNodes) != 0 {
+							markReduceFragility(parent, childNodes, reduceFragile)
+						} else if reduceFragile {
+							// Collapsed keyword leaves already inherit child flags.
+							parent.setFragileLeft(true)
+							parent.setFragileRight(true)
+						}
 						// Mark a reduced EXTRA node (e.g. a multi-token comment like rust's
 						// doc_comment, which is parsed as `//`+content then reduced) as
 						// extra, mirroring the production reduce (parser_reduce.go:
@@ -3834,6 +3895,7 @@ func (p *Parser) parseForest(arena *nodeArena, source []byte, captureExternalChe
 					}
 					leaf.preGotoState = node.state
 					leaf.parseState = target
+					noteLegacyReuseLeaf(leaf, tok)
 					p.recordCurrentExternalLeafCheckpoint(leaf, tok)
 					before := nextIndex.len()
 					sh := coalesceForestWithRawAndAlternatives(p, arena, &nextIndex, slab, target, tok.EndByte, node,
@@ -4002,6 +4064,9 @@ func (p *Parser) parseForest(arena *nodeArena, source []byte, captureExternalChe
 			if lexicalReadSpan != nil && !root.hasError() && recoverCount == 0 {
 				*lexicalReadSpan = ts.tokenInvariantReadSpan()
 			}
+			if recoverCount != 0 {
+				arena.legacyReuseReads.Abstain()
+			}
 			return root, true
 		}
 		if tok.NoLookahead {
@@ -4040,7 +4105,7 @@ func (p *Parser) parseForest(arena *nodeArena, source []byte, captureExternalChe
 			// keep the frontier alive in its current states, advancing past the
 			// token. Consecutive absorbed tokens are deferred to finalization, which
 			// wraps the error span(s). Off by default (glrForestRecover).
-			if !recoverActive || eof || recoverCount >= forestRecoverCap || tok.EndByte <= tok.StartByte {
+			if cleanOnly || !recoverActive || eof || recoverCount >= forestRecoverCap || tok.EndByte <= tok.StartByte {
 				p.recordForestDecline("dead_end", tok, curStates)
 				if progress.enabled {
 					progress.emit(time.Now(), "forest_decline", iter, tokens, tok, true, nil, 0, 0, 0, false, 0, 0,

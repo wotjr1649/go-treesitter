@@ -1,6 +1,8 @@
+diff --git a/incremental.go b/incremental.go
+index b575751..ccdde19 100644
 --- a/incremental.go
 +++ b/incremental.go
-@@ -1189,8 +1189,10 @@
+@@ -1401,8 +1401,10 @@ func (p *Parser) reuseTargetState(state StateID, n *Node, lookahead Token) (Stat
  			return 0, false
  		}
  

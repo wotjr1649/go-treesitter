@@ -1,6 +1,9 @@
 package gotreesitter
 
-import "time"
+import (
+	"github.com/wotjr1649/go-treesitter/internal/runtime/internal/incr"
+	"time"
+)
 
 // Authenticate earlier lexical dependencies before reusing the edited tree.
 // Matching one leaf does not prove that preceding tokens retain their boundaries.
@@ -9,29 +12,35 @@ func (p *Parser) tryTokenInvariantLeafEdit(source []byte, oldTree *Tree, ts Toke
 	if p == nil || oldTree == nil || oldTree.RootNode() == nil || oldTree.language != p.language {
 		return nil, false
 	}
-	if compactRecoverEOFTreeMarked(oldTree) {
+	if recoverEOFRootPublished(oldTree) {
 		return nil, false
 	}
 	if len(oldTree.edits) != 1 {
 		return nil, false
 	}
 	edit := oldTree.edits[0]
-	if edit.NewEndByte-edit.StartByte != edit.OldEndByte-edit.StartByte {
-		return nil, false
-	}
-	if edit.NewEndPoint != edit.OldEndPoint || edit.OldEndByte <= edit.StartByte {
-		return nil, false
-	}
-	if len(source) != len(oldTree.source) {
+	moving := edit.NewEndByte != edit.OldEndByte
+	lengthNeutral := moving && edit.StartPoint.Row == edit.OldEndPoint.Row && edit.StartPoint.Row == edit.NewEndPoint.Row &&
+		uint64(edit.OldEndPoint.Column) == uint64(edit.StartPoint.Column)+uint64(edit.OldEndByte)-uint64(edit.StartByte) &&
+		uint64(edit.NewEndPoint.Column) == uint64(edit.StartPoint.Column)+uint64(edit.NewEndByte)-uint64(edit.StartByte) &&
+		incr.LengthNeutralScannerEdit(p.language.ExternalScanner, oldTree.source, source, incr.TokenEdit{Start: edit.StartByte, OldEnd: edit.OldEndByte, NewEnd: edit.NewEndByte, Row: edit.StartPoint.Row})
+	if !lengthNeutral && (moving || edit.NewEndPoint != edit.OldEndPoint || edit.OldEndByte <= edit.StartByte || len(source) != len(oldTree.source)) {
 		return nil, false
 	}
 	root := oldTree.RootNode()
 	node := oldTree.lastEditedLeaf
-	if node == nil || !node.containsByteRange(edit.StartByte, edit.OldEndByte) {
-		node = root.DescendantForByteRange(edit.StartByte, edit.OldEndByte)
+	end := edit.OldEndByte
+	if lengthNeutral {
+		end = edit.NewEndByte
+	}
+	if node == nil || !node.containsByteRange(edit.StartByte, end) {
+		node = root.DescendantForByteRange(edit.StartByte, end)
 	}
 	if node == nil || node.ownerArena == nil ||
 		!node.ownerArena.externalScannerLeafCheckpointIdentityMatches(p.language) {
+		return nil, false
+	}
+	if lengthNeutral && (node.ChildCount() != 0 || node.hasError() || node.isMissing() || node.isFragile() || uint32(node.symbol) >= p.language.TokenCount || oldTree.rawParseRuntime().MaxStacksSeen != 1 || edit.StartByte <= node.startByte || edit.NewEndByte >= node.endByte) {
 		return nil, false
 	}
 	start := time.Time{}
@@ -42,12 +51,34 @@ func (p *Parser) tryTokenInvariantLeafEdit(source []byte, oldTree *Tree, ts Toke
 	if !proven {
 		return nil, false
 	}
-	if p.canReuseLanguageTextInvariantNode(source, oldTree, node, edit) {
+	var runBound incr.TokenReadBound
+	if lengthNeutral {
+		width := node.endByte - node.startByte
+		oldWidth := int64(width) - int64(edit.NewEndByte) + int64(edit.OldEndByte)
+		if oldWidth < 0 || oldWidth > int64(^uint32(0)) {
+			return nil, false
+		}
+		var ok bool
+		if finalizer := oldTree.resultCompatibilityFinalizer; finalizer != nil {
+			runBound = finalizer.tokenInvariantRunBound
+		}
+		runBound, readSpan, ok = runBound.Edit(node, uint32(oldWidth), width, oldTree.tokenInvariantReadSpan)
+		if !ok {
+			return nil, false
+		}
+	}
+	if lengthNeutral || p.canReuseLanguageTextInvariantNode(source, oldTree, node, edit) {
 		tree := reuseTreeWithNewSource(oldTree, source, node, true)
 		if tree == nil || tree.root == nil {
 			return nil, false
 		}
 		tree.tokenInvariantReadSpan = readSpan
+		if lengthNeutral {
+			tree.resultCompatibilityFinalizer = &treeResultCompatibilityFinalizer{
+				tokenInvariantRunBound: runBound,
+				runBoundOnly:           true,
+			}
+		}
 		tree.setParseRuntime(ParseRuntime{
 			StopReason:       ParseStopAccepted,
 			SourceLen:        uint32(len(source)),
@@ -818,7 +849,7 @@ func (p *Parser) tokenInvariantLeafEditCandidate(source []byte, oldTree *Tree) (
 	if p == nil || oldTree == nil || oldTree.RootNode() == nil || oldTree.language != p.language {
 		return nil, InputEdit{}, false
 	}
-	if compactRecoverEOFTreeMarked(oldTree) {
+	if recoverEOFRootPublished(oldTree) {
 		return nil, InputEdit{}, false
 	}
 	if len(oldTree.edits) != 1 {
@@ -942,6 +973,9 @@ func tokenSourceHasDFABase(ts TokenSource) bool {
 }
 
 func skipTokenSourceToLeaf(ts TokenSource, leaf *Node) (Token, bool) {
+	if !tokenSourceCanResumeAt(ts, leaf.startByte) {
+		return Token{}, false
+	}
 	if skipper, ok := ts.(PointSkippableTokenSource); ok {
 		return skipper.SkipToByteWithPoint(leaf.startByte, leaf.startPoint), true
 	}
@@ -1268,6 +1302,11 @@ func reuseTreeWithNewSource(oldTree *Tree, source []byte, dirtyNode *Node, clear
 		arena.Retain()
 	}
 	borrowed := retainBorrowedArenasForReusedTree(oldTree, arena)
+	if len(oldTree.edits) == 1 {
+		// The dependency proof authenticated the preceding tokens too. Clear
+		// their lookahead-only changes before clearing the edited leaf's path.
+		clearTokenInvariantLookaheadChanges(oldTree.root, oldTree.edits[0].StartByte)
+	}
 	if clearSubtree {
 		clearDirtySubtreeAndPath(dirtyNode)
 	} else {
@@ -1280,6 +1319,8 @@ func reuseTreeWithNewSource(oldTree *Tree, source []byte, dirtyNode *Node, clear
 	tree.resultErrorSummary = oldTree.resultErrorSummary
 	tree.resultCompatibilityApplied = oldTree.resultCompatibilityApplied
 	tree.tokenInvariantReadSpan = oldTree.tokenInvariantReadSpan
+	tree.eofExtraTokenSourceProofID = oldTree.eofExtraTokenSourceProofID
+	tree.abstainLegacyReuseDependencies()
 	// This tree shares the old root, so shouldNormalizeIncrementalReturnedTree
 	// skips result normalization for it (same root). Even if a range-limited
 	// pass ever ran here, incrementalReparsedTopLevelRanges would read this
@@ -1287,6 +1328,18 @@ func reuseTreeWithNewSource(oldTree *Tree, source []byte, dirtyNode *Node, clear
 	// stays sound: the shared tree is already normalized and the range-limited Go
 	// normalizers are idempotent, so re-running them changes nothing.
 	return tree
+}
+
+func clearTokenInvariantLookaheadChanges(n *Node, editStart uint32) {
+	if n == nil || !n.dirty() {
+		return
+	}
+	if n.endByte <= editStart && !n.hasError() && !n.isMissing() {
+		n.setDirty(false)
+	}
+	for i := 0; i < nodeChildCountNoMaterialize(n); i++ {
+		clearTokenInvariantLookaheadChanges(nodeChildAtForReason(n, i, materializeForEdit), editStart)
+	}
 }
 
 func clearDirtySubtreeAndPath(n *Node) {
@@ -1337,4 +1390,81 @@ func retainBorrowedArenasForReusedTree(oldTree *Tree, primary *nodeArena) []*nod
 		borrowed = append(borrowed, arena)
 	}
 	return borrowed
+}
+
+// An alias changes the public symbol, but C's first-leaf reuse check still
+// consults the underlying lexer symbol. Keep that rare terminal metadata in
+// the arena rather than expanding every node's header.
+func legacyReuseFirstLeafSymbol(n *Node) Symbol {
+	if n == nil {
+		return 0
+	}
+	if word := legacyReuseMetadataWord(n, false, true); word != nil && *word != 0 {
+		return Symbol(*word - 1)
+	}
+	return n.symbol
+}
+
+// Small-input dispatch retains the established public-symbol contract. Alias
+// receipts keep their raw symbol independently for large-input certification.
+func legacyReuseDispatchSymbol(n *Node) Symbol {
+	if n == nil {
+		return 0
+	}
+	if n.ownerArena == nil || n.ownerArena.legacyReuseReads == nil || !incr.RequiresFreshResult(int(n.ownerArena.legacyReuseReads.SourceBytes())) {
+		return n.symbol
+	}
+	return legacyReuseFirstLeafSymbol(n)
+}
+
+func setLegacyReuseRawSymbol(n *Node, symbol Symbol) {
+	if word := legacyReuseMetadataWord(n, true, true); word != nil {
+		*word = uint32(symbol) + 1
+	} else if n != nil && n.ownerArena != nil {
+		// A missing alias receipt cannot authenticate its public symbol.
+		n.ownerArena.legacyReuseReads.Abstain()
+	}
+}
+
+func recordLegacyReuseAliasSymbol(n *Node, lang *Language) {
+	recordLegacyReuseAliasSymbolFrom(n, n, lang)
+}
+
+func recordLegacyReuseAliasSymbolFrom(dst, src *Node, lang *Language) {
+	if src == nil || src.ownerArena == nil || src.ownerArena.legacyReuseReads == nil || lang == nil || nodeChildCountNoMaterialize(src) != 0 {
+		return
+	}
+	symbol := legacyReuseFirstLeafSymbol(src)
+	if uint32(symbol) < lang.TokenCount {
+		setLegacyReuseRawSymbol(dst, symbol)
+	}
+}
+
+func copyLegacyReuseLeafReceipt(dst, src *Node) {
+	// Without a lexer read history, the source cannot certify a terminal's
+	// reuse. Nonterminals have no leaf flags or raw alias symbol to copy.
+	if dst == nil || src == nil || src.ownerArena == nil || src.ownerArena.legacyReuseReads == nil || nodeChildCountNoMaterialize(src) != 0 {
+		return
+	}
+	if word := legacyReuseWord(src, false); word != nil {
+		flags := *word & (legacyReuseLeafKnown | legacyReuseKeyword)
+		if flags != 0 {
+			if target := legacyReuseWord(dst, true); target != nil {
+				*target |= flags
+			}
+		}
+	}
+	if symbol := legacyReuseFirstLeafSymbol(src); symbol != src.symbol {
+		setLegacyReuseRawSymbol(dst, symbol)
+	}
+}
+
+// Nested ERROR regions can expose hidden derivations and alias decisions that
+// a clean subtree receipt does not authenticate. Follow only error-bearing
+// paths; ordinary clean suffixes do not require a second tree walk.
+func incrementalRecoveryShapeCertified(root *Node) bool {
+	return incr.RecoveryShape(root, func(n *Node) bool { return n == nil || !n.HasError() },
+		func(n *Node) bool { return n.IsError() },
+		func(n *Node) int { return n.ChildCount() },
+		func(n *Node, i int) *Node { return n.Child(i) })
 }

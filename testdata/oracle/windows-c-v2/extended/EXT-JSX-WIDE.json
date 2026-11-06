@@ -10327,6 +10327,6 @@
   "fixture": "EXT-JSX-WIDE",
   "language": "javascript",
   "source_sha256": "0f5407bee55a34294c09957f61e4992a5857e2f97b5e6ae73724d96f016d43ae",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "e9c88fb0b59c9d88202d4b4dc544321c16fac87e0985a732c7e0b818c35ade28"
 }

@@ -352,6 +352,6 @@
   "fixture": "RH-before-2f0dd5ceb23e8a4e",
   "language": "go",
   "source_sha256": "5ee2ecb22dd3d82055fe85725e501d084884712612b6f90e1ec5ca536fa8877a",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "60fedf8e332dee90124044287f3d0a0ab2a287efee0be0aa5542edb90b0fbafc"
 }

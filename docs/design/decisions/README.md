@@ -51,3 +51,4 @@ understand whether the contract is still right.
 | 0015 | Derived Go grammar and recovery | Accepted |
 | 0016 | Curated publication and release evidence | Accepted |
 | 0017 | Exclude unclear grammars; assurance by release scope | Accepted |
+| 0018 | Evaluate the approved runtime baseline transition | Accepted |

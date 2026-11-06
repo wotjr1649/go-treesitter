@@ -9,9 +9,15 @@ type parserColdState struct {
 	pendingForkStackReserve         []glrStack
 	pendingFrontierForkStackReserve []glrStack
 	cNodeMemoCollisions             uint64
+	cPausedLookaheads               map[*gssNode]Token
 	recoveryRuntime                 recoveryRuntimeTelemetry
 	// memoryBudgetBytes is the SetMemoryBudgetBytes value. Zero keeps the
 	// default budget. A negative value turns the per-parse budget off.
 	memoryBudgetBytes       int64
 	recoveryRuntimeDetailed *recoveryRuntimeDetailedState
+	// Hidden verification keeps routing but emits no public admission event.
+	admissionCountersSuppressed bool
+	// Nonadvancing stateless markers require C recovery ordering and GSS paths.
+	crecoveryEmptyExternal bool
+	admissionConvergedWork [3]uint64
 }

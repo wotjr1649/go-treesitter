@@ -1,0 +1,13 @@
+diff --git a/parser_recover_c.go b/parser_recover_c.go
+--- a/parser_recover_c.go
++++ b/parser_recover_c.go
+@@ -5397,7 +5397,8 @@
+ 			}
+ 		}
+ 	}
+-	cacheRecoveredStatus := p.emptyExternalRecoveryEnabled()
++	// C keeps the outer version's status_i when condense swaps physical slots.
++	cacheRecoveredStatus := packedVersionOrder || p.emptyExternalRecoveryEnabled()
+ 	var topologyBefore []glrStack
+ 	if workCountInstrumentationEnabled {
+ 		topologyBefore = append(topologyBefore, stacks...)

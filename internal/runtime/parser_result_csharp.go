@@ -76,7 +76,6 @@ func normalizeCSharpCompatibility(root *Node, source []byte, p *Parser, lang *La
 			normalizeCSharpSplitScopedLambdaStatements(root, source, lang)
 		}
 		normalizeCSharpInvocationStatements(root, source, lang)
-		normalizeCSharpDereferenceLogicalAndCasts(root, source, lang)
 		normalizeCSharpConditionalIsPatternInitializers(root, source, lang)
 		normalizeCSharpConditionalIsPatternExpressions(root, source, lang)
 		normalizeCSharpIdentifierIsPatternExpressions(root, source, lang)
@@ -116,7 +115,6 @@ func normalizeCSharpCompatibility(root *Node, source []byte, p *Parser, lang *La
 		normalizeCSharpRecoveredMethodBlocks(root, source, p)
 	}
 	normalizeCSharpInvocationStatements(root, source, lang)
-	normalizeCSharpDereferenceLogicalAndCasts(root, source, lang)
 	normalizeCSharpConditionalIsPatternInitializers(root, source, lang)
 	normalizeCSharpConditionalIsPatternExpressions(root, source, lang)
 	normalizeCSharpIdentifierIsPatternExpressions(root, source, lang)
@@ -723,7 +721,16 @@ func normalizeCSharpRecoveredTopLevelChunks(root *Node, source []byte, p *Parser
 	retagResultRoot(root, compilationUnitSym, compilationUnitNamed)
 	replaceNodeChildrenUnfielded(root, recovered)
 	root.productionID = 0
-	root.setHasError(false)
+	// A recovered chunk may still carry an error: the statement fallback in
+	// csharpRecoverTopLevelChunkNodesFromRange assembles nodes from a partial
+	// re-parse whose interior flags never saw the ERROR deep inside. Re-derive
+	// the flags over each recovered subtree, then derive the root's flag from
+	// them, instead of clearing it: clearing left a root that reported
+	// HasError()=false above descendants that reported true.
+	for _, child := range recovered {
+		resultRecomputeHasErrorSubtree(child)
+	}
+	resultRefreshHasErrorFromChildren(root)
 	extendNodeToTrailingWhitespace(root, source)
 }
 

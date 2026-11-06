@@ -2,7 +2,11 @@ package gotreesitter
 
 import (
 	"fmt"
+	"github.com/wotjr1649/go-treesitter/internal/runtime/internal/recoverymerge"
 	"time"
+
+	"github.com/wotjr1649/go-treesitter/internal/runtime/internal/incr"
+	sharedrecover "github.com/wotjr1649/go-treesitter/internal/runtime/internal/recover"
 )
 
 // Parser-result assembly owns the private handoff from GLR/parse-stack nodes to
@@ -18,22 +22,26 @@ import (
 // into ordinary productions and the ERROR wrapper is spliced away), ancestor
 // flags set during the wrapped phase can be left behind. C cannot represent
 // this state: ts_subtree_has_error is DERIVED (error_cost > 0, which only
-// ERROR and MISSING subtrees contribute), so a tree with no ERROR/MISSING
-// descendant is definitionally HasError=false. A stale root flag is not
+// ERROR and MISSING subtrees contribute), so a tree with no retained ERROR/MISSING
+// history is definitionally HasError=false. A stale root flag is not
 // cosmetic — the retry ladder's treeParseClean/shouldRetryAcceptedErrorParse
 // read it and will run every widened retry pass on an already-clean parse
 // (bash cliff RCA 2026-07: 46s for a 657-byte file, ~7 wasted full passes).
 //
-// Clear-only by design: a node whose flag is set but whose subtree carries no
-// ERROR/MISSING is repaired; under-set flags are left alone (some language
-// normalizers deliberately leave repaired regions unflagged). Subtrees deeper
-// than maxTreeWalkDepth keep their existing claim (never cleared unverified).
+// Repair both stale and under-set flags. Retained hidden MISSING tokens are
+// checked separately on the selected root. Subtrees deeper than maxTreeWalkDepth
+// keep their existing claim (never cleared unverified).
 // Returns whether the subtree truly contains an error.
 func reconcileStaleHasErrorFlags(n *Node, depth int) bool {
+	return reconcileStaleHasErrorFlagsWithMissing(n, depth, false)
+}
+
+func reconcileStaleHasErrorFlagsWithMissing(n *Node, depth int, retainMissing bool) bool {
 	if n == nil {
 		return false
 	}
 	if n.symbol == errorSymbol || n.isMissing() {
+		n.setHasError(true)
 		return true
 	}
 	if depth >= maxTreeWalkDepth {
@@ -45,13 +53,27 @@ func reconcileStaleHasErrorFlags(n *Node, depth int) bool {
 	// exactly the subtrees this repair exists for.
 	for i, count := 0, nodeChildCount(n); i < count; i++ {
 		// No early exit: every stale sibling flag gets repaired.
-		if reconcileStaleHasErrorFlags(resultChildAt(n, i), depth+1) {
+		if reconcileStaleHasErrorFlagsWithMissing(resultChildAt(n, i), depth+1, retainMissing) {
 			has = true
 		}
 	}
-	if !has && n.hasError() {
-		n.setHasError(false)
+	if retainMissing && !has && n.hasError() && n.ownerArena != nil && rawShapeRefIsArenaBacked(n.rawShape) {
+		// A hidden missing leaf still contributes C error cost even when its
+		// hidden ancestors disappear from the public child list.
+		arena := n.ownerArena
+		has = recoverymerge.MayContainMissing(rawStackWalkEntry{entry: newStackEntryNode(n.parseState, n)}, maxTreeWalkDepth-depth,
+			func(item rawStackWalkEntry) (bool, int) {
+				count := stackEntryNodeChildCount(item.entry)
+				if shape, _, ok := rawShapeForStackWalkEntry(arena, item); ok {
+					count = len(arena.rawShapeChildren(shape))
+				}
+				return stackEntryNodeIsMissing(item.entry) && count == 0, count
+			},
+			func(item rawStackWalkEntry, i int) (rawStackWalkEntry, bool) {
+				return rawStackWalkChildAt(arena, item, i)
+			})
 	}
+	n.setHasError(has)
 	return has
 }
 
@@ -87,6 +109,24 @@ type parseMaterializationTiming struct {
 	actionSingleAcceptNanos            int64
 	actionSingleRecoverNanos           int64
 	actionSingleOtherNanos             int64
+}
+
+// retainedHiddenMissingFlags reads only hidden tokens from the selected
+// production. Visible MISSING nodes removed by result repair can remain in
+// raw snapshots, but the public tree owns their truth.
+func retainedHiddenMissingFlags(root *Node, lang *Language, arena *nodeArena) bool {
+	if root == nil || lang == nil {
+		return false
+	}
+	var entry stackEntry
+	setStackEntryNode(&entry, root)
+	return sharedrecover.ContainsMissing(rawStackWalkEntry{entry: entry}, func(item rawStackWalkEntry) (bool, int) {
+		sym, count, _ := rawStackWalkEntryHeader(arena, item)
+		missing := stackEntryNodeIsMissing(item.entry) && int(sym) < len(lang.SymbolMetadata) && !lang.SymbolMetadata[sym].Visible
+		return missing, count
+	}, func(item rawStackWalkEntry, i int) (rawStackWalkEntry, bool) {
+		return rawStackWalkChildAt(arena, item, i)
+	})
 }
 
 func materializationTimingStart(t *parseMaterializationTiming) time.Time {
@@ -563,7 +603,7 @@ func stackCompareForResultSelectionWithRawShape(p *Parser, arena *nodeArena, a, 
 			}
 			return -1
 		} else if ac > 0 {
-			if p.compactPackedGSSVersionOrderEnabled() && a.cAcceptOrder != b.cAcceptOrder {
+			if a.cAcceptOrder != 0 && b.cAcceptOrder != 0 && a.cAcceptOrder != b.cAcceptOrder {
 				if a.cAcceptOrder < b.cAcceptOrder {
 					return -1
 				}
@@ -1079,6 +1119,26 @@ func cachedStackEntryErrorRank(entry stackEntry, arena *nodeArena) int {
 		cacheInline := arena != nil && n.ownerArena == arena
 		if cacheInline && n.errorRankCache != 0 {
 			return int(n.errorRankCache - 1)
+		}
+		if !cacheInline && (n.ownerArena == nil || n.childIndex > finalChildSidecarIndexBase) {
+			// Published dense subtrees already contain Node children. Walk
+			// those pointers directly instead of reconstructing and decoding a
+			// stackEntry at every edge. Foreign nodes remain read-only, and
+			// every descendant still contributes its original error rank.
+			return incr.SubtreeErrorRank(n, func(current *Node) (int, []*Node) {
+				if (arena != nil && current.ownerArena == arena) ||
+					(current.ownerArena != nil && current.childIndex <= finalChildSidecarIndexBase) {
+					return cachedStackEntryErrorRank(newStackEntryNode(current.parseState, current), arena), nil
+				}
+				if current.symbol == errorSymbol {
+					return 2, nil
+				}
+				rank := 0
+				if current.hasError() {
+					rank = 1
+				}
+				return rank, current.children
+			})
 		}
 		rank := computeStackEntryErrorRank(entry, arena)
 		if cacheInline {
@@ -1616,3 +1676,63 @@ func (p *Parser) buildResultFromNodes(nodes []*Node, source []byte, arena *nodeA
 // parsing with grammargen-produced grammars that can create pathologically deep
 // hidden-node chains (e.g. Scala with >1M levels).
 const maxTreeWalkDepth = 5000
+
+// resultRefreshHasErrorFromChildren derives n's hasError bit from its direct
+// children: set when any child is an ERROR node or carries an error, clear
+// otherwise. A result-compatibility pass that replaces a node's children must
+// call this instead of clearing the bit by hand, so the parent/child HasError
+// invariant (a parent reports an error whenever a descendant does) survives
+// the rewrite.
+func resultRefreshHasErrorFromChildren(n *Node) {
+	if n == nil {
+		return
+	}
+	n.setHasError(false)
+	for i := 0; i < resultChildCount(n); i++ {
+		child := resultChildAt(n, i)
+		if child != nil && (child.IsError() || child.HasError()) {
+			n.setHasError(true)
+			return
+		}
+	}
+}
+
+// resultRecomputeHasErrorSubtree re-derives the hasError bit of every
+// interior node under n (n included) from its descendants, post-order: an
+// interior node reports an error when it is an ERROR node itself or when any
+// child is an ERROR node or reports an error (the same rule the parser
+// applies when it builds a parent, see trackChildErrors in tree.go). Leaves
+// keep the flag the parser gave them. Recovery passes that assemble nodes from
+// partial re-parses (for example the c_sharp top-level statement recovery)
+// can hand back a subtree whose interior flags never saw the ERROR deep
+// inside it; run this over that subtree before attaching it to a result root.
+func resultRecomputeHasErrorSubtree(n *Node) {
+	if n == nil {
+		return
+	}
+	var local [64]*Node
+	order := local[:0]
+	order = append(order, n)
+	for i := 0; i < len(order); i++ {
+		cur := order[i]
+		for j := 0; j < resultChildCount(cur); j++ {
+			if child := resultChildAt(cur, j); child != nil {
+				order = append(order, child)
+			}
+		}
+	}
+	for i := len(order) - 1; i >= 0; i-- {
+		cur := order[i]
+		if resultChildCount(cur) == 0 {
+			continue
+		}
+		has := cur.IsError()
+		for j := 0; !has && j < resultChildCount(cur); j++ {
+			child := resultChildAt(cur, j)
+			if child != nil && (child.IsError() || child.hasError()) {
+				has = true
+			}
+		}
+		cur.setHasError(has)
+	}
+}

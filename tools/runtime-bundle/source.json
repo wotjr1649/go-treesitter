@@ -1,11 +1,11 @@
 {
   "baseline": {
     "module": "github.com/odvcencio/gotreesitter",
-    "version": "v0.53.0",
-    "tag": "f102332cca9dc45e841b9439d34ba5cc59f0b10f",
-    "commit": "c871b1f576866c40b1695677fe3512243e266d39"
+    "version": "v0.56.0",
+    "tag": "7a1e5770e16d607a1f4dc3a6f8ce28342d0de187",
+    "commit": "ac4e027e02525e9d1d005c54ed5e54979271e4ed"
   },
-  "archive_sha256": "a7fc4a2f1b369542b14429c36a09a41d6db0bb0d2beec5844930b4a17c6ae3a6",
+  "archive_sha256": "0925d93fadca3ad943e20594d602c3639d79f9ad8f82d466262672890d7592a6",
   "internal_module": "github.com/wotjr1649/go-treesitter/internal/runtime",
   "packages": [
     ".",
@@ -14,31 +14,57 @@
     "grammars",
     "grammars/runtime",
     "grammars/internal/standaloneregistry",
-    "grammars/internal/pythonruntime"
+    "grammars/internal/pythonruntime",
+    "internal/declarationfacts",
+    "internal/incr",
+    "internal/recover",
+    "internal/recoverymerge",
+    "internal/recoveryturn",
+    "internal/reducechoice",
+    "internal/scannerstate",
+    "internal/sched",
+    "internal/syntaxfacts"
   ],
   "assets": [
     "LICENSE",
     "grammars/languages.lock",
     "testdata/result_compat_ownership_v1.json"
   ],
-  "file_count": 1527,
+  "file_count": 1595,
   "patches": [
-    "KR-0001b-jsx-text.patch",
     "catalog-c-family-lexer-reuse.patch",
-    "KR-0002-csharp-recovery-transaction.patch",
     "KR-0004-csharp-preserve-recovery-errors.patch",
+    "csharp-packed-raw-cost.patch",
+    "c-oracle-error-leaf-zero-cost.patch",
     "catalog-optional-blob-providers.patch",
-    "go-recovery-version-order.patch",
-    "recovery-lookahead-and-eof.patch",
-    "recovery-variable-token-width.patch",
-    "recovery-cost-memo.patch",
     "incremental-leaf-conflict.patch",
-    "recovery-raw-child-memo.patch"
+    "csharp-acceptance-order.patch",
+    "c-oracle-zero-width-external-sibling-lex.patch",
+    "c-oracle-preserve-lookahead-on-recovery.patch",
+    "c-oracle-condense-status-order.patch",
+    "c-oracle-jsx-invalid-reference.patch",
+    "c-oracle-js-family-recovery-token-frontier.patch",
+    "c-oracle-js-family-state-local-tokenization.patch",
+    "c-oracle-preserve-c-recovery-summary-versions.patch",
+    "c-oracle-recovery-default-merge-width.patch",
+    "c-oracle-javascript-default-c-recovery.patch",
+    "go-derived-blob.patch",
+    "go-derived-runtime-recovery.patch",
+    "go-zero-external-scanner.patch",
+    "go-c-derived-registry-source.patch",
+    "go-derived-recovery-order.patch",
+    "c-oracle-preserve-inserted-missing.patch",
+    "c-oracle-preserve-accepted-raw-children.patch",
+    "c-oracle-go-lookahead-and-eof.patch",
+    "c-oracle-deferred-missing-turns.patch",
+    "c-oracle-physical-recovery-turns.patch",
+    "c-oracle-js-family-local-lookahead.patch",
+    "c-oracle-preserve-native-recovery-order.patch"
   ],
   "inputs": [
     {
       "path": "tools/runtime-bundle/grammars/go.json",
-      "sha256": "ac5df100bf51e2d791e085f45ea45fc8384148892856315f705d80b4bc8cd6ec"
+      "sha256": "cb27703f9dcc30a5563a06606811a59a04199c2f076ce46fc368cf276c1627c1"
     },
     {
       "path": "tools/runtime-bundle/grammars/go-source.zip",

@@ -276,6 +276,6 @@
   "fixture": "TS-string-fuzz",
   "language": "typescript",
   "source_sha256": "2b9a782265dbb40b6f73a382f71d819ad5ab625538383e9be23929ed136a074f",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "be32ebbd8c5355929b5019b7bed720ed074daa4d62b3e23810fb96fddcf45ea1"
 }

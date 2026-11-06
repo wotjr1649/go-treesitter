@@ -123,6 +123,7 @@ func captureDiagnosticParserCoreS5Scheduler(s *diagnosticParserCoreGenericSchedu
 	value.conflictScratch.headerAssembly = diagnosticParserCoreS5CloneSlice(s.conflictScratch.headerAssembly)
 	value.headerRollbackScratch.headers = diagnosticParserCoreS5CloneSlice(s.headerRollbackScratch.headers)
 	value.footprintRefs = diagnosticParserCoreS5CloneSlice(s.footprintRefs)
+	value.relexZeroWidthPreScanScratch = diagnosticParserCoreS5CloneSlice(s.relexZeroWidthPreScanScratch)
 	value.canonicalScratch.keys = diagnosticParserCoreS5CloneSlice(s.canonicalScratch.keys)
 	value.canonicalScratch.headerBuffers[0] = diagnosticParserCoreS5CloneSlice(s.canonicalScratch.headerBuffers[0])
 	value.canonicalScratch.headerBuffers[1] = diagnosticParserCoreS5CloneSlice(s.canonicalScratch.headerBuffers[1])
@@ -130,6 +131,18 @@ func captureDiagnosticParserCoreS5Scheduler(s *diagnosticParserCoreGenericSchedu
 		value.canonicalScratch.groups = make(map[diagnosticParserCorePhaseHead]diagnosticParserCoreCanonicalGroup, len(s.canonicalScratch.groups))
 		for key, group := range s.canonicalScratch.groups {
 			value.canonicalScratch.groups[key] = group
+		}
+	}
+	// zeroWidthCatchUp is a map: value := *s above shares its backing storage
+	// with the live scheduler. Without this clone, a speculative S5 trial
+	// that spends a budget entry (or lazily creates one) mutates the map a
+	// later restore() is supposed to roll back, and a restore after that
+	// trial would leave the spent or speculative entry in place instead of
+	// reverting to what captureDiagnosticParserCoreS5Scheduler observed.
+	if s.zeroWidthCatchUp != nil {
+		value.zeroWidthCatchUp = make(map[uint64]diagnosticParserCoreZeroWidthCatchUpState, len(s.zeroWidthCatchUp))
+		for key, state := range s.zeroWidthCatchUp {
+			value.zeroWidthCatchUp[key] = state
 		}
 	}
 	if s.receipt != nil {
@@ -271,8 +284,6 @@ func (s *diagnosticParserCoreGenericScheduler) s5CollectReductionActions(
 				if !action.Extra && !action.Repetition {
 					hasShift = true
 				}
-			case core.ActionAccept:
-				hasShift = true
 			case core.ActionReduce:
 				if action.ChildCount == 0 {
 					continue
@@ -934,6 +945,11 @@ func (s *diagnosticParserCoreGenericScheduler) s5AppendAndMergeAbsorberOwned(
 	absorb.head = incumbent
 	absorb.paused = false
 	absorb.shifted = true
+	// absorb := anyHeaders[0] above copies anyHeaders[0]'s own recoveryFlags
+	// byte, including diagnosticParserCoreZeroWidthReopenedFlag
+	// (parsercore_phase0_driver.go); this S5 absorption gives it a fresh
+	// recovery shift, so any earlier zero-width reopen no longer applies.
+	absorb.clearZeroWidthReopened()
 	absorb.accepted = false
 	absorb.openRecoveryRegion(&diagnosticParserCoreS3Region{
 		state: state, startByte: s.token.StartByte, endByte: s.token.EndByte,
@@ -978,8 +994,15 @@ func (s *diagnosticParserCoreGenericScheduler) s5RunOwned(
 	if s.token.Symbol == 0 && !s.options.allowCompactS5EOFMissingInsertion {
 		return false, nil
 	}
-	tokenCount := core.Symbol(s.tokenSource.language.TokenCount)
-	if tokenCount <= 1 || tokenCount > math.MaxUint16 {
+	// Check the raw uint32 count before the narrowing conversion. A
+	// conversion first would truncate an out-of-range count and hide the
+	// overflow from this guard.
+	rawTokenCount := s.tokenSource.language.TokenCount
+	if rawTokenCount > math.MaxUint16 {
+		return false, nil
+	}
+	tokenCount := core.Symbol(rawTokenCount)
+	if tokenCount <= 1 {
 		return false, nil
 	}
 	original := s.headers[index]

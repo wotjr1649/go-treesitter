@@ -466,6 +466,6 @@
   "fixture": "javascript-spread",
   "language": "javascript",
   "source_sha256": "9c1a24244146c68db481989ea93d8301536717ebe7ccfb1df05f5a88cc16ab64",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "eb860287d36f7cc6c77530083ee0c74af48b894bf40b2b2720a085af726acb6b"
 }

@@ -1055,6 +1055,6 @@
   "fixture": "CS-unindented",
   "language": "c_sharp",
   "source_sha256": "122c2e7ceaa22036b265b420aa538c7abe9265df89a46698f09feb42bf54754a",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "25740da7c07934980a82cec49a6ac9c6929ef48bff7abc08039fb6ada190ce21"
 }

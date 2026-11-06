@@ -314,6 +314,6 @@
   "fixture": "CS-zero-identifier-reduction-unicode",
   "language": "c_sharp",
   "source_sha256": "63130e931e424ae94a87626adc8040fe40feb11ac519113a41817ccbf3fc57be",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "131c9bc205b4f5bee1f89d108524ef84105568bc750106e1775d5fe92d111ed7"
 }

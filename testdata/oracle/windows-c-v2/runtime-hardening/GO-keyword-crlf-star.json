@@ -295,6 +295,6 @@
   "fixture": "GO-keyword-crlf-star",
   "language": "go",
   "source_sha256": "fcae3a210a9679124621533c0e1b509aced11cc74a37397216dcd9df4e3d2b73",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "abc7276f56e758359f0ec4e0c2b0802a122e6ceedc7d08bb04a79a1621f4325b"
 }

@@ -1131,6 +1131,6 @@
   "fixture": "CS-else-declaration-reduction-renamed",
   "language": "c_sharp",
   "source_sha256": "d92b6821f70b9599429b0f3784b4d246327bc06d0ee217ef776b4ace889592b9",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "7f70f65c6d138f7c14d14691496a1d210f846e11d27c236fd687ccb1cab31241"
 }

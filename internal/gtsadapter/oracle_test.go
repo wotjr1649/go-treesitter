@@ -156,7 +156,7 @@ func runOracleRecords(t *testing.T) {
 	runOracleCorpus(t, "testdata/oracle/cases.json", "testdata/oracle/windows-c-v2/base", "testdata/oracle/active-differences.json")
 }
 
-func runOracleCorpus(t *testing.T, casesPath, recordsDir, differencesPath string) {
+func runOracleCorpus(t *testing.T, casesPath, recordsDir, differencesPath string, selectedIDs ...string) map[string]oracleRecord {
 	root, err := filepath.Abs(filepath.Join("..", ".."))
 	if err != nil {
 		t.Fatal(err)
@@ -265,39 +265,61 @@ func runOracleCorpus(t *testing.T, casesPath, recordsDir, differencesPath string
 	for _, c := range cases {
 		byID[c.ID] = c
 	}
+	if len(selectedIDs) > 1 {
+		t.Fatal("multiple oracle fixture selections")
+	}
+	if len(selectedIDs) == 1 {
+		selected, ok := byID[selectedIDs[0]]
+		if !ok {
+			t.Fatalf("unknown oracle fixture selection: %s", selectedIDs[0])
+		}
+		cases = []oracleCase{selected}
+	}
 	idPattern := regexp.MustCompile(`^[A-Za-z0-9_-]+$`)
 	buildHash := fmt.Sprintf("%x", sha256.Sum256(manifest))
+	receipts := make(map[string]oracleRecord, len(cases))
+	loadRecord := func(t *testing.T, c oracleCase) ([]byte, oracleRecord) {
+		t.Helper()
+		var source []byte
+		if c.Source != nil {
+			source = []byte(*c.Source)
+		} else {
+			if !filepath.IsLocal(*c.Path) || !strings.HasPrefix(*c.Path, "testdata/") {
+				t.Fatal("unbounded fixture path")
+			}
+			path, err := filepath.EvalSymlinks(filepath.Join(root, filepath.FromSlash(*c.Path)))
+			if err != nil {
+				t.Fatal(err)
+			}
+			relative, err := filepath.Rel(root, path)
+			if err != nil || !filepath.IsLocal(relative) {
+				t.Fatal("fixture escapes repository")
+			}
+			source, err = os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+		var receipt oracleRecord
+		read(recordsDir+"/"+c.ID+".json", &receipt)
+		if err := validateOracle(c, source, receipt, buildHash, build.Grammars[c.Language].ABI); err != nil {
+			t.Fatal(err)
+		}
+		return source, receipt
+	}
 	for _, c := range cases {
 		if !idPattern.MatchString(c.ID) || seen[c.ID] || (c.Source == nil) == (c.Path == nil) {
 			t.Fatal("duplicate/invalid fixture")
 		}
 		seen[c.ID] = true
+		if len(selectedIDs) == 1 {
+			_, receipt := loadRecord(t, c)
+			receipts[c.ID] = receipt
+			continue
+		}
 		t.Run(c.ID, func(t *testing.T) {
-			var source []byte
-			if c.Source != nil {
-				source = []byte(*c.Source)
-			} else {
-				if !filepath.IsLocal(*c.Path) || !strings.HasPrefix(*c.Path, "testdata/") {
-					t.Fatal("unbounded fixture path")
-				}
-				path, err := filepath.EvalSymlinks(filepath.Join(root, filepath.FromSlash(*c.Path)))
-				if err != nil {
-					t.Fatal(err)
-				}
-				relative, err := filepath.Rel(root, path)
-				if err != nil || !filepath.IsLocal(relative) {
-					t.Fatal("fixture escapes repository")
-				}
-				source, err = os.ReadFile(path)
-				if err != nil {
-					t.Fatal(err)
-				}
-			}
-			var receipt oracleRecord
-			read(recordsDir+"/"+c.ID+".json", &receipt)
-			if err := validateOracle(c, source, receipt, buildHash, build.Grammars[c.Language].ABI); err != nil {
-				t.Fatal(err)
-			}
+			source, receipt := loadRecord(t, c)
+			receipts[c.ID] = receipt
 			result, err := (Adapter{}).Parse(context.Background(), syntax.Request{Filename: c.Filename, Source: source, Timeout: 10 * time.Second})
 			if result.Tree != nil {
 				defer result.Tree.Close()
@@ -382,12 +404,22 @@ func runOracleCorpus(t *testing.T, casesPath, recordsDir, differencesPath string
 			}
 		})
 	}
+	return receipts
 }
 
 func TestCSharpRecoveryOrigin(t *testing.T) {
+	const fixtureID = "CS-JsonTextReader-excerpt-cs"
+	records := runOracleCorpus(t, "testdata/oracle/csharp-preservation-cases.json", "testdata/oracle/windows-c-v2/cs-preservation", "", fixtureID)
+	receipt, ok := records[fixtureID]
+	if !ok {
+		t.Fatal("missing identity-validated current C receipt")
+	}
 	source, err := os.ReadFile("../../testdata/newtonsoft/JsonTextReader-excerpt.cs")
 	if err != nil {
 		t.Fatal(err)
+	}
+	if fmt.Sprintf("%x", sha256.Sum256(source)) != receipt.SourceSHA256 {
+		t.Fatal("raw runtime source does not match the identity-validated C fixture")
 	}
 	lang := grammars.DetectLanguageByName("c_sharp").Language()
 	parser := gts.NewParser(lang)
@@ -400,8 +432,8 @@ func TestCSharpRecoveryOrigin(t *testing.T) {
 		t.Fatalf("raw runtime failure: %T", err)
 	}
 	nodes := snapshot(raw.RootNode(), lang)
-	if nodeDigest(nodes) != "673a2377a867d27cf8c0a02a5e54df64d3610547f38efe8b69cdb61c9aca59cc" || !raw.RootNode().HasError() {
-		t.Fatal("raw runtime disagrees with the pinned C recovery tree")
+	if first := logNodeDifference(t, "raw runtime/current C", nodes, receipt.Nodes); first >= 0 || raw.RootNode().HasError() != receipt.HasError {
+		t.Fatal("raw runtime disagrees with the current identity-validated C recovery tree")
 	}
 	t.Logf("raw runtime nodes=%d digest=%s error=%t stop=%s", len(nodes), nodeDigest(nodes), raw.RootNode().HasError(), raw.ParseRuntime().StopReason)
 }

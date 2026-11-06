@@ -390,6 +390,6 @@
   "fixture": "tsx-newline-optional-in",
   "language": "tsx",
   "source_sha256": "2d9a64aab3c346b5c7555602956c354788ccb653dfc5679332219db6464a6855",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "35c282631b2c4e27ce0c78c5b53607cb4fb3932cf11623148232e30d22bb1654"
 }

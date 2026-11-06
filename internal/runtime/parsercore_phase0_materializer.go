@@ -69,7 +69,7 @@ type compactMaterializer struct {
 	budgetScheduler        *diagnosticParserCoreGenericScheduler
 	materializationScratch *diagnosticParserCoreMaterializationScratch
 	acceptedLeaves         *diagnosticParserCoreAcceptedLeafCoverageScratch
-	replayTransition       core.MaterializationReplayTransition
+	replayTransition       core.MaterializationReplayBorrowedTransition
 	points                 diagnosticParserCorePointIndex
 	// view and replayView are the eager driver's visit arguments. frames is
 	// the pending-subtree traversal stack.
@@ -89,6 +89,7 @@ type compactMaterializer struct {
 	lastEagerNodes   uint64
 	lastEagerSkipped uint64
 	lastAdopted      bool
+	purpose          core.MaterializationPurpose
 
 	replayRootPre                   core.StateID
 	recoveryTerminalAlias           Symbol
@@ -116,6 +117,13 @@ func (m *compactMaterializer) begin(
 		return errors.New("parser-core phase zero: materializer requires a compact core and a parser")
 	}
 	m.compact, m.parser, m.source, m.scratch = compact, parser, source, scratch
+	m.purpose = core.MaterializationForPublication
+	if scratch != nil {
+		m.purpose = scratch.materializationPurpose
+	}
+	if m.purpose != core.MaterializationForPublication && m.purpose != core.MaterializationForComparison {
+		return errors.New("parser-core phase zero: unknown materialization purpose")
+	}
 	m.incrementalReuse = incrementalReuse
 	m.replayEnabled = replayEnabled
 	m.replayTransition = nil
@@ -127,9 +135,14 @@ func (m *compactMaterializer) begin(
 			}
 		}
 		m.replayRootPre = core.StateID(parser.replayRootPreGotoState())
-		m.replayTransition = func(pre core.StateID, view core.MaterializationReplayView) (core.StateID, bool, error) {
-			state, known, err := parser.replayCompactMaterializationTransition(StateID(pre), view)
-			return core.StateID(state), known, err
+		// Nil-scratch acceptance trials used the states-free postorder walk.
+		// Reusing its buffers must not add replay work to that public-shape
+		// comparison. Publication still authenticates and stamps every state.
+		if m.purpose != core.MaterializationForComparison {
+			m.replayTransition = func(pre core.StateID, view *core.MaterializationReplayView) (core.StateID, bool, error) {
+				state, known, err := parser.replayCompactMaterializationTransition(StateID(pre), view)
+				return core.StateID(state), known, err
+			}
 		}
 	}
 	m.arena = acquireNodeArena(arenaClassFull)
@@ -139,9 +152,9 @@ func (m *compactMaterializer) begin(
 	// visit. Set the language identity before publishing the first
 	// checkpoint so the incremental reuse gate can authenticate the copied
 	// snapshots.
-	m.scannerProvenanceTransferProven = true
+	m.scannerProvenanceTransferProven = m.purpose == core.MaterializationForPublication
 	m.usesScannerCheckpoints = languageUsesExternalScannerCheckpoints(parser.language)
-	if m.usesScannerCheckpoints {
+	if m.usesScannerCheckpoints && m.purpose == core.MaterializationForPublication {
 		_, identityRequired, identityValid := externalScannerCheckpointIdentityStatus(parser.language)
 		if identityRequired {
 			m.scannerProvenanceTransferProven = identityValid && m.arena.setExternalScannerCheckpointIdentityForLanguage(parser.language)
@@ -356,7 +369,7 @@ func (m *compactMaterializer) visitEager(id core.SubtreeID, view *core.Materiali
 	}
 	m.ensureTables(int(id) + 1)
 	if m.replayEnabled {
-		state, known, err := m.replayTransition(pre, m.replayView)
+		state, known, err := m.replayTransition(pre, &m.replayView)
 		if err != nil {
 			return err
 		}
@@ -399,7 +412,7 @@ func (m *compactMaterializer) buildPending(root core.SubtreeID, pre core.StateID
 					}
 					// The replay advances the parent's cursor by the child's
 					// result even when the tables held no transition.
-					state, _, err := m.replayTransition(top.cursor, replay)
+					state, _, err := m.replayTransition(top.cursor, &replay)
 					if err != nil {
 						return err
 					}
@@ -446,7 +459,7 @@ func (m *compactMaterializer) restampRoot(id core.SubtreeID) error {
 	if err := m.compact.FillMaterializationView(id, view, &m.replayView); err != nil {
 		return err
 	}
-	state, known, err := m.replayTransition(m.replayRootPre, m.replayView)
+	state, known, err := m.replayTransition(m.replayRootPre, &m.replayView)
 	if err != nil {
 		return err
 	}
@@ -462,11 +475,35 @@ func (m *compactMaterializer) poll() error {
 	reason := m.parser.resultMaterializationStopReason(m.arena)
 	if !resultMaterializationShouldStop(reason) && m.budgetScheduler != nil {
 		additional := arenaAllocatedVolume(m.arena)
-		coverageBytes := m.acceptedLeaves.footprintBytes()
+		if m.scratch != nil {
+			if math.MaxUint64-additional < m.scratch.materializationReferenceBytes {
+				additional = math.MaxUint64
+			} else {
+				additional += m.scratch.materializationReferenceBytes
+			}
+		}
+		// A retained comparison workspace is already charged in full by the
+		// scheduler, including its coverage and checkpoint buffers.
+		comparisonCharged := false
+		if publication := m.budgetScheduler.options.acceptanceMaterializationScratch; publication != nil {
+			comparisonCharged = m.scratch != nil && publication.acceptanceComparison == m.scratch
+		}
+		coverageBytes := uint64(0)
+		if !comparisonCharged {
+			coverageBytes = m.acceptedLeaves.footprintBytes()
+		}
 		if math.MaxUint64-additional < coverageBytes {
 			additional = math.MaxUint64
 		} else {
 			additional += coverageBytes
+		}
+		if !comparisonCharged && m.materializationScratch != nil {
+			checkpointBytes := m.materializationScratch.checkpoints.RetainedBytes()
+			if math.MaxUint64-additional < checkpointBytes {
+				additional = math.MaxUint64
+			} else {
+				additional += checkpointBytes
+			}
 		}
 		reason = m.budgetScheduler.stopControlMemoryBudgetReasonWithAdditionalBytes(additional)
 	}
@@ -618,8 +655,8 @@ func (m *compactMaterializer) visit(id core.SubtreeID, view *core.Materializatio
 			arena, Symbol(view.Symbol), named, view.StartByte, view.EndByte,
 			m.points.point(view.StartByte), m.points.point(view.EndByte),
 		)
-		if m.usesScannerCheckpoints && view.Terminal &&
-			!materializeCompactExternalScannerCheckpoint(m.compact, arena, node, *view) {
+		if m.usesScannerCheckpoints && m.purpose == core.MaterializationForPublication &&
+			!materializeCompactExternalScannerCheckpoint(m.compact, arena, node, *view, &m.materializationScratch.checkpoints) {
 			m.scannerProvenanceTransferProven = false
 		}
 		node.setExtra(view.Extra)

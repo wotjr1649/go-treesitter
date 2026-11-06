@@ -189,8 +189,11 @@ func matchStepsAllWithReader[N comparable, C any, R queryNodeReader[N, C]](q *Qu
 	if !nodeMatchesStepWithReader(q, step, node, lang, reader) {
 		return
 	}
-	next := cloneQueryCapturesWithReader(captures)
-	appendCaptureIDsWithReader(q, step.captureIDs, node, &next, reader)
+	next := captures
+	if len(step.captureIDs) > 0 {
+		next = cloneQueryCapturesWithReader(captures)
+		appendCaptureIDsWithReader(q, step.captureIDs, node, &next, reader)
+	}
 	if predicatesStillViableWithReader(q, predicates, next, source, reader) {
 		matchStepChildrenAllWithReader(q, steps, stepIdx, node, lang, source, predicates, next, budget, reader, emit)
 	}
@@ -280,7 +283,7 @@ func matchAlternationBranchWithReader[N comparable, C any, R queryNodeReader[N, 
 func matchChildStepsAllWithReader[N comparable, C any, R queryNodeReader[N, C]](q *Query, parent N, steps []QueryStep, childSteps []queryChildStepInfo, lang *Language, source []byte, predicates []QueryPredicate, captures []C, budget *queryMatchBudget, reader R, emit func([]C)) {
 	childCount := reader.ChildCount(parent)
 	var inline [64]int
-	namedPositions := inline[:0]
+	var namedPositions []int
 	if childCount <= len(inline) {
 		namedPositions = inline[:childCount]
 	} else {
@@ -309,6 +312,21 @@ func matchChildStepsRecursiveAllWithReader[N comparable, C any, R queryNodeReade
 	minCount, maxCount, ok := quantifierBounds(step.quantifier)
 	if !ok {
 		return
+	}
+	// Reject a run before enumerating its capture combinations when a required
+	// following sibling cannot occur anywhere after it. This also covers an
+	// anchored successor; the precise adjacency check still runs below.
+	if childPos+1 < len(childSteps) {
+		following := childSteps[childPos+1]
+		followingStep := &steps[following.stepIdx]
+		followingMin, _, valid := quantifierBounds(followingStep.quantifier)
+		if valid && followingMin > 0 {
+			var followingInline [32]int
+			possible, ok := collectChildCandidateIndicesWithReader(q, parent, followingStep, following.field, nextChildIdx, lang, followingInline[:0], reader)
+			if !ok || len(possible) == 0 {
+				return
+			}
+		}
 	}
 	var inline [32]int
 	candidates, ok := collectChildCandidateIndicesWithReader(q, parent, step, cs.field, nextChildIdx, lang, inline[:0], reader)

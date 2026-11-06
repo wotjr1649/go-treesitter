@@ -141,6 +141,268 @@ const (
 	yTokCount // 113
 )
 
+// yamlDefaultSymTable records the concrete gotreesitter.Symbol IDs the
+// currently shipped yaml.bin assigns to each external, in yTok* order (all
+// 113 externals sit in one contiguous run, 1-113). It exists only as a
+// pre-bind fallback (and as an independent value to compare a real bind
+// against in tests); ExternalScannerForLanguage below overwrites it with
+// values read from the actual loaded Language at bind time, which is what
+// the scanner must do to survive a future blob regen that renumbers
+// absolute symbol IDs without touching the externals list order.
+var yamlDefaultSymTable = [yTokCount]gotreesitter.Symbol{
+	1,   // _eof
+	2,   // _s_dir_yml_bgn
+	3,   // _r_dir_yml_ver
+	4,   // _s_dir_tag_bgn
+	5,   // _r_dir_tag_hdl
+	6,   // _r_dir_tag_pfx
+	7,   // _s_dir_rsv_bgn
+	8,   // _r_dir_rsv_prm
+	9,   // _s_drs_end
+	10,  // _s_doc_end
+	11,  // _r_blk_seq_bgn
+	12,  // _br_blk_seq_bgn
+	13,  // _b_blk_seq_bgn
+	14,  // _r_blk_key_bgn
+	15,  // _br_blk_key_bgn
+	16,  // _b_blk_key_bgn
+	17,  // _r_blk_val_bgn
+	18,  // _br_blk_val_bgn
+	19,  // _b_blk_val_bgn
+	20,  // _r_blk_imp_bgn
+	21,  // _r_blk_lit_bgn
+	22,  // _br_blk_lit_bgn
+	23,  // _r_blk_fld_bgn
+	24,  // _br_blk_fld_bgn
+	25,  // _br_blk_str_ctn
+	26,  // _r_flw_seq_bgn
+	27,  // _br_flw_seq_bgn
+	28,  // _b_flw_seq_bgn
+	29,  // _r_flw_seq_end
+	30,  // _br_flw_seq_end
+	31,  // _b_flw_seq_end
+	32,  // _r_flw_map_bgn
+	33,  // _br_flw_map_bgn
+	34,  // _b_flw_map_bgn
+	35,  // _r_flw_map_end
+	36,  // _br_flw_map_end
+	37,  // _b_flw_map_end
+	38,  // _r_flw_sep_bgn
+	39,  // _br_flw_sep_bgn
+	40,  // _r_flw_key_bgn
+	41,  // _br_flw_key_bgn
+	42,  // _r_flw_jsv_bgn
+	43,  // _br_flw_jsv_bgn
+	44,  // _r_flw_njv_bgn
+	45,  // _br_flw_njv_bgn
+	46,  // _r_dqt_str_bgn
+	47,  // _br_dqt_str_bgn
+	48,  // _b_dqt_str_bgn
+	49,  // _r_dqt_str_ctn
+	50,  // _br_dqt_str_ctn
+	51,  // _r_dqt_esc_nwl
+	52,  // _br_dqt_esc_nwl
+	53,  // _r_dqt_esc_seq
+	54,  // _br_dqt_esc_seq
+	55,  // _r_dqt_str_end
+	56,  // _br_dqt_str_end
+	57,  // _r_sqt_str_bgn
+	58,  // _br_sqt_str_bgn
+	59,  // _b_sqt_str_bgn
+	60,  // _r_sqt_str_ctn
+	61,  // _br_sqt_str_ctn
+	62,  // _r_sqt_esc_sqt
+	63,  // _br_sqt_esc_sqt
+	64,  // _r_sqt_str_end
+	65,  // _br_sqt_str_end
+	66,  // _r_sgl_pln_nul_blk
+	67,  // _br_sgl_pln_nul_blk
+	68,  // _b_sgl_pln_nul_blk
+	69,  // _r_sgl_pln_nul_flw
+	70,  // _br_sgl_pln_nul_flw
+	71,  // _r_sgl_pln_bol_blk
+	72,  // _br_sgl_pln_bol_blk
+	73,  // _b_sgl_pln_bol_blk
+	74,  // _r_sgl_pln_bol_flw
+	75,  // _br_sgl_pln_bol_flw
+	76,  // _r_sgl_pln_int_blk
+	77,  // _br_sgl_pln_int_blk
+	78,  // _b_sgl_pln_int_blk
+	79,  // _r_sgl_pln_int_flw
+	80,  // _br_sgl_pln_int_flw
+	81,  // _r_sgl_pln_flt_blk
+	82,  // _br_sgl_pln_flt_blk
+	83,  // _b_sgl_pln_flt_blk
+	84,  // _r_sgl_pln_flt_flw
+	85,  // _br_sgl_pln_flt_flw
+	86,  // _r_sgl_pln_tms_blk
+	87,  // _br_sgl_pln_tms_blk
+	88,  // _b_sgl_pln_tms_blk
+	89,  // _r_sgl_pln_tms_flw
+	90,  // _br_sgl_pln_tms_flw
+	91,  // _r_sgl_pln_str_blk
+	92,  // _br_sgl_pln_str_blk
+	93,  // _b_sgl_pln_str_blk
+	94,  // _r_sgl_pln_str_flw
+	95,  // _br_sgl_pln_str_flw
+	96,  // _r_mtl_pln_str_blk
+	97,  // _br_mtl_pln_str_blk
+	98,  // _r_mtl_pln_str_flw
+	99,  // _br_mtl_pln_str_flw
+	100, // _r_tag
+	101, // _br_tag
+	102, // _b_tag
+	103, // _r_acr_bgn
+	104, // _br_acr_bgn
+	105, // _b_acr_bgn
+	106, // _r_acr_ctn
+	107, // _r_als_bgn
+	108, // _br_als_bgn
+	109, // _b_als_bgn
+	110, // _r_als_ctn
+	111, // _bl
+	112, // comment
+	113, // _err_rec
+}
+
+// yamlExternalScannerSpec pins the upstream scanner sources this Go port
+// tracks. tree-sitter-yaml a1c4812a73ec replaced the SCN_SUCC, SCN_STOP, and
+// SCN_FAIL preprocessor defines with a ScanStatus enum and changed four
+// sub-scanner return types from char to ScanStatus. That change removes the
+// -Wswitch-outside-range warnings on targets where char is unsigned. The
+// status values stay -1, 0, and 1, and this port already returns int8, so the
+// Go behavior is identical. src/grammar.json, src/parser.c, src/node-types.json,
+// and the three schema translation units are byte-identical across the bump.
+var yamlExternalScannerSpec = ExternalScannerSpec{
+	Language:       "yaml",
+	UpstreamRepo:   "https://github.com/tree-sitter-grammars/tree-sitter-yaml",
+	UpstreamCommit: "a1c4812a73ec5e089de8e441fdea3a921e8d5079",
+	SourceFiles: []ExternalScannerSourceFile{
+		{Path: "src/grammar.json", SHA256: "a2c03fcc9bd9b7843780854f5e8264c9d465a34172b530d9511d6e89c5d2630e"},
+		{Path: "src/scanner.c", SHA256: "a510c0ca699cf3853bd2192bf103e11132414bc002fe952a88a7106ffb5d44e9"},
+		{Path: "src/schema.core.c", SHA256: "91e56c3f3ae6fad1803b739ce4eb4568a782a9aec710f733db2f3e38d407a4d5"},
+	},
+	Externals: []string{
+		"_eof",
+		"_s_dir_yml_bgn",
+		"_r_dir_yml_ver",
+		"_s_dir_tag_bgn",
+		"_r_dir_tag_hdl",
+		"_r_dir_tag_pfx",
+		"_s_dir_rsv_bgn",
+		"_r_dir_rsv_prm",
+		"_s_drs_end",
+		"_s_doc_end",
+		"_r_blk_seq_bgn",
+		"_br_blk_seq_bgn",
+		"_b_blk_seq_bgn",
+		"_r_blk_key_bgn",
+		"_br_blk_key_bgn",
+		"_b_blk_key_bgn",
+		"_r_blk_val_bgn",
+		"_br_blk_val_bgn",
+		"_b_blk_val_bgn",
+		"_r_blk_imp_bgn",
+		"_r_blk_lit_bgn",
+		"_br_blk_lit_bgn",
+		"_r_blk_fld_bgn",
+		"_br_blk_fld_bgn",
+		"_br_blk_str_ctn",
+		"_r_flw_seq_bgn",
+		"_br_flw_seq_bgn",
+		"_b_flw_seq_bgn",
+		"_r_flw_seq_end",
+		"_br_flw_seq_end",
+		"_b_flw_seq_end",
+		"_r_flw_map_bgn",
+		"_br_flw_map_bgn",
+		"_b_flw_map_bgn",
+		"_r_flw_map_end",
+		"_br_flw_map_end",
+		"_b_flw_map_end",
+		"_r_flw_sep_bgn",
+		"_br_flw_sep_bgn",
+		"_r_flw_key_bgn",
+		"_br_flw_key_bgn",
+		"_r_flw_jsv_bgn",
+		"_br_flw_jsv_bgn",
+		"_r_flw_njv_bgn",
+		"_br_flw_njv_bgn",
+		"_r_dqt_str_bgn",
+		"_br_dqt_str_bgn",
+		"_b_dqt_str_bgn",
+		"_r_dqt_str_ctn",
+		"_br_dqt_str_ctn",
+		"_r_dqt_esc_nwl",
+		"_br_dqt_esc_nwl",
+		"_r_dqt_esc_seq",
+		"_br_dqt_esc_seq",
+		"_r_dqt_str_end",
+		"_br_dqt_str_end",
+		"_r_sqt_str_bgn",
+		"_br_sqt_str_bgn",
+		"_b_sqt_str_bgn",
+		"_r_sqt_str_ctn",
+		"_br_sqt_str_ctn",
+		"_r_sqt_esc_sqt",
+		"_br_sqt_esc_sqt",
+		"_r_sqt_str_end",
+		"_br_sqt_str_end",
+		"_r_sgl_pln_nul_blk",
+		"_br_sgl_pln_nul_blk",
+		"_b_sgl_pln_nul_blk",
+		"_r_sgl_pln_nul_flw",
+		"_br_sgl_pln_nul_flw",
+		"_r_sgl_pln_bol_blk",
+		"_br_sgl_pln_bol_blk",
+		"_b_sgl_pln_bol_blk",
+		"_r_sgl_pln_bol_flw",
+		"_br_sgl_pln_bol_flw",
+		"_r_sgl_pln_int_blk",
+		"_br_sgl_pln_int_blk",
+		"_b_sgl_pln_int_blk",
+		"_r_sgl_pln_int_flw",
+		"_br_sgl_pln_int_flw",
+		"_r_sgl_pln_flt_blk",
+		"_br_sgl_pln_flt_blk",
+		"_b_sgl_pln_flt_blk",
+		"_r_sgl_pln_flt_flw",
+		"_br_sgl_pln_flt_flw",
+		"_r_sgl_pln_tms_blk",
+		"_br_sgl_pln_tms_blk",
+		"_b_sgl_pln_tms_blk",
+		"_r_sgl_pln_tms_flw",
+		"_br_sgl_pln_tms_flw",
+		"_r_sgl_pln_str_blk",
+		"_br_sgl_pln_str_blk",
+		"_b_sgl_pln_str_blk",
+		"_r_sgl_pln_str_flw",
+		"_br_sgl_pln_str_flw",
+		"_r_mtl_pln_str_blk",
+		"_br_mtl_pln_str_blk",
+		"_r_mtl_pln_str_flw",
+		"_br_mtl_pln_str_flw",
+		"_r_tag",
+		"_br_tag",
+		"_b_tag",
+		"_r_acr_bgn",
+		"_br_acr_bgn",
+		"_b_acr_bgn",
+		"_r_acr_ctn",
+		"_r_als_bgn",
+		"_br_als_bgn",
+		"_b_als_bgn",
+		"_r_als_ctn",
+		"_bl",
+		"comment",
+		"_err_rec",
+	},
+}
+
+func init() {
+	RegisterExternalScannerSpec(yamlExternalScannerSpec)
+}
+
 // Indentation types.
 const (
 	yIndRot int16 = 'r'
@@ -200,15 +462,51 @@ type yamlEnv struct {
 
 // yamlPayload is stored as the scanner payload.
 type yamlPayload struct {
-	state  yamlState
-	symMap []gotreesitter.Symbol // external token index → grammar Symbol
+	state yamlState
 }
 
 // ---------------------------------------------------------------------------
 // Section 3: ExternalScanner interface
 // ---------------------------------------------------------------------------
 
-type YamlExternalScanner struct{}
+// YamlExternalScanner is a direct port of tree-sitter-yaml's C external
+// scanner.
+//
+// symbols holds the concrete gotreesitter.Symbol each external index maps to
+// in the Language this instance was bound to (see ExternalScannerForLanguage).
+// The scanner never hardcodes an absolute Symbol value: a blob regen can
+// renumber the grammar's absolute symbol IDs without touching the externals
+// list order, and a scanner that still called SetResultSymbol with a stale
+// hardcoded ID would silently emit the wrong (but still structurally valid)
+// node type instead of failing loudly.
+type YamlExternalScanner struct {
+	symbols         [yTokCount]gotreesitter.Symbol
+	externalToToken []int
+}
+
+// ExternalScannerForLanguage binds the scanner's token slots to the loaded
+// Language's ExternalSymbols positionally. A hardcoded absolute
+// gotreesitter.Symbol constant here would emit the wrong token whenever a
+// grammar bump renumbers yaml's external symbols. This also removes the
+// prior per-payload lazy loadEmbeddedLanguage("yaml.bin") lookup entirely:
+// the scanner now resolves its symbols once, at bind time.
+func (YamlExternalScanner) ExternalScannerForLanguage(lang *gotreesitter.Language) gotreesitter.ExternalScanner {
+	s := YamlExternalScanner{symbols: yamlDefaultSymTable}
+	s.externalToToken = bindExternalScannerSpec(lang, yamlExternalScannerSpec, func(tokenIdx int, sym gotreesitter.Symbol) {
+		s.symbols[tokenIdx] = sym
+	})
+	// The binding is immutable; per-parse state lives in Create's payload.
+	// Give it a stable instance identity so owned lexer snapshots do not copy
+	// or fingerprint the entire symbol mapping on each validation.
+	return &s
+}
+
+func (s YamlExternalScanner) symbolTable() *[yTokCount]gotreesitter.Symbol {
+	if s.symbols == ([yTokCount]gotreesitter.Symbol{}) {
+		return &yamlDefaultSymTable
+	}
+	return &s.symbols
+}
 
 func (YamlExternalScanner) Create() any {
 	p := &yamlPayload{}
@@ -257,8 +555,11 @@ func (YamlExternalScanner) Deserialize(payload any, buf []byte) {
 	s.blkImpRow = -1
 	s.blkImpCol = -1
 	s.blkImpTab = 0
-	s.indTypStk = []int16{yIndRot}
-	s.indLenStk = []int16{-1}
+	// A restore replaces the current cursor's indentation history. Snapshots
+	// own serialized bytes, so retaining these private buffers cannot alias
+	// another version's history.
+	s.indTypStk = append(s.indTypStk[:0], yIndRot)
+	s.indLenStk = append(s.indLenStk[:0], -1)
 	if len(buf) >= 10 {
 		off := 0
 		s.row = int16(binary.LittleEndian.Uint16(buf[off:]))
@@ -282,22 +583,29 @@ func (YamlExternalScanner) Deserialize(payload any, buf []byte) {
 	}
 }
 
-func (YamlExternalScanner) Scan(payload any, lexer *gotreesitter.ExternalLexer, validSymbols []bool) bool {
+func (s YamlExternalScanner) Scan(payload any, lexer *gotreesitter.ExternalLexer, validSymbols []bool) bool {
 	p := payload.(*yamlPayload)
-	// Lazy-init symbol map on first scan
-	if p.symMap == nil {
-		lang := loadEmbeddedLanguage("yaml.bin")
-		if lang != nil && len(lang.ExternalSymbols) >= yTokCount {
-			p.symMap = lang.ExternalSymbols
-		} else {
-			return false
+
+	if len(s.externalToToken) > 0 {
+		var semanticValid [yTokCount]bool
+		for externalIdx, valid := range validSymbols {
+			if !valid || externalIdx >= len(s.externalToToken) {
+				continue
+			}
+			tokenIdx := s.externalToToken[externalIdx]
+			if tokenIdx >= 0 && tokenIdx < yTokCount {
+				semanticValid[tokenIdx] = true
+			}
 		}
+		validSymbols = semanticValid[:]
 	}
+	syms := s.symbolTable()
+
 	env := yamlEnv{
 		lexer:        lexer,
 		validSymbols: validSymbols,
 		st:           &p.state,
-		symMap:       p.symMap,
+		symMap:       syms[:],
 	}
 	return env.scan()
 }

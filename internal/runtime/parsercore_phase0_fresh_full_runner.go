@@ -3,6 +3,7 @@
 package gotreesitter
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"strings"
@@ -41,10 +42,8 @@ type parserCoreFreshFullRunner struct {
 	frontierVerificationToken   *dropCohortActivationToken
 	certificateAdmissionToken   *dropCohortActivationToken
 	scannerScratch              []byte
-	// scratch retains the reusable per-parse materialization buffers. The runner
-	// is per-Parser and single-goroutine, so reusing these buffers across parses
-	// mirrors production's parser-held arena reuse and keeps the warm steady
-	// state from re-allocating the public-tree scratch on every parse.
+	// scratch retains materialization buffers across exclusive runtime leases.
+	// Published trees own their storage independently of these buffers.
 	scratch   parserCoreRunnerScratch
 	scheduler diagnosticParserCoreGenericScheduler
 	// eagerPreviousReduceScratch restores the parser's reduce scratch after
@@ -165,6 +164,7 @@ func (r *parserCoreFreshFullRunner) executeSchedulerOpenWithObserverAndErrorRuns
 		r.options.stopControlMemoryBudgetBytes = parseMemoryBudgetForParser(r.options.stopControlParser, len(source))
 		r.options.stopControlHardCeilingBytes = parseMemoryHardCeilingBytesForParse(r.options.stopControlParser, len(source))
 	}
+	r.options.captureCertificationPeaks = r.parser != nil && r.parser.compactCertificationTelemetry
 	// See DiagnosticParserCorePrefixOptions.materializationParser: this runner
 	// is reused across parses, so these fields are refreshed on every call
 	// rather than set once at construction. materializationForceReplayParseStates
@@ -253,7 +253,8 @@ func requireParserCoreFreshFullAcceptance(scheduler *diagnosticParserCoreGeneric
 	if acceptance.Token.Symbol != 0 || acceptance.Token.StartByte != wantEOF || acceptance.Token.EndByte != wantEOF ||
 		acceptance.Token.Missing || acceptance.Token.NoLookahead || acceptance.Token.ExternalScannerToken ||
 		!header.Accepted || header.Paused || header.ExactPaths != 1 &&
-		!selectedCertifiedPrimary && !selectedMaterialityCertified && !selectedStructuralElectionCertified ||
+		!selectedCertifiedPrimary && !selectedMaterialityCertified && !selectedStructuralElectionCertified &&
+		!acceptance.RecoveredElectionCertified ||
 		!parserCoreFreshFullAcceptedTailIsClean(source, header.ByteOffset, continuationEscape) || !acceptCountValid {
 		// See the comment above: census classification is opt-in and additive.
 		if admissionCensusEnabled() {
@@ -379,6 +380,37 @@ func (r *parserCoreFreshFullRunner) materializeSelection(source []byte, compact 
 		}
 	}
 	r.scratch.materializationBudgetScheduler = scheduler
+	if !allowErrorRoot && rootFinalization == diagnosticParserCoreFinalizeDefault &&
+		r.options.compactIncrementalReuse == nil {
+		if tree, ok := r.scratch.acceptanceMaterialization.Take(compact,
+			scheduler.acceptedHead, scheduler.acceptedPayloads,
+			compactAcceptanceMaterializationContext(r.replayParseStates)); ok {
+			if tree.language == r.parser.language && bytes.Equal(tree.source, source) &&
+				(compactAcceptanceMaterializationContext(r.replayParseStates) == 0 || compact.TableIdentityMatches()) {
+				r.scratch.materializationBudgetScheduler = nil
+				// Acceptance comparisons can outlast the reference's final poll.
+				// Check the deadline without traversal throttling, then charge
+				// the transferred arena and retained scratch as publication does.
+				if reason := r.parser.activeParseStopReason(); resultMaterializationShouldStop(reason) {
+					tree.Release()
+					return nil, &diagnosticParserCoreDecline{boundary: DiagnosticParserCoreCap,
+						detail: "accepted-tree materialization stopped: " + string(reason)}
+				}
+				m := compactMaterializer{
+					parser: r.parser, arena: tree.arena, budgetScheduler: scheduler,
+					materializationScratch: &r.scratch.materialization,
+					acceptedLeaves:         &r.scratch.acceptedLeaves,
+				}
+				if err := m.poll(); err != nil {
+					tree.Release()
+					return nil, err
+				}
+				return tree, nil
+			}
+			tree.Release()
+		}
+	}
+	r.scratch.acceptanceMaterialization.Discard()
 	tree, err := materializeDiagnosticParserCoreAcceptedSelectionWithRootFinalization(
 		compact,
 		scheduler.acceptedHead,
@@ -524,6 +556,22 @@ func (r *parserCoreFreshFullRunner) parseWithObserverAndErrorRuns(
 	}()
 	r.beginEagerMaterialization(source)
 	defer r.endEagerMaterialization()
+	r.scratch.acceptanceMaterialization.Discard()
+	r.options.acceptanceMaterializationScratch = nil
+	if !r.s3AllowErrorRoot() && r.options.compactIncrementalReuse == nil &&
+		r.scratch.incrementalReuse == nil && r.options.eagerMaterializer == nil {
+		r.options.acceptanceMaterializationScratch = &r.scratch
+	} else {
+		// This attempt cannot use the comparison lease. Drop its retained
+		// storage before scheduler memory accounting starts without the hook.
+		r.scratch.acceptanceComparison = nil
+		r.scratch.derivations = core.DerivationScratch{}
+	}
+	defer func() {
+		r.options.acceptanceMaterializationScratch = nil
+		r.scheduler.options.acceptanceMaterializationScratch = nil
+		r.scratch.acceptanceMaterialization.Discard()
+	}()
 	scheduler, tokenSource, err := r.executeSchedulerOpenWithObserverAndErrorRuns(
 		source, r.compact, true, observer, forceErrorRuns,
 	)
@@ -543,8 +591,14 @@ func (r *parserCoreFreshFullRunner) parseWithObserverAndErrorRuns(
 		return nil, materializeErr
 	}
 	if tree != nil {
-		tree.parseRuntime.TokensConsumed = scheduler.tokens
-		tree.parseRuntime.CompactReductions = scheduler.work.Reductions
+		treeRT := tree.ensureParseRuntime()
+		treeRT.TokensConsumed = scheduler.tokens
+		treeRT.CompactReductions = scheduler.work.Reductions
+		if r.options.captureCertificationPeaks {
+			treeRT.CompactPeakHeaders = scheduler.work.PeakHeaders
+			treeRT.CompactPeakDerivations = scheduler.peakLiveDerivations
+			treeRT.CompactMultiHeaderTokens = uint32(min(scheduler.multiHeaderTokens, uint64(^uint32(0))))
+		}
 	}
 	return tree, nil
 }

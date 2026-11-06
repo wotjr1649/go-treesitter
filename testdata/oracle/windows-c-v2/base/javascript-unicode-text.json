@@ -333,6 +333,6 @@
   "fixture": "javascript-unicode-text",
   "language": "javascript",
   "source_sha256": "7f66123e1fb818a0ba95b014d1ffddf7a4b9f57c20a6b35c18359577c144515f",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "029750d753894feee368c3606fe4212c11ad1035163adcfba79b1205186cd543"
 }

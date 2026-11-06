@@ -387,7 +387,14 @@ func recoveryCostNodeErrorCost(
 	if node.Missing && len(node.Children) == 0 {
 		return uint32(RecoveryCostPerMissingTree + RecoveryCostPerRecovery), nil
 	}
-	var cost uint32
+	var cost uint64
+	addCost := func(value uint64) error {
+		if value > math.MaxUint32-cost {
+			return errors.New("parser-core phase zero: recovery node error cost overflow")
+		}
+		cost += value
+		return nil
+	}
 	for _, childID := range node.Children {
 		if childID == 0 {
 			continue
@@ -405,7 +412,9 @@ func recoveryCostNodeErrorCost(
 		if err != nil {
 			return 0, err
 		}
-		cost += childCost
+		if err := addCost(uint64(childCost)); err != nil {
+			return 0, err
+		}
 	}
 	if node.Symbol == RecoveryErrorSymbol {
 		if len(node.Aliases) != 0 && len(node.Aliases) != len(node.Children) {
@@ -426,13 +435,20 @@ func recoveryCostNodeErrorCost(
 				continue
 			}
 			if RecoverySymbolVisible(symbols, child.Symbol) {
-				cost += RecoveryCostPerSkippedTree
+				if err := addCost(RecoveryCostPerSkippedTree); err != nil {
+					return 0, err
+				}
 			} else if len(child.Children) > 0 {
 				vis, err := recoveryVisibleChildCount(symbols, src, childID)
 				if err != nil {
 					return 0, err
 				}
-				cost += RecoveryCostPerSkippedTree * uint32(vis)
+				if vis < 0 || uint64(vis) > math.MaxUint32 {
+					return 0, errors.New("parser-core phase zero: recovery visible-child count overflow")
+				}
+				if err := addCost(uint64(RecoveryCostPerSkippedTree) * uint64(vis)); err != nil {
+					return 0, err
+				}
 			}
 		}
 		spanBytes := uint32(0)
@@ -443,9 +459,13 @@ func recoveryCostNodeErrorCost(
 		if node.EndRow > node.StartRow {
 			spanRows = node.EndRow - node.StartRow
 		}
-		cost += RecoveryCostPerRecovery + RecoveryCostPerSkippedChar*spanBytes + RecoveryCostPerSkippedLine*spanRows
+		if err := addCost(uint64(RecoveryCostPerRecovery) +
+			uint64(RecoveryCostPerSkippedChar)*uint64(spanBytes) +
+			uint64(RecoveryCostPerSkippedLine)*uint64(spanRows)); err != nil {
+			return 0, err
+		}
 	}
-	return cost, nil
+	return uint32(cost), nil
 }
 
 // RecoveryErrorStatus is the compact equivalent of parser_recover_c.go's
@@ -542,9 +562,9 @@ type RecoveryGraphAggregate struct {
 	PathCount               uint64
 }
 
-// RecoveryGraphAggregateLimitError reports a graph aggregate that exceeds a
+// ErrRecoveryGraphAggregateLimit reports a graph aggregate that exceeds a
 // Core traversal limit. The aggregate never calls Derivations before it stops.
-var RecoveryGraphAggregateLimitError = errors.New("parser-core phase zero: recovery graph aggregate limit")
+var ErrRecoveryGraphAggregateLimit = errors.New("parser-core phase zero: recovery graph aggregate limit")
 
 type recoveryGraphAggregateNode struct {
 	maximumVisible uint32
@@ -637,7 +657,7 @@ func (c *Core) RecoveryGraphAggregateForHead(
 		reachableIDs = append(reachableIDs, id)
 		reachableNodes++
 		if reachableNodes > uint64(c.limits.MaxNodes) {
-			return result, false, fmt.Errorf("%w: reachable node graph", RecoveryGraphAggregateLimitError)
+			return result, false, fmt.Errorf("%w: reachable node graph", ErrRecoveryGraphAggregateLimit)
 		}
 		node := c.nodes[id-1]
 		if node.linkCount == 0 {
@@ -647,7 +667,7 @@ func (c *Core) RecoveryGraphAggregateForHead(
 			continue
 		}
 		if uint64(node.linkCount) > uint64(c.limits.MaxLinksPerBoundary) || uint64(node.linkCount) > uint64(c.limits.MaxLinks) {
-			return result, false, fmt.Errorf("%w: boundary links", RecoveryGraphAggregateLimitError)
+			return result, false, fmt.Errorf("%w: boundary links", ErrRecoveryGraphAggregateLimit)
 		}
 		var inline [inlineAdjacencyCapacity]linkRecord
 		links, linkErr := c.publishedNodeLinksInto(inline[:0], node)
@@ -656,7 +676,7 @@ func (c *Core) RecoveryGraphAggregateForHead(
 		}
 		reachableLinks += uint64(len(links))
 		if reachableLinks > uint64(c.limits.MaxLinks) {
-			return result, false, fmt.Errorf("%w: reachable link graph", RecoveryGraphAggregateLimitError)
+			return result, false, fmt.Errorf("%w: reachable link graph", ErrRecoveryGraphAggregateLimit)
 		}
 		for _, link := range links {
 			if err := link.validateShape(); err != nil {
@@ -697,7 +717,7 @@ func (c *Core) RecoveryGraphAggregateForHead(
 			return result, false, linkErr
 		}
 		if uint64(len(links)) > uint64(c.limits.MaxLinksPerBoundary) || uint64(len(links)) > uint64(c.limits.MaxLinks) {
-			return result, false, fmt.Errorf("%w: boundary links", RecoveryGraphAggregateLimitError)
+			return result, false, fmt.Errorf("%w: boundary links", ErrRecoveryGraphAggregateLimit)
 		}
 		for _, link := range links {
 			if err := link.validateShape(); err != nil {
@@ -749,7 +769,7 @@ func (c *Core) RecoveryGraphAggregateForHead(
 			}
 			current.pathCount = saturatingAddPaths(current.pathCount, prefix.pathCount)
 			if current.pathCount > uint64(c.limits.MaxDerivations) {
-				return result, false, fmt.Errorf("%w: derivation paths", RecoveryGraphAggregateLimitError)
+				return result, false, fmt.Errorf("%w: derivation paths", ErrRecoveryGraphAggregateLimit)
 			}
 			current.supported = current.supported && candidateSupported
 			current.valid = true

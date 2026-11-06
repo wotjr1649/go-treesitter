@@ -295,6 +295,6 @@
   "fixture": "EXT-JS-DELETE",
   "language": "javascript",
   "source_sha256": "428cf2207b40d92f2296050cc72af00fbec4af82c4e6573e6869747c65f67396",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "8757b121c96022da8d3bda6643d175d3200dfe60d47d4ac52adf66bdaa11fa52"
 }

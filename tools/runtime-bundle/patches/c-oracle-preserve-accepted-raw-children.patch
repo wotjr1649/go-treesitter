@@ -1,0 +1,59 @@
+diff --git a/parser_recover_c.go b/parser_recover_c.go
+--- a/parser_recover_c.go
++++ b/parser_recover_c.go
+@@ -5942,7 +5942,54 @@
+ 	)
+ 	root := p.newRecoveryParentNodeInArena(arena, cand.symbol, p.isNamedSymbol(cand.symbol), children, cand.productionID)
+ 	root.setFieldMetadata(fieldIDs, fieldSources)
+-	root.rawShape = captureRawShapeForNodeSlice(arena, cand.symbol, cand.productionID, children)
++	if cand.ownerArena != nil && cand.ownerArena != arena {
++		// Older trees do not carry raw refs into this parse's arena.
++		root.rawShape = captureRawShapeForNodeSlice(arena, cand.symbol, cand.productionID, children)
++	} else {
++		// Accept replaces the root's visible children, but its raw ledger must
++		// retain invisible MISSING terminals and their recovery cost.
++		item := rawStackWalkEntry{entry: newStackEntryNode(cand.parseState, cand)}
++		_, rootChildCount, _ := rawStackWalkEntryHeader(arena, item)
++		count := rootChildCount + len(nodes) - 1
++		if count > rawShapeMaxExactChildCount {
++			return ParseStopNodeLimit
++		}
++		ref, shape := arena.allocRawShape()
++		if shape == nil {
++			return ParseStopMemoryBudget
++		}
++		shape.symbol, shape.productionID = cand.symbol, cand.productionID
++		shape.childRange = arena.allocRawShapeChildren(count)
++		rawChildren := arena.rawShapeChildren(shape)
++		if len(rawChildren) != count {
++			return ParseStopMemoryBudget
++		}
++		out := 0
++		for i, node := range nodes {
++			if i != rootIdx {
++				rawChildren[out] = newRawShapeChild(newStackEntryNode(node.parseState, node))
++				out++
++				continue
++			}
++			for j := 0; j < rootChildCount; j++ {
++				if j&63 == 0 {
++					if reason := p.resultMaterializationStopReason(arena); resultMaterializationShouldStop(reason) {
++						return reason
++					}
++				}
++				child, ok := rawStackWalkChildAt(arena, item, j)
++				if !ok {
++					return ParseStopNoStacksAlive
++				}
++				edge := newRawShapeChild(child.entry)
++				edge.packedEntry.state = StateID(rawStackWalkEntryRef(child))
++				rawChildren[out] = edge
++				out++
++			}
++		}
++		arena.storeRawShapeHash(ref, rawShapeComputeContentHash(arena, ref, cand.symbol, cand.productionID, uint16(count), rawChildren))
++		root.rawShape = ref
++	}
+ 	root.dynamicPrecedence = nodeSliceDynamicPrecedence(children)
+ 	first, last := nodes[0], nodes[len(nodes)-1]
+ 	cSetNodeSpan(root, first.startByte, last.endByte, first.startPoint, last.endPoint)

@@ -37,6 +37,20 @@ const (
 	reserveChildrenPerKiB = 730 // 0.7129
 )
 
+// RecordArenaReservePlan separates speculative capacity from the progress
+// needed before reserving for the whole source. A short early decline should
+// not pay the density estimate for the full progress window. Larger sources
+// keep the same source-proportional first reserve, and sources within the
+// progress window keep their existing one-step reservation.
+func RecordArenaReservePlan(sourceBytes int) (initialBytes int, growAt uint32) {
+	const divisor, minInitialBytes, minProgressBytes = 16, 128, 1024
+	progress := max(sourceBytes/divisor, minProgressBytes)
+	if progress >= sourceBytes || uint64(progress) > uint64(^uint32(0)) {
+		return sourceBytes, 0
+	}
+	return max(sourceBytes/divisor, minInitialBytes), uint32(progress)
+}
+
 // ReserveRecordArenas reserves record-arena capacity for one parse over a
 // source of sourceLen bytes, so the five arenas that carry the compact
 // core's record mass -- nodes, nodeLineages, links, subtrees, children --
@@ -90,6 +104,48 @@ func (c *Core) ReserveRecordArenas(sourceLen int, maxBytes uint64) {
 	c.links = reserveArena(c.links, links)
 	c.subtrees = reserveArena(c.subtrees, subtrees)
 	c.children = reserveArena(c.children, children)
+}
+
+// GrowRecordArenas grows the record arenas to the capacity that
+// ReserveRecordArenas reserves for sourceLen and maxBytes, and keeps every
+// record already published. Like ReserveRecordArenas it is a pure capacity
+// operation: it changes no length, record, identifier, or Work counter, and
+// it never shrinks an arena. Unlike ReserveRecordArenas it runs on a core that
+// already holds records, so a caller can reserve for a source prefix before
+// the seed and for the whole source once the parse gets past that prefix.
+func (c *Core) GrowRecordArenas(sourceLen int, maxBytes uint64) {
+	if c == nil || sourceLen <= 0 {
+		return
+	}
+	nodes := reserveRecordCount(sourceLen, reserveNodesPerKiB, c.limits.MaxNodes)
+	links := reserveRecordCount(sourceLen, reserveLinksPerKiB, c.limits.MaxLinks)
+	subtrees := reserveRecordCount(sourceLen, reserveSubtreesPerKiB, c.limits.MaxSubtrees)
+	children := reserveRecordCount(sourceLen, reserveChildrenPerKiB, c.limits.MaxChildren)
+	total := reserveTotalBytes(nodes, links, subtrees, children)
+	if total == 0 {
+		return
+	}
+	if maxBytes > 0 && total > maxBytes {
+		nodes = scaleReserveCount(nodes, maxBytes, total)
+		links = scaleReserveCount(links, maxBytes, total)
+		subtrees = scaleReserveCount(subtrees, maxBytes, total)
+		children = scaleReserveCount(children, maxBytes, total)
+	}
+	c.nodes = growArena(c.nodes, nodes)
+	c.nodeLineages = growArena(c.nodeLineages, nodes)
+	c.links = growArena(c.links, links)
+	c.subtrees = growArena(c.subtrees, subtrees)
+	c.children = growArena(c.children, children)
+}
+
+// growArena returns arena with at least want capacity and the same records.
+func growArena[T any](arena []T, want int) []T {
+	if want <= 0 || cap(arena) >= want {
+		return arena
+	}
+	grown := make([]T, len(arena), want)
+	copy(grown, arena)
+	return grown
 }
 
 // ReserveRecordArenaBytes reports the total record-arena capacity, in bytes,

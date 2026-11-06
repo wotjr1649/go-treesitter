@@ -1,0 +1,24 @@
+diff --git a/parser.go b/parser.go
+index 83471dc..f8ef29e 100644
+--- a/parser.go
++++ b/parser.go
+@@ -6773,13 +6773,15 @@ func (p *Parser) parseInternal(source []byte, ts TokenSource, reuse *reuseCursor
+ 				// the visible token is empty. Let recovery process that token.
+ 				if tok.StartByte == tok.EndByte &&
+ 					!(tok.lexFlags&tokenFlagExternalErrorFallback != 0 && tok.ExternalScannerStartByte < tok.EndByte) {
+-					// A marker that advances neither input nor scanner state
+-					// selects a parser branch. Skipping it on an incompatible
+-					// sibling keeps that sibling alive. Layout transitions and
+-					// skipped whitespace still belong to per-version lexing.
++					// A zero-width external token selects a branch only for
++					// states that use the external scanner. A sibling whose
++					// lex mode has no external state must stay alive to lex its
++					// own internal lookahead at this byte position.
+ 					if tok.ExternalScannerToken && tok.ExternalScannerStartByte == tok.StartByte &&
+ 						dts != nil && len(dts.externalPreScanPayload) > 0 &&
+ 						dts.externalScannerStateMatches(dts.externalPreScanPayload) &&
++						int(currentState) < len(p.language.LexModes) &&
++						p.language.LexModes[currentState].ExternalLexState != 0 &&
+ 						p.glrSiblingAcceptsLookahead(stacks, s, tok) {
+ 						s.dead = true
+ 					} else {

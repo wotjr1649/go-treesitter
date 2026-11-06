@@ -1,0 +1,13 @@
+diff --git a/parser.go b/parser.go
+--- a/parser.go
++++ b/parser.go
+@@ -8411,7 +8411,8 @@
+ 		p.traceCRecoverPrepareStacks("post-cull", result.stacks)
+ 	}
+ 	if len(result.stacks) > 1 {
+-		if !p.emptyExternalRecoveryEnabled() || !p.errorCostCompetitionEnabled() || !cRecoveryRelevantStack(result.stacks) {
++		// Preserve C condense order during certified native recovery.
++		if (!p.emptyExternalRecoveryEnabled() && !p.compactPackedGSSVersionOrderEnabled()) || !p.errorCostCompetitionEnabled() || !cRecoveryRelevantStack(result.stacks) {
+ 			p.promotePrimaryStack(result.stacks)
+ 		}
+ 	} else {

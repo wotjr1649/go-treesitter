@@ -466,6 +466,6 @@
   "fixture": "EXT-TS-RENAME",
   "language": "typescript",
   "source_sha256": "174efdcb10679aaf7cc396c1d43d24ba3f1ce94ee50549dd9b9df7ded61bc7e5",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "2c07f98a6e02ae6b82e37c5ec15b78bc6fbcb0b31e9c5657b2e1b0ffd6695186"
 }

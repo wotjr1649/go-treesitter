@@ -1,4 +1,4 @@
-// modulezip uses the same x/mod revision vendored by Go 1.27.1.
+// modulezip uses the same x/mod revision vendored by Go 1.27.2 (unchanged from 1.27.1).
 package main
 
 import (

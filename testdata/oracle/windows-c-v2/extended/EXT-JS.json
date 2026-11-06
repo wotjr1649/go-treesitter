@@ -295,6 +295,6 @@
   "fixture": "EXT-JS",
   "language": "javascript",
   "source_sha256": "721bf030a406d80f06f547bfbfb93501dcea5b9f28cee2cab4497813f6942131",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "cf5c1ec19d198d615943ddede2a68c525ba5fe6d5b467aba26c3a30a143ff53d"
 }

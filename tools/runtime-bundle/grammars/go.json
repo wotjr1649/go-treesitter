@@ -2,8 +2,9 @@
   "schema": 1,
   "language": "go",
   "grammar_commit": "2346a3ab1bb3857b48b29d779a1ef9799a248cd7",
-  "origin_blob_sha256": "9cf914d26d962d1a62e7954f8b20b302337a44cb7d4a07218eec482c45a57a08",
+  "origin_blob_sha256": "df63fc35604c4e4e7a484abde9eb2110b61640045601c23991723f323a48310d",
   "product_blob_sha256": "81f9b19b5886ac11646c713c0c531bd835fc026d363437ba29b28ac2faabea9a",
+  "product_grammar_source": "ts2go_blob",
   "c_parser_sha256": "3dbf6ed1238b5dfcf2be4d2f2d4cb27a14d34f34d7784eccccbfd532fd4a6d85",
   "source_archive": {
     "path": "tools/runtime-bundle/grammars/go-source.zip",

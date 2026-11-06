@@ -29,7 +29,7 @@ const (
 	// these have no embedded blob.
 	GrammarSourceGrammargen GrammarSource = "grammargen"
 	// GrammarSourceGrammargenBlob marks an embedded .bin blob compiled by
-	// grammargen (cmd/grammargen -lr-split -bin ...), e.g. go.bin.
+	// grammargen (cmd/grammargen -lr-split -bin ...).
 	GrammarSourceGrammargenBlob GrammarSource = "grammargen_blob"
 )
 
