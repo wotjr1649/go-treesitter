@@ -94,6 +94,23 @@ Never widen a record to absorb a new failure. Open a new record.
 
 Declare the number of runs **before** running. A benchmark is never repeated until it passes.
 
+## Scratch retention
+
+`.scratch/` is disposable working space, not an evidence store. When a run is created, record its role
+(failure, intermediate comparison, or adoption candidate) in its receipt. Before a session closes, copy
+into `artifacts/`, with hashes, anything that a claim, handoff, or release depends on. When a historical
+record names a `.scratch` path, it says where something ran, not where it is kept.
+
+To delete `.scratch` content:
+
+1. Confirm that no live session or process uses it.
+2. Copy any unique evidence into `artifacts/` and verify its hash.
+3. Add a cleanup ledger to `artifacts/handoff/` that lists each old path, its kept location or `deleted`,
+   its SHA-256, and the reason.
+
+Never edit old records to drop a reference. Live tools read `.scratch/oracle`
+(`tools/native-oracle/run.py`), so do not delete it without re-running `prepare`.
+
 ## Definition of Done
 
 ### Work unit done
