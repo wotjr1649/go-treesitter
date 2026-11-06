@@ -144,6 +144,10 @@ func TestCSharpConstructOracleRecords(t *testing.T) {
 	runOracleCorpus(t, "testdata/oracle/csharp-constructs-cases.json", "testdata/oracle/windows-c-v2/cs-constructs", "")
 }
 
+func TestCSharpLambdaModifierOracleRecords(t *testing.T) {
+	runOracleCorpus(t, "testdata/oracle/csharp-lambda-modifier-cases.json", "testdata/oracle/windows-c-v2/cs-lambda-modifiers", "")
+}
+
 // KR-0005 (docs/validation/known-regressions.md): exact source, ordered Go/C digests and first differing node.
 var kr0005Signatures = map[string]struct {
 	source, goDigest, cDigest string
