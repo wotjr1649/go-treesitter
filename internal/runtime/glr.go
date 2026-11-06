@@ -5,7 +5,11 @@ import (
 	"fmt"
 	"os"
 	"sync"
+	"sync/atomic"
 	"unsafe"
+
+	"github.com/wotjr1649/go-treesitter/internal/runtime/internal/recoverymerge"
+	"github.com/wotjr1649/go-treesitter/internal/runtime/internal/recoveryturn"
 )
 
 // maxPooledGSSVisitedEntries bounds what gssCanReachVisitedPool will retain.
@@ -54,12 +58,12 @@ type glrStack struct {
 	// Once a stack is promoted to GSS (shared-prefix), entries becomes an
 	// optional cached materialization for indexed reduce/recover access.
 	entries []stackEntry
-	// cacheEntries keeps a materialized entries cache on this stack when true.
-	// We generally keep this enabled only for the primary stack.
-	cacheEntries bool
 	// byteOffset tracks the end byte of the latest non-nil node on stack.
 	// It avoids rescanning entries in merge/retention hot paths.
 	byteOffset uint32
+	// cPreviousByteOffset keeps the position before the latest shift for C
+	// recovery competition against a sibling not yet dispatched.
+	cPreviousByteOffset uint32
 	// score tracks dynamic precedence accumulated through reduce actions.
 	// It is used for tie-breaking when choosing a final parse.
 	score int
@@ -68,7 +72,7 @@ type glrStack struct {
 	dead bool
 	// accepted is set when the stack reaches a ParseActionAccept.
 	accepted bool
-	// C breaks equal positive-cost results by acceptance time, not slice position.
+	// C uses acceptance time to resolve equal positive-cost trees.
 	cAcceptOrder uint64
 	// shifted is set when this stack consumed the current token via a SHIFT
 	// action in a GLR fork that also produced REDUCE actions. When the
@@ -80,7 +84,12 @@ type glrStack struct {
 	recoverabilityKnown bool
 	// mayRecover is true when the stack is known to contain at least one
 	// state that can perform ParseActionRecover for some symbol.
-	mayRecover bool
+	mayRecover               bool
+	cPreviousByteOffsetValid bool
+	// The lockstep loop can shift the first recovery lookahead before C
+	// visits this version. Keep its competition deferred until its next
+	// physical dispatch, rather than for every reduction at that position.
+	cRecoveryDispatchPending recoveryturn.Kind
 	// branchOrder preserves original GLR fork order for exact-tie selection.
 	// Lower values correspond to earlier parse-table actions.
 	branchOrder uint64
@@ -94,7 +103,8 @@ type glrStack struct {
 	// lockstep token loop uses this to avoid letting an already-advanced
 	// sibling suppress that group's Strategy 1 recovery.
 	cRecoverMissingGroup *cRecGroup
-	// A missing-token sibling resumes its previous lookahead next round.
+	// cRecoverPendingToken queues this version's lookahead for the next
+	// shared-token dispatch, including when ERROR_STATE lexed a different width.
 	cRecoverPendingToken *Token
 	// diagnosticTopology carries a version identity only in gts_workcount
 	// builds. The production type is zero-sized, so it does not change the
@@ -165,6 +175,9 @@ type glrStack struct {
 	// Parser.crecoveryDroppedErrorForClean from this field, scoped to the
 	// selected stack only, with a same-position sibling check.
 	cRecoveryUnvalidatedMarker bool
+	// cacheEntries keeps a materialized entries cache on the primary stack.
+	// Keep this bit in the tail padding to preserve the 104-byte stack budget.
+	cacheEntries bool
 }
 
 const (
@@ -289,12 +302,20 @@ func (p *Parser) resetPendingStackBuffersAtBoundary() {
 }
 
 type glrMergeScratch struct {
+	// Sticky for the entire parse, including discards outside merging.
+	// Diagnostics must never determine the incremental recovery proof.
+	policyPruned        bool
+	closedRecoveryMerge bool
 	// lexicalReadSpan belongs to the active token source, never the pool.
-	lexicalReadSpan             *uint32
-	result                      []glrStack
-	slots                       []glrMergeSlot
-	largeSlots                  []glrMergeLargeSlot
-	perKeyCap                   int
+	lexicalReadSpan *uint32
+	result          []glrStack
+	slots           []glrMergeSlot
+	largeSlots      []glrMergeLargeSlot
+	perKeyCap       int
+	// C recovery retains distinct summary paths under the base per-key cap;
+	// ordinary parsing and explicit overrides retain their configured caps.
+	cRecoveryDefaultMergeWidth  bool
+	cRecoveryBasePerKeyCap      int
 	language                    *Language
 	packedGSSVersionOrderActive bool
 	arena                       *nodeArena
@@ -308,6 +329,12 @@ type glrMergeScratch struct {
 	// cRecoveryConvergence enables faithful cap-one convergence during an active
 	// recovery episode. A clean suffix returns to the ordinary merge path.
 	cRecoveryConvergence bool
+	// cRecoveryCondenseMerge permits equal-cost recovered prefixes during
+	// condense. Preflight and mutation must apply the same merge predicate.
+	cRecoveryCondenseMerge bool
+	// cClosedRecoveryMerge admits equal-cost closed heads only within a C
+	// action transaction or condense operation, before legacy pruning.
+	cClosedRecoveryMerge bool
 	// cRecoveryFallbackSuppression suppresses the non-GSS fallback after an
 	// active recovery-cost episode.
 	cRecoveryFallbackSuppression bool
@@ -355,6 +382,7 @@ type glrMergeScratch struct {
 	mergeSeen                map[gssMergePair]bool
 	gssOwner                 *gssScratch
 	preflightReachCacheBytes int64
+	preflightDenseBytes      int64
 	pythonShallow            bool
 	budgetBytes              int64
 	resultBytes              int64
@@ -606,12 +634,30 @@ func (s *glrStack) ensureGSS(scratch *gssScratch) {
 	if s.gss.head != nil || len(s.entries) == 0 {
 		return
 	}
+	entryCount := len(s.entries)
 	if workCountInstrumentationEnabled {
 		workCountTopologyPreparePromotion(s)
 	}
 	s.gss = buildGSSStack(s.entries, scratch)
 	if workCountInstrumentationEnabled {
 		workCountTopologyCommitPromotion(s)
+	}
+	// A real flat-to-GSS rebuild just happened: this is exactly the moment
+	// a fork disturbed a previously-demoted single stack. Reset the demotion
+	// hysteresis streak and re-derive its threshold from the depth this
+	// rebuild started from, so tryDemoteSingleLinearGSS (parser.go) waits
+	// for a fresh, depth-proportional run of single-stack tokens before
+	// paying another materialize cost. Scaling the threshold with depth (not
+	// holding it at a fixed constant) is what keeps the *total*
+	// demote+rebuild cost amortized O(depth) across the whole parse: see
+	// singleStackDemoteThreshold's doc comment (glr_gss.go).
+	if scratch != nil {
+		scratch.singleStackDemoteStreak = 0
+		threshold := uint32(gssDemotionHysteresisTokens)
+		if entryCount > 0 && uint32(entryCount) > threshold {
+			threshold = uint32(entryCount)
+		}
+		scratch.singleStackDemoteThreshold = threshold
 	}
 }
 
@@ -657,6 +703,17 @@ func (s *glrStack) top() stackEntry {
 	return s.entries[len(s.entries)-1]
 }
 
+func (s *glrStack) clearCRecoverPendingToken(tok Token) {
+	if s == nil || s.cRecoverPendingToken == nil {
+		return
+	}
+	pending := s.cRecoverPendingToken
+	if pending.Symbol == tok.Symbol && pending.StartByte == tok.StartByte && pending.EndByte == tok.EndByte &&
+		pending.ExternalScannerToken == tok.ExternalScannerToken {
+		s.cRecoverPendingToken = nil
+	}
+}
+
 func (s *glrStack) clone() glrStack {
 	workCountRecordVersionCreation()
 	if s.gss.head == nil && len(s.entries) > 0 {
@@ -666,6 +723,8 @@ func (s *glrStack) clone() glrStack {
 			entries:                    entries,
 			cacheEntries:               s.cacheEntries,
 			byteOffset:                 s.byteOffset,
+			cPreviousByteOffset:        s.cPreviousByteOffset,
+			cPreviousByteOffsetValid:   s.cPreviousByteOffsetValid,
 			score:                      s.score,
 			recoverabilityKnown:        s.recoverabilityKnown,
 			mayRecover:                 s.mayRecover,
@@ -673,6 +732,7 @@ func (s *glrStack) clone() glrStack {
 			cRec:                       s.cRec.clone(),
 			cRecoverMissingGroup:       s.cRecoverMissingGroup,
 			cRecoverPendingToken:       s.cRecoverPendingToken,
+			cRecoveryDispatchPending:   s.cRecoveryDispatchPending,
 			cAcceptOrder:               s.cAcceptOrder,
 			diagnosticTopology:         s.diagnosticTopology,
 			cNodeBaseline:              s.cNodeBaseline,
@@ -688,6 +748,8 @@ func (s *glrStack) clone() glrStack {
 		gss:                        s.gss.clone(),
 		cacheEntries:               s.cacheEntries,
 		byteOffset:                 s.byteOffset,
+		cPreviousByteOffset:        s.cPreviousByteOffset,
+		cPreviousByteOffsetValid:   s.cPreviousByteOffsetValid,
 		score:                      s.score,
 		recoverabilityKnown:        s.recoverabilityKnown,
 		mayRecover:                 s.mayRecover,
@@ -695,6 +757,7 @@ func (s *glrStack) clone() glrStack {
 		cRec:                       s.cRec.clone(),
 		cRecoverMissingGroup:       s.cRecoverMissingGroup,
 		cRecoverPendingToken:       s.cRecoverPendingToken,
+		cRecoveryDispatchPending:   s.cRecoveryDispatchPending,
 		cAcceptOrder:               s.cAcceptOrder,
 		diagnosticTopology:         s.diagnosticTopology,
 		cNodeBaseline:              s.cNodeBaseline,
@@ -713,6 +776,8 @@ func (s *glrStack) cloneWithScratch(scratch *gssScratch) glrStack {
 		gss:                        s.gss.clone(),
 		cacheEntries:               false,
 		byteOffset:                 s.byteOffset,
+		cPreviousByteOffset:        s.cPreviousByteOffset,
+		cPreviousByteOffsetValid:   s.cPreviousByteOffsetValid,
 		score:                      s.score,
 		recoverabilityKnown:        s.recoverabilityKnown,
 		mayRecover:                 s.mayRecover,
@@ -720,6 +785,7 @@ func (s *glrStack) cloneWithScratch(scratch *gssScratch) glrStack {
 		cRec:                       s.cRec.clone(),
 		cRecoverMissingGroup:       s.cRecoverMissingGroup,
 		cRecoverPendingToken:       s.cRecoverPendingToken,
+		cRecoveryDispatchPending:   s.cRecoveryDispatchPending,
 		cAcceptOrder:               s.cAcceptOrder,
 		diagnosticTopology:         s.diagnosticTopology,
 		cNodeBaseline:              s.cNodeBaseline,
@@ -1195,11 +1261,42 @@ func finalizeMaterializingShapeHash(prefix glrMaterializingShapeHash) (uint64, b
 // in scratch.shapePrefixCache so a fresh head only pays for its own new
 // entries. The rolling direction is root->head (matching the s.entries path
 // and gssNodeHash) so shared prefixes are reusable across heads and tokens.
+// gssShapePrefixVerify makes gssMaterializingShapePrefix recompute every
+// cache hit without the cache and compare, recording the first mismatch in
+// gssShapePrefixVerifyMismatches. Tests set it to prove the invalidation rule
+// (gssShapePrefixLink0Rewrites) never serves a stale prefix on a workload;
+// it is off in production.
+//
+// GOT_GLR_SHAPE_PREFIX_VERIFY=1 turns the same oracle on for a whole process
+// and makes a mismatch panic, so a Docker parity ring can run the real
+// corpora with the cache audited on every hit.
+var (
+	gssShapePrefixVerify           bool
+	gssShapePrefixVerifyPanic      bool
+	gssShapePrefixVerifyMismatches atomic.Uint64
+)
+
+func init() {
+	if os.Getenv("GOT_GLR_SHAPE_PREFIX_VERIFY") == "1" {
+		gssShapePrefixVerify = true
+		gssShapePrefixVerifyPanic = true
+	}
+}
+
 func gssMaterializingShapePrefix(scratch *glrMergeScratch, n *gssNode) glrMaterializingShapeHash {
 	if n == nil {
 		return glrMaterializingShapeHash{hash: gssHashSeed}
 	}
 	if cached, ok := lookupShapePrefixCache(scratch, n); ok {
+		if gssShapePrefixVerify {
+			if fresh := gssMaterializingShapePrefixUncached(scratch, n); fresh != cached {
+				gssShapePrefixVerifyMismatches.Add(1)
+				if gssShapePrefixVerifyPanic {
+					panic(fmt.Sprintf("gssMaterializingShapePrefix: stale cached prefix %+v, fresh %+v (GOT_GLR_SHAPE_PREFIX_VERIFY)", cached, fresh))
+				}
+				return fresh
+			}
+		}
 		return cached
 	}
 	var local [32]*gssNode
@@ -1209,6 +1306,9 @@ func gssMaterializingShapePrefix(scratch *glrMergeScratch, n *gssNode) glrMateri
 		if cached, ok := lookupShapePrefixCache(scratch, cur); ok {
 			prefix = cached
 			break
+		}
+		if perfCountersEnabled {
+			perfRecordShapePrefixWalkStep()
 		}
 		pending = append(pending, cur)
 	}
@@ -1221,6 +1321,28 @@ func gssMaterializingShapePrefix(scratch *glrMergeScratch, n *gssNode) glrMateri
 			}
 		}
 		storeShapePrefixCache(scratch, cur, prefix)
+	}
+	return prefix
+}
+
+// gssMaterializingShapePrefixUncached folds the full root->n link-0 chain
+// with the same per-entry hash as gssMaterializingShapePrefix, never reading
+// or writing the cache. It is the oracle for gssShapePrefixVerify.
+func gssMaterializingShapePrefixUncached(scratch *glrMergeScratch, n *gssNode) glrMaterializingShapeHash {
+	var local [64]*gssNode
+	chain := local[:0]
+	for cur := n; cur != nil; cur = cur.prev {
+		chain = append(chain, cur)
+	}
+	prefix := glrMaterializingShapeHash{hash: gssHashSeed}
+	for i := len(chain) - 1; i >= 0; i-- {
+		cur := chain[i]
+		if stackEntryMaterializesForResult(cur.entry) {
+			prefix = glrMaterializingShapeHash{
+				hash:  materializingShapeEntryHashWithScratch(scratch, prefix.hash, cur.entry),
+				count: prefix.count + 1,
+			}
+		}
 	}
 	return prefix
 }
@@ -1632,12 +1754,40 @@ func (s *glrMergeScratch) ensureMergeHotCaches() {
 	}
 }
 
+// gssShapePrefixLink0Rewrites counts every setGSSMainLink call that changed a
+// node's link 0 (prev or entry), process-wide. A cached root->head shape
+// prefix (gssMaterializingShapePrefix) folds exactly the link-0 chain, so it
+// can only go stale through one of these rewrites, a payload retarget at a
+// reduce site, or a new parse epoch. The merge sites read this counter before
+// and after a successful main merge and invalidate the cache only when the
+// merge rewrote a link 0: most successful merges only add extra links (or
+// re-point an extra link), which leaves every cached prefix exact. Before
+// this counter existed every successful merge invalidated the whole cache,
+// which made the next head hash rewalk the entire spine and turned the
+// fork/collapse-per-token pattern superlinear (issue #454, depth >= 1600).
+// Cross-parser increments only cause an extra, harmless invalidation.
+var gssShapePrefixLink0Rewrites atomic.Uint64
+
+// bumpShapePrefixEpochIfLink0Rewritten invalidates the cache when
+// gssShapePrefixLink0Rewrites moved past rewritesBefore, the value read just
+// before the merge that may have rewritten a link 0. nil-safe.
+func (s *glrMergeScratch) bumpShapePrefixEpochIfLink0Rewritten(rewritesBefore uint64) {
+	if s == nil || gssShapePrefixLink0Rewrites.Load() == rewritesBefore {
+		return
+	}
+	s.bumpShapePrefixEpoch()
+}
+
 // bumpShapePrefixEpoch invalidates every cached materializing-shape prefix in
-// O(1). Called when a GSS main merge rewrites links (stale prefixes) and at
-// the start of each parse epoch.
+// O(1). Called when a GSS main merge rewrote a link 0 (stale prefixes), at
+// the reduce sites that retarget a spine payload, and at the start of each
+// parse epoch.
 func (s *glrMergeScratch) bumpShapePrefixEpoch() {
 	if s == nil {
 		return
+	}
+	if perfCountersEnabled {
+		perfRecordShapePrefixEpochBump()
 	}
 	if s.shapePrefixEpoch == ^uint32(0) {
 		clear(s.shapePrefixCache)
@@ -1914,6 +2064,9 @@ func activeEquivAudit(scratch *glrMergeScratch) *runtimeAudit {
 }
 
 func stackEquivalentForMergeState(scratch *glrMergeScratch, lang *Language, state StateID, a, b *glrStack) bool {
+	if cRecoveryGroupSummariesDiffer(a, b) {
+		return false
+	}
 	if cRecoveryMergeCostsDiffer(scratch, a, b) {
 		return false
 	}
@@ -1923,6 +2076,28 @@ func stackEquivalentForMergeState(scratch *glrMergeScratch, lang *Language, stat
 		defer audit.clearEquivState()
 	}
 	return stackEquivalentForLanguageWithScratch(scratch, lang, a, b)
+}
+
+// cRecoveryGroupSummariesDiffer reports whether two physical paths that stand
+// in for one C ERROR_STATE version carry different strategy-1 summary inputs.
+// GSS merge preserves their tree histories, but the per-path cRec.summary is
+// not part of that graph. Merging these paths would therefore erase a
+// recoverable state/depth pair before the group's next C-style election.
+func cRecoveryGroupSummariesDiffer(a, b *glrStack) bool {
+	if a == nil || b == nil || a.cRec == nil || b.cRec == nil ||
+		a.cRec.group == nil || a.cRec.group != b.cRec.group {
+		return false
+	}
+	aSummary, bSummary := a.cRec.summary, b.cRec.summary
+	if len(aSummary) != len(bSummary) {
+		return true
+	}
+	for i := range aSummary {
+		if aSummary[i] != bSummary[i] {
+			return true
+		}
+	}
+	return false
 }
 
 // nodeEquivCacheIndex returns the primary slot index for the 2-way set-
@@ -3483,6 +3658,7 @@ func tryGSSMainMergeForParser(p *Parser, a, b *glrStack) bool {
 	if p != nil {
 		scratch = p.mergeScratch
 	}
+	rewritesBefore := gssShapePrefixLink0Rewrites.Load()
 	merged := gssMainMergeWithScratch(scratch, a, b)
 	if merged {
 		workCountRecordMergeSuccess()
@@ -3490,8 +3666,10 @@ func tryGSSMainMergeForParser(p *Parser, a, b *glrStack) bool {
 			mergeCensusRecordSuccess()
 		}
 		a.cEverErrored = a.cEverErrored || b.cEverErrored
+		a.score = mergedStackScore(a.score, b.score)
 		if p != nil {
-			p.mergeScratch.bumpShapePrefixEpoch()
+			dropLegacyMergeFlatMirror(p.mergeScratch, a)
+			p.mergeScratch.bumpShapePrefixEpochIfLink0Rewritten(rewritesBefore)
 		}
 	} else if mergeCensusEnabled {
 		mergeCensusRecordMergeFailed()
@@ -3525,6 +3703,7 @@ func tryGSSMainMergeForParserPhase(p *Parser, a, b *glrStack, phase string, reco
 	if p != nil {
 		scratch = p.mergeScratch
 	}
+	rewritesBefore := gssShapePrefixLink0Rewrites.Load()
 	merged = false
 	if workCountInstrumentationEnabled {
 		workCountTopologyRecordMergeBeforeMutation(a, b) // work-count-assembly: topology parser-merge success seam
@@ -3545,13 +3724,16 @@ func tryGSSMainMergeForParserPhase(p *Parser, a, b *glrStack, phase string, reco
 		// shed a merged-in recovered-wreckage lineage's error history (see
 		// glrStack.cEverErrored / tryGSSMainMergeResult).
 		a.cEverErrored = a.cEverErrored || b.cEverErrored
+		a.score = mergedStackScore(a.score, b.score)
 		if p != nil {
-			// Mirror tryGSSMainMergeResult (bumpShapePrefixEpoch above): a successful
-			// main merge rewrites link 0 (setGSSMainLink) of surviving nodes during
-			// dispatch, so every root->head shape prefix cached in the active merge
-			// scratch may now be stale. p.mergeScratch is nil outside a parse and
-			// bumpShapePrefixEpoch is nil-safe.
-			p.mergeScratch.bumpShapePrefixEpoch()
+			dropLegacyMergeFlatMirror(p.mergeScratch, a)
+			// Mirror tryGSSMainMergeResult: a successful main merge can rewrite
+			// link 0 (setGSSMainLink) of surviving nodes during dispatch, which
+			// makes every root->head shape prefix cached in the active merge
+			// scratch that runs through them stale. Invalidate only when the
+			// merge rewrote a link 0 (see gssShapePrefixLink0Rewrites).
+			// p.mergeScratch is nil outside a parse and the helper is nil-safe.
+			p.mergeScratch.bumpShapePrefixEpochIfLink0Rewritten(rewritesBefore)
 		}
 	} else if mergeCensusEnabled {
 		mergeCensusRecordMergeFailed()
@@ -3559,67 +3741,30 @@ func tryGSSMainMergeForParserPhase(p *Parser, a, b *glrStack, phase string, reco
 	return merged
 }
 
-// A shared immutable error prefix has identical recovery history on both
-// paths. Only the clean suffixes may merge; distinct error-bearing payloads
-// and paths that bypass that common prefix remain separate.
-func gssSharedClosedErrorPrefix(scratch *glrMergeScratch, a, b *gssNode) bool {
-	if !compactPackedGSSVersionOrderEnabledForMerge(scratch) {
-		return false
-	}
-	var boundary *gssNode
-	seen := make(map[*gssNode]bool)
-	queue := []*gssNode{a, b}
-	for len(queue) > 0 {
-		n := queue[len(queue)-1]
-		queue = queue[:len(queue)-1]
-		if n == nil {
-			return false
-		}
-		if seen[n] {
-			continue
-		}
-		seen[n] = true
-		if len(seen)&63 == 0 && scratch.parser != nil &&
-			resultMaterializationShouldStop(scratch.parser.resultMaterializationStopReason(scratch.arena)) {
-			return false
-		}
-		if stackEntryHasNode(n.entry) && (stackEntryNodeHasError(n.entry) ||
-			stackEntryNodeIsMissing(n.entry) || stackEntryNodeSymbol(n.entry) == errorSymbol) {
-			if boundary != nil && boundary != n {
-				return false
-			}
-			boundary = n
-			continue
-		}
-		for i := 0; i < n.linkCount(); i++ {
-			prev, entry := n.link(i)
-			if stackEntryHasNode(entry) && (stackEntryNodeHasError(entry) ||
-				stackEntryNodeIsMissing(entry) || stackEntryNodeSymbol(entry) == errorSymbol) {
-				return false
-			}
-			queue = append(queue, prev)
-		}
-	}
-	return boundary != nil
-}
-
 func gssMainCanMergeWithScratch(scratch *glrMergeScratch, a, b *glrStack) bool {
 	if a.gss.head == nil || b.gss.head == nil {
+		return false
+	}
+	if cRecoveryGroupSummariesDiffer(a, b) {
 		return false
 	}
 	if a.dead || b.dead || a.accepted != b.accepted {
 		return false
 	}
-	if a.score != b.score || a.shifted != b.shifted {
+	if gssMergeScoresRefuse(scratch, a, b) || a.shifted != b.shifted {
 		return false
 	}
 	if a.top().state != b.top().state || a.byteOffset != b.byteOffset {
 		return false
 	}
-	return (gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a.gss.head) &&
-		gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b.gss.head)) ||
-		(a.cRec == nil && b.cRec == nil && !a.cPaused && !b.cPaused &&
-			gssSharedClosedErrorPrefix(scratch, a.gss.head, b.gss.head))
+	if scratch != nil && (scratch.closedRecoveryMerge || scratch.cRecoveryCondenseMerge) {
+		return recoverymerge.EqualCosts(cStackPrefixCostForMerge(scratch, scratch.language, a.gss.head), cStackPrefixCostForMerge(scratch, scratch.language, b.gss.head))
+	}
+	clean := gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a.gss.head) &&
+		gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b.gss.head)
+	// Closed recovery versions with equal C error cost can share packed
+	// links. Open absorbers retain their separate recovery ownership.
+	return clean || (scratch != nil && scratch.cClosedRecoveryMerge && a.cRec == nil && b.cRec == nil && !a.cPaused && !b.cPaused && cStackErrorCostForMergeCached(scratch, scratch.language, a) == cStackErrorCostForMergeCached(scratch, scratch.language, b))
 }
 
 // gssStackCleanZeroErrorAllLinksWithScratch applies the GSS clean-zero gate
@@ -3653,7 +3798,7 @@ func gssMainCanMergeWithScratchPhase(scratch *glrMergeScratch, a, b *glrStack, p
 		workCountRecordGSSReject(workCountParserFromMergeScratch(scratch), phase, workCountConvergenceReasonStatus, "GSS merge status differs", a, b)
 		return false
 	}
-	if a.score != b.score || a.shifted != b.shifted {
+	if gssMergeScoresRefuse(scratch, a, b) || a.shifted != b.shifted {
 		workCountRecordGSSScoreShiftReject(workCountParserFromMergeScratch(scratch), phase, a, b)
 		return false
 	}
@@ -3661,12 +3806,41 @@ func gssMainCanMergeWithScratchPhase(scratch *glrMergeScratch, a, b *glrStack, p
 		workCountRecordGSSReject(workCountParserFromMergeScratch(scratch), phase, workCountConvergenceReasonStatus, "GSS merge state or byte differs", a, b)
 		return false
 	}
-	clean := (gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a.gss.head) &&
-		gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b.gss.head)) ||
-		(a.cRec == nil && b.cRec == nil && !a.cPaused && !b.cPaused &&
-			gssSharedClosedErrorPrefix(scratch, a.gss.head, b.gss.head))
+	clean := gssMainCanMergeWithScratch(scratch, a, b)
 	workCountRecordGSSCleanReject(workCountParserFromMergeScratch(scratch), phase, a, b, clean)
 	return clean
+}
+
+// legacyMergeAdmits reports whether the grammar artifact's profile drops one
+// Go-only merge refusal. A nil scratch or language keeps every refusal.
+func legacyMergeAdmits(scratch *glrMergeScratch, bit LegacyMergeAdmissionPolicy) bool {
+	return scratch != nil && scratch.language != nil && scratch.language.LegacyMergeAdmission&bit != 0
+}
+
+// gssMergeScoresRefuse applies the Go-only dynamic-precedence equality gate.
+// C's ts_stack_can_merge has no precedence term. It merges first and orders
+// the packed alternatives by precedence when it selects a tree.
+func gssMergeScoresRefuse(scratch *glrMergeScratch, a, b *glrStack) bool {
+	return a.score != b.score && !legacyMergeAdmits(scratch, LegacyMergeAdmitDynamicPrecedence)
+}
+
+// mergedStackScore returns the cumulative dynamic precedence of a merged
+// version. C's stack_node_add_link keeps the highest precedence of any link.
+func mergedStackScore(a, b int) int {
+	return max(a, b)
+}
+
+// dropLegacyMergeFlatMirror removes a merged survivor's contiguous entry
+// mirror when the grammar admits relaxed merges. The mirror follows link 0
+// only, so a reduce that read it would skip every packed alternative.
+func dropLegacyMergeFlatMirror(scratch *glrMergeScratch, s *glrStack) {
+	if scratch == nil || scratch.language == nil || scratch.language.LegacyMergeAdmission == 0 ||
+		s == nil || s.gss.head == nil || (s.entries == nil && !s.cacheEntries) {
+		return
+	}
+	s.entries = nil
+	s.cacheEntries = false
+	s.invalidateCEntryAgg()
 }
 
 func gssNodeByteOffset(n *gssNode) uint32 {
@@ -3695,9 +3869,12 @@ func gssNodesCanMergeWithScratch(scratch *glrMergeScratch, a, b *gssNode) bool {
 	if a.entry.state != b.entry.state {
 		return false
 	}
-	if (!gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a) ||
-		!gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b)) &&
-		!gssSharedClosedErrorPrefix(scratch, a, b) {
+	if scratch != nil && (scratch.closedRecoveryMerge || scratch.cRecoveryCondenseMerge) {
+		if !recoverymerge.EqualCosts(cStackPrefixCostForMerge(scratch, scratch.language, a), cStackPrefixCostForMerge(scratch, scratch.language, b)) {
+			return false
+		}
+	} else if !gssNodeCleanZeroErrorAllLinksWithScratch(scratch, a) ||
+		!gssNodeCleanZeroErrorAllLinksWithScratch(scratch, b) {
 		return false
 	}
 	aOffset, aOK := gssNodeUniformByteOffset(a, make(map[*gssNode]bool))
@@ -3711,6 +3888,15 @@ func gssNodeCanReach(from, target *gssNode) bool {
 	}
 	if from == target {
 		return true
+	}
+	// depth strictly decreases along every real (committed) link: pushEntry
+	// always allocates a node at prev.depth+1 (glr_gss.go), and
+	// gssStack.materialize panics if that invariant does not hold. So once
+	// from's own depth is at or below target's, nothing reachable from
+	// `from` can be `target` (gssMainPreflight.canReach, glr.go, already
+	// relies on this same invariant for its "reachStrict" fast path).
+	if from.depth <= target.depth {
+		return false
 	}
 	// Iterative DFS with a small linear visited set: these walks are almost
 	// always tiny, and the per-call map this used to allocate was a top
@@ -3765,8 +3951,17 @@ func gssNodeCanReach(from, target *gssNode) bool {
 	for len(stack) > 0 {
 		cur := stack[len(stack)-1]
 		stack = stack[:len(stack)-1]
-		if cur == nil || isVisited(cur) {
+		// Same depth-monotonicity argument as the from/target check above:
+		// once a walk drops below target's depth it can never come back up
+		// to it, so cur cannot be target and none of cur's own links are
+		// worth exploring either. This is what bounds the walk to the span
+		// between from's depth and target's depth instead of running all
+		// the way to the GSS root on every call.
+		if cur == nil || cur.depth < target.depth || isVisited(cur) {
 			continue
+		}
+		if perfCountersEnabled {
+			perfRecordGSSCanReachVisit()
 		}
 		if cur == target {
 			releaseVisited()
@@ -3950,8 +4145,15 @@ func cStackLinkPayloadsEquivalentAtOffsets(scratch *glrMergeScratch, a, b stackE
 	if !stackEntryHasNode(a) || !stackEntryHasNode(b) {
 		return !stackEntryHasNode(a) && !stackEntryHasNode(b)
 	}
-	// Distinct payloads belong to the clean suffix; a shared error prefix
-	// matched by identity above. Do not use
+	if scratch.closedRecoveryMerge {
+		an, bn := stackEntryNode(a), stackEntryNode(b)
+		if an != nil && bn != nil && an.symbol == bn.symbol &&
+			(an.symbol != errorSymbol || len(an.children) > 0) && (bn.symbol != errorSymbol || len(bn.children) > 0) &&
+			cNodeErrorCostLangWithScratch(scratch, scratch.language, an) > 0 && cNodeErrorCostLangWithScratch(scratch, scratch.language, bn) > 0 {
+			return true
+		}
+	}
+	// The enclosing GSS merge proves that every link is clean. Do not use
 	// rawStackEntryErrorCost for C's positive-error shortcut: that Go walk uses
 	// flattened arity and does not price a raw error leaf as C does.
 	aHeader, aHeaderOK := cStackLinkPayloadHeader(scratch, a)
@@ -4212,6 +4414,9 @@ func setGSSMainLink(n *gssNode, i int, prev *gssNode, entry stackEntry) {
 		// not either aggregate. Keep the cache in that explicit identity case;
 		// every other rewrite remains conservatively globally invalidating.
 		changed := n.prev != prev || n.entry != entry
+		if changed {
+			gssShapePrefixLink0Rewrites.Add(1)
+		}
 		if n.prev != prev || stackEntryNode(n.entry) != stackEntryNode(entry) {
 			gssPrefixAggGen.Add(1)
 		}
@@ -4233,30 +4438,32 @@ func gssMainAddLink(n *gssNode, prev *gssNode, entry stackEntry) bool {
 	return gssMainAddLinkSeen(n, prev, entry, make(map[gssMergePair]bool))
 }
 
-func cloneGSSMergeSeen(seen map[gssMergePair]bool) map[gssMergePair]bool {
-	cloned := make(map[gssMergePair]bool, len(seen))
-	for pair, ok := range seen {
-		cloned[pair] = ok
-	}
-	return cloned
-}
-
 type gssMainPreflight struct {
-	seen                 map[gssMergePair]bool
-	virtualLink          map[*gssNode][]gssMainLink
-	reachStrict          bool
-	reachEpoch           uint32
-	reachGeneration      uint32
-	reachCacheGeneration uint32
-	reachCache           []gssReachCacheEntry
-	reachSeen            map[*gssNode]bool
-	reachStack           []*gssNode
-	reachVisit           []*gssNode
-	reachSlabHint        int
-	cleanCache           map[*gssNode]gssPreflightCleanCacheEntry
-	cleanSeen            map[*gssNode]bool
-	cleanStack           []*gssNode
-	cleanVisit           []*gssNode
+	seenPairs             []gssPreflightPairSlot
+	seenPairGeneration    uint32
+	seenPairCount         int
+	nodeSlots             []gssPreflightNodeSlot
+	nodeGeneration        uint32
+	nodeCount             int
+	virtualLinkNodeCount  int
+	minVirtualDepth       uint32
+	denseBytes            int64
+	preflightWorkUnits    uint32
+	preflightWorkLimit    uint32
+	preflightWorkDepth    uint32
+	preflightWorkExceeded bool
+	reachStrict           bool
+	reachEpoch            uint32
+	reachGeneration       uint32
+	reachCacheGeneration  uint32
+	reachCache            []gssReachCacheEntry
+	reachSeen             map[*gssNode]bool
+	reachStack            []*gssNode
+	reachVisit            []*gssNode
+	reachSlabHint         int
+	cleanSeen             map[*gssNode]bool
+	cleanStack            []*gssNode
+	cleanVisit            []*gssNode
 	// scratch, when non-nil, lets the preflight consult the parse-long
 	// clean-zero caches instead of rebuilding a private verdict map per
 	// preflight (valid only while no virtual links exist — virtual links can
@@ -4272,10 +4479,18 @@ func (p *gssMainPreflight) clearGSSPointersForReuse() {
 	if p == nil {
 		return
 	}
-	clear(p.seen)
-	clear(p.virtualLink)
+	clear(p.seenPairs)
+	for i := range p.nodeSlots {
+		slot := &p.nodeSlots[i]
+		if cap(slot.virtualLinks) > 0 {
+			clear(slot.virtualLinks[:cap(slot.virtualLinks)])
+			slot.virtualLinks = slot.virtualLinks[:0]
+		}
+		slot.node = nil
+		slot.generation = 0
+		slot.cleanValid = false
+	}
 	clear(p.reachSeen)
-	clear(p.cleanCache)
 	clear(p.cleanSeen)
 	clear(p.offsetSeen)
 	if cap(p.reachCache) > 0 {
@@ -4298,6 +4513,19 @@ func (p *gssMainPreflight) clearGSSPointersForReuse() {
 		clear(p.cleanVisit[:cap(p.cleanVisit)])
 		p.cleanVisit = p.cleanVisit[:0]
 	}
+	p.seenPairGeneration = 1
+	p.seenPairCount = 0
+	p.nodeGeneration = 1
+	p.nodeCount = 0
+	p.virtualLinkNodeCount = 0
+	p.minVirtualDepth = ^uint32(0)
+	p.preflightWorkUnits = 0
+	p.preflightWorkLimit = maxGSSMainPreflightWorkPerMerge
+	p.preflightWorkDepth = 0
+	p.preflightWorkExceeded = false
+	if p.scratch != nil {
+		p.scratch.preflightDenseBytes = p.denseBytes
+	}
 	p.reachStrict = true
 	p.reachEpoch = 1
 	p.resetReachGeneration()
@@ -4307,6 +4535,7 @@ func (p *gssMainPreflight) clearGSSPointersForReuse() {
 const (
 	maxGSSPreflightReachCacheEntries = 32768
 	gssPreflightReachCacheSetCount   = maxGSSPreflightReachCacheEntries / 2
+	maxGSSMainPreflightWorkPerMerge  = 1 << 16
 )
 
 type gssReachCacheEntry struct {
@@ -4322,15 +4551,298 @@ type gssPreflightCleanCacheEntry struct {
 	clean bool
 }
 
+type gssPreflightPairSlot struct {
+	pair       gssMergePair
+	generation uint32
+}
+
+type gssPreflightNodeSlot struct {
+	node         *gssNode
+	generation   uint32
+	virtualLinks []gssMainLink
+	cleanEpoch   uint32
+	clean        bool
+	cleanValid   bool
+}
+
+const gssPreflightInitialTableSize = 16
+
+func gssPreflightPointerHash(node *gssNode) uint64 {
+	h := uint64(uintptr(unsafe.Pointer(node)))
+	h ^= h >> 33
+	h *= 0xff51afd7ed558ccd
+	h ^= h >> 33
+	h *= 0xc4ceb9fe1a85ec53
+	h ^= h >> 33
+	return h
+}
+
+func gssPreflightPairHash(pair gssMergePair) uint64 {
+	a := gssPreflightPointerHash(pair.a)
+	b := gssPreflightPointerHash(pair.b)
+	h := a ^ (b + 0x9e3779b97f4a7c15 + (a << 6) + (a >> 2))
+	h ^= h >> 29
+	h *= 0x165667919e3779f9
+	h ^= h >> 32
+	return h
+}
+
+func (p *gssMainPreflight) updateDenseMemoryAccounting() {
+	if p == nil {
+		return
+	}
+	bytes := int64(cap(p.seenPairs)) * int64(unsafe.Sizeof(gssPreflightPairSlot{}))
+	bytes += int64(cap(p.nodeSlots)) * int64(unsafe.Sizeof(gssPreflightNodeSlot{}))
+	for i := range p.nodeSlots {
+		bytes += int64(cap(p.nodeSlots[i].virtualLinks)) * int64(unsafe.Sizeof(gssMainLink{}))
+	}
+	p.denseBytes = bytes
+	if p.scratch != nil {
+		p.scratch.preflightDenseBytes = bytes
+	}
+}
+
+func (p *gssMainPreflight) addDenseBytes(delta int64) {
+	if p == nil || delta == 0 {
+		return
+	}
+	p.denseBytes += delta
+	if p.scratch != nil {
+		p.scratch.preflightDenseBytes = p.denseBytes
+	}
+}
+
+func (p *gssMainPreflight) seenPair(pair gssMergePair) bool {
+	if p == nil || len(p.seenPairs) == 0 {
+		return false
+	}
+	mask := uint64(len(p.seenPairs) - 1)
+	index := gssPreflightPairHash(pair) & mask
+	for probes := 0; probes < len(p.seenPairs); probes++ {
+		slot := &p.seenPairs[index]
+		if slot.generation != p.seenPairGeneration {
+			return false
+		}
+		if slot.pair == pair {
+			return true
+		}
+		index = (index + 1) & mask
+	}
+	return false
+}
+
+func (p *gssMainPreflight) addSeenPair(pair gssMergePair) {
+	if p == nil {
+		return
+	}
+	if len(p.seenPairs) == 0 {
+		p.seenPairs = make([]gssPreflightPairSlot, gssPreflightInitialTableSize)
+		if p.seenPairGeneration == 0 {
+			p.seenPairGeneration = 1
+		}
+		p.addDenseBytes(int64(cap(p.seenPairs)) * int64(unsafe.Sizeof(gssPreflightPairSlot{})))
+	} else if (p.seenPairCount+1)*2 > len(p.seenPairs) {
+		p.growSeenPairs()
+	}
+	mask := uint64(len(p.seenPairs) - 1)
+	index := gssPreflightPairHash(pair) & mask
+	for probes := 0; probes < len(p.seenPairs); probes++ {
+		slot := &p.seenPairs[index]
+		if slot.generation != p.seenPairGeneration {
+			slot.pair = pair
+			slot.generation = p.seenPairGeneration
+			p.seenPairCount++
+			return
+		}
+		if slot.pair == pair {
+			return
+		}
+		index = (index + 1) & mask
+	}
+	// The table grows at a one-half load factor, so a full table means the
+	// size was changed outside this helper. Recover without losing a verdict.
+	p.growSeenPairs()
+	p.addSeenPair(pair)
+}
+
+func (p *gssMainPreflight) growSeenPairs() {
+	old := p.seenPairs
+	oldCap := cap(old)
+	newSize := gssPreflightInitialTableSize
+	if len(old) > 0 {
+		newSize = len(old) * 2
+	}
+	p.seenPairs = make([]gssPreflightPairSlot, newSize)
+	p.seenPairCount = 0
+	for i := range old {
+		slot := old[i]
+		if slot.generation != p.seenPairGeneration {
+			continue
+		}
+		mask := uint64(len(p.seenPairs) - 1)
+		index := gssPreflightPairHash(slot.pair) & mask
+		for p.seenPairs[index].generation == p.seenPairGeneration {
+			index = (index + 1) & mask
+		}
+		p.seenPairs[index] = slot
+		p.seenPairCount++
+	}
+	p.addDenseBytes(int64(cap(p.seenPairs)-oldCap) * int64(unsafe.Sizeof(gssPreflightPairSlot{})))
+}
+
+func (p *gssMainPreflight) advanceSeenPairGeneration() {
+	if p.seenPairGeneration == 0 || p.seenPairGeneration == ^uint32(0) {
+		clear(p.seenPairs)
+		p.seenPairGeneration = 1
+	} else {
+		p.seenPairGeneration++
+	}
+	p.seenPairCount = 0
+}
+
+func (p *gssMainPreflight) findNodeSlot(node *gssNode) (*gssPreflightNodeSlot, bool) {
+	if p == nil || node == nil || len(p.nodeSlots) == 0 {
+		return nil, false
+	}
+	mask := uint64(len(p.nodeSlots) - 1)
+	index := gssPreflightPointerHash(node) & mask
+	for probes := 0; probes < len(p.nodeSlots); probes++ {
+		slot := &p.nodeSlots[index]
+		if slot.generation != p.nodeGeneration {
+			return nil, false
+		}
+		if slot.node == node {
+			return slot, true
+		}
+		index = (index + 1) & mask
+	}
+	return nil, false
+}
+
+func (p *gssMainPreflight) nodeSlot(node *gssNode, create bool) (*gssPreflightNodeSlot, bool) {
+	if slot, ok := p.findNodeSlot(node); ok || !create || p == nil || node == nil {
+		return slot, ok
+	}
+	if len(p.nodeSlots) == 0 {
+		p.nodeSlots = make([]gssPreflightNodeSlot, gssPreflightInitialTableSize)
+		if p.nodeGeneration == 0 {
+			p.nodeGeneration = 1
+		}
+		p.addDenseBytes(int64(cap(p.nodeSlots)) * int64(unsafe.Sizeof(gssPreflightNodeSlot{})))
+	} else if (p.nodeCount+1)*2 > len(p.nodeSlots) {
+		p.growNodeSlots()
+	}
+	mask := uint64(len(p.nodeSlots) - 1)
+	index := gssPreflightPointerHash(node) & mask
+	for probes := 0; probes < len(p.nodeSlots); probes++ {
+		slot := &p.nodeSlots[index]
+		if slot.generation != p.nodeGeneration {
+			if cap(slot.virtualLinks) > 0 {
+				clear(slot.virtualLinks[:cap(slot.virtualLinks)])
+				slot.virtualLinks = slot.virtualLinks[:0]
+			}
+			slot.node = node
+			slot.generation = p.nodeGeneration
+			slot.cleanEpoch = 0
+			slot.clean = false
+			slot.cleanValid = false
+			p.nodeCount++
+			return slot, true
+		}
+		if slot.node == node {
+			return slot, true
+		}
+		index = (index + 1) & mask
+	}
+	p.growNodeSlots()
+	return p.nodeSlot(node, true)
+}
+
+func (p *gssMainPreflight) growNodeSlots() {
+	old := p.nodeSlots
+	newSize := gssPreflightInitialTableSize
+	if len(old) > 0 {
+		newSize = len(old) * 2
+	}
+	p.nodeSlots = make([]gssPreflightNodeSlot, newSize)
+	p.nodeCount = 0
+	for i := range old {
+		slot := old[i]
+		if slot.generation != p.nodeGeneration {
+			continue
+		}
+		mask := uint64(len(p.nodeSlots) - 1)
+		index := gssPreflightPointerHash(slot.node) & mask
+		for p.nodeSlots[index].generation == p.nodeGeneration {
+			index = (index + 1) & mask
+		}
+		p.nodeSlots[index] = slot
+		p.nodeCount++
+	}
+	p.updateDenseMemoryAccounting()
+}
+
+func (p *gssMainPreflight) advanceNodeGeneration() {
+	if p.nodeGeneration == 0 || p.nodeGeneration == ^uint32(0) {
+		for i := range p.nodeSlots {
+			slot := &p.nodeSlots[i]
+			if cap(slot.virtualLinks) > 0 {
+				clear(slot.virtualLinks[:cap(slot.virtualLinks)])
+				slot.virtualLinks = slot.virtualLinks[:0]
+			}
+			slot.node = nil
+			slot.generation = 0
+			slot.cleanValid = false
+		}
+		p.nodeGeneration = 1
+	} else {
+		p.nodeGeneration++
+	}
+	p.nodeCount = 0
+	p.virtualLinkNodeCount = 0
+	p.minVirtualDepth = ^uint32(0)
+}
+
+func (p *gssMainPreflight) virtualLinksFor(node *gssNode) []gssMainLink {
+	slot, ok := p.findNodeSlot(node)
+	if !ok {
+		return nil
+	}
+	return slot.virtualLinks
+}
+
+func (p *gssMainPreflight) storeCleanCache(node *gssNode, entry gssPreflightCleanCacheEntry) {
+	slot, _ := p.nodeSlot(node, true)
+	slot.cleanEpoch = entry.epoch
+	slot.clean = entry.clean
+	slot.cleanValid = true
+}
+
+func (p *gssMainPreflight) cachedClean(node *gssNode) (gssPreflightCleanCacheEntry, bool) {
+	slot, ok := p.findNodeSlot(node)
+	if !ok || !slot.cleanValid {
+		return gssPreflightCleanCacheEntry{}, false
+	}
+	return gssPreflightCleanCacheEntry{epoch: slot.cleanEpoch, clean: slot.clean}, true
+}
+
 func newGSSMainPreflight(seen map[gssMergePair]bool) *gssMainPreflight {
-	return &gssMainPreflight{
-		seen:                 cloneGSSMergeSeen(seen),
-		virtualLink:          make(map[*gssNode][]gssMainLink),
+	p := &gssMainPreflight{
 		reachStrict:          true,
 		reachEpoch:           1,
 		reachGeneration:      1,
 		reachCacheGeneration: 1,
+		seenPairGeneration:   1,
+		nodeGeneration:       1,
+		minVirtualDepth:      ^uint32(0),
+		preflightWorkLimit:   maxGSSMainPreflightWorkPerMerge,
 	}
+	for pair, ok := range seen {
+		if ok {
+			p.addSeenPair(pair)
+		}
+	}
+	return p
 }
 
 func (p *gssMainPreflight) resetReachGeneration() {
@@ -4377,34 +4889,33 @@ func acquirePreflightForScratch(scratch *glrMergeScratch) *gssMainPreflight {
 	pf := scratch.preflight
 	if pf == nil {
 		pf = &gssMainPreflight{
-			virtualLink:          make(map[*gssNode][]gssMainLink),
 			reachStrict:          true,
 			reachEpoch:           1,
 			reachGeneration:      1,
 			reachCacheGeneration: 1,
+			seenPairGeneration:   1,
+			nodeGeneration:       1,
+			minVirtualDepth:      ^uint32(0),
+			preflightWorkLimit:   maxGSSMainPreflightWorkPerMerge,
 		}
 		scratch.preflight = pf
 	}
-	if pf.seen == nil {
-		pf.seen = make(map[gssMergePair]bool, 16)
-	} else if len(pf.seen) > 0 {
-		clear(pf.seen)
-	}
-	if len(pf.virtualLink) > 0 {
-		clear(pf.virtualLink)
-	}
+	pf.advanceSeenPairGeneration()
+	pf.advanceNodeGeneration()
 	if len(pf.reachSeen) > 0 {
 		clear(pf.reachSeen)
-	}
-	if len(pf.cleanCache) > 0 {
-		clear(pf.cleanCache)
 	}
 	if len(pf.cleanSeen) > 0 {
 		clear(pf.cleanSeen)
 	}
 	pf.reachStrict = true
 	pf.reachEpoch = 1
+	pf.preflightWorkUnits = 0
+	pf.preflightWorkLimit = maxGSSMainPreflightWorkPerMerge
+	pf.preflightWorkDepth = 0
+	pf.preflightWorkExceeded = false
 	pf.scratch = scratch
+	scratch.preflightDenseBytes = pf.denseBytes
 	if scratch.gssOwner != nil {
 		scratch.gssOwner.ensureReachMarks()
 	}
@@ -4428,12 +4939,12 @@ func acquireMergeSeenForScratch(scratch *glrMergeScratch) map[gssMergePair]bool 
 }
 
 func (p *gssMainPreflight) linkCount(n *gssNode) int {
-	if len(p.virtualLink) == 0 {
-		// Fast path: no virtual links anywhere, skip the per-node map lookup
+	if p.virtualLinkNodeCount == 0 {
+		// Fast path: no virtual links anywhere, skip the per-node table lookup
 		// (this runs once per node visit in every preflight DFS).
 		return n.linkCount()
 	}
-	return n.linkCount() + len(p.virtualLink[n])
+	return n.linkCount() + len(p.virtualLinksFor(n))
 }
 
 func (p *gssMainPreflight) linkAt(n *gssNode, i int) (prev *gssNode, entry stackEntry) {
@@ -4441,12 +4952,26 @@ func (p *gssMainPreflight) linkAt(n *gssNode, i int) (prev *gssNode, entry stack
 	if i < realCount {
 		return n.link(i)
 	}
-	l := p.virtualLink[n][i-realCount]
+	l := p.virtualLinksFor(n)[i-realCount]
 	return l.prev, l.entry
 }
 
 func (p *gssMainPreflight) addVirtualLink(n *gssNode, prev *gssNode, entry stackEntry) {
-	p.virtualLink[n] = append(p.virtualLink[n], gssMainLink{prev: prev, entry: entry})
+	if n == nil {
+		return
+	}
+	slot, _ := p.nodeSlot(n, true)
+	oldCap := cap(slot.virtualLinks)
+	if len(slot.virtualLinks) == 0 {
+		p.virtualLinkNodeCount++
+	}
+	slot.virtualLinks = append(slot.virtualLinks, gssMainLink{prev: prev, entry: entry})
+	if cap(slot.virtualLinks) != oldCap {
+		p.addDenseBytes(int64(cap(slot.virtualLinks)-oldCap) * int64(unsafe.Sizeof(gssMainLink{})))
+	}
+	if n != nil && n.depth < p.minVirtualDepth {
+		p.minVirtualDepth = n.depth
+	}
 	if n != nil && prev != nil && prev.depth >= n.depth {
 		p.reachStrict = false
 	}
@@ -4534,12 +5059,21 @@ func (p *gssMainPreflight) canReach(from, target *gssNode) bool {
 	if from == target {
 		return true
 	}
+	if !p.takePreflightWork() {
+		return false
+	}
 	if p.reachCache != nil {
 		if reachable, ok := p.cachedReach(from, target); ok {
 			return reachable
 		}
 	}
-	if p.reachStrict && from.depth <= target.depth {
+	// Real links always decrease depth. Even when a staged link breaks that
+	// ordering, a walk below every staged link's source cannot climb again.
+	minVirtualDepth := ^uint32(0)
+	if !p.reachStrict {
+		minVirtualDepth = p.minVirtualDepth
+	}
+	if from.depth <= target.depth && from.depth < minVirtualDepth {
 		return false
 	}
 	p.resetReachGeneration()
@@ -4550,7 +5084,15 @@ func (p *gssMainPreflight) canReach(from, target *gssNode) bool {
 		last := len(stack) - 1
 		cur := stack[last]
 		stack = stack[:last]
-		if cur == nil {
+		if !p.takePreflightWork() {
+			for _, node := range visited {
+				delete(p.reachSeen, node)
+			}
+			p.reachStack = stack[:0]
+			p.reachVisit = visited[:0]
+			return false
+		}
+		if cur == nil || (cur.depth < target.depth && cur.depth < minVirtualDepth) {
 			continue
 		}
 		mark, dense := p.denseReachMark(cur)
@@ -4611,25 +5153,23 @@ func (p *gssMainPreflight) cleanZeroErrorAllLinks(n *gssNode) bool {
 	if n == nil {
 		return true
 	}
-	if p.scratch != nil && len(p.virtualLink) == 0 {
+	if !p.takePreflightWork() {
+		return false
+	}
+	if p.scratch != nil && p.virtualLinkNodeCount == 0 {
 		// With no virtual links the preflight's link view is exactly the real
 		// graph, so the parse-long clean-zero caches give the same verdict the
 		// private DFS below would compute — without rebuilding a per-preflight
 		// verdict map every merge attempt.
 		return gssNodeCleanZeroErrorAllLinksWithScratch(p.scratch, n)
 	}
-	if p.cleanCache != nil {
-		if entry, ok := p.cleanCache[n]; ok {
-			if !entry.clean {
-				return false
-			}
-			if entry.epoch == p.reachEpoch {
-				return true
-			}
+	if entry, ok := p.cachedClean(n); ok {
+		if !entry.clean {
+			return false
 		}
-	}
-	if p.cleanCache == nil {
-		p.cleanCache = make(map[*gssNode]gssPreflightCleanCacheEntry, 64)
+		if entry.epoch == p.reachEpoch {
+			return true
+		}
 	}
 	if p.cleanSeen == nil {
 		p.cleanSeen = make(map[*gssNode]bool, 64)
@@ -4641,12 +5181,20 @@ func (p *gssMainPreflight) cleanZeroErrorAllLinks(n *gssNode) bool {
 		last := len(stack) - 1
 		cur := stack[last]
 		stack = stack[:last]
+		if !p.takePreflightWork() {
+			for _, node := range visited {
+				delete(p.cleanSeen, node)
+			}
+			p.cleanStack = stack[:0]
+			p.cleanVisit = visited[:0]
+			return false
+		}
 		if cur == nil || p.cleanSeen[cur] {
 			continue
 		}
-		if entry, ok := p.cleanCache[cur]; ok {
+		if entry, ok := p.cachedClean(cur); ok {
 			if !entry.clean {
-				p.cleanCache[n] = gssPreflightCleanCacheEntry{clean: false}
+				p.storeCleanCache(n, gssPreflightCleanCacheEntry{clean: false})
 				for _, node := range visited {
 					delete(p.cleanSeen, node)
 				}
@@ -4664,8 +5212,8 @@ func (p *gssMainPreflight) cleanZeroErrorAllLinks(n *gssNode) bool {
 			prev, entry := p.linkAt(cur, i)
 			if stackEntryHasNode(entry) &&
 				(stackEntryNodeHasError(entry) || stackEntryNodeIsMissing(entry) || stackEntryNodeSymbol(entry) == errorSymbol) {
-				p.cleanCache[cur] = gssPreflightCleanCacheEntry{clean: false}
-				p.cleanCache[n] = gssPreflightCleanCacheEntry{clean: false}
+				p.storeCleanCache(cur, gssPreflightCleanCacheEntry{clean: false})
+				p.storeCleanCache(n, gssPreflightCleanCacheEntry{clean: false})
 				for _, node := range visited {
 					delete(p.cleanSeen, node)
 				}
@@ -4677,7 +5225,7 @@ func (p *gssMainPreflight) cleanZeroErrorAllLinks(n *gssNode) bool {
 		}
 	}
 	for _, node := range visited {
-		p.cleanCache[node] = gssPreflightCleanCacheEntry{epoch: p.reachEpoch, clean: true}
+		p.storeCleanCache(node, gssPreflightCleanCacheEntry{epoch: p.reachEpoch, clean: true})
 		delete(p.cleanSeen, node)
 	}
 	p.cleanStack = stack[:0]
@@ -4688,6 +5236,9 @@ func (p *gssMainPreflight) cleanZeroErrorAllLinks(n *gssNode) bool {
 func (p *gssMainPreflight) uniformByteOffset(n *gssNode, seen map[*gssNode]bool) (uint32, bool) {
 	if n == nil {
 		return 0, true
+	}
+	if !p.takePreflightWork() {
+		return 0, false
 	}
 	if seen[n] {
 		return gssNodeByteOffset(n), true
@@ -4721,25 +5272,37 @@ func (p *gssMainPreflight) linkByteOffset(prev *gssNode, entry stackEntry, seen 
 }
 
 func (p *gssMainPreflight) nodesCanMerge(a, b *gssNode) bool {
+	if !p.takePreflightWork() {
+		return false
+	}
 	if a == b {
 		return true
 	}
 	if a == nil || b == nil {
 		return false
 	}
-	if p.canReach(a, b) || p.canReach(b, a) {
+	if p.canReach(a, b) || p.preflightWorkExceeded || p.canReach(b, a) || p.preflightWorkExceeded {
 		return false
 	}
 	if a.entry.state != b.entry.state {
 		return false
 	}
-	if (!p.cleanZeroErrorAllLinks(a) || !p.cleanZeroErrorAllLinks(b)) &&
-		!gssSharedClosedErrorPrefix(p.scratch, a, b) {
+	if p.scratch != nil && (p.scratch.closedRecoveryMerge || p.scratch.cRecoveryCondenseMerge) {
+		if !recoverymerge.EqualCosts(cStackPrefixCostForMerge(p.scratch, p.scratch.language, a), cStackPrefixCostForMerge(p.scratch, p.scratch.language, b)) {
+			return false
+		}
+	} else if !p.cleanZeroErrorAllLinks(a) || !p.cleanZeroErrorAllLinks(b) {
+		return false
+	}
+	if p.preflightWorkExceeded {
 		return false
 	}
 	aOffset, aOK := p.uniformByteOffset(a, p.acquireOffsetSeen())
+	if p.preflightWorkExceeded {
+		return false
+	}
 	bOffset, bOK := p.uniformByteOffset(b, p.acquireOffsetSeen())
-	return aOK && bOK && aOffset == bOffset
+	return !p.preflightWorkExceeded && aOK && bOK && aOffset == bOffset
 }
 
 // acquireOffsetSeen returns the preflight's reusable (cleared) cycle-guard map
@@ -4755,6 +5318,9 @@ func (p *gssMainPreflight) acquireOffsetSeen() map[*gssNode]bool {
 }
 
 func (p *gssMainPreflight) linkPayloadsEquivalent(aPrev *gssNode, a stackEntry, bPrev *gssNode, b stackEntry) bool {
+	if !p.takePreflightWork() {
+		return false
+	}
 	if p == nil || !compactPackedGSSVersionOrderEnabledForMerge(p.scratch) {
 		var scratch *glrMergeScratch
 		if p != nil {
@@ -4804,18 +5370,55 @@ func (p *gssMainPreflight) canAddLink(n *gssNode, prev *gssNode, entry stackEntr
 	if n == nil {
 		return false
 	}
-	if prev == n || p.canReach(prev, n) {
+	if !p.takePreflightWork() {
+		return false
+	}
+	// A full production node cannot accept a distinct link. Check for a
+	// matching payload before walking reachability through the predecessor.
+	// An equivalent link still needs the normal cycle and merge checks.
+	if !compactCMainLinkPolicyEnabled(p.scratch) && p.linkCount(n) >= gssMainLinkLimitForScratch(p.scratch) {
+		matched := false
+		for i := 0; i < p.linkCount(n); i++ {
+			if !p.takePreflightWork() {
+				return false
+			}
+			existingPrev, existingEntry := p.linkAt(n, i)
+			equivalent := p.linkPayloadsEquivalent(existingPrev, existingEntry, prev, entry)
+			if p.preflightWorkExceeded {
+				return false
+			}
+			if equivalent {
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			return false
+		}
+	}
+	if prev == n || p.canReach(prev, n) || p.preflightWorkExceeded {
 		return false
 	}
 	for i := 0; i < p.linkCount(n); i++ {
+		if !p.takePreflightWork() {
+			return false
+		}
 		existingPrev, existingEntry := p.linkAt(n, i)
-		if !p.linkPayloadsEquivalent(existingPrev, existingEntry, prev, entry) {
+		equivalent := p.linkPayloadsEquivalent(existingPrev, existingEntry, prev, entry)
+		if p.preflightWorkExceeded {
+			return false
+		}
+		if !equivalent {
 			continue
 		}
 		if existingPrev == prev {
 			return true
 		}
-		if p.nodesCanMerge(existingPrev, prev) {
+		canMerge := p.nodesCanMerge(existingPrev, prev)
+		if p.preflightWorkExceeded {
+			return false
+		}
+		if canMerge {
 			return p.canMergeNodes(existingPrev, prev)
 		}
 	}
@@ -4885,9 +5488,13 @@ func gssMainAddLinkSeenMutate(scratch *glrMergeScratch, n *gssNode, prev *gssNod
 		// Match C's fixed eight-link node: keep the incumbent links, drop this
 		// distinct late link, and let the enclosing merge retire its source.
 		if compactCMainLinkPolicyEnabled(scratch) {
+			scratch.policyPruned = true
 			return true
 		}
 		if gssMainReplaceWorstEquivalentLinkIfBetterMutate(scratch, n, prev, entry, seen) {
+			if scratch != nil {
+				scratch.policyPruned = true
+			}
 			n.hash = 0
 			return true
 		}
@@ -4911,16 +5518,32 @@ func gssMainCanReplaceWorstEquivalentLinkIfBetter(n *gssNode, prev *gssNode, ent
 }
 
 func (p *gssMainPreflight) canReplaceWorstEquivalentLinkIfBetter(n *gssNode, prev *gssNode, entry stackEntry) bool {
+	if !p.takePreflightWork() {
+		return false
+	}
 	worst := -1
 	worstPrecedence := stackEntryDynamicPrecedence(entry)
 	var worstPrev *gssNode
 	for i := 0; i < p.linkCount(n); i++ {
+		if !p.takePreflightWork() {
+			return false
+		}
 		existingPrev, existingEntry := p.linkAt(n, i)
-		if !p.linkPayloadsEquivalent(existingPrev, existingEntry, prev, entry) {
+		equivalent := p.linkPayloadsEquivalent(existingPrev, existingEntry, prev, entry)
+		if p.preflightWorkExceeded {
+			return false
+		}
+		if !equivalent {
 			continue
 		}
-		if existingPrev != prev && !p.nodesCanMerge(existingPrev, prev) {
-			continue
+		if existingPrev != prev {
+			canMerge := p.nodesCanMerge(existingPrev, prev)
+			if p.preflightWorkExceeded {
+				return false
+			}
+			if !canMerge {
+				continue
+			}
 		}
 		existingPrecedence := stackEntryDynamicPrecedence(existingEntry)
 		if worst == -1 || existingPrecedence < worstPrecedence {
@@ -4990,22 +5613,66 @@ func gssMainCanMergeNodesSeen(a, b *gssNode, seen map[gssMergePair]bool) bool {
 	return newGSSMainPreflight(seen).canMergeNodes(a, b)
 }
 
+func (p *gssMainPreflight) takePreflightWork() bool {
+	if p == nil || p.preflightWorkExceeded {
+		return false
+	}
+	if p.preflightWorkUnits >= p.preflightWorkLimit {
+		p.preflightWorkExceeded = true
+		return false
+	}
+	p.preflightWorkUnits++
+	return true
+}
+
 func (p *gssMainPreflight) canMergeNodes(a, b *gssNode) bool {
+	outer := p.preflightWorkDepth == 0
+	p.preflightWorkDepth++
+	accepted := p.canMergeNodesInner(a, b)
+	p.preflightWorkDepth--
+	if p.preflightWorkExceeded {
+		accepted = false
+	}
+	if mergeCensusEnabled {
+		mergeCensusRecordPreflightVerdict(accepted)
+		if outer {
+			mergeCensusRecordPreflightWork(uint64(p.preflightWorkUnits), p.preflightWorkExceeded)
+		}
+	}
+	return accepted
+}
+
+func (p *gssMainPreflight) canMergeNodesInner(a, b *gssNode) bool {
+	if p.preflightWorkExceeded {
+		return false
+	}
 	if a == nil || b == nil || a == b {
 		return true
+	}
+	if !p.takePreflightWork() {
+		return false
 	}
 	if p.canReach(b, a) {
 		return false
 	}
+	if p.preflightWorkExceeded {
+		return false
+	}
 	pair := gssMergePair{a: a, b: b}
-	if p.seen[pair] {
+	if p.seenPair(pair) {
 		return true
 	}
-	p.seen[pair] = true
+	p.addSeenPair(pair)
 	count := p.linkCount(b)
 	for i := 0; i < count; i++ {
+		if !p.takePreflightWork() {
+			return false
+		}
 		prev, entry := p.linkAt(b, i)
 		if !p.canAddLink(a, prev, entry) {
+			return false
+		}
+		if p.preflightWorkExceeded {
 			return false
 		}
 	}
@@ -5068,6 +5735,41 @@ func gssMainMergeWithScratch(scratch *glrMergeScratch, a, b *glrStack) bool {
 	return gssMainMergeNodesSeenMutate(scratch, ah, bh, acquireMergeSeenForScratch(scratch))
 }
 
+// mixedMergePackedPathHasRawPriority admits a packed receiver when raw
+// subtree ordering prefers it at a completed, zero-width boundary.
+// Intermediate mixed heads retain separate versions.
+func mixedMergePackedPathHasRawPriority(scratch *glrMergeScratch, flat, packed *glrStack) bool {
+	if scratch == nil || scratch.parser == nil || scratch.arena == nil ||
+		flat == nil || packed == nil || len(flat.entries) < 2 ||
+		flat.gss.head != nil || packed.gss.head == nil ||
+		packed.gss.head.linkCount() != 1 || packed.gss.head.prev == nil {
+		return false
+	}
+	flatTop, packedTop := flat.top(), packed.top()
+	if !stackEntryHasNode(flatTop) || !stackEntryHasNode(packedTop) ||
+		stackEntryNodeSymbol(flatTop) != stackEntryNodeSymbol(packedTop) ||
+		stackEntryNodeStartByte(flatTop) != stackEntryNodeEndByte(flatTop) ||
+		stackEntryNodeStartByte(packedTop) != stackEntryNodeEndByte(packedTop) {
+		return false
+	}
+	flatTree := flat.entries[len(flat.entries)-2]
+	packedTree := packed.gss.head.prev.entry
+	if !stackEntryHasNode(flatTree) || !stackEntryHasNode(packedTree) ||
+		stackEntryNodeSymbol(flatTree) != stackEntryNodeSymbol(packedTree) ||
+		stackEntryNodeStartByte(flatTree) != stackEntryNodeStartByte(packedTree) ||
+		stackEntryNodeEndByte(flatTree) != stackEntryNodeEndByte(packedTree) ||
+		stackEntryNodeHasError(flatTree) || stackEntryNodeHasError(packedTree) {
+		return false
+	}
+	cmp, complete := compareRawStackEntriesCExact(scratch.arena, flatTree, packedTree, cExactParentSelectionWorkLimit)
+	if !complete {
+		// Deferred parents can lack complete raw topology. Use the existing
+		// deterministic stack comparator before admitting the packed receiver.
+		cmp = scratch.parser.compareRawStackEntries(scratch.arena, flatTree, packedTree)
+	}
+	return cmp > 0
+}
+
 func tryGSSMainMergeResult(scratch *glrMergeScratch, result []glrStack, idx int, stack *glrStack) (merged bool, attempted bool) {
 	topologyRecorded := false
 	workCountRecordMergeAttempt()
@@ -5087,13 +5789,18 @@ func tryGSSMainMergeResult(scratch *glrMergeScratch, result []glrStack, idx int,
 	if workCountInstrumentationEnabled {
 		workCountRecordPairCandidate(workCountParserFromMergeScratch(scratch), workCountConvergencePhaseBoundaryGSS, "boundary merge entered eligibility preflight", &result[idx], stack)
 	}
-	// Score is an unconditional GSS merge identity component (see
-	// gssMainCanMergeWithScratch). Reject it before recovery-cost attribution
-	// and deeper graph/equivalence work: on ambiguity-heavy parses most
-	// same-state, same-offset candidates carry distinct cumulative dynamic
-	// precedence, so walking recovery state for those pairs can never affect the
-	// outcome. Diagnostic builds still retain the candidate and score rejection.
-	if result[idx].score != stack.score {
+	if cRecoveryGroupSummariesDiffer(&result[idx], stack) {
+		traceCRecoverMergeDecision(scratch, "gss", "preserve-summary", &result[idx], stack)
+		return false, true
+	}
+	// Score is a GSS merge identity component unless the grammar's profile
+	// admits C's precedence-free merge (see gssMainCanMergeWithScratch). Reject
+	// it before recovery-cost attribution and deeper graph/equivalence work: on
+	// ambiguity-heavy parses most same-state, same-offset candidates carry
+	// distinct cumulative dynamic precedence, so walking recovery state for
+	// those pairs can never affect the outcome. Diagnostic builds still retain
+	// the candidate and score rejection.
+	if gssMergeScoresRefuse(scratch, &result[idx], stack) {
 		if workCountInstrumentationEnabled {
 			workCountRecordGSSScoreShiftReject(workCountParserFromMergeScratch(scratch), workCountConvergencePhaseBoundaryGSS, &result[idx], stack)
 		}
@@ -5129,10 +5836,14 @@ func tryGSSMainMergeResult(scratch *glrMergeScratch, result []glrStack, idx int,
 	var promoted glrStack
 	mixedRepresentation := false
 	candidateGSSReceiver := false
+	admitMixed := legacyMergeAdmits(scratch, LegacyMergeAdmitMixedRepresentation)
 	mixedMergeCertified := scratch != nil && scratch.gssOwner != nil &&
-		(scratch.language == nil || scratch.language.CompactMixedGSSMergeCertified)
+		(scratch.language == nil || scratch.language.CompactMixedGSSMergeCertified || admitMixed)
 	if mixedMergeCertified &&
 		((left.gss.head == nil) != (right.gss.head == nil)) {
+		if scratch.language != nil && !admitMixed && !mixedMergePackedPathHasRawPriority(scratch, left, right) {
+			return false, false
+		}
 		mixedRepresentation = true
 		if mergeCensusEnabled {
 			mergeCensusRecordMixedRepresentationAttempt()
@@ -5239,6 +5950,7 @@ func tryGSSMainMergeResult(scratch *glrMergeScratch, result []glrStack, idx int,
 		}
 		return false, true
 	}
+	rewritesBefore := gssShapePrefixLink0Rewrites.Load()
 	if workCountInstrumentationEnabled {
 		workCountTopologyRecordMergeBeforeMutation(logicalTarget, logicalCandidate) // work-count-assembly: topology boundary-merge success seam
 		topologyRecorded = true
@@ -5273,6 +5985,7 @@ func tryGSSMainMergeResult(scratch *glrMergeScratch, result []glrStack, idx int,
 			result[idx].byteOffset = left.byteOffset
 			result[idx].invalidateCEntryAgg()
 			result[idx].cEverErrored = incumbentHeader.cEverErrored || candidateHeader.cEverErrored
+			result[idx].score = mergedStackScore(incumbentHeader.score, candidateHeader.score)
 			if workCountInstrumentationEnabled {
 				// Rebind the surviving logical version to the physical graph receiver.
 				// The merge event uses the flat incumbent header before mutation.
@@ -5280,6 +5993,8 @@ func tryGSSMainMergeResult(scratch *glrMergeScratch, result []glrStack, idx int,
 			}
 		} else {
 			result[idx].cEverErrored = incumbentHeader.cEverErrored || candidateHeader.cEverErrored
+			result[idx].score = mergedStackScore(incumbentHeader.score, candidateHeader.score)
+			dropLegacyMergeFlatMirror(scratch, &result[idx])
 		}
 		workCountRecordMergeSuccess()
 		if mergeCensusEnabled {
@@ -5289,11 +6004,12 @@ func tryGSSMainMergeResult(scratch *glrMergeScratch, result []glrStack, idx int,
 				mergeCensusRecordSuccess()
 			}
 		}
-		if scratch != nil {
-			// A successful main merge can rewrite link 0 (prev/entry) of surviving
-			// nodes (setGSSMainLink), so every cached spine prefix may be stale.
-			scratch.bumpShapePrefixEpoch()
-		}
+		// A successful main merge can rewrite link 0 (prev/entry) of surviving
+		// nodes (setGSSMainLink), which makes every cached spine prefix that
+		// runs through them stale. Invalidate only when a rewrite happened: a
+		// merge that just added extra links leaves every cached prefix exact
+		// (see gssShapePrefixLink0Rewrites).
+		scratch.bumpShapePrefixEpochIfLink0Rewritten(rewritesBefore)
 	} else if mergeCensusEnabled {
 		mergeCensusRecordMergeFailed()
 	}
@@ -5460,6 +6176,7 @@ func mergeStacksSmallForLanguage(alive []glrStack, scratch *glrMergeScratch, lan
 				break
 			}
 			if scratch != nil && scratch.perKeyCap == 1 {
+				scratch.policyPruned = true
 				if cRecoveryPreserveNewCost {
 					traceCRecoverMergeDecision(scratch, "small", "preserve-cost", &result[j], &stack)
 					preserveByGSS = true
@@ -5543,6 +6260,7 @@ func mergeStacksSmallDeferExact(alive []glrStack, scratch *glrMergeScratch, lang
 				break
 			}
 			if scratch != nil && scratch.perKeyCap == 1 {
+				scratch.policyPruned = true
 				if cRecoveryPreserveNewCost {
 					traceCRecoverMergeDecision(scratch, "small-defer", "preserve-cost", &result[j], &stack)
 					sameKeyCount = perKeyCap
@@ -5679,6 +6397,7 @@ func mergeStacksWithScratch(stacks []glrStack, scratch *glrMergeScratch) []glrSt
 			topologyBeforeCull = append(topologyBeforeCull, alive...)
 		}
 		alive = retainTopStacksForLanguage(alive, limit, scratch.language)
+		scratch.policyPruned = true
 		if workCountInstrumentationEnabled {
 			workCountTopologyReconcileVersionSelection(topologyBeforeCull, alive)
 		}
@@ -5754,6 +6473,7 @@ func mergeStacksWithScratch(stacks []glrStack, scratch *glrMergeScratch) []glrSt
 		}
 
 		if perKeyCap == 1 && mergeSlotTrackedCount(slot) > 0 {
+			scratch.policyPruned = true
 			idx, preserveCost := cRecoveryCostClassForSlot(scratch, result, slot, &stack)
 			if preserveCost {
 				idx = mergeSlotIndexAt(slot, 0)
@@ -5874,6 +6594,7 @@ func mergeStacksWithScratch(stacks []glrStack, scratch *glrMergeScratch) []glrSt
 
 		// Per-key alternative budget reached: replace the weakest
 		// retained candidate only if this stack is better.
+		scratch.policyPruned = true
 		if slot.worstIndex >= 0 {
 			replacedSlot := mergeSlotPositionForIndex(slot, slot.worstIndex)
 			incumbentHash := uint64(0)
@@ -5952,6 +6673,7 @@ func mergeStacksWithScratchDeferExact(alive []glrStack, scratch *glrMergeScratch
 		}
 
 		if perKeyCap == 1 && mergeSlotTrackedCount(slot) > 0 {
+			scratch.policyPruned = true
 			idx, preserveCost := cRecoveryCostClassForSlot(scratch, result, slot, &stack)
 			if preserveCost {
 				idx = mergeSlotIndexAt(slot, 0)
@@ -6067,6 +6789,7 @@ func mergeStacksWithScratchDeferExact(alive []glrStack, scratch *glrMergeScratch
 			}
 		}
 
+		scratch.policyPruned = true
 		if slot.worstIndex >= 0 {
 			replacedSlot := mergeSlotPositionForIndex(slot, slot.worstIndex)
 			incumbentHash := uint64(0)
@@ -6116,6 +6839,7 @@ func mergeStacksWithScratchLargeCap(alive []glrStack, scratch *glrMergeScratch, 
 			comparisons = 0
 			if scratch != nil && scratch.parser != nil {
 				if reason := scratch.parser.runtimeMemoryBudgetStopReasonNow(); reason == ParseStopMemoryBudget {
+					scratch.policyPruned = true
 					scratch.mergeBudgetStopReason = reason
 					if perfCountersEnabled {
 						perfRecordMergeOut(len(result))
@@ -6227,6 +6951,7 @@ func mergeStacksWithScratchLargeCap(alive []glrStack, scratch *glrMergeScratch, 
 
 		// Per-key alternative budget reached: replace the weakest
 		// retained candidate only if this stack is better.
+		scratch.policyPruned = true
 		if slot.worstIndex >= 0 {
 			replacedSlot := -1
 			for j := 0; j < slot.count; j++ {
@@ -6400,7 +7125,7 @@ func (s *glrMergeScratch) allocatedBytes() int64 {
 	if s == nil {
 		return 0
 	}
-	return s.resultBytes + s.slotBytes + s.largeSlotBytes + s.equivCacheBytes + s.stackEquivBytes + s.spineEquivBytes + s.frontierHashBytes + s.shapePrefixBytes + s.cleanZeroBytes + s.preflightReachCacheBytes + int64(cap(s.cPrefixPath))*int64(unsafe.Sizeof((*gssNode)(nil)))
+	return s.resultBytes + s.slotBytes + s.largeSlotBytes + s.equivCacheBytes + s.stackEquivBytes + s.spineEquivBytes + s.frontierHashBytes + s.shapePrefixBytes + s.cleanZeroBytes + s.preflightReachCacheBytes + s.preflightDenseBytes + int64(cap(s.cPrefixPath))*int64(unsafe.Sizeof((*gssNode)(nil)))
 }
 
 func (s *glrMergeScratch) reset() {
@@ -6440,6 +7165,7 @@ func (s *glrMergeScratch) reset() {
 		s.preflight.clearGSSPointersForReuse()
 		s.preflight = nil
 		s.preflightReachCacheBytes = 0
+		s.preflightDenseBytes = 0
 	}
 	s.frontierMergeHash = false
 	s.cErrorCostParser = nil
@@ -6472,6 +7198,7 @@ func (s *glrMergeScratch) reset() {
 	s.cleanZeroScan = 0
 	s.childErrors = nil
 	s.perKeyCap = 0
+	s.policyPruned = false
 	s.language = nil
 	s.packedGSSVersionOrderActive = false
 	s.arena = nil
@@ -6480,6 +7207,8 @@ func (s *glrMergeScratch) reset() {
 	s.trace = false
 	s.cRecoveryCostWalk = false
 	s.cRecoveryConvergence = false
+	s.cRecoveryCondenseMerge = false
+	s.cClosedRecoveryMerge = false
 	s.cRecoveryFallbackSuppression = false
 	s.cRecoveryCost = false
 	s.audit = nil

@@ -276,6 +276,6 @@
   "fixture": "TS-alias-tsx-space-23",
   "language": "tsx",
   "source_sha256": "7e939a9f886f17718a2e7d19ddfa1d53c5125a3d71284ffc6ab7cdc2bfecf51f",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "10b9ba7787284a3a49c7124312aa805e116c6d53b0052847102c627bb8df808f"
 }

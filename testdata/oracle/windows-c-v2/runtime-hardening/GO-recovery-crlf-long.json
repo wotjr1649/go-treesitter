@@ -314,6 +314,6 @@
   "fixture": "GO-recovery-crlf-long",
   "language": "go",
   "source_sha256": "72526859504d0c53e9289e0d61de59114cc7664208ec63bdf86d79db9a566845",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "e334bdfe7d1f97425ea19e1128c0ae5d2f90f19426272de010d73b6d44418a5c"
 }

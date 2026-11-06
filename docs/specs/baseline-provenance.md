@@ -12,39 +12,48 @@ No other document may restate these values; link here instead.
 
 There is currently **no release-approved runtime**. A usable development baseline is not a release.
 
-## Development baseline
+## Development baseline candidate
 
+The source identity for the candidate baseline transition under evaluation is
+recorded in tools/runtime-bundle/source.json and
+internal/provenance/identities.json:
+
+```text
+module          github.com/odvcencio/gotreesitter
+version         v0.56.0
+tag identity    7a1e5770e16d607a1f4dc3a6f8ce28342d0de187
+peeled commit   ac4e027e02525e9d1d005c54ed5e54979271e4ed
+archive SHA-256 0925d93fadca3ad943e20594d602c3639d79f9ad8f82d466262672890d7592a6
 ```
-module   github.com/odvcencio/gotreesitter
-version  v0.53.0
-tag      f102332cca9dc45e841b9439d34ba5cc59f0b10f   (annotated tag object)
-commit   c871b1f576866c40b1695677fe3512243e266d39   (peeled, 2026-09-19 01:40:16 -0700)
-```
 
-The source archive, tag and peeled commit were identified at baseline selection.
-The public identity and patch manifests retain this selection; later releases
-do not change this baseline without the upgrade procedure below.
+Use those pinned identities, not a checkout tip. This section records a
+candidate identity; final runtime adoption remains subject to the completion
+gate in ADR-0018. A development baseline identifies
+the source used by the internal carrier; it is not release approval.
 
-**Source origin, not product identity.** The original unmodified runtime does not satisfy
-Release-Critical correctness for JSX and TSX. The owner-approved internal carrier applies
-separately identified patches (ADR-0013); its origin remains this baseline. See `docs/validation/known-regressions.md` (`KR-0001`) and
-`docs/reports/release-critical-status.md`. Development may proceed; a release claim may not.
+**Source origin, not product identity.** The original upstream module is input
+to the product's internal runtime carrier. The product builds its own
+internal/runtime and owns its patches, correctness, performance, API and validation
+results. The upstream source identity remains separate from the resulting
+product identity. See ADR-0013 and ADR-0018.
 
-## Grammar identities at the baseline
+## Grammar identities for the candidate baseline
 
-Bound to `v0.53.0`. These are *not* the values at upstream `main`; do not copy from a checkout tip.
+The origin blob hashes and grammar commits below are the candidate values in
+internal/provenance/identities.json. They identify candidate upstream-origin inputs, not
+a blanket correctness result. A derived product artifact is identified
+separately by identities.json.runtime.grammar_blobs and its artifact manifest.
 
-| Language | grammar blob SHA-256 | upstream grammar commit (`grammars/languages.lock`) |
+| Language | origin grammar blob SHA-256 | upstream grammar commit |
 |---|---|---|
-| go | `9cf914d26d962d1a62e7954f8b20b302337a44cb7d4a07218eec482c45a57a08` | `2346a3ab1bb3857b48b29d779a1ef9799a248cd7` |
+| go | `df63fc35604c4e4e7a484abde9eb2110b61640045601c23991723f323a48310d` | `2346a3ab1bb3857b48b29d779a1ef9799a248cd7` |
 | python | `cde4a67dc6af6e1232dbbd1eab8618478d1d73727020e8a8002542390a452d37` | `26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64` |
 | javascript | `6706f93890f24d8ea90d6a140df5dde29c02ec8a3213bae16e8cc4df37e33ee0` | `58404d8cf191d69f2674a8fd507bd5776f46cb11` |
-| typescript | `46d8d4f7a0056db32e874500ae5b19170237e1628a63a9e3a401e0ee426d6126` | `75b3874edb2dc714fb1fd77a32013d0f8699989f` (`typescript/src`) |
-| tsx | `bf8c490b0bbeb6d4150abce2edc193552e44b093893665dde69bd39e9e940e85` | `75b3874edb2dc714fb1fd77a32013d0f8699989f` (`tsx/src`) |
-| c_sharp | `7ad425e89733339dde94e3c03b762ae478fb453b530493f5d62e1ae7537e1784` | `88366631d598ce6595ec655ce1591b315cffb14c` |
+| typescript | `1b6ace3de973196290411c0347013b9f2cc2385171c77dcf375e355f3c2cc90c` | `75b3874edb2dc714fb1fd77a32013d0f8699989f` (`typescript/src`) |
+| tsx | `419002e62f0bbaf9a7f7bdc0fbe58799bf6ca94038550ccde33695c16859d984` | `75b3874edb2dc714fb1fd77a32013d0f8699989f` (`tsx/src`) |
+| c_sharp | `198db0d7544ae78c6ba533889e972d4371bdbcaba5d438e6f51e6cb95fff9bcf` | `9150f7d56bb47f1a809fa23623f1ba1413e93fa9` |
 
 `.jsx` resolves to the `javascript` grammar; it is not a separate blob.
-
 ## Machine-readable source of truth
 
 Prose drifts from tests. The values above must also exist once, in machine-readable form, and the
@@ -61,37 +70,25 @@ and this document is a defect.
 
 ## Internal carrier
 
-The product compiles `internal/runtime`, not a replaced external module.
-`identities.json.runtime` records the internal import path and the SHA-256 of
-`internal/provenance/runtime.json`. That manifest binds the exact original
-archive, source inventory, import relocation tool, patch inventory and every
-original/resulting file. The original grammar blob hashes above remain the
-upstream origin identities. A derived product blob is separately identified by
-`runtime.grammar_blobs` and must match its manifest's resulting file hash.
-Changing the carrier requires regenerating and reviewing this identity, then
-rerunning its affected checks. This is distinct from changing the upstream origin.
-See ADR-0013 and `tools/runtime-bundle/README.md` for reproduction and retirement.
+The product compiles internal/runtime, not an external runtime module at
+consumer build time. internal/provenance/identities.json binds the carrier
+manifest; internal/provenance/runtime.json binds the source archive,
+importer/source inventory, patch inputs and original/resulting file hashes.
+tools/runtime-bundle/source.json is the source and patch-input record. These
+machine-readable files are authoritative; this document does not duplicate
+their changing file or patch counts.
 
-ADR-0014 separates 19 GPL-specific files and three aggregate registrations into
-the optional grammar module. ADR-0017 drops the 11 Brightscript and Cooklang
-files and their registrations. The main carrier has 1,497 files; its manifest
-also binds the separator and the original hashes of all 30 files outside it.
-The optional module's `provenance.json` binds its generated files, notices and
-corresponding sources. The upstream module origin (whose `languages.lock` still
-lists 206 grammars) and the C-oracle epoch are unchanged; 204 are distributed.
+identities.json.grammars records upstream-origin grammar blobs.
+identities.json.runtime.grammar_blobs records resulting product artifacts.
+ADR-0015 keeps the Go origin blob distinct from its C-derived product artifact;
+tools/runtime-bundle/grammars/go.json binds that conversion. Each product
+artifact and its C comparisons require evidence for the exact current identity.
+Evidence from an earlier blob or manifest does not transfer.
 
-The Go recovery-order patch also enables the existing C version transaction
-for the exact Go blob above. Its fresh/edit C witnesses and minimized fuzz seed
-are retained in the workload register. The carrier manifest includes this
-patch; this does not select a different upstream version or grammar.
-
-ADR-0015 derives the Go product blob from the same pinned grammar's C tables
-with the pinned upstream converter. Its hash is
-`81f9b19b5886ac11646c713c0c531bd835fc026d363437ba29b28ac2faabea9a`.
-`tools/runtime-bundle/grammars/go.json` identifies the C input, converter and
-source archive. The original Go blob above remains the origin, while the
-derived blob has independently rerun product and C comparisons. No compact-route
-certificate is transferred from the original blob.
+The optional GPL module is separate. Its provenance must bind the optional
+payload, notices and corresponding-source inventory to the final runtime
+manifest before a release claim. ADR-0014 and ADR-0017 continue to define its
+distribution boundary and grammar scope.
 
 ## Identity rules
 

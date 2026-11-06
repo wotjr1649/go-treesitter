@@ -504,6 +504,6 @@
   "fixture": "EXT-CS-RENAME",
   "language": "c_sharp",
   "source_sha256": "86d10656ad8b0e9ea9e8c45c2ee9d62e7cca21bd4a11671bf3407730246880dc",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "1c85c1b146fb35a642bc480814f87ceca0bd4518268ceae5f600a9580a5a0c6e"
 }

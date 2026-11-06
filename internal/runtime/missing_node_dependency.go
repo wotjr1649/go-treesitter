@@ -127,6 +127,9 @@ func nodeEndsBeforeEditDependency(node *Node, editStart uint32) bool {
 			}
 		}
 	}
+	if count, ok := legacyReuseLookahead(node); ok {
+		return uint64(node.endByte)+uint64(count) < uint64(editStart)
+	}
 	return node.endByte <= editStart
 }
 
@@ -140,7 +143,9 @@ func stackEntryEndsBeforeEditDependency(arena *nodeArena, entry stackEntry, edit
 		if !nodeEndsBeforeEditDependency(node, editStart) {
 			return false
 		}
-		if !node.hasError() {
+		// Normal error nodes already checked every child above. Missing nodes
+		// may return early from their receipt and still need the child check.
+		if !node.hasError() || !node.isMissing() {
 			return true
 		}
 		for i := 0; i < nodeChildCountNoMaterialize(node); i++ {

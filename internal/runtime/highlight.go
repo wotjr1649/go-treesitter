@@ -41,6 +41,7 @@ type Highlighter struct {
 	execBuffer         queryExecBuffer
 	rangeBuffer        []HighlightRange
 	resolvedBuffer     []HighlightRange
+	admissionRoute     *bool
 }
 
 // HighlighterOption configures a Highlighter.
@@ -62,6 +63,15 @@ func WithTokenSourceFactory(factory func(source []byte) TokenSource) Highlighter
 func WithHighlighterTimeoutMicros(timeoutMicros uint64) HighlighterOption {
 	return func(h *Highlighter) {
 		h.parser.SetTimeoutMicros(timeoutMicros)
+	}
+}
+
+// WithHighlighterAdmissionCandidateRoute pins the route for the document parser
+// and injected-language parsers. The compact route still obeys eligibility checks.
+func WithHighlighterAdmissionCandidateRoute(enabled bool) HighlighterOption {
+	return func(h *Highlighter) {
+		h.admissionRoute = &enabled
+		h.parser.SetAdmissionCandidateRoute(enabled)
 	}
 }
 
@@ -98,7 +108,9 @@ func NewHighlighter(lang *Language, highlightQuery string, opts ...HighlighterOp
 
 // HighlightIncremental re-highlights source after edits were applied to oldTree.
 // Returns the new highlight ranges and the new parse tree (for use in subsequent
-// incremental calls). Call oldTree.Edit() before calling this.
+// incremental calls). Call oldTree.Edit() before calling this: see
+// ParseIncremental's doc comment for what happens to a length-changing
+// source when that call is skipped.
 func (h *Highlighter) HighlightIncremental(source []byte, oldTree *Tree) ([]HighlightRange, *Tree) {
 	if len(source) == 0 {
 		return nil, NewTree(nil, source, h.lang)
@@ -266,13 +278,13 @@ func (h *Highlighter) highlightTree(tree *Tree, source []byte) []HighlightRange 
 	}
 	for _, m := range matches {
 		for _, c := range m.Captures {
-			node := c.Node
-			if node.StartByte() == node.EndByte() {
+			startByte, endByte := c.ByteRange()
+			if startByte == endByte {
 				continue
 			}
 			ranges = append(ranges, HighlightRange{
-				StartByte:    node.StartByte(),
-				EndByte:      node.EndByte(),
+				StartByte:    startByte,
+				EndByte:      endByte,
 				Capture:      c.Name,
 				PatternIndex: m.PatternIndex,
 			})
@@ -340,7 +352,7 @@ func compactNonEmptyHighlightRanges(ranges []HighlightRange) []HighlightRange {
 }
 
 func sortHighlightRanges(ranges []HighlightRange) {
-	slices.SortFunc(ranges, func(a, b HighlightRange) int {
+	slices.SortStableFunc(ranges, func(a, b HighlightRange) int {
 		if c := cmp.Compare(a.StartByte, b.StartByte); c != 0 {
 			return c
 		}
@@ -349,6 +361,16 @@ func sortHighlightRanges(ranges []HighlightRange) {
 		if c := cmp.Compare(wb, wa); c != 0 { // wider first
 			return c
 		}
+		// Spell captures do not color text. Give a real highlight the
+		// last position in an identical-span stack, across all patterns.
+		if a.Capture == "spell" && b.Capture != "spell" {
+			return -1
+		}
+		if b.Capture == "spell" && a.Capture != "spell" {
+			return 1
+		}
+		// Later patterns override earlier ones. A stable sort preserves
+		// source capture order when the pattern and span are identical.
 		return cmp.Compare(a.PatternIndex, b.PatternIndex)
 	})
 }

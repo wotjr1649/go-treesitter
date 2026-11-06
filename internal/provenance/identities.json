@@ -1,17 +1,35 @@
 {
   "baseline": {
     "module": "github.com/odvcencio/gotreesitter",
-    "version": "v0.53.0",
-    "tag": "f102332cca9dc45e841b9439d34ba5cc59f0b10f",
-    "commit": "c871b1f576866c40b1695677fe3512243e266d39"
+    "version": "v0.56.0",
+    "tag": "7a1e5770e16d607a1f4dc3a6f8ce28342d0de187",
+    "commit": "ac4e027e02525e9d1d005c54ed5e54979271e4ed"
   },
   "grammars": {
-    "go": {"blob_sha256": "9cf914d26d962d1a62e7954f8b20b302337a44cb7d4a07218eec482c45a57a08", "commit": "2346a3ab1bb3857b48b29d779a1ef9799a248cd7"},
-    "python": {"blob_sha256": "cde4a67dc6af6e1232dbbd1eab8618478d1d73727020e8a8002542390a452d37", "commit": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64"},
-    "javascript": {"blob_sha256": "6706f93890f24d8ea90d6a140df5dde29c02ec8a3213bae16e8cc4df37e33ee0", "commit": "58404d8cf191d69f2674a8fd507bd5776f46cb11"},
-    "typescript": {"blob_sha256": "46d8d4f7a0056db32e874500ae5b19170237e1628a63a9e3a401e0ee426d6126", "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f"},
-    "tsx": {"blob_sha256": "bf8c490b0bbeb6d4150abce2edc193552e44b093893665dde69bd39e9e940e85", "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f"},
-    "c_sharp": {"blob_sha256": "7ad425e89733339dde94e3c03b762ae478fb453b530493f5d62e1ae7537e1784", "commit": "88366631d598ce6595ec655ce1591b315cffb14c"}
+    "go": {
+      "blob_sha256": "df63fc35604c4e4e7a484abde9eb2110b61640045601c23991723f323a48310d",
+      "commit": "2346a3ab1bb3857b48b29d779a1ef9799a248cd7"
+    },
+    "python": {
+      "blob_sha256": "cde4a67dc6af6e1232dbbd1eab8618478d1d73727020e8a8002542390a452d37",
+      "commit": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64"
+    },
+    "javascript": {
+      "blob_sha256": "6706f93890f24d8ea90d6a140df5dde29c02ec8a3213bae16e8cc4df37e33ee0",
+      "commit": "58404d8cf191d69f2674a8fd507bd5776f46cb11"
+    },
+    "typescript": {
+      "blob_sha256": "1b6ace3de973196290411c0347013b9f2cc2385171c77dcf375e355f3c2cc90c",
+      "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f"
+    },
+    "tsx": {
+      "blob_sha256": "419002e62f0bbaf9a7f7bdc0fbe58799bf6ca94038550ccde33695c16859d984",
+      "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f"
+    },
+    "c_sharp": {
+      "blob_sha256": "198db0d7544ae78c6ba533889e972d4371bdbcaba5d438e6f51e6cb95fff9bcf",
+      "commit": "9150f7d56bb47f1a809fa23623f1ba1413e93fa9"
+    }
   },
   "oracle": {
     "runtime_version": "v0.25.1",
@@ -21,7 +39,11 @@
     "transport_commit": "adc13ffd8b2c0b01b878fda9f7c422ce0df5fad3",
     "generator": "installed-or-checked-in",
     "abi_policy": "runtime-compatible",
-    "build_flags": ["-std=c11", "-fPIC", "-O2"],
+    "build_flags": [
+      "-std=c11",
+      "-fPIC",
+      "-O2"
+    ],
     "typescript_patch": {
       "commit": "24e1d3b2b4409ee2ffa63e88abba51a40060e76e",
       "sha256": "8d091351f8107d1546a8130d281f0ca8d6d959b11da66b7872d3e10f998340e9",
@@ -30,7 +52,7 @@
   },
   "runtime": {
     "module": "github.com/wotjr1649/go-treesitter/internal/runtime",
-    "manifest_sha256": "0f32d22943e7e636f1ccdf03ec677871f67f81bc22db106a739d88a950ffa6e6",
+    "manifest_sha256": "b54a07c1ad4284a3c26147516c94e748d69ea0edcb6603d802c5fc2886356e03",
     "grammar_blobs": {"go": "81f9b19b5886ac11646c713c0c531bd835fc026d363437ba29b28ac2faabea9a"}
   }
 }

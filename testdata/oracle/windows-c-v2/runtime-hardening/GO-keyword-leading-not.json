@@ -276,6 +276,6 @@
   "fixture": "GO-keyword-leading-not",
   "language": "go",
   "source_sha256": "fbc493338d6cc69618b894010983ede19da4051a7112523a77ed4fa3380c893d",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "3db152e715eb60a9e3f80f930c375950860de90218546119238ab3430ef65253"
 }

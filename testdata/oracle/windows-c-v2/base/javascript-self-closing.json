@@ -352,6 +352,6 @@
   "fixture": "javascript-self-closing",
   "language": "javascript",
   "source_sha256": "13ce55ee399bebf84f1800b52150bf7621e3a7c7d01953388d73cad8057f2ec1",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "0bdecd7a6ab2a1586cd8b7fb465695541d6aaad66ec813e76a6bf297cf921d51"
 }

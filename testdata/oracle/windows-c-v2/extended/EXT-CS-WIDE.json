@@ -10251,6 +10251,6 @@
   "fixture": "EXT-CS-WIDE",
   "language": "c_sharp",
   "source_sha256": "293fa5bba36eda4b5a213993650bc37d94523a176cc319856547d468418ee28c",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "8f8f660d2b926fc72e49238a4725337fd9f4af696db885ca96a91e9909363d1b"
 }

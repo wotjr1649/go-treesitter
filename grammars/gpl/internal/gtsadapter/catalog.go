@@ -14,6 +14,11 @@ var blobs embed.FS
 
 var RegisterExternalLexStates = grammars.RegisterExternalLexStates
 
+type ExternalScannerSourceFile = grammarruntime.ExternalScannerSourceFile
+type ExternalScannerSpec = grammarruntime.ExternalScannerSpec
+
+var RegisterExternalScannerSpec = grammarruntime.RegisterExternalScannerSpec
+
 func loader(name string) func() *gotreesitter.Language {
 	return func() *gotreesitter.Language { return grammarruntime.Language(name) }
 }

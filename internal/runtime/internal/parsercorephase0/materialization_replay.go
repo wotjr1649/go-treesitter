@@ -49,7 +49,13 @@ func (c *Core) MaterializationReplayView(id SubtreeID) (MaterializationReplayVie
 // caller already resolved, so the fused postorder replay resolves each
 // subtree once.
 func (c *Core) materializationReplayViewForRecord(id SubtreeID, record *subtreeRecord) MaterializationReplayView {
-	view := MaterializationReplayView{
+	var view MaterializationReplayView
+	c.fillMaterializationReplayViewForRecord(id, record, &view)
+	return view
+}
+
+func (c *Core) fillMaterializationReplayViewForRecord(id SubtreeID, record *subtreeRecord, view *MaterializationReplayView) {
+	*view = MaterializationReplayView{
 		Symbol: record.symbol,
 		Children: MaterializationReplayChildren{
 			first: record.firstChild,
@@ -62,5 +68,4 @@ func (c *Core) materializationReplayViewForRecord(id SubtreeID, record *subtreeR
 		view.ReusedKey = reused.Key
 		view.ReusedPreGotoState, view.ReusedState = reused.PreGotoState, reused.State
 	}
-	return view
 }

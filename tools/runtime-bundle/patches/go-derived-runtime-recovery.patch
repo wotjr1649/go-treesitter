@@ -1,0 +1,139 @@
+diff --git a/lexer.go b/lexer.go
+index 7847383..a34a5cb 100644
+--- a/lexer.go
++++ b/lexer.go
+@@ -216,6 +216,10 @@ func (l *Lexer) nextWithFrontier(startState uint32, emitErrorRuns bool, lookahea
+ 	for {
+ 		// EOF check.
+ 		if l.atLogicalEOF() {
++			if eofToken, ok := l.scan(startState, l.pos, l.row, l.col); ok && eofToken.Symbol != 0 {
++				return eofToken
++			}
++
+ 			lookaheadEndByte = maxUint32(lookaheadEndByte, l.lookaheadEndByteAt(l.pos, false))
+ 			recordTokenInvariantReadSpan(l.tokenInvariantReadSpanMax, l.pos, l.lookaheadEndByteAt(l.pos, false))
+ 			tok := Token{
+@@ -489,8 +493,9 @@ func (l *Lexer) scanContiguousInto(startState uint32, startPos int, startRow, st
+ 		}
+ 
+ 		if scanPos >= len(l.source) {
+-			if st.EOF >= 0 && eofHops <= len(l.states) {
+-				curState = int32(st.EOF)
++			eofState := lexerEOFState(st)
++			if eofState >= 0 && eofHops <= len(l.states) {
++				curState = int32(eofState)
+ 				eofHops++
+ 				continue
+ 			}
+@@ -687,3 +692,15 @@ func (l *Lexer) allowsZeroWidthToken(sym Symbol) bool {
+ 	}
+ 	return int(sym) < len(l.zeroWidthTokens) && l.zeroWidthTokens[sym]
+ }
++
++func lexerEOFState(state *LexState) int {
++	if state.EOF >= 0 {
++		return state.EOF
++	}
++	for _, transition := range state.Transitions {
++		if transition.Lo <= 0 && transition.Hi >= 0 {
++			return int(transition.NextState)
++		}
++	}
++	return -1
++}
+\ No newline at end of file
+diff --git a/lexer_included_ranges.go b/lexer_included_ranges.go
+index b76571d..6ea8e69 100644
+--- a/lexer_included_ranges.go
++++ b/lexer_included_ranges.go
+@@ -333,8 +333,8 @@ func (l *Lexer) scanIncluded(startState uint32, startPos int, startRow, startCol
+ 		}
+ 
+ 		if scanCursor.rangeIdx >= len(l.includedRanges) {
+-			if st.EOF >= 0 && eofHops <= len(l.states) {
+-				curState = int32(st.EOF)
++			if eofState := lexerEOFState(st); eofState >= 0 && eofHops <= len(l.states) {
++				curState = int32(eofState)
+ 				eofHops++
+ 				continue
+ 			}
+diff --git a/grammars/runtime/runtime_profiles.go b/grammars/runtime/runtime_profiles.go
+index f417b8e..f3cfd57 100644
+--- a/grammars/runtime/runtime_profiles.go
++++ b/grammars/runtime/runtime_profiles.go
+@@ -13,6 +13,7 @@ import (
+ // caller-constructed and adapted languages retain conservative zero defaults.
+ type builtinLanguageRuntimeProfile struct {
+ 	blobSHA256                          [32]byte
++	normalizeAnonymousNULName           bool
+ 	errorModeAllExternalSymbols         bool
+ 	recoveryMissingVersionTurns         bool
+ 	externalScannerCheckpointReuse      bool
+@@ -115,24 +116,11 @@ var builtinLanguageRuntimeProfiles = map[string]builtinLanguageRuntimeProfile{
+ 			reduceSymbols: []gotreesitter.Symbol{173},
+ 		}},
+ 	},
+-	// The canonical compact corpus certifies Go's converged-path split drops
+-	// against the production parser and the tree-sitter C oracle.
+-	// The owned EOF bundle requires its executed recovery route before publication.
++	// ADR-0015 C-derived Go product blob. This profile binds only C-facing compatibility metadata;
++	// compact-route certificates remain unset until revalidated for this exact artifact.
+ 	"go": {
+-		// Re-certified 2026-09-20 against grammars/grammar_blobs/go.bin
+-		// SHA-256 df63fc35604c4e4e7a484abde9eb2110b61640045601c23991723f323a48310d,
+-		// regenerated with cmd/grammargen (no -lr-split; -lr-split
+-		// interacts badly with the Go external ASI scanner, see
+-		// grammargen/README.md "Go's blob is generated without -lr-split").
+-		// The compact/converged-split-drops and owned-EOF-recovery
+-		// certifications were re-validated against this blob via the
+-		// cgo_harness Go compact/recovery receipts (TestGoCompactIncrementalExecution*,
+-		// TestGoCompactRecoveryVersionTurnsLockedC, TestStage6GoCompactCertification).
+-		blobSHA256:                 mustRuntimeProfileSHA256("df63fc35604c4e4e7a484abde9eb2110b61640045601c23991723f323a48310d"),
+-		compactConvergedSplitDrops: true,
+-		compactOwnedEOFRecovery:    true,
+-		// Locked C exposes these aliased DFA leaves even when error recovery
+-		// pops them before the enclosing string production can reduce.
++		blobSHA256:                mustRuntimeProfileSHA256("81f9b19b5886ac11646c713c0c531bd835fc026d363437ba29b28ac2faabea9a"),
++		normalizeAnonymousNULName: true,
+ 		visibleTerminalAliases: []visibleTerminalAliasProfile{
+ 			{internalName: "_raw_string_literal_token1", publicName: "raw_string_literal_content"},
+ 			{internalName: "_interpreted_string_literal_token1", publicName: "interpreted_string_literal_content"},
+@@ -946,6 +934,9 @@ func attachBuiltinLanguageRuntimeProfile(name string, blobSHA256 [32]byte, lang
+ 		return false
+ 	}
+ 	changed := false
++	if profile.normalizeAnonymousNULName && normalizeGoAnonymousNULName(lang) {
++		changed = true
++	}
+ 	for _, alias := range profile.visibleTerminalAliases {
+ 		for symbol := 1; symbol < len(lang.SymbolNames) && uint32(symbol) < lang.TokenCount && symbol < len(lang.SymbolMetadata); symbol++ {
+ 			if lang.SymbolNames[symbol] != alias.internalName {
+@@ -1141,6 +1132,28 @@ func attachBuiltinLanguageRuntimeProfile(name string, blobSHA256 [32]byte, lang
+ 	return changed
+ }
+ 
++func normalizeGoAnonymousNULName(lang *gotreesitter.Language) bool {
++	if lang == nil {
++		return false
++	}
++	index := -1
++	for i, name := range lang.SymbolNames {
++		if name != "\x00" {
++			continue
++		}
++		if index >= 0 || i >= len(lang.SymbolMetadata) {
++			return false
++		}
++		index = i
++	}
++	if index < 0 {
++		return false
++	}
++	lang.SymbolNames[index] = ""
++	lang.SymbolMetadata[index].Name = ""
++	return true
++}
++
+ func excludeBuiltinConflictPolicies(lang *gotreesitter.Language, exclusions []conflictPolicyExclusionProfile) bool {
+ 	if lang == nil || len(exclusions) == 0 || len(lang.ConflictPolicies) == 0 {
+ 		return false

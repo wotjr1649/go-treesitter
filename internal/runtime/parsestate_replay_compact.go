@@ -171,7 +171,7 @@ func (p *Parser) replayCompactDerivation(compact *core.Core, roots []core.Subtre
 		if err != nil {
 			return fail(err)
 		}
-		rootParseState, rootStateKnown, err := p.replayCompactMaterializationTransition(seed, view)
+		rootParseState, rootStateKnown, err := p.replayCompactMaterializationTransition(seed, &view)
 		if err != nil {
 			return fail(err)
 		}
@@ -208,7 +208,7 @@ func (p *Parser) replayCompactDerivation(compact *core.Core, roots []core.Subtre
 			if err != nil {
 				return fail(err)
 			}
-			childParseState, childStateKnown, err := p.replayCompactMaterializationTransition(childPreGoto, cview)
+			childParseState, childStateKnown, err := p.replayCompactMaterializationTransition(childPreGoto, &cview)
 			if err != nil {
 				return fail(err)
 			}
@@ -233,7 +233,7 @@ func (p *Parser) replayCompactDerivation(compact *core.Core, roots []core.Subtre
 	return states, nil
 }
 
-func (p *Parser) replayCompactMaterializationTransition(pre StateID, view core.MaterializationReplayView) (StateID, bool, error) {
+func (p *Parser) replayCompactMaterializationTransition(pre StateID, view *core.MaterializationReplayView) (StateID, bool, error) {
 	state, known := p.replayTransition(pre, Symbol(view.Symbol), view.Terminal)
 	if view.ReusedKey == 0 {
 		return state, known, nil

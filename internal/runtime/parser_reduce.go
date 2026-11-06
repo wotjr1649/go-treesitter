@@ -724,7 +724,13 @@ func (p *Parser) completeConflictReduceFrontier(source []byte, s *glrStack, tok 
 		if maxLiveStacks <= 0 {
 			return true
 		}
-		return liveStacks+len(p.pendingFrontierForkStacks)+len(p.pendingForkStacks) < maxLiveStacks
+		if liveStacks+len(p.pendingFrontierForkStacks)+len(p.pendingForkStacks) >= maxLiveStacks {
+			if p.mergeScratch != nil {
+				p.mergeScratch.policyPruned = true
+			}
+			return false
+		}
+		return true
 	}
 	if seed.action.Type != ParseActionReduce || seed.beforeDepth == 0 || seed.afterDepth == 0 {
 		return
@@ -837,7 +843,7 @@ func (p *Parser) completeConflictReduceFrontier(source []byte, s *glrStack, tok 
 					workCountTopologyPrepareVersionCopy(s, &fork) // work-count-assembly: topology frontier-accept-copy seam
 				}
 				p.noteStopActionDiagnostic("conflict-frontier-fork-accept", &fork, tok, terminal, terminalOrdinal, len(actions), true, step, 0, false)
-				p.applyAcceptAction(&fork)
+				p.applyAcceptAction(&fork, tok, arena)
 				p.noteStopActionResult(&fork)
 				appendTerminalFork(fork)
 				terminalAppended = true
@@ -915,7 +921,7 @@ func (p *Parser) completeConflictReduceFrontier(source []byte, s *glrStack, tok 
 			return
 		case ParseActionAccept:
 			p.noteStopActionDiagnostic("conflict-frontier-accept", s, tok, act, 0, 1, true, step, 0, false)
-			p.applyAcceptAction(s)
+			p.applyAcceptAction(s, tok, arena)
 			p.noteStopActionResult(s)
 			return
 		case ParseActionRecover:
@@ -933,20 +939,81 @@ func (p *Parser) completeConflictReduceFrontier(source []byte, s *glrStack, tok 
 	}
 }
 
-func (p *Parser) pushOrExtendErrorNode(s *glrStack, state StateID, tok Token, nodeCount *int, arena *nodeArena, entryScratch *glrEntryScratch, gssScratch *gssScratch, trackChildErrors *bool) {
+// errorNodeOpenForAbsorption reports whether an ERROR node at the top of a
+// stack is still a simple, growing region that pushOrExtendErrorNode and the
+// skipped-real-gap helpers may extend further. The legacy shape is a
+// childless ERROR leaf. pushOrExtendErrorNode also builds an extra ERROR
+// wrapper around each absorbed real token (mirroring C's error_repeat, see
+// pushLexErrorRunLeaf's doc for the analogous unlexable-run case); such a
+// wrapper is open too, as long as every child stays a plain, childless,
+// non-ERROR leaf. A non-extra ERROR with children — the resync mechanism's
+// structural wrap of real popped fragments — is NOT open: those children are
+// meaningful parse content, not simple absorbed tokens.
+func errorNodeOpenForAbsorption(top *Node) bool {
+	if top == nil || top.symbol != errorSymbol || top.isMissing() {
+		return false
+	}
+	if len(top.children) == 0 {
+		return true
+	}
+	if !top.isExtra() {
+		return false
+	}
+	for _, c := range top.children {
+		if c == nil || c.symbol == errorSymbol || len(c.children) != 0 {
+			return false
+		}
+	}
+	return true
+}
+
+// pushOrExtendErrorNode pushes a fresh ERROR node for tok, or extends the
+// current stack top's ERROR node when it is still open for absorption
+// (errorNodeOpenForAbsorption).
+//
+// arityTransparent selects whether a freshly built ERROR wrapping a real
+// token counts toward an enclosing production's ChildCount. The no-action
+// fallback (parser.go) has no production expecting this ERROR at all, so it
+// must be arity-transparent (extra), matching C's invisible error_repeat.
+// applyRecoverAction's table-driven ParseActionRecover is different: the
+// grammar's own ChildCount already reserves a slot for the ERROR in place of
+// the symbol that failed to parse, so that ERROR must stay counted
+// (non-extra) — see TestParserAncestorRecoverActionPreservesLeftExpression.
+func (p *Parser) pushOrExtendErrorNode(s *glrStack, state StateID, tok Token, nodeCount *int, arena *nodeArena, entryScratch *glrEntryScratch, gssScratch *gssScratch, trackChildErrors *bool, arityTransparent bool) {
 	if p != nil {
 		// An ERROR node is entering a stack: costs can be nonzero from here on
 		// (sticky per-parse gate, see crecoveryCostCompetitionRelevant).
 		p.crecoveryCostCompetitionRelevant = true
 	}
+	// A real, non-empty lookahead keeps its own leaf inside the ERROR node
+	// instead of being discarded by a bare span widen. C wraps each absorbed
+	// token in an invisible error_repeat and hoists consecutive wraps' children
+	// flat into the final ERROR; this engine has no invisible node type, so it
+	// builds the ERROR wrapper directly, then appends each further absorbed
+	// real token as a direct child (see also the wrap-site splice in
+	// tryResyncErrorRecoveryMode, which hoists a popped wrapper's children the
+	// same way when the ERROR gets rebuilt one level up).
+	realTok := tok.Symbol != 0 && tok.Symbol != errorSymbol && !tok.Missing && tok.EndByte > tok.StartByte
+
 	if s != nil {
 		top := stackEntryNode(s.top())
-		if top != nil &&
-			top.symbol == errorSymbol &&
-			!top.isMissing() &&
-			len(top.children) == 0 &&
-			top.parseState == state &&
-			tok.StartByte >= top.endByte {
+		if errorNodeOpenForAbsorption(top) && top.parseState == state && tok.StartByte >= top.endByte {
+			if realTok {
+				leaf := newLeafNodeInArena(arena, tok.Symbol, p.isNamedSymbol(tok.Symbol),
+					tok.StartByte, tok.EndByte, tok.StartPoint, tok.EndPoint)
+				p.stampCompactPackedGSSZeroChildReceipt(&leaf.rawShape)
+				// No leaf.setHasError(true) here: C gives an absorbed token no
+				// error cost (ts_subtree_error_cost only charges the ERROR
+				// container). Only the wrapper the leaf lands in (top, below)
+				// carries the error bit.
+				leaf.setExternalScannerToken(tok.ExternalScannerToken)
+				noteTokenColumnDependency(arena, leaf, tok.lexFlags, tok.StartByte, tok.EndByte)
+				top.children = append(top.children, leaf)
+				invalidateRawShapeAfterChildMutation(top)
+				if nodeCount != nil {
+					*nodeCount = *nodeCount + 1
+				}
+			}
 			top.endByte = tok.EndByte
 			top.endPoint = tok.EndPoint
 			top.setHasError(true)
@@ -959,6 +1026,42 @@ func (p *Parser) pushOrExtendErrorNode(s *glrStack, state StateID, tok Token, no
 			}
 			return
 		}
+	}
+
+	if realTok {
+		leaf := newLeafNodeInArena(arena, tok.Symbol, p.isNamedSymbol(tok.Symbol),
+			tok.StartByte, tok.EndByte, tok.StartPoint, tok.EndPoint)
+		p.stampCompactPackedGSSZeroChildReceipt(&leaf.rawShape)
+		// No leaf.setHasError(true) here: C gives an absorbed token no error
+		// cost (ts_subtree_error_cost only charges the ERROR container).
+		// wrapper.setHasError(true) below carries the error bit instead.
+		leaf.setExternalScannerToken(tok.ExternalScannerToken)
+		noteTokenColumnDependency(arena, leaf, tok.lexFlags, tok.StartByte, tok.EndByte)
+		// newRecoveryParentNodeInArena, not newParentNodeInArena: this wrapper
+		// gets pushed straight onto the GSS stack and can be popped as a plain
+		// child of a LATER transient reduce. Eager parent-link wiring here
+		// would set leaf.parent to this wrapper, and the transient
+		// materializer reads any non-nil, non-self .parent as "already
+		// cloned elsewhere" -- see newRecoveryParentNodeInArena's doc for the
+		// resulting cyclic-transient-tree defect.
+		children := arena.allocNodeSliceNoClear(1)
+		children[0] = leaf
+		wrapper := p.newRecoveryParentNodeInArena(arena, errorSymbol, true, children, 0)
+		wrapper.setHasError(true)
+		wrapper.setExtra(arityTransparent)
+		if trackChildErrors != nil {
+			*trackChildErrors = true
+		}
+		if perfCountersEnabled {
+			perfRecordErrorNode()
+		}
+		pushState := p.schemeErrorRecoveryState(state)
+		wrapper.parseState = pushState
+		p.pushStackNode(s, pushState, wrapper, entryScratch, gssScratch)
+		if nodeCount != nil {
+			*nodeCount = *nodeCount + 2
+		}
+		return
 	}
 
 	errNode := newLeafNodeInArena(arena, errorSymbol, true,
@@ -1147,6 +1250,11 @@ func (p *Parser) tryNearestActionStateRecovery(s *glrStack, tok Token, nodeCount
 		if node == nil {
 			return false
 		}
+		// node is becoming a plain child of the real ERROR built below;
+		// undo any provisional extra mark left by tryReplayTopLevelRecovery
+		// (see nodeFlagRecoveryPlaceholderExtra and the identical splice in
+		// tryResyncErrorRecoveryMode).
+		node.clearRecoveryPlaceholderExtra()
 		errChildren = append(errChildren, node)
 	}
 	recoverState := entries[recoverIdx].state
@@ -1449,8 +1557,44 @@ func (p *Parser) tryResyncErrorRecoveryMode(source []byte, s *glrStack, tok Toke
 	}
 
 	errChildren := make([]*Node, 0, len(poppedNodes)-preservedEnd+1)
-	errChildren = append(errChildren, poppedNodes[preservedEnd:]...)
+	for _, n := range poppedNodes[preservedEnd:] {
+		// A popped node can be one of pushOrExtendErrorNode's plain-token ERROR
+		// wrappers (see errorNodeOpenForAbsorption). Splice its children in
+		// directly instead of nesting the wrapper, so the rebuilt ERROR here
+		// gets the absorbed tokens as its own direct children — matching C's
+		// error_repeat hoist at the point the outer ERROR is finally built.
+		if n != nil && len(n.children) > 0 && errorNodeOpenForAbsorption(n) {
+			errChildren = append(errChildren, n.children...)
+			continue
+		}
+		// n is becoming a plain child of the real, GOTO-validated ERROR
+		// built below. C never gives a plain absorbed child its own extra
+		// bit (only the ERROR wrapper is extra); undo any provisional mark
+		// tryReplayTopLevelRecovery left on n from treating it as an
+		// unvalidated standalone top-level sibling (see
+		// nodeFlagRecoveryPlaceholderExtra). A node lexed as a genuine
+		// grammar extra never carries that mark, so its own extra bit
+		// survives untouched.
+		n.clearRecoveryPlaceholderExtra()
+		errChildren = append(errChildren, n)
+	}
 	if status == resyncAdvance {
+		// Structural-recovery retries absorb the failed suffix, including
+		// bytes skipped before its lookahead. Ordinary resynchronization
+		// still requires the lookahead to follow the stack without a gap.
+		if opportunisticAdvanceAllowed && tok.StartByte > s.byteOffset && !realTokenAttachmentGapIsParserPadding(source, s, tok, p.included, p.lineContinuationEscapeByte()) {
+			gap := newLeafNodeInArena(arena, errorSymbol, true, s.byteOffset, tok.StartByte, p.parserStackEndPoint(s), tok.StartPoint)
+			p.stampCompactPackedGSSZeroChildReceipt(&gap.rawShape)
+			gap.setHasError(true)
+			if perfCountersEnabled {
+				perfRecordErrorNode()
+			}
+			errChildren = append(errChildren, gap)
+			if nodeCount != nil {
+				*nodeCount = *nodeCount + 1
+			}
+			s.byteOffset = tok.StartByte
+		}
 		if !p.guardRealTokenAttachmentGap(source, s, tok, "resync") {
 			return resyncNone
 		}
@@ -1458,8 +1602,10 @@ func (p *Parser) tryResyncErrorRecoveryMode(source []byte, s *glrStack, tok Toke
 		tokLeaf := newLeafNodeInArena(arena, tok.Symbol, p.isNamedSymbol(tok.Symbol),
 			tok.StartByte, tok.EndByte, tok.StartPoint, tok.EndPoint)
 		p.stampCompactPackedGSSZeroChildReceipt(&tokLeaf.rawShape)
-		tokLeaf.setHasError(true)
+		// The ERROR wrapper owns the recovery cost; an absorbed real token
+		// keeps its ordinary error-free leaf flags, including during reuse.
 		tokLeaf.setExternalScannerToken(tok.ExternalScannerToken)
+		noteTokenColumnDependency(arena, tokLeaf, tok.lexFlags, tok.StartByte, tok.EndByte)
 		errChildren = append(errChildren, tokLeaf)
 	}
 	// See newRecoveryParentNodeInArena: popped fragments can be transient
@@ -1467,6 +1613,12 @@ func (p *Parser) tryResyncErrorRecoveryMode(source []byte, s *glrStack, tok Toke
 	// map; eager link wiring here would link this ERROR under itself.
 	errNode := p.newRecoveryParentNodeInArena(arena, errorSymbol, true, errChildren, 0)
 	errNode.setHasError(true)
+	// C's ts_parser__recover_to_state always builds this ERROR extra=true
+	// (ts_subtree_new_error_node(&slice.subtrees, true, language)): the
+	// popped span resyncs to a state the grammar reached without this ERROR
+	// in its production, so the ERROR cannot count toward that production's
+	// arity.
+	errNode.setExtra(true)
 	nodeBumpEquivVersionBeforePublication(errNode)
 	if perfCountersEnabled {
 		perfRecordErrorNode()
@@ -1751,6 +1903,16 @@ func (p *Parser) tryReplayTopLevelRecovery(source []byte, s *glrStack, tok Token
 	}
 	for i := 0; i < split; i++ {
 		n := poppedNodes[i]
+		// n is unvalidated here: it is reattached at state without a real
+		// GOTO/SHIFT transition, so it must not count toward whatever
+		// production consumes it next. If n was already extra (a genuine
+		// grammar extra, e.g. a comment), leave its provenance alone; only
+		// a freshly forced mark is provisional and needs undoing later
+		// (see nodeFlagRecoveryPlaceholderExtra) if a subsequent resync
+		// folds n into a real ERROR node instead of leaving it standalone.
+		if !n.isExtra() {
+			n.setRecoveryPlaceholderExtra(true)
+		}
 		n.setExtra(true)
 		n.preGotoState = state
 		n.parseState = state
@@ -1931,6 +2093,9 @@ func (p *Parser) recoverReduceChainCycle(source []byte, s *glrStack, state State
 	}
 	if tok.Symbol == 0 {
 		if p.errorCostCompetitionEnabled() && tok.StartByte == tok.EndByte {
+			if p.language.RecoveryStackVersionOrderEnabled || (s.cEverErrored && p.emptyExternalRecoveryEnabled()) {
+				s.cNodeBaseline = uint32(p.cStackCumulativeNodeCount(s))
+			}
 			s.cPaused = true
 		}
 		return false
@@ -1938,7 +2103,9 @@ func (p *Parser) recoverReduceChainCycle(source []byte, s *glrStack, state State
 	if !p.guardRealTokenAttachmentGap(source, s, tok, "reduce-chain-cycle") {
 		return false
 	}
-	p.pushOrExtendErrorNode(s, state, tok, nodeCount, arena, entryScratch, gssScratch, trackChildErrors)
+	// No production expects this ERROR — it is a break-glass cycle breaker,
+	// so it stays arity-transparent like the plain no-action fallback.
+	p.pushOrExtendErrorNode(s, state, tok, nodeCount, arena, entryScratch, gssScratch, trackChildErrors, true)
 	return true
 }
 
@@ -2548,7 +2715,7 @@ func (p *Parser) applyAction(source []byte, s *glrStack, act ParseAction, tok To
 		p.applyReduceActionDispatch(source, s, act, tok, anyReduced, nodeCount, arena, entryScratch, gssScratch, tmpEntries, deferParentLinks, trackChildErrors)
 
 	case ParseActionAccept:
-		p.applyAcceptAction(s)
+		p.applyAcceptAction(s, tok, arena)
 
 	case ParseActionRecover:
 		p.applyRecoverAction(s, act, tok, nodeCount, arena, entryScratch, gssScratch, trackChildErrors)
@@ -2556,6 +2723,13 @@ func (p *Parser) applyAction(source []byte, s *glrStack, act ParseAction, tok To
 }
 
 func (p *Parser) applyShiftAction(s *glrStack, act ParseAction, tok Token, nodeCount *int, arena *nodeArena, entryScratch *glrEntryScratch, gssScratch *gssScratch, trackChildErrors *bool) {
+	if arena != nil && arena.legacyReuseReads != nil {
+		arena.legacyReuseReads.CommitDroppedInput(tok.lexerDroppedInput())
+	}
+	if p.language.RecoveryStackVersionOrderEnabled {
+		s.cPreviousByteOffset = s.byteOffset
+		s.cPreviousByteOffsetValid = true
+	}
 	workCountRecordShift()
 	named := p.isNamedSymbol(tok.Symbol)
 	currentState := s.top().state
@@ -2568,6 +2742,7 @@ func (p *Parser) applyShiftAction(s *glrStack, act ParseAction, tok Token, nodeC
 			p.stampCompactPackedGSSZeroChildReceipt(&leaf.rawShape)
 			leaf.setExtra(extra)
 			leaf.setExternalScannerToken(tok.ExternalScannerToken)
+			noteCompactTokenColumnDependency(arena, &leaf.noTreeNode, tok.lexFlags, tok.StartByte, tok.EndByte)
 			leaf.setLexerSkippedPrefixAtSourceStart(tok.lexerSkippedPrefix() && tok.lexerSkippedPrefixStart == 0)
 			leaf.preGotoState = currentState
 			leaf.parseState = targetState
@@ -2578,6 +2753,7 @@ func (p *Parser) applyShiftAction(s *glrStack, act ParseAction, tok Token, nodeC
 			p.stampCompactPackedGSSZeroChildReceipt(&leaf.rawShape)
 			leaf.setExtra(extra)
 			leaf.setExternalScannerToken(tok.ExternalScannerToken)
+			noteCompactTokenColumnDependency(arena, leaf, tok.lexFlags, tok.StartByte, tok.EndByte)
 			leaf.setLexerSkippedPrefixAtSourceStart(tok.lexerSkippedPrefix() && tok.lexerSkippedPrefixStart == 0)
 			leaf.preGotoState = currentState
 			leaf.parseState = targetState
@@ -2595,6 +2771,7 @@ func (p *Parser) applyShiftAction(s *glrStack, act ParseAction, tok Token, nodeC
 			leaf.hasCheckpoint = true
 		}
 		leaf.setExternalScannerToken(tok.ExternalScannerToken)
+		noteCompactTokenColumnDependency(arena, &leaf.noTreeNode, tok.lexFlags, tok.StartByte, tok.EndByte)
 		leaf.setLexerSkippedPrefixAtSourceStart(tok.lexerSkippedPrefix() && tok.lexerSkippedPrefixStart == 0)
 		leaf.preGotoState = currentState
 		leaf.parseState = targetState
@@ -2628,12 +2805,13 @@ func (p *Parser) applyShiftAction(s *glrStack, act ParseAction, tok Token, nodeC
 		// This also keeps a failed sidecar write from publishing an unsafe entry.
 		if substituteActive && !isMissing {
 			key := internKey{
-				symbol:       uint32(tok.Symbol),
-				flags:        internedLeafFlags(flags),
-				startByte:    tok.StartByte,
-				endByte:      tok.EndByte,
-				parseState:   targetState,
-				preGotoState: currentState,
+				symbol:          uint32(tok.Symbol),
+				flags:           internedLeafFlags(flags),
+				startByte:       tok.StartByte,
+				endByte:         tok.EndByte,
+				parseState:      targetState,
+				preGotoState:    currentState,
+				dependsOnColumn: tok.dependsOnColumn(),
 			}
 			if canonical := lookupCanonicalLeafKey(arena, key); canonical != nil {
 				if internLeavesObserveEnabled {
@@ -2651,6 +2829,7 @@ func (p *Parser) applyShiftAction(s *glrStack, act ParseAction, tok Token, nodeC
 				// the right one to apply here too. Skip the re-record.
 				p.pushStackNode(s, targetState, canonical, entryScratch, gssScratch)
 				s.shifted = true
+				s.clearCRecoverPendingToken(tok)
 				*nodeCount++
 				if p != nil && p.glrTrace {
 					fmt.Printf("      -> SHIFT[intern-hit] new_state=%d depth=%d\n", targetState, s.depth())
@@ -2662,6 +2841,9 @@ func (p *Parser) applyShiftAction(s *glrStack, act ParseAction, tok Token, nodeC
 		}
 		leaf := newLeafNodeInArena(arena, tok.Symbol, named,
 			tok.StartByte, tok.EndByte, tok.StartPoint, tok.EndPoint)
+		if arena != nil && arena.legacyReuseReads != nil {
+			noteLegacyReuseLeaf(leaf, tok)
+		}
 		p.stampCompactPackedGSSZeroChildReceipt(&leaf.rawShape)
 		if isMissing {
 			leaf.setMissing(true)
@@ -2678,6 +2860,7 @@ func (p *Parser) applyShiftAction(s *glrStack, act ParseAction, tok Token, nodeC
 		}
 		leaf.setExtra(act.Extra)
 		leaf.setExternalScannerToken(tok.ExternalScannerToken)
+		noteTokenColumnDependency(arena, leaf, tok.lexFlags, tok.StartByte, tok.EndByte)
 		leaf.setLexerSkippedPrefixAtSourceStart(tok.lexerSkippedPrefix() && tok.lexerSkippedPrefixStart == 0)
 		if leaf.isExtra() && perfCountersEnabled {
 			perfRecordExtraNode()
@@ -2697,6 +2880,7 @@ func (p *Parser) applyShiftAction(s *glrStack, act ParseAction, tok Token, nodeC
 		p.pushStackNode(s, targetState, leaf, entryScratch, gssScratch)
 	}
 	s.shifted = true
+	s.clearCRecoverPendingToken(tok)
 	*nodeCount++
 	if p != nil && p.glrTrace {
 		fmt.Printf("      -> SHIFT new_state=%d depth=%d\n", targetState, s.depth())
@@ -2752,9 +2936,13 @@ func (p *Parser) acceptStack(s *glrStack) {
 	s.accepted = true
 }
 
-func (p *Parser) applyAcceptAction(s *glrStack) {
+func (p *Parser) applyAcceptAction(s *glrStack, tok Token, arena *nodeArena) {
+	if arena != nil && arena.legacyReuseReads != nil {
+		arena.legacyReuseReads.CommitDroppedInput(tok.lexerDroppedInput())
+	}
 	workCountRecordAccept()
 	p.acceptStack(s)
+	s.clearCRecoverPendingToken(tok)
 	workCountRecordAcceptedHead(p, s, "parse-action accept")
 	if p != nil && p.glrTrace {
 		fmt.Printf("      -> ACCEPT\n")
@@ -2764,6 +2952,9 @@ func (p *Parser) applyAcceptAction(s *glrStack) {
 func (p *Parser) applyRecoverAction(s *glrStack, act ParseAction, tok Token, nodeCount *int, arena *nodeArena, entryScratch *glrEntryScratch, gssScratch *gssScratch, trackChildErrors *bool) {
 	workCountRecordExplicitRecover()
 	if tok.Symbol == 0 && tok.StartByte == tok.EndByte {
+		if arena != nil && arena.legacyReuseReads != nil {
+			arena.legacyReuseReads.CommitDroppedInput(tok.lexerDroppedInput())
+		}
 		p.acceptStack(s)
 		workCountRecordAcceptedHead(p, s, "EOF recovery accepted head")
 		return
@@ -2772,7 +2963,10 @@ func (p *Parser) applyRecoverAction(s *glrStack, act ParseAction, tok Token, nod
 	if act.State != 0 {
 		recoverState = act.State
 	}
-	p.pushOrExtendErrorNode(s, recoverState, tok, nodeCount, arena, entryScratch, gssScratch, trackChildErrors)
+	// A table-driven ParseActionRecover fills a production slot the grammar's
+	// ChildCount already reserves for it, so this ERROR must stay counted
+	// (non-extra) -- see pushOrExtendErrorNode's doc.
+	p.pushOrExtendErrorNode(s, recoverState, tok, nodeCount, arena, entryScratch, gssScratch, trackChildErrors, false)
 	if p != nil && p.glrTrace && s != nil && !s.dead {
 		fmt.Printf("      -> RECOVER state=%d depth=%d\n", s.top().state, s.depth())
 	}
@@ -2786,6 +2980,17 @@ func extraShiftTargetState(current StateID, act ParseAction) StateID {
 }
 
 func (p *Parser) pushStackNode(s *glrStack, state StateID, node *Node, entryScratch *glrEntryScratch, gssScratch *gssScratch) {
+	// C summarizes hidden missing children before the public tree flattens them.
+	if p.retainExternalFallbackMissingFlags && node != nil && !node.hasError() && rawShapeRefIsArenaBacked(node.rawShape) && node.ownerArena != nil {
+		if shape, ok := node.ownerArena.rawShapeForRef(node.rawShape); ok {
+			for _, child := range node.ownerArena.rawShapeChildren(shape) {
+				if stackEntryNodeHasError(child.entry()) {
+					node.setHasError(true)
+					break
+				}
+			}
+		}
+	}
 	s.push(state, node, entryScratch, gssScratch)
 	if !s.recoverabilityKnown {
 		return
@@ -3104,64 +3309,71 @@ func rawStackWalkChildAt(arena *nodeArena, item rawStackWalkEntry, i int) (rawSt
 }
 
 func (p *Parser) rawStackEntryErrorCost(arena *nodeArena, entry stackEntry) uint32 {
+	return p.rawStackWalkErrorCost(arena, rawStackWalkEntry{entry: entry})
+}
+
+func (p *Parser) rawShapeRecoveryCostEnabled() bool {
+	return p != nil && p.language != nil &&
+		(p.language.RecoveryStackVersionOrderEnabled || p.compactPackedGSSVersionOrderEnabled())
+}
+
+// rawStackWalkErrorCost memoizes costs on captured shapes. A GLR election can
+// compare the same growing clean prefix at each reduction. Walking it again
+// makes the cost quadratic even though the captured raw shape is immutable.
+func (p *Parser) rawStackWalkErrorCost(arena *nodeArena, item rawStackWalkEntry) uint32 {
+	if !stackEntryHasNode(item.entry) {
+		return 0
+	}
+	shape, _, ok := rawShapeForStackWalkEntry(arena, item)
+	if ok && shape.errorCost != rawShapeErrorCostUnknown {
+		return shape.errorCost
+	}
 	var cost uint32
-	pending := []rawStackWalkEntry{{entry: entry}}
-	for len(pending) > 0 {
-		last := len(pending) - 1
-		item := pending[last]
-		pending = pending[:last]
-		if !stackEntryHasNode(item.entry) {
-			continue
-		}
-		// A captured edge may reference an older raw shape of a live Node.
-		// Reuse only an aggregate for this arena, shape and node version.
-		if n := stackEntryNode(item.entry); n != nil && n.symbol != errorSymbol &&
-			n.ownerArena == arena && (!item.shapeRefKnown || item.shapeRef == n.rawShape) && len(p.cNodeMemoCache) > 0 {
-			if slot := p.cNodeMemoPrimaryHit(n); slot != nil && slot.hasCost && slot.ver == n.equivVersion {
-				cost += slot.cost
-				continue
-			}
-		}
-		_, childCount, _ := rawStackWalkEntryHeader(arena, item)
-		if stackEntryNodeIsMissing(item.entry) && childCount == 0 {
-			cost += cErrCostPerMissingTree + cErrCostPerRecovery
-			continue
-		}
-		for i := childCount - 1; i >= 0; i-- {
-			child, ok := rawStackWalkChildAt(arena, item, i)
-			if ok {
-				pending = append(pending, child)
-			}
-		}
-		// C error leaves carry no subtree error cost; their enclosing ERROR
-		// region accounts for the skipped bytes. Hidden MISSING leaves above
-		// still have their separate recovery cost.
-		if stackEntryNodeSymbol(item.entry) != errorSymbol || childCount == 0 {
-			continue
-		}
+	childCount := stackEntryNodeChildCount(item.entry)
+	if ok && (p.rawShapeRecoveryCostEnabled() || stackEntryNodeChildCount(item.entry) == 0) {
+		childCount = shape.childCount()
+	}
+	// C lexer ERROR leaves carry a zero-child receipt; empty ERROR parents do not.
+	if stackEntryNodeSymbol(item.entry) == errorSymbol && !stackEntryNodeIsMissing(item.entry) && childCount == 0 && rawStackWalkEntryRef(item) == rawShapeZeroChildRef {
+		return 0
+	}
+	if stackEntryNodeIsMissing(item.entry) && childCount == 0 {
+		cost = cErrCostPerMissingTree + cErrCostPerRecovery
+	} else {
 		for i := 0; i < childCount; i++ {
-			child, ok := rawStackWalkChildAt(arena, item, i)
-			if !ok || stackEntryNodeIsExtra(child.entry) {
-				continue
-			}
-			if stackEntryNodeSymbol(child.entry) == errorSymbol && stackEntryNodeChildCount(child.entry) == 0 {
-				continue
-			}
-			if cSymbolVisibleLang(p.language, stackEntryNodeSymbol(child.entry)) {
-				cost += cErrCostPerSkippedTree
-			} else if count := p.rawStackWalkVisibleChildCount(arena, child); count > 0 {
-				cost += cErrCostPerSkippedTree * uint32(count)
+			child, found := rawStackWalkChildAt(arena, item, i)
+			if found {
+				cost += p.rawStackWalkErrorCost(arena, child)
 			}
 		}
-		bytes := uint32(0)
-		rows := uint32(0)
-		if endByte, startByte := stackEntryNodeEndByte(item.entry), stackEntryNodeStartByte(item.entry); endByte > startByte {
-			bytes = endByte - startByte
+		if stackEntryNodeSymbol(item.entry) == errorSymbol {
+			for i := 0; i < childCount; i++ {
+				child, found := rawStackWalkChildAt(arena, item, i)
+				if !found || stackEntryNodeIsExtra(child.entry) {
+					continue
+				}
+				if stackEntryNodeSymbol(child.entry) == errorSymbol && stackEntryNodeChildCount(child.entry) == 0 {
+					continue
+				}
+				if cSymbolVisibleLang(p.language, stackEntryNodeSymbol(child.entry)) {
+					cost += cErrCostPerSkippedTree
+				} else if count := p.rawStackWalkVisibleChildCount(arena, child); count > 0 {
+					cost += cErrCostPerSkippedTree * uint32(count)
+				}
+			}
+			bytes := uint32(0)
+			rows := uint32(0)
+			if endByte, startByte := stackEntryNodeEndByte(item.entry), stackEntryNodeStartByte(item.entry); endByte > startByte {
+				bytes = endByte - startByte
+			}
+			if endPoint, startPoint := stackEntryNodeEndPoint(item.entry), stackEntryNodeStartPoint(item.entry); endPoint.Row > startPoint.Row {
+				rows = endPoint.Row - startPoint.Row
+			}
+			cost += cErrCostPerRecovery + cErrCostPerSkippedChar*bytes + cErrCostPerSkippedLine*rows
 		}
-		if endPoint, startPoint := stackEntryNodeEndPoint(item.entry), stackEntryNodeStartPoint(item.entry); endPoint.Row > startPoint.Row {
-			rows = endPoint.Row - startPoint.Row
-		}
-		cost += cErrCostPerRecovery + cErrCostPerSkippedChar*bytes + cErrCostPerSkippedLine*rows
+	}
+	if ok {
+		shape.errorCost = cost
 	}
 	return cost
 }
@@ -3680,7 +3892,7 @@ func appendCStackSliceOrderReduceFork(forks []reduceFork, fork reduceFork) []red
 // exceeds MAX_ITERATOR_COUNT. Completed paths use stack__add_slice order, so
 // every path with the same pop target stays in one physical version group.
 func cWaveReduceWindowsFromGSS(s *glrStack, childCount int) []reduceFork {
-	if s == nil || s.gss.head == nil || childCount < 0 {
+	if s == nil || s.gss.head == nil || childCount < -1 {
 		return nil
 	}
 
@@ -3690,7 +3902,10 @@ func cWaveReduceWindowsFromGSS(s *glrStack, childCount int) []reduceFork {
 		for i, waveSize := 0, len(iterators); i < waveSize; {
 			iterator := iterators[i]
 			node := iterator.node
-			if node != nil && iterator.subtreeCount == childCount {
+			// A count of -1 requests pop-all, whose slices stop at the
+			// linkless base regardless of the paths' differing lengths.
+			complete := node != nil && (iterator.subtreeCount == childCount || (childCount == -1 && node.prev == nil && node.extraLinkCount == 0))
+			if complete {
 				window := make([]stackEntry, len(iterator.revPath))
 				for j := range iterator.revPath {
 					window[j] = iterator.revPath[len(iterator.revPath)-1-j]
@@ -3703,7 +3918,7 @@ func cWaveReduceWindowsFromGSS(s *glrStack, childCount int) []reduceFork {
 			}
 
 			linkCount := 0
-			if node != nil && iterator.subtreeCount != childCount {
+			if node != nil && !complete {
 				linkCount = node.linkCount()
 				// Go represents C's linkless base node as one initial stack
 				// entry with a nil predecessor. Do not traverse that entry.
@@ -3828,6 +4043,9 @@ func (p *Parser) selectedReduceWindowsFromGSSWithBudget(arena *nodeArena, act Pa
 		return nil, 0, false
 	}
 	if workBudget <= 0 {
+		if p.mergeScratch != nil {
+			p.mergeScratch.policyPruned = true
+		}
 		return nil, 0, true
 	}
 
@@ -3847,6 +4065,9 @@ func (p *Parser) selectedReduceWindowsFromGSSWithBudget(arena *nodeArena, act Pa
 				continue
 			}
 			preference := p.reduceForkWindowPreference(arena, act, fork, forks[i])
+			if preference != 0 && p.mergeScratch != nil {
+				p.mergeScratch.policyPruned = true
+			}
 			if workCountInstrumentationEnabled && preference != 0 {
 				workCountTopologyRecordChildElection(s, forks[i], fork, preference) // work-count-assembly: topology child-election seam
 			}
@@ -3868,6 +4089,8 @@ func (p *Parser) selectedReduceWindowsFromGSSWithBudget(arena *nodeArena, act Pa
 		}
 		if insertAt >= 0 || len(forks) < maxGroups {
 			forks = insertReduceFork(forks, insertAt, fork)
+		} else if p.mergeScratch != nil {
+			p.mergeScratch.policyPruned = true
 		}
 	}
 
@@ -3922,6 +4145,9 @@ func (p *Parser) selectedReduceWindowsFromGSSWithBudget(arena *nodeArena, act Pa
 	}
 
 	dfs(s.gss.head, childCount)
+	if capped && p.mergeScratch != nil {
+		p.mergeScratch.policyPruned = true
+	}
 	workCountRecordReduceWindow(p, s, len(forks), work, workBudget, capped)
 	return forks, work, capped
 }
@@ -4481,6 +4707,9 @@ func (p *Parser) applyReduceActionForked(source []byte, s *glrStack, act ParseAc
 				end++
 			}
 			group := allForks[start:end]
+			if len(group) > 1 && p.mergeScratch != nil {
+				p.mergeScratch.policyPruned = true
+			}
 			selected := 0
 			for i := 1; i < len(group); i++ {
 				if p.reduceForkWindowPreference(arena, act, group[i], group[selected]) < 0 {
@@ -4493,6 +4722,15 @@ func (p *Parser) applyReduceActionForked(source []byte, s *glrStack, act ParseAc
 		}
 	} else {
 		forks = p.selectedReduceWindowsFromGSS(arena, act, s, int(act.ChildCount), maxStacksPerMergeKey)
+	}
+	if limit := p.cRecoveryReductionForkLimit; limit > 0 && len(forks) > limit {
+		if p.mergeScratch != nil {
+			p.mergeScratch.policyPruned = true
+		}
+		forks = forks[:limit]
+		if packedGroups != nil {
+			packedGroups = packedGroups[:limit]
+		}
 	}
 	if perfCountersEnabled {
 		perfRecordReduceForkCall(len(forks))
@@ -6141,6 +6379,8 @@ func extendParentSpanToWindow(parent *Node, entries []stackEntry, start, reduced
 	// contiguous only after a later sibling has already pulled startByte back.
 	// The same reverse scan is still safe for endByte growth because the
 	// contiguity checks below prevent phantom gaps from inflating the span.
+	// Empty layout tokens can carry preceding scanner padding. They do not
+	// consume a line ending, so include that padding in the parent's extent.
 	for i := reducedEnd - 1; i >= start; i-- {
 		n := stackEntryNode(entries[i])
 		if n == nil || n.isExtra() {
@@ -6153,7 +6393,7 @@ func extendParentSpanToWindow(parent *Node, entries []stackEntry, start, reduced
 		if visible {
 			continue // visible children are already represented in parent's children
 		}
-		if symbolMarked(nonSpanExtendingInvisibleSymbols, n.symbol) {
+		if symbolMarked(nonSpanExtendingInvisibleSymbols, n.symbol) && n.startByte != n.endByte {
 			continue
 		}
 		// Invisible entries (with or without children) may have span that
@@ -6188,7 +6428,7 @@ func extendParentSpanToWindow(parent *Node, entries []stackEntry, start, reduced
 		if visible {
 			continue
 		}
-		if symbolMarked(nonSpanExtendingInvisibleSymbols, n.symbol) {
+		if symbolMarked(nonSpanExtendingInvisibleSymbols, n.symbol) && n.startByte != n.endByte {
 			continue
 		}
 		spanExtending := symbolMarked(spanExtendingInvisibleSymbols, n.symbol)
@@ -7528,6 +7768,10 @@ func applyDirectFieldToUnassignedFlattenedSpan(children []*Node, fieldIDs []Fiel
 		assignAllUnassignedFlattenedFields(children, fieldIDs, fieldSources, start, end, fid, source, false)
 	case namedTargets == 1:
 		assignAllUnassignedFlattenedFields(children, fieldIDs, fieldSources, start, end, fid, source, true)
+	case totalTargets > 1:
+		// A direct field carries through every child of its hidden slot,
+		// including a span made entirely of anonymous tokens.
+		assignAllUnassignedFlattenedFields(children, fieldIDs, fieldSources, start, end, fid, source, false)
 	default:
 		assignFirstUnassignedFlattenedField(children, fieldIDs, fieldSources, start, end, fid, source, preferNamed)
 	}
@@ -9024,7 +9268,17 @@ func aliasedNodeInArena(arena *nodeArena, lang *Language, n *Node, alias Symbol)
 			if child := flattenedVisibleAliasTarget(n, lang.SymbolMetadata, nil, alias, int(lang.TokenCount)); child != nil {
 				n = child
 			} else {
+				// Materialization already clones the hidden node. Apply the alias
+				// to that new node instead of cloning it a second time.
 				n = materializeHiddenNodeForAlias(arena, lang, n)
+				if n.ownerArena != nil && n.ownerArena.legacyReuseReads != nil {
+					recordLegacyReuseAliasSymbol(n, lang)
+				}
+				n.symbol = alias
+				if int(alias) < len(lang.SymbolMetadata) {
+					n.setNamed(lang.SymbolMetadata[alias].Named)
+				}
+				return n
 			}
 		}
 	}
@@ -9048,6 +9302,11 @@ func aliasedNodeInArena(arena *nodeArena, lang *Language, n *Node, alias Symbol)
 	if mask := n.supertypeMask(); mask != 0 {
 		arena.setNodeSupertypeMask(cloned, mask)
 	}
+	// depends_on_column lives in an arena side table, not in the copied
+	// header; re-record it explicitly. See Node.dependsOnColumn.
+	if n.dependsOnColumn() {
+		arena.setNodeDependsOnColumnBit(cloned, true)
+	}
 	cloned.symbol = alias
 	if lang != nil && int(alias) < len(lang.SymbolMetadata) {
 		cloned.setNamed(lang.SymbolMetadata[alias].Named)
@@ -9055,6 +9314,10 @@ func aliasedNodeInArena(arena *nodeArena, lang *Language, n *Node, alias Symbol)
 	cloned.ownerArena = arena
 	copyMissingNodeDependencyForClone(cloned, n)
 	copyCompactReuseDependency(cloned, n)
+	if n.ownerArena != nil && n.ownerArena.legacyReuseReads != nil {
+		copyLegacyReuseLeafReceipt(cloned, n)
+		recordLegacyReuseAliasSymbolFrom(cloned, n, lang)
+	}
 	copyExternalScannerCheckpointToNode(cloned, n)
 	return cloned
 }
@@ -9116,6 +9379,9 @@ func materializeAnonymousLeafAliasWrapper(arena *nodeArena, lang *Language, n *N
 		}
 	}
 	child := cloneNodeInArena(arena, n)
+	if n.ownerArena != nil && n.ownerArena.legacyReuseReads != nil {
+		recordLegacyReuseAliasSymbolFrom(child, n, lang)
+	}
 	child.symbol = alias
 	child.setNamed(named)
 	wrapper := newParentNodeInArena(arena, alias, named, []*Node{child}, nil, n.productionID)
@@ -9237,9 +9503,17 @@ func cloneNodeInArena(arena *nodeArena, n *Node) *Node {
 	if mask := n.supertypeMask(); mask != 0 {
 		arena.setNodeSupertypeMask(cloned, mask)
 	}
+	// depends_on_column lives in an arena side table, not in the copied
+	// header; re-record it explicitly. See Node.dependsOnColumn.
+	if n.dependsOnColumn() {
+		arena.setNodeDependsOnColumnBit(cloned, true)
+	}
 	cloneNodeFieldMetadataHeaderInto(cloned, n, arena)
 	copyMissingNodeDependencyForClone(cloned, n)
 	copyCompactReuseDependency(cloned, n)
+	if n.ownerArena != nil && n.ownerArena.legacyReuseReads != nil {
+		copyLegacyReuseLeafReceipt(cloned, n)
+	}
 	copyExternalScannerCheckpointToNode(cloned, n)
 	if nodeHasFinalChildRefs(n) {
 		childCount := nodeChildCountNoMaterialize(n)

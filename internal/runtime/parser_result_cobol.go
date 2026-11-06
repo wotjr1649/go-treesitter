@@ -23,7 +23,7 @@ func normalizeCobolCompatibility(root *Node, source []byte, lang *Language) {
 	normalizeCobolRootCommentsCoveredByError(root, lang)
 	normalizeCobolTrailingTriviaSpans(root, source, lang)
 	normalizeCobolRecoveredParagraphHeader(root, source, lang)
-	normalizeCobolProcedureTrailingParagraphCommentEntry(root, source, lang)
+	normalizeCobolProcedureTrailingParagraphHeader(root, source, lang)
 	normalizeCobolProcedureTrailingExecCICSSpans(root, source, lang)
 	normalizeCobolRootExecCICSErrorMarkers(root, source, lang)
 	normalizeCobolIfHeaderExecCICSProgramEnd(root, source, lang)
@@ -536,6 +536,21 @@ func normalizeCobolProcedureRootRecovery(root *Node, source []byte, lang *Langua
 			continue
 		}
 		if len(tailMoved) == 0 && hoistedEnd == 0 {
+			continue
+		}
+		// Idempotence guard. normalizeCobolRootProcedurePrefixError is this
+		// pass's inverse: it carves the clean statement prefix back out of the
+		// merged ERROR sibling into procedure_division, sets the division end
+		// to the EXEC/CICS split, and starts the ERROR at the CICS tail. That
+		// is the converged, C-matching shape. Hoisting again from it would
+		// only rebuild the pre-prefix state (header-only division, statements
+		// inside the ERROR) and, because the prefix pass is skipped after a
+		// hoist, leave the tree there until the next application moved it
+		// back: a two-state cycle whose final shape depended on how many
+		// times the compatibility pass ran. Recognize the converged shape by
+		// its exact boundaries and leave it alone.
+		if splitEnd, tailStart, split := cobolFirstExecCICSTailSplit(source, codeStart, err.endByte); split &&
+			proc.endByte == splitEnd && err.startByte == tailStart {
 			continue
 		}
 
@@ -1169,12 +1184,25 @@ func normalizeCobolIfHeaderExecCICSClassError(header *Node, source []byte, lang 
 	if !ok {
 		return false
 	}
+	// The C oracle assigns is_class's declared "x" and "class" fields to the
+	// condition and trailing WORD even when an EXEC-CICS tail interrupts the
+	// two, and assigns if_header's declared "condition" field to the
+	// rebuilt expr. newParentNodeInArena and replaceNodeChildrenUnfielded
+	// otherwise leave hand-built nodes field-free, which only field-parity
+	// checks made visible (PR #638 made field comparison opt-out).
+	xFieldID, hasXField := lang.FieldByName("x")
+	classFieldID, hasClassField := lang.FieldByName("class")
+	conditionFieldID, hasConditionField := lang.FieldByName("condition")
 
 	execEnd := execStart + uint32(len("EXEC"))
 	err := newLeafNodeInArena(header.ownerArena, errorSymbol, true, execStart, execEnd, advancePointByBytes(Point{}, source[:execStart]), advancePointByBytes(Point{}, source[:execEnd]))
 	err.setHasError(true)
 	cicsWord := newLeafNodeInArena(header.ownerArena, wordSym, symbolIsNamed(lang, wordSym), cicsStart, cicsEnd, advancePointByBytes(Point{}, source[:cicsStart]), advancePointByBytes(Point{}, source[:cicsEnd]))
-	isClass := newParentNodeInArena(header.ownerArena, isClassSym, symbolIsNamed(lang, isClassSym), []*Node{condition, err, cicsWord}, nil, 0)
+	var isClassFieldIDs []FieldID
+	if hasXField && hasClassField {
+		isClassFieldIDs = []FieldID{xFieldID, 0, classFieldID}
+	}
+	isClass := newParentNodeInArena(header.ownerArena, isClassSym, symbolIsNamed(lang, isClassSym), []*Node{condition, err, cicsWord}, isClassFieldIDs, 0)
 	expr := newParentNodeInArena(header.ownerArena, exprSym, symbolIsNamed(lang, exprSym), []*Node{isClass}, nil, 0)
 
 	ifStart := header.startByte
@@ -1184,6 +1212,9 @@ func normalizeCobolIfHeaderExecCICSClassError(header *Node, source []byte, lang 
 		}
 	}
 	replaceNodeChildrenUnfielded(header, cloneNodeSliceInArena(header.ownerArena, []*Node{expr}))
+	if hasConditionField {
+		setNodeChildFieldDirect(header, 0, conditionFieldID)
+	}
 	header.startByte = ifStart
 	header.startPoint = advancePointByBytes(Point{}, source[:ifStart])
 	header.endByte = cicsEnd
@@ -1480,8 +1511,25 @@ func cobolTrimNodeEndForRecovery(n *Node, source []byte, end uint32) {
 	startByte, startPoint := n.startByte, n.startPoint
 	children := resultChildSliceForMutation(n)
 	if len(children) > 0 {
+		// n keeps its declared fields (for example if_header's direct
+		// "condition" field on its expr child) across this trim: dropping
+		// only children past the new end never changes which surviving
+		// child holds a given field, but replaceNodeChildrenUnfielded
+		// clears all field metadata unconditionally. Carry the original
+		// per-index field IDs/sources forward onto the kept children so a
+		// trim that removes nothing field-relevant does not silently strip
+		// fields the reduce already assigned correctly.
+		origFieldIDs := n.fieldIDs()
+		origFieldSources := n.fieldSources()
+		hasFields := len(origFieldIDs) == len(children)
 		kept := make([]*Node, 0, len(children))
-		for _, child := range children {
+		var keptFieldIDs []FieldID
+		var keptFieldSources []uint8
+		if hasFields {
+			keptFieldIDs = make([]FieldID, 0, len(children))
+			keptFieldSources = make([]uint8, 0, len(children))
+		}
+		for i, child := range children {
 			if child == nil {
 				continue
 			}
@@ -1492,8 +1540,19 @@ func cobolTrimNodeEndForRecovery(n *Node, source []byte, end uint32) {
 				cobolTrimNodeEndForRecovery(child, source, end)
 			}
 			kept = append(kept, child)
+			if hasFields {
+				keptFieldIDs = append(keptFieldIDs, origFieldIDs[i])
+				var childSource uint8
+				if i < len(origFieldSources) {
+					childSource = origFieldSources[i]
+				}
+				keptFieldSources = append(keptFieldSources, childSource)
+			}
 		}
 		replaceNodeChildrenUnfielded(n, cloneNodeSliceInArena(n.ownerArena, kept))
+		if hasFields && fieldIDSliceHasAny(keptFieldIDs) {
+			n.setFieldMetadata(keptFieldIDs, keptFieldSources)
+		}
 	}
 	n.startByte = startByte
 	n.startPoint = startPoint
@@ -2183,7 +2242,7 @@ func normalizeCobolRecoveredParagraphHeader(root *Node, source []byte, lang *Lan
 	cobolRefreshHasErrorFromChildren(root)
 }
 
-func normalizeCobolProcedureTrailingParagraphCommentEntry(root *Node, source []byte, lang *Language) {
+func normalizeCobolProcedureTrailingParagraphHeader(root *Node, source []byte, lang *Language) {
 	if root == nil || !isCobolLanguage(lang) || root.Type(lang) != "start" || len(source) == 0 {
 		return
 	}
@@ -2205,7 +2264,7 @@ func normalizeCobolProcedureTrailingParagraphCommentEntry(root *Node, source []b
 			return
 		}
 		last := resultChildAt(n, resultChildCount(n)-1)
-		if last == nil || last.Type(lang) != "comment_entry" || last.startByte != last.endByte || int(last.startByte) > len(source) {
+		if last == nil || int(last.endByte) > len(source) {
 			return
 		}
 		lineStart := cobolLineStart(source, int(last.startByte))
@@ -2213,15 +2272,38 @@ func normalizeCobolProcedureTrailingParagraphCommentEntry(root *Node, source []b
 		if !ok {
 			return
 		}
-		labelEnd := lastNonTriviaByteEnd(source[:last.startByte])
+		var labelEnd, dotStart uint32
+		var dot *Node
+		switch {
+		case last.Type(lang) == "comment_entry" && last.startByte == last.endByte:
+			labelEnd = lastNonTriviaByteEnd(source[:last.startByte])
+			if labelEnd > 0 {
+				dotStart = labelEnd - 1
+			}
+		case lang.GeneratedByGrammargen && last.Type(lang) == "." && !last.IsExtra() && !last.HasError() &&
+			last.endByte == last.startByte+1 && source[last.startByte] == '.':
+			// Recovery can leave a final paragraph label as a bare dot.
+			// Require a preceding period on an earlier line before rebuilding it.
+			if resultChildCount(n) < 2 {
+				return
+			}
+			previous := resultChildAt(n, resultChildCount(n)-2)
+			if previous == nil || previous.Type(lang) != "period" || previous.endByte > uint32(lineStart) {
+				return
+			}
+			labelEnd, dotStart, dot = last.endByte, last.startByte, last
+		default:
+			return
+		}
 		if labelEnd == 0 || labelEnd <= labelStart || source[labelEnd-1] != '.' {
 			return
 		}
-		dotStart := labelEnd - 1
 		if !cobolBytesAreParagraphLabel(source[labelStart:dotStart]) {
 			return
 		}
-		dot := newLeafNodeInArena(n.ownerArena, dotSym, symbolIsNamed(lang, dotSym), dotStart, labelEnd, advancePointByBytes(Point{}, source[:dotStart]), advancePointByBytes(Point{}, source[:labelEnd]))
+		if dot == nil {
+			dot = newLeafNodeInArena(n.ownerArena, dotSym, symbolIsNamed(lang, dotSym), dotStart, labelEnd, advancePointByBytes(Point{}, source[:dotStart]), advancePointByBytes(Point{}, source[:labelEnd]))
+		}
 		header := newParentNodeInArena(n.ownerArena, paragraphSym, symbolIsNamed(lang, paragraphSym), []*Node{dot}, nil, 0)
 		header.startByte = labelStart
 		header.startPoint = advancePointByBytes(Point{}, source[:labelStart])
@@ -2311,15 +2393,5 @@ func cobolClearErrorFlags(n *Node) {
 }
 
 func cobolRefreshHasErrorFromChildren(n *Node) {
-	if n == nil {
-		return
-	}
-	n.setHasError(false)
-	for i := 0; i < resultChildCount(n); i++ {
-		child := resultChildAt(n, i)
-		if child != nil && (child.IsError() || child.HasError()) {
-			n.setHasError(true)
-			return
-		}
-	}
+	resultRefreshHasErrorFromChildren(n)
 }

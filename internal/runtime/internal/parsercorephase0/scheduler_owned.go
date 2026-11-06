@@ -144,7 +144,7 @@ func (c *Core) recordNodeLineage(head Head, rank CleanPathRankSelection, lineage
 	}
 	if len(c.transactions) != 0 {
 		c.nodeLineageJournal = append(c.nodeLineageJournal, nodeLineageMutation{
-			node: head.Node, owner: node.owner, dropCohortRefs: node.dropCohortRefs,
+			node: head.Node, owner: node.owner, dropCohortRefIndex: node.dropCohortRefIndex,
 			setCount: node.set.count, setFlags: node.set.flags, setSpillRef: node.set.spillRef,
 			lineage: node.lineage, rank: node.rank, converged: node.converged, blended: node.blended,
 			storedErrorCost: node.storedErrorCost,
@@ -184,7 +184,7 @@ func (c *Core) recordHeadOwner(head Head, lineage uint32) error {
 	}
 	if len(c.transactions) != 0 {
 		c.nodeLineageJournal = append(c.nodeLineageJournal, nodeLineageMutation{
-			node: head.Node, owner: node.owner, dropCohortRefs: node.dropCohortRefs,
+			node: head.Node, owner: node.owner, dropCohortRefIndex: node.dropCohortRefIndex,
 			setCount: node.set.count, setFlags: node.set.flags, setSpillRef: node.set.spillRef,
 			lineage: node.lineage, rank: node.rank, converged: node.converged, blended: node.blended,
 			storedErrorCost: node.storedErrorCost,
@@ -221,7 +221,7 @@ func (c *Core) recordNodeStoredErrorCost(head Head, cost uint32) error {
 	}
 	if len(c.transactions) != 0 {
 		c.nodeLineageJournal = append(c.nodeLineageJournal, nodeLineageMutation{
-			node: head.Node, owner: node.owner, dropCohortRefs: node.dropCohortRefs,
+			node: head.Node, owner: node.owner, dropCohortRefIndex: node.dropCohortRefIndex,
 			setCount: node.set.count, setFlags: node.set.flags, setSpillRef: node.set.spillRef,
 			lineage: node.lineage, rank: node.rank, converged: node.converged, blended: node.blended,
 			storedErrorCost: node.storedErrorCost,
@@ -262,13 +262,14 @@ func (c *Core) recordNodeLineageSet(head Head, set AlternativeSet, setBlended bo
 	before := node.set
 	beforeBlended := node.blended
 	incomparable := c.AlternativeSetIncomparable(before, set)
-	if !c.alternativeSetUnion(&node.set, set) {
+	setChanged := c.alternativeSetUnion(&node.set, set)
+	nextBlended := beforeBlended || setBlended || incomparable
+	if !setChanged && nextBlended == beforeBlended {
 		return nil
 	}
-	nextBlended := beforeBlended || setBlended || incomparable
 	if len(c.transactions) != 0 {
 		c.nodeLineageJournal = append(c.nodeLineageJournal, nodeLineageMutation{
-			node: head.Node, owner: node.owner, dropCohortRefs: node.dropCohortRefs,
+			node: head.Node, owner: node.owner, dropCohortRefIndex: node.dropCohortRefIndex,
 			setCount: before.count, setFlags: before.flags, setSpillRef: before.spillRef,
 			lineage: node.lineage, rank: node.rank, converged: node.converged, blended: beforeBlended,
 			storedErrorCost: node.storedErrorCost,
@@ -296,22 +297,30 @@ func (c *Core) recordNodeLineageRefs(head Head, refs DropCohortRefSet) error {
 	if err != nil {
 		return err
 	}
-	before := node.dropCohortRefs
-	changed, err := c.dropCohortRefUnion(&node.dropCohortRefs, refs)
+	merged, err := c.nodeLineageRefs(node.dropCohortRefIndex)
+	if err != nil {
+		return err
+	}
+	changed, err := c.dropCohortRefUnion(&merged, refs)
 	if err != nil {
 		return err
 	}
 	if !changed {
 		return nil
 	}
+	index, err := c.appendNodeLineageRefs(merged)
+	if err != nil {
+		return err
+	}
 	if len(c.transactions) != 0 {
 		c.nodeLineageJournal = append(c.nodeLineageJournal, nodeLineageMutation{
-			node: head.Node, owner: node.owner, dropCohortRefs: before,
+			node: head.Node, owner: node.owner, dropCohortRefIndex: node.dropCohortRefIndex,
 			setCount: node.set.count, setFlags: node.set.flags, setSpillRef: node.set.spillRef,
 			lineage: node.lineage, rank: node.rank, converged: node.converged, blended: node.blended,
 			storedErrorCost: node.storedErrorCost,
 		})
 	}
+	node.dropCohortRefIndex = index
 	return nil
 }
 
@@ -339,7 +348,7 @@ func (c *Core) recordNodeLineageMember(head Head, event, branch uint16) error {
 	c.invalidateReusedLineageProof(head.Node, node)
 	if len(c.transactions) != 0 {
 		c.nodeLineageJournal = append(c.nodeLineageJournal, nodeLineageMutation{
-			node: head.Node, owner: node.owner, dropCohortRefs: node.dropCohortRefs,
+			node: head.Node, owner: node.owner, dropCohortRefIndex: node.dropCohortRefIndex,
 			setCount: before.count, setFlags: before.flags, setSpillRef: before.spillRef,
 			lineage: node.lineage, rank: node.rank, converged: node.converged, blended: node.blended,
 			storedErrorCost: node.storedErrorCost,
@@ -406,6 +415,9 @@ func (c *Core) mergeLiveCondenseCandidatesUncheckpointedWithCost(candidates []Co
 		match := -1
 		for prior := 0; prior < write; prior++ {
 			other := candidates[prior]
+			if candidate.Independent || other.Independent {
+				continue
+			}
 			otherNode, err := c.node(other.Head.Node)
 			if err != nil {
 				return nil, err
@@ -887,9 +899,34 @@ func (c *Core) mergeNodeLineageMetadata(leftID, rightID, targetID NodeID) error 
 	if targetID == leftID {
 		merged.owner = left.owner
 	}
-	merged.dropCohortRefs = left.dropCohortRefs
-	if _, err := c.dropCohortRefUnion(&merged.dropCohortRefs, right.dropCohortRefs); err != nil {
+	leftRefs, err := c.nodeLineageRefs(left.dropCohortRefIndex)
+	if err != nil {
 		return err
+	}
+	rightRefs, err := c.nodeLineageRefs(right.dropCohortRefIndex)
+	if err != nil {
+		return err
+	}
+	mergedRefs := leftRefs
+	if _, err := c.dropCohortRefUnion(&mergedRefs, rightRefs); err != nil {
+		return err
+	}
+	targetRefs, err := c.nodeLineageRefs(before.dropCohortRefIndex)
+	if err != nil {
+		return err
+	}
+	// Preserve value equality when distinct indices contain the same set.
+	// An unchanged merge must not allocate or publish a fresh lineage record.
+	switch {
+	case mergedRefs == targetRefs:
+		merged.dropCohortRefIndex = before.dropCohortRefIndex
+	case mergedRefs == leftRefs:
+		merged.dropCohortRefIndex = left.dropCohortRefIndex
+	default:
+		merged.dropCohortRefIndex, err = c.appendNodeLineageRefs(mergedRefs)
+		if err != nil {
+			return err
+		}
 	}
 	merged.set = left.set
 	merged.blended = left.blended || right.blended || c.AlternativeSetIncomparable(left.set, right.set)
@@ -903,7 +940,7 @@ func (c *Core) mergeNodeLineageMetadata(leftID, rightID, targetID NodeID) error 
 	}
 	if targetID == leftID && len(c.transactions) != 0 {
 		c.nodeLineageJournal = append(c.nodeLineageJournal, nodeLineageMutation{
-			node: targetID, owner: before.owner, dropCohortRefs: before.dropCohortRefs,
+			node: targetID, owner: before.owner, dropCohortRefIndex: before.dropCohortRefIndex,
 			setCount: before.set.count, setFlags: before.set.flags, setSpillRef: before.set.spillRef,
 			lineage: before.lineage, rank: before.rank, converged: before.converged, blended: before.blended,
 			storedErrorCost: before.storedErrorCost,
@@ -1739,6 +1776,26 @@ func (c *Core) reduceOutputsClassifiedIntoActive(owner SchedulerTransactionToken
 	}
 	c.addWork(&c.work.EmittedPopPayloads, emittedPayloads)
 	scratch := &c.reductionScratch
+	// C selects children when paths in this reduction reconverge on the
+	// identical predecessor. Start that proof when a fresh source forest
+	// exceeds the live-link capacity, then retain it through this session's
+	// acceptance. Diagnostic owned-lexer sessions start immediately to avoid
+	// repeated acceptance materialization; ordinary small sessions keep their
+	// established work. Recovery and borrowed histories remain unsupported.
+	sourceNode, sourceErr := c.node(boundary.head.Node)
+	if sourceErr != nil {
+		return nil, sourceErr
+	}
+	if c.schedulerFrame.fresh && cost == nil && source.storedErrorCost == 0 && sourceNode.pathCount > uint64(c.limits.MaxLinksPerBoundary) {
+		scratch.pressureSeen = true
+	}
+	scratch.selectCleanChildren = len(paths) > 1 && c.schedulerFrame.fresh && cost == nil && source.storedErrorCost == 0 && (scratch.pressureSeen || ExternalLexerOwnershipProbeEnabled())
+	for index := range paths {
+		if paths[index].recoveryDiscontinuity {
+			scratch.selectCleanChildren = false
+			break
+		}
+	}
 	// len(paths) > 1 is this reduce's pop.size > 1 (a GSS multi-pop / diamond
 	// merge): more than one distinct way to pop act.ChildCount entries was
 	// found, one per path below -- mirrors the production Go parser's
@@ -1830,6 +1887,24 @@ func (c *Core) reduceOutputsClassifiedIntoActive(owner SchedulerTransactionToken
 				return nil, err
 			}
 		}
+		// A fresh sole pop with no imported history or certificate refs
+		// has exactly the zero-valued provenance the general aggregation
+		// below computes. Publish its one output without the cold workspace.
+		if !multiPop && cost == nil && outcome.change == condenseNew && !outcome.historicalBoundarySplit {
+			predecessor, err := c.nodeLineage(path.prev)
+			if err != nil {
+				return nil, err
+			}
+			if predecessor.dropCohortRefIndex == 0 {
+				links, err := c.reductionLinkChainForHead(out)
+				if err != nil {
+					return nil, err
+				}
+				frontier = append(frontier, ReductionOutput{Head: out, Links: links, Freshness: ReductionNew, CleanPathRank: path.cleanPathRank})
+				phase0AFinishReductionConstruction(c)
+				return frontier, nil
+			}
+		}
 		boundaryIndex, seen := scratch.boundary(key)
 		var previousStore reductionBoundaryOutput
 		previous := &previousStore
@@ -1847,8 +1922,14 @@ func (c *Core) reduceOutputsClassifiedIntoActive(owner SchedulerTransactionToken
 		historicalBlended := previous.historicalBlended
 		dropCohortRefs := previous.dropCohortRefs
 		if source, refsErr := c.nodeLineage(path.prev); refsErr == nil {
-			if _, refsErr = c.dropCohortRefUnion(&dropCohortRefs, source.dropCohortRefs); refsErr != nil {
-				return nil, refsErr
+			if source.dropCohortRefIndex != 0 {
+				refs, refsErr := c.nodeLineageRefs(source.dropCohortRefIndex)
+				if refsErr != nil {
+					return nil, refsErr
+				}
+				if _, refsErr = c.dropCohortRefUnion(&dropCohortRefs, refs); refsErr != nil {
+					return nil, refsErr
+				}
 			}
 		} else {
 			return nil, refsErr
@@ -1886,9 +1967,18 @@ func (c *Core) reduceOutputsClassifiedIntoActive(owner SchedulerTransactionToken
 			// record that was itself blended, mark this boundary's accumulated
 			// historicalSet blended -- computed before the union mutates it.
 			if outcome.historicalConvergedSplit {
+				// Condensation retains the dead node's identity; its lineage is
+				// immutable through publication of the replacement. Resolve the
+				// reference set here, alongside the alternative set, so fresh
+				// boundaries never carry a copy of this cold provenance.
+				dead, deadErr := c.nodeLineage(outcome.historicalNode)
+				var deadRefs DropCohortRefSet
+				if deadErr == nil {
+					deadRefs, deadErr = c.nodeLineageRefs(dead.dropCohortRefIndex)
+				}
 				if !c.historicalCertificateAuthentication {
 					// Preserve the pre-D2 historical union and counter behavior.
-					if dead, err := c.nodeLineage(outcome.historicalNode); err == nil {
+					if deadErr == nil {
 						incomparable := c.AlternativeSetIncomparable(historicalSet, dead.set)
 						unionChanged := c.alternativeSetUnion(&historicalSet, dead.set)
 						wasBlended := historicalBlended
@@ -1899,9 +1989,9 @@ func (c *Core) reduceOutputsClassifiedIntoActive(owner SchedulerTransactionToken
 								c.dropCohortAuthenticatedHistory++
 							}
 						}
-					}
-					if _, refsErr := c.dropCohortRefUnion(&dropCohortRefs, outcome.historicalDropCohortRefs); refsErr != nil {
-						return nil, refsErr
+						if _, refsErr := c.dropCohortRefUnion(&dropCohortRefs, deadRefs); refsErr != nil {
+							return nil, refsErr
+						}
 					}
 				} else {
 					markUnproved := func() {
@@ -1918,11 +2008,9 @@ func (c *Core) reduceOutputsClassifiedIntoActive(owner SchedulerTransactionToken
 							c.dropCohortUnprovedHistory++
 						}
 					}
-					if !c.authenticateHistoricalDropCohortImport(
-						owner, outcome.historicalDropCohortRefs, outcome.historicalNode, expectedHistoricalAction(),
+					if deadErr != nil || !c.authenticateHistoricalDropCohortImport(
+						owner, deadRefs, outcome.historicalNode, expectedHistoricalAction(),
 					) {
-						markUnproved()
-					} else if dead, err := c.nodeLineage(outcome.historicalNode); err != nil {
 						markUnproved()
 					} else {
 						c.addDropCohortProducerWrite(dropCohortProducerDeadHistoryImport)
@@ -1932,7 +2020,7 @@ func (c *Core) reduceOutputsClassifiedIntoActive(owner SchedulerTransactionToken
 						incomparable := c.AlternativeSetIncomparable(historicalSet, dead.set)
 						historicalBlended = historicalBlended || dead.blended || incomparable
 						c.alternativeSetUnion(&historicalSet, dead.set)
-						if _, refsErr := c.dropCohortRefUnion(&dropCohortRefs, outcome.historicalDropCohortRefs); refsErr != nil {
+						if _, refsErr := c.dropCohortRefUnion(&dropCohortRefs, deadRefs); refsErr != nil {
 							return nil, refsErr
 						}
 					}

@@ -922,6 +922,6 @@
   "fixture": "CS-valid-out-var",
   "language": "c_sharp",
   "source_sha256": "a36106677380711167167e348dbebb3d7653645ef8b31457bc44eb7ef28cd1d3",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "7e7c7ac8c8356a3222faeec9a47668bcfecb80bd8e6ef79eb4ed9d90e05f79d7"
 }

@@ -1,6 +1,8 @@
+diff --git a/parser_result_csharp.go b/parser_result_csharp.go
+index c067a2d..1a7affd 100644
 --- a/parser_result_csharp.go
 +++ b/parser_result_csharp.go
-@@ -61,7 +61,7 @@
+@@ -61,7 +61,7 @@ const (
  
  func normalizeCSharpCompatibility(root *Node, source []byte, p *Parser, lang *Language) {
  	missing := csharpMissingNativeResultCompatibility(lang)

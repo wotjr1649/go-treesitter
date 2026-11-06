@@ -257,6 +257,6 @@
   "fixture": "prefix-x-go-12",
   "language": "go",
   "source_sha256": "55ac3f77262080393d6ef5eff43aa18afc382a4b68ff0199407fd5e23be6817f",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "9ba581760396bc2f729832826167fc80441c76362a578fdd64fb8b01fed300f5"
 }

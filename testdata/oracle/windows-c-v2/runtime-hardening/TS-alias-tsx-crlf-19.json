@@ -276,6 +276,6 @@
   "fixture": "TS-alias-tsx-crlf-19",
   "language": "tsx",
   "source_sha256": "4cb320df1778e4ff3262a4f417ae99a085664a0c60bd02754011b103db841dac",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "128f5d792df05a8ba5b548b45a6ee129f9fabdcfcbc49888dcd4760965f3ecd7"
 }

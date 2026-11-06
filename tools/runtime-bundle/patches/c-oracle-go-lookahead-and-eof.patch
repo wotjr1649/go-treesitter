@@ -1,0 +1,97 @@
+diff --git a/parser_recover_c.go b/parser_recover_c.go
+--- a/parser_recover_c.go
++++ b/parser_recover_c.go
+@@ -3278,10 +3278,9 @@
+ // non-EOF terminal are applied (the "close in-progress productions" step); versions
+ // that dead-end keep their pre-reduction shape (C leaves them in place).
+ // With anyLookahead false, dead-end versions are dropped (C removes them).
+-// EOF is symbol 0. The missing-token trial uses anyLookahead for that sentinel;
+-// other callers can still request an exact EOF row. The caller seed supplies reusable initial
+-// capacity for the returned version set; growth beyond that capacity remains
+-// ordinary append growth.
++// C also uses the all-symbol reduction closure when lookahead is EOF (symbol zero).
++// The caller seed supplies reusable initial capacity for the returned version set;
++// growth beyond that capacity remains ordinary append growth.
+ func (p *Parser) cDoAllPotentialReductions(source []byte, start glrStack, lookaheadSym Symbol, anyLookahead bool, tok Token, nodeCount *int, arena *nodeArena, entryScratch *glrEntryScratch, gssScratch *gssScratch, tmpEntries *[]stackEntry, trackChildErrors *bool, callerSeed []glrStack) ([]glrStack, bool, ParseStopReason) {
+ 	return p.cDoAllPotentialReductionsWithSharedCount(source, start, lookaheadSym, anyLookahead, tok, nodeCount, arena, entryScratch, gssScratch, tmpEntries, trackChildErrors, callerSeed, -1, false)
+ }
+@@ -3291,6 +3290,7 @@
+ // legacyEOFAccept keeps the prior exact-row fallback viable on Accept.
+ // The native sentinel path and the potential-reduction collector ignore it.
+ func (p *Parser) cDoAllPotentialReductionsWithSharedCount(source []byte, start glrStack, lookaheadSym Symbol, anyLookahead bool, tok Token, nodeCount *int, arena *nodeArena, entryScratch *glrEntryScratch, gssScratch *gssScratch, tmpEntries *[]stackEntry, trackChildErrors *bool, callerSeed []glrStack, outsideCount int, legacyEOFAccept bool) ([]glrStack, bool, ParseStopReason) {
++	anyLookahead = anyLookahead || lookaheadSym == 0
+ 	oldDisablePostReduceForkMerge := p.disablePostReduceForkMerge
+ 	p.disablePostReduceForkMerge = true
+ 	defer func() {
+@@ -4354,6 +4354,12 @@
+ 	if rec == nil {
+ 		return cRecFallthrough, false, ParseStopNone
+ 	}
++	if p.cRecoverSkipsSharedGoNewline(tok) {
++		// C's error-mode lexer skips this newline. Leave the version position
++		// at its last subtree until the next real lookahead.
++		v.shifted = true
++		return cRecConsumed, false, ParseStopNone
++	}
+ 	vIndex := -1
+ 	for i := range *stacks {
+ 		if i&63 == 0 {
+@@ -4487,6 +4493,16 @@
+ 		count++
+ 	}
+ 	return count
++}
++
++// cRecoverSkipsSharedGoNewline identifies shared Go newline terminators.
++// C's error-mode DFA skips these bytes; explicit semicolons and zero-width EOF
++// terminators still go through ordinary recovery.
++func (p *Parser) cRecoverSkipsSharedGoNewline(tok Token) bool {
++	return p != nil && p.language != nil && p.language.Name == "go" &&
++		tok.EndByte > tok.StartByte && int(tok.Symbol) < len(p.language.SymbolNames) &&
++		(p.language.SymbolNames[tok.Symbol] == "source_file_token1" ||
++			(tok.ExternalScannerToken && p.language.SymbolNames[tok.Symbol] == "_automatic_semicolon"))
+ }
+ 
+ // cRecoverElectionLookaheadSymbol is the symbol-only compatibility view of
+@@ -4559,6 +4575,12 @@
+ 		lx.setIncludedRanges(p.included)
+ 	}
+ 	relexed := lx.NextWithErrorRuns(uint32(ls))
++	if lang.Name == "go" {
++		// Go's ERROR row is empty. Preserve reserved keyword identity without
++		// filtering through that row's contextual actions.
++		keywordSource := dfaTokenSource{language: lang, lexer: &lx, state: cErrorState}
++		keywordSource.promoteKeyword(&relexed)
++	}
+ 	if relexed.Symbol == 0 && relexed.StartByte == relexed.EndByte {
+ 		// Whitespace-only tail: C would see `end` here while the shared
+ 		// token disagrees; don't fabricate an EOF election.
+@@ -4770,6 +4792,12 @@
+ 						return false, false, reason
+ 					}
+ 					fork.branchOrder = (*stacks)[mi].branchOrder
++					if p.language.Name == "go" && electionToken.StartByte >= tok.StartByte &&
++						(electionToken.Symbol != tok.Symbol || electionToken.EndByte != tok.EndByte) &&
++						electionToken.EndByte > electionToken.StartByte {
++						replay := electionToken
++						fork.cRecoverPendingToken = &replay
++					}
+ 					if (p.language.Name == "javascript" || p.language.Name == "typescript" || p.language.Name == "tsx") && len(p.included) == 0 &&
+ 						!tok.ExternalScannerToken && !electionToken.ExternalScannerToken &&
+ 						electionToken.StartByte == tok.StartByte && electionToken.EndByte > tok.EndByte {
+@@ -5376,6 +5404,15 @@
+ 	}
+ 	if reason := checkStop(); reason != ParseStopNone {
+ 		return stacks, false, tok, reason
++	}
++	if p.cRecoverSkipsSharedGoNewline(tok) {
++		for i := range stacks {
++			if !stacks[i].dead && stacks[i].cRec != nil {
++				// Ordinary versions consumed the ASI token, but absorbing
++				// versions have not received their next C lookahead yet.
++				return stacks, false, tok, ParseStopNone
++			}
++		}
+ 	}
+ 	// Once recovery begins, preserve C's physical version order for both
+ 	// the action transaction and the subsequent condense comparisons.

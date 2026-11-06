@@ -333,6 +333,6 @@
   "fixture": "GO-recovery-comment-long",
   "language": "go",
   "source_sha256": "51252232d7d35848949ddd3645e45a184e68ce3b6bbec12ddde4137fa9649f22",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "4c59b7427a0e51c39028c33f1901053830be65537c2e6d284da4fa94d1a24dec"
 }

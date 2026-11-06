@@ -15,7 +15,7 @@ transport      official Go lane: github.com/tree-sitter/go-tree-sitter v0.25.0
                adc13ffd8b2c0b01b878fda9f7c422ce0df5fad3   (statically links the runtime)
                native C lane: tools/native-oracle/driver.c, identified by SHA-256
 
-grammars       the upstream grammar commits pinned by gotreesitter v0.53.0
+grammars       the active Release-Critical grammar inputs identified by baseline-provenance and the C artifact manifests
                see docs/specs/baseline-provenance.md
 
 generator      selected at execution time; record the actual producer per artifact
@@ -24,10 +24,13 @@ generator      selected at execution time; record the actual producer per artifa
 build          -std=c11 -fPIC -O2, plus the compiler identity and the artifact SHA-256
 ```
 
-The runtime and grammar epoch is inherited from upstream `gotreesitter`, which encodes it in
-`cgo_harness/parity_c_loader_cgo.go`. The constants there were verified identical at `v0.52.0`,
-`v0.53.0`, and upstream `main`. The generator policy was revised by the user's
-Session 05 instruction; see ADR-0007.
+The pinned C runtime and transport epoch are recorded in
+the oracle fields of internal/provenance/identities.json. The upstream development baseline
+and its grammar commits are separate tuple components. Moving the Go runtime
+baseline does not itself move the C runtime or transport, but a changed grammar
+pin creates a different oracle input identity. Regenerate and attribute the
+affected comparison records; never transfer old digests by version label.
+The generator policy was revised by the owner's Session 05 instruction; see ADR-0007.
 
 ## Generator selection and artifact identity
 
@@ -54,8 +57,10 @@ ADR-0012 records the owner's Candidate C adoption. Its complete import-type,
 variance, adjacent-call-signature and contextual-`in` changes are inseparable.
 `testdata/oracle/typescript-patched/manifest.json` binds the generated grammar
 JSON and scanner inputs to that patch and its producer. The build validates
-this identity and generates C with the currently selected CLI. Other grammars
-retain their original sources. The C runtime and grammar base commits did not move.
+this identity and generates C with the currently selected CLI. The C runtime
+and transport remain pinned. Each grammar uses the source identity bound by
+its active C artifact manifest; the candidate C# grammar pin is recorded in
+`baseline-provenance.md` and requires its own comparisons.
 
 Active records are under `testdata/oracle/windows-c-v2/`. The older unpatched
 record sets and KR-0003 signatures remain historical evidence. They identify
@@ -72,12 +77,12 @@ the C grammar may exclude leading hidden text, including in C# recovery roots
 and fixed-format COBOL. The reported root range must exactly match the first
 canonical node's range. Preserve these coordinates rather than widening them.
 
-## Why not current `tree-sitter/master`
+## Historical rationale for the pinned C runtime
 
-At the time of selection, upstream `master` was **958 commits** ahead of `v0.25.1`, of which
+At the time of the ADR-0002 selection, upstream `master` was **958 commits** ahead of `v0.25.1`, of which
 **56 touched the semantic core** — including error-recovery child nesting, error-cost accumulation
 through hidden nodes, state on missing nodes, and a large number of query anchor/quantifier changes.
-Moving the oracle there would not make results "more correct"; it would make every existing parity
+Moving the C oracle there would change its runtime epoch; it would make every existing parity
 board **incomparable**. Newness is not a reason.
 
 ## Comparison dimensions

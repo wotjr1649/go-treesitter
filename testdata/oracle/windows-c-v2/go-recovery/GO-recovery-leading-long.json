@@ -314,6 +314,6 @@
   "fixture": "GO-recovery-leading-long",
   "language": "go",
   "source_sha256": "f87b2bc1935304ff9c30797dbccb183884056788c7d6ed8c16d6fd87e8e0a091",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "346aac8b0ff7b82cd36aa96e95fc92c3386076149ccfeef1f83c2bac2d38b352"
 }

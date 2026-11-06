@@ -238,6 +238,6 @@
   "fixture": "prefix-x-ts-5",
   "language": "typescript",
   "source_sha256": "128d19a2d3d0a95d7b6e6bbec37135202a192decb3869075ab305bc97df6608f",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "fae8854756dd6cdb6cc73ede7af7b339eac94630290854e592115475bb44a862"
 }

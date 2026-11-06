@@ -580,6 +580,6 @@
   "fixture": "javascript-nested",
   "language": "javascript",
   "source_sha256": "14f3fe9c0268a50788014716516c5fdcd55c7e56d56b88d76a6ba142a95541a7",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "2a1cdac4492a0e4f5c9f0df2d3c3b9c6bed488e5839898ffbff749c8508c4aad"
 }

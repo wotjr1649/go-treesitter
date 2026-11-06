@@ -1,0 +1,63 @@
+diff --git a/parser_reduce.go b/parser_reduce.go
+--- a/parser_reduce.go
++++ b/parser_reduce.go
+@@ -3300,8 +3300,13 @@
+ func (p *Parser) rawStackEntryErrorCost(arena *nodeArena, entry stackEntry) uint32 {
+ 	return p.rawStackWalkErrorCost(arena, rawStackWalkEntry{entry: entry})
+ }
+ 
++func (p *Parser) rawShapeRecoveryCostEnabled() bool {
++	return p != nil && p.language != nil &&
++		(p.language.RecoveryStackVersionOrderEnabled || p.compactPackedGSSVersionOrderEnabled())
++}
++
+ // rawStackWalkErrorCost memoizes costs on captured shapes. A GLR election can
+ // compare the same growing clean prefix at each reduction. Walking it again
+ // makes the cost quadratic even though the captured raw shape is immutable.
+ func (p *Parser) rawStackWalkErrorCost(arena *nodeArena, item rawStackWalkEntry) uint32 {
+@@ -3315,6 +3320,6 @@
+ 	var cost uint32
+ 	childCount := stackEntryNodeChildCount(item.entry)
+-	if ok && p.language.RecoveryStackVersionOrderEnabled {
++	if ok && (p.rawShapeRecoveryCostEnabled() || stackEntryNodeChildCount(item.entry) == 0) {
+ 		childCount = shape.childCount()
+ 	}
+ 	if stackEntryNodeIsMissing(item.entry) && childCount == 0 {
+diff --git a/parser_recover_c.go b/parser_recover_c.go
+--- a/parser_recover_c.go
++++ b/parser_recover_c.go
+@@ -2297,6 +2297,6 @@
+ 	// Captured children include hidden missing terminals that the public
+ 	// child list elides. Their recovery cost still participates in elections.
+-	if p.language != nil && p.language.RecoveryStackVersionOrderEnabled && n.symbol != errorSymbol && n.HasError() && rawShapeRefIsArenaBacked(n.rawShape) && p.mergeScratch != nil && p.mergeScratch.arena != nil {
++	if p.rawShapeRecoveryCostEnabled() && n.HasError() && (n.symbol == errorSymbol || rawShapeRefIsArenaBacked(n.rawShape)) && p.mergeScratch != nil && p.mergeScratch.arena != nil {
+ 		return p.rawStackEntryErrorCost(p.mergeScratch.arena, newStackEntryNode(0, n))
+ 	}
+ 	// Ordinary leaves need no subtree walk. Keep them out of the bounded memo.
+@@ -2302,6 +2302,9 @@
+ 	if len(n.children) == 0 && n.symbol != errorSymbol {
+ 		if n.isMissing() {
+ 			return cErrCostPerMissingTree + cErrCostPerRecovery
+ 		}
++		if rawShapeRefIsArenaBacked(n.rawShape) && n.ownerArena != nil {
++			return p.rawStackEntryErrorCost(n.ownerArena, newStackEntryNode(n.parseState, n))
++		}
+ 		return 0
+ 	}
+@@ -2374,6 +2374,6 @@
+ 	if p == nil || n == nil {
+ 		return 0, 0
+ 	}
+-	if p.language != nil && p.language.RecoveryStackVersionOrderEnabled && n.symbol != errorSymbol && n.HasError() && rawShapeRefIsArenaBacked(n.rawShape) && p.mergeScratch != nil && p.mergeScratch.arena != nil {
++	if p.rawShapeRecoveryCostEnabled() && n.HasError() && (n.symbol == errorSymbol || rawShapeRefIsArenaBacked(n.rawShape)) && p.mergeScratch != nil && p.mergeScratch.arena != nil {
+ 		return p.rawStackEntryErrorCost(p.mergeScratch.arena, newStackEntryNode(0, n)), p.cNodeVisibleSubtreeCount(n)
+ 	}
+@@ -2380,6 +2380,8 @@
+ 	if len(n.children) == 0 && n.symbol != errorSymbol {
+ 		var cost uint32
+ 		if n.isMissing() {
+ 			cost = cErrCostPerMissingTree + cErrCostPerRecovery
++		} else if rawShapeRefIsArenaBacked(n.rawShape) && n.ownerArena != nil {
++			cost = p.rawStackEntryErrorCost(n.ownerArena, newStackEntryNode(n.parseState, n))
+ 		}
+ 		visible := 0

@@ -333,6 +333,6 @@
   "fixture": "javascript-multiline",
   "language": "javascript",
   "source_sha256": "95eedca478dd4dd9d34a06e42da28cc6ad4b9b5aa42b289ff317701b90c8c125",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "5c5b295788eaa87beb626ffbd2f6bf6dcc7aa57ee6bfb630e627f301fe48d7fc"
 }

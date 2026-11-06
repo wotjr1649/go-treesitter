@@ -181,6 +181,6 @@
   "fixture": "Go-EOF-valid-expanded-18-2",
   "language": "go",
   "source_sha256": "89557113c540b724688bfd844aac737f7585e149f703368744266425667affba",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "6d9050ee10e026be1efb1d0b371342385fbf3203f1024a80449d40f9b12cbd53"
 }

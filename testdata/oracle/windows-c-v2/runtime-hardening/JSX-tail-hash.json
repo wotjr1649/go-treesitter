@@ -466,6 +466,6 @@
   "fixture": "JSX-tail-hash",
   "language": "javascript",
   "source_sha256": "a304317e1feabf8fbff2d3868f523b05541f91eb6a9f9129985b5af9188c3712",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "be67ab3ce70666a17c9c50c2ab5b9f411aa7b28507957764ca27fb463e5cec20"
 }

@@ -80,11 +80,15 @@ func LookupReservedWords(name string) (ReservedWordTable, bool) {
 // attachRegisteredReservedWords attaches the registered ABI 15 reserved-word
 // table for name onto lang, when doing so is provably safe.
 //
-// The blobs for these six languages predate cmd/ts2go's reserved-word
-// extraction, so their decoded Language carries no ReservedWords data even
-// though their lex modes reference reserved-word set IDs. This sidecar
-// mechanism supplies that missing data after the fact, generated separately
-// from the pinned blob.
+// The blobs for a handful of legacy languages predate cmd/ts2go's
+// reserved-word extraction, so their decoded Language carries no
+// ReservedWords data even though their lex modes reference reserved-word set
+// IDs. This sidecar mechanism supplies that missing data after the fact,
+// generated separately from the pinned blob. A language drops out of this
+// group once its blob is regenerated with a ts2go build that extracts
+// ts_reserved_words directly (see ocaml, retired 2026-09-20): the freshly
+// decoded Language then already carries ReservedWords, so the fail-closed
+// check below skips the sidecar and its file becomes dead weight.
 //
 // Because the sidecar and the blob can drift independently, the attach fails
 // closed: it requires every one of the following before it writes anything
@@ -526,20 +530,8 @@ type languageBoundExternalScanner interface {
 }
 
 func attachExternalScannerForLanguage(name string, lang *gotreesitter.Language) bool {
-	// The C-derived Go tables encode ASI internally. The literal NUL
-	// terminal has an empty type name in the C API's NUL-terminated string.
-	if name == "go" && lang != nil && len(lang.ExternalSymbols) == 0 {
-		for i, name := range lang.SymbolNames {
-			if name == "\x00" {
-				lang.SymbolNames[i] = ""
-				lang.SymbolMetadata[i].Name = ""
-			}
-		}
-		return false
-	}
-
 	s, ok := externalScannerRegistry[name]
-	if !ok || lang == nil {
+	if !ok || lang == nil || len(lang.ExternalSymbols) == 0 {
 		return false
 	}
 	if bound, ok := s.(languageBoundExternalScanner); ok {
@@ -636,6 +628,35 @@ func decodeEmbeddedLanguage(blobName string) (*gotreesitter.Language, [32]byte, 
 	sum := sha256.Sum256(blob.data)
 	lang, err := decodeLanguageBlobData(blobName, blob.data)
 	return lang, sum, err
+}
+
+// DecodeAndCertifyLanguageBlob decodes a raw grammar blob and reproduces
+// every step production's embedded loader applies before it certifies the
+// language's C-recovery gate state: the post-decode table repairs
+// (decodeLanguageBlobData — compaction, the no-lookahead lex-mode repair,
+// reserved-word attachment, and grammar-specific symbol repairs), then the
+// registered scanner and ExternalLexStates attachment, which certifies the
+// gate as its last step (attachRegisteredExternalLexStates).
+//
+// name is both the scanner/lex-state registry key and lang.Name; the two
+// stay one value regardless of what the blob itself embeds, so a scanner
+// attach and an opt-out check can never key on two different names for the
+// same grammar.
+//
+// A tool that measures a shipped or candidate grammars/grammar_blobs/*.bin
+// file directly (cmd/crecoverygatefleet, cmd/grammar_update_guard) should
+// decode through this function instead of assembling the steps itself, so a
+// future decode-time repair cannot silently drift its measurement away from
+// the language a parser actually uses.
+func DecodeAndCertifyLanguageBlob(name string, data []byte) (*gotreesitter.Language, error) {
+	lang, err := decodeLanguageBlobData(name, data)
+	if err != nil {
+		return nil, err
+	}
+	lang.Name = name
+	attachExternalScannerForLanguage(name, lang)
+	attachRegisteredExternalLexStates(name, lang)
+	return lang, nil
 }
 
 func decodeLanguageBlobData(blobName string, data []byte) (*gotreesitter.Language, error) {

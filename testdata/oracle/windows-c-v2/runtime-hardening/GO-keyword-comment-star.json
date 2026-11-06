@@ -314,6 +314,6 @@
   "fixture": "GO-keyword-comment-star",
   "language": "go",
   "source_sha256": "c075cc6d9488b123e48334de24e2e3162f64c2508677e5284c3b21eddc91757b",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "2ee6d31be184491cba5070f496cccd0715ea010484285dfb16e05431d62090f1"
 }

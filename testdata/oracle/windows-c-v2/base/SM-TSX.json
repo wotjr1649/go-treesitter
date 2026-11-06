@@ -428,6 +428,6 @@
   "fixture": "SM-TSX",
   "language": "tsx",
   "source_sha256": "8a3be41bdf61db2f6cb9c2fddce14401c51a0ab8be7f0834b692a54a939dc208",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "8f7cbd90290710423f9d63e0422b9f7988861a3bd1002403c96c9de1307a3250"
 }

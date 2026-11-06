@@ -1473,6 +1473,6 @@
   "fixture": "CS-pointer-argument-reduction-crlf",
   "language": "c_sharp",
   "source_sha256": "03759f2914321508960736e8940bab27b349a5803bc5a6fbe698392c30cc74bd",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "c66c0e23f9c480df306d575dac567835f7a754f000d99204ce056b5223628684"
 }

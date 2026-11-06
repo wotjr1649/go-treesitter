@@ -922,6 +922,6 @@
   "fixture": "CS-short-namespace",
   "language": "c_sharp",
   "source_sha256": "072eb1c427cd8cbe8bb6127438d0d4d571ec4b60b0b6746587c08e81b1030e9d",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "ecba57b7897a9663ef4a493f59947585512eee3fad92471e86a3441ed30ef6ec"
 }

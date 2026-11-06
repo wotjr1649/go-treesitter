@@ -428,6 +428,6 @@
   "fixture": "prefix-x-tsx-9",
   "language": "tsx",
   "source_sha256": "5382b5f265797bf773ed4df25e8bcc04067965f1669ee1e4f5e5ddaaad57cc8b",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "9ac9b3b6af3cb90247d2156370b9e7aa26930489b19fd48286f89f47ae5cadfa"
 }

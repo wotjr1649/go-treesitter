@@ -1,9 +1,16 @@
 package gotreesitter
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/wotjr1649/go-treesitter/internal/runtime/internal/declarationfacts"
+	"github.com/wotjr1649/go-treesitter/internal/runtime/internal/syntaxfacts"
+)
 
 // DefinitionSpan is a compact language-neutral declaration span extracted from
-// a syntax tree.
+// a syntax tree. Each declared name has its own NameStartByte/NameEndByte.
+// Names from one construct can share StartByte/EndByte: those equal ranges
+// mean siblings, not a conflict or a parent/child relationship.
 type DefinitionSpan struct {
 	Lang          string
 	Kind          string
@@ -14,6 +21,45 @@ type DefinitionSpan struct {
 	NameStartByte uint32
 	NameEndByte   uint32
 }
+
+// DeclarationFact is an opt-in grammar-owned declaration, emitted only into
+// FactSet.Declarations. It includes the definition/name byte ranges plus Shape
+// ("struct", "interface", "alias", or empty for other defined types) and Container,
+// ContainerStartByte, and ContainerEndByte for named members. Kind remains "type"
+// on type facts. Embedded marks struct embeddings; their name is the base type
+// identifier. Interface embeddings use Kind "embed"; type-set unions,
+// approximations and predeclared constraint terms are omitted.
+//
+// Container is a dotted syntax-owner path for anonymous nested members. Its
+// range covers the direct owning type_spec, type_alias, field_declaration or
+// package-level var_spec, rather than an ancestor's larger range.
+//
+// Equal StartByte/EndByte ranges from one construct mean sibling declarations,
+// not conflicts or a parent/child relationship. Each name keeps its own range.
+// Zero metadata means not applicable and is omitted from JSON.
+type DeclarationFact = declarationfacts.Fact
+
+// SignatureFact is an opt-in declared function or method signature. It excludes
+// unbound function literals and function types. Named function values can have
+// grammar-owned binding rows. Container names a method's receiver base
+// type (without pointer or type arguments), or an interface's syntax owner.
+type SignatureFact = syntaxfacts.SignatureFact
+
+// ParameterFact holds one name (empty when unnamed), its exact source type and
+// the declaration, name and type ranges. Grouped names share type/declaration
+// ranges. Type excludes a variadic ellipsis; Variadic records it. Pointer applies
+// only to receivers. An unnamed entry's name range is zero. A parameter with
+// no written type has empty Type and zero type ranges. Optional is set for a
+// parameter the source marks optional with "?" (TypeScript), never for defaults.
+type ParameterFact = syntaxfacts.ParameterFact
+
+// CallArgumentFact holds an argument in source order. CallStartByte/CallEndByte
+// join CallRef's range for ordinary calls, independently of FactCalls. JavaScript,
+// TypeScript and TSX constructor arguments instead use the new_expression range
+// and join no CallRef. Spread includes the ellipsis
+// in its range and retains the wrapper NodeType while Kind describes its operand.
+// Calls with no arguments produce no entries.
+type CallArgumentFact = syntaxfacts.CallArgumentFact
 
 // CallRef is a compact language-neutral call-site reference extracted from a
 // syntax tree.

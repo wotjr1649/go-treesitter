@@ -3,6 +3,9 @@ package gotreesitter
 import (
 	"fmt"
 	"strings"
+
+	"github.com/wotjr1649/go-treesitter/internal/runtime/internal/declarationfacts"
+	"github.com/wotjr1649/go-treesitter/internal/runtime/internal/syntaxfacts"
 )
 
 // FactKind selects the outputs that a FactProgram emits.
@@ -18,7 +21,22 @@ const (
 	// FactImports selects package and dependency declarations.
 	FactImports
 
-	// FactAll selects every supported fact kind.
+	// FactDeclarations selects grammar-owned declaration facts and type shapes.
+	// It requires WithDeclarationRules and emits into FactSet.Declarations.
+	// Combine it with FactDefinitions to retain ordinary function/method facts.
+	FactDeclarations
+
+	// FactSignatures selects grammar-owned function and method signatures.
+	// It requires WithSignatureRules. Grammar rows may name bound function values;
+	// unbound function literals and function types are excluded.
+	FactSignatures
+	// FactCallArguments selects direct call arguments, independently of FactCalls.
+	// It requires WithCallArgumentRules. JavaScript, TypeScript and TSX constructor
+	// arguments use the new_expression range and join no CallRef.
+	FactCallArguments
+
+	// FactAll selects the original fact kinds. FactDeclarations is opt-in and
+	// intentionally excluded to preserve existing results.
 	FactAll = FactDefinitions | FactCalls | FactHeritage | FactImports
 )
 
@@ -28,13 +46,22 @@ type FactSet struct {
 	Calls       []CallRef
 	Heritage    []HeritageRef
 	Imports     []ImportRef
+	// Declarations is opt-in and leaves Definitions unchanged.
+	Declarations  []DeclarationFact  `json:",omitempty"`
+	Signatures    []SignatureFact    `json:",omitempty"`
+	CallArguments []CallArgumentFact `json:",omitempty"`
 }
 
 // FactProgram is a compiled, reusable syntax-fact extractor.
 //
 // Each grammar symbol indexes one packed instruction. Extraction executes the
-// selected operations during one tree traversal. A program only accepts trees
-// built with the Language value supplied to NewFactProgram.
+// ordinary selected operations during one tree traversal. A program only
+// accepts trees built with the Language value supplied to NewFactProgram.
+// FactDeclarations is opt-in: attach grammar-owned rows with
+// WithDeclarationRules to populate Declarations in a separate internal pass.
+// Definitions stays unchanged even when both bits are selected. FactAll
+// retains the original selection. Signatures and call arguments likewise require
+// their bits and grammar-owned options. Disabled kinds add no traversal.
 type FactProgram struct {
 	language      *Language
 	kinds         FactKind
@@ -42,6 +69,9 @@ type FactProgram struct {
 	fields        factProgramFields
 	importer      factImporter
 	hasOperations bool
+	declarations  *declarationfacts.Program[*Node]
+	signatures    *syntaxfacts.Signatures[*Node]
+	arguments     *syntaxfacts.Arguments[*Node]
 }
 
 type factInstruction uint16
@@ -89,13 +119,22 @@ type factProgramFields struct {
 	expressionName [4]FieldID
 }
 
-// NewFactProgram compiles a reusable extractor for lang and the selected
-// kinds. Compilation resolves grammar symbols and field names once.
+// NewFactProgram compiles a reusable extractor with the original constructor
+// signature. FactAll retains the original outputs. Use
+// NewFactProgramWithOptions to attach opt-in grammar-owned declaration rules.
 func NewFactProgram(lang *Language, kinds FactKind) (*FactProgram, error) {
+	return NewFactProgramWithOptions(lang, kinds)
+}
+
+// NewFactProgramWithOptions compiles selected facts and applies opts in order.
+// FactDeclarations emits grammar-owned facts into FactSet.Declarations without
+// changing Definitions. Attach rows with WithDeclarationRules; unsupported
+// grammar data is dropped. Without the bit, no declaration program is compiled.
+func NewFactProgramWithOptions(lang *Language, kinds FactKind, opts ...FactProgramOption) (*FactProgram, error) {
 	if lang == nil {
 		return nil, fmt.Errorf("fact program: language is nil")
 	}
-	if unknown := kinds &^ FactAll; unknown != 0 {
+	if unknown := kinds &^ (FactAll | FactDeclarations | FactSignatures | FactCallArguments); unknown != 0 {
 		return nil, fmt.Errorf("fact program: unknown fact-kind bits 0x%x", uint8(unknown))
 	}
 
@@ -105,9 +144,52 @@ func NewFactProgram(lang *Language, kinds FactKind) (*FactProgram, error) {
 		code:     make([]factInstruction, len(lang.SymbolNames)),
 		importer: factImporterForLanguage(lang.Name, kinds),
 	}
+	for _, opt := range opts {
+		if opt != nil {
+			opt(program)
+		}
+	}
 	program.compileFields()
 	program.compileInstructions()
 	return program, nil
+}
+
+// DeclarationRule describes one declaration shape using grammar data only.
+// Names must be direct children in NameField with exactly NameNodeType.
+// Every nonblank name emits a sibling span covering the whole NodeType node.
+// A rule never searches descendants for a guessed name. BaseName instead follows
+// TypeNames through a direct BaseNameField (or one named child), emitting an
+// embedding after stripping type wrappers. ExcludeNames omits constraint terms.
+//
+// Ancestors lists an exact parent chain, nearest first. ContainerNameField
+// and ContainerNameNodeType select a single name on its last ancestor;
+// ContainerTypeField must link that ancestor to the preceding ancestor.
+// ContainerPath optionally replaces this fixed ownership with exact recursive
+// paths, producing dotted names and retaining the direct owner's range.
+// Without either container selection the rule has no container.
+//
+// TypeField/TypeNodeType optionally constrain the declaration's direct type
+// child. Shape is set only on Kind "type". For several matching rules on one
+// node, the first applicable rule wins. Missing grammar data fails closed.
+// ParentChildField/ParentChildNodeType select a direct parent field child (for
+// example the const/let keyword). NameSelf names the matched node; NameWrappers
+// traverses only the specified binding patterns.
+type DeclarationRule = declarationfacts.Rule
+
+// FactProgramOption configures a FactProgram.
+type FactProgramOption func(*FactProgram)
+
+// WithDeclarationRules attaches grammar-owned declaration rules. A later
+// option replaces earlier rules. The option has no effect unless
+// FactDeclarations is selected; ordinary programs compile no extra operations
+// and allocate no rule storage. NewFactProgramWithOptions owns the compiled data.
+func WithDeclarationRules(rules []DeclarationRule) FactProgramOption {
+	return func(p *FactProgram) {
+		if p.kinds&FactDeclarations == 0 {
+			return
+		}
+		p.declarations = declarationfacts.Compile(p.factGrammar(), p.factReader(), rules)
+	}
 }
 
 // Kinds returns the outputs selected when the program was compiled.
@@ -118,10 +200,11 @@ func (p *FactProgram) Kinds() FactKind {
 	return p.kinds
 }
 
-// Extract emits the selected facts during one tree traversal. It returns an
-// empty set for a nil tree or a tree built with a different Language value.
+// Extract emits ordinary facts in one traversal and, when enabled, declaration
+// facts in a separate internal pass. It returns an empty set for a nil tree or
+// a tree built with a different Language value.
 func (p *FactProgram) Extract(tree *Tree) FactSet {
-	if p == nil || tree == nil || tree.Language() != p.language || !p.hasOperations {
+	if p == nil || tree == nil || tree.Language() != p.language || (!p.hasOperations && p.declarations == nil && p.signatures == nil && p.arguments == nil) {
 		return FactSet{}
 	}
 	root := tree.RootNode()
@@ -130,8 +213,65 @@ func (p *FactProgram) Extract(tree *Tree) FactSet {
 	}
 
 	var facts FactSet
-	p.extractNode(root, tree.Source(), p.importer != factImporterNone, &facts)
+	if p.hasOperations {
+		p.extractNode(root, tree.Source(), p.importer != factImporterNone, &facts)
+	}
+	if p.declarations != nil {
+		p.declarations.Extract(root, tree.Source(), &facts.Declarations)
+	}
+	if p.signatures != nil {
+		p.signatures.Extract(root, tree.Source(), &facts.Signatures)
+	}
+	if p.arguments != nil {
+		p.arguments.Extract(root, tree.Source(), p.acceptArgumentCall, &facts.CallArguments)
+	}
 	return facts
+}
+
+// ExtractInto replaces dst with the selected facts and reuses its slice storage.
+// It clears previous entries, including facts from kinds that this program excludes.
+// A nil program, invalid tree, or language mismatch leaves dst empty with its capacity retained.
+// A nil dst has no effect.
+//
+// Results share storage with dst. Clone the result slices before the next extraction to retain them.
+// Use a separate destination for each concurrent extraction.
+// Signature parameter slices are freshly allocated; only the outer Signatures
+// slice is reused. Clearing a signature releases its nested slices and strings.
+// Assign FactSet{} to *dst when its retained storage is no longer needed.
+func (p *FactProgram) ExtractInto(tree *Tree, dst *FactSet) {
+	if dst == nil {
+		return
+	}
+	clear(dst.Signatures)
+	clear(dst.CallArguments)
+	clear(dst.Declarations)
+	clear(dst.Definitions)
+	clear(dst.Calls)
+	clear(dst.Heritage)
+	clear(dst.Imports)
+	dst.Signatures = dst.Signatures[:0]
+	dst.CallArguments = dst.CallArguments[:0]
+	dst.Declarations = dst.Declarations[:0]
+	dst.Definitions = dst.Definitions[:0]
+	dst.Calls = dst.Calls[:0]
+	dst.Heritage = dst.Heritage[:0]
+	dst.Imports = dst.Imports[:0]
+
+	if p == nil || tree == nil || tree.Language() != p.language || (!p.hasOperations && p.declarations == nil && p.signatures == nil && p.arguments == nil) {
+		return
+	}
+	if p.hasOperations {
+		p.extractNode(tree.RootNode(), tree.Source(), p.importer != factImporterNone, dst)
+	}
+	if p.declarations != nil {
+		p.declarations.Extract(tree.RootNode(), tree.Source(), &dst.Declarations)
+	}
+	if p.signatures != nil {
+		p.signatures.Extract(tree.RootNode(), tree.Source(), &dst.Signatures)
+	}
+	if p.arguments != nil {
+		p.arguments.Extract(tree.RootNode(), tree.Source(), p.acceptArgumentCall, &dst.CallArguments)
+	}
 }
 
 // ExtractBound emits selected facts from a BoundTree.
@@ -150,7 +290,7 @@ func (p *FactProgram) compileFields() {
 	if p.kinds&(FactDefinitions|FactHeritage) != 0 {
 		p.fields.definitionName = factFieldByName(p.language, "name")
 	}
-	if p.kinds&FactCalls != 0 {
+	if p.kinds&(FactCalls|FactCallArguments) != 0 {
 		p.fields.callTarget = [3]FieldID{
 			factFieldByName(p.language, "function"),
 			factFieldByName(p.language, "name"),
@@ -193,8 +333,8 @@ func (p *FactProgram) compileInstruction(nodeType string) factInstruction {
 			instruction |= factRoleDefinitionName
 		}
 	}
-	if p.kinds&FactCalls != 0 {
-		if isCallNode(p.language.Name, nodeType) {
+	if p.kinds&(FactCalls|FactCallArguments) != 0 {
+		if p.kinds&FactCalls != 0 && isCallNode(p.language.Name, nodeType) {
 			instruction |= factOpCall
 		}
 		if factCallNameNodeType(nodeType) {
@@ -533,4 +673,68 @@ func (p *FactProgram) extractImportNode(n *Node, source []byte, refs *[]ImportRe
 	default:
 		return true
 	}
+}
+
+// TypeNameRule selects a base type identifier through grammar-owned paths.
+type TypeNameRule = declarationfacts.TypeNameRule
+
+// ContainerRule describes exact, optionally recursive type-body ownership.
+type ContainerRule = declarationfacts.ContainerRule
+
+// SignatureRule describes a grammar-owned declared function or method.
+type SignatureRule = syntaxfacts.SignatureRule
+
+// ParameterRule describes one grouped or unnamed parameter declaration.
+type ParameterRule = syntaxfacts.ParameterRule
+
+// ExpressionKindRule maps a grammar node type to a normalized argument kind.
+type ExpressionKindRule = syntaxfacts.ExpressionKindRule
+
+// CallArgumentRule selects a call's direct argument list and expression kinds.
+type CallArgumentRule = syntaxfacts.CallArgumentRule
+
+// WithSignatureRules replaces signature rules when FactSignatures is selected.
+// With the bit off, it retains no rows and compiles no instructions.
+func WithSignatureRules(rules []SignatureRule) FactProgramOption {
+	return func(p *FactProgram) {
+		if p.kinds&FactSignatures != 0 {
+			p.signatures = syntaxfacts.CompileSignatures(p.factGrammar(), p.factReader(), rules)
+		}
+	}
+}
+
+// WithCallArgumentRules replaces argument rules when FactCallArguments is selected.
+// Ordinary call ranges join Calls even when FactCalls is off. Standalone
+// constructor arguments use the new_expression range and join no CallRef. With
+// the bit off, it retains no rows and adds no extraction pass.
+func WithCallArgumentRules(rules []CallArgumentRule) FactProgramOption {
+	return func(p *FactProgram) {
+		if p.kinds&FactCallArguments != 0 {
+			p.arguments = syntaxfacts.CompileArguments(p.factGrammar(), p.factReader(), rules)
+		}
+	}
+}
+
+func (p *FactProgram) factGrammar() declarationfacts.Grammar {
+	lang := p.language
+	return declarationfacts.Grammar{Names: lang.SymbolNames,
+		Symbol: func(name string) (uint16, bool) { s, ok := lang.SymbolByName(name); return uint16(s), ok },
+		Field:  func(name string) (uint16, bool) { f, ok := lang.FieldByName(name); return uint16(f), ok }}
+}
+
+func (p *FactProgram) factReader() declarationfacts.Reader[*Node] {
+	lang := p.language
+	return declarationfacts.Reader[*Node]{Language: lang.Name,
+		Symbol: func(n *Node) uint16 { return uint16(n.Symbol()) }, Parent: (*Node).Parent,
+		ChildCount: nodeChildCountNoMaterialize, Child: func(n *Node, i int) *Node { return nodeChildAtForReason(n, i, materializeForParentAPI) },
+		Field: func(n *Node, i int) uint16 { return uint16(nodeFieldIDAt(n, i)) }, Missing: (*Node).IsMissing, Named: (*Node).IsNamed,
+		Text: (*Node).Text, NodeType: func(n *Node) string { return n.Type(lang) }, StartByte: (*Node).StartByte, EndByte: (*Node).EndByte}
+}
+
+func (p *FactProgram) acceptArgumentCall(n *Node, source []byte) bool {
+	if !isCallNode(p.language.Name, n.Type(p.language)) {
+		return false
+	}
+	_, ok := p.callRef(n, source)
+	return ok
 }

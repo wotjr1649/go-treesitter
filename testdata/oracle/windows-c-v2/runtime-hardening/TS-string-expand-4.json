@@ -295,6 +295,6 @@
   "fixture": "TS-string-expand-4",
   "language": "typescript",
   "source_sha256": "d73f04558d93aa0cca12f0663ea7a3f7708ca86acbb07bd0d3c9ba204dde4af8",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "49646b9e6e523a23648162a19a80ecb4134777b737e504a8b30a8aafd9d1eacc"
 }

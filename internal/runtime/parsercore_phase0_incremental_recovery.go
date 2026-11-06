@@ -43,8 +43,12 @@ func (p *Parser) attemptCompactIncrementalRecoveryFullParse(source []byte, oldTr
 		!compactIncrementalRecoveryPreferred(source, oldTree) {
 		return nil
 	}
-	runner, ok := p.admissionCandidateRunner.(*parserCoreFreshFullRunner)
-	if !ok || runner == nil || runner.lang != p.language ||
+	runner, borrowed, err := p.borrowAdmissionCandidateRunner()
+	if err != nil {
+		return nil
+	}
+	defer p.returnAdmissionCandidateRunner(runner, borrowed)
+	if runner == nil || runner.lang != p.language ||
 		!runner.options.allowCompactRecoveryVersionTurns || !runner.options.Recovery ||
 		runner.options.compactIncrementalReuse != nil || runner.scheduler.options.compactIncrementalReuse != nil ||
 		runner.scratch.incrementalReuse != nil || runner.scratch.freshAttemptWork != nil {
@@ -61,7 +65,7 @@ func (p *Parser) attemptCompactIncrementalRecoveryFullParse(source []byte, oldTr
 			// The successful tree reports its own allocations. Charge only
 			// discarded attempts here, including materialization declines.
 			if result != nil {
-				work.allocatedNodes -= uint64(result.parseRuntime.NodesAllocated)
+				work.allocatedNodes -= uint64(result.rawParseRuntime().NodesAllocated)
 			}
 			timing.newNodes += work.allocatedNodes
 			timing.tokensConsumed += work.tokens
@@ -78,7 +82,8 @@ func (p *Parser) attemptCompactIncrementalRecoveryFullParse(source []byte, oldTr
 	if !accepted || tree == nil {
 		return nil
 	}
-	tree.parseRuntime.CompactIncrementalFullRecoveryRoute = true
-	tree.parseRuntime.CompactIncrementalFallbackReason = reason
+	treeRT := tree.ensureParseRuntime()
+	treeRT.CompactIncrementalFullRecoveryRoute = true
+	treeRT.CompactIncrementalFallbackReason = reason
 	return tree
 }

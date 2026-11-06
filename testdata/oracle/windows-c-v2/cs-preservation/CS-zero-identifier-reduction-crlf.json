@@ -314,6 +314,6 @@
   "fixture": "CS-zero-identifier-reduction-crlf",
   "language": "c_sharp",
   "source_sha256": "dac6e17b50c3067cb035778e8339b00b82d9fe94171abbceae001319ba74c1bb",
-  "build_sha256": "30a0743be0909efa641927c0c8704df72041aace4544aaf59822fb7f443e44a2",
+  "build_sha256": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
   "nodes_sha256": "e9098ea2403e738bea5d5a6ff675694d18863fb705f4fef6292b4464d5d79dfb"
 }

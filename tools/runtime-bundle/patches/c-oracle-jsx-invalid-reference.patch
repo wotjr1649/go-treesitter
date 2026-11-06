@@ -1,0 +1,76 @@
+diff --git a/grammars/runtime/javascript_scanner.go b/grammars/runtime/javascript_scanner.go
+--- a/grammars/runtime/javascript_scanner.go
++++ b/grammars/runtime/javascript_scanner.go
+@@ -507,16 +507,12 @@
+ 				lexer.SetResultSymbol(symbols[jsTokJsxText])
+ 				return sawText
+ 			}
+-			// Not a character reference. Real JSX text allows a bare '&'
+-			// (tsc accepts it); only the external scanner used to stop
+-			// here unconditionally. Treat the '&', and any letters/digits
+-			// already examined while checking, as literal text. See
+-			// gotreesitter issue #1242 and the upstream
+-			// tree-sitter-javascript#366 report this mirrors.
+-			sawText = true
+-			onlyWhitespace = false
+-			atNewline = false
+-			continue
++			// C stops JSX text at '&'; leave invalid references for grammar recovery.
++			if !sawText {
++				return false
++			}
++			lexer.SetResultSymbol(symbols[jsTokJsxText])
++			return true
+ 		}
+ 		if lexer.Lookahead() == '/' && onlyWhitespace {
+ 			lexer.Advance(false)
+@@ -570,9 +566,8 @@
+ //
+ //	&(#([xX][0-9a-fA-F]{1,6}|[0-9]{1,5})|[A-Za-z]{1,30});
+ //
+-// It always consumes at least the '&'. Callers that get false must treat
+-// everything the lexer consumed as literal JSX text: none of it can start
+-// any other token.
++// It always consumes at least '&'. Callers mark the token boundary first so
++// invalid references can be left to the grammar.
+ func jsScanHTMLCharacterReference(lexer *gotreesitter.ExternalLexer) bool {
+ 	lexer.Advance(false) // '&'
+ 	if lexer.Lookahead() == '#' {
+diff --git a/grammars/runtime/tsx_scanner.go b/grammars/runtime/tsx_scanner.go
+--- a/grammars/runtime/tsx_scanner.go
++++ b/grammars/runtime/tsx_scanner.go
+@@ -446,16 +446,12 @@
+ 				lexer.SetResultSymbol(symbols[tsxTokJsxText])
+ 				return sawText
+ 			}
+-			// Not a character reference. Real JSX text allows a bare '&'
+-			// (tsc accepts it); only the external scanner used to stop
+-			// here unconditionally. Treat the '&', and any letters/digits
+-			// already examined while checking, as literal text. See
+-			// gotreesitter issue #1242 and the upstream
+-			// tree-sitter-javascript#366 report this mirrors.
+-			sawText = true
+-			onlyWhitespace = false
+-			atNewline = false
+-			continue
++			// C stops JSX text at '&'; leave invalid references for grammar recovery.
++			if !sawText {
++				return false
++			}
++			lexer.SetResultSymbol(symbols[tsxTokJsxText])
++			return true
+ 		}
+ 		if lexer.Lookahead() == '/' && onlyWhitespace {
+ 			lexer.Advance(false)
+@@ -509,9 +505,8 @@
+ //
+ //	&(#([xX][0-9a-fA-F]{1,6}|[0-9]{1,5})|[A-Za-z]{1,30});
+ //
+-// It always consumes at least the '&'. Callers that get false must treat
+-// everything the lexer consumed as literal JSX text: none of it can start
+-// any other token.
++// It always consumes at least '&'. Callers mark the token boundary first so
++// invalid references can be left to the grammar.
+ func tsxScanHTMLCharacterReference(lexer *gotreesitter.ExternalLexer) bool {
+ 	lexer.Advance(false) // '&'
+ 	if lexer.Lookahead() == '#' {

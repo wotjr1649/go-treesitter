@@ -6,6 +6,8 @@ import (
 	"sort"
 	"strings"
 	"sync"
+
+	"github.com/wotjr1649/go-treesitter/internal/runtime/internal/incr"
 )
 
 // Range is a span of source text.
@@ -48,6 +50,218 @@ func (n *Node) supertypeMask() uint32 {
 		return 0
 	}
 	return n.ownerArena.nodeSupertypeMask(n)
+}
+
+// dependsOnColumn reports whether this node's identity depends on its
+// code-point column, mirroring C tree-sitter's Subtree.depends_on_column
+// (subtree.h). A leaf carries the bit when the external scanner read
+// ExternalLexer.Column while it produced the token. A parent carries it
+// when a child on the parent's first content row carries it (see
+// propagateDependsOnColumnSubtree). The record lives in an arena side table
+// because Node's layout is pinned; an arena whose parse never read a column
+// answers with one integer compare.
+//
+// The body stays small enough to inline. Every reduce and every edit-walk
+// frame calls it, and a parse whose scanner never read a column must answer
+// from one load and one compare without a call. The bitset lookup lives in
+// dependsOnColumnRecorded, which the inliner leaves out of the fast path.
+// Measured inline cost is 77 against the budget of 80
+// (go build -gcflags='-m -m' .). An edit that pushes it past the budget
+// turns every call site back into a real call; move work into the cold
+// half instead.
+func (n *Node) dependsOnColumn() bool {
+	if n == nil || n.ownerArena == nil || n.ownerArena.dependsOnColumnRecords == 0 {
+		return false
+	}
+	return n.dependsOnColumnRecorded()
+}
+
+// dependsOnColumnRecorded is the cold half of dependsOnColumn. It stays out
+// of line so the caller keeps its inline budget for the three guards.
+//
+//go:noinline
+func (n *Node) dependsOnColumnRecorded() bool {
+	return n.ownerArena.nodeDependsOnColumnBit(n)
+}
+
+// setDependsOnColumn records the node's column dependency in its owning
+// arena. A node owned by another arena (a borrowed subtree) keeps its own
+// record.
+func (n *Node) setDependsOnColumn(arena *nodeArena, depends bool) {
+	if n == nil || arena == nil || n.ownerArena != arena {
+		return
+	}
+	arena.setNodeDependsOnColumnBit(n, depends)
+}
+
+// noteTokenColumnDependency records a lexed token's column dependency on the
+// leaf it produced and on the arena's span record. The span record is the
+// durable copy: alias wrappers, hidden-node collapse, and node cloning all
+// build a fresh leaf object for the same span.
+//
+// The shift lane calls this for every token, so the signature takes the
+// three scalars the decision needs instead of a 64-byte Token by value, and
+// the body stays inlinable. A token without the flag then costs one compare.
+func noteTokenColumnDependency(arena *nodeArena, leaf *Node, flags tokenLexFlags, startByte, endByte uint32) {
+	if flags&tokenFlagDependsOnColumn == 0 {
+		return
+	}
+	recordLeafColumnDependency(arena, leaf, startByte, endByte)
+}
+
+// noteCompactTokenColumnDependency is noteTokenColumnDependency for the
+// compact leaf payloads, which hold the bit in the payload itself.
+func noteCompactTokenColumnDependency(arena *nodeArena, leaf *noTreeNode, flags tokenLexFlags, startByte, endByte uint32) {
+	if flags&tokenFlagDependsOnColumn == 0 {
+		return
+	}
+	recordCompactLeafColumnDependency(arena, leaf, startByte, endByte)
+}
+
+// recordLeafColumnDependency is the cold half of noteTokenColumnDependency.
+// It stays out of line so the caller keeps its inline budget for the flag
+// test.
+//
+//go:noinline
+func recordLeafColumnDependency(arena *nodeArena, leaf *Node, startByte, endByte uint32) {
+	leaf.setDependsOnColumn(arena, true)
+	arena.recordColumnDependentSpan(startByte, endByte)
+}
+
+// recordCompactLeafColumnDependency is recordLeafColumnDependency for the
+// compact leaf payloads.
+//
+//go:noinline
+func recordCompactLeafColumnDependency(arena *nodeArena, leaf *noTreeNode, startByte, endByte uint32) {
+	leaf.dependsOnColumn = true
+	arena.recordColumnDependentSpan(startByte, endByte)
+}
+
+// propagateDependsOnColumnSubtree ports C tree-sitter's depends_on_column
+// fold in ts_subtree_summarize_children (subtree.c). C resets a parent's bit,
+// then ORs in each child's bit while the accumulated extent of the earlier
+// children has not crossed a line break. Child 0 always contributes, because
+// the running extent is still empty. In this runtime the same guard reads as
+// "the previous sibling ends on the parent's first content row".
+//
+// C folds the bit at every reduce. This runtime folds it once, bottom up,
+// on the finished tree, because only Tree.Edit reads it. One pass over a
+// finished tree replaces a per-reduce fold on the hot path, and it covers
+// every node construction lane with one rule. See
+// Tree.ensureDependsOnColumnPropagated.
+func propagateDependsOnColumnSubtree(n *Node) bool {
+	if n == nil {
+		return false
+	}
+	arena := n.ownerArena
+	// An arena answers its own nodes once. An incremental parse borrows
+	// whole subtrees from the arena of the previous parse, and that arena
+	// already folded them, so stop here instead of walking them again on
+	// every keystroke.
+	//
+	// The early return rests on one invariant: an arena is closed only by
+	// a tree that walked all of it. markTreeArenasDependsOnColumnFolded
+	// closes exactly the arena the fold entered from, so a closed arena
+	// always carries a complete answer for every node it owns.
+	if arena != nil && arena.dependsOnColumnFolded {
+		return n.dependsOnColumn()
+	}
+	childCount := nodeChildCountNoMaterialize(n)
+	if childCount == 0 {
+		if n.dependsOnColumn() {
+			return true
+		}
+		if arena != nil && arena.columnDependentSpanRecorded(n.startByte, n.endByte) {
+			arena.setNodeDependsOnColumnBit(n, true)
+			return true
+		}
+		return false
+	}
+	// The fold only adds bits. A node that recorded the bit while its
+	// children still existed keeps it after result normalization drops a
+	// collapsed single child.
+	depends := n.dependsOnColumn()
+	crossedLine := false
+	contentStartRow := uint32(0)
+	haveContentStartRow := false
+	if !nodeHasFinalChildRefs(n) {
+		for _, c := range n.children {
+			if c == nil {
+				continue
+			}
+			if !haveContentStartRow {
+				contentStartRow = c.startPoint.Row
+				haveContentStartRow = true
+			}
+			if propagateDependsOnColumnSubtree(c) && !crossedLine {
+				depends = true
+			}
+			if c.endPoint.Row > contentStartRow {
+				crossedLine = true
+			}
+		}
+	} else {
+		for i := 0; i < childCount; i++ {
+			entry, ok := nodeChildEntryAtNoMaterialize(n, i)
+			if !ok {
+				continue
+			}
+			if !haveContentStartRow {
+				contentStartRow = stackEntryNodeStartPoint(entry).Row
+				haveContentStartRow = true
+			}
+			if propagateDependsOnColumnStackEntry(arena, entry) && !crossedLine {
+				depends = true
+			}
+			if stackEntryNodeEndPoint(entry).Row > contentStartRow {
+				crossedLine = true
+			}
+		}
+	}
+	if depends && arena != nil {
+		arena.setNodeDependsOnColumnBit(n, true)
+	}
+	return depends
+}
+
+// propagateDependsOnColumnStackEntry is propagateDependsOnColumnSubtree for
+// the compact pending-parent lane.
+func propagateDependsOnColumnStackEntry(arena *nodeArena, entry stackEntry) bool {
+	if node := stackEntryNode(entry); node != nil {
+		return propagateDependsOnColumnSubtree(node)
+	}
+	parent := stackEntryPendingParent(entry)
+	if parent == nil {
+		return stackEntryDependsOnColumn(entry)
+	}
+	childCount := parent.childEntryCount()
+	if childCount == 0 {
+		return parent.dependsOnColumn
+	}
+	depends := parent.dependsOnColumn
+	crossedLine := false
+	contentStartRow := uint32(0)
+	haveContentStartRow := false
+	for i := 0; i < childCount; i++ {
+		child := parent.childEntry(arena, i)
+		if !stackEntryHasNode(child) {
+			continue
+		}
+		if !haveContentStartRow {
+			contentStartRow = stackEntryNodeStartPoint(child).Row
+			haveContentStartRow = true
+		}
+		if propagateDependsOnColumnStackEntry(arena, child) && !crossedLine {
+			depends = true
+		}
+		if stackEntryNodeEndPoint(child).Row > contentStartRow {
+			crossedLine = true
+		}
+	}
+	if depends {
+		parent.dependsOnColumn = true
+	}
+	return depends
 }
 
 // addSupertypeMask records further hidden supertype ancestors on the node.
@@ -116,9 +330,14 @@ const (
 	// survive materialization.
 	nodeFlagFragileLeft
 	nodeFlagFragileRight
-	// nodeFlagCompactRecoverEOF marks the one compact recover_eof root whose
-	// raw C span must survive public result finalization. It is runtime-only
-	// provenance and fits the existing uint16 flag budget.
+	// nodeFlagCompactRecoverEOF marks the one recover_eof root whose raw C
+	// span must survive public result finalization. Both compact
+	// materialization (finishRecoverEOFTree) and the classic GLR C-recovery
+	// port (cRecoverEOFAccept, parser_recover_c.go) set this same bit: it is
+	// runtime-only lineage provenance, shared across both pipelines so the
+	// uint16 flag budget does not need a second bit for the same shape. See
+	// tryPublishCRecoverEOFRoot (parser_result_root_build.go) for the
+	// classic-pipeline consumer.
 	nodeFlagCompactRecoverEOF
 	// nodeFlagCompactMaterialized marks nodes whose parser-state metadata came
 	// from compact materialization. The remaining two bits record which state
@@ -126,6 +345,20 @@ const (
 	nodeFlagCompactMaterialized
 	nodeFlagCompactParseStateProven
 	nodeFlagCompactPreGotoStateProven
+	// nodeFlagRecoveryPlaceholderExtra marks a node whose extra bit was
+	// forced true by tryReplayTopLevelRecovery's unvalidated top-level
+	// replay (an opportunistic GLR rescue with no C equivalent; see
+	// findTopLevelReplaySplit). The mark is provisional: C never gives an
+	// ordinary token its own extra bit inside a resync ERROR
+	// (ts_subtree_new_error_node marks only the ERROR wrapper), so if this
+	// node later becomes a plain child of a real resync ERROR
+	// (tryResyncErrorRecoveryMode, tryNearestActionStateRecovery), that
+	// builder clears both this bit and nodeFlagExtra to restore the value
+	// the node had when lexed. Runtime-only, like every other nodeFlags
+	// bit; fresh arena nodes start at flags=0. This is the last free bit in
+	// the uint16 budget (see the nodeFlags doc above) -- do not add another
+	// without first widening the type.
+	nodeFlagRecoveryPlaceholderExtra
 )
 
 func (n *Node) hasFlag(flag nodeFlags) bool {
@@ -175,6 +408,36 @@ func (n *Node) setCompactParseStateProof(v bool) {
 
 func (n *Node) hasCompactPreGotoStateProof() bool {
 	return n != nil && n.hasFlag(nodeFlagCompactPreGotoStateProven)
+}
+
+// isRecoveryPlaceholderExtra reports whether this node's extra bit is a
+// provisional mark from tryReplayTopLevelRecovery, not a genuine grammar
+// extra. See nodeFlagRecoveryPlaceholderExtra.
+func (n *Node) isRecoveryPlaceholderExtra() bool {
+	return n != nil && n.hasFlag(nodeFlagRecoveryPlaceholderExtra)
+}
+
+// setRecoveryPlaceholderExtra sets or clears the provisional-extra mark. See
+// nodeFlagRecoveryPlaceholderExtra.
+func (n *Node) setRecoveryPlaceholderExtra(v bool) {
+	if n != nil {
+		n.setFlag(nodeFlagRecoveryPlaceholderExtra, v)
+	}
+}
+
+// clearRecoveryPlaceholderExtra restores a node's extra bit to the value it
+// had when lexed, undoing tryReplayTopLevelRecovery's provisional mark if
+// present. Call this whenever such a node stops being an unvalidated
+// top-level placeholder and becomes a plain child of a real ERROR node
+// (tryResyncErrorRecoveryMode, tryNearestActionStateRecovery): C never
+// marks a plain absorbed child extra, only the ERROR wrapper itself
+// (ts_subtree_new_error_node). A no-op for a node that was never marked.
+func (n *Node) clearRecoveryPlaceholderExtra() {
+	if n == nil || !n.isRecoveryPlaceholderExtra() {
+		return
+	}
+	n.setExtra(false)
+	n.setRecoveryPlaceholderExtra(false)
 }
 
 func (n *Node) setCompactPreGotoStateProof(v bool) {
@@ -238,6 +501,27 @@ func compactNodeMayBeReused(n *Node) bool {
 // payload (buildSyntheticRootTree). That synthesized root carries no compact
 // flags; treating it as unproven disabled reuse for every INI tree that ends
 // in a blank line (issue #454).
+//
+// Extra (comment/whitespace) leaves are exempt too. replayCompactDerivation's
+// table-replay walk (parsestate_replay.go, replayShiftTarget) finds a
+// parseState transition only for a symbol the LR action table actually
+// shifts at the live state; extras are injected around the grammar's normal
+// shift/goto skeleton, so an extra almost never has a table entry at its own
+// position and psKnown stays false by construction, not by any defect in a
+// given parse (see parsestate_replay_compact.go's compactReplayStates
+// doc comment). Before this exemption, one ordinary comment anywhere in the
+// source disabled incremental reuse for the WHOLE tree -- every non-leaf
+// candidate elsewhere in a clean file paid the same "unproven visible node"
+// decline a single trailing-comment leaf caused (reproduced on the Rust
+// fixture in issue #454's downstream report: every one of 6,135 proven nodes
+// lost reuse because of 130 unrelated line comments). The reuse cursor
+// already has its own per-node fallback for exactly this case
+// (compactNodeMayBeReused, called from tryReuseSubtree and the reuse
+// cursor's indexed top-level scan): an individual unproven extra is simply
+// skipped as a reuse candidate, the same way parsercore_phase0_reuse_
+// materialization.go already excludes extras from its own reuse-dependency
+// walk. Exempting extras here only lets the rest of an otherwise-provable
+// tree reach that existing, already-safe machinery.
 func compactTreeIncrementalReuseProven(root *Node, scratch *[]*Node) bool {
 	if root == nil || scratch == nil {
 		return false
@@ -251,7 +535,7 @@ func compactTreeIncrementalReuseProven(root *Node, scratch *[]*Node) bool {
 		if n == nil {
 			continue
 		}
-		if n != root && !compactNodeRecoveryBearing(n) {
+		if n != root && !compactNodeRecoveryBearing(n) && !n.isExtra() {
 			if !n.isCompactMaterialized() || !compactNodeStateProofAvailable(n) {
 				clear(stack)
 				*scratch = stack[:0]
@@ -853,8 +1137,10 @@ func nodeFieldIDAt(n *Node, i int) FieldID {
 type ParseStopReason string
 
 const (
-	ParseStopNone            ParseStopReason = "none"
-	ParseStopAccepted        ParseStopReason = "accepted"
+	ParseStopNone     ParseStopReason = "none"
+	ParseStopAccepted ParseStopReason = "accepted"
+	// ParseStopAcceptedPrefix means the parser accepted a tree before real input ended.
+	ParseStopAcceptedPrefix  ParseStopReason = "accepted_prefix"
 	ParseStopNoStacksAlive   ParseStopReason = "no_stacks_alive"
 	ParseStopTokenSourceEOF  ParseStopReason = "token_source_eof"
 	ParseStopTimeout         ParseStopReason = "timeout"
@@ -1127,6 +1413,10 @@ type ParseRuntime struct {
 	CompactIncrementalFallbackReason string
 	// CompactReductions counts reductions executed by the compact scheduler.
 	CompactReductions uint64
+	// CompactPeakHeaders and CompactPeakDerivations are populated only when
+	// SetCompactCertificationTelemetry is enabled on a compact parse.
+	CompactPeakHeaders     uint64
+	CompactPeakDerivations uint64
 	// CRecoveryEnteredErrorState is true when the faithful C error-recovery
 	// port (parser_recover_c.go) actually ran ts_parser__handle_error at
 	// least once while producing this specific tree — i.e. some no-action
@@ -1172,6 +1462,9 @@ type ParseRuntime struct {
 	// materialization transferred every required terminal scanner checkpoint
 	// into node sidecars. A false value disables later subtree reuse.
 	CompactExternalScannerCheckpointTransferProven bool
+	// CompactMultiHeaderTokens counts elections that start with multiple compact headers.
+	// Certification telemetry enables it. The count saturates at 2^32-1.
+	CompactMultiHeaderTokens uint32
 	// CRecoverReductionCandidateCeilingHits and CRecoverMissingTokenCeilingHits
 	// count how many times this parse's cDoAllPotentialReductions /
 	// cHandleError missing-token search hit the
@@ -1523,7 +1816,51 @@ type ParseRuntime struct {
 	// and child slabs this parse held, including slabs inherited from the
 	// pool. The scratch lifetime isolation bound applies to this value.
 	TransientScratchBytesAllocated int64
+	// CRecoverEOFFallbacks counts recovery calls that use the prior exact
+	// EOF trial when Go paths cannot be counted as C physical versions.
+	CRecoverEOFFallbacks uint64
 }
+
+// parseRuntimePool recycles the ParseRuntime block that a Tree points to.
+// Tree.Release is the only place that returns a block, and it nils the
+// tree's pointer before the block reaches the pool, so no live *Tree can
+// ever observe a block after some other tree recycles it. Tree.ParseRuntime
+// always returns a value copy, so a caller can never hold a reference into a
+// pooled block either. Do not add another path that calls Put.
+var parseRuntimePool = sync.Pool{
+	New: func() any { return new(ParseRuntime) },
+}
+
+// acquireParseRuntime returns a zeroed ParseRuntime block, reused from a
+// prior Tree.Release when the pool holds one. Every Tree construction site
+// (NewTree, resetTreeForReuse, Copy) calls this eagerly, so a live Tree's
+// parseRuntime field is never observed as nil by a concurrent reader; see
+// parseRuntimeNone for the one exception.
+func acquireParseRuntime() *ParseRuntime {
+	return parseRuntimePool.Get().(*ParseRuntime)
+}
+
+// releaseParseRuntime scrubs rt and returns it to the pool. Scrubbing here,
+// at release time, drops any large fields the block holds (EquivStateStats,
+// ReduceTiming, ActionTiming, NormalizationPasses) as soon as the owning
+// tree goes away, instead of leaving them retained in the pool until some
+// unrelated later parse happens to reuse this exact block.
+func releaseParseRuntime(rt *ParseRuntime) {
+	if rt == nil {
+		return
+	}
+	*rt = ParseRuntime{}
+	parseRuntimePool.Put(rt)
+}
+
+// parseRuntimeNone is a shared, permanently zero ParseRuntime. rawParseRuntime
+// returns a pointer to it for a Tree whose parseRuntime field is nil (a bare
+// &Tree{} built outside every constructor above), so a read never allocates
+// and never writes to the tree. Never write through the pointer rawParseRuntime
+// can return: every live Tree with a nil block shares this exact value, so a
+// write here would corrupt what every other such Tree reads. Write sites must
+// call ensureParseRuntime instead, which allocates a private block first.
+var parseRuntimeNone = ParseRuntime{StopReason: ParseStopNone}
 
 type NormalizationPassRuntime struct {
 	Name           string
@@ -1587,6 +1924,7 @@ func (p reduceChildPath) valid() bool {
 // ArenaBreakdown captures optional arena/materialization attribution. It is
 // populated only when EnableArenaBreakdown(true) is set before parsing.
 type ArenaBreakdown struct {
+	LegacyReuseDependencyBytesAllocated  int64
 	CompactReuseDependencyBytesAllocated int64
 
 	NodeStructBytesAllocated            int64
@@ -1817,32 +2155,55 @@ func (rt ParseRuntime) Summary() string {
 	return s
 }
 
-// Symbol returns the node's grammar symbol.
-func (n *Node) Symbol() Symbol { return n.symbol }
+// Symbol returns the node's grammar symbol. Returns 0 for a nil node,
+// matching a null TSNode handle in the C API.
+func (n *Node) Symbol() Symbol {
+	if n == nil {
+		return 0
+	}
+	return n.symbol
+}
 
-// ParseState returns the parser state associated with this node.
-func (n *Node) ParseState() StateID { return n.parseState }
+// ParseState returns the parser state associated with this node. Returns 0
+// for a nil node.
+func (n *Node) ParseState() StateID {
+	if n == nil {
+		return 0
+	}
+	return n.parseState
+}
 
 // PreGotoState returns the parser state that was on top of the stack before
 // this node was pushed (i.e., the state exposed after popping children during
 // reduce). For non-leaf nodes: lookupGoto(PreGotoState, Symbol) == ParseState.
-func (n *Node) PreGotoState() StateID { return n.preGotoState }
+// Returns 0 for a nil node.
+func (n *Node) PreGotoState() StateID {
+	if n == nil {
+		return 0
+	}
+	return n.preGotoState
+}
 
-// IsNamed reports whether this is a named node (as opposed to anonymous syntax like punctuation).
-func (n *Node) IsNamed() bool { return n.isNamed() }
+// IsNamed reports whether this is a named node (as opposed to anonymous
+// syntax like punctuation). Returns false for a nil node.
+func (n *Node) IsNamed() bool { return n != nil && n.isNamed() }
 
 // IsExtra reports whether this node was marked as extra syntax
-// (e.g. whitespace/comments outside the core parse structure).
-func (n *Node) IsExtra() bool { return n.isExtra() }
+// (e.g. whitespace/comments outside the core parse structure). Returns
+// false for a nil node.
+func (n *Node) IsExtra() bool { return n != nil && n.isExtra() }
 
 // IsMissing reports whether this node was inserted by error recovery.
-func (n *Node) IsMissing() bool { return n.isMissing() }
+// Returns false for a nil node.
+func (n *Node) IsMissing() bool { return n != nil && n.isMissing() }
 
-// IsError reports whether this node is an explicit error node.
-func (n *Node) IsError() bool { return n.symbol == errorSymbol }
+// IsError reports whether this node is an explicit error node. Returns
+// false for a nil node.
+func (n *Node) IsError() bool { return n != nil && n.symbol == errorSymbol }
 
-// HasError reports whether this node or any descendant contains a parse error.
-func (n *Node) HasError() bool { return n.hasError() }
+// HasError reports whether this node or any descendant contains a parse
+// error. Returns false for a nil node.
+func (n *Node) HasError() bool { return n != nil && n.hasError() }
 
 // HasErrorOrMissing reports whether this node or a descendant contains an
 // ERROR or MISSING node. Use it for strict parse-health checks.
@@ -1877,20 +2238,48 @@ func (n *Node) HasErrorOrMissing() bool {
 // HasChanges reports whether this node was marked dirty by Tree.Edit.
 func (n *Node) HasChanges() bool { return n.dirty() }
 
-// StartByte returns the byte offset where this node begins.
-func (n *Node) StartByte() uint32 { return n.startByte }
+// StartByte returns the byte offset where this node begins. Returns 0 for
+// a nil node.
+func (n *Node) StartByte() uint32 {
+	if n == nil {
+		return 0
+	}
+	return n.startByte
+}
 
 // EndByte returns the byte offset where this node ends (exclusive).
-func (n *Node) EndByte() uint32 { return n.endByte }
+// Returns 0 for a nil node.
+func (n *Node) EndByte() uint32 {
+	if n == nil {
+		return 0
+	}
+	return n.endByte
+}
 
 // StartPoint returns the row/column position where this node begins.
-func (n *Node) StartPoint() Point { return n.startPoint }
+// Returns the zero Point for a nil node.
+func (n *Node) StartPoint() Point {
+	if n == nil {
+		return Point{}
+	}
+	return n.startPoint
+}
 
-// EndPoint returns the row/column position where this node ends.
-func (n *Node) EndPoint() Point { return n.endPoint }
+// EndPoint returns the row/column position where this node ends. Returns
+// the zero Point for a nil node.
+func (n *Node) EndPoint() Point {
+	if n == nil {
+		return Point{}
+	}
+	return n.endPoint
+}
 
-// Range returns the full span of this node as a Range.
+// Range returns the full span of this node as a Range. Returns the zero
+// Range for a nil node.
 func (n *Node) Range() Range {
+	if n == nil {
+		return Range{}
+	}
 	return Range{
 		StartByte:  n.startByte,
 		EndByte:    n.endByte,
@@ -2046,39 +2435,61 @@ func (n *Node) FieldNameForChild(i int, lang *Language) string {
 func (n *Node) Children() []*Node { return nodeChildrenForReason(n, materializeForParentAPI) }
 
 // SExpr returns a tree-sitter-style S-expression for this node.
-// It includes only named nodes for stable debug snapshots.
+// It includes named nodes and ERROR nodes for stable debug snapshots.
 func (n *Node) SExpr(lang *Language) string {
 	if n == nil || lang == nil {
 		return ""
 	}
-	if !n.IsNamed() {
+	if !n.IsNamed() && !n.IsError() {
 		return ""
 	}
 	var b strings.Builder
 	// S-expressions are typically ~5x the source byte count for named nodes.
-	// Pre-growing the builder avoids intermediate reallocations.
-	b.Grow((int(n.endByte-n.startByte) * 5) + 32)
+	// Pre-growing the builder avoids intermediate reallocations. The hint is
+	// capped and treats an inverted span as zero, so a bad span (endByte <
+	// startByte, which NewLeafNode permits) or a very large node cannot
+	// force a multi-gigabyte pre-allocation.
+	b.Grow(sexprGrowHint(n.startByte, n.endByte))
 	sexprWrite(n, lang, &b)
 	return b.String()
+}
+
+// sexprGrowCap bounds the strings.Builder growth hint that SExpr requests
+// up front, regardless of node span.
+const sexprGrowCap = 1 << 20 // 1 MiB
+
+// sexprGrowHint estimates the strings.Builder capacity SExpr should
+// pre-allocate for a node spanning [startByte, endByte). It treats an
+// inverted span as zero and clamps the result to sexprGrowCap.
+func sexprGrowHint(startByte, endByte uint32) int {
+	if endByte < startByte {
+		return 32
+	}
+	span := uint64(endByte - startByte)
+	hint := span*5 + 32
+	if hint > sexprGrowCap {
+		return sexprGrowCap
+	}
+	return int(hint)
 }
 
 // sexprWrite writes the S-expression for n into b, returning true if anything
 // was written. Using a shared builder avoids the per-node string allocation and
 // the intermediate []string slice that the previous implementation required.
 func sexprWrite(n *Node, lang *Language, b *strings.Builder) {
-	if n == nil || !n.IsNamed() {
+	if n == nil || (!n.IsNamed() && !n.IsError()) {
 		return
 	}
 	name := n.Type(lang)
 	b.WriteByte('(')
 	b.WriteString(name)
 
-	// Walk children, writing only named ones. Because a named child always
-	// produces at least "(type)", we can write a space before each one eagerly.
+	// ERROR is a built-in symbol, so it must survive even if a recovered
+	// node lacks the named flag. Other anonymous children remain omitted.
 	childCount := nodeChildCountNoMaterialize(n)
 	for i := 0; i < childCount; i++ {
 		entry, ok := nodeChildEntryAtNoMaterialize(n, i)
-		if !ok || !stackEntryNodeIsNamed(entry) {
+		if !ok || (!stackEntryNodeIsNamed(entry) && stackEntryNodeSymbol(entry) != errorSymbol) {
 			continue
 		}
 		child := nodeChildAtForReason(n, i, materializeForParentAPI)
@@ -2106,9 +2517,13 @@ func (n *Node) Text(source []byte) string {
 	return string(source[start:end])
 }
 
-// Type returns the node's type name from the language.
+// Type returns the node's type name from the language. Returns "" for a
+// nil node or a nil lang.
 func (n *Node) Type(lang *Language) string {
-	if n != nil && n.symbol == errorSymbol {
+	if n == nil || lang == nil {
+		return ""
+	}
+	if n.symbol == errorSymbol {
 		return "ERROR"
 	}
 	if int(n.symbol) < len(lang.SymbolNames) {
@@ -2369,9 +2784,17 @@ func NewLeafNode(sym Symbol, named bool, startByte, endByte uint32, startPoint, 
 	return n
 }
 
+func nodeCarriesError(n *Node) bool {
+	return n.flags&(nodeFlagHasError|nodeFlagMissing) != 0 || n.symbol == errorSymbol
+}
+
 func populateParentNode(n *Node, children []*Node) {
+	hasError := n.symbol == errorSymbol || n.flags&nodeFlagMissing != 0
 	switch len(children) {
 	case 0:
+		if hasError {
+			n.setHasError(true)
+		}
 		return
 	case 1:
 		c0 := children[0]
@@ -2380,7 +2803,7 @@ func populateParentNode(n *Node, children []*Node) {
 		n.startPoint = c0.startPoint
 		n.endPoint = c0.endPoint
 		setNodeParentLink(c0, n, 0)
-		n.setHasError(c0.hasError())
+		n.setHasError(hasError || nodeCarriesError(c0))
 		return
 	case 2:
 		c0 := children[0]
@@ -2391,7 +2814,7 @@ func populateParentNode(n *Node, children []*Node) {
 		n.endPoint = c1.endPoint
 		setNodeParentLink(c0, n, 0)
 		setNodeParentLink(c1, n, 1)
-		n.setHasError(c0.hasError() || c1.hasError())
+		n.setHasError(hasError || nodeCarriesError(c0) || nodeCarriesError(c1))
 		return
 	default:
 		first := children[0]
@@ -2401,10 +2824,9 @@ func populateParentNode(n *Node, children []*Node) {
 		n.startPoint = first.startPoint
 		n.endPoint = last.endPoint
 
-		hasError := false
 		for i, c := range children {
 			setNodeParentLink(c, n, i)
-			if c.hasError() {
+			if nodeCarriesError(c) {
 				hasError = true
 			}
 		}
@@ -2443,6 +2865,10 @@ func refreshRewrittenParentPreservingProducedSpan(n *Node, children []*Node) {
 // populateParentNodeNoLinks computes parent span/error metadata from children
 // without wiring child.parent/childIndex links. Used on deferred-link paths.
 func populateParentNodeNoLinks(n *Node, children []*Node, trackChildErrors bool) {
+	hasError := n.symbol == errorSymbol || n.flags&nodeFlagMissing != 0
+	if hasError {
+		n.setHasError(true)
+	}
 	switch len(children) {
 	case 0:
 		return
@@ -2453,7 +2879,7 @@ func populateParentNodeNoLinks(n *Node, children []*Node, trackChildErrors bool)
 		n.startPoint = c0.startPoint
 		n.endPoint = c0.endPoint
 		if trackChildErrors {
-			n.setHasError(c0.hasError())
+			n.setHasError(hasError || nodeCarriesError(c0))
 		}
 		return
 	case 2:
@@ -2464,7 +2890,7 @@ func populateParentNodeNoLinks(n *Node, children []*Node, trackChildErrors bool)
 		n.startPoint = c0.startPoint
 		n.endPoint = c1.endPoint
 		if trackChildErrors {
-			n.setHasError(c0.hasError() || c1.hasError())
+			n.setHasError(hasError || nodeCarriesError(c0) || nodeCarriesError(c1))
 		}
 		return
 	default:
@@ -2475,8 +2901,9 @@ func populateParentNodeNoLinks(n *Node, children []*Node, trackChildErrors bool)
 		n.startPoint = first.startPoint
 		n.endPoint = last.endPoint
 		if trackChildErrors {
+			n.setHasError(hasError)
 			for i := range children {
-				if children[i].hasError() {
+				if nodeCarriesError(children[i]) {
 					n.setHasError(true)
 					break
 				}
@@ -2808,6 +3235,7 @@ func (t *Tree) deferResultCompatibility() {
 	if t.resultCompatibilityFinalizer == nil {
 		t.resultCompatibilityFinalizer = &treeResultCompatibilityFinalizer{}
 	}
+	t.resultCompatibilityFinalizer.runBoundOnly = false
 }
 
 // treeResultCompatibilityFinalizer is installed while a tree is still parser-
@@ -2818,10 +3246,34 @@ type treeResultCompatibilityFinalizer struct {
 	once sync.Once
 	// Keep the exact attempt's bound private until normalization completes.
 	tokenInvariantReadSpan uint32
+	// A certified edit uses this existing cold block for its read-bound anchor.
+	// It needs no normalization and must not grow the hot Tree header.
+	tokenInvariantRunBound   incr.TokenReadBound
+	runBoundOnly             bool
+	incrementalFreshVerified bool
+}
+
+func (t *Tree) incrementalFreshVerified() bool {
+	return t != nil && t.resultCompatibilityFinalizer != nil && t.resultCompatibilityFinalizer.incrementalFreshVerified
+}
+
+// Keep fresh-result provenance in the existing cold block. A metadata-only
+// block does not schedule normalization or allocate on an unverified edit.
+func (t *Tree) setIncrementalFreshVerified(verified bool) {
+	if t == nil {
+		return
+	}
+	if t.resultCompatibilityFinalizer == nil {
+		if !verified {
+			return
+		}
+		t.resultCompatibilityFinalizer = &treeResultCompatibilityFinalizer{runBoundOnly: true}
+	}
+	t.resultCompatibilityFinalizer.incrementalFreshVerified = verified
 }
 
 func (t *Tree) hasDeferredResultCompatibility() bool {
-	return t != nil && t.resultCompatibilityFinalizer != nil
+	return t != nil && t.resultCompatibilityFinalizer != nil && !t.resultCompatibilityFinalizer.runBoundOnly
 }
 
 func (t *Tree) ensureResultCompatibility() {
@@ -2829,13 +3281,15 @@ func (t *Tree) ensureResultCompatibility() {
 		return
 	}
 	finalizer := t.resultCompatibilityFinalizer
-	if finalizer == nil {
+	if finalizer == nil || finalizer.runBoundOnly {
 		return
 	}
 	finalizer.once.Do(func() {
+		defer func() { markPublishedRootError(t.root) }()
 		span := finalizer.tokenInvariantReadSpan
 		finalizer.tokenInvariantReadSpan = 0
 		t.tokenInvariantReadSpan = 0
+		t.setIncrementalFreshVerified(false)
 		defer func() {
 			if t.resultCompatibilityApplied && t.tokenInvariantReadSpanResultEligible() {
 				t.tokenInvariantReadSpan = span
@@ -2860,7 +3314,7 @@ func (t *Tree) ensureResultCompatibility() {
 			// normalizer just ran on the line above. parser.normalizationStats is
 			// only ever non-empty when that census flag is set, so this is a
 			// no-op field copy in every ordinary parse.
-			parser.copyNormalizationStats(&t.parseRuntime)
+			parser.copyNormalizationStats(t.ensureParseRuntime())
 			return
 		}
 		timing := &parseMaterializationTiming{}
@@ -2874,8 +3328,8 @@ func (t *Tree) ensureResultCompatibility() {
 		t.resultCompatibilityApplied = !resultMaterializationShouldStop(result.stopReason)
 		t.disableIncrementalReuseAfterCompactCompatibility(compatibilitySnapshot)
 		timing.addResultCompatibility(start)
-		t.parseRuntime.ResultCompatibilityNanos += timing.resultCompatibilityNanos
-		parser.copyNormalizationStats(&t.parseRuntime)
+		t.ensureParseRuntime().ResultCompatibilityNanos += timing.resultCompatibilityNanos
+		parser.copyNormalizationStats(t.ensureParseRuntime())
 	})
 }
 
@@ -3052,9 +3506,48 @@ func newParentNode(arena *nodeArena, sym Symbol, named bool, children []*Node, f
 // NewParentNode creates a non-terminal node with children.
 // It sets parent pointers on all children and computes byte/point spans
 // from the first and last children. If any child has an error, the parent
-// is marked as having an error too.
+// is marked as having an error too. A nil entry in children is dropped,
+// along with the matching entry in fieldIDs at the same index, before the
+// parent node is built.
 func NewParentNode(sym Symbol, named bool, children []*Node, fieldIDs []FieldID, productionID uint16) *Node {
+	children, fieldIDs = dropNilChildren(children, fieldIDs)
 	return newParentNode(nil, sym, named, children, fieldIDs, productionID)
+}
+
+// dropNilChildren removes nil entries from children, dropping the fieldIDs
+// entry at the same index so field assignments stay matched to their
+// children. It returns children and fieldIDs unchanged when children has
+// no nil entry.
+func dropNilChildren(children []*Node, fieldIDs []FieldID) ([]*Node, []FieldID) {
+	hasNil := false
+	for _, c := range children {
+		if c == nil {
+			hasNil = true
+			break
+		}
+	}
+	if !hasNil {
+		return children, fieldIDs
+	}
+	outChildren := make([]*Node, 0, len(children))
+	var outFieldIDs []FieldID
+	if fieldIDs != nil {
+		outFieldIDs = make([]FieldID, 0, len(children))
+	}
+	for i, c := range children {
+		if c == nil {
+			continue
+		}
+		outChildren = append(outChildren, c)
+		if fieldIDs != nil {
+			if i < len(fieldIDs) {
+				outFieldIDs = append(outFieldIDs, fieldIDs[i])
+			} else {
+				outFieldIDs = append(outFieldIDs, 0)
+			}
+		}
+	}
+	return outChildren, outFieldIDs
 }
 
 func newLeafNodeInArena(arena *nodeArena, sym Symbol, named bool, startByte, endByte uint32, startPoint, endPoint Point) *Node {
@@ -3068,6 +3561,9 @@ func newLeafNodeInArena(arena *nodeArena, sym Symbol, named bool, startByte, end
 			childIndex: -1,
 		}
 		n.setNamed(named)
+		if sym == errorSymbol {
+			n.rawShape = rawShapeZeroChildRef
+		}
 		return n
 	}
 	n := arena.allocNodeFast()
@@ -3079,6 +3575,9 @@ func newLeafNodeInArena(arena *nodeArena, sym Symbol, named bool, startByte, end
 	n.endPoint = endPoint
 	n.childIndex = -1
 	n.rawShape = 0
+	if sym == errorSymbol {
+		n.rawShape = rawShapeZeroChildRef
+	}
 	n.ownerArena = arena
 	arena.leafNodesConstructed++
 	workCountRecordLeafConstruction()
@@ -3100,7 +3599,7 @@ func observeLeafIntern(arena *nodeArena, n *Node) {
 	if arena.internLeaves == nil {
 		arena.internLeaves = newInternTable()
 	}
-	key := buildKey(n.symbol, n.productionID, n.flags, n.startByte, n.endByte, nil)
+	key := buildKey(n.symbol, n.productionID, n.flags, n.dependsOnColumn(), n.startByte, n.endByte, nil)
 	if hit := arena.internLeaves.lookup(key, nil); hit == nil {
 		arena.internLeaves.store(key, n)
 	}
@@ -3352,6 +3851,9 @@ const (
 	resultErrorSummaryUnknown resultErrorSummary = iota
 	resultErrorSummaryClean
 	resultErrorSummaryPresent
+	// The public root carries an error from a hidden recovery token. A clean
+	// forest rescue cannot validate that retained production evidence.
+	resultErrorSummaryHiddenMissing
 )
 
 // Tree holds a complete syntax tree along with its source text and language.
@@ -3362,22 +3864,33 @@ type Tree struct {
 	root           *Node
 	source         []byte
 	sourceEncoding InputEncoding
+	// Captured only from the accepted lexical attempt, never inferred from the
+	// next edit's token source. The byte occupies existing header padding.
+	eofExtraTokenSourceProofID uint8
 	// Zero means unknown. A full DFA parse records the longest primitive read,
 	// including failed probes. Incremental reconstruction cannot infer this bound.
-	tokenInvariantReadSpan             uint32
-	sourceUTF16                        []uint16
-	utf16Map                           *utf16SourceMap
-	language                           *Language
-	edits                              []InputEdit  // pending edits applied to this tree
-	lastEditedLeaf                     *Node        // deepest leaf overlapped by the most recent edit, when tracked
-	arena                              *nodeArena   // primary arena that owns newly-built nodes
-	borrowedArena                      []*nodeArena // arenas borrowed via subtree reuse
-	parseRuntime                       ParseRuntime
+	tokenInvariantReadSpan uint32
+	sourceUTF16            []uint16
+	utf16Map               *utf16SourceMap
+	language               *Language
+	edits                  []InputEdit  // pending edits applied to this tree
+	lastEditedLeaf         *Node        // deepest leaf overlapped by the most recent edit, when tracked
+	arena                  *nodeArena   // primary arena that owns newly-built nodes
+	borrowedArena          []*nodeArena // arenas borrowed via subtree reuse
+	// parseRuntime is a pooled block (see parseRuntimePool). Only Release
+	// returns it to the pool, and only after nilling this field, so a stale
+	// *Tree can never reach a block another tree is now using. Read it
+	// through rawParseRuntime/ParseRuntime, never by taking this pointer's
+	// address.
+	parseRuntime                       *ParseRuntime
 	arenaBreakdown                     *ArenaBreakdown
 	includedRanges                     []Range
 	externalScannerCheckpointsDeferred bool
 	forestFastPath                     bool
-	incrementalReuseDisabled           bool
+	// dependsOnColumnPropagated records that the parent column-dependency
+	// fold already ran on this tree. See ensureDependsOnColumnPropagated.
+	dependsOnColumnPropagated bool
+	incrementalReuseDisabled  bool
 	// incrementalReuseUnsupportedClause names the clause that disabled reuse
 	// for a compact-materialized tree. Zero selects the default
 	// scanner-quiescence reason; see incrementalReuseUnsupportedReasonForTree.
@@ -3414,13 +3927,26 @@ const maxRetainedTreeEditCap = 8
 // saturated tree. The garbage collector reclaims it when it is unreachable.
 const maxTreeExtraHandles = ^uint16(0)
 
+// Set the flag before publishing the tree. Tree readers can then share the root.
+func markPublishedRootError(root *Node) {
+	if root != nil && root.IsError() {
+		root.setHasError(true)
+	}
+}
+
 // NewTree creates a new Tree.
 func NewTree(root *Node, source []byte, lang *Language) *Tree {
+	markPublishedRootError(root)
 	return &Tree{
 		root:           root,
 		source:         source,
 		sourceEncoding: InputEncodingUTF8,
 		language:       lang,
+		// Tree is documented safe for concurrent reads after construction, so
+		// this must not be left nil for rawParseRuntime to backfill lazily on
+		// first read: two goroutines reading concurrently would race on that
+		// write. Acquire eagerly here, matching every other construction site.
+		parseRuntime: acquireParseRuntime(),
 	}
 }
 
@@ -3429,6 +3955,9 @@ func newTreeWithArenas(root *Node, source []byte, lang *Language, arena *nodeAre
 }
 
 func newTreeWithUniqueArenas(root *Node, source []byte, lang *Language, arena *nodeArena, borrowed []*nodeArena) *Tree {
+	if arena != nil && root != nil && root.ownerArena == arena {
+		arena.ownership.Publish(len(borrowed) != 0)
+	}
 	// Do not pool Tree values. A caller can keep a pointer after Release, and
 	// a pooled Tree would let that stale pointer release a later parse result.
 	tree := &Tree{}
@@ -3446,16 +3975,21 @@ func resetTreeForReuse(tree *Tree, root *Node, source []byte, lang *Language, ar
 	if tree == nil {
 		return
 	}
+	markPublishedRootError(root)
 	edits := reusableTreeEditScratch(tree.edits)
 	deferExternalCheckpoints := root != nil && languageUsesExternalScannerCheckpoints(lang)
 	*tree = Tree{
-		root:                               root,
-		source:                             source,
-		sourceEncoding:                     InputEncodingUTF8,
-		language:                           lang,
-		edits:                              edits,
-		arena:                              arena,
-		borrowedArena:                      borrowed,
+		root:           root,
+		source:         source,
+		sourceEncoding: InputEncodingUTF8,
+		language:       lang,
+		edits:          edits,
+		arena:          arena,
+		borrowedArena:  borrowed,
+		// The parser's tree construction seam is the one place that acquires
+		// eagerly, so the runtime writes the parse loop makes as it runs
+		// never hit rawParseRuntime's lazy fallback.
+		parseRuntime:                       acquireParseRuntime(),
 		externalScannerCheckpointsDeferred: deferExternalCheckpoints,
 	}
 }
@@ -3535,7 +4069,13 @@ func (t *Tree) Release() {
 	t.utf16Map = nil
 	t.language = nil
 	t.edits = edits
-	t.parseRuntime = ParseRuntime{}
+	// Nil the field before the block reaches the pool, so a use-after-release
+	// caller that still holds this *Tree can never read another tree's data
+	// through it.
+	if rt := t.parseRuntime; rt != nil {
+		t.parseRuntime = nil
+		releaseParseRuntime(rt)
+	}
 	t.arenaBreakdown = nil
 	t.includedRanges = nil
 	t.resultErrorSummary = resultErrorSummaryUnknown
@@ -3544,6 +4084,7 @@ func (t *Tree) Release() {
 	t.recoveryNodeMemoPeakTier = RecoveryNodeMemoTierNone
 	t.recoveryNodeMemoCollisions = 0
 	t.tokenInvariantReadSpan = 0
+	t.eofExtraTokenSourceProofID = 0
 }
 
 // retainUnchangedIncrementalResult adds a caller handle to an old tree that an
@@ -3556,8 +4097,11 @@ func (t *Tree) retainUnchangedIncrementalResult() *Tree {
 	return t
 }
 
-// RootNode returns the tree's root node.
+// RootNode returns the tree's root node. Returns nil for a nil tree.
 func (t *Tree) RootNode() *Node {
+	if t == nil {
+		return nil
+	}
 	t.ensureResultCompatibility()
 	return t.root
 }
@@ -3581,8 +4125,13 @@ func (t *Tree) RootNodeWithOffset(offsetBytes uint32, offsetExtent Point) *Node 
 	return cloneTreeNodesWithOffset(t.root, offsetBytes, offsetExtent)
 }
 
-// Source returns the original source text.
-func (t *Tree) Source() []byte { return t.source }
+// Source returns the original source text. Returns nil for a nil tree.
+func (t *Tree) Source() []byte {
+	if t == nil {
+		return nil
+	}
+	return t.source
+}
 
 // UsedForestFastPath reports whether the node data behind this tree was
 // produced by the GSS-forest GLR fast path (Parser.Parse trying
@@ -3720,8 +4269,14 @@ func (t *Tree) UTF16SourceForNode(n *Node) ([]uint16, bool) {
 	return source[start:end], true
 }
 
-// Language returns the language used to parse this tree.
-func (t *Tree) Language() *Language { return t.language }
+// Language returns the language used to parse this tree. Returns nil for
+// a nil tree.
+func (t *Tree) Language() *Language {
+	if t == nil {
+		return nil
+	}
+	return t.language
+}
 
 // WriteDOT writes a DOT graph representation of this tree to w.
 func (t *Tree) WriteDOT(w io.Writer, lang *Language) error {
@@ -3794,22 +4349,36 @@ func (t *Tree) DOT(lang *Language) string {
 // The copied tree has distinct node objects, so subsequent Tree.Edit calls on
 // either tree do not mutate the other's spans/dirty bits. Source bytes and
 // language pointer are shared (read-only).
+//
+// Copy is not read-only on the source. It runs the column-dependency fold
+// first, which writes the folded bits into the source arena's side table and
+// releases that arena's span list, exactly as a first Tree.Edit would. The
+// source tree's public shape does not change.
 func (t *Tree) Copy() *Tree {
 	if t == nil {
 		return nil
 	}
 	t.ensureResultCompatibility()
+	// Fold before the clone. The clone copies a node's column-dependency
+	// bit but not the arena span list that the fold reads, so a copy taken
+	// before the first edit would answer false for every node.
+	t.ensureDependsOnColumnPropagated()
 
 	out := &Tree{
-		source:                     t.source,
-		sourceEncoding:             t.sourceEncoding,
-		sourceUTF16:                t.sourceUTF16,
-		utf16Map:                   t.utf16Map,
-		language:                   t.language,
-		parseRuntime:               t.parseRuntime,
+		source:         t.source,
+		sourceEncoding: t.sourceEncoding,
+		sourceUTF16:    t.sourceUTF16,
+		utf16Map:       t.utf16Map,
+		language:       t.language,
+		// A fresh block, not a shared pointer: out must never alias t's
+		// pooled parseRuntime, since the two trees release independently.
+		parseRuntime:               acquireParseRuntime(),
 		resultErrorSummary:         t.resultErrorSummary,
 		resultCompatibilityApplied: t.resultCompatibilityApplied,
 		tokenInvariantReadSpan:     t.tokenInvariantReadSpan,
+		eofExtraTokenSourceProofID: t.eofExtraTokenSourceProofID,
+		// The copied nodes have different identities. Reanchor a later edit
+		// using the authenticated span instead of retaining an original node.
 		// Reuse-provenance flags must survive Copy: cloneNodeHeaderInto keeps the
 		// per-node stamped/replayed states, so a copy that dropped these would
 		// become reuse-eligible on the standard DFA path and splice replayed or
@@ -3819,7 +4388,12 @@ func (t *Tree) Copy() *Tree {
 		incrementalReuseDisabled:          t.incrementalReuseDisabled,
 		incrementalReuseUnsupportedClause: t.incrementalReuseUnsupportedClause,
 		compactMaterialized:               t.compactMaterialized,
+		// The clone carries every node's folded column-dependency bit, so
+		// the copy must not fold again. Copy also carries t.edits, and a
+		// second fold would decline on those and leave the copy stuck.
+		dependsOnColumnPropagated: t.dependsOnColumnPropagated,
 	}
+	*out.parseRuntime = *t.rawParseRuntime()
 	if len(t.edits) > 0 {
 		out.edits = make([]InputEdit, len(t.edits))
 		copy(out.edits, t.edits)
@@ -3836,6 +4410,13 @@ func (t *Tree) Copy() *Tree {
 	arena.inheritExternalScannerCheckpointIdentity(t.arena)
 	out.root = cloneTreeNodesIntoArena(t.root, arena)
 	out.arena = arena
+	arena.legacyIncrementalReuseCertified = t.hasCertifiedIncrementalReuse()
+	arena.legacyNoPolicyPruning = t.hasCertifiedUnprunedPolicy()
+	// The clone reproduced every recorded bit, so close the destination
+	// arena as well. A later fold on the copy then stops at the root.
+	if out.dependsOnColumnPropagated {
+		arena.markDependsOnColumnFolded()
+	}
 	return out
 }
 
@@ -3986,7 +4567,15 @@ func cloneNodeHeaderInto(dst, src *Node, arena *nodeArena, offset *cloneOffset) 
 	if mask := src.supertypeMask(); mask != 0 && arena != nil {
 		arena.setNodeSupertypeMask(dst, mask)
 	}
+	// depends_on_column lives in an arena side table, not in dst's copied
+	// header, so re-record it explicitly against the destination arena.
+	if arena != nil && src.dependsOnColumn() {
+		arena.setNodeDependsOnColumnBit(dst, true)
+	}
 	copyCompactReuseDependency(dst, src)
+	if src.ownerArena != nil && src.ownerArena.legacyReuseReads != nil {
+		copyLegacyReuseLeafReceipt(dst, src)
+	}
 	if !copyMissingNodeDependency(dst, src, offset) {
 		if _, present := missingNodeDependencyEntryForNode(src); present {
 			dst.setDirty(true)
@@ -4126,6 +4715,7 @@ func cloneStackEntryIntoArena(srcArena, dstArena *nodeArena, entry stackEntry, o
 	if leaf := stackEntryCompactFullLeaf(entry); leaf != nil {
 		cloned := dstArena.allocCompactFullLeaf()
 		*cloned = *leaf
+		dstArena.noteClonedColumnDependency(cloned.dependsOnColumn)
 		if perfCountersEnabled {
 			if metrics == cloneMetricScopeOffset {
 				perfRecordCloneOffsetCompactCopy()
@@ -4154,6 +4744,7 @@ func cloneStackEntryIntoArena(srcArena, dstArena *nodeArena, entry stackEntry, o
 	if noTree := stackEntryNoTreeNode(entry); noTree != nil {
 		cloned := dstArena.allocNoTreeNode()
 		*cloned = *noTree
+		dstArena.noteClonedColumnDependency(cloned.dependsOnColumn)
 		if perfCountersEnabled {
 			if metrics == cloneMetricScopeOffset {
 				perfRecordCloneOffsetCompactCopy()
@@ -4226,6 +4817,7 @@ func clonePendingParentIntoArena(srcArena, dstArena *nodeArena, src *pendingPare
 	childCount := src.childEntryCount()
 	dst := newPendingParentShellInArena(dstArena, src.symbol, src.isNamed(), src.productionID, childCount, src.startByte, src.endByte, src.startPoint, src.endPoint, src.hasError())
 	dst.noTreeNode = src.noTreeNode
+	dstArena.noteClonedColumnDependency(dst.dependsOnColumn)
 	dst.startPoint = src.startPoint
 	dst.endPoint = src.endPoint
 	applyCloneOffsetToPendingParent(dst, offset)
@@ -4339,7 +4931,7 @@ func (t *Tree) ParseStoppedEarly() bool {
 // normalization code must use this accessor until the tree is returned; public
 // observers use ParseStopReason and join the synchronized finalization boundary.
 func (t *Tree) rawParseStopReason() ParseStopReason {
-	if t == nil || t.parseRuntime.StopReason == "" {
+	if t == nil || t.parseRuntime == nil || t.parseRuntime.StopReason == "" {
 		return ParseStopNone
 	}
 	return t.parseRuntime.StopReason
@@ -4349,11 +4941,25 @@ func (t *Tree) rawParseStopReason() ParseStopReason {
 // It intentionally does not initiate deferred result compatibility.
 func (t *Tree) rawParseStoppedEarly() bool {
 	switch t.rawParseStopReason() {
-	case ParseStopIterationLimit, ParseStopStackDepthLimit, ParseStopNodeLimit, ParseStopMemoryBudget, ParseStopReuseBudget, ParseStopTokenSourceEOF, ParseStopTimeout, ParseStopCancelled, ParseStopInvariantViolation:
+	case ParseStopAcceptedPrefix, ParseStopIterationLimit, ParseStopStackDepthLimit, ParseStopNodeLimit, ParseStopMemoryBudget, ParseStopReuseBudget, ParseStopTokenSourceEOF, ParseStopTimeout, ParseStopCancelled, ParseStopInvariantViolation:
 		return true
 	default:
 		return false
 	}
+}
+
+// rawParseEligibleForFreshRetryLadder reports whether a fresh top-level
+// parse's first tree may still enter the full-parse retry ladder even
+// though it stopped early. Only a node-limit stop is eligible here: the
+// ladder holds a bounded, documented node-budget widening
+// (fullParseRetryNodeLimitOverride) for that one reason. Every other early
+// stop stays a hard stop and returns the tree unchanged, matching
+// rawParseStoppedEarly.
+func (t *Tree) rawParseEligibleForFreshRetryLadder() bool {
+	if !t.rawParseStoppedEarly() {
+		return true
+	}
+	return t.rawParseStopReason() == ParseStopNodeLimit
 }
 
 // ParseRuntime returns parser-loop diagnostics captured when this tree was built.
@@ -4390,15 +4996,52 @@ func (t *Tree) RecoveryNodeMemoRuntime() RecoveryNodeMemoRuntime {
 	}
 }
 
+// The arena owns these immutable proof attributes alongside lexer receipts.
+// Keep them outside the public runtime record and preserve them on Copy.
+func (t *Tree) hasCertifiedIncrementalReuse() bool {
+	return t != nil && t.arena != nil && t.arena.legacyIncrementalReuseCertified
+}
+
+func (t *Tree) hasCertifiedUnprunedPolicy() bool {
+	return incr.PruningCertificateVersion == 1 && t != nil && t.arena != nil && t.arena.legacyNoPolicyPruning
+}
+
 // rawParseRuntime returns the parser-captured runtime record without running
 // deferred result compatibility and without the public accessor's live arena
-// counter overlay. Parser-owned decision helpers may use it only while the tree
-// is alive and must not mutate the result.
+// counter overlay. Parser-owned decision helpers may use it only while the
+// tree is alive and must not mutate the result.
+//
+// This is READ-ONLY: it never allocates and never writes to t. A Tree with no
+// block of its own (t.parseRuntime == nil — not expected on any current
+// construction path, since every one of them acquires eagerly, but Tree is
+// documented safe for concurrent reads, so this must not backfill lazily)
+// gets a pointer to the shared parseRuntimeNone zero value instead. Callers
+// that need to write must call ensureParseRuntime, never assign through the
+// pointer this returns.
 func (t *Tree) rawParseRuntime() *ParseRuntime {
 	if t == nil {
 		return nil
 	}
-	return &t.parseRuntime
+	if t.parseRuntime == nil {
+		return &parseRuntimeNone
+	}
+	return t.parseRuntime
+}
+
+// ensureParseRuntime returns t's own runtime block, allocating one from the
+// pool and storing it on t first if this Tree has none yet. Only call this
+// from a write site. Every construction path acquires eagerly already
+// (NewTree, resetTreeForReuse, Copy), so in practice this never allocates;
+// it exists as a fail-safe for a Tree assembled some other way, for example a
+// bare &Tree{} literal in a test.
+func (t *Tree) ensureParseRuntime() *ParseRuntime {
+	if t == nil {
+		return nil
+	}
+	if t.parseRuntime == nil {
+		t.parseRuntime = acquireParseRuntime()
+	}
+	return t.parseRuntime
 }
 
 // ArenaBreakdown returns optional arena/materialization attribution captured
@@ -4417,7 +5060,7 @@ func (t *Tree) setParseRuntime(rt ParseRuntime) {
 	if rt.StopReason == "" {
 		rt.StopReason = ParseStopNone
 	}
-	t.parseRuntime = rt
+	*t.ensureParseRuntime() = rt
 }
 
 func (t *Tree) setRecoveryNodeMemoRuntime(rt RecoveryNodeMemoRuntime) {
@@ -4616,9 +5259,15 @@ func inputEditIsSingleByteReplacement(edit InputEdit) bool {
 // Edit records an edit on this tree. Call this before ParseIncremental to
 // inform the parser which regions changed. The edit adjusts byte offsets
 // and marks overlapping nodes as dirty so the incremental parser knows
-// what to re-parse.
+// what to re-parse. Does nothing for a nil tree.
 func (t *Tree) Edit(edit InputEdit) {
+	if t == nil {
+		return
+	}
+	t.setIncrementalFreshVerified(false)
 	t.ensureResultCompatibility()
+	t.ensureDependsOnColumnPropagated()
+	t.prepareLegacyReuseDependencies()
 	t.editCompactReuseDependencies(edit)
 	if perfCountersEnabled {
 		perfRecordNodeEditCall()
@@ -4642,17 +5291,101 @@ func (t *Tree) Edit(edit InputEdit) {
 	}
 }
 
-// Edits returns the pending edits recorded on this tree.
-func (t *Tree) Edits() []InputEdit { return t.edits }
+// ensureDependsOnColumnPropagated folds the leaf column-dependency bits up
+// the tree once, before the first edit walk reads them. A parse whose
+// external scanner never read a column records nothing, so the fold does not
+// run at all and a full parse pays one integer compare.
+//
+// Cost on a grammar that does read columns. Measured on COBOL, which is the
+// worst case today because its scanner disables incremental reuse, so every
+// round lands in a fresh open arena and the fold runs over the whole tree:
+//
+//	300 lines:  Tree.Edit 5.1 us -> 30.4 us
+//	1200 lines: Tree.Edit 21.0 us -> 140.6 us
+//
+// That is about six times the bare Tree.Edit cost, and it grows linearly
+// with file size. Against the incremental round it shares, the fold is 0.9
+// percent at 300 lines and 1.3 percent at 1200 lines. A grammar that keeps
+// reuse alive pays far less: the fold stops at the first node of every
+// borrowed arena, so it walks only what the new parse built.
+func (t *Tree) ensureDependsOnColumnPropagated() {
+	if t == nil || t.dependsOnColumnPropagated || t.root == nil {
+		return
+	}
+	// The span records use the coordinates the parse produced. A tree that
+	// already carries edits no longer matches them, so skip the fold there
+	// and keep the node records the first fold wrote.
+	if len(t.edits) != 0 {
+		return
+	}
+	t.dependsOnColumnPropagated = true
+	if !treeArenasRecordDependsOnColumn(t) {
+		return
+	}
+	propagateDependsOnColumnSubtree(t.root)
+	t.markTreeArenasDependsOnColumnFolded()
+}
 
-// ChangedRanges converts this tree's recorded edits into changed source ranges.
-// Overlapping ranges are coalesced.
+// treeArenasRecordDependsOnColumn reports whether any arena backing this
+// tree recorded a column-dependent leaf.
+func treeArenasRecordDependsOnColumn(t *Tree) bool {
+	if t.arena != nil && t.arena.dependsOnColumnRecords != 0 {
+		return true
+	}
+	if t.root.ownerArena != nil && t.root.ownerArena.dependsOnColumnRecords != 0 {
+		return true
+	}
+	for _, borrowed := range t.borrowedArena {
+		if borrowed != nil && borrowed.dependsOnColumnRecords != 0 {
+			return true
+		}
+	}
+	return false
+}
+
+// markTreeArenasDependsOnColumnFolded closes the arenas the fold just
+// walked. The fold skips an arena that is already closed, so the next tree
+// built on these arenas pays only for the nodes its own parse created.
+//
+// It closes only the two arenas the fold entered from. A borrowed arena is
+// already closed, because the fold stops at its first node and a tree can
+// borrow a subtree only from a tree that ran its own fold. Closing a
+// borrowed arena here would be the one place that could close an arena this
+// tree never walked, which is exactly what the early return in
+// propagateDependsOnColumnSubtree relies on not happening.
+func (t *Tree) markTreeArenasDependsOnColumnFolded() {
+	t.arena.markDependsOnColumnFolded()
+	if t.root != nil {
+		t.root.ownerArena.markDependsOnColumnFolded()
+	}
+}
+
+// Edits returns the pending edits recorded on this tree. Returns nil for
+// a nil tree.
+func (t *Tree) Edits() []InputEdit {
+	if t == nil {
+		return nil
+	}
+	return t.edits
+}
+
+// ChangedRanges converts this tree's recorded edits into changed source
+// ranges, in the coordinates of the final source (the state after every
+// recorded edit has been applied). Overlapping ranges are coalesced.
 func (t *Tree) ChangedRanges() []Range {
 	if t == nil || len(t.edits) == 0 {
 		return nil
 	}
 	ranges := make([]Range, 0, len(t.edits))
 	for _, e := range t.edits {
+		// Every range recorded so far was captured in the source coordinates
+		// that existed right before e. An edit that lands earlier in the
+		// source than an already-recorded range shifts that range's byte
+		// offsets and points, so re-express each one in e's post-edit
+		// coordinates before adding e's own range.
+		for i := range ranges {
+			shiftChangedRangeForEdit(&ranges[i], e)
+		}
 		ranges = append(ranges, Range{
 			StartByte:  e.StartByte,
 			EndByte:    e.NewEndByte,
@@ -4661,6 +5394,37 @@ func (t *Tree) ChangedRanges() []Range {
 		})
 	}
 	return coalesceRanges(ranges)
+}
+
+// shiftChangedRangeForEdit re-expresses r, a changed range recorded in the
+// source coordinates before edit, in the coordinates after edit is applied.
+// edit may fall entirely after r (r is unaffected), entirely before r
+// (translate r by edit's delta), or overlap r (widen r to cover the part of
+// edit's replaced region that r did not already cover).
+func shiftChangedRangeForEdit(r *Range, edit InputEdit) {
+	if edit.StartByte >= r.EndByte {
+		return
+	}
+	byteDelta := int64(edit.NewEndByte) - int64(edit.OldEndByte)
+	rowDelta := int64(edit.NewEndPoint.Row) - int64(edit.OldEndPoint.Row)
+	if edit.OldEndByte <= r.StartByte {
+		r.StartByte = addUint32Delta(r.StartByte, byteDelta)
+		r.StartPoint = shiftPointAfterEdit(r.StartPoint, edit, rowDelta)
+		r.EndByte = addUint32Delta(r.EndByte, byteDelta)
+		r.EndPoint = shiftPointAfterEdit(r.EndPoint, edit, rowDelta)
+		return
+	}
+	if edit.StartByte < r.StartByte {
+		r.StartByte = edit.StartByte
+		r.StartPoint = edit.StartPoint
+	}
+	if edit.OldEndByte >= r.EndByte {
+		r.EndByte = edit.NewEndByte
+		r.EndPoint = edit.NewEndPoint
+	} else {
+		r.EndByte = addUint32Delta(r.EndByte, byteDelta)
+		r.EndPoint = shiftPointAfterEdit(r.EndPoint, edit, rowDelta)
+	}
 }
 
 func rangesOverlapOrTouch(a, b Range) bool {
@@ -4721,8 +5485,149 @@ func addUint32Delta(value uint32, delta int64) uint32 {
 	return uint32(next)
 }
 
-// editNodeSingleByteReplacement marks the affected path without recomputing unchanged spans.
+// editColumnRule carries the per-frame inputs of C tree-sitter's
+// depends_on_column guards in ts_subtree_edit (subtree.c). C breaks out of the
+// child loop at the first child that starts after the edit only when both
+// column guards also allow it:
+//
+//   - the parent guard: the parent does not depend on its column, or a line
+//     break already separates this child from the parent's content start;
+//   - the child guard: the child does not depend on its column, or the edit
+//     did not move the text after it, or a line break already separates this
+//     child from the end of the edited region.
+//
+// When either guard refuses, C keeps editing the later children of the line
+// and marks them changed, so a column-sensitive scanner re-lexes them.
+//
+// C reads the child guard from the edit it rebased into the current frame,
+// and it collapses new_end onto start once a child has absorbed the inserted
+// text (subtree.c). Inside a later touching child C therefore sees a shifted
+// column almost always. This runtime keeps one absolute edit per walk, so it
+// takes the conservative reading instead: any edit that moves the text after
+// it counts as a column shift. The extra marks land only on children that
+// already depend on their column.
+type editColumnRule struct {
+	parentDependsOnColumn bool
+	columnShifted         bool
+	parentStartRow        uint32
+	editOldEndRow         uint32
+}
+
+// active reports whether either guard can refuse a break. An arena whose parse
+// never read a column leaves both guards off, so the walk keeps its old shape.
+func (r editColumnRule) active() bool {
+	return r.parentDependsOnColumn || r.columnShifted
+}
+
+// breaksAt reports whether the child loop may stop at a child that begins
+// after the edit. childLeftRow is the row of the previous sibling's end, or
+// the parent's start row for the first child, matching C's child_left.
+func (r editColumnRule) breaksAt(childDependsOnColumn bool, childLeftRow uint32) bool {
+	if r.parentDependsOnColumn && childLeftRow <= r.parentStartRow {
+		return false
+	}
+	if childDependsOnColumn && r.columnShifted && childLeftRow <= r.editOldEndRow {
+		return false
+	}
+	return true
+}
+
+// editShiftsTextAfterIt reports the conservative column-shift reading: the
+// edit changes the byte length or the end point, so every byte after it
+// moves. It equals the hasTailShift predicate the edit walk already computes.
+func editShiftsTextAfterIt(edit InputEdit) bool {
+	return edit.NewEndByte != edit.OldEndByte || edit.NewEndPoint != edit.OldEndPoint
+}
+
+// markColumnDependentSubtreeChanged ports the C frame that runs for a child
+// the column guards refused to break at. C re-enters that child with a
+// collapsed no-op edit, which sets has_changes on the child and then repeats
+// the same guards one level down. The collapsed edit never moves columns, so
+// only the parent guard can refuse there.
+func markColumnDependentSubtreeChanged(n *Node) {
+	if n == nil {
+		return
+	}
+	n.setDirty(true)
+	if perfCountersEnabled {
+		perfRecordNodeEditMarked()
+	}
+	childCount := nodeChildCountNoMaterialize(n)
+	if childCount == 0 {
+		return
+	}
+	parentDependsOnColumn := n.dependsOnColumn()
+	prevEndRow := n.startPoint.Row
+	if !nodeHasFinalChildRefs(n) {
+		for i, c := range n.children {
+			if c == nil {
+				continue
+			}
+			if i > 0 && (!parentDependsOnColumn || prevEndRow > n.startPoint.Row) {
+				break
+			}
+			endRow := c.endPoint.Row
+			markColumnDependentSubtreeChanged(c)
+			prevEndRow = endRow
+		}
+		return
+	}
+	for i := 0; i < childCount; i++ {
+		entry, ok := nodeChildEntryAtNoMaterialize(n, i)
+		if !ok {
+			continue
+		}
+		if i > 0 && (!parentDependsOnColumn || prevEndRow > n.startPoint.Row) {
+			break
+		}
+		endRow := stackEntryNodeEndPoint(entry).Row
+		markColumnDependentStackEntryChanged(n.ownerArena, entry)
+		prevEndRow = endRow
+	}
+}
+
+// markColumnDependentStackEntryChanged is markColumnDependentSubtreeChanged
+// for the compact pending-parent lane.
+func markColumnDependentStackEntryChanged(arena *nodeArena, entry stackEntry) {
+	if node := stackEntryNode(entry); node != nil {
+		markColumnDependentSubtreeChanged(node)
+		return
+	}
+	if !stackEntryHasNode(entry) {
+		return
+	}
+	setStackEntryDirty(entry, true)
+	if perfCountersEnabled {
+		perfRecordNodeEditMarked()
+	}
+	parent := stackEntryPendingParent(entry)
+	if parent == nil {
+		return
+	}
+	parentDependsOnColumn := parent.dependsOnColumn
+	startRow := parent.startPoint.Row
+	prevEndRow := startRow
+	childCount := parent.childEntryCount()
+	for i := 0; i < childCount; i++ {
+		child := parent.childEntry(arena, i)
+		if !stackEntryHasNode(child) {
+			continue
+		}
+		if i > 0 && (!parentDependsOnColumn || prevEndRow > startRow) {
+			break
+		}
+		endRow := stackEntryNodeEndPoint(child).Row
+		markColumnDependentStackEntryChanged(arena, child)
+		prevEndRow = endRow
+	}
+}
+
+// editNodeSingleByteReplacement marks the affected path without recomputing
+// unchanged spans.
 func editNodeSingleByteReplacement(n *Node, edit InputEdit, leafHint **Node) {
+	if editLegacyLookaheadOnly(n, edit) {
+		return
+	}
 	if editMissingNodeDependency(n, edit, 0, 0) {
 		if leafHint != nil {
 			*leafHint = n
@@ -4747,12 +5652,29 @@ func editNodeSingleByteReplacement(n *Node, edit InputEdit, leafHint **Node) {
 	}
 
 	descended := false
+	// A single-byte replacement keeps every byte offset and every point,
+	// so editShiftsTextAfterIt answers false and only the parent guard can
+	// refuse a break here.
+	rule := editColumnRule{
+		parentDependsOnColumn: n.dependsOnColumn(),
+		columnShifted:         editShiftsTextAfterIt(edit),
+		parentStartRow:        n.startPoint.Row,
+		editOldEndRow:         edit.OldEndPoint.Row,
+	}
+	prevEndRow := n.startPoint.Row
 	for _, child := range n.children {
+		childLeftRow := prevEndRow
+		prevEndRow = child.endPoint.Row
 		if nodeEndsBeforeEditDependency(child, edit.StartByte) {
 			continue
 		}
 		if child.startByte >= edit.OldEndByte {
-			break
+			if !rule.active() || rule.breaksAt(child.dependsOnColumn(), childLeftRow) {
+				break
+			}
+			markColumnDependentSubtreeChanged(child)
+			descended = true
+			continue
 		}
 		descended = true
 		editNodeSingleByteReplacement(child, edit, leafHint)
@@ -4763,6 +5685,9 @@ func editNodeSingleByteReplacement(n *Node, edit InputEdit, leafHint **Node) {
 }
 
 func editNodeWithDelta(n *Node, edit InputEdit, byteDelta, rowDelta int64, hasTailShift bool, shiftScratch *[]*Node, leafHint **Node) {
+	if editLegacyLookaheadOnly(n, edit) {
+		return
+	}
 	if editMissingNodeDependency(n, edit, byteDelta, rowDelta) {
 		if leafHint != nil {
 			*leafHint = n
@@ -4772,8 +5697,20 @@ func editNodeWithDelta(n *Node, edit InputEdit, byteDelta, rowDelta int64, hasTa
 	if missingNodeDependencyNoopAtEnd(n, edit) {
 		return
 	}
+	// A read dependency reaches beyond visible text without extending its
+	// span. Span-changing edits retain these clean candidates for the fresh
+	// verifier; never clamp an earlier subtree to the edit's new end.
+	if n.endByte < edit.StartByte && !n.hasError() && !n.isMissing() {
+		return
+	}
 	// If the node ends before the edit starts, it's completely unaffected.
-	if nodeEndsBeforeEditDependency(n, edit.StartByte) {
+	// Arena-backed and compact materialized nodes retain conservative
+	// boundary invalidation when a read certificate is unavailable. Their
+	// descendants may still depend on the following byte; public nodes
+	// constructed without an arena have only their visible spans.
+	if nodeEndsBeforeEditDependency(n, edit.StartByte) &&
+		!(hasTailShift && n.endByte == edit.StartByte &&
+			(n.ownerArena != nil || n.isCompactMaterialized())) {
 		return
 	}
 
@@ -4820,16 +5757,35 @@ func editNodeWithDelta(n *Node, edit InputEdit, byteDelta, rowDelta int64, hasTa
 	// Recurse only into children that can be affected.
 	descended := false
 	childCount := nodeChildCountNoMaterialize(n)
+	// hasTailShift is exactly editShiftsTextAfterIt(edit): the caller built
+	// it from the same byte delta and end point. Reuse it so the hot walk
+	// does not recompute the predicate per frame.
+	rule := editColumnRule{
+		parentDependsOnColumn: n.dependsOnColumn(),
+		columnShifted:         hasTailShift,
+		parentStartRow:        n.startPoint.Row,
+		editOldEndRow:         edit.OldEndPoint.Row,
+	}
+	prevEndRow := n.startPoint.Row
 	if !nodeHasFinalChildRefs(n) {
 		for _, c := range n.children {
-			if nodeEndsBeforeEditDependency(c, edit.StartByte) {
+			childLeftRow := prevEndRow
+			prevEndRow = c.endPoint.Row
+			if nodeEndsBeforeEditDependency(c, edit.StartByte) &&
+				!(hasTailShift && c.endByte == edit.StartByte &&
+					(c.ownerArena != nil || c.isCompactMaterialized())) {
 				continue
 			}
 			if c.startByte >= edit.OldEndByte {
-				if !hasTailShift {
+				invalidate := rule.active() && !rule.breaksAt(c.dependsOnColumn(), childLeftRow)
+				if !invalidate && !hasTailShift {
 					break
 				}
 				shiftSubtreeNodeAfterEdit(c, edit, byteDelta, rowDelta, shiftScratch)
+				if invalidate {
+					markColumnDependentSubtreeChanged(c)
+					descended = true
+				}
 				continue
 			}
 			descended = true
@@ -4841,14 +5797,28 @@ func editNodeWithDelta(n *Node, edit InputEdit, byteDelta, rowDelta int64, hasTa
 			if ok && perfCountersEnabled {
 				perfRecordNodeEditCompactRef()
 			}
-			if !ok || stackEntryEndsBeforeEditDependency(n.ownerArena, entry, edit.StartByte) {
+			childLeftRow := prevEndRow
+			if !ok {
+				// The entry is unavailable, so its end row is unknown.
+				// Keep row zero, which makes both guards refuse a break
+				// for every child that follows.
+				prevEndRow = 0
+				continue
+			}
+			prevEndRow = stackEntryNodeEndPoint(entry).Row
+			if stackEntryEndsBeforeEditDependency(n.ownerArena, entry, edit.StartByte) {
 				continue
 			}
 			if stackEntryNodeStartByte(entry) >= edit.OldEndByte {
-				if !hasTailShift {
+				invalidate := rule.active() && !rule.breaksAt(stackEntryDependsOnColumn(entry), childLeftRow)
+				if !invalidate && !hasTailShift {
 					break
 				}
 				shiftStackEntrySubtreeAfterEdit(n.ownerArena, entry, edit, byteDelta, rowDelta)
+				if invalidate {
+					markColumnDependentStackEntryChanged(n.ownerArena, entry)
+					descended = true
+				}
 				continue
 			}
 			descended = true
@@ -4895,16 +5865,33 @@ func editStackEntryWithDelta(arena *nodeArena, entry stackEntry, edit InputEdit,
 		return
 	}
 	childCount := parent.childEntryCount()
+	rule := editColumnRule{
+		parentDependsOnColumn: parent.dependsOnColumn,
+		columnShifted:         hasTailShift,
+		parentStartRow:        stackEntryNodeStartPoint(entry).Row,
+		editOldEndRow:         edit.OldEndPoint.Row,
+	}
+	prevEndRow := stackEntryNodeStartPoint(entry).Row
 	for i := 0; i < childCount; i++ {
 		child := parent.childEntry(arena, i)
-		if !stackEntryHasNode(child) || stackEntryEndsBeforeEditDependency(arena, child, edit.StartByte) {
+		childLeftRow := prevEndRow
+		if !stackEntryHasNode(child) {
+			prevEndRow = 0
+			continue
+		}
+		prevEndRow = stackEntryNodeEndPoint(child).Row
+		if stackEntryEndsBeforeEditDependency(arena, child, edit.StartByte) {
 			continue
 		}
 		if stackEntryNodeStartByte(child) >= edit.OldEndByte {
-			if !hasTailShift {
+			invalidate := rule.active() && !rule.breaksAt(stackEntryDependsOnColumn(child), childLeftRow)
+			if !invalidate && !hasTailShift {
 				break
 			}
 			shiftStackEntrySubtreeAfterEdit(arena, child, edit, byteDelta, rowDelta)
+			if invalidate {
+				markColumnDependentStackEntryChanged(arena, child)
+			}
 			continue
 		}
 		if perfCountersEnabled {

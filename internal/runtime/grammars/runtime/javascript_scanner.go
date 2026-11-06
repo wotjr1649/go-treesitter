@@ -497,7 +497,23 @@ func jsScanJsxText(lexer *gotreesitter.ExternalLexer, symbols *[jsTokenCount]got
 	onlyWhitespace := true
 
 	for lexer.Lookahead() != 0 && lexer.Lookahead() != '<' && lexer.Lookahead() != '>' &&
-		lexer.Lookahead() != '{' && lexer.Lookahead() != '}' && lexer.Lookahead() != '&' {
+		lexer.Lookahead() != '{' && lexer.Lookahead() != '}' {
+		if lexer.Lookahead() == '&' {
+			lexer.MarkEnd()
+			if jsScanHTMLCharacterReference(lexer) {
+				// A full html_character_reference (for example "&amp;")
+				// follows. Stop the text token here so that token can lex
+				// the entity, same as before this fix.
+				lexer.SetResultSymbol(symbols[jsTokJsxText])
+				return sawText
+			}
+			// C stops JSX text at '&'; leave invalid references for grammar recovery.
+			if !sawText {
+				return false
+			}
+			lexer.SetResultSymbol(symbols[jsTokJsxText])
+			return true
+		}
 		if lexer.Lookahead() == '/' && onlyWhitespace {
 			lexer.Advance(false)
 			if lexer.Lookahead() == '>' {
@@ -542,6 +558,64 @@ func jsScanJsxText(lexer *gotreesitter.ExternalLexer, symbols *[jsTokenCount]got
 	lexer.MarkEnd()
 	lexer.SetResultSymbol(symbols[jsTokJsxText])
 	return sawText
+}
+
+// jsScanHTMLCharacterReference reports whether the lexer, positioned at
+// '&', is looking at a complete html_character_reference as defined in
+// grammargen/javascript_grammar.go:
+//
+//	&(#([xX][0-9a-fA-F]{1,6}|[0-9]{1,5})|[A-Za-z]{1,30});
+//
+// It always consumes at least '&'. Callers mark the token boundary first so
+// invalid references can be left to the grammar.
+func jsScanHTMLCharacterReference(lexer *gotreesitter.ExternalLexer) bool {
+	lexer.Advance(false) // '&'
+	if lexer.Lookahead() == '#' {
+		lexer.Advance(false)
+		if lexer.Lookahead() == 'x' || lexer.Lookahead() == 'X' {
+			lexer.Advance(false)
+			n := 0
+			for isJsHexDigit(lexer.Lookahead()) && n < 6 {
+				lexer.Advance(false)
+				n++
+			}
+			if n == 0 || lexer.Lookahead() != ';' {
+				return false
+			}
+			lexer.Advance(false)
+			return true
+		}
+		n := 0
+		for isJsASCIIDigit(lexer.Lookahead()) && n < 5 {
+			lexer.Advance(false)
+			n++
+		}
+		if n == 0 || lexer.Lookahead() != ';' {
+			return false
+		}
+		lexer.Advance(false)
+		return true
+	}
+	n := 0
+	for isJsASCIILetter(lexer.Lookahead()) && n < 30 {
+		lexer.Advance(false)
+		n++
+	}
+	if n == 0 || lexer.Lookahead() != ';' {
+		return false
+	}
+	lexer.Advance(false)
+	return true
+}
+
+func isJsASCIIDigit(r rune) bool { return r >= '0' && r <= '9' }
+
+func isJsASCIILetter(r rune) bool {
+	return (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z')
+}
+
+func isJsHexDigit(r rune) bool {
+	return isJsASCIIDigit(r) || (r >= 'a' && r <= 'f') || (r >= 'A' && r <= 'F')
 }
 
 func jsValid(vs []bool, i int) bool { return i < len(vs) && vs[i] }

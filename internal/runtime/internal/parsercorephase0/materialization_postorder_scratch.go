@@ -1,11 +1,14 @@
 package parsercorephase0
 
-import "errors"
+import (
+	"errors"
+	"math"
+	"unsafe"
+)
 
 type materializationPostorderFrame struct {
-	id     SubtreeID
-	next   uint32
-	record *subtreeRecord
+	id   SubtreeID
+	next uint32
 	// The replay fields carry the top-down parse-state replay through the
 	// same traversal. cursor is the state after the children visited so far,
 	// which is the next child's pre-goto state. pre and state are this
@@ -24,6 +27,11 @@ type materializationPostorderFrame struct {
 // visit assigns the same states as the separate top-down replay.
 type MaterializationReplayTransition func(pre StateID, view MaterializationReplayView) (StateID, bool, error)
 
+// MaterializationReplayBorrowedTransition reads one temporary replay view.
+// The view expires when the callback returns. Callers must not retain its
+// pointer, mutate it, or mutate Core during the traversal.
+type MaterializationReplayBorrowedTransition func(pre StateID, view *MaterializationReplayView) (StateID, bool, error)
+
 // MaterializationPostorderScratch retains the transient ownership colors and
 // iterative traversal stack for VisitMaterializationPostorderWithScratch.
 // Callers must not use one scratch concurrently or reentrantly.
@@ -32,8 +40,24 @@ type MaterializationPostorderScratch struct {
 	frames []materializationPostorderFrame
 	// view is the visit argument. It lives in the scratch so the pointer
 	// visitor does not move a fresh view to the heap on every subtree.
-	view  MaterializationSubtreeView
-	inUse bool
+	view       MaterializationSubtreeView
+	replayView MaterializationReplayView
+	inUse      bool
+}
+
+// RetainedBytes counts backing storage even after Reset clears the lengths.
+// The traversal's inline state belongs to its caller's scratch allocation.
+func (scratch *MaterializationPostorderScratch) RetainedBytes() uint64 {
+	if scratch == nil {
+		return 0
+	}
+	colors := uint64(cap(scratch.colors))
+	frames := uint64(cap(scratch.frames))
+	size := uint64(unsafe.Sizeof(materializationPostorderFrame{}))
+	if frames > (math.MaxUint64-colors)/size {
+		return math.MaxUint64
+	}
+	return colors + frames*size
 }
 
 // Reset clears traversal state while retaining the backing storage for reuse.
@@ -48,6 +72,7 @@ func (scratch *MaterializationPostorderScratch) Reset() {
 	}
 	scratch.frames = scratch.frames[:0]
 	scratch.view = MaterializationSubtreeView{}
+	scratch.replayView = MaterializationReplayView{}
 	scratch.inUse = false
 }
 
@@ -120,6 +145,30 @@ func (c *Core) VisitMaterializationPostorderPrebuilt(
 	prebuilt func(SubtreeID) bool,
 	visit func(SubtreeID, *MaterializationSubtreeView) error,
 ) error {
+	var borrowed MaterializationReplayBorrowedTransition
+	if transition != nil {
+		borrowed = func(pre StateID, view *MaterializationReplayView) (StateID, bool, error) {
+			return transition(pre, *view)
+		}
+	}
+	return c.VisitMaterializationPostorderPrebuiltWithBorrowedReplay(roots, poll, scratch, rootPre, borrowed, prebuilt, visit)
+}
+
+// VisitMaterializationPostorderPrebuiltWithBorrowedReplay preserves the full
+// traversal and validation of VisitMaterializationPostorderPrebuilt while
+// lending one scratch-owned replay view to each transition. Core must remain
+// unchanged throughout the traversal. Every frame carries the already checked
+// subtree ID; record storage is resolved from the fixed arena without retaining
+// a record pointer in the traversal stack.
+func (c *Core) VisitMaterializationPostorderPrebuiltWithBorrowedReplay(
+	roots []SubtreeID,
+	poll func() error,
+	scratch *MaterializationPostorderScratch,
+	rootPre StateID,
+	transition MaterializationReplayBorrowedTransition,
+	prebuilt func(SubtreeID) bool,
+	visit func(SubtreeID, *MaterializationSubtreeView) error,
+) error {
 	if c == nil || len(roots) == 0 {
 		return errors.New("parser-core phase zero: materialization requires at least one compact root")
 	}
@@ -144,6 +193,7 @@ func (c *Core) VisitMaterializationPostorderPrebuilt(
 	defer scratch.Reset()
 
 	colors := scratch.colors
+	records := c.subtrees
 	var reusedOwners map[uint32]SubtreeID
 	if len(c.reusedSubtrees) != 0 {
 		reusedOwners = make(map[uint32]SubtreeID)
@@ -158,9 +208,10 @@ func (c *Core) VisitMaterializationPostorderPrebuilt(
 			return errors.New("parser-core phase zero: compact subtree has repeated public-tree ownership")
 		}
 		colors[root] = 1
-		rootFrame := materializationPostorderFrame{id: root, record: record, prebuilt: prebuilt != nil && prebuilt(root)}
+		rootFrame := materializationPostorderFrame{id: root, prebuilt: prebuilt != nil && prebuilt(root)}
 		if transition != nil {
-			state, known, err := transition(rootPre, c.materializationReplayViewForRecord(root, record))
+			c.fillMaterializationReplayViewForRecord(root, record, &scratch.replayView)
+			state, known, err := transition(rootPre, &scratch.replayView)
 			if err != nil {
 				return err
 			}
@@ -177,7 +228,7 @@ func (c *Core) VisitMaterializationPostorderPrebuilt(
 				}
 			}
 			top := &scratch.frames[len(scratch.frames)-1]
-			record := top.record
+			record := &records[top.id-1]
 			if top.next < record.childCount {
 				child := c.children[record.firstChild+top.next]
 				top.next++
@@ -188,11 +239,12 @@ func (c *Core) VisitMaterializationPostorderPrebuilt(
 				switch colors[child] {
 				case 0:
 					colors[child] = 1
-					childFrame := materializationPostorderFrame{id: child, record: childRecord,
+					childFrame := materializationPostorderFrame{id: child,
 						prebuilt: top.prebuilt || (prebuilt != nil && prebuilt(child))}
 					if transition != nil {
 						childPre := top.cursor
-						state, known, err := transition(childPre, c.materializationReplayViewForRecord(child, childRecord))
+						c.fillMaterializationReplayViewForRecord(child, childRecord, &scratch.replayView)
+						state, known, err := transition(childPre, &scratch.replayView)
 						if err != nil {
 							return err
 						}
