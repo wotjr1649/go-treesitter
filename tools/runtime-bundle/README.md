@@ -54,3 +54,17 @@ The Go artifact keeps separate origin and C-derived product identities under
 ADR-0015. Current candidate results and unrun gates are in
 docs/reports/release-critical-status.md. Historical results remain bound to
 their original source, grammar, manifest, fixture and lane identities.
+
+## When to replay the importer
+
+A full replay writes a complete carrier (about 26 MiB, including grammar blobs) into a new directory.
+Routine cause experiments use `check.py` overlays or focused tests instead. Replay the importer only at
+patch-registration and integration-candidate boundaries, into a new `.scratch/<task>/<run>` directory, and
+keep the comparison receipt: file list, hashes, differences, and exit status.
+
+A replay tree whose result matches may be deleted after the session, under `docs/specs/validation.md`
+§ Scratch retention. A tree whose result does not match stays until its difference is explained and
+recorded.
+
+Do not change `import.py` to save space: `internal/provenance/runtime.json` binds its hash. Some patches
+modify grammar blobs (`GIT binary patch`), so the blobs must stay in the replay.
