@@ -81,7 +81,9 @@ their changing file or patch counts.
 identities.json.grammars records upstream-origin grammar blobs.
 identities.json.runtime.grammar_blobs records resulting product artifacts.
 ADR-0015 keeps the Go origin blob distinct from its C-derived product artifact;
-tools/runtime-bundle/grammars/go.json binds that conversion. Each product
+tools/runtime-bundle/grammars/go.json binds that conversion. The conversion
+still uses the v0.53.0 ts2go converter recorded there, and the Go product
+artifact is unchanged by the v0.56.0 transition. Each product
 artifact and its C comparisons require evidence for the exact current identity.
 Evidence from an earlier blob or manifest does not transfer.
 

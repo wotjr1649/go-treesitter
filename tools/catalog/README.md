@@ -24,7 +24,7 @@ limit and idempotent tree release. Each parse has a two-second timeout, a 1 MiB
 input limit, a 100,000-node snapshot limit and a 64 MiB runtime allocation budget.
 The process timeout is 30 seconds. The runtime budget is not a process RSS cap.
 
-`testdata/catalog/basic.json` preserves `ParseSmokeSamples` from the pinned
+`testdata/catalog/basic.json` preserves `ParseSmokeSamples` taken from the
 gotreesitter v0.53.0 runtime and their SHA-256 hashes. Its MIT notice is retained
 in `internal/runtime/LICENSE`. These samples establish basic catalog coverage;
 they do not establish C oracle parity. The seven Release-Critical paths retain

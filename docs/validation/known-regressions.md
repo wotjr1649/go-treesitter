@@ -3,8 +3,14 @@
 Authoritative list of failures that are known, upstream-owned, and signature-matched.
 Semantics and gate behavior: `docs/specs/validation.md` § Known-regression ratchet.
 
-A record here keeps the **Development gate green** and the **Release-Critical gate red** for the
-languages it names. It never loosens an assertion.
+An open record here keeps the **Development gate green** and the **Release-Critical gate red** for
+the languages it names. A retired record or a characterization is not a blocker by itself, but a
+failing retained test or characterization check still fails its gate. It never loosens an assertion.
+
+Each record is bound to the baseline identity it names. In a retired record, "current", "now" or
+"unchanged" describes the gotreesitter `v0.53.0` carrier in which it was observed or retired, not
+the `v0.56.0` candidate of ADR-0018. The candidate's own re-verification is recorded separately at
+the end of this register; no result transfers between the two identities.
 
 ## Record format
 
@@ -103,7 +109,9 @@ Two facts, read from the pinned sources:
           lexer->lookahead != '{' && lexer->lookahead != '}' && lexer->lookahead != '&') {
    ```
 
-   **`&` is in the C stop set.** The Go port's identical condition is faithful.
+   **`&` is in the C stop set.** At `v0.53.0` the Go port used the identical loop condition.
+   Upstream `v0.56.0` instead treats a bare `&` as literal JSX text, which diverges from C. The
+   candidate's `c-oracle-jsx-invalid-reference.patch` restores the C stop at `&` in the loop body.
 
 2. The only grammar rule that can consume the `&` is `html_character_reference`:
 
@@ -265,20 +273,20 @@ C-comparison claim is made. Product baseline remains unchanged.
 | Field | Value |
 |---|---|
 | Upstream issue | None filed; local diagnosis only. Do not associate this with the JSX issue. |
-| Baseline | Current pinned baseline and C# blob from identities.json |
+| Baseline | `v0.53.0` @ `c871b1f5`, C# grammar `88366631` and its blob (historical identity of this record) |
 | Fixture | `CS-JsonTextReader-excerpt`, SHA-256 `d76fd62cfc90076c11d86cb7d7a0058df181231aa3b34f30e549f650b5294d4a` |
 | Go state | accepted_with_errors, accepted, full 12,408-byte root; HasError=false, HasMissing=true; 1,919 nodes |
 | C state | full root; HasError=true, no missing nodes; 2,092 nodes |
 | First difference | node 5, namespace end: Go byte 12,407; C byte 12,405 |
 | Exact signature | source plus both ordered tree digests in known-differences.json |
 | Evidence | Session 06 Phase 2, E5; raw runtime reproduces the adapter's Go digest |
-| Release impact | C# Release-Critical remains blocked pending recovery attribution/resolution |
+| Release impact | At record time, C# Release-Critical was blocked pending recovery attribution/resolution. Retired in the `v0.53.0` carrier (below); not a current blocker |
 | Retirement | Authorized baseline or patch yields C agreement for this input and passes the affected corpus; preserve this historical record |
 
 The first Go missing node is `;` after `internal enum ReadType`, while C reports
 ERROR nodes later in the excerpt, including conditional enum members. The input
 does contain an enum body: no claim that it is an incomplete enum or invalid C#
-source is made. Full recovery correction remains open. The difference
+source is made. Full recovery correction was still open at that time. The difference
 originates in the pinned runtime, not the adapter; it is not a route-performance
 finding. The other two C# files agree for all represented node fields.
 
@@ -294,14 +302,15 @@ blocks in the full excerpt. This is a causal diagnosis, not a complete patch;
 neither diagnostic change is adopted. Exact traces, identities and rejected
 experiments are retained in that phase. The signature above is unchanged.
 
-Full-pass product retirement: the internal carrier now retains the pending
-lookahead of a missing-token sibling, preserves the C version ordering, counts
-hidden missing leaves, merges only clean suffixes over an identical closed
-error prefix, and orders tied positive-cost results by actual acceptance time.
-The original excerpt now matches all 2,092 C nodes and the existing no-enum
-control matches all 2,051. The 33-record order catalog and retained invariant
-checks enforce these cases. Origin, grammar blob and C epoch are unchanged.
-Historical statements above describe the original failure, not the carrier.
+Full-pass product retirement in the `v0.53.0` carrier: the internal carrier
+retained the pending lookahead of a missing-token sibling, preserved the C
+version ordering, counted hidden missing leaves, merged only clean suffixes over
+an identical closed error prefix, and ordered tied positive-cost results by
+actual acceptance time. The original excerpt then matched all 2,092 C nodes and
+the existing no-enum control matched all 2,051. The 33-record order catalog and
+retained invariant checks enforced these cases. Origin, grammar blob and C epoch
+were unchanged by that retirement. Historical statements above describe the
+original failure, not the carrier.
 
 ## KR-0003 — TypeScript/TSX upstream grammar patch difference (retired)
 
@@ -319,7 +328,7 @@ The following original definition and signature files are preserved as history.
 | Field | Value |
 |---|---|
 | Related upstream work | gotreesitter #1108, merged PR #1112; merge commit is an ancestor of the pinned baseline |
-| Baseline | Unchanged identities.json, including the existing TypeScript/TSX blobs |
+| Baseline | `v0.53.0` identities, including its TypeScript/TSX blobs (historical identity of this record) |
 | Fixtures | `testdata/oracle/typescript-contextual-cases.json`, eight authored LF sources with per-source hashes |
 | Affected set | `ts-newline-in`, `ts-newline-optional-in`, `tsx-newline-in`, `tsx-newline-optional-in` only |
 | Go state | accepted_clean, accepted, full root, no error or missing nodes |
@@ -327,12 +336,12 @@ The following original definition and signature files are preserved as history.
 | Controls | binary `in` across a newline and semicolon-separated `in` properties, in both routes, remain clean and equal |
 | Exact signatures | Four source/Go/C hashes in `testdata/oracle/typescript-contextual-differences.json` |
 | Evidence | Session 07 Phase 2, fresh Windows C execution and retained product test, E5 |
-| Release impact | TypeScript and TSX Release-Critical remain red until oracle policy and upstream grammar differences are resolved |
+| Release impact | At record time, TypeScript and TSX Release-Critical were red until oracle policy and upstream grammar differences were resolved. Retired; not a current blocker |
 | Retirement | Explicitly authorized grammar/oracle reconciliation followed by fresh exact comparisons; never silently add a C patch or make valid Go input erroneous |
 
 The upstream runtime includes a maintained TypeScript grammar/scanner patch.
-Its own C harness applies that patch too. Our current C receipts identify the
-original pinned grammar sources without that patch. PR #1112 explicitly limits
+Its own C harness applies that patch too. At record time our C receipts identified
+the original pinned grammar sources without that patch. PR #1112 explicitly limits
 its comparison to patched C. Consequently this record is a grammar-definition
 disagreement, not evidence that the Go port broke valid TypeScript. The earlier
 same-line `in` controls did not exercise the newline-sensitive scanner branch.
@@ -348,14 +357,14 @@ and does not approve a release.
 | Field | Value |
 |---|---|
 | Upstream issue | None filed; local bounded diagnosis, separate from KR-0002 |
-| Baseline | Unchanged identities.json and C# blob |
+| Baseline | `v0.53.0` identities and C# grammar `88366631` blob (historical identity of this record) |
 | Fixture | `CS-excerpt-no-enum` in `testdata/oracle/csharp-recovery-cases.json`; original MIT excerpt with only the enum section removed |
 | Go state | accepted_clean, accepted, full root, HasError=false, HasMissing=false; 1,910 nodes |
 | C state | full root, HasError=true; 2,051 nodes |
 | Exact signature | Source and ordered Go/C hashes in `testdata/oracle/csharp-recovery-differences.json` |
 | Controls | Original excerpt retains KR-0002; directive-free diagnostic control remains clean and equal |
 | Evidence | Session 07 Phase 2, fresh native C and retained product comparison, E5 |
-| Release impact | C# Release-Critical remains red; accepted_clean is not a C# correctness guarantee on affected recovery shapes |
+| Release impact | At record time, C# Release-Critical was red; accepted_clean was not a C# correctness guarantee on affected recovery shapes. Retired; not a current blocker |
 | Retirement | Authorized runtime correction preserves actual recovery errors and matches C for this fixture plus affected controls; preserve this historical record |
 
 Disabling C# compatibility reconstruction exposes errors but still yields a
@@ -371,7 +380,7 @@ These are measured, upstream-documented properties. Reporting them as defects is
 
 ### KC-0001 — C# compact declines on the recorded real corpus
 
-At the baseline, the recorded C# real-corpus parses decline the compact scheduler and fall back
+At the `v0.53.0` baseline (not re-measured for the `v0.56.0` candidate), the recorded C# real-corpus parses decline the compact scheduler and fall back
 to the classic GLR path. Upstream's pinned matrix records `c_sharp: 0 PASS / 2 FALLBACK`, the worst of
 the Release-Critical set (`go`, `python` 2/0; `javascript` 1/0; `typescript`, `tsx` 1/1).
 
@@ -401,8 +410,8 @@ Upstream's own C-parity test asserts `HasError() == false` for `jsontextreader_e
 classic production route with the compact route explicitly disabled. A downstream consumer observed
 `HasError() == true` on the same bytes with the compact route enabled (and therefore declined).
 
-**Not yet a ratchet** — not reproduced at the current baseline. The experiment that would settle it
-is a 2×2 over `{v0.52.0, v0.53.0} × {default route, compact disabled}`.
+**Not yet a ratchet** — not reproduced at the `v0.53.0` baseline. The experiment proposed to settle it
+was a 2×2 over `{v0.52.0, v0.53.0} × {default route, compact disabled}`.
 Until reproduced at the baseline, do not cite it as a defect of `v0.53.0`.
 
 Session 05 Phase 3 executed all four cells once per fixture with the same C#
@@ -411,15 +420,49 @@ the reported route-dependent error flag was not reproduced. All four instead
 contained a missing `;` at byte 335 (row 6, column 26), yielding
 `accepted_with_errors` under this repository's contract. A separate retained
 adapter test covers that receipt (E3). This is not a new ratchet or a claim of
-C# oracle agreement; C# differential diagnosis remains open. Node/token counts
+C# oracle agreement; C# differential diagnosis was still open at that time. Node/token counts
 and outcome were unchanged across cells. See Phase 3 evidence for conditions.
 
-Full-pass product retirement: source-based C# reconstruction no longer replaces
-an error-bearing native tree. The 41-record preservation catalog requires exact
-C nodes, error/missing flags, source ranges and all 40 edit comparisons. Private
+Full-pass product retirement in the `v0.53.0` carrier: source-based C#
+reconstruction no longer replaced an error-bearing native tree. The 41-record
+preservation catalog required exact C nodes, error/missing flags, source ranges and all 40 edit comparisons. Private
 core changes alone fixed the original large witness but still let reconstruction
 clear errors on smaller variants; that failed intermediate run is preserved.
 The independently inventoried KR-0002 and KR-0004 patches therefore form one
 verified product commit. Original signature JSON and C evidence are retained;
 neither C# case is an active exception. Release-wide platform, licensing and
 resource gates still have their own completion requirements.
+
+---
+
+## Re-verification at the `v0.56.0` candidate (ADR-0018)
+
+The candidate's identities are in `internal/provenance/identities.json`; see
+`docs/specs/baseline-provenance.md`. Its CGO-free Windows AMD64 product run passes
+the retained controls of the KR records above against C records regenerated for the
+candidate's grammar tuples. Ordered C comparisons (E5): `TestOracleRecords` (F1–F7
+in both JSX and TSX), `TestTypeScriptContextualOracleRecords`,
+`TestCSharpRecoveryOrigin`, `TestCSharpRecoveryOrderOracleRecords`,
+`TestCSharpRecoveryPreservationOracleRecords` and
+`TestCSharpRecoveryVariantOracleRecords`. Outcome and characterization controls
+(E3): `TestKR0001aCharacterization`, `TestKR0001bResolved`, `TestKR0001Controls`
+and `TestJSXEqualsEdits`. The candidate passes all of them; see
+[validation-0eee29e.json](../../artifacts/release-candidate/runtime-upgrade/validation-0eee29e.json).
+
+- The candidate changes the C# grammar pin. Its native C record for the KR-0002
+  excerpt has 2,090 nodes where the `v0.53.0` record had 2,092.
+  `TestCSharpRecoveryOrigin` compares the raw runtime with that identity-validated
+  record; the earlier count does not transfer.
+- The upstream `v0.56.0` JavaScript and TSX scanners do not contain the two
+  KR-0001b guards, and the candidate does not apply the KR-0001b patch. The
+  KR-0001b tests above pass without it. They ran with the candidate's own
+  patches applied. One of those patches changes bare `&` handling in the same
+  scanners, so the results do not show that upstream alone supplies the
+  KR-0001b behavior. The bare `&` characterization holds through that patch,
+  not through upstream.
+- `tools/runtime-bundle/source.json` lists the patches the candidate applies.
+  Patch files of the `v0.53.0` inventory that are not listed are not applied.
+  They remain in the repository until a separate retirement decision under
+  ADR-0013.
+- No regression record is open for the candidate. A new failure opens a new record; it is
+  never absorbed into a retired one.

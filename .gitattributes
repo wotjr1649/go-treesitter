@@ -14,3 +14,7 @@
 *.pdf -text
 # Preserve the exact bytes whose hashes identify downloaded CI receipts.
 artifacts/release-candidate/native-*/licenses.json -text
+# Preserve the exact sample bytes whose SHA-256 the runtime comparison projection records.
+artifacts/release-candidate/runtime-upgrade/*.csv -text
+# Preserve the exact bytes of local packaging and license receipts recorded by hash.
+artifacts/release-candidate/local-*/*.json -text

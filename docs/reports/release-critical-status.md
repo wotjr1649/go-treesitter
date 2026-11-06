@@ -1,5 +1,52 @@
 # Release-Critical status board
 
+Updated 2026-11-07. The runtime baseline candidate is described in
+[baseline-provenance](../specs/baseline-provenance.md). Its carrier applies 28
+patches (runtime manifest `b54a07c1…`, committed as `0eee29e`). It passed the
+local Windows AMD64 product checks below. It is not release-approved and is not
+integrated into main.
+
+[The candidate's verification projection](../../artifacts/release-candidate/runtime-upgrade/validation-0eee29e.json)
+binds commit, tree, commands, log hashes and omitted private fields. The checks ran
+on a clean checkout of a commit with exactly the tree of `0eee29e`, before
+`0eee29e` itself was created. The full product run passed 889
+terminal tests, the selected-grammar run passed 874, and the private runtime
+checker passed 6. None of those selections skipped a test. The 703-case core
+bundle includes ordered C comparisons and regression controls; it is not a count
+of unique C input records. All previously retained candidate C mismatches,
+including GO-third, are resolved for this identity. An earlier working-tree run
+of the same manifest is projected in
+[validation-28.json](../../artifacts/release-candidate/runtime-upgrade/validation-28.json).
+
+| Gate | Current candidate state |
+|---|---|
+| Windows AMD64 product | PASS (E3) on the tree of `0eee29e`: build, vet, full and selected-grammar tests, private invariants and native consumer execution. |
+| Retained core C comparisons | PASS (E5) on the tree of `0eee29e` for their pinned inputs and represented node/result fields. |
+| Runtime and grammar provenance | Product provenance checks pass. The importer reproduces all 1,561 inventoried carrier files. |
+| Local optional GPL module | Checks pass using a local go.work; official ZIP consumers remain a separate gate. |
+| Performance | A [controlled whole-product comparison](../../artifacts/release-candidate/runtime-upgrade/runtime-comparison.json) of v0.53.0 against a working tree with this candidate's runtime manifest `b54a07c1…` completed. It binds the manifest, benchmark inputs and binaries, but not the full source tree, so it is an observation for that manifest rather than an E4 result for `0eee29e`. Allocation volume falls in major full-parse workloads. Edit latency is mixed, and host load varied. No speed claim is made. |
+| C# grammar-kit pin check (ADR-0017 Decision 5) | Run with tsgk v0.2.0 (E2, local receipts). Origin: the commit-addressed GitHub tar.gz of tree-sitter-c-sharp `9150f7d5`, downloaded again, is byte-identical to the archive the oracle lane recorded, and its 8 grammar inputs match. `verify --archive` of the same commit's GitHub ZIP against an expected document built from those inputs: PASS, no differences (`parser.c` read under the kit's registered large-file exception; the expected document is caller-declared from the oracle snapshot). Product blob identity: observed (NOT_ASSESSED). Update review against the previous pin: verify FAIL on four changed files and schema diff FAIL with 28 static node-types changes (27 additions; `lambda_expression.parameters` widened to multiple). Both outcomes are expected for a pin update and do not approve the change. The previous pin's `parser.c` exceeds the kit file limit, so its old-to-new difference is not kit-reported. Fingerprints identify bytes, not authorship. |
+| C# constructs added by the new pin | OPEN coverage gap. The 84 retained C# oracle records, all at the new pin, contain no lambda and none of the added constructs (collection expressions, extension declarations, slice patterns, the new compound-assignment operator declarations). Carrier code that shapes `lambda_expression.parameters` (`parser_result_csharp.go`, `parser_result_csharp_query.go`) is therefore not compared with C for the widened field. |
+| Official module ZIPs and empty-cache consumers | NOT RUN yet for this candidate. |
+| Release license gate | NOT RUN yet for this candidate. |
+| Windows ARM64 native | NOT RUN for this candidate; cross-linking cannot replace execution. |
+| Race diagnostic | NOT RUN for this candidate (diagnostic lane; never a product gate). |
+| Remote/hosted CI | NOT RUN for this candidate. |
+| Release decision | Not made. |
+
+The exact current source and patch inventory remain in
+`internal/provenance/identities.json` and `tools/runtime-bundle/source.json`.
+No allocation optimization beyond the 28 inventoried patches is part of this
+candidate. Existing historical native CI results do not apply to this new
+identity. Current release requirements are in
+[validation](../specs/validation.md) and [publication](../specs/publication.md).
+
+## Historical evidence at the pre-upgrade identity
+
+Everything below is retained as historical evidence from the earlier
+v0.53.0 carrier and its candidate commits. It is not the status of the current
+candidate and does not satisfy its product or release gates.
+
 Updated 2026-10-23 (ADR-0017). **Release is not yet executed.** Brightscript
 and Cooklang are no longer distributed. At `d6c802a` the whole Windows workflow
 passed for the first time ([run 39949173766](https://github.com/wotjr1649/go-treesitter/actions/runs/39949173766)):

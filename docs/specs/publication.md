@@ -7,7 +7,11 @@ Keep the seven-route C oracle gate and the complete 204-entry basic catalog (ADR
 
 Session prompts, private handoffs, raw investigation output, temporary checkouts,
 build caches, profiles, dumps and personal machine/account configuration stay
-outside the public candidate. Keep original failures in the local archive and
+outside the public candidate. This applies to this project's own material.
+Third-party corresponding-source archives are distributed unmodified, as
+upstream publishes them. Build files that upstream committed inside such an
+archive are third-party content, not this project's configuration, and are
+disclosed where the archive is described. Keep original failures in the local archive and
 their regression controls in the public test suite. A public projection of a
 receipt identifies the original hash and states which fields were omitted;
 it must not pretend to be an unmodified original execution receipt.

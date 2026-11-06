@@ -28,6 +28,14 @@ Their scope and identities still apply: they are not universal parser guarantees
 or observations of a later candidate. Original failing controls and C trees
 remain in `testdata/oracle/`.
 
+`runtime-upgrade/` holds the public projections for the gotreesitter v0.56.0
+candidate (ADR-0018): `validation-28.json` records the local AMD64 product
+checks for runtime manifest `b54a07c1…`, and `runtime-comparison.json` with
+`runtime-comparison-samples.csv` records the controlled v0.53.0-to-candidate
+whole-product comparison. `validation-0eee29e.json` records the same product
+checks for the committed candidate `0eee29e`, run on a clean checkout of its
+tree. Each names its original local receipt hash and the fields it omits.
+
 Fresh candidate checks run in
 [the Windows workflow](../../.github/workflows/windows.yml). Its native AMD64
 and ARM64 jobs build official module ZIPs and execute empty-cache consumers.
