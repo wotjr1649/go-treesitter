@@ -378,20 +378,45 @@ expansion of KR-0002. Every changed or disappearing signature fails the test.
 
 | Field | Value |
 |---|---|
-| Upstream issue | None filed. Not yet attributed between upstream `v0.56.0` and the 28 carrier patches |
+| Upstream issue | None filed. Attribution (E2, local ablation; runs not retained in this repository): upstream `v0.56.0` code before C# result normalization; no carrier patch other than KR-0004 changes it (see below) |
 | Baseline | `v0.56.0` candidate identities in `internal/provenance/identities.json`; C# grammar `9150f7d5`; C build `e00a14ff…` |
 | Fixture | `CS-lambda-unclosed-params` in `testdata/oracle/csharp-kr0005-cases.json` (authored, MIT); source `3815cc16…`, 85 bytes |
 | Go state | accepted_with_errors, full root, HasError=true, HasMissing=false; 40 ordered nodes |
 | C state | full root, HasError=true; 41 ordered nodes in `windows-c-v2/cs-kr0005/` |
 | Exact signature | Source, ordered Go/C digests and first differing node 32 in `kr0005Signatures` (`internal/gtsadapter/oracle_test.go`) |
 | Difference | At byte 71 C keeps `lambda_expression` (71–81) holding `implicit_parameter`, `=>` and the body; Go places those three directly under the recovered parent. The raw runtime tree, before adapter shaping, already differs |
-| Controls | The 16 clean and recovery records of `csharp-constructs-cases.json` agree exactly, including the other two erroneous lambdas |
+| Controls | The 16 records of `csharp-constructs-cases.json` and the 7 of `csharp-lambda-modifier-cases.json` agree exactly, including four other erroneous lambdas |
 | Evidence | Session 13, one native C record and a product run (E5 for this input only) |
 | Release impact | C# Release-Critical is red for this recovery shape. Error flags agree; tree shape does not |
 | Retirement | A reviewed carrier patch (ADR-0013) or upstream fix makes Go match C for this fixture and every construct control |
 
 `TestKR0005CSharpLambdaRecovery` passes only while the exact signature holds.
 Agreement fails it as STALE; any other difference fails it as a new regression.
+
+Attribution (Session 13; E2, local ablation; the probes and regenerated trees
+are not retained in this repository).
+`tools/runtime-bundle/import.py` regenerated the carrier from the pinned module
+archive with different patch lists. Each tree was probed against the same C record.
+
+- Control: with all 28 patches, the regenerated files equal the committed
+  manifest, and the signature reproduces.
+- No patches (upstream `v0.56.0` alone): a worse, different tree. It has 12 nodes
+  and stops at `accepted_prefix` after 27 of 85 bytes.
+- Upstream plus only `KR-0004-csharp-preserve-recovery-errors.patch`: exactly the
+  KR-0005 signature.
+- Each of the other 27 patches was dropped, alone or together with the later
+  patches that depend on it, without changing the signature.
+- With the whole C# result-normalization dispatch disabled on the full carrier,
+  the signature is unchanged.
+
+That patch only lets the native recovery tree stand, instead of upstream's C#
+reconstruction, when the root has an error. Together with the disabled-
+normalization probe, this places the missing `lambda_expression` in upstream's
+parse and recovery or its language-independent result construction, not in a
+carrier patch. Go also places the
+`parameters`-labelled child and the unlabelled body directly in `ERROR`. This
+suggests that the hidden `_lambda_expression_init` was not reduced into
+`lambda_expression` before the error was wrapped (inference, not traced).
 
 ## Known characteristics (not regressions, not defects)
 
