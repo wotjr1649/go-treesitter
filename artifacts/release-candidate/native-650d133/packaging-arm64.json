@@ -1,0 +1,155 @@
+{
+  "status": "PASS",
+  "candidate_commit": "650d133b94c7c4d3e400d6d1d512d92c48a745cc",
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOARCH": "arm64",
+    "GOOS": "windows",
+    "GOVERSION": "go1.27.2"
+  },
+  "modulezip_sha256": "be8ddc84819d0adf74b23df8f74c8abc1e5dc13a90682403778aac286e0b2b6f",
+  "modules": [
+    {
+      "module": "github.com/wotjr1649/go-treesitter",
+      "version": "v0.0.1",
+      "sha256": "92c40d4a5514680d1fd31664616f2f4f92a70aac65d335bcd6fe792db72401aa",
+      "bytes": 24499849,
+      "entries": 2766
+    },
+    {
+      "module": "github.com/wotjr1649/go-treesitter/grammars/gpl",
+      "version": "v0.0.1",
+      "sha256": "ab0d089f3ab53ce44f7ac7cb1a3886f8548f509e133430d594d9ad97ea566d2f",
+      "bytes": 2621039,
+      "entries": 32
+    }
+  ],
+  "consumers": [
+    {
+      "module": "main",
+      "graph": [
+        {
+          "Path": "example.com/release-consumer",
+          "Main": true
+        },
+        {
+          "Path": "github.com/wotjr1649/go-treesitter",
+          "Version": "v0.0.1"
+        }
+      ],
+      "executable_sha256": "cac78214f190a9ca8969e613cccc892e4a6133e73bc91100cdfa690429536d2d",
+      "dependency_packages": 147,
+      "cgo_files": 0,
+      "empty_module_cache": true
+    },
+    {
+      "module": "gpl",
+      "graph": [
+        {
+          "Path": "example.com/release-consumer",
+          "Main": true
+        },
+        {
+          "Path": "github.com/wotjr1649/go-treesitter",
+          "Version": "v0.0.1"
+        },
+        {
+          "Path": "github.com/wotjr1649/go-treesitter/grammars/gpl",
+          "Version": "v0.0.1"
+        }
+      ],
+      "executable_sha256": "e1783172ee774e2273a527db3d4b8cb85f3d365069f0130e20b27afb76128926",
+      "dependency_packages": 149,
+      "cgo_files": 0,
+      "empty_module_cache": true
+    }
+  ],
+  "executions": [
+    {
+      "check": "commit",
+      "exit": 0,
+      "log_sha256": "864c957607e03724b080ab247befa8ab061a7b88e9f94b73c152c27fd517d7a8"
+    },
+    {
+      "check": "status",
+      "exit": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "go-env",
+      "exit": 0,
+      "log_sha256": "17906cc22cad570b263ce4bb9e6b9bbca2fca21eed916503f2d2874646f8696b"
+    },
+    {
+      "check": "zip-main",
+      "exit": 0,
+      "log_sha256": "dee891697b524d15bbf87adf2b1c2a57adaf51354fee69ddd7bbae28d08aa5d1"
+    },
+    {
+      "check": "zip-gpl",
+      "exit": 0,
+      "log_sha256": "846fe00bc23c1fde1b8c260b74115016dd5f0625d5b1e1550f8eeff76d368cd8"
+    },
+    {
+      "check": "build-main",
+      "exit": 0,
+      "log_sha256": "86f06d2c1ad40019f86618dc4222e7718125c0abac63ae4eb42476c1ff34169d"
+    },
+    {
+      "check": "execute-main",
+      "exit": 0,
+      "log_sha256": "64d395e0cc871d06846975a940d53e6826059ce439e98d8240ade4fb44e46b09"
+    },
+    {
+      "check": "graph-main",
+      "exit": 0,
+      "log_sha256": "eb835074e88a19d65cde90d7735edd147f30343177378bff3627d9f07d6aba6a"
+    },
+    {
+      "check": "deps-main",
+      "exit": 0,
+      "log_sha256": "db73b2458b31f97b19329c48d7bdaea230b0b5ea52a6939353d1c30f55a529cc"
+    },
+    {
+      "check": "catalog-build-main",
+      "exit": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "build-gpl",
+      "exit": 0,
+      "log_sha256": "59863ec767ed71a590e5887ba114def00f28360207dda789fcf032fa181227e2"
+    },
+    {
+      "check": "execute-gpl",
+      "exit": 0,
+      "log_sha256": "c94c2470fbfc1d0736c498f5f68c1d8a01ffb8fd44cba1cc7fff65393c2ed471"
+    },
+    {
+      "check": "graph-gpl",
+      "exit": 0,
+      "log_sha256": "dcd0e07c1e568c83c4c035b914d59c146af0e67bf63a51912e08f72ada8f09f3"
+    },
+    {
+      "check": "deps-gpl",
+      "exit": 0,
+      "log_sha256": "d9a08eeab9d7a23b44e22e66d86dec94312f612e8376dce905603a09d3106aa9"
+    },
+    {
+      "check": "catalog-build-gpl",
+      "exit": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "catalog-204",
+      "exit": 0,
+      "log_sha256": "e3d7cc78660d67cd63ec5a9726046cc766b7e41a2cc1d6d21976a5e41e392412"
+    }
+  ],
+  "catalog_basic": {
+    "passed": 204,
+    "receipt_sha256": "05d20e1187fe0f0d837a3869c1fd13ae1e304de03453df329cd3781a6f3c3331",
+    "cases_sha256": "826bde0d24fbd5f26a2d1fd0f6d3fe8137eff722f1e505190c4cce932caad6c4"
+  },
+  "network": "task-local file proxy only; no replace directives"
+}

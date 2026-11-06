@@ -18,3 +18,5 @@ artifacts/release-candidate/native-*/licenses.json -text
 artifacts/release-candidate/runtime-upgrade/*.csv -text
 # Preserve the exact bytes of local packaging and license receipts recorded by hash.
 artifacts/release-candidate/local-*/*.json -text
+# Preserve the exact bytes of hosted CI packaging receipts recorded by hash.
+artifacts/release-candidate/native-*/packaging-*.json -text

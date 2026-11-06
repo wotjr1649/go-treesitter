@@ -1,0 +1,61 @@
+{
+  "candidate_commit": "650d133b94c7c4d3e400d6d1d512d92c48a745cc",
+  "run_url": "https://github.com/wotjr1649/go-treesitter/actions/runs/42259446839",
+  "workflow_conclusion": "success",
+  "jobs": [
+    {
+      "name": "licenses",
+      "conclusion": "success",
+      "url": "https://github.com/wotjr1649/go-treesitter/actions/runs/42259446839/job/128035213959"
+    },
+    {
+      "name": "product (windows-11-arm, arm64)",
+      "conclusion": "success",
+      "url": "https://github.com/wotjr1649/go-treesitter/actions/runs/42259446839/job/128035214313"
+    },
+    {
+      "name": "race",
+      "conclusion": "success",
+      "url": "https://github.com/wotjr1649/go-treesitter/actions/runs/42259446839/job/128035214462"
+    },
+    {
+      "name": "product (windows-latest, amd64)",
+      "conclusion": "success",
+      "url": "https://github.com/wotjr1649/go-treesitter/actions/runs/42259446839/job/128035214749"
+    }
+  ],
+  "receipts": [
+    {
+      "path": "licenses.json",
+      "sha256": "8e306c6c4959ad33748bcff1b0c23e48de6f2550aa72a52b6d9317f914604fc8"
+    },
+    {
+      "path": "packaging-amd64.json",
+      "sha256": "1f8afa1a9d229ea07eb02c5125d412b924c09def297bfd320ad1d45701a527e6"
+    },
+    {
+      "path": "packaging-arm64.json",
+      "sha256": "e4a782fa8c57be95e0f2093c57851c01ce626236bb41b53350ce5a398aee8483"
+    }
+  ],
+  "artifact_downloads": [
+    {
+      "name": "licenses",
+      "id": 13523728012,
+      "github_digest": "sha256:79fb7792a720da32b8363e98322fca812f7eed992778af291ea0cd776c30beef",
+      "receipt_sha256": "8e306c6c4959ad33748bcff1b0c23e48de6f2550aa72a52b6d9317f914604fc8"
+    },
+    {
+      "name": "packaging-amd64",
+      "id": 13524806197,
+      "github_digest": "sha256:4148b63d841f3f70c3474c8c970ea6331f0fcbe0cee1ae7e9b2765674e8db538",
+      "receipt_sha256": "1f8afa1a9d229ea07eb02c5125d412b924c09def297bfd320ad1d45701a527e6"
+    },
+    {
+      "name": "packaging-arm64",
+      "id": 13523748498,
+      "github_digest": "sha256:45b33ad98424af3c74e3b9d72a50e15fe8b78c137a6f96bb008b9818a465a8b1",
+      "receipt_sha256": "e4a782fa8c57be95e0f2093c57851c01ce626236bb41b53350ce5a398aee8483"
+    }
+  ]
+}

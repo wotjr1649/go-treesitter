@@ -38,6 +38,8 @@ tree, and `validation-b52f8ce.json` records them again for commit `b52f8ce`. Eac
 names its original local receipt hash and the fields it omits.
 `local-b52f8ce/` keeps the local packaging, license, ARM64 cross-link and race
 diagnostic receipts for commit `b52f8ce`, all run from a fresh regular clone.
+`native-650d133/` keeps the hosted CI receipts (licenses, AMD64 and ARM64
+packaging) for commit `650d133`, run 42259446839.
 
 Fresh candidate checks run in
 [the Windows workflow](../../.github/workflows/windows.yml). Its native AMD64

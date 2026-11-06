@@ -27,11 +27,11 @@ of the same manifest is projected in
 | Performance | A [controlled whole-product comparison](../../artifacts/release-candidate/runtime-upgrade/runtime-comparison.json) of v0.53.0 against a working tree with this candidate's runtime manifest `b54a07c1…` completed. It binds the manifest, benchmark inputs and binaries, but not the full source tree, so it is an observation for that manifest rather than an E4 result for `0eee29e`. Allocation volume falls in major full-parse workloads. Edit latency is mixed, and host load varied. No speed claim is made. |
 | C# grammar-kit pin check (ADR-0017 Decision 5) | Run with tsgk v0.2.0 (E2, local receipts). Origin: the commit-addressed GitHub tar.gz of tree-sitter-c-sharp `9150f7d5`, downloaded again, is byte-identical to the archive the oracle lane recorded, and its 8 grammar inputs match. `verify --archive` of the same commit's GitHub ZIP against an expected document built from those inputs: PASS, no differences (`parser.c` read under the kit's registered large-file exception; the expected document is caller-declared from the oracle snapshot). Product blob identity: observed (NOT_ASSESSED). Update review against the previous pin: verify FAIL on four changed files and schema diff FAIL with 28 static node-types changes (27 additions; `lambda_expression.parameters` widened to multiple). Both outcomes are expected for a pin update and do not approve the change. The previous pin's `parser.c` exceeds the kit file limit, so its old-to-new difference is not kit-reported. Fingerprints identify bytes, not authorship. |
 | C# constructs added by the new pin | OPEN coverage gap. The 84 retained C# oracle records, all at the new pin, contain no lambda and none of the added constructs (collection expressions, extension declarations, slice patterns, the new compound-assignment operator declarations). Carrier code that shapes `lambda_expression.parameters` (`parser_result_csharp.go`, `parser_result_csharp_query.go`) is therefore not compared with C for the widened field. |
-| Official module ZIPs and empty-cache consumers | PASS locally for commit `b52f8ce` ([receipts](../../artifacts/release-candidate/local-b52f8ce/index.json)), from a fresh regular clone: the 201+3 split, consumers without replace and with empty caches, CGO-free graphs, and all 204 basic catalog cases. |
-| Release license gate | PASS locally for commit `b52f8ce`: 204 grammars, no unresolved declarations. |
-| Windows ARM64 native | NOT RUN (no local ARM64 host). A local cross-link of commit `b52f8ce` passed (`go build ./...` and the consumer); that cannot replace execution. |
-| Race diagnostic | PASS locally for commit `b52f8ce`, using the workflow's selection (diagnostic lane; never a product gate). |
-| Remote/hosted CI | NOT RUN for this candidate. |
+| Official module ZIPs and empty-cache consumers | PASS locally for commit `b52f8ce` ([receipts](../../artifacts/release-candidate/local-b52f8ce/index.json)), from a fresh regular clone: the 201+3 split, consumers without replace and with empty caches, CGO-free graphs, and all 204 basic catalog cases. Hosted CI on `650d133` also passed this check on both AMD64 and ARM64, with identical module ZIPs ([receipts](../../artifacts/release-candidate/native-650d133/index.json)). |
+| Release license gate | PASS locally for commit `b52f8ce` and in hosted CI on `650d133`: 204 grammars, no unresolved declarations. |
+| Windows ARM64 native | PASS in hosted CI on `650d133` ([run 42259446839](https://github.com/wotjr1649/go-treesitter/actions/runs/42259446839), job `product (windows-11-arm, arm64)`): build, vet, full and selected-grammar tests, tool tests, native consumer, private invariants, official module ZIPs and empty-cache consumers. A local cross-link of `b52f8ce` also passed. |
+| Race diagnostic | PASS locally for commit `b52f8ce` and in hosted CI on `650d133`, using the workflow's selection (diagnostic lane; never a product gate). |
+| Remote/hosted CI | PASS on `650d133` ([run 42259446839](https://github.com/wotjr1649/go-treesitter/actions/runs/42259446839)): licenses, product AMD64, product ARM64 and race. |
 | Release decision | Not made. |
 
 Commit `b52f8ce` differs from `0eee29e` in documentation (including README files),
@@ -41,6 +41,10 @@ The product gate, packaging, license, cross-link and race results above were run
 on `b52f8ce` itself. The commit that records them changes only this board and
 `artifacts/`. It was not itself packaged, and those results do not transfer to
 it.
+
+The hosted CI results above belong to `650d133`. The commit that records them
+changes only this board, `artifacts/` and `.gitattributes`, and its own CI run is
+separate.
 
 The exact current source and patch inventory remain in
 `internal/provenance/identities.json` and `tools/runtime-bundle/source.json`.
