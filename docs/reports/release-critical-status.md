@@ -20,19 +20,27 @@ of the same manifest is projected in
 
 | Gate | Current candidate state |
 |---|---|
-| Windows AMD64 product | PASS (E3) on the tree of `0eee29e`: build, vet, full and selected-grammar tests, private invariants and native consumer execution. |
-| Retained core C comparisons | PASS (E5) on the tree of `0eee29e` for their pinned inputs and represented node/result fields. |
+| Windows AMD64 product | PASS (E3) on `b52f8ce` ([projection](../../artifacts/release-candidate/runtime-upgrade/validation-b52f8ce.json)) and earlier on the tree of `0eee29e`: build, vet, full and selected-grammar tests, private invariants and native consumer execution. |
+| Retained core C comparisons | PASS (E5) on `b52f8ce` and on the tree of `0eee29e` for their pinned inputs and represented node/result fields. |
 | Runtime and grammar provenance | Product provenance checks pass. The importer reproduces all 1,561 inventoried carrier files. |
 | Local optional GPL module | Checks pass using a local go.work; official ZIP consumers remain a separate gate. |
 | Performance | A [controlled whole-product comparison](../../artifacts/release-candidate/runtime-upgrade/runtime-comparison.json) of v0.53.0 against a working tree with this candidate's runtime manifest `b54a07c1…` completed. It binds the manifest, benchmark inputs and binaries, but not the full source tree, so it is an observation for that manifest rather than an E4 result for `0eee29e`. Allocation volume falls in major full-parse workloads. Edit latency is mixed, and host load varied. No speed claim is made. |
 | C# grammar-kit pin check (ADR-0017 Decision 5) | Run with tsgk v0.2.0 (E2, local receipts). Origin: the commit-addressed GitHub tar.gz of tree-sitter-c-sharp `9150f7d5`, downloaded again, is byte-identical to the archive the oracle lane recorded, and its 8 grammar inputs match. `verify --archive` of the same commit's GitHub ZIP against an expected document built from those inputs: PASS, no differences (`parser.c` read under the kit's registered large-file exception; the expected document is caller-declared from the oracle snapshot). Product blob identity: observed (NOT_ASSESSED). Update review against the previous pin: verify FAIL on four changed files and schema diff FAIL with 28 static node-types changes (27 additions; `lambda_expression.parameters` widened to multiple). Both outcomes are expected for a pin update and do not approve the change. The previous pin's `parser.c` exceeds the kit file limit, so its old-to-new difference is not kit-reported. Fingerprints identify bytes, not authorship. |
 | C# constructs added by the new pin | OPEN coverage gap. The 84 retained C# oracle records, all at the new pin, contain no lambda and none of the added constructs (collection expressions, extension declarations, slice patterns, the new compound-assignment operator declarations). Carrier code that shapes `lambda_expression.parameters` (`parser_result_csharp.go`, `parser_result_csharp_query.go`) is therefore not compared with C for the widened field. |
-| Official module ZIPs and empty-cache consumers | NOT RUN yet for this candidate. |
-| Release license gate | NOT RUN yet for this candidate. |
-| Windows ARM64 native | NOT RUN for this candidate; cross-linking cannot replace execution. |
-| Race diagnostic | NOT RUN for this candidate (diagnostic lane; never a product gate). |
+| Official module ZIPs and empty-cache consumers | PASS locally for commit `b52f8ce` ([receipts](../../artifacts/release-candidate/local-b52f8ce/index.json)), from a fresh regular clone: the 201+3 split, consumers without replace and with empty caches, CGO-free graphs, and all 204 basic catalog cases. |
+| Release license gate | PASS locally for commit `b52f8ce`: 204 grammars, no unresolved declarations. |
+| Windows ARM64 native | NOT RUN (no local ARM64 host). A local cross-link of commit `b52f8ce` passed (`go build ./...` and the consumer); that cannot replace execution. |
+| Race diagnostic | PASS locally for commit `b52f8ce`, using the workflow's selection (diagnostic lane; never a product gate). |
 | Remote/hosted CI | NOT RUN for this candidate. |
 | Release decision | Not made. |
+
+Commit `b52f8ce` differs from `0eee29e` in documentation (including README files),
+evidence, `.gitattributes`, the GPL provenance entry for its sources README, and
+the license manifest source URLs; it changes no Go code or test.
+The product gate, packaging, license, cross-link and race results above were run
+on `b52f8ce` itself. The commit that records them changes only this board and
+`artifacts/`. It was not itself packaged, and those results do not transfer to
+it.
 
 The exact current source and patch inventory remain in
 `internal/provenance/identities.json` and `tools/runtime-bundle/source.json`.
