@@ -49,5 +49,5 @@ executables and module graphs. The separate license job must also pass before
 Release can pass. CI artifacts are validation evidence, not published releases.
 
 See [publication boundaries](../../docs/specs/publication.md) for local archives
-and the treatment of previously published history. Main merge, tag and release
-remain on hold.
+and the treatment of previously published history. PR #1 merged the v0.56.0
+carrier into main as merge commit `402b52c`; tag and release remain on hold.
