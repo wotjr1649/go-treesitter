@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "cases_sha256": "cb6faecbe4755370edcae2eef0c7972d7cddaed08ac892f0bcd54f5bf3587e16",
+  "files": {
+    "build.json": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
+    "CS-lambda-mod-missing-body.json": "193c260230524b4b53b852d4fdd0b5635cf1532cbd3c2ac037d8a5db731541d4",
+    "CS-lambda-mod-mixed.json": "c7c55ae08dee6e541ad23ba27685472313f5fe3837e85031c21a00cba891315f",
+    "CS-lambda-mod-out-add.json": "937926bf0496b5ade55766f26adfb0b9b7e76c598142b1c000bdd2fc2f38f06c",
+    "CS-lambda-mod-out.json": "c119034ac6a311c11995d3b038904ba10797f7b05a60e6f48dbb2716cb7e04ff",
+    "CS-lambda-mod-ref-in.json": "87c8dc6bdf11e6a032f839ff81b2512d882ca8baf46198e6b5e848cbe9967625",
+    "CS-lambda-mod-ref.json": "b7e0c9bc81435deae6dd6cbc269f25b1ae17744f64415d8498ccc2ade4c51c17",
+    "CS-lambda-mod-unclosed.json": "e59467d38a8223faf9da01a3bed564ad7c920425ea59fcab0931e0cf45a7197a"
+  }
+}

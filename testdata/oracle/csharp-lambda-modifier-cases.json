@@ -1,0 +1,70 @@
+[
+  {
+    "id": "CS-lambda-mod-out",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "lambda-modifiers",
+    "source": "delegate bool TryParse(string text, out int value);\n\nclass OutLambda\n{\n    static TryParse Parse = (text, out value) => int.TryParse(text, out value);\n}\n",
+    "sha256": "c79b0b1e2289822f3da0d5acebbec87a7490e834d4c3bcfa8f9397ea835db0a8"
+  },
+  {
+    "id": "CS-lambda-mod-ref",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "lambda-modifiers",
+    "source": "delegate void RefAction(ref int value);\n\nclass RefLambda\n{\n    static RefAction Increment = (ref x) => x++;\n}\n",
+    "sha256": "46256231f20f3d6d0bdecca27722e10d3c421d642bf9dddbaf88373d1ab65328"
+  },
+  {
+    "id": "CS-lambda-mod-mixed",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "lambda-modifiers",
+    "source": "using System;\n\ndelegate void Mixed(scoped Span<int> span, ref readonly int first, in int second);\n\nclass MixedLambda\n{\n    static Mixed Fill = (scoped span, ref readonly first, in second) => span[0] = first + second;\n}\n",
+    "sha256": "849391af85797deb896cc229f98580e5e46795ee180af271f3c18265442d0f56"
+  },
+  {
+    "id": "CS-lambda-mod-missing-body",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "lambda-modifiers-recovery",
+    "source": "delegate void RefAction(ref int value);\n\nclass Broken\n{\n    static RefAction Increment = (ref x) => ;\n}\n",
+    "sha256": "ed38608d1cadc7672559930c9660bc31997b7d37aab40508f0da1ba47d927844"
+  },
+  {
+    "id": "CS-lambda-mod-unclosed",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "lambda-modifiers-recovery",
+    "source": "delegate bool TryParse(string text, out int value);\n\nclass Broken\n{\n    static TryParse Parse = (text, out value => int.TryParse(text, out value);\n}\n",
+    "sha256": "f2e5da2b009afc51a33e1d694ac677f5423223f5223778fd0388e3312629dbc9"
+  },
+  {
+    "id": "CS-lambda-mod-out-add",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "lambda-modifiers",
+    "source": "delegate bool TryParse(string text, out int value);\n\nclass OutLambda\n{\n    static TryParse Parse = (text, out value, extra) => int.TryParse(text, out value);\n}\n",
+    "sha256": "6b0d8dae732fbd1ca29aa87f9e7f82fb6aa978846b04a7b5a7527b43411b7539",
+    "previous": "CS-lambda-mod-out",
+    "edit": {
+      "StartByte": 99,
+      "OldEndByte": 119,
+      "NewEndByte": 126
+    }
+  },
+  {
+    "id": "CS-lambda-mod-ref-in",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "lambda-modifiers",
+    "source": "delegate void RefAction(ref int value);\n\nclass RefLambda\n{\n    static RefAction Increment = (in x) => x++;\n}\n",
+    "sha256": "f7291872a66597575345c8da7b6b740aff4f290b38f9b370dd40db308c0a6077",
+    "previous": "CS-lambda-mod-ref",
+    "edit": {
+      "StartByte": 92,
+      "OldEndByte": 99,
+      "NewEndByte": 98
+    }
+  }
+]

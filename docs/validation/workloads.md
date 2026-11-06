@@ -151,8 +151,13 @@ blocks, list and slice patterns, compound-assignment operator declarations
 and null-conditional assignment, plus two erroneous lambdas. C emits one
 `parameters` child per lambda in every record. Each edit changes
 the construct itself. `csharp-kr0005-cases.json` holds the one erroneous lambda
-that differs from C (KR-0005). C records are in `windows-c-v2/cs-constructs`
-and `windows-c-v2/cs-kr0005`, recorded once with the retained C build
+that differs from C (KR-0005). `csharp-lambda-modifier-cases.json` (7 records, 2 edits,
+2 erroneous) covers implicit lambda parameters with `ref`, `out`, `in`,
+`scoped` and `readonly`. In the grammar only that rule gives
+`lambda_expression.parameters` several children; C does so in 6 of the 7
+records and parses the unclosed variant with a single parameter. C records
+are in `windows-c-v2/cs-constructs`, `windows-c-v2/cs-kr0005` and
+`windows-c-v2/cs-lambda-modifiers`, recorded once with the retained C build
 `e00a14ff…`. All inputs were authored in this repository under its MIT
 licence; no third-party text is copied. The JSON uses LF.
 
