@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "cases_sha256": "ea66bcf279656a97592bc2a570b8c84c2a5f92c880a8dc5fa55b434892058c1c",
+  "files": {
+    "build.json": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
+    "CS-lambda-unclosed-params.json": "5f076ad458fa748f234bdc10013da023913d4ea5db04ae629418511c1d1845d2"
+  }
+}

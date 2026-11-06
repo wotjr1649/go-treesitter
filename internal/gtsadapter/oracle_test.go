@@ -140,6 +140,35 @@ func TestCSharpRecoveryPreservationOracleRecords(t *testing.T) {
 	runOracleCorpus(t, "testdata/oracle/csharp-preservation-cases.json", "testdata/oracle/windows-c-v2/cs-preservation", "")
 }
 
+func TestCSharpConstructOracleRecords(t *testing.T) {
+	runOracleCorpus(t, "testdata/oracle/csharp-constructs-cases.json", "testdata/oracle/windows-c-v2/cs-constructs", "")
+}
+
+// KR-0005 (docs/validation/known-regressions.md): exact source, ordered Go/C digests and first differing node.
+var kr0005Signatures = map[string]struct {
+	source, goDigest, cDigest string
+	first                     int
+}{
+	"CS-lambda-unclosed-params": {
+		source:   "3815cc169fd7c0c8eb3731646080d03c33804618829d5784459fc64b576703cc",
+		goDigest: "0f373385ba54f813be4d4251c47d204fb9590da468807c7ba36ef7debc07e748",
+		cDigest:  "dfcbf933643ea12c5f13c106535b6e9ae29b7c2fd8a09fea6c0a1a953cead066",
+		first:    32,
+	},
+}
+
+func TestKR0005CSharpLambdaRecovery(t *testing.T) {
+	records := runOracleCorpus(t, "testdata/oracle/csharp-kr0005-cases.json", "testdata/oracle/windows-c-v2/cs-kr0005", "")
+	if len(records) != len(kr0005Signatures) {
+		t.Fatal("provenance failure: KR-0005 fixture set changed")
+	}
+	for id := range kr0005Signatures {
+		if _, ok := records[id]; !ok {
+			t.Fatalf("provenance failure: KR-0005 fixture missing: %s", id)
+		}
+	}
+}
+
 func TestGoRecoveryOrderOracleRecords(t *testing.T) {
 	runOracleCorpus(t, "testdata/oracle/go-recovery-cases.json", "testdata/oracle/windows-c-v2/go-recovery", "")
 }
@@ -387,6 +416,20 @@ func runOracleCorpus(t *testing.T, casesPath, recordsDir, differencesPath string
 				if !receipt.HasError || result.Outcome != syntax.AcceptedWithErrors || !result.HasError {
 					t.Fatal("NEW REGRESSION: bare ampersand characterization")
 				}
+			}
+			if c.Group == "KR-0005" {
+				want, ok := kr0005Signatures[c.ID]
+				if !ok {
+					t.Fatal("provenance failure: KR-0005 fixture has no recorded signature")
+				}
+				if first < 0 {
+					t.Fatal("STALE KR-0005: Go now matches C; investigate, then retire the record")
+				}
+				if c.SHA256 != want.source || receipt.NodesSHA256 != want.cDigest || nodeDigest(goNodes) != want.goDigest ||
+					first != want.first || !receipt.HasError || result.Outcome != syntax.AcceptedWithErrors || !result.HasError || result.HasMissing {
+					t.Fatal("NEW REGRESSION: KR-0005 signature changed")
+				}
+				return
 			}
 			if first >= 0 {
 				t.Fatal("unregistered ordered tree difference")
