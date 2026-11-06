@@ -142,6 +142,20 @@ Newtonsoft MIT fixtures, whose notice remains in `testdata/newtonsoft/LICENSE.md
 Other inline cases and transformations were authored in this repository. The
 JSON file itself uses LF; intentional CRLF source bytes are encoded in strings.
 
+## C# constructs of the new pin
+
+`csharp-constructs-cases.json` (16 records, 7 edits) covers syntax that
+tree-sitter-c-sharp `9150f7d5` added or widened: lambda parameter lists,
+`async`/`static` lambdas, collection expressions and spreads, extension
+blocks, list and slice patterns, compound-assignment operator declarations
+and null-conditional assignment, plus two erroneous lambdas. C emits one
+`parameters` child per lambda in every record. Each edit changes
+the construct itself. `csharp-kr0005-cases.json` holds the one erroneous lambda
+that differs from C (KR-0005). C records are in `windows-c-v2/cs-constructs`
+and `windows-c-v2/cs-kr0005`, recorded once with the retained C build
+`e00a14ff…`. All inputs were authored in this repository under its MIT
+licence; no third-party text is copied. The JSON uses LF.
+
 ## Go edit-fuzz recovery
 
 The Go edit-fuzz regression adds `go-recovery-cases.json`: four clean edit

@@ -1,0 +1,10 @@
+[
+  {
+    "id": "CS-lambda-unclosed-params",
+    "language": "c_sharp",
+    "filename": "x.cs",
+    "group": "KR-0005",
+    "source": "using System;\n\nclass Broken\n{\n    static Func<int, int, int> Add = (a, b => a + b;\n}\n",
+    "sha256": "3815cc169fd7c0c8eb3731646080d03c33804618829d5784459fc64b576703cc"
+  }
+]

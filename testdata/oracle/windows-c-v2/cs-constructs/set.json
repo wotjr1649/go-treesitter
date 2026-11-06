@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "cases_sha256": "44bdcaeb716af7d3766596a283d88f92925fd88c0e07a98575cac509b7ad2cae",
+  "files": {
+    "build.json": "e00a14ffd248d97ffbd6d2c8dde17a770bba251a068f0835a697c3de11876345",
+    "CS-async-lambda-missing-arrow.json": "efe9623ede329bd8340d9601c005146cf779206b8b610450b96bd4bc48f6def0",
+    "CS-collection-expression-spread.json": "9c3162aee9e45368aa1034af93fd53a39370ac5b21cd5313ca326e3d2ce4cd77",
+    "CS-collection-expression.json": "54f8b5fc2233588503c48510b051dca040f8dfc7f1f8a55ab9c1da79ef597416",
+    "CS-compound-operator-minus.json": "fcc2692e0ba7d3d876690074a89addfbab2144020b35f6c0a89376993116ef75",
+    "CS-compound-operator.json": "5764eccf93f0330093ec10a6a2e3af8b966a1c00bf55691b30d59ee1d4b54709",
+    "CS-extension-block-rename.json": "eb09b74deccfa8b9acde8db0b7942400db6566e2ba8590f4a320ffbc19d61bd3",
+    "CS-extension-block.json": "b3575801c0d37b8d120dc27510debc4a8bbea3377940b873fd04204bb4ac3698",
+    "CS-lambda-missing-body.json": "55cbfd1218cf3bf6a379133eb04a5a0a8a210734ee8f937205021101d0850fa4",
+    "CS-lambda-modifiers-parens.json": "18bd353b21e76ec636d317f25029bdb973733dbdc58ee2e8a3d552faace0b08c",
+    "CS-lambda-modifiers.json": "72a16f71b3cf97576cd59c02956c45a3a06bebf78d75abee76ecf54c24e000c6",
+    "CS-lambda-params-add.json": "78798c7560a3239da38eabeffd5b59404019c5efe01b4688a22b05da06d202bb",
+    "CS-lambda-params.json": "3c9d60a1eb873abf25b1c29fb4b8e2feaa9555ae5b18ad1518aed456e7443d3d",
+    "CS-list-pattern-longer.json": "031b9c5828035baaa99338dbaf97db36254da38be707da94fafe93e9d29710f1",
+    "CS-list-pattern.json": "b56cee227e158d1fd6135f1204000c29308153db8b7c35391be4dd7a43b61fa1",
+    "CS-null-conditional-assignment-deeper.json": "32d789e52538ecb151db486d0ffea3e5f5fd847fd27d80295a8db6d5a9c6e572",
+    "CS-null-conditional-assignment.json": "cdaa5e65b3bbca42ee3ba38ac18bd42777d877949d42e33f816a1f519e1cbbdf"
+  }
+}
