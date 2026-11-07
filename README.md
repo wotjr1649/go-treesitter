@@ -135,9 +135,9 @@ failure evidence remains available; those inputs now require exact C agreement.
 
 The final recovery corpus also covers Go EOF/NUL terminals, reserved keywords,
 version-specific lookahead, hidden missing nodes and incremental dependencies.
-At the v0.56.0 candidate one C-tree difference is open, KR-0005 (an unclosed C#
-lambda; see `docs/validation/known-regressions.md`), held by an exact-signature
-ratchet. The internal Go blob is derived from the
+At the v0.56.0 candidate one C-tree difference, KR-0005 (an unclosed C#
+lambda; see `docs/validation/known-regressions.md`), was found and retired by a
+carrier patch. No active C-tree exception remains. The internal Go blob is derived from the
 same pinned C grammar, with distinct origin and product identities (ADR-0015).
 Performance and memory measurements, controlled fallback reasons and remaining
 release blockers are recorded in the [status board](docs/reports/release-critical-status.md)

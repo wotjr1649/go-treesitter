@@ -59,7 +59,8 @@
     "c-oracle-deferred-missing-turns.patch",
     "c-oracle-physical-recovery-turns.patch",
     "c-oracle-js-family-local-lookahead.patch",
-    "c-oracle-preserve-native-recovery-order.patch"
+    "c-oracle-preserve-native-recovery-order.patch",
+    "c-oracle-recovery-summary-all-links.patch"
   ],
   "inputs": [
     {

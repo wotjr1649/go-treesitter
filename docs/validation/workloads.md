@@ -150,8 +150,8 @@ tree-sitter-c-sharp `9150f7d5` added or widened: lambda parameter lists,
 blocks, list and slice patterns, compound-assignment operator declarations
 and null-conditional assignment, plus two erroneous lambdas. C emits one
 `parameters` child per lambda in every record. Each edit changes
-the construct itself. `csharp-kr0005-cases.json` holds the one erroneous lambda
-that differs from C (KR-0005). `csharp-lambda-modifier-cases.json` (7 records, 2 edits,
+the construct itself. `csharp-kr0005-cases.json` holds the erroneous lambda
+that first differed from C (KR-0005, now retired). `csharp-lambda-modifier-cases.json` (7 records, 2 edits,
 2 erroneous) covers implicit lambda parameters with `ref`, `out`, `in`,
 `scoped` and `readonly`. In the grammar only that rule gives
 `lambda_expression.parameters` several children; C does so in 6 of the 7

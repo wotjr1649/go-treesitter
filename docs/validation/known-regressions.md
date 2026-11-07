@@ -374,24 +374,24 @@ exception is adopted. The fixture is a reduction of the same licensed corpus,
 but its exact source and failure signature are a new record rather than an
 expansion of KR-0002. Every changed or disappearing signature fails the test.
 
-## KR-0005 — open: C# lambda with unclosed parameter list
+## KR-0005 — retired: C# lambda with unclosed parameter list
 
 | Field | Value |
 |---|---|
-| Upstream issue | None filed. Attribution (E2, local ablation; runs not retained in this repository): upstream `v0.56.0` code before C# result normalization; no carrier patch other than KR-0004 changes it (see below) |
+| Upstream issue | None filed. Cause in upstream `v0.56.0` C-recovery port (see below); retired by the carrier patch `c-oracle-recovery-summary-all-links.patch` |
 | Baseline | `v0.56.0` candidate identities in `internal/provenance/identities.json`; C# grammar `9150f7d5`; C build `e00a14ff…` |
 | Fixture | `CS-lambda-unclosed-params` in `testdata/oracle/csharp-kr0005-cases.json` (authored, MIT); source `3815cc16…`, 85 bytes |
 | Go state | accepted_with_errors, full root, HasError=true, HasMissing=false; 40 ordered nodes |
 | C state | full root, HasError=true; 41 ordered nodes in `windows-c-v2/cs-kr0005/` |
-| Exact signature | Source, ordered Go/C digests and first differing node 32 in `kr0005Signatures` (`internal/gtsadapter/oracle_test.go`) |
+| Exact signature (historical) | Source `3815cc16…`, ordered Go digest `0f373385…`, C digest `dfcbf933…`, first differing node 32 |
 | Difference | At byte 71 C keeps `lambda_expression` (71–81) holding `implicit_parameter`, `=>` and the body; Go places those three directly under the recovered parent. The raw runtime tree, before adapter shaping, already differs |
 | Controls | The 16 records of `csharp-constructs-cases.json` and the 7 of `csharp-lambda-modifier-cases.json` agree exactly, including four other erroneous lambdas |
 | Evidence | Session 13, one native C record and a product run (E5 for this input only) |
-| Release impact | C# Release-Critical is red for this recovery shape. Error flags agree; tree shape does not |
-| Retirement | A reviewed carrier patch (ADR-0013) or upstream fix makes Go match C for this fixture and every construct control |
+| Release impact | At record time C# Release-Critical was red for this recovery shape. Retired; not a current blocker |
+| Retirement | Done: with the 29th carrier patch the fixture and every construct control agree exactly with C; preserve this historical record |
 
-`TestKR0005CSharpLambdaRecovery` passes only while the exact signature holds.
-Agreement fails it as STALE; any other difference fails it as a new regression.
+While open, `TestKR0005CSharpLambdaRecovery` passed only while the exact
+signature held. Since retirement it requires exact C agreement.
 
 Attribution (Session 13; E2, local ablation; the probes and regenerated trees
 are not retained in this repository).
@@ -417,6 +417,23 @@ carrier patch. Go also places the
 `parameters`-labelled child and the unlabelled body directly in `ERROR`. This
 suggests that the hidden `_lambda_expression_init` was not reduced into
 `lambda_expression` before the error was wrapped (inference, not traced).
+
+Cause and retirement (Session 13; trace E2, fixture comparison E5). A native C
+trace of the same pinned runtime and grammar shows `recover_to_previous state:6797,
+depth:6`; Go recovered to the same state at depth 8. The Go port's
+`do_all_potential_reductions` does reduce `lambda_expression`, but the result has
+the same state and position as the earlier `binary_expression` version, so it is
+merged into that version as a packed GSS link. C's `ts_stack_record_summary`
+walks every link of the merged version (`stack__iter`); the port walked link 0
+only, so the shorter path through `lambda_expression` never reached the
+strategy-1 election, which popped the unreduced path instead.
+`c-oracle-recovery-summary-all-links.patch` records the summary over every link
+when the head chain has packed links, for grammars whose election can pop
+through those links. With it, the fixture's ordered tree equals the C record,
+and no other retained test result changes. In the retained tests only C#
+recovery reaches the new walk, so other grammars are not evidenced either way.
+The hypothesis above was wrong about the mechanism: the reduction does happen,
+and its result was lost in the summary walk.
 
 ## Known characteristics (not regressions, not defects)
 
@@ -508,5 +525,5 @@ and `TestJSXEqualsEdits`. The candidate passes all of them; see
   Patch files of the `v0.53.0` inventory that are not listed are not applied.
   They remain in the repository until a separate retirement decision under
   ADR-0013.
-- KR-0005 is open for the candidate. A new failure opens a new record; it is
+- KR-0005 was opened and retired at the candidate (29th carrier patch). A new failure opens a new record; it is
   never absorbed into a retired one.
