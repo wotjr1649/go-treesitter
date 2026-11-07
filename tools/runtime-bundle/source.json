@@ -60,7 +60,8 @@
     "c-oracle-physical-recovery-turns.patch",
     "c-oracle-js-family-local-lookahead.patch",
     "c-oracle-preserve-native-recovery-order.patch",
-    "c-oracle-recovery-summary-all-links.patch"
+    "c-oracle-recovery-summary-all-links.patch",
+    "c-oracle-packed-version-order-no-promotion.patch"
   ],
   "inputs": [
     {

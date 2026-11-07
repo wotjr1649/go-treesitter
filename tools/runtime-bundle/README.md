@@ -57,6 +57,13 @@ the link-0 walk hid it from the strategy-1 election (KR-0005).
 with a literal port of C's iterator loop and checks that the election sees
 every recorded depth.
 
+c-oracle-packed-version-order-no-promotion.patch stops promoting a primary
+stack to slot 0 between iterations for grammars with packed GSS version order.
+C keeps its stack-version order, and a later merge keeps the earlier version's
+link; the promotion changed which C# and TypeScript generic-call reading survived (KR-0006).
+`TestCSharpGenericCallOracleRecords` and `TestTypeScriptGenericCallOracleRecords`
+retain the regression witnesses.
+
 The upstream source MIT notice is retained verbatim in internal/runtime/LICENSE.
 Grammar and fixture notices are covered separately in THIRD_PARTY_NOTICES.md.
 The Go artifact keeps separate origin and C-derived product identities under

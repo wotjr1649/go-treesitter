@@ -7,8 +7,9 @@ Active differences have exact Go and C hashes in `active-differences.json`;
 the original `known-differences.json` preserves the pre-patch failures.
 Changing either side fails the ratchet; an unregistered difference fails too.
 
-KR-0005 in `csharp-kr0005-cases.json` is retired; `TestKR0005CSharpLambdaRecovery`
-now requires its exact C agreement. No active C-tree difference remains in the
+KR-0005 in `csharp-kr0005-cases.json` and KR-0006 in the C# and TypeScript
+generic-call catalogs are retired; their tests now require exact C
+agreement. No active C-tree difference remains in the
 retained final corpus. Bare-ampersand
 controls remain erroneous and require the same recovered tree as C.
 The C# order and preservation catalogs require exact nodes and error receipts.

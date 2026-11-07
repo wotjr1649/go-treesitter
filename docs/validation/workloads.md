@@ -161,6 +161,17 @@ are in `windows-c-v2/cs-constructs`, `windows-c-v2/cs-kr0005` and
 `e00a14ff…`. All inputs were authored in this repository under its MIT
 licence; no third-party text is copied. The JSON uses LF.
 
+## Generic-call ambiguity
+
+`csharp-generic-call-cases.json` (11 records, 1 edit) and
+`typescript-generic-call-cases.json` (5 records) hold clean inputs where
+`<...>(` can be a generic call or two comparisons: shapes that differed from C
+(KR-0006, now retired), the edit, and controls that already agreed, including a
+declaration expression and parenthesized comparisons. C records are in
+`windows-c-v2/cs-generic-call` and `windows-c-v2/ts-generic-call`, recorded once
+with the retained C build `e00a14ff…`. All inputs were authored in this
+repository under its MIT licence. The JSON uses LF.
+
 ## Go edit-fuzz recovery
 
 The Go edit-fuzz regression adds `go-recovery-cases.json`: four clean edit

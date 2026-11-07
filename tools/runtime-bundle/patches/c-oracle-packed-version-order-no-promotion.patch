@@ -1,0 +1,17 @@
+diff --git a/parser.go b/parser.go
+--- a/parser.go
++++ b/parser.go
+@@ -8411,8 +8411,11 @@ func (p *Parser) prepareParseStacksForIteration(stacks []glrStack, scratch *pars
+ 		p.traceCRecoverPrepareStacks("post-cull", result.stacks)
+ 	}
+ 	if len(result.stacks) > 1 {
+-		// Preserve C condense order during certified native recovery.
+-		if (!p.emptyExternalRecoveryEnabled() && !p.compactPackedGSSVersionOrderEnabled()) || !p.errorCostCompetitionEnabled() || !cRecoveryRelevantStack(result.stacks) {
++		// Preserve C condense order during certified native recovery. Packed
++		// version order keeps C's stack-version order outside recovery too:
++		// when two versions later merge, C keeps the earlier version's link,
++		// so promoting another stack to slot 0 changes the selected tree.
++		if !p.compactPackedGSSVersionOrderEnabled() && (!p.emptyExternalRecoveryEnabled() || !p.errorCostCompetitionEnabled() || !cRecoveryRelevantStack(result.stacks)) {
+ 			p.promotePrimaryStack(result.stacks)
+ 		}
+ 	} else {

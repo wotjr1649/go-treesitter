@@ -435,6 +435,43 @@ recovery reaches the new walk, so other grammars are not evidenced either way.
 The hypothesis above was wrong about the mechanism: the reduction does happen,
 and its result was lost in the summary walk.
 
+## KR-0006 — retired: C# and TypeScript generic call inside an argument
+
+| Field | Value |
+|---|---|
+| Upstream issue | None filed. Cause in upstream `v0.56.0` stack-order handling (see below); retired by the carrier patch `c-oracle-packed-version-order-no-promotion.patch` |
+| Baseline | `v0.56.0` candidate identities with 29 carrier patches; C# grammar `9150f7d5`; C build `e00a14ff…` |
+| Fixtures | `testdata/oracle/csharp-generic-call-cases.json` (5 failing shapes, 1 edit, 5 controls) and `typescript-generic-call-cases.json` (3 failing shapes, 2 controls); authored, MIT |
+| Go state | accepted_clean; `G<A, B>(7)` parsed as two comparisons (`binary_expression`), likewise TypeScript `g<A, B>(7)` |
+| C state | accepted, no error; C# `invocation_expression` over `generic_name`, TypeScript `call_expression` |
+| Affected set | a generic call as an argument (C#: one or two type arguments, a member call, a field initializer, `a < b, c > (d)`, and the edit; TypeScript: an argument, `a < b, c > (d)` and two generic calls as arguments). Not affected: a statement, an assignment, one of two C# arguments, `F(a < b, c > d)` (C reads a declaration expression) and parenthesized comparisons |
+| Exact signature (historical) | `CS-generic-call-argument`: source `b9930321…`, Go `d0674e5f…`, C `77de6b7e…`, first differing node 19. `TS-generic-call-argument`: source `c4314251…`, Go `469aa2f4…`, C `20e00596…`, first differing node 6 |
+| Evidence | Session 13: product run of the catalogs before the patch (6 of 11 C# and 3 of 5 TypeScript records fail), native C and Go traces (E2), and exact C agreement after the patch (E5, these inputs) |
+| Release impact | Found outside the retained corpus and retired in the same change; at discovery C# Release-Critical was red for these shapes |
+| Retirement | Done: every record of the catalog agrees exactly with C; preserve this historical record |
+
+Cause (trace E2). After `(`, both the generic-call version and the comparison
+version stay alive. C keeps them in stack-version order: the generic call is
+version 0. When both later shift `;` into the same state, C's
+`stack_node_add_link` merges them and keeps the earlier version's equivalent
+link, so the generic call survives. Between iterations the port also ran
+`promotePrimaryStack`, which moved the comparison version to slot 0 outside
+recovery. It was already suppressed during certified native recovery.
+`c-oracle-packed-version-order-no-promotion.patch` skips that promotion for every
+grammar whose profile certifies packed GSS version order: C#, C++, Dart,
+Erlang, Go, Swift and TypeScript. The retained product suite reaches the changed
+branch only for C#, Go and TypeScript, and the patch changes no retained result
+other than the KR-0006 records. C++, Dart, Erlang and Swift have no multi-stack
+hit in the retained suite and no C oracle here. An E2 probe saw Swift output
+change on unretained generic constructor calls such as `Array<Int>(…)` (no C
+reference), so those four grammars are not evidenced either way.
+
+C reorders versions only in `ts_parser__condense_stack`, when a later version
+has a strictly lower error cost or higher dynamic precedence. For packed-order
+grammars with several live stacks, the port's condense pass still runs that
+comparison and swaps versions on it. The patch removes only the separate
+promotion, whose depth, shift and position preferences have no C counterpart.
+
 ## Known characteristics (not regressions, not defects)
 
 These are measured, upstream-documented properties. Reporting them as defects is a reporting error.
@@ -542,5 +579,5 @@ and `TestJSXEqualsEdits`. The candidate passes all of them; see
   Patch files of the `v0.53.0` inventory that are not listed are not applied.
   They remain in the repository until a separate retirement decision under
   ADR-0013.
-- KR-0005 was opened and retired at the candidate (29th carrier patch). A new failure opens a new record; it is
+- KR-0005 and KR-0006 were opened and retired at the candidate (29th and 30th carrier patches). A new failure opens a new record; it is
   never absorbed into a retired one.

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "TS-generic-call-argument",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "kr0006",
+    "source": "f(g<A, B>(7));\n",
+    "sha256": "c4314251db85d11d13e37576313bbb2eedcc99039c66cfdf79002a3b5f2a9bae"
+  },
+  {
+    "id": "TS-generic-call-comparison-paren",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "kr0006",
+    "source": "f(a < b, c > (d));\n",
+    "sha256": "b70b59164f44966d229c58f31f280679653e88adceab22e30b617ec5fcee8df0"
+  },
+  {
+    "id": "TS-generic-calls-two-arguments",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "kr0006",
+    "source": "const x = f(g<A>(7), h<B, C>(1));\n",
+    "sha256": "d975097e0586c2bafa92577a1645e9921ca20431a3b4d22809b98c590d06b856"
+  },
+  {
+    "id": "TS-generic-call-statement",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "control",
+    "source": "g<A, B>(7);\n",
+    "sha256": "e8bf6a653ca0389a34e9776b05e19c63de2868bc55e73f7eab8f9aaf2d57c26f"
+  },
+  {
+    "id": "TS-parenthesized-comparisons",
+    "language": "typescript",
+    "filename": "x.ts",
+    "group": "control",
+    "source": "f((a < b), (c > d));\n",
+    "sha256": "bcc9f0ca2beb3cd88e4de7ab3937afa0a30188ddb09aacf3ffd9c288aaff678d"
+  }
+]
