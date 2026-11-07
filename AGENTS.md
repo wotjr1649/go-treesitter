@@ -78,7 +78,7 @@ branches; do not mix their documents with yours.
 - Preserve failures. Do not delete, retry-until-green, or re-label a failure as a different condition.
   Keep a failure's command, inputs, identity, and output.
 - `.scratch/` is working space, not an evidence store. Before removing anything there, identify the
-  unique evidence it holds, failures included. Copy that evidence into `artifacts/` and verify its hash.
+  unique evidence it holds, failures included. Copy that evidence into the local `artifacts/handoff/` and verify its hash.
 
 ## Authority
 
@@ -106,7 +106,7 @@ grant does not extend these limits. Even with authority, never use the ruleset a
 
 ## Git
 
-- `main` holds verified work. Session work happens on a short-lived branch (ADR-0005).
+- `main` holds verified work. Session work happens on a short-lived branch (ADR-0005, ADR-0019).
 - A LARGE branch, as ADR-0005 classifies it, stops at the branch. Produce the PR description and the
   reviewer guide, and do not merge without authority.
 - One verified work unit per commit. No mixed unrelated changes in one commit.

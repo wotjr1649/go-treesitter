@@ -1,6 +1,6 @@
 # ADR-0005 — Git branching and commit discipline
 
-**Status:** Accepted · 2026-09-22
+**Status:** Accepted · 2026-09-22 · superseded in part by ADR-0019 (main merges and remote)
 
 ## Context
 

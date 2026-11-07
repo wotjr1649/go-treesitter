@@ -38,7 +38,7 @@ understand whether the contract is still right.
 | 0002 | Inherit the existing oracle epoch | Accepted |
 | 0003 | Windows Tier-1, CGO-free production | Accepted |
 | 0004 | Parser boundary and result model | Accepted |
-| 0005 | Git branching and commit discipline | Accepted |
+| 0005 | Git branching and commit discipline | Superseded in part by ADR-0019 |
 | 0006 | Instruction architecture — AGENTS kernel, docs router, no skill | Accepted |
 | 0007 | Dynamic generator selection, immutable evidence inputs | Accepted |
 | 0008 | Windows native C oracle execution | Accepted |
@@ -52,3 +52,4 @@ understand whether the contract is still right.
 | 0016 | Curated publication and release evidence | Accepted |
 | 0017 | Exclude unclear grammars; assurance by release scope | Accepted |
 | 0018 | Evaluate the approved runtime baseline transition | Accepted |
+| 0019 | Explicit authority for every main merge | Accepted |
