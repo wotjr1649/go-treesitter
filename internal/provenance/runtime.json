@@ -7,7 +7,7 @@
     "commit": "ac4e027e02525e9d1d005c54ed5e54979271e4ed"
   },
   "archive_sha256": "0925d93fadca3ad943e20594d602c3639d79f9ad8f82d466262672890d7592a6",
-  "source_sha256": "ffc191d312eee32173078050bb5b8f18653ff4386e467a65a3031f148d91ba82",
+  "source_sha256": "3af539b36565d5819ba914b86bf30c6fbb115a56f57cc07b9284917c09ac3ceb",
   "importer_sha256": "de1808ce4f6e8f972d8098f948b468b521aa8a99eae7e14bb05729af8be44d4c",
   "separator_sha256": "85f5d66389768f3f010de803bd6ff082e8adc1723da1df42dec32705af8502f1",
   "internal_module": "github.com/wotjr1649/go-treesitter/internal/runtime",
@@ -127,6 +127,10 @@
     {
       "path": "tools/runtime-bundle/patches/c-oracle-recovery-summary-all-links.patch",
       "sha256": "9421266e4cce542dbfbafe90de46ed3f901ba6579bc47e8972503542a6b551f2"
+    },
+    {
+      "path": "tools/runtime-bundle/patches/c-oracle-packed-version-order-no-promotion.patch",
+      "sha256": "75cb530403f40d5dc6501f0030bf71a26984104cb67d3698414857b85fdc4e43"
     }
   ],
   "inputs": [
@@ -5722,7 +5726,7 @@
     },
     "parser.go": {
       "origin_sha256": "964d6aa6de084030ef4c4c6a19b7949ea9e5bf1a26d9e09b3b994d382abe3a62",
-      "sha256": "d757716e471893413f0aea87d75e8d5f5b296243869f3877814a4699fafcd8c9"
+      "sha256": "efd6e5548f88d0b58ff8f70339ef92238d31ee616f028a8794ae82ec6f7b1258"
     },
     "parser_api.go": {
       "origin_sha256": "8a72cee519590fcc94cb6464f084177681a50a90545468d8f7c624d8ae8bcb6c",

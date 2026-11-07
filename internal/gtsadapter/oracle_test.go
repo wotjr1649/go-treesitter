@@ -144,6 +144,15 @@ func TestCSharpConstructOracleRecords(t *testing.T) {
 	runOracleCorpus(t, "testdata/oracle/csharp-constructs-cases.json", "testdata/oracle/windows-c-v2/cs-constructs", "")
 }
 
+// KR-0006 (docs/validation/known-regressions.md) is retired: generic calls must agree exactly with C.
+func TestCSharpGenericCallOracleRecords(t *testing.T) {
+	runOracleCorpus(t, "testdata/oracle/csharp-generic-call-cases.json", "testdata/oracle/windows-c-v2/cs-generic-call", "")
+}
+
+func TestTypeScriptGenericCallOracleRecords(t *testing.T) {
+	runOracleCorpus(t, "testdata/oracle/typescript-generic-call-cases.json", "testdata/oracle/windows-c-v2/ts-generic-call", "")
+}
+
 func TestCSharpLambdaModifierOracleRecords(t *testing.T) {
 	runOracleCorpus(t, "testdata/oracle/csharp-lambda-modifier-cases.json", "testdata/oracle/windows-c-v2/cs-lambda-modifiers", "")
 }
