@@ -48,6 +48,15 @@ dispatch. Reusing one shift from such a cell discarded pending reductions and
 caused repeated stack copying. The patch keeps conflicting cells on normal
 dispatch; `TestLargeGoIncrementalConflict` retains the regression witness.
 
+c-oracle-recovery-summary-all-links.patch records the error-recovery stack
+summary over every link of a merged version, as C's stack__iter does. A
+reduction merged into an earlier version survives only as a packed link, and
+the link-0 walk hid it from the strategy-1 election (KR-0005).
+`TestKR0005CSharpLambdaRecovery` retains the regression witness. The private
+`testdata/recovery_summary_links_test.go`, run by check.py, compares the walk
+with a literal port of C's iterator loop and checks that the election sees
+every recorded depth.
+
 The upstream source MIT notice is retained verbatim in internal/runtime/LICENSE.
 Grammar and fixture notices are covered separately in THIRD_PARTY_NOTICES.md.
 The Go artifact keeps separate origin and C-derived product identities under

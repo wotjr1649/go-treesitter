@@ -11,10 +11,12 @@ with tempfile.TemporaryDirectory(prefix='runtime-invariants-', dir=SCRATCH) as d
     overlay = Path(directory) / 'overlay.json'
     overlay.write_text(json.dumps({'Replace': {
         str(ROOT / 'internal/runtime/recovery_hardening_test.go'):
-        str(ROOT / 'tools/runtime-bundle/testdata/recovery_hardening_test.go')
+        str(ROOT / 'tools/runtime-bundle/testdata/recovery_hardening_test.go'),
+        str(ROOT / 'internal/runtime/recovery_summary_links_test.go'):
+        str(ROOT / 'tools/runtime-bundle/testdata/recovery_summary_links_test.go'),
     }}), encoding='utf-8')
     result = subprocess.run(['go', 'test', '-overlay=' + str(overlay), './internal/runtime',
-                             '-run', '^Test(ClosedRecoveryGSSMergePreservesHistories|RecoveryAcceptanceOrder|EOFTransitions|RecoveryRawLeafCost|AcceptRootPreservesMissing)$',
+                             '-run', '^Test(ClosedRecoveryGSSMergePreservesHistories|RecoveryAcceptanceOrder|EOFTransitions|RecoveryRawLeafCost|AcceptRootPreservesMissing|RecoverySummaryLinks.*)$',
                              '-count=1', '-timeout=30s', '-json'],
                             cwd=ROOT, capture_output=True, timeout=90)
     print(result.stdout.decode(), end='')
@@ -22,5 +24,6 @@ with tempfile.TemporaryDirectory(prefix='runtime-invariants-', dir=SCRATCH) as d
         print(result.stderr.decode(), end='')
     result.check_returncode()
     passed = {row.get('Test') for row in map(json.loads, result.stdout.splitlines()) if row.get('Action') == 'pass'}
-    if not {'TestClosedRecoveryGSSMergePreservesHistories', 'TestRecoveryAcceptanceOrder', 'TestEOFTransitions', 'TestRecoveryRawLeafCost', 'TestAcceptRootPreservesMissing'} <= passed:
+    if not {'TestClosedRecoveryGSSMergePreservesHistories', 'TestRecoveryAcceptanceOrder', 'TestEOFTransitions', 'TestRecoveryRawLeafCost', 'TestAcceptRootPreservesMissing',
+            'TestRecoverySummaryLinksIteratorCapacity', 'TestRecoverySummaryLinksElectionSeesEveryDepth', 'TestRecoverySummaryLinksSingleChain'} <= passed:
         raise RuntimeError('private runtime invariant tests did not run')
