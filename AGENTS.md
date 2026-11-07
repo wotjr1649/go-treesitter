@@ -78,7 +78,7 @@ branches; do not mix their documents with yours.
 - Preserve failures. Do not delete, retry-until-green, or re-label a failure as a different condition.
   Keep a failure's command, inputs, identity, and output.
 - `.scratch/` is working space, not an evidence store. Before removing anything there, identify the
-  unique evidence it holds, failures included. Copy that evidence into `artifacts/` and verify its hash.
+  unique evidence it holds, failures included. Copy that evidence into the local `artifacts/handoff/` and verify its hash.
 
 ## Authority
 

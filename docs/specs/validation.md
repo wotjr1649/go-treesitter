@@ -98,18 +98,21 @@ Declare the number of runs **before** running. A benchmark is never repeated unt
 
 `.scratch/` is disposable working space, not an evidence store. When a run is created, record its role
 (failure, intermediate comparison, or adoption candidate) in its receipt. Before a session closes, copy
-into `artifacts/`, with hashes, anything that a claim, handoff, or release depends on. When a historical
-record names a `.scratch` path, it says where something ran, not where it is kept.
+into the local `artifacts/handoff/`, with hashes, anything that a claim, handoff, or release depends
+on. When a historical record names a `.scratch` path, it says where something ran, not where it is kept.
 
 To delete `.scratch` content:
 
 1. Confirm that no live session or process uses it.
-2. Copy any unique evidence into `artifacts/` and verify its hash.
+2. Copy any unique evidence into `artifacts/handoff/` and verify its hash. Publish only reviewed
+   projections, under `artifacts/release-candidate/` (`docs/specs/publication.md`).
 3. Add a cleanup ledger to `artifacts/handoff/` that lists each old path, its kept location or `deleted`,
    its SHA-256, and the reason.
 
 Never edit old records to drop a reference. Live tools read `.scratch/oracle`
 (`tools/native-oracle/run.py`), so do not delete it without re-running `prepare`.
+Other tools (`tools/release/check.py`, `tools/runtime-bundle/check.py`, CI) recreate their
+`.scratch` content on demand.
 
 ## Definition of Done
 
