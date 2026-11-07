@@ -106,7 +106,7 @@ grant does not extend these limits. Even with authority, never use the ruleset a
 
 ## Git
 
-- `main` holds verified work. Session work happens on a short-lived branch (ADR-0005).
+- `main` holds verified work. Session work happens on a short-lived branch (ADR-0005, ADR-0019).
 - A LARGE branch, as ADR-0005 classifies it, stops at the branch. Produce the PR description and the
   reviewer guide, and do not merge without authority.
 - One verified work unit per commit. No mixed unrelated changes in one commit.

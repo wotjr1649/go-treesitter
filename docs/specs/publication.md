@@ -30,7 +30,9 @@ Publishing a curated branch does not remove previously published branches,
 commits or cached copies. Review reachable history as well as the tip before
 publication. Remote history replacement, branch deletion, visibility changes,
 main merges and release tags each require explicit authorization for that act.
-No publication workflow may infer those permissions from a passing test.
+This includes a local merge into main, whatever the branch size (ADR-0019).
+No publication workflow may infer those permissions from a passing test, and
+no one acting under this contract uses a ruleset administrator bypass.
 
 Accepted ADRs preserve their original reasoning. Historical references in them
 may identify local records; current public contracts and selected evidence must
