@@ -461,6 +461,23 @@ reparse. Phase 3 independently recorded declines on its three larger inputs.
 Measured on the same C# input: 253 ms (product) vs 3,687 ms (race), same deadline.
 A race-lane timeout is a diagnostic observation. It never fails a product gate.
 
+### KC-0003 — recovery election order is depth-major, not C's record order
+
+C's `ts_parser__recover` reads one merged version's summary in `stack__iter`
+record order and stops at the first successful recovery. This engine keeps
+the merged version as several stacks and elects across their summaries
+depth-major, and within one depth it reads member summaries one after another.
+The all-links summary of `c-oracle-recovery-summary-all-links.patch` is stably
+sorted by depth for the same reason. Both choices can try candidates in a
+different order from C's single iterator walk. An extra on one path can make C
+try a deeper entry first. Even without extras, C can interleave entries of
+different paths at one depth where this engine finishes one member first.
+Reviews reproduced both cases on hand-built GSSs with hand-built tables (E2).
+No retained input is known to reach either. The difference predates the patch
+for multi-stack groups.
+Making the election follow record order would change recovery for every
+C-recovery grammar, so it is a separate decision, not a silent fix.
+
 ---
 
 ## Open investigations (no ratchet yet)
