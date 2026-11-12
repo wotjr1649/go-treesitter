@@ -64,6 +64,13 @@ link; the promotion changed which C# and TypeScript generic-call reading survive
 `TestCSharpGenericCallOracleRecords` and `TestTypeScriptGenericCallOracleRecords`
 retain the regression witnesses.
 
+c-oracle-packed-version-order-opt-out-promotion.patch exempts grammars that opt
+out of the default C recovery port (cRecoveryDefaultOptOut; C++ among the
+packed-order grammars) from that change. By default the port's condense swap
+does not run for them, and on the traced C++ inputs the promotion orders versions as C's
+condense does; removing it chose the template reading over C's comparison
+(KR-0007). `TestCppPackedVersionOrderControls` retains the witnesses.
+
 The upstream source MIT notice is retained verbatim in internal/runtime/LICENSE.
 Grammar and fixture notices are covered separately in THIRD_PARTY_NOTICES.md.
 The Go artifact keeps separate origin and C-derived product identities under

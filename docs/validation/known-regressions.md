@@ -472,6 +472,79 @@ grammars with several live stacks, the port's condense pass still runs that
 comparison and swaps versions on it. The patch removes only the separate
 promotion, whose depth, shift and position preferences have no C counterpart.
 
+Later measurement (Session 14, E2; native C parsers built locally at the pinned
+runtime and grammar commits, outside the oracle epoch; receipts in the local
+session handoff):
+
+- **Swift.** The pinned Swift commit has no checked-in `parser.c`; the C parser
+  was generated with tree-sitter CLI 0.27.0, and its parse tables differ from
+  the Go Swift blob's. On the 16 authored inputs and the 1 upstream corpus
+  example where the patch changes the tree, the patched tree has the same
+  ordered nodes as that C build and the pre-patch tree does not. The results
+  compare different table constructions.
+- **Dart and Erlang.** On their pinned upstream corpora (187 and 229 examples),
+  the patch changes no tree.
+- **C++.** The patch moved two upstream corpus examples off C; see KR-0007.
+  The sentence above about the port's condense pass does not hold for C++,
+  which opts out of the default C recovery port.
+
+## KR-0007 — retired: C++ template reading chosen over C's comparison
+
+| Field | Value |
+|---|---|
+| Upstream issue | None. Caused by the 30th carrier patch `c-oracle-packed-version-order-no-promotion.patch` (KR-0006). Retired by the 31st, `c-oracle-packed-version-order-opt-out-promotion.patch` |
+| Baseline | `v0.56.0` candidate identities with 30 carrier patches (runtime manifest `1a27c3d5…`); C++ grammar `c0092228` with its checked-in `parser.c` `0007727b…` |
+| Fixtures | Upstream pinned corpus `ambiguities.txt` #1 (`bool i = x.Base::foo < 0 \|\| 1 > (5);`) and `reflection.txt` #3 (`[:NS:]::template TCls<1>::v == a::v`). 4 authored reductions (MIT) in `TestCppPackedVersionOrderControls` |
+| Go state | accepted_clean. `x.B::f<0>(5)` became a `call_expression` over a `template_method`. `N::T<1>::v` became a nested `qualified_identifier` over a `template_type` |
+| C state | accepted, no error. Both inputs are comparisons (`binary_expression`). The upstream corpus's expected tree for `ambiguities.txt` #1 is the same as C's |
+| Evidence | E2. Three separate builds of the same native C sources (driver `c6e25f61…`, runtime `f5afe475`, gcc 16.2.0; `-O2` executables `c1b24509…` and `5c252778…`, `-O0` `f4ede09e…`) give identical ordered nodes for the 4 reductions. A table dump shows the Go C++ blob's parse tables equal the C `parser.c` (lexer and scanner not compared). C and Go GLR traces locate the cause. C++ is not in the retained oracle epoch, so these are not oracle records |
+| Release impact | None on Release-Critical gates: C++ is not Release-Critical. Found and retired in the same change |
+| Retirement | Done. `TestCppPackedVersionOrderControls` requires the C digests, fresh and after a one-byte edit; with the 30-patch `parser.go` all 4 fail |
+
+Cause (trace E2). At `<` after `B` (state 3705) the table reduces
+`qualified_identifier` (dynamic precedence 2) and also shifts. C's
+`ts_parser__condense_stack` then swaps the two versions, putting the comparison
+first. The versions later merge in one state with equal total dynamic precedence,
+and the earlier version's link survives. C++ opts out of the default C recovery
+port (`cRecoveryDefaultOptOut`), so by default the port's condense swap does not
+run for it.
+In these inputs `promotePrimaryStack` ordered the versions as C does, and the
+30th patch removed it. The 31st patch exempts grammars on that opt-out list from
+the 30th, so C++ keeps the rule from before the 30th patch in every runtime
+mode, and the other six packed-order grammars keep the 30th patch's rule. With
+C recovery forced on for C++ (`GOT_C_RECOVERY=cpp`), the swap and the promotion
+both run. A reviewer's 41 authored C++ variants then give one input,
+`x = N::M::T<1>::v;`, a tree different from C's, which the 30-patch file
+matches. Default runs are not affected.
+
+A first draft gated on the runtime flag `errorCostCompetitionEnabled()` instead.
+It matched on default runs. With the diagnostic `GOT_C_RECOVERY=0` or `=cpp`,
+the flag is off for the other six and the promotion returned. The C# and
+TypeScript KR-0006 records then failed (6 and 3). By code reading, the
+swallowed-error fallback reparse also turns the flag off; no measured input
+reached it. That draft was not adopted.
+
+Measurement of the 31-patch `parser.go` (E2; Go probe builds of the same file
+content, an independent reviewer's build included):
+
+- **C++ corpus.** 197 of the 198 examples in the pinned upstream corpus produce
+  a tree, and on each of them it equals the tree from before the 30th patch.
+  One example produces no tree in any Go build; C parses it.
+- **Against the local C build.** 174 of those 197 trees have the same ordered
+  nodes as the C build. The other 23 already differed before the 30th patch and
+  are not investigated.
+- **Incremental.** After a one-byte edit of the 4 reductions, the C++
+  incremental parse gives the C tree, as a fresh parse does. That reuse path
+  does not use packed version order, so the 30-patch file also gave the C
+  tree there. Only its fresh parse differed.
+- **Other grammars.** On the Swift inputs above and on the Dart and Erlang
+  corpora, the trees equal those of the 30-patch carrier.
+
+Not covered: when dynamic precedence ties, the promotion still breaks the tie
+by depth, which C does not do. Among the reviewer's 41 variants,
+`x = N::M::T<1>::v;` differs from C by default in every build, before and
+after both patches. It was not traced, and no wider search was made.
+
 ## Known characteristics (not regressions, not defects)
 
 These are measured, upstream-documented properties. Reporting them as defects is a reporting error.
@@ -579,5 +652,5 @@ and `TestJSXEqualsEdits`. The candidate passes all of them; see
   Patch files of the `v0.53.0` inventory that are not listed are not applied.
   They remain in the repository until a separate retirement decision under
   ADR-0013.
-- KR-0005 and KR-0006 were opened and retired at the candidate (29th and 30th carrier patches). A new failure opens a new record; it is
+- KR-0005, KR-0006 and KR-0007 were opened and retired at the candidate (29th, 30th and 31st carrier patches). A new failure opens a new record; it is
   never absorbed into a retired one.

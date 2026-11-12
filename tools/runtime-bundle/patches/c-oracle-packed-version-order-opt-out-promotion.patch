@@ -1,0 +1,15 @@
+diff --git a/parser.go b/parser.go
+--- a/parser.go
++++ b/parser.go
+@@ -8415,7 +8415,10 @@ func (p *Parser) prepareParseStacksForIteration(stacks []glrStack, scratch *pars
+ 		// version order keeps C's stack-version order outside recovery too:
+ 		// when two versions later merge, C keeps the earlier version's link,
+ 		// so promoting another stack to slot 0 changes the selected tree.
+-		if !p.compactPackedGSSVersionOrderEnabled() && (!p.emptyExternalRecoveryEnabled() || !p.errorCostCompetitionEnabled() || !cRecoveryRelevantStack(result.stacks)) {
++		// Grammars that opt out of the default C recovery port (C++) do not
++		// run its condense swap; in the traced C++ inputs the promotion orders
++		// versions as C's condense does, so they keep the earlier rule (KR-0007).
++		if (!p.compactPackedGSSVersionOrderEnabled() || cRecoveryDefaultOptOut(p.language.Name)) && (!p.emptyExternalRecoveryEnabled() || !p.errorCostCompetitionEnabled() || !cRecoveryRelevantStack(result.stacks)) {
+ 			p.promotePrimaryStack(result.stacks)
+ 		}
+ 	} else {
