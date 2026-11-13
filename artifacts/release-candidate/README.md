@@ -40,6 +40,12 @@ names its original local receipt hash and the fields it omits.
 diagnostic receipts for commit `b52f8ce`, all run from a fresh regular clone.
 `native-650d133/` keeps the hosted CI receipts (licenses, AMD64 and ARM64
 packaging) for commit `650d133`, run 42259446839.
+For main `2d1e93d` (31-patch carrier), `runtime-upgrade/validation-2d1e93d.json`
+projects the local product gate and the importer replay, `local-2d1e93d/` keeps
+the local packaging, license, ARM64 cross-link and race receipts, `native-2d1e93d/`
+keeps the hosted CI receipts of run 43333301306 with the local packaging receipt,
+and `runtime-comparison-2d1e93d.json` with its samples records the v0.53.0-to-main
+whole-product comparison.
 
 Fresh candidate checks run in
 [the Windows workflow](../../.github/workflows/windows.yml). Its native AMD64

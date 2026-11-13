@@ -1,0 +1,68 @@
+{
+  "candidate_commit": "2d1e93d2a21b4f8f314d4e0dd655167eddbfde98",
+  "run_url": "https://github.com/wotjr1649/go-treesitter/actions/runs/43333301306",
+  "workflow_conclusion": "success",
+  "jobs": [
+    {
+      "name": "licenses",
+      "conclusion": "success",
+      "url": "https://github.com/wotjr1649/go-treesitter/actions/runs/43333301306/job/131583094092"
+    },
+    {
+      "name": "product (windows-11-arm, arm64)",
+      "conclusion": "success",
+      "url": "https://github.com/wotjr1649/go-treesitter/actions/runs/43333301306/job/131583094088"
+    },
+    {
+      "name": "product (windows-latest, amd64)",
+      "conclusion": "success",
+      "url": "https://github.com/wotjr1649/go-treesitter/actions/runs/43333301306/job/131583093642"
+    },
+    {
+      "name": "race",
+      "conclusion": "success",
+      "url": "https://github.com/wotjr1649/go-treesitter/actions/runs/43333301306/job/131583094073"
+    }
+  ],
+  "receipts": [
+    {
+      "path": "licenses.json",
+      "sha256": "8e306c6c4959ad33748bcff1b0c23e48de6f2550aa72a52b6d9317f914604fc8"
+    },
+    {
+      "path": "packaging-amd64.json",
+      "sha256": "be96b0e94169f1bddfbd2091427a86afeffd2acfdf6eac391befe621f928f9da"
+    },
+    {
+      "path": "packaging-arm64.json",
+      "sha256": "f0b70411ba1d89517806a0ab357589a1aaf396076a8cee7195173b3a6e4b0522"
+    },
+    {
+      "path": "packaging-local.json",
+      "sha256": "1176a2e8527973b5676249b8fe70c7eae27d30b5ef47565977a7066a5ae6cd1f"
+    }
+  ],
+  "artifact_downloads": [
+    {
+      "name": "licenses",
+      "id": 13995757772,
+      "archive_sha256": "aa1a5a078f9f2d80ef069411dc532b57d817412ecac99b3789ce1793d20fac5f",
+      "receipt_sha256": "8e306c6c4959ad33748bcff1b0c23e48de6f2550aa72a52b6d9317f914604fc8",
+      "github_digest": "sha256:aa1a5a078f9f2d80ef069411dc532b57d817412ecac99b3789ce1793d20fac5f"
+    },
+    {
+      "name": "packaging-amd64",
+      "id": 13996112592,
+      "archive_sha256": "cf0e9eb44805e355fa22a107405be3d8752c30a5f32151add0ed82571fd14658",
+      "receipt_sha256": "be96b0e94169f1bddfbd2091427a86afeffd2acfdf6eac391befe621f928f9da",
+      "github_digest": "sha256:cf0e9eb44805e355fa22a107405be3d8752c30a5f32151add0ed82571fd14658"
+    },
+    {
+      "name": "packaging-arm64",
+      "id": 13995358602,
+      "archive_sha256": "cf22932a4e1f5d533c4e9a4f2892457ec4c6fb85ae0cc178be8b8e1d610b274d",
+      "receipt_sha256": "f0b70411ba1d89517806a0ab357589a1aaf396076a8cee7195173b3a6e4b0522",
+      "github_digest": "sha256:cf22932a4e1f5d533c4e9a4f2892457ec4c6fb85ae0cc178be8b8e1d610b274d"
+    }
+  ]
+}
