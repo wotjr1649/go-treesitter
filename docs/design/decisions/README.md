@@ -47,11 +47,12 @@ understand whether the contract is still right.
 | 0011 | Snapshot lookup | Accepted |
 | 0012 | Complete maintained TypeScript oracle patch | Accepted |
 | 0013 | Bundle the approved runtime | Superseded by ADR-0020 |
-| 0014 | Separate GPL grammar distribution | Accepted |
-| 0015 | Derived Go grammar and recovery | Accepted |
+| 0014 | Separate GPL grammar distribution | Superseded by ADR-0022 (removed) |
+| 0015 | Derived Go grammar and recovery | Superseded by ADR-0022 (removed) |
 | 0016 | Curated publication and release evidence | Accepted |
 | 0017 | Exclude unclear grammars; assurance by release scope | Superseded in part by ADR-0020 |
 | 0018 | Evaluate the approved runtime baseline transition | Superseded by ADR-0020 |
 | 0019 | Explicit authority for every main merge | Accepted |
-| 0020 | A public CGO-free tree-sitter library built from unmodified upstream C | Accepted |
+| 0020 | A public CGO-free tree-sitter library built from unmodified upstream C | Accepted; §4 amended by ADR-0022 |
 | 0021 | Public API v2: owned immutable snapshots on a confined parser | Accepted |
+| 0022 | Wave-1 preview, multi-module versioning, release-memory criterion, carrier removal | Accepted |

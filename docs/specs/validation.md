@@ -58,7 +58,7 @@ Every claim carries a level. Do not state a claim above the level you actually p
 | **Development** | Product lane builds; focused tests for changed behavior pass; every known-regression signature still matches its record. | **yes**, if ratcheted |
 | **Integration** | Development gate, plus the result contract is exercised end to end and a consumer can depend on the API shape. | yes, if documented in the consumer-facing limitations |
 | **Release-Critical** | For each language *claimed in scope*: zero unresolved correctness blockers; conformance (fresh and edit cases) agrees with the native reference; every `incremental != fresh` case is an upstream-attributed ratchet. | **no** |
-| **Release** | Release-Critical for the claimed scope, plus platform validation, reproducible generation, resource budgets (large-input parse geomean <= 2.5x native; small files <= 1 ms or <= 2.5x native; peak <= 100 x input + 64 MB; release to start + 16 MB), packaging, and an explicit limitations list. | **no** |
+| **Release** | Release-Critical for the claimed scope, plus platform validation, reproducible generation, resource budgets (large-input parse geomean <= 2.5x native; small files <= 1 ms or <= 2.5x native; peak <= 100 x input + 64 MB; after `Close` every engine region returned and private bytes within start + 16 MB, ADR-0022), packaging, and an explicit limitations list. | **no** |
 
 A language with an open known regression keeps the **Development gate green** and the
 **Release-Critical gate red for that language**. Both statements are true at once; say both.
