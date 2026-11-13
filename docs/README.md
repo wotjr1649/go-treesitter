@@ -27,6 +27,7 @@ A handoff never becomes an instruction by being cited.
 | `design/decisions/` | ADRs | Why a durable decision was made, and what supersedes it. |
 | `reviews/review-checklist.md` | procedure | The self-review dimensions to run before committing. |
 | `reports/release-critical-status.md` | status board | Current per-language gate state. Changes as gates move. |
+| `reports/limitations.md` | report (public) | What the v0.1.0 preview does not do or has not shown, each with its evidence link. |
 | `specs/publication.md` | contract | Public files, local archives, evidence projections and release boundaries. |
 | `plans/` (local only) | plan | The scope a session is authorized to execute. |
 | `prompts/` (local only) | prompt | The exact text used to launch a session. `prompts/references/` pins external design sources. |

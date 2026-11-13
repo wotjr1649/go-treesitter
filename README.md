@@ -46,6 +46,8 @@ fmt.Println(snap.Root().Kind()) // source_file
 
 Contracts: [`docs/specs/parser-result.md`](docs/specs/parser-result.md), [`docs/design/api-v2.md`](docs/design/api-v2.md).
 
+Preview [limitations](docs/reports/limitations.md); coming from the removed `syntax` API: [MIGRATING.md](MIGRATING.md).
+
 ## Develop
 
 ```sh
