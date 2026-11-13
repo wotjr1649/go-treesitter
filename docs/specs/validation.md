@@ -9,15 +9,19 @@ Definition of Done.
 |---|---|---|---|
 | **product** | `CGO_ENABLED=0`, Windows native | **yes** | The only lane that can pass or fail a product gate. |
 | **race** | CGO + `-race` | no | Data-race and concurrency diagnostics. |
+| **engine CI** | `CGO_ENABLED=0` on hosted Linux/macOS/Windows, amd64 and arm64 (`.github/workflows/engine.yml`) | yes, for the platform it ran on | Execution evidence per platform; a platform is claimed only after this lane ran there. |
 | **cross** | `CGO_ENABLED=0`, other `GOOS/GOARCH` | scope-limited | Link-only proof that no C toolchain is required. |
-| **oracle** | Linux container/CGO, or Windows native C (ADR-0008) | yes, for oracle claims | Produces checked-in tree digests. See `docs/specs/oracle.md`. |
+| **native reference** | C compiler, same runtime release and grammar sources (ADR-0020) | yes, for C-agreement claims | Produces the reference dumps. See `docs/specs/oracle.md`. |
+| **conformance** | `CGO_ENABLED=0`, `tools/conformance` with the local reference data | yes, for C-agreement claims | Byte-for-byte comparison of the public API's dumps with the native reference. |
+| **bench** | `CGO_ENABLED=0`, `tools/bench` paired with native executables | yes, for resource gates | Speed and memory gates on the product build. |
 
 Rules:
 
 - Never plan `CGO_ENABLED=0` together with `-race`; they are mutually exclusive by construction.
 - A race-lane timeout or slowdown is a diagnostic finding, never a product-gate failure.
   Race instrumentation has been measured at roughly **14×** the product lane on the same input.
-- First-release platform scope is Windows only. Other platforms are link-checked, not validated.
+- Windows amd64 is Tier-1. Linux, macOS and arm64 are claimed only for platforms where the engine CI lane
+  executed; otherwise they stay `NOT_RUN`.
 
 ## Evidence levels
 
@@ -30,7 +34,7 @@ Every claim carries a level. Do not state a claim above the level you actually p
 | `E2` | focused probe | A one-off executable check, not retained in the repository. |
 | `E3` | retained test | A test in this repository that re-runs in the product lane. |
 | `E4` | controlled comparison | A/B with exactly one variable changed and all identities bound. |
-| `E5` | oracle differential | Compared against the pinned C oracle digests. |
+| `E5` | C reference differential | Compared byte-for-byte with native C reference dumps of the same runtime release and grammar sources. |
 | `E6` | release gate | Full lane set, provenance, budgets, packaging, and limitations. |
 
 ### Claim vocabulary
@@ -53,8 +57,8 @@ Every claim carries a level. Do not state a claim above the level you actually p
 |---|---|---|
 | **Development** | Product lane builds; focused tests for changed behavior pass; every known-regression signature still matches its record. | **yes**, if ratcheted |
 | **Integration** | Development gate, plus the result contract is exercised end to end and a consumer can depend on the API shape. | yes, if documented in the consumer-facing limitations |
-| **Release-Critical** | For each language *claimed in scope*: zero unresolved correctness blockers, oracle digests agree, incremental invariant holds. | **no** |
-| **Release** | Release-Critical for the claimed scope, plus platform validation, provenance reproducibility, resource budgets, packaging, and an explicit limitations list. | **no** |
+| **Release-Critical** | For each language *claimed in scope*: zero unresolved correctness blockers; conformance (fresh and edit cases) agrees with the native reference; every `incremental != fresh` case is an upstream-attributed ratchet. | **no** |
+| **Release** | Release-Critical for the claimed scope, plus platform validation, reproducible generation, resource budgets (large-input parse geomean <= 2.5x native; small files <= 1 ms or <= 2.5x native; peak <= 100 x input + 64 MB; release to start + 16 MB), packaging, and an explicit limitations list. | **no** |
 
 A language with an open known regression keeps the **Development gate green** and the
 **Release-Critical gate red for that language**. Both statements are true at once; say both.
