@@ -12,6 +12,15 @@ Each record is bound to the baseline identity it names. In a retired record, "cu
 the `v0.56.0` candidate of ADR-0018. The candidate's own re-verification is recorded separately at
 the end of this register; no result transfers between the two identities.
 
+## Status after ADR-0022
+
+Every record below describes the removed `gotreesitter` carrier (the Go port of the runtime and its patches) and is
+**historical**; the engine runs unmodified upstream C, so these signatures and the tests, tools and paths they cite
+(`TestKR*`, `tools/runtime-bundle`, `windows-c-v2/`) no longer exist; Git history at `9ad82eb`. No record is open
+against the engine. The one ratcheted divergence in the engine lane is native-C behaviour, not a Go defect: five T-SQL
+edit cases whose incremental reparse differs from a fresh parse in C v0.27.2 and in the engine alike
+(`knownIncrementalDiffs` in `tools/conformance/edits_test.go`). A new failure opens a new record.
+
 ## Record format
 
 ```

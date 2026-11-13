@@ -11,7 +11,7 @@ Definition of Done.
 | **race** | CGO + `-race` | no | Data-race and concurrency diagnostics. |
 | **engine CI** | `CGO_ENABLED=0` on hosted Linux/macOS/Windows, amd64 and arm64 (`.github/workflows/engine.yml`) | yes, for the platform it ran on | Execution evidence per platform; a platform is claimed only after this lane ran there. |
 | **cross** | `CGO_ENABLED=0`, other `GOOS/GOARCH` | scope-limited | Link-only proof that no C toolchain is required. |
-| **native reference** | C compiler, same runtime release and grammar sources (ADR-0020) | yes, for C-agreement claims | Produces the reference dumps. See `docs/specs/oracle.md`. |
+| **native reference** | C compiler, same runtime release and grammar sources (ADR-0020); `tools/native-ref` | yes, for C-agreement claims | Produces the reference dumps. See `docs/specs/oracle.md`. |
 | **conformance** | `CGO_ENABLED=0`, `tools/conformance` with the local reference data | yes, for C-agreement claims | Byte-for-byte comparison of the public API's dumps with the native reference. |
 | **bench** | `CGO_ENABLED=0`, `tools/bench` paired with native executables | yes, for resource gates | Speed and memory gates on the product build. |
 
@@ -113,10 +113,11 @@ To delete `.scratch` content:
 3. Add a cleanup ledger to `artifacts/handoff/` that lists each old path, its kept location or `deleted`,
    its SHA-256, and the reason.
 
-Never edit old records to drop a reference. Live tools read `.scratch/oracle`
-(`tools/native-oracle/run.py`), so do not delete it without re-running `prepare`.
-Other tools (`tools/release/check.py`, `tools/runtime-bundle/check.py`, CI) recreate their
-`.scratch` content on demand.
+Never edit old records to drop a reference. The native reference executables are rebuilt on demand from the pins by
+`tools/native-ref`; the conformance and bench lanes read their local data tree (corpus, edits, large inputs, reference
+dumps) from `TSG_S15_DIR`, which is not tracked, so do not delete it without copying its evidence first. The
+pre-ADR-0022 tools (`.scratch/oracle`, `tools/native-oracle`, `tools/release`, `tools/runtime-bundle`) were removed;
+they remain in Git history at `9ad82eb`.
 
 ## Definition of Done
 

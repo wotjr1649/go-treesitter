@@ -6,7 +6,8 @@ Normative. Defines what "correct syntax" means here (ADR-0020 §3).
 
 The correctness reference for a generated grammar module is a **native C build of the same inputs**: the same
 tree-sitter runtime release and the same grammar `parser.c`/`scanner.c` bytes (`docs/specs/baseline-provenance.md`),
-compiled unmodified by this repository's own tooling, plus the shared dump/edit driver. There is no long-lived pinned
+compiled unmodified by this repository's own tooling (`tools/native-ref`: our own dump/edit/changed-ranges driver,
+sources verified against `tools/gen/pins.json`). There is no long-lived pinned
 oracle epoch: the reference moves with the runtime release and is rebuilt for it.
 
 A reference result is identified by the tuple

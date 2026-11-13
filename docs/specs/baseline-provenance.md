@@ -41,13 +41,11 @@ committed bytes.
   node-type (schema) diff.
 - **Engine ABI:** `internal/engine.ABIVersion`; a grammar module built for another ABI is rejected at `NewParser`.
 
-## Transition (until the carrier is removed)
+## Previous runtime (history)
 
-The previous product runtime — the `internal/runtime` carrier of `gotreesitter` v0.56.0 with its patches, bound by
-`internal/provenance/identities.json`, `internal/provenance/runtime.json` and `tools/runtime-bundle/source.json` —
-remains in the tree only until the new engine passes its gates and the owner approves its removal (ADR-0020 §7).
-Those files keep binding the old code while it exists; they are not identities of the new engine, and no result is
-carried between the two.
+The previous product runtime — the `internal/runtime` carrier of `gotreesitter` v0.56.0 with its patches and its
+provenance files — was removed by ADR-0022 and remains in Git history at `9ad82eb`. No result is carried between the
+two engines.
 
 ## Identity rules
 

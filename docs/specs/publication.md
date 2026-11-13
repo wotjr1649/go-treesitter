@@ -1,9 +1,12 @@
 # Publication boundary
 
-The public candidate contains the API and implementation, maintained runtime
-patches, grammar artifacts, source/patch identities, licenses, retained tests
-and fixtures, reproducible tools, CI, technical contracts and selected evidence.
-Keep the seven-route C oracle gate and the complete 204-entry basic catalog (ADR-0017).
+The public candidate contains the API and implementation, the engine ABI, generated
+grammar modules, pinned source identities (`tools/gen/pins.json`), licenses, retained
+tests and fixtures, reproducible tools (including the native C reference,
+`tools/native-ref`), CI, technical contracts and selected evidence. The runtime and
+grammar C are unmodified upstream. The seven-route C oracle gate and the 204-entry
+basic catalog of ADR-0017 belonged to the removed carrier (ADR-0022; Git history at
+`9ad82eb`); the current gate is the conformance lane (`docs/specs/validation.md`).
 
 Session prompts, private handoffs, raw investigation output, temporary checkouts,
 build caches, profiles, dumps and personal machine/account configuration stay
