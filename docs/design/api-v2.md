@@ -137,6 +137,21 @@ All are lazy (computed on first use, once, safe for concurrent readers) and meas
   on small edits (Go 3.7 % wrong), weak when the edit produces ERROR recovery. Marked experimental; accuracy work
   continues before it is promoted.
 
+Signatures as implemented (session 15 step 2):
+
+```go
+func NewSource(raw []byte) (*Source, error)                  // BOM detection; UTF-8 (with or without BOM) is kept as is
+func NewSourceUTF16(raw []byte, bigEndian bool) (*Source, error)
+func (*Source) Bytes() []byte; Original() []byte; Encoding() Encoding; OriginalOffset(utf8Off uint32) int
+func NewLineIndex(src string) *LineIndex; (*Snapshot) Lines() *LineIndex
+func (*LineIndex) NumLines() int; LineStart(line int) uint32; Line(off uint32) int; Pos(off uint32) Position // {Line, ByteCol, UTF16Col, RuneCol}
+func (Node) Hash() uint64; ShapeHash() uint64          // comparable within one grammar only (symbol ids are hashed)
+func (Node) Atom() Atom; (*Snapshot) AtomText(Atom) string; NumAtoms() int   // named non-empty leaves only
+func Match(old, new *Snapshot) *Mapping               // EXPERIMENTAL; NewOf/OldOf(Node) (Node, bool), Len; other grammar -> empty
+func NewParserPool(lang *Language, maxParsers int, opts ...Option) (*ParserPool, error) // Get(ctx), Put, Close
+func NewIndex(*Snapshot) *Index; (*Snapshot) Index() *Index  // OfType, OfSymbol -> iter.Seq[Node]; NodeAt(off uint32) (Node, bool)
+```
+
 ## 8. Queries (v0.1; signatures fixed now)
 
 `NewQuery(lang, pattern) (*Query, error)` compiles per instance on first use (cache invalidated by reset);
