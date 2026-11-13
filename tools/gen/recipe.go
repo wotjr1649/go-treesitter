@@ -59,7 +59,7 @@ func (r recipe) recipeLines(name string, pins *Pins) string {
 	}
 	s := fmt.Sprintf("\nrecipe=%s", name)
 	if r.opt != "" {
-		s += fmt.Sprintf("\nwasm-opt(after clang, before wasm2go)=%s\nbinaryen=%s %s", strings.Join(r.wasmOptArgs(), " "), pins.Tools.Binaryen, pins.Tools.BinaryenSHA256)
+		s += fmt.Sprintf("\nwasm-opt(after clang, before wasm2go)=%s\nbinaryen=%s", strings.Join(r.wasmOptArgs(), " "), pins.Tools.Binaryen)
 	}
 	if r.embed {
 		s += "\nwasm2go-embed=engine_gen.dat"

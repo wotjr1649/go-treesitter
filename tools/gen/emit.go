@@ -103,8 +103,14 @@ func checkImports(src string) error {
 	return nil
 }
 
-func goMod(lang string) string {
-	return "module " + modulePrefix + lang + "\n\ngo 1.27.2\n\nrequire github.com/wotjr1649/go-treesitter v0.0.0\n\n" +
+// goMod is a grammar module's go.mod. rootVersion "" is the local-development form (replace ../..); a version
+// emits the release form of ADR-0022: the exact root version, no replace.
+func goMod(lang, rootVersion string) string {
+	head := "module " + modulePrefix + lang + "\n\ngo 1.27.2\n\n"
+	if rootVersion != "" {
+		return head + "require github.com/wotjr1649/go-treesitter " + rootVersion + "\n"
+	}
+	return head + "require github.com/wotjr1649/go-treesitter v0.0.0\n\n" +
 		"// Local development: the grammar modules live in the root repository. Removed when the root module is tagged.\n" +
 		"replace github.com/wotjr1649/go-treesitter => ../..\n"
 }

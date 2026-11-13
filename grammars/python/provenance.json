@@ -15,14 +15,14 @@
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
       "shim.tsg_abi.c": "eca21d17b1a4d97e2b774f9e2fd00afb0751b529ccbbf03442ff1cbf15907241"
     },
-    "RecipeSHA256": "e74e90ace100cf99d81f8c71f5b0881d36eba48107b306ebd479f993dd4d9a15",
+    "RecipeSHA256": "58acf81f48969517626f0dac013ae3cc41ed6633fcc9df24922971d1a2256c5a",
     "Tools": {
       "binaryen": "wasm-opt version 133 (version_133)",
       "clang": "clang version 23.1.0-rc3 (https://github.com/llvm/llvm-project 895aa2c896ada719451be2e3673c83da8ddf1141)",
-      "go": "go1.27.4",
       "recipe": "v2-O3",
       "wasi-sdk": "34.0",
-      "wasm2go": "v0.4.21"
+      "wasm2go": "v0.4.21",
+      "wasm2go-sum": "h1:F9xQyNnXIjWesQgt7tLxqVUg2pmxwBOrRCLpEFv3QUc="
     }
   },
   "outputs": {

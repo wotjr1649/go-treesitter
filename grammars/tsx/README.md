@@ -6,7 +6,7 @@ Generated tree-sitter grammar module for go-treesitter. **Do not edit**: `engine
 - upstream grammar: https://github.com/tree-sitter/tree-sitter-typescript at `75b3874edb2dc714fb1fd77a32013d0f8699989f`
 - tree-sitter runtime: v0.27.2 (unmodified)
 - engine ABI: 1
-- recipe sha256: `e05fe7a1b25a98576641a838542a2f1ff73a941981fadc0638ef026126d62c9d`
+- recipe sha256: `6ce33c839b017660c9aff97df20f351474af9fb79ba6634a89f36ebfdce01eb6`
 - identity and output hashes: `provenance.json` (equals the compiled `engine.Identity`; `go test` checks it)
 
 `LICENSE` is the upstream grammar's license. Regenerate with `tools/gen` (see its README); regenerating gives identical bytes.

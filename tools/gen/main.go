@@ -17,11 +17,14 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"sort"
 	"strings"
 	"time"
 )
+
+var rootVersionRx = regexp.MustCompile(`^v[0-9]+[.][0-9]+[.][0-9]+(-[0-9A-Za-z.-]+)?$`)
 
 const modulePrefix = "github.com/wotjr1649/go-treesitter/grammars/"
 
@@ -35,8 +38,8 @@ var (
 )
 
 type opts struct {
-	lang, root, src, dl, sdk, wasm2go, wasmOpt, recipe, out, work, repo string
-	hash, noAPI                                                         bool
+	lang, root, src, dl, sdk, wasm2go, wasmOpt, recipe, out, work, repo, rootVersion, plan string
+	hash, noAPI, verifyBinaries                                                            bool
 }
 
 func main() {
@@ -52,6 +55,9 @@ func main() {
 	flag.StringVar(&o.out, "out", "", "output module directory")
 	flag.StringVar(&o.work, "work", "", "scratch directory (wasm, meta runner)")
 	flag.StringVar(&o.repo, "repo", "../..", "repository root (only for the meta runner's replace directive)")
+	flag.StringVar(&o.rootVersion, "root-version", "", "release mode: emit go.mod requiring the root module at this exact version (vX.Y.Z), without replace; default is the local-development form")
+	flag.StringVar(&o.plan, "plan", "", "print the fetch plan for this host platform (GOOS-GOARCH, or \"host\") and exit; tools/gen/regen.sh executes it")
+	flag.BoolVar(&o.verifyBinaries, "verify-binaries", false, "also check the host binary hashes pinned in localBinarySHA256 (optional local verification, not an identity)")
 	flag.BoolVar(&o.hash, "hash", false, "print the computed values of every pin and exit")
 	flag.BoolVar(&o.noAPI, "no-api", false, "do not emit language_api.go (Language() needs the root treesitter package)")
 	flag.Parse()
@@ -65,6 +71,20 @@ func run(o opts) error {
 	pins, err := loadPins(filepath.Join(o.root, "pins.json"))
 	if err != nil {
 		return err
+	}
+	if o.plan != "" {
+		if o.plan == "host" {
+			o.plan = hostPlatform()
+		}
+		lines, err := pins.plan(o.plan)
+		if err != nil {
+			return err
+		}
+		fmt.Println(strings.Join(lines, "\n"))
+		return nil
+	}
+	if o.rootVersion != "" && !rootVersionRx.MatchString(o.rootVersion) {
+		return fmt.Errorf("-root-version %q is not a semantic version vX.Y.Z", o.rootVersion)
 	}
 	if o.src == "" {
 		return fmt.Errorf("-src is required")
@@ -144,7 +164,7 @@ func run(o opts) error {
 	wasmBytes, _ := os.ReadFile(wasm)
 	files := map[string][]byte{
 		"engine_gen.go": []byte(patched),
-		"go.mod":        []byte(goMod(o.lang)),
+		"go.mod":        []byte(goMod(o.lang, o.rootVersion)),
 	}
 	if rc.embed {
 		dat, err := os.ReadFile(filepath.Join(work, "engine_gen.dat"))
@@ -171,7 +191,7 @@ func run(o opts) error {
 	tm["meta_s"] = since(t0)
 
 	id.RecipeSHA256 = recipeSHA256(pins, g, rname, rc)
-	id.Tools = map[string]string{"wasi-sdk": pins.Tools.WasiSDK, "clang": pins.Tools.Clang, "wasm2go": pins.Tools.Wasm2go, "go": pins.Tools.Go, "recipe": rname}
+	id.Tools = map[string]string{"wasi-sdk": pins.Tools.WasiSDK, "clang": pins.Tools.Clang, "wasm2go": pins.Tools.Wasm2go, "wasm2go-sum": pins.Tools.Wasm2goSum, "recipe": rname}
 	if rc.opt != "" {
 		id.Tools["binaryen"] = pins.Tools.Binaryen
 	}
@@ -299,30 +319,28 @@ func verify(o opts, pins *Pins, g GrammarPin, rc recipe, tm map[string]float64) 
 	if err := expect("clang version", strings.TrimSpace(strings.SplitN(out, "\n", 2)[0]), pins.Tools.Clang); err != nil {
 		return id, err
 	}
-	if got, err = sumFile(o.wasm2go); err != nil {
-		return id, err
-	}
-	if err := expect("wasm2go binary", got, pins.Tools.Wasm2goSHA256); err != nil {
-		return id, err
-	}
 	bi, err := buildinfo.ReadFile(o.wasm2go)
 	if err != nil {
+		return id, err
+	}
+	// The module version and its go.sum hash identify wasm2go; the binary itself is rebuilt per host (go install -trimpath).
+	if err := expect("wasm2go module", bi.Main.Path, pins.Tools.Wasm2goModule); err != nil {
 		return id, err
 	}
 	if err := expect("wasm2go module version", bi.Main.Version, pins.Tools.Wasm2go); err != nil {
 		return id, err
 	}
-	if err := expect("wasm2go built with", bi.GoVersion, pins.Tools.Go); err != nil {
+	if err := expect("wasm2go module sum", bi.Main.Sum, pins.Tools.Wasm2goSum); err != nil {
+		return id, err
+	}
+	if err := verifyBinary(o, pins, "wasm2go", o.wasm2go); err != nil {
 		return id, err
 	}
 	if rc.opt != "" {
 		if o.wasmOpt == "" {
 			return id, fmt.Errorf("-wasm-opt is required by this recipe")
 		}
-		if got, err = sumFile(o.wasmOpt); err != nil {
-			return id, err
-		}
-		if err := expect("wasm-opt binary", got, pins.Tools.BinaryenSHA256); err != nil {
+		if err := verifyBinary(o, pins, "wasm-opt", o.wasmOpt); err != nil {
 			return id, err
 		}
 		out, err := runCmd("", nil, o.wasmOpt, "--version")
@@ -334,6 +352,22 @@ func verify(o opts, pins *Pins, g GrammarPin, rc recipe, tm map[string]float64) 
 		}
 	}
 	return id, nil
+}
+
+// verifyBinary is the optional local check of a host binary against localBinarySHA256 (-verify-binaries).
+func verifyBinary(o opts, pins *Pins, tool, path string) error {
+	if !o.verifyBinaries {
+		return nil
+	}
+	want, ok := pins.Tools.LocalBinarySHA256[hostPlatform()][tool]
+	if !ok { // wasm2go has none: a go install build differs with the Go version, so only its module sum is pinned
+		return nil
+	}
+	got, err := sumFile(path)
+	if err != nil {
+		return err
+	}
+	return expect(tool+" binary", got, want)
 }
 
 func clangPath(sdk string) string {
@@ -454,9 +488,6 @@ func printHashes(o opts, pins *Pins) error {
 	res["grammars"] = gs
 	if s, err := sumFile(filepath.Join(o.root, "shim", "tsg_abi.c")); err == nil {
 		res["shimSHA256"] = s
-	}
-	if o.wasm2go != "" {
-		res["wasm2goSHA256"], _ = sumFile(o.wasm2go)
 	}
 	return json.NewEncoder(os.Stdout).Encode(res)
 }

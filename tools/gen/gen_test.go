@@ -102,7 +102,7 @@ func TestTreeSHA256IsPathAndContentBound(t *testing.T) {
 }
 
 func TestRecipes(t *testing.T) {
-	pins := &Pins{Tools: ToolPins{Binaryen: "b", BinaryenSHA256: "h"}}
+	pins := &Pins{Tools: ToolPins{Binaryen: "b"}}
 	if got := recipes["v0"].recipeLines("v0", pins); got != "" {
 		t.Fatalf("v0 must not change the baseline recipe hash, got %q", got)
 	}
@@ -119,5 +119,92 @@ func TestRecipes(t *testing.T) {
 	}
 	if _, err := lookupRecipe("nope"); err == nil {
 		t.Fatal("unknown recipe accepted")
+	}
+}
+
+func TestGoModModes(t *testing.T) {
+	dev := goMod("json", "")
+	if !strings.Contains(dev, "require github.com/wotjr1649/go-treesitter v0.0.0\n") || !strings.Contains(dev, "replace github.com/wotjr1649/go-treesitter => ../..\n") {
+		t.Fatalf("dev go.mod lost its local form:\n%s", dev)
+	}
+	rel := goMod("json", "v0.1.0")
+	want := "module github.com/wotjr1649/go-treesitter/grammars/json\n\ngo 1.27.2\n\nrequire github.com/wotjr1649/go-treesitter v0.1.0\n"
+	if rel != want {
+		t.Fatalf("release go.mod:\n%s\nwant:\n%s", rel, want)
+	}
+	if strings.Contains(rel, "replace") || strings.Contains(rel, "v0.0.0") {
+		t.Fatal("release go.mod must have neither replace nor the placeholder version")
+	}
+	for _, ok := range []string{"v0.1.0", "v1.22.333", "v0.1.0-rc.1"} {
+		if !rootVersionRx.MatchString(ok) {
+			t.Errorf("%s rejected", ok)
+		}
+	}
+	for _, bad := range []string{"", "0.1.0", "v0.1", "v0.1.0 ", "v0.1.0\nreplace x => y", "latest", "v0.0.0+incompatible"} {
+		if rootVersionRx.MatchString(bad) {
+			t.Errorf("%q accepted", bad)
+		}
+	}
+}
+
+// The pinned inputs must stay host independent: archives and versions, one entry per supported platform.
+func TestPinsPlan(t *testing.T) {
+	pins, err := loadPins("pins.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, plat := range []string{"windows-amd64", "linux-amd64"} {
+		lines, err := pins.plan(plat)
+		if err != nil {
+			t.Fatalf("%s: %v", plat, err)
+		}
+		kinds := map[string]int{}
+		for _, l := range lines {
+			f := strings.Split(l, "\t")
+			if len(f) != 5 {
+				t.Fatalf("%s: malformed plan line %q", plat, l)
+			}
+			kinds[f[0]]++
+			if f[0] != "goinstall" && (!strings.HasPrefix(f[2], "https://") || len(f[3]) != 64) {
+				t.Fatalf("%s: unpinned download %q", plat, l)
+			}
+		}
+		// sdk + binaryen, wasm2go, runtime + 6 distinct grammar repositories (typescript and tsx share one archive)
+		if kinds["tool"] != 2 || kinds["goinstall"] != 1 || kinds["source"] != 7 {
+			t.Fatalf("%s: plan kinds %v", plat, kinds)
+		}
+	}
+	if _, err := pins.plan("plan9-amd64"); err == nil {
+		t.Fatal("a platform without pinned archives must fail")
+	}
+	if pins.Tools.Wasm2goSum == "" || !strings.HasPrefix(pins.Tools.Wasm2goSum, "h1:") {
+		t.Fatalf("wasm2go go.sum hash not pinned: %q", pins.Tools.Wasm2goSum)
+	}
+}
+
+func TestTarballURL(t *testing.T) {
+	c := strings.Repeat("a", 40)
+	got, err := tarballURL("https://github.com/tree-sitter/tree-sitter-json", c)
+	if err != nil || got != "https://api.github.com/repos/tree-sitter/tree-sitter-json/tarball/"+c {
+		t.Fatalf("%q %v", got, err)
+	}
+	if _, err := tarballURL("https://example.com/x/y", c); err == nil {
+		t.Fatal("non-GitHub repository accepted")
+	}
+	if _, err := tarballURL("https://github.com/x/y", "abc"); err == nil {
+		t.Fatal("short commit accepted")
+	}
+}
+
+// The recipe hash binds tool versions, not host binaries: two hosts with different binaries must agree.
+func TestRecipeHashIsHostIndependent(t *testing.T) {
+	pins, err := loadPins("pins.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	a := recipes["v2-O3"].recipeLines("v2-O3", pins)
+	pins.Tools.LocalBinarySHA256 = map[string]map[string]string{"linux-amd64": {"wasm-opt": strings.Repeat("0", 64)}}
+	if b := recipes["v2-O3"].recipeLines("v2-O3", pins); a != b || strings.Contains(a, pins.Tools.LocalBinarySHA256["linux-amd64"]["wasm-opt"]) {
+		t.Fatal("recipe lines depend on a host binary hash")
 	}
 }

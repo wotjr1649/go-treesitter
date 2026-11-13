@@ -8,7 +8,9 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 )
@@ -36,16 +38,27 @@ type RuntimePin struct {
 	TreeSHA256    string   `json:"treeSHA256"`
 }
 
+// Archive is one upstream release archive; its sha256 is verified before anything inside it is used.
+type Archive struct {
+	URL    string `json:"url"`
+	SHA256 string `json:"sha256"`
+}
+
+// ToolPins identify tools by upstream source and version, never by a host binary hash: a generated module's
+// identity must not depend on the host that generated it. Archives are keyed per host platform "<GOOS>-<GOARCH>".
 type ToolPins struct {
-	WasiSDK       string `json:"wasi-sdk"`
-	Clang         string `json:"clang"`         // first line of `clang --version`
-	Wasm2go       string `json:"wasm2go"`       // module version recorded in the binary
-	Wasm2goSHA256 string `json:"wasm2goSHA256"` // the pinned binary (host specific)
-	Go            string `json:"go"`            // Go version wasm2go was built with
+	WasiSDK         string             `json:"wasi-sdk"`
+	Clang           string             `json:"clang"` // first line of `clang --version`
+	WasiSDKArchives map[string]Archive `json:"wasiSDKArchives"`
+	Wasm2go         string             `json:"wasm2go"`       // module version
+	Wasm2goModule   string             `json:"wasm2goModule"` // built with: go install -trimpath <module>@<version>
+	Wasm2goSum      string             `json:"wasm2goSum"`    // go.sum h1: hash of that module version (read back from the binary's build info)
 	// Binaryen is needed only by the recipes that run wasm-opt.
-	Binaryen              string `json:"binaryen,omitempty"`              // first line of `wasm-opt --version`
-	BinaryenSHA256        string `json:"binaryenSHA256,omitempty"`        // the pinned wasm-opt binary (host specific)
-	BinaryenArchiveSHA256 string `json:"binaryenArchiveSHA256,omitempty"` // upstream release archive the binary was extracted from (provenance only)
+	Binaryen         string             `json:"binaryen,omitempty"` // first line of `wasm-opt --version`
+	BinaryenArchives map[string]Archive `json:"binaryenArchives,omitempty"`
+	// LocalBinarySHA256 holds host binary hashes (platform -> tool -> sha256). They are checked only with -verify-binaries
+	// and are not part of any identity.
+	LocalBinarySHA256 map[string]map[string]string `json:"localBinarySHA256,omitempty"`
 }
 
 type GrammarPin struct {
@@ -130,3 +143,62 @@ func expect(what, got, want string) error {
 	}
 	return nil
 }
+
+// tarballURL is the GitHub API tarball of a full commit. Its bytes are what archiveSHA256 pins.
+func tarballURL(repo, commit string) (string, error) {
+	const p = "https://github.com/"
+	if !strings.HasPrefix(repo, p) || len(commit) != 40 {
+		return "", fmt.Errorf("cannot derive a tarball url from %q @ %q", repo, commit)
+	}
+	return "https://api.github.com/repos/" + strings.TrimPrefix(repo, p) + "/tarball/" + commit, nil
+}
+
+// plan lists everything a host must fetch, one tab-separated line each: kind, file, url, sha256, destination.
+// Archives are extracted with their top directory stripped into <work>/<destination>; a "goinstall" line names a
+// module version to build with go install -trimpath. tools/gen/regen.sh executes it.
+func (p *Pins) plan(platform string) ([]string, error) {
+	var out []string
+	add := func(kind, file, url, sum, dest string) {
+		out = append(out, strings.Join([]string{kind, file, url, sum, dest}, "\t"))
+	}
+	sdk, ok := p.Tools.WasiSDKArchives[platform]
+	if !ok {
+		return nil, fmt.Errorf("no wasi-sdk archive pinned for platform %q", platform)
+	}
+	add("tool", path.Base(sdk.URL), sdk.URL, sdk.SHA256, "sdk")
+	if p.Tools.BinaryenArchives != nil {
+		bin, ok := p.Tools.BinaryenArchives[platform]
+		if !ok {
+			return nil, fmt.Errorf("no binaryen archive pinned for platform %q", platform)
+		}
+		add("tool", path.Base(bin.URL), bin.URL, bin.SHA256, "binaryen")
+	}
+	add("goinstall", p.Tools.Wasm2goModule+"@"+p.Tools.Wasm2go, "-", "-", "-")
+	rt := p.Runtime
+	u, err := tarballURL(rt.Repo, rt.Commit)
+	if err != nil {
+		return nil, err
+	}
+	add("source", rt.Archive, u, rt.ArchiveSHA256, "src/"+rt.ExtractDir)
+	seen := map[string]bool{}
+	names := make([]string, 0, len(p.Grammars))
+	for n := range p.Grammars {
+		names = append(names, n)
+	}
+	sort.Strings(names)
+	for _, n := range names {
+		g := p.Grammars[n]
+		if seen[g.Archive] { // typescript and tsx share one repository archive
+			continue
+		}
+		seen[g.Archive] = true
+		if u, err = tarballURL(g.Repo, g.Commit); err != nil {
+			return nil, err
+		}
+		add("source", g.Archive, u, g.ArchiveSHA256, "src/"+g.ExtractDir)
+	}
+	return out, nil
+}
+
+// hostPlatform is the key of the per-platform archive tables.
+func hostPlatform() string { return runtime.GOOS + "-" + runtime.GOARCH }

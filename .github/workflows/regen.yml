@@ -1,0 +1,42 @@
+name: Regeneration drift check
+
+# Regenerates every grammar module on Linux from the pinned upstream sources and tools (tools/gen/pins.json) and
+# requires the result to equal the committed bytes, which were generated on Windows. A difference means the
+# generation is not host independent, or a pin and the committed modules disagree.
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  regen:
+    name: regenerate and diff (ubuntu-24.04)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      CGO_ENABLED: "0"
+      GOENV: "off"
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      # Downloads each pinned archive into a new empty directory and checks its sha256 before extracting;
+      # builds wasm2go from its pinned module version; regenerates all seven modules into grammars/.
+      - name: Regenerate grammar modules
+        run: bash tools/gen/regen.sh "$RUNNER_TEMP/regen"
+      - name: Compare with the committed modules
+        run: |
+          git status --porcelain -- grammars/
+          git diff --exit-code --stat -- grammars/
+          test -z "$(git status --porcelain -- grammars/)"
