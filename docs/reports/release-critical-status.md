@@ -24,7 +24,7 @@ to the new engine.
 | Memory peak / release (24) | PASS; worst peak 0.55 of limit; worst release 15.2 MB of 16 MB, not reproduced in 80 probe runs (max 12.3 MB; engine regions returned 80/80, remainder mostly image pages) | bench lane |
 | Reproducible generation | PASS for the modules checked (byte-identical regeneration) | E3 |
 | `-race` (diagnostic) | all 7 grammars: no race (sampled edits, quick cancel) | diagnostic |
-| Linux, macOS, Windows arm64 execution | NOT_RUN (engine CI lane pending) | — |
+| Linux amd64/arm64, macOS arm64, Windows amd64/arm64 execution | PASS: engine CI run 43499796838 on `1c9a204`, 10/10 packages per platform (engine, root, generator, 7 grammar modules with embedded samples). C-reference conformance ran on Windows amd64 only | E3 per platform |
 
 ## Open items before Release
 
