@@ -1,152 +1,57 @@
 # go-treesitter
 
-A Go syntax-analysis layer over an internally bundled, pinned `gotreesitter` runtime, with explicit
-parse outcomes, an adapter boundary, and Windows-native CGO-free validation.
+**v0.1.0 preview (unreleased).** A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
+module is generated from the unmodified upstream tree-sitter runtime and grammar C (wasm translated to Go by
+`tools/gen`), and is checked against a native C build of the same sources.
 
-This repository owns syntax results and their evidence. Language semantics,
-code graphs, and downstream application policy belong to consumers.
+This repository owns the `treesitter` API, its result contract, the engine ABI and the generator. Language semantics,
+code graphs and application policy belong to consumers.
 
-Start with [AGENTS.md](AGENTS.md) and the [documentation map](docs/README.md).
-The [status board](docs/reports/release-critical-status.md) separates development
-use from release approval. The first version will be `v0.0.1`; release gates are
-still being completed. The module includes its approved runtime patches and
-needs no consumer `replace` directive or external runtime dependency.
+Start with [AGENTS.md](AGENTS.md) and the [documentation map](docs/README.md). The
+[status board](docs/reports/release-critical-status.md) separates development use from release approval.
 
-Create a parser through the public package; the implementation stays internal:
+## Use
+
+The root module has no grammar. Add the grammar modules you need (wave 1: `csharp`, `golang`, `json`, `python`, `tsql`,
+`tsx`, `typescript` under `grammars/`):
 
 ```go
-parser := treesitter.New() // import treesitter "github.com/wotjr1649/go-treesitter"
-result, err := parser.Parse(ctx, syntax.Request{
-    Filename: "hello.go",
-    Source:   []byte("package hello\nfunc Hello() {}\n"),
-    Timeout:  time.Second,
-})
-if result.Tree != nil {
-    defer result.Tree.Close()
+import (
+	"context"
+	"fmt"
+
+	treesitter "github.com/wotjr1649/go-treesitter"
+	"github.com/wotjr1649/go-treesitter/grammars/golang"
+)
+
+parser, err := treesitter.NewParser(golang.Language())
+if err != nil {
+	return err
 }
-if err != nil || !result.Complete() {
-    // Parsing stopped or could not run. Inspect result.Diagnostics.
-    return
+defer parser.Close()
+
+snap, err := parser.ParseSnapshot(context.Background(), []byte("package p\nfunc F() {}\n"))
+if err != nil {
+	return err
 }
-if result.Outcome == syntax.AcceptedWithErrors {
-    // A complete recovery tree is available; the source has syntax errors.
-}
+fmt.Println(snap.Root().Kind()) // source_file
 ```
 
-`syntax` is `github.com/wotjr1649/go-treesitter/syntax`. The runnable
-[external consumer](testdata/consumer/main.go) exercises fresh parsing, an edit,
-error outcomes, cancellation, tree release and the JSX/TSX scanner correction
-from a separate Go module, installed through a local versioned module proxy.
-Keep each tree on one worker; close every returned tree. The API remains
-unreleased and may change before the first version tag.
+- `ParseSnapshot` returns an immutable `*Snapshot` that needs no `Close` and is safe to share between goroutines.
+  `Parse` returns a `*Tree` for incremental work (`Edit`, then `Parse(ctx, src, old)`); close every `Tree`.
+- A `Parser` and its `Tree`s are one confinement unit: use them from one goroutine at a time. `NewParserPool` lends parsers
+  to concurrent goroutines.
+- A nil error means a complete tree, which can still contain syntax errors: check `snap.Root().HasError()` (`Tree.Outcome()`
+  is `AcceptedClean` or `AcceptedWithErrors`). No result is a `*ParseError` carrying the `Outcome` (`Timeout`, `Cancelled`, …).
 
-For repeated AST lookup, build `index, err := syntax.NewIndex(result.Tree.Nodes())`
-after a complete result. `index.NodeAt(byteOffset)` returns the deepest node's
-snapshot index, and `index.OfType("identifier")` yields matching indexes in
-preorder. Positions use half-open UTF-8 byte ranges; EOF and zero-width missing
-nodes are excluded from position lookup. The index is optional, retains no
-backend handle, and supports concurrent readers. Rebuild it after an edit.
-Construction adds time and memory, so a single scan can be cheaper for a few
-lookups. See the retained `BenchmarkSnapshotLookup` for the measured workload.
+Contracts: [`docs/specs/parser-result.md`](docs/specs/parser-result.md), [`docs/design/api-v2.md`](docs/design/api-v2.md).
 
-For bounded inputs, set `Request.Limits`, for example
-`syntax.Limits{MaxInputBytes: 8 << 20, MaxSnapshotNodes: 100_000,
-MemoryBudgetBytes: 64 << 20}`. Runtime memory and work limits are checked at
-parser checkpoints; they are not a hard process-memory cap and may change the
-runtime route. Grammar caches, source copies and snapshots are outside that
-runtime memory threshold. Context cancellation covers snapshot construction.
-An explicit memory budget also rejects results whose reported arena plus
-scratch footprint exceeds it, even if the upstream growth check accepted them.
-`Timeout` covers the parse API, excluding grammar loading. Negative limits or
-timeouts are rejected as `not_run`; a local cap reports `resource_limit` and
-an adapter-owned `LimitReason` without changing the raw runtime `StopReason`.
+## Develop
 
-Run the Windows product checks with:
-
-```powershell
-$env:CGO_ENABLED = '0'
-go build ./...
-go vet ./...
-go test ./... -count=1
+```sh
+CGO_ENABLED=0 go build ./... && go vet ./... && go test -count=1 ./...
 ```
 
-Consumers that need only the seven assessed routes can use upstream's existing
-embedded grammar selection. This keeps the selected blobs inside the executable
-and needs no runtime downloads or external grammar directory:
-
-```powershell
-$subset = 'grammar_subset,grammar_subset_go,grammar_subset_python,grammar_subset_javascript,grammar_subset_typescript,grammar_subset_tsx,grammar_subset_c_sharp'
-go build -tags $subset ./...
-go test -tags $subset ./... -count=1
-```
-
-Executable size depends on the selected grammars and application. See
-[resource measurements and limitations](docs/reports/release-critical-status.md).
-`go run ./tools/measure -language go -iterations 20` reproduces one fixed
-workload; available routes are `go`, `py`, `js`, `jsx`, `ts`, `tsx` and `cs`.
-The tool reports Go heap metrics, not OS RSS, and separates first-use grammar
-loading from subsequent parse API calls.
-
-The base module contains 201 grammars. The separate
-[`grammars/gpl`](grammars/gpl/README.md) module adds the pinned `caddy`,
-`disassembly` and `jq` grammars by a side-effect import, for 204 total.
-Brightscript and Cooklang are not distributed because their upstream license
-declarations conflict ([ADR-0017](docs/design/decisions/ADR-0017-exclude-unclear-grammars-and-assurance-tiers.md)).
-The base module has no dependency on that module and its ZIP excludes the GPL
-payload. Including the optional module brings its GPL distribution terms.
-
-[Basic catalog checks](tools/catalog/README.md) cover all 204 grammars with
-three fresh runs, determinism, incremental edits, cancellation and input limits.
-This coverage is separate from the seven Release-Critical C oracle gates; the
-grammars outside those routes do not have that gate. Before v1, the availability and default
-handling of other grammars may change; see the
-[consumer contract](docs/specs/parser-result.md#language-availability).
-Completion preserves grammar-owned root coordinates and requires the runtime's
-actual and expected EOF receipts; the retained COBOL controls also compare all
-ordered nodes with the pinned C oracle.
-
-Public contracts are under `docs/specs/`. Selected, source-bound validation
-evidence is under `artifacts/release-candidate/`; original regression inputs
-and C expectations stay in `testdata/`. Session prompts, plans, handoffs,
-raw investigation logs and old experiment worktrees are local-only material.
-See [publication boundaries](docs/specs/publication.md).
-
-Product tests include 688 source-bound C oracle records and 439 edit comparisons
-across the seven core routes, without invoking a C compiler.
-[Oracle tooling](tools/native-oracle/README.md) documents producing
-new records, using an updated generator, and comparing artifacts before adoption.
-Generator selection has no release constant; runtime/grammar identities remain
-pinned. Original scanner failures remain in the retained oracle records. The
-upstream scanners of the current [internal runtime](tools/runtime-bundle/README.md)
-no longer contain the two Go-only guards, and the carrier no longer applies its
-earlier six-line correction patch; KR-0001b stays retired and its controls still
-require C agreement.
-The separate extended catalog adds 35 fresh comparisons and 21 edit comparisons
-over all seven routes, including UTF-8/CRLF and wide sibling boundaries.
-Eight further TypeScript/TSX controls now agree with the officially adopted C
-grammar built with the complete maintained upstream patch. KR-0003 is retired;
-the original unpatched C evidence is preserved.
-The C# recovery changes preserve missing-token scheduling, ambiguity over a
-shared error history and the order in which results were accepted. Source-based
-reconstruction preserves error-bearing trees. The retained C# catalogs add 74
-fresh records and 72 edits, including reduced inputs, identifier changes,
-Unicode, CRLF and the original real-world excerpts. Original KR-0002/KR-0004
-failure evidence remains available; those inputs now require exact C agreement.
-
-The final recovery corpus also covers Go EOF/NUL terminals, reserved keywords,
-version-specific lookahead, hidden missing nodes and incremental dependencies.
-At the v0.56.0 candidate two C-tree differences, KR-0005 (an unclosed C#
-lambda) and KR-0006 (a C# and TypeScript generic call inside an argument),
-were found and retired by carrier patches; see
-`docs/validation/known-regressions.md`. No active C-tree exception remains in the retained corpus. The internal Go blob is derived from the
-same pinned C grammar, with distinct origin and product identities (ADR-0015).
-Performance and memory measurements, controlled fallback reasons and remaining
-release blockers are recorded in the [status board](docs/reports/release-critical-status.md)
-and [selected evidence](artifacts/release-candidate/README.md).
-The curated candidate's native Windows AMD64 and ARM64 product jobs at
-`e4e6a56`, including official-ZIP consumers and the then 206 basic grammar
-checks, passed; see the commit-bound receipts in the status board.
-
-The library's own code is [MIT licensed](LICENSE). See
-[third-party notices](THIRD_PARTY_NOTICES.md) for the pinned runtime, all catalog
-grammars, oracle tooling and copied validation fixtures.
+Grammar modules, `tools/gen`, `tools/bench` and `tools/conformance` are separate Go modules; run their tests from
+their own directories. Pins live in [`tools/gen/pins.json`](tools/gen/pins.json). Third-party notices:
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

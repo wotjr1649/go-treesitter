@@ -56,7 +56,6 @@ jobs:
           rc=0
           for d in grammars/*/; do
             lang=$(basename "$d")
-            [ "$lang" = gpl ] && continue
             echo "::group::grammars/$lang"
             (cd "$d" && go test -count=1 -timeout 900s .) || { echo "::error::grammars/$lang failed"; rc=1; }
             echo "::endgroup::"

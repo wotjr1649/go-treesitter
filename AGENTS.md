@@ -11,8 +11,8 @@ from **unmodified** upstream tree-sitter runtime and grammar C (wasm → Go via 
 It owns: the `treesitter` API and its result contract, the versioned engine ABI (`internal/engine`),
 the generator and its pins, and conformance against a native C build of the same sources.
 
-Transition: the old `internal/runtime` carrier, `syntax` and `internal/gtsadapter` remain only until
-their owner-approved removal; their rules are in ADR-0013 and Git history.
+The old `gotreesitter` carrier, `syntax` and `internal/gtsadapter` were removed (ADR-0022); they remain in
+Git history only.
 
 It is **not**: a re-implementation of tree-sitter, a code-graph or
 semantic-resolution product, or a place for downstream application logic.
@@ -34,7 +34,7 @@ your task touches:
 | changing module, package, or layer boundaries | `docs/design/overview.md` |
 | making a decision that outlives this session | `docs/design/decisions/` |
 | reviewing your own diff before commit | `docs/reviews/review-checklist.md` |
-| preparing a public candidate or packaging | `docs/specs/publication.md`, `tools/release/README.md` |
+| preparing a public candidate or packaging | `docs/specs/publication.md`, `docs/design/decisions/ADR-0022-wave1-preview-versioning-and-release-memory-criterion.md` |
 | executing a planned session | the plan or handoff the user supplies for the task |
 
 Read contracts from the checkout you are changing. Other worktrees and checkouts can be on other
