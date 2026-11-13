@@ -10,8 +10,10 @@ import (
 	"bytes"
 	"debug/buildinfo"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -132,6 +134,12 @@ func run(o opts) error {
 	if err != nil {
 		return err
 	}
+	var noticeBytes []byte
+	if g.NoticeSHA256 != "" {
+		if noticeBytes, err = os.ReadFile(filepath.Join(o.src, g.ExtractDir, "NOTICE")); err != nil {
+			return err
+		}
+	}
 	prov := provenance{Schema: 1, ABI: uint32(pins.ABI), Name: o.lang, Module: modulePrefix + o.lang, Identity: id,
 		Outputs: map[string]string{"engine_gen.go": sumBytes([]byte(patched)), "wasm": sumBytes(wasmBytes)}}
 	provJSON, err := marshal(prov)
@@ -152,6 +160,9 @@ func run(o opts) error {
 		"LICENSE":         lic,
 		"provenance.json": provJSON,
 		"README.md":       []byte(readme(o.lang, pins, g, id)),
+	}
+	if noticeBytes != nil {
+		files["NOTICE"] = noticeBytes
 	}
 	if !o.noAPI {
 		files["language_api.go"] = []byte(languageAPI(o.lang))
@@ -205,6 +216,18 @@ func verify(o opts, pins *Pins, g GrammarPin, tm map[string]float64) (Identity, 
 		return id, err
 	}
 	id.SourceSHA256["grammar.LICENSE"] = got
+	// NOTICE is optional upstream; an unpinned NOTICE is a failure so a new one cannot be missed silently.
+	notice := filepath.Join(o.src, g.ExtractDir, "NOTICE")
+	if got, err = sumFile(notice); err == nil {
+		if err := expect("grammar NOTICE", got, g.NoticeSHA256); err != nil {
+			return id, err
+		}
+		id.SourceSHA256["grammar.NOTICE"] = got
+	} else if !errors.Is(err, fs.ErrNotExist) {
+		return id, err
+	} else if g.NoticeSHA256 != "" {
+		return id, fmt.Errorf("pin mismatch: grammar NOTICE pinned %s but the file is absent", g.NoticeSHA256)
+	}
 	if got, err = sumFile(filepath.Join(o.root, "shim", "tsg_abi.c")); err != nil {
 		return id, err
 	}
@@ -353,6 +376,9 @@ func printHashes(o opts, pins *Pins) error {
 		m["files"] = files
 		if m["licenseSHA256"], err = sumFile(filepath.Join(o.src, g.ExtractDir, "LICENSE")); err != nil {
 			return err
+		}
+		if s, err := sumFile(filepath.Join(o.src, g.ExtractDir, "NOTICE")); err == nil {
+			m["noticeSHA256"] = s
 		}
 		if o.dl != "" {
 			if m["archiveSHA256"], err = sumFile(filepath.Join(o.dl, g.Archive)); err != nil {

@@ -54,7 +54,8 @@ type GrammarPin struct {
 	TreeSHA256    string            `json:"treeSHA256"`
 	Files         map[string]string `json:"files"` // parser.c / scanner.c -> sha256
 	LicenseSHA256 string            `json:"licenseSHA256"`
-	CSymbol       string            `json:"cSymbol"` // tree_sitter_xxx
+	NoticeSHA256  string            `json:"noticeSHA256,omitempty"` // upstream NOTICE file, when the grammar repository has one
+	CSymbol       string            `json:"cSymbol"`                // tree_sitter_xxx
 }
 
 func loadPins(path string) (*Pins, error) {

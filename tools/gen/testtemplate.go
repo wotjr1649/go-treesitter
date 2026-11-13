@@ -63,11 +63,13 @@ func put(t *testing.T, m engine.Module, mem *[]byte, b []byte) int32 {
 
 func u32(mem *[]byte, off int) uint32 { return binary.LittleEndian.Uint32((*mem)[off:]) }
 
+// inputs is the embedded sample plus, when TSG_CORPUS names a directory of source files, up to five of them.
 func inputs(t *testing.T) map[string][]byte {
 	in := map[string][]byte{"sample": []byte(sample)}
 	dir := os.Getenv("TSG_CORPUS")
 	if dir == "" {
-		dir = filepath.Join("..", "..", ".scratch", "s15", "corpus", "@CORPUS@")
+		t.Log("TSG_CORPUS is not set: corpus files skipped, embedded sample only")
+		return in
 	}
 	names, _ := filepath.Glob(filepath.Join(dir, "*"))
 	sort.Strings(names)

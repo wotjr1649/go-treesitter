@@ -147,6 +147,7 @@
         "scanner.c": "392bf26c2295e8ee3dd584dbea619d39573495244b4bbd2b59dab387a8494aec"
       },
       "licenseSHA256": "cffa335b2bf899b98e49d14a7f96464b6823a98f9a5d544bef5c6d3b5e46d42c",
+      "noticeSHA256": "fe7b7e195134b018606dc3d40250c240f2bb9e1f5bbadb6542c169c49b21dcb1",
       "cSymbol": "tree_sitter_mssql"
     }
   }

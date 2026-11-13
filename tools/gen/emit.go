@@ -286,12 +286,16 @@ func languageAPI(lang string) string {
 }
 
 func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
+	files := "`LICENSE` is the upstream grammar's license."
+	if g.NoticeSHA256 != "" {
+		files = "`LICENSE` and `NOTICE` are the upstream grammar's license files."
+	}
 	return fmt.Sprintf("# %s%s\n\nGenerated tree-sitter grammar module for go-treesitter. **Do not edit**: `engine_gen.go` and `language.go` are output of\n"+
 		"`tools/gen` (docs/design/engine-abi.md, ADR-0020).\n\n"+
 		"- upstream grammar: %s at `%s`\n- tree-sitter runtime: %s (unmodified)\n- engine ABI: %d\n"+
 		"- recipe sha256: `%s`\n- identity and output hashes: `provenance.json` (equals the compiled `engine.Identity`; `go test` checks it)\n\n"+
-		"`LICENSE` is the upstream grammar's license. Regenerate with `tools/gen` (see its README); regenerating gives identical bytes.\n",
-		modulePrefix, lang, g.Repo, g.Commit, pins.Runtime.Release, pins.ABI, id.RecipeSHA256)
+		"%s Regenerate with `tools/gen` (see its README); regenerating gives identical bytes.\n",
+		modulePrefix, lang, g.Repo, g.Commit, pins.Runtime.Release, pins.ABI, id.RecipeSHA256, files)
 }
 
 var samples = map[string]string{
@@ -304,18 +308,11 @@ var samples = map[string]string{
 	"tsql":       "SELECT a, b FROM t WHERE a > 1;\n",
 }
 
-// corpusDirs maps a module to its directory under the session corpus (.scratch/s15/corpus).
-var corpusDirs = map[string]string{"golang": "go"}
-
 func emitTest(lang string) ([]byte, error) {
 	s, ok := samples[lang]
 	if !ok {
 		return nil, fmt.Errorf("no sample for %q", lang)
 	}
-	c := lang
-	if d, ok := corpusDirs[lang]; ok {
-		c = d
-	}
-	t := strings.NewReplacer("@PKG@", lang, "@SAMPLE@", strconv.Quote(s), "@CORPUS@", c).Replace(testTemplate)
+	t := strings.NewReplacer("@PKG@", lang, "@SAMPLE@", strconv.Quote(s)).Replace(testTemplate)
 	return format.Source([]byte(t))
 }
