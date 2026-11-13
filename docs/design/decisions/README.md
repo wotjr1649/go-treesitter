@@ -53,3 +53,4 @@ understand whether the contract is still right.
 | 0017 | Exclude unclear grammars; assurance by release scope | Accepted |
 | 0018 | Evaluate the approved runtime baseline transition | Accepted |
 | 0019 | Explicit authority for every main merge | Accepted |
+| 0020 | A public CGO-free tree-sitter library built from unmodified upstream C | Proposed |
