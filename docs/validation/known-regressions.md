@@ -649,8 +649,7 @@ and `TestJSXEqualsEdits`. The candidate passes all of them; see
   KR-0001b behavior. The bare `&` characterization holds through that patch,
   not through upstream.
 - `tools/runtime-bundle/source.json` lists the patches the candidate applies.
-  Patch files of the `v0.53.0` inventory that are not listed are not applied.
-  They remain in the repository until a separate retirement decision under
-  ADR-0013.
+  The `v0.53.0` patch files outside that list were removed in commit
+  `7fe7ef9`; the patch directory now holds exactly the listed files.
 - KR-0005, KR-0006 and KR-0007 were opened and retired at the candidate (29th, 30th and 31st carrier patches). A new failure opens a new record; it is
   never absorbed into a retired one.
