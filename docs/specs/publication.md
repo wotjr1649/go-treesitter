@@ -41,3 +41,38 @@ Accepted ADRs preserve their original reasoning. Historical references in them
 may identify local records; current public contracts and selected evidence must
 be sufficient for the current product and its stated claims. ADR-0016 records
 the publication and commit-boundary decision.
+
+## Multi-module release
+
+The root module and each grammar module are versioned and tagged separately (ADR-0022 §2). Go versions are
+immutable once a proxy has served them, so the order below is fixed. Every numbered step that writes to the remote
+needs the owner's explicit authority for that act (above); one grant does not cover the next step.
+
+| # | Step | Owner authority |
+|---|---|---|
+| 1 | On the release commit, run the release gates (`docs/specs/validation.md`) and the rehearsal: module ZIPs for the root and the seven grammars at `vX.Y.Z` served from a file `GOPROXY`, built by an empty-cache consumer with `CGO_ENABLED=0`, plus `GOOS=linux GOARCH=arm64 go build`. | no (local) |
+| 2 | Tag the root `vX.Y.Z` on the release commit and push the tag. | **yes** |
+| 3 | Verify the root: `GOPROXY=direct go list -m github.com/wotjr1649/go-treesitter@vX.Y.Z` from an empty module; then the same through `GOPROXY=https://proxy.golang.org`. | no (read-only) |
+| 4 | Regenerate the grammar `go.mod` files in release form: `ROOT_VERSION=vX.Y.Z bash tools/gen/regen.sh <work-dir>` (`-root-version`). Only `go.mod` changes; `engine_gen.*` and `provenance.json` must stay byte-identical (`git diff --stat grammars/` shows seven `go.mod` files). Commit them. No `replace` may remain in a grammar module. | no (local commit) |
+| 5 | Tag each grammar `grammars/<dir>/vX.Y.Z` on that commit and push the tags. | **yes** |
+| 6 | Verify every grammar with `GOPROXY=direct`, then through `proxy.golang.org`: an empty consumer with no `replace` runs `go get` for the root and two grammars, builds with `CGO_ENABLED=0`, runs, and also builds for `linux/arm64`. | no (read-only) |
+| 7 | Create the release notes/GitHub release, if wanted. | **yes** |
+
+Notes:
+
+- The root tag (step 2) points at a commit whose grammar `go.mod` files still use the development form; that is
+  fine because the root ZIP excludes nested modules. Grammar tags point at the later step-4 commit. Do not move
+  the root tag to it.
+- The root ZIP is built by `golang.org/x/mod/zip` from the tagged tree: it contains the root package, `internal/engine`,
+  `testdata/`, `LICENSE`/`LICENSES/`, `docs/`, `.github/`, `AGENTS.md` and `tools/lane` (no `go.mod` there). It omits
+  every nested module: `grammars/*`, `tools/gen`, `tools/bench`, `tools/conformance`, `tools/modulezip`, `artifacts`.
+  Local-only paths (`docs/plans`, `docs/prompts`, `artifacts/handoff`, `.scratch`) must not be tracked, because a
+  tracked file is published by the tag; check `git ls-files` before step 2.
+- After the tags, development continues with the `replace ../..` form (`tools/gen` without `-root-version`), so the
+  release commit is not the tip of `main` unless the owner decides otherwise.
+- **Rollback.** A pushed tag and any version a proxy has served are never deleted, moved or re-tagged. A bad
+  version is retracted: add `retract vX.Y.Z // reason` to the `go.mod` of a newer version of the same module and tag
+  that (`vX.Y.(Z+1)`). A bad grammar is retracted in that grammar's module only; the root is unaffected. A bad
+  release before step 2 is fixed by a new commit, nothing to roll back.
+- A grammar `require`s one exact root version. If the root needs a fix, release root `vX.Y.(Z+1)`, then regenerate
+  every grammar `go.mod` against it (steps 4-6); a grammar is not re-tagged at the old number.
