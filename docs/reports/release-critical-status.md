@@ -19,16 +19,20 @@ to the new engine.
 | `ChangedRanges` vs native `ts_tree_get_changed_ranges` (5,919) | PASS | E5 |
 | Invalid UTF-8 inputs (189) | PASS | E5 |
 | Cancel then reparse a different source (7 grammars x large inputs) | PASS | E3 |
-| Large-input speed (12 inputs) | PASS, geomean 1.386x native (limit 2.5x) | bench lane |
-| Small-file speed (1,586) | PASS, 1,586/1,586 | bench lane |
-| Memory peak / release (24) | PASS; worst peak 0.55 of limit; worst release 15.2 MB of 16 MB, not reproduced in 80 probe runs (max 12.3 MB; engine regions returned 80/80, remainder mostly image pages) | bench lane |
+| Cancel during balancing, then reparse (deterministic k-th callback stop; json 5 MB, typescript.js; test-only probe build with the product shim) | PASS: 494 of 682 stops landed in balancing; 682/682 next parses equal native; without the reset 6/6 fail | E5 (probe build, those inputs) |
+| C agreement in CI from the grammars' own `test/corpus` (943 inputs, 2,829 seeded edits) | PASS on Linux x64 and arm64 and Windows x64, 0 differences | E5 (those inputs) |
+| Fuzz (7 grammars, ~2.6M execs) | 0 crashers | E3 |
+| Large-input speed (12 inputs) | PASS, geomean 1.356x native on the committed bytes `3bb05a4` (limit 2.5x; host load 71-78 %) | bench lane |
+| Small-file speed (1,586) | PASS, 1,586/1,586 on `3bb05a4` | bench lane |
+| Memory peak / release (ADR-0022 criterion) | PASS 72/72: worst peak 0.53 of limit; engine regions returned 72/72; worst private delta 6.0 MB of 16 MB | bench lane |
 | Reproducible generation | PASS for the modules checked (byte-identical regeneration) | E3 |
 | `-race` (diagnostic) | all 7 grammars: no race (sampled edits, quick cancel) | diagnostic |
 | Linux amd64/arm64, macOS arm64, Windows amd64/arm64 execution | PASS: engine CI run 43499796838 on `1c9a204`, 10/10 packages per platform (engine, root, generator, 7 grammar modules with embedded samples). C-reference conformance ran on Windows amd64 only | E3 per platform |
 
-## Open items before Release
+## Open items before the v0.1.0 preview
 
-- Grammar modules are committed (`e42345f`, recipe v2-O3); re-run speed and memory gates on these exact bytes.
-- Engine CI lane executed on every claimed platform.
-- Wave 2 grammars; removal of the old carrier, `syntax` and `internal/gtsadapter` (owner approval).
-- Packaging, limitations list and `MIGRATING.md`.
+- Limitations list for the release notes (experimental `Match`, C agreement only on the listed inputs, incremental may
+  differ from fresh where native C does) and a short `MIGRATING.md` from the removed `syntax` API.
+- Owner authority, each separately: PR to `main`, merge, root tag, grammar tags, release (procedure:
+  `docs/specs/publication.md` § Multi-module release).
+- After v0.1.0: wave-2 grammars, queries (v0.1 API), speed/memory measurement on Linux and macOS.
