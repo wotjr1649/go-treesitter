@@ -36,6 +36,7 @@ type Module interface {
 	Xtsg_parse(src, n, old int32) int32
 	Xtsg_parser_reset()
 	Xtsg_root_end(t int32) int32
+	Xtsg_root_has_error(t int32) int32
 	Xtsg_descendant_count(t int32) int32
 	Xtsg_tree_edit(t, startByte, oldEndByte, newEndByte, startRow, startCol, oldEndRow, oldEndCol, newEndRow, newEndCol int32)
 	Xtsg_tree_delete(t int32)

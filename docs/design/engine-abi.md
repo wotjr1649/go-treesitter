@@ -22,18 +22,19 @@ All pointers are wasm32 offsets (`int32` in Go). `TSTree*` handles are opaque. O
 | Export | Semantics |
 |---|---|
 | `uint32_t tsg_abi_version(void)` | returns `1` |
-| `int32_t tsg_init(void)` | create the parser and set the language; `0` ok, `-1` the runtime rejected the language (language ABI) |
+| `int32_t tsg_init(void)` | create the parser, set the language, allocate the export chunk buffer and write its header (section 2); `0` ok, `-1` the runtime rejected the language (language ABI) or allocation failed |
 | `TSTree *tsg_parse(const char *src, uint32_t len, TSTree *old)` | `ts_parser_parse_with_options`, UTF-8 input, progress callback = host `should_stop`; `old` may be `0`. **If the result is `NULL` the shim calls `ts_parser_reset` before returning.** |
 | `void tsg_parser_reset(void)` | `ts_parser_reset` (host calls it on any no-tree path it creates itself) |
 | `uint32_t tsg_root_end(TSTree *t)` | `ts_node_end_byte(root)` |
+| `uint32_t tsg_root_has_error(TSTree *t)` | `ts_node_has_error(root)` as `0`/`1` (sets `Outcome` without an export) |
 | `uint32_t tsg_descendant_count(TSTree *t)` | `ts_node_descendant_count(root)` (snapshot node cap is checked with this before export) |
 | `void tsg_tree_edit(TSTree *t, uint32_t start_byte, old_end_byte, new_end_byte, start_row, start_col, old_end_row, old_end_col, new_end_row, new_end_col)` | `ts_tree_edit` |
 | `void tsg_tree_delete(TSTree *t)` | `ts_tree_delete` |
-| `uint8_t *tsg_changed_ranges(TSTree *old, TSTree *neu)` | malloc'ed block: `u32 count`, then `count` x `{u32 start_byte, end_byte, start_row, start_col, end_row, end_col}`; free with `free` |
+| `uint8_t *tsg_changed_ranges(TSTree *old, TSTree *neu)` | malloc'ed block, never `NULL` (`count = 0` when nothing changed): `u32 count`, then `count` x `{u32 start_byte, end_byte, start_row, start_col, end_row, end_col}`; free with `free` |
 | `uint32_t tsg_export_begin(TSTree *t)` | start a chunked preorder export; returns node count `n` (`0` = error) |
 | `uint32_t tsg_export_next(void)` | fill the chunk buffer; returns nodes written (`0` = finished) |
 | `uint32_t tsg_export_err(void)` | `1` if the traversal disagreed with the descendant count |
-| `uint8_t *tsg_export_buf(void)` | chunk buffer (allocated once per instance) |
+| `uint8_t *tsg_export_buf(void)` | chunk buffer; valid from `tsg_init` on, header already written |
 | `void tsg_export_end(void)` | abandon an export in progress (cancellation); idempotent |
 | `uint8_t *tsg_lang_meta(void)` | malloc'ed language meta block (section 3); used by the generator, not on the parse path |
 | `malloc`, `free` | wasi-libc, for source buffers and returned blocks |
@@ -51,7 +52,7 @@ multiple of 4), `u32 reserved`. Columns follow the header (offsets relative to `
 `symbol u16[KC] @0`, `field u16[KC] @2KC`, `flags u8[KC] @4KC`, `startByte @5KC`, `endByte @9KC`, `startRow @13KC`,
 `startCol @17KC`, `endRow @21KC`, `endCol @25KC` (`u32[KC]` each), `parent i32[KC] @29KC` (global preorder index,
 `-1` = root). Flags: `1` named, `2` extra, `4` missing, `8` error, `16` has_error. `symbol 65535` = ERROR.
-The Go side checks magic and format on every `tsg_export_begin` and derives `descendantEnd`/`childCount`/siblings.
+The header is written by `tsg_init`; `NewParser` checks magic and format once (mismatch = `ErrIncompatibleLanguage`) and the Go side checks them again after every `tsg_export_begin`, and derives `descendantEnd`/`childCount`/siblings.
 
 ## 3. Language meta block (format 1)
 
@@ -71,7 +72,7 @@ type Module interface { // implemented by the generated *Module
     X_initialize(); Xmemory() Memory; Xmalloc(int32) int32; Xfree(int32)
     Xtsg_abi_version() int32; Xtsg_init() int32
     Xtsg_parse(src, n, old int32) int32; Xtsg_parser_reset()
-    Xtsg_root_end(t int32) int32; Xtsg_descendant_count(t int32) int32
+    Xtsg_root_end(t int32) int32; Xtsg_root_has_error(t int32) int32; Xtsg_descendant_count(t int32) int32
     Xtsg_tree_edit(t, sb, oeb, neb, sr, sc, oer, oec, ner, nec int32); Xtsg_tree_delete(t int32)
     Xtsg_changed_ranges(old, neu int32) int32
     Xtsg_export_begin(t int32) int32; Xtsg_export_next() int32; Xtsg_export_err() int32
@@ -103,7 +104,7 @@ Memory provider: reserve-then-commit, `VirtualAlloc` on Windows, `mmap` on Unix 
 recorded in the generator; mismatch = generation failure).
 
 Instance sequence (the `treesitter` package): `m := g.New(h)` → `SetLimit(m.Xmemory().Slice(), limit)` →
-`engine.Call(m.X_initialize)` → `Xtsg_abi_version() == ABIVersion` → `Xtsg_init() == 0`; any failure =
+`engine.Call(m.X_initialize)` → `Xtsg_abi_version() == ABIVersion` → `Xtsg_init() == 0` → export header magic/format; any failure =
 `ErrIncompatibleLanguage` (version) or `EngineFault`. A trap with `Refused` set maps to `ResourceLimit`; any other trap
 to `EngineFault`; both discard the instance (`Release`) and create a new one.
 
