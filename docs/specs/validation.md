@@ -12,7 +12,7 @@ Definition of Done.
 | **engine CI** | `CGO_ENABLED=0` on hosted Linux/macOS/Windows, amd64 and arm64 (`.github/workflows/engine.yml`) | yes, for the platform it ran on | Execution evidence per platform; a platform is claimed only after this lane ran there. |
 | **cross** | `CGO_ENABLED=0`, other `GOOS/GOARCH` | scope-limited | Link-only proof that no C toolchain is required. |
 | **native reference** | C compiler, same runtime release and grammar sources (ADR-0020); `tools/native-ref` | yes, for C-agreement claims | Produces the reference dumps. See `docs/specs/oracle.md`. |
-| **conformance** | `CGO_ENABLED=0`, `tools/conformance` with the local reference data | yes, for C-agreement claims | Byte-for-byte comparison of the public API's dumps with the native reference. |
+| **conformance** | `CGO_ENABLED=0`, `tools/conformance` with reference data: local (`TSG_S15_DIR`) or built in CI from the pinned grammars' own `test/corpus` plus seeded edits (`.github/workflows/conformance.yml`, `TSG_DATA_DIR`) | yes, for C-agreement claims on the inputs used | Byte-for-byte comparison of the public API's dumps, edits and changed ranges with the native reference. |
 | **bench** | `CGO_ENABLED=0`, `tools/bench` paired with native executables | yes, for resource gates | Speed and memory gates on the product build. |
 
 Rules:

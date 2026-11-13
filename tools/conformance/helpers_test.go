@@ -22,15 +22,26 @@ import (
 
 var bg = context.Background()
 
-// dataRoot returns TSG_S15_DIR or skips the test.
+// dataRoot returns the data directory or skips the test: TSG_DATA_DIR (the CI directory produced by
+// tools/native-ref/ciconf from the pinned grammars' own corpora) or else TSG_S15_DIR (the local session-15 tree).
 func dataRoot(t *testing.T) string {
 	t.Helper()
-	d := os.Getenv("TSG_S15_DIR")
+	d := os.Getenv("TSG_DATA_DIR")
 	if d == "" {
-		t.Skip("TSG_S15_DIR is not set: the conformance lane needs the local session-15 data tree " +
-			"(corpus, edits, large inputs and native dumps); skipping")
+		d = os.Getenv("TSG_S15_DIR")
+	}
+	if d == "" {
+		t.Skip("neither TSG_DATA_DIR (tools/native-ref/ciconf output) nor TSG_S15_DIR (local session-15 tree) is set: " +
+			"the conformance lane has no data; skipping")
 	}
 	return d
+}
+
+// ciData reports whether root was produced by ciconf (it has ci.json). Its inputs are upstream corpora, so the
+// session-15 ratchet lists (knownIncrementalDiffs) do not apply to it.
+func ciData(root string) bool {
+	_, err := os.Stat(filepath.Join(root, "ci.json"))
+	return err == nil
 }
 
 // langs returns the linked languages selected by TSG_S15_LANGS (comma list; default all linked), skipping when none.

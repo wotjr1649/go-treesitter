@@ -5,8 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strconv"
-	"strings"
 	"testing"
 	"time"
 
@@ -49,10 +49,11 @@ func editSample() int {
 // the incremental result with the recorded native C incremental dump (sha256) and the fresh reparse with the recorded
 // native fresh dump. incremental==fresh must agree with the native outcome for every case (the 5 known tsql cases
 // differ in both). ChangedRanges must succeed and satisfy structural sanity; when a native reference exe is available
-// (TSG_CONF_NATIVECR, see nativeRanges) it must equal the native ts_tree_get_changed_ranges output exactly.
+// (the recorded edits/<lang>/<name>.ranges, or TSG_NATIVE_EXE_DIR, see nativeRanges) it must equal the native ts_tree_get_changed_ranges output exactly.
 func TestEdits(t *testing.T) {
 	root := dataRoot(t)
 	native := loadNative(t, root)
+	ci := ciData(root)
 	all := readCSV(t, filepath.Join(root, "edits", "manifest.csv"))
 	sample := editSample()
 	for _, lang := range langs(t) {
@@ -171,7 +172,10 @@ func TestEdits(t *testing.T) {
 				if eq != nativeEq {
 					bad("incremental==fresh is %v, native says %v", eq, nativeEq)
 				}
-				if knownIncrementalDiffs[id] {
+				if ci {
+					// ciconf data has no ratchet list: incremental != fresh is accepted exactly when native C shows the
+					// same difference for the same case (checked above), and counted in incrementalDiffersFromFresh.
+				} else if knownIncrementalDiffs[id] {
 					knownSeen++
 					if eq {
 						bad("known upstream incremental difference no longer differs (ratchet)")
@@ -221,28 +225,50 @@ func TestEdits(t *testing.T) {
 	}
 }
 
-// nativeEdit runs the native reference exe for one case (preserving a failing case's native dump).
+// nativeExe returns the tools/native-ref executable for a language from TSG_NATIVE_EXE_DIR (the -out directory of
+// `native-ref`); ok is false when it is unset or has no executable for the language.
+func nativeExe(lang string) (string, bool) {
+	dir := os.Getenv("TSG_NATIVE_EXE_DIR")
+	if dir == "" {
+		return "", false
+	}
+	name := lang
+	if lang == "go" {
+		name = "golang" // native-ref names executables by the pins.json key
+	}
+	if runtime.GOOS == "windows" {
+		name += ".exe"
+	}
+	exe := filepath.Join(dir, name)
+	_, err := os.Stat(exe)
+	return exe, err == nil
+}
+
+// nativeEdit runs `<exe> edit` for one case (preserving a failing case's native dump).
 func nativeEdit(root, lang, name string, r []string) ([]byte, error) {
-	exe := filepath.Join(root, "native", "exe2", lang+".exe")
+	exe, ok := nativeExe(lang)
+	if !ok {
+		return nil, fmt.Errorf("no native executable (TSG_NATIVE_EXE_DIR)")
+	}
 	d := filepath.Join(root, "edits", lang)
 	return exec.Command(exe, "edit", filepath.Join(d, name+".old"), filepath.Join(d, name+".new"), r[3], r[4], r[5]).Output()
 }
 
-// nativeRanges runs the native ChangedRanges reference (cr.exe built from .scratch/s15/p2-api/conf/nativecr/cr.c) for one
-// case; ok is false when TSG_CONF_NATIVECR is unset or has no exe for the language.
+// nativeRanges returns the native ts_tree_get_changed_ranges output for one case: the recorded
+// edits/<lang>/<name>.ranges when it exists (ciconf data), else `<exe> changed-ranges` from TSG_NATIVE_EXE_DIR; ok is
+// false when neither is available.
 func nativeRanges(lang, root, name string, r []string) (string, bool) {
-	dir := os.Getenv("TSG_CONF_NATIVECR")
-	if dir == "" {
-		return "", false
-	}
-	exe := filepath.Join(dir, lang+".exe")
-	if _, err := os.Stat(exe); err != nil {
-		return "", false
-	}
 	d := filepath.Join(root, "edits", lang)
-	out, err := exec.Command(exe, filepath.Join(d, name+".old"), filepath.Join(d, name+".new"), r[3], r[4], r[5]).Output()
+	if b, err := os.ReadFile(filepath.Join(d, name+".ranges")); err == nil {
+		return string(b), true
+	}
+	exe, ok := nativeExe(lang)
+	if !ok {
+		return "", false
+	}
+	out, err := exec.Command(exe, "changed-ranges", filepath.Join(d, name+".old"), filepath.Join(d, name+".new"), r[3], r[4], r[5]).Output()
 	if err != nil {
 		return "", false
 	}
-	return strings.ReplaceAll(string(out), "\r\n", "\n"), true // the exe prints in Windows text mode
+	return string(out), true
 }

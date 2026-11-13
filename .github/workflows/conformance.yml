@@ -1,0 +1,74 @@
+name: C-reference conformance (CI corpora)
+
+# Compares the CGO-free engine with native C tree-sitter on inputs that need no local data: the pinned grammar
+# repositories' own test/corpus files plus deterministic seeded edits (tools/native-ref/ciconf). The native reference
+# is built here with the runner's gcc from the same pinned, sha256-verified sources; the Go side stays CGO_ENABLED=0.
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    name: conformance (${{ matrix.runner }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
+          - {runner: ubuntu-24.04-arm, goos: linux, goarch: arm64}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    env:
+      GOENV: "off"
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: Native architecture
+        run: |
+          go env GOOS GOARCH
+          test "$(go env GOOS)" = "${{ matrix.goos }}" && test "$(go env GOARCH)" = "${{ matrix.goarch }}" || { echo "native target mismatch"; exit 1; }
+          gcc --version | head -1
+      # Archives are fetched from the pinned commits and their sha256 checked against tools/gen/pins.json before use.
+      - name: Fetch pinned sources, build the 7 native executables, extract corpora
+        working-directory: tools/native-ref
+        env:
+          CGO_ENABLED: "0"
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          go build -o "$RUNNER_TEMP/native-ref" .
+          go build -o "$RUNNER_TEMP/ciconf" ./ciconf
+          cd "$GITHUB_WORKSPACE"
+          "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -fetch -cc gcc \
+            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus"
+      - name: Extract inputs and edits, record native results
+        env:
+          CGO_ENABLED: "0"
+        run: |
+          "$RUNNER_TEMP/ciconf" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data"
+      - name: Go conformance against the native results
+        working-directory: tools/conformance
+        env:
+          CGO_ENABLED: "0"
+          TSG_DATA_DIR: ${{ runner.temp }}/data
+          TSG_NATIVE_EXE_DIR: ${{ runner.temp }}/exe
+        run: go test -count=1 -timeout 5400s -v -run 'TestCorpus|TestEdits|TestParserPoolRealEngine' .
+      # The fuzz targets need no data: this runs their seed corpora once (no fuzzing).
+      - name: Fuzz seed corpora
+        if: ${{ !cancelled() }}
+        working-directory: tools/conformance
+        env:
+          CGO_ENABLED: "0"
+        run: go test -count=1 -timeout 1800s -run Fuzz .

@@ -53,18 +53,20 @@ func main() {
 	cc := flag.String("cc", "gcc", "C compiler (gcc or clang)")
 	opt := flag.String("opt", "-O2", "optimization flag")
 	fetch := flag.Bool("fetch", false, "download a missing archive from GitHub (sha256 still verified)")
+	corpus := flag.String("corpus", "", "also extract each grammar archive's test/corpus into DIR/<extractDir>/test/corpus (the archive is sha256-verified first)")
+	nobuild := flag.Bool("nobuild", false, "verify and extract only; do not compile (-out is then optional)")
 	flag.Parse()
-	if *dl == "" || *work == "" || *out == "" {
-		fmt.Fprintln(os.Stderr, "usage: native-ref -dl DIR -work DIR -out DIR [-pins F] [-cc gcc] [-fetch] [lang ...]")
+	if *dl == "" || *work == "" || (*out == "" && !*nobuild) {
+		fmt.Fprintln(os.Stderr, "usage: native-ref -dl DIR -work DIR -out DIR [-pins F] [-cc gcc] [-fetch] [-corpus DIR] [-nobuild] [lang ...]")
 		os.Exit(2)
 	}
-	if err := run(*log, *dl, *work, *out, *cc, *opt, *fetch, flag.Args()); err != nil {
+	if err := run(*log, *dl, *work, *out, *cc, *opt, *corpus, *fetch, *nobuild, flag.Args()); err != nil {
 		fmt.Fprintln(os.Stderr, "native-ref:", err)
 		os.Exit(1)
 	}
 }
 
-func run(pinsFile, dl, work, out, cc, opt string, fetch bool, langs []string) error {
+func run(pinsFile, dl, work, out, cc, opt, corpus string, fetch, nobuild bool, langs []string) error {
 	raw, err := os.ReadFile(pinsFile)
 	if err != nil {
 		return err
@@ -83,11 +85,15 @@ func run(pinsFile, dl, work, out, cc, opt string, fetch bool, langs []string) er
 		return fmt.Errorf("%s is not empty", work)
 	}
 	for _, d := range []string{dl, work, out} {
+		if d == "" {
+			continue
+		}
 		if err := os.MkdirAll(d, 0o755); err != nil {
 			return err
 		}
 	}
 	extracted := map[string]bool{} // typescript and tsx share one archive
+	corpusDone := map[string]bool{}
 	if err := prepare(p.Runtime, dl, work, fetch, extracted); err != nil {
 		return fmt.Errorf("runtime: %w", err)
 	}
@@ -111,6 +117,15 @@ func run(pinsFile, dl, work, out, cc, opt string, fetch bool, langs []string) er
 			if got, err := fileSHA(filepath.Join(gdir, name)); err != nil || got != want {
 				return fmt.Errorf("%s: %s sha256 %s, pinned %s (%v)", l, name, got, want, err)
 			}
+		}
+		if corpus != "" && !corpusDone[g.Archive] { // prepare has verified the archive's sha256
+			if err := extract(filepath.Join(dl, g.Archive), filepath.Join(corpus, g.ExtractDir), []string{"test/corpus"}); err != nil {
+				return fmt.Errorf("%s: corpus: %w", l, err)
+			}
+			corpusDone[g.Archive] = true
+		}
+		if nobuild {
+			continue
 		}
 		lib := filepath.Join(work, p.Runtime.ExtractDir, "lib")
 		exe := filepath.Join(out, l)
@@ -164,7 +179,8 @@ func fileSHA(p string) (string, error) {
 
 // prepare verifies the source's archive and extracts the pinned dirs into <work>/<extractDir>, once per archive.
 func prepare(s source, dl, work string, fetch bool, done map[string]bool) error {
-	if done[s.Archive] {
+	key := s.Archive + "|" + strings.Join(s.Dirs, ",") // typescript and tsx share an archive but extract different dirs
+	if done[key] {
 		return nil
 	}
 	arc := filepath.Join(dl, s.Archive)
@@ -183,12 +199,19 @@ func prepare(s source, dl, work string, fetch bool, done map[string]bool) error 
 	if err := extract(arc, filepath.Join(work, s.ExtractDir), s.Dirs); err != nil {
 		return err
 	}
-	done[s.Archive] = true
+	done[key] = true
 	return nil
 }
 
 func download(url, dst string) error {
-	resp, err := http.Get(url)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return err
+	}
+	if tok := os.Getenv("GITHUB_TOKEN"); tok != "" { // optional: lifts the anonymous API rate limit on shared CI runners; net/http drops it on the cross-host redirect
+		req.Header.Set("Authorization", "Bearer "+tok)
+	}
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}
