@@ -98,7 +98,7 @@ func runExternalConsumer(t *testing.T, optionalGPL bool) {
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "go", "run", "-mod=mod", ".")
 	cmd.Dir = dir
-	cmd.Env = append(os.Environ(), "CGO_ENABLED=0", "GOWORK=off", "GOFLAGS=", "GOPROXY="+consumerProxy(t, module, optionalGPL),
+	cmd.Env = append(os.Environ(), "CGO_ENABLED=0", "GOWORK=off", "GOFLAGS=-modcacherw", "GOPROXY="+consumerProxy(t, module, optionalGPL),
 		"GONOPROXY=none", "GOPRIVATE=", "GOSUMDB=off", "GOTOOLCHAIN=local", "GOMODCACHE="+filepath.Join(t.TempDir(), "modcache"))
 	var diagnostics bytes.Buffer
 	cmd.Stderr = &diagnostics

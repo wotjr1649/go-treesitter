@@ -45,10 +45,12 @@ jobs:
           go vet ./internal/engine .
           go test -count=1 -timeout 600s ./internal/engine .
       - name: Generator unit tests
+        if: ${{ !cancelled() }}
         working-directory: tools/gen
         run: go test -count=1 -timeout 300s ./...
       # Embedded sample only: TSG_CORPUS stays unset. csharp and tsql take minutes to compile on a cold cache.
       - name: Grammar modules
+        if: ${{ !cancelled() }}
         run: |
           unset TSG_CORPUS
           rc=0
@@ -62,5 +64,6 @@ jobs:
           exit $rc
       # Its tests need the local session data tree (TSG_S15_DIR) and skip, so only vet runs here.
       - name: Conformance module (vet only)
+        if: ${{ !cancelled() }}
         working-directory: tools/conformance
         run: go vet ./...
