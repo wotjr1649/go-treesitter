@@ -330,6 +330,7 @@ func recoverCall(fn func()) (err error) {
 
 // fakeLang is a Language whose instances are fakeModules; setup runs on each new module (mods already holds it).
 type fakeLang struct {
+	mu    sync.Mutex // New may be called from several goroutines (ParserPool tests)
 	lang  *Language
 	mods  []*fakeModule
 	setup func(f *fakeModule)
@@ -351,10 +352,12 @@ func newFakeLang(setup func(fl *fakeLang, f *fakeModule)) *fakeLang {
 		f.buf = f.brk
 		f.brk += 16 + 33*int32(f.kc)
 		fakeReg.Store(f.m.Slice(), f)
+		fl.mu.Lock()
 		fl.mods = append(fl.mods, f)
 		if setup != nil {
 			setup(fl, f)
 		}
+		fl.mu.Unlock()
 		return f
 	}
 	fl.lang = NewLanguage(g)

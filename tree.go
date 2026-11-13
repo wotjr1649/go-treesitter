@@ -171,6 +171,7 @@ func (t *Tree) Close() {
 	}
 	defer c.end()
 	c.live--
+	delete(c.ptrs, t.ptr)
 	if c.deleteTree(t.ptr) == nil {
 		c.maybeRecycle()
 	}

@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"iter"
+	"sync"
 )
 
 // Point is a zero-based row and byte column.
@@ -43,6 +44,18 @@ type Snapshot struct {
 	childCount                         []uint32 // number of children (visible nodes only)
 
 	invalidUTF8 bool
+
+	// Lazily computed once, safe for concurrent readers (primitives of api-v2 section 7).
+	linesOnce sync.Once
+	lines     *LineIndex
+	hashOnce  sync.Once
+	hash      []uint64
+	shapeOnce sync.Once
+	shape     []uint64
+	atomOnce  sync.Once
+	atoms     atomTable
+	indexOnce sync.Once
+	index     *Index
 }
 
 // Root is the root node (its start may be after leading padding; its end is the input length).

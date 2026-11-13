@@ -23,7 +23,14 @@ type Language struct {
 	once   sync.Once
 	named  map[string]Symbol // visible/supertype symbols by name, first id wins (C: ts_language_symbol_for_name)
 	anon   map[string]Symbol
+	byName map[string][]Symbol // every symbol id carrying the name (named, anonymous, hidden)
 	fields map[string]FieldID
+}
+
+// symbolsNamed lists every symbol id whose name is kind (empty for an unknown kind).
+func (l *Language) symbolsNamed(kind string) []Symbol {
+	l.index()
+	return l.byName[kind]
 }
 
 // NewLanguage wraps a generated grammar. It is for generated grammar modules (the argument type is internal).
@@ -46,6 +53,11 @@ func (l *Language) index() {
 				set[name] = Symbol(i)
 			}
 		}
+		l.byName = make(map[string][]Symbol, len(m.Symbols)+1)
+		for i, name := range m.Symbols {
+			l.byName[name] = append(l.byName[name], Symbol(i))
+		}
+		l.byName["ERROR"] = append(l.byName["ERROR"], ErrorSymbol)
 		l.fields = make(map[string]FieldID, len(m.Fields))
 		for i := 1; i < len(m.Fields); i++ {
 			if _, dup := l.fields[m.Fields[i]]; !dup {

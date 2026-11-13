@@ -25,10 +25,11 @@ type core struct {
 	lang *Language
 	cfg  config
 
-	inst    *instance // nil only after a failed recreate; the next operation retries
-	gen     uint64    // bumped whenever the instance is dropped: invalidates every Tree
-	live    int       // trees alive in the current instance
-	recycle bool      // committed memory passed WithRecycleAboveBytes
+	inst    *instance          // nil only after a failed recreate; the next operation retries
+	gen     uint64             // bumped whenever the instance is dropped: invalidates every Tree
+	live    int                // trees alive in the current instance
+	ptrs    map[int32]struct{} // handles of those trees, so a pool can free them all (dropTrees)
+	recycle bool               // committed memory passed WithRecycleAboveBytes
 	closed  bool
 	busy    atomic.Bool
 
@@ -147,7 +148,7 @@ func (c *core) discard() {
 		c.inst = nil
 	}
 	c.gen++
-	c.live, c.recycle = 0, false
+	c.live, c.recycle, c.ptrs = 0, false, nil
 	c.mu.Lock()
 	c.leaked = nil
 	c.mu.Unlock()
@@ -223,6 +224,7 @@ func (c *core) drainLeaked() *ParseError {
 			continue
 		}
 		c.live--
+		delete(c.ptrs, l.ptr)
 		if e := c.deleteTree(l.ptr); e != nil {
 			return e
 		}
@@ -406,6 +408,10 @@ func (p *Parser) parse(ctx context.Context, src []byte, old *Tree, owned bool) (
 	t := &Tree{p: p, gen: gen, ptr: ptr, src: text, inputLen: len(src), outcome: outcome, invalidUTF8: invalid}
 	t.cleanup = runtime.AddCleanup(t, func(a leakArg) { a.c.enqueueLeak(leakedTree{a.ptr, a.gen}) }, leakArg{c, ptr, gen})
 	c.live++
+	if c.ptrs == nil {
+		c.ptrs = map[int32]struct{}{}
+	}
+	c.ptrs[ptr] = struct{}{}
 	c.noteCommitted()
 	return t, nil
 }
@@ -478,6 +484,30 @@ func (p *Parser) Close() error {
 		c.closed = true
 		c.discard()
 	}
+	return nil
+}
+
+// dropTrees invalidates every live Tree of the parser and frees them in the engine, keeping the instance (and its warm
+// memory). Used by ParserPool.Put. Owner goroutine only; the caller holds the busy guard.
+func (c *core) dropTrees() *ParseError {
+	c.gen++ // every Tree handle now fails with ErrTreeInvalidated
+	ptrs := c.ptrs
+	c.ptrs, c.live = nil, 0
+	c.mu.Lock()
+	c.leaked = nil // entries carry the old generation: their trees are freed below
+	c.mu.Unlock()
+	if c.inst == nil {
+		return nil
+	}
+	for ptr := range ptrs {
+		if e := c.deleteTree(ptr); e != nil {
+			return e // the instance was replaced; nothing is left to free
+		}
+	}
+	if e := c.resetParser(); e != nil {
+		return e
+	}
+	c.maybeRecycle()
 	return nil
 }
 
