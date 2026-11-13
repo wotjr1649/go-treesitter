@@ -1,7 +1,7 @@
 # ADR-0020 — A public CGO-free tree-sitter library built from unmodified upstream C
 
-**Status:** Proposed · 2026-11-13 · on acceptance supersedes ADR-0002, ADR-0013 and ADR-0018,
-and ADR-0017 in part
+**Status:** Accepted by the owner · 2026-11-13 · supersedes ADR-0002, ADR-0013 and ADR-0018,
+and ADR-0017 in part (grammar scope)
 
 ## Context
 
@@ -50,6 +50,31 @@ tree-sitter), which keeps builds pure Go and needs no compiler on the consumer s
 7. **Transition.** This repository is restructured in place (module path kept; no tag exists). The carrier and
    its 31 patches are removed only after the new engine passes its gates. Prior ADRs and evidence stay as
    history.
+8. **Build recipe details fixed by the spike.** wasm2go runs with `-unsafe` (bounds checks kept; unaligned
+   loads/stores on amd64/arm64). The generated `memory_grow` is replaced in a deterministic, hash-checked
+   post-processing step of our own generator with a reserve-then-commit linear memory (`VirtualAlloc` on
+   Windows, `mmap` on Unix), because wasm2go's `append`-based growth left 4–5x garbage in the Go heap.
+   A custom memory-provider hook is proposed to wasm2go upstream; if accepted, the post-processing step is
+   removed. Publishing that proposal needs the owner's separate authority.
+
+## Evidence (session 15 spike, E2/E5 as noted, identity-bound)
+
+Identity: tree-sitter v0.27.2 unmodified; wave-1 grammars at the pins above; wasi-sdk 34 (clang 23.1.0-rc3),
+wasm2go v0.4.21, Go 1.27.4, `CGO_ENABLED=0`, Windows amd64; reference = gcc 16.2.0 native build of the same
+sources. Raw results are kept in the local session-15 handoff, not in this public record.
+
+- Correctness vs the same-release native C (canonical cursor-preorder dump): fresh 1,586/1,586 and
+  incremental edits 5,919/5,919 identical; the Go snapshot renders the same 1,586 dumps (C agreement on that
+  corpus only, not on arbitrary input).
+- Speed: large-input parse geomean 1.46x native; faster than gotreesitter v0.57.0 (8.1x native) and bonsai
+  v0.4.1 (3.4x native) on every same-grammar input; small inputs within 1 ms or 2.5x native per file.
+- Memory: peak working set within 100 x input + 64 MB on all 12 large inputs for parse and for parse + snapshot
+  export (worst 53 % of the limit); released to within 16 MB of start after discard.
+- Build: largest grammar (C#) builds in about 16 s with under 1 GB compiler memory; binary growth up to
+  about 12 MB per grammar. Cold start about 32 ms; cancellation through the progress callback about 0.2 ms.
+- Update drill v0.27.1 → v0.27.2: no manual edits beyond the version parameter; native and W2 agree at both
+  releases; the release changed only `has_error` on ERROR nodes (57/1,586 dumps), as its release notes state.
+- Not yet run: Linux, macOS and Windows arm64 execution; memory implementation exists for Windows only.
 
 ## Consequences
 

@@ -1,6 +1,6 @@
 # ADR-0017 — Exclude two unclear grammars and state assurance by release scope
 
-**Status:** Accepted by the owner · 2026-10-23 · amends ADR-0014
+**Status:** Superseded in part by [ADR-0020](ADR-0020-cgo-free-library-on-unmodified-tree-sitter.md) (grammar scope) · 2026-11-13 (accepted by the owner 2026-10-23 · amends ADR-0014)
 
 ## Context
 
