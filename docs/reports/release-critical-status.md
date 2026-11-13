@@ -21,14 +21,14 @@ to the new engine.
 | Cancel then reparse a different source (7 grammars x large inputs) | PASS | E3 |
 | Large-input speed (12 inputs) | PASS, geomean 1.386x native (limit 2.5x) | bench lane |
 | Small-file speed (1,586) | PASS, 1,586/1,586 | bench lane |
-| Memory peak / release (24) | PASS; worst peak 0.55 of limit; worst release 15.2 MB of 16 MB (under investigation) | bench lane |
+| Memory peak / release (24) | PASS; worst peak 0.55 of limit; worst release 15.2 MB of 16 MB, not reproduced in 80 probe runs (max 12.3 MB; engine regions returned 80/80, remainder mostly image pages) | bench lane |
 | Reproducible generation | PASS for the modules checked (byte-identical regeneration) | E3 |
-| `-race` (diagnostic) | json, go, python: no race; others pending | diagnostic |
+| `-race` (diagnostic) | all 7 grammars: no race (sampled edits, quick cancel) | diagnostic |
 | Linux, macOS, Windows arm64 execution | NOT_RUN (engine CI lane pending) | — |
 
 ## Open items before Release
 
-- Generated grammar modules committed after the size-reduction round, then all gates re-run on the committed identity.
+- Grammar modules are committed (`e42345f`, recipe v2-O3); re-run speed and memory gates on these exact bytes.
 - Engine CI lane executed on every claimed platform.
 - Wave 2 grammars; removal of the old carrier, `syntax` and `internal/gtsadapter` (owner approval).
 - Packaging, limitations list and `MIGRATING.md`.

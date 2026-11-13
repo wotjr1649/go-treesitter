@@ -1,0 +1,66 @@
+name: Engine cross-platform lane
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  engine:
+    name: engine (${{ matrix.runner }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
+          - {runner: ubuntu-24.04-arm, goos: linux, goarch: arm64}
+          - {runner: macos-latest, goos: darwin, goarch: arm64}
+          - {runner: windows-latest, goos: windows, goarch: amd64}
+          - {runner: windows-11-arm, goos: windows, goarch: arm64}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    env:
+      CGO_ENABLED: "0"
+      GOENV: "off"
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: Native architecture
+        run: |
+          go env GOOS GOARCH CGO_ENABLED
+          test "$(go env GOOS)" = "${{ matrix.goos }}" && test "$(go env GOARCH)" = "${{ matrix.goarch }}" || { echo "native target mismatch"; exit 1; }
+      - name: Engine and root package
+        run: |
+          go vet ./internal/engine .
+          go test -count=1 -timeout 600s ./internal/engine .
+      - name: Generator unit tests
+        working-directory: tools/gen
+        run: go test -count=1 -timeout 300s ./...
+      # Embedded sample only: TSG_CORPUS stays unset. csharp and tsql take minutes to compile on a cold cache.
+      - name: Grammar modules
+        run: |
+          unset TSG_CORPUS
+          rc=0
+          for d in grammars/*/; do
+            lang=$(basename "$d")
+            [ "$lang" = gpl ] && continue
+            echo "::group::grammars/$lang"
+            (cd "$d" && go test -count=1 -timeout 900s .) || { echo "::error::grammars/$lang failed"; rc=1; }
+            echo "::endgroup::"
+          done
+          exit $rc
+      # Its tests need the local session data tree (TSG_S15_DIR) and skip, so only vet runs here.
+      - name: Conformance module (vet only)
+        working-directory: tools/conformance
+        run: go vet ./...
