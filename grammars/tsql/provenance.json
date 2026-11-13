@@ -16,10 +16,11 @@
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
       "shim.tsg_abi.c": "eca21d17b1a4d97e2b774f9e2fd00afb0751b529ccbbf03442ff1cbf15907241"
     },
-    "RecipeSHA256": "365e70cf825179441330be048bc285471e8660f673262e5e1101056f78eec094",
+    "RecipeSHA256": "b403a73d8c82ff0ded29d25a7cdc0ec7d2544ffa260e60ed6ebbdd4e505ba4a8",
     "Tools": {
-      "binaryen": "wasm-opt version 133 (version_133)",
-      "clang": "clang version 23.1.0-rc3 (https://github.com/llvm/llvm-project 895aa2c896ada719451be2e3673c83da8ddf1141)",
+      "binaryen": "133",
+      "clang": "23.1.0",
+      "llvm": "895aa2c896ada719451be2e3673c83da8ddf1141",
       "recipe": "v2-O3",
       "wasi-sdk": "34.0",
       "wasm2go": "v0.4.21",

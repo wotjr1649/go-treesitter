@@ -208,3 +208,39 @@ func TestRecipeHashIsHostIndependent(t *testing.T) {
 		t.Fatal("recipe lines depend on a host binary hash")
 	}
 }
+
+// wasi-sdk 34 reports different clang strings per host for one LLVM commit (CI run 43506423917); the identity keeps
+// only the number and the commit.
+func TestToolVersionParsing(t *testing.T) {
+	const c = "895aa2c896ada719451be2e3673c83da8ddf1141"
+	for _, line := range []string{
+		"clang version 23.1.0-rc3 (https://github.com/llvm/llvm-project " + c + ")",
+		"clang version 23.1.0-wasi-sdk (https://github.com/llvm/llvm-project " + c + ")",
+	} {
+		v, got, err := parseClangVersion(line)
+		if err != nil || v != "23.1.0" || got != c {
+			t.Fatalf("%q -> %q %q %v", line, v, got, err)
+		}
+	}
+	for _, bad := range []string{"", "clang version 23.1.0", "gcc version 13.2.0 (x " + c + ")", "clang version 23.1.0-x (https://x short)"} {
+		if _, _, err := parseClangVersion(bad); err == nil {
+			t.Errorf("%q accepted", bad)
+		}
+	}
+	for line, want := range map[string]string{"wasm-opt version 133 (version_133)": "133", "wasm-opt version 133": "133", "wasm-opt version 133-linux (x)": ""} {
+		got, err := parseWasmOptVersion(line)
+		if (err == nil) != (want != "") || got != want {
+			t.Errorf("%q -> %q %v", line, got, err)
+		}
+	}
+}
+
+func TestPinsHostIndependentStrings(t *testing.T) {
+	pins, err := loadPins("pins.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if pins.Tools.Clang != "23.1.0" || len(pins.Tools.LLVMCommit) != 40 || pins.Tools.Binaryen != "133" {
+		t.Fatalf("tool pins carry host strings: %+v", pins.Tools)
+	}
+}

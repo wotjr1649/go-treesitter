@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"sort"
 	"strings"
@@ -48,13 +49,14 @@ type Archive struct {
 // identity must not depend on the host that generated it. Archives are keyed per host platform "<GOOS>-<GOARCH>".
 type ToolPins struct {
 	WasiSDK         string             `json:"wasi-sdk"`
-	Clang           string             `json:"clang"` // first line of `clang --version`
+	Clang           string             `json:"clang"`      // clang release number (host strings differ in the suffix)
+	LLVMCommit      string             `json:"llvmCommit"` // llvm-project commit clang was built from
 	WasiSDKArchives map[string]Archive `json:"wasiSDKArchives"`
 	Wasm2go         string             `json:"wasm2go"`       // module version
 	Wasm2goModule   string             `json:"wasm2goModule"` // built with: go install -trimpath <module>@<version>
 	Wasm2goSum      string             `json:"wasm2goSum"`    // go.sum h1: hash of that module version (read back from the binary's build info)
 	// Binaryen is needed only by the recipes that run wasm-opt.
-	Binaryen         string             `json:"binaryen,omitempty"` // first line of `wasm-opt --version`
+	Binaryen         string             `json:"binaryen,omitempty"` // binaryen release number (version_N)
 	BinaryenArchives map[string]Archive `json:"binaryenArchives,omitempty"`
 	// LocalBinarySHA256 holds host binary hashes (platform -> tool -> sha256). They are checked only with -verify-binaries
 	// and are not part of any identity.
@@ -202,3 +204,27 @@ func (p *Pins) plan(platform string) ([]string, error) {
 
 // hostPlatform is the key of the per-platform archive tables.
 func hostPlatform() string { return runtime.GOOS + "-" + runtime.GOARCH }
+
+var (
+	clangRx   = regexp.MustCompile(`^clang version ([0-9]+[.][0-9]+[.][0-9]+)[^ ]* [(][^ ]+ ([0-9a-f]{40})[)]`)
+	wasmOptRx = regexp.MustCompile(`^wasm-opt version ([0-9]+)( |$)`)
+)
+
+// parseClangVersion reduces the first line of `clang --version` to the host-independent parts. wasi-sdk 34 reports
+// "23.1.0-rc3" on Windows and "23.1.0-wasi-sdk" on Linux for the same LLVM commit; only the number and the commit count.
+func parseClangVersion(line string) (version, commit string, err error) {
+	m := clangRx.FindStringSubmatch(strings.TrimSpace(line))
+	if m == nil {
+		return "", "", fmt.Errorf("unrecognised clang version line %q", line)
+	}
+	return m[1], m[2], nil
+}
+
+// parseWasmOptVersion returns the release number of `wasm-opt --version` (binaryen version_N).
+func parseWasmOptVersion(line string) (string, error) {
+	m := wasmOptRx.FindStringSubmatch(strings.TrimSpace(line))
+	if m == nil {
+		return "", fmt.Errorf("unrecognised wasm-opt version line %q", line)
+	}
+	return m[1], nil
+}

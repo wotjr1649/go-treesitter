@@ -191,7 +191,7 @@ func run(o opts) error {
 	tm["meta_s"] = since(t0)
 
 	id.RecipeSHA256 = recipeSHA256(pins, g, rname, rc)
-	id.Tools = map[string]string{"wasi-sdk": pins.Tools.WasiSDK, "clang": pins.Tools.Clang, "wasm2go": pins.Tools.Wasm2go, "wasm2go-sum": pins.Tools.Wasm2goSum, "recipe": rname}
+	id.Tools = map[string]string{"wasi-sdk": pins.Tools.WasiSDK, "clang": pins.Tools.Clang, "llvm": pins.Tools.LLVMCommit, "wasm2go": pins.Tools.Wasm2go, "wasm2go-sum": pins.Tools.Wasm2goSum, "recipe": rname}
 	if rc.opt != "" {
 		id.Tools["binaryen"] = pins.Tools.Binaryen
 	}
@@ -316,7 +316,21 @@ func verify(o opts, pins *Pins, g GrammarPin, rc recipe, tm map[string]float64) 
 	if err != nil {
 		return id, fmt.Errorf("clang: %w", err)
 	}
-	if err := expect("clang version", strings.TrimSpace(strings.SplitN(out, "\n", 2)[0]), pins.Tools.Clang); err != nil {
+	cv, cc, err := parseClangVersion(strings.SplitN(out, "\n", 2)[0])
+	if err != nil {
+		return id, err
+	}
+	if err := expect("clang version", cv, pins.Tools.Clang); err != nil {
+		return id, err
+	}
+	if err := expect("llvm commit", cc, pins.Tools.LLVMCommit); err != nil {
+		return id, err
+	}
+	sdkVer, err := os.ReadFile(filepath.Join(o.sdk, "VERSION"))
+	if err != nil {
+		return id, err
+	}
+	if err := expect("wasi-sdk version", strings.TrimSpace(strings.SplitN(string(sdkVer), "\n", 2)[0]), pins.Tools.WasiSDK); err != nil {
 		return id, err
 	}
 	bi, err := buildinfo.ReadFile(o.wasm2go)
@@ -347,7 +361,11 @@ func verify(o opts, pins *Pins, g GrammarPin, rc recipe, tm map[string]float64) 
 		if err != nil {
 			return id, fmt.Errorf("wasm-opt: %w", err)
 		}
-		if err := expect("wasm-opt version", strings.TrimSpace(strings.SplitN(out, "\n", 2)[0]), pins.Tools.Binaryen); err != nil {
+		wv, err := parseWasmOptVersion(strings.SplitN(out, "\n", 2)[0])
+		if err != nil {
+			return id, err
+		}
+		if err := expect("wasm-opt version", wv, pins.Tools.Binaryen); err != nil {
 			return id, err
 		}
 	}
