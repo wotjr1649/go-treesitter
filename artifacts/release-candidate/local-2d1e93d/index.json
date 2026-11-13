@@ -1,0 +1,177 @@
+{
+ "record_kind": "local packaging, license, cross-link and race-diagnostic receipts for one exact commit",
+ "candidate_commit": "2d1e93d2a21b4f8f314d4e0dd655167eddbfde98",
+ "checkout": "fresh regular clone (git clone --no-hardlinks --branch main) of the local repository; HEAD verified equal; git status clean before and after packaging",
+ "platform": "Windows native amd64, go1.27.4; product steps CGO_ENABLED=0, GOENV=off, GOWORK=off, GOTOOLCHAIN=local",
+ "original_receipt_sha256": "5659b04219827e8033f68fbe087b3a3c8388e5ddd52299a7955d61120b1f0dfd",
+ "receipts": [
+  {
+   "path": "packaging-local.json",
+   "sha256": "1176a2e8527973b5676249b8fe70c7eae27d30b5ef47565977a7066a5ae6cd1f",
+   "producer": "python tools/release/check.py .scratch/modulezip.exe"
+  },
+  {
+   "path": "licenses.json",
+   "sha256": "8e306c6c4959ad33748bcff1b0c23e48de6f2550aa72a52b6d9317f914604fc8",
+   "producer": "python tools/licenses/check.py (stdout)"
+  }
+ ],
+ "modulezip_sha256": "ae5a7b8609f614981ad4d84157fe8455ca1ac1883a6b7586076bbfb3f5f08455",
+ "steps": [
+  {
+   "check": "modulezip-build",
+   "command": [
+    "go",
+    "-C",
+    "tools/modulezip",
+    "build",
+    "-mod=readonly",
+    "-o",
+    "../../.scratch/modulezip.exe",
+    "."
+   ],
+   "env_overrides": {
+    "CGO_ENABLED": "0",
+    "GOENV": "off",
+    "GOWORK": "off",
+    "GOTOOLCHAIN": "local",
+    "GOPROXY": "off",
+    "GOFLAGS": "-mod=readonly"
+   },
+   "exit_code": 0,
+   "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "check": "release-unittest",
+   "command": [
+    "python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/release",
+    "-p",
+    "test_*.py"
+   ],
+   "env_overrides": {
+    "CGO_ENABLED": "0",
+    "GOENV": "off",
+    "GOWORK": "off",
+    "GOTOOLCHAIN": "local"
+   },
+   "exit_code": 0,
+   "log_sha256": "3fc16fc24b85c6f010b60152ddfa220af411f0aaced23956032d436487aed8fb"
+  },
+  {
+   "check": "release-check",
+   "command": [
+    "python",
+    "tools/release/check.py",
+    ".scratch/modulezip.exe"
+   ],
+   "env_overrides": {
+    "CGO_ENABLED": "0",
+    "GOENV": "off",
+    "GOWORK": "off",
+    "GOTOOLCHAIN": "local"
+   },
+   "exit_code": 0,
+   "log_sha256": "98c92f5de2b82ba176831d735717a05180cf639d607230a037e17725fae7b8f0"
+  },
+  {
+   "check": "license-gate",
+   "command": [
+    "python",
+    "tools/licenses/check.py"
+   ],
+   "env_overrides": {
+    "CGO_ENABLED": "0",
+    "GOENV": "off",
+    "GOWORK": "off",
+    "GOTOOLCHAIN": "local"
+   },
+   "exit_code": 0,
+   "log_sha256": "8e306c6c4959ad33748bcff1b0c23e48de6f2550aa72a52b6d9317f914604fc8"
+  },
+  {
+   "check": "arm64-build",
+   "command": [
+    "go",
+    "build",
+    "./..."
+   ],
+   "env_overrides": {
+    "CGO_ENABLED": "0",
+    "GOENV": "off",
+    "GOWORK": "off",
+    "GOTOOLCHAIN": "local",
+    "GOOS": "windows",
+    "GOARCH": "arm64"
+   },
+   "exit_code": 0,
+   "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "check": "arm64-consumer",
+   "command": [
+    "go",
+    "build",
+    "-o",
+    "<local-output>/arm64-consumer.exe",
+    "./testdata/consumer"
+   ],
+   "env_overrides": {
+    "CGO_ENABLED": "0",
+    "GOENV": "off",
+    "GOWORK": "off",
+    "GOTOOLCHAIN": "local",
+    "GOOS": "windows",
+    "GOARCH": "arm64"
+   },
+   "exit_code": 0,
+   "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "check": "race-diagnostic",
+   "command": [
+    "go",
+    "test",
+    "-race",
+    "./syntax",
+    "./internal/gtsadapter",
+    "-run",
+    "^Test(IndependentWorkers|Index.*|Cancellation.*|RuntimeTimeoutReleasesPartialTree)$",
+    "-count=1",
+    "-timeout=180s"
+   ],
+   "env_overrides": {
+    "CGO_ENABLED": "1",
+    "GOENV": "off",
+    "GOWORK": "off",
+    "GOTOOLCHAIN": "local"
+   },
+   "exit_code": 0,
+   "log_sha256": "e890f646d955ecf89bf57ede42a7bc54d7c8274083991108d89b1acd2dcb9e46"
+  }
+ ],
+ "fresh_checkout_check": {
+  "artifacts/release-candidate/runtime-upgrade/runtime-comparison-samples.csv": "2df90025f20eb0c8091165e870a659e2179f8df45e4496027bdd57a38d8e331e"
+ },
+ "interpretation": {
+  "release-check": "official module ZIPs (main 2820 entries, GPL 32 entries), empty-cache consumers without replace, CGO-free graphs, 204 basic catalog cases: PASS",
+  "license-gate": "PASS: 204 grammars, no unresolved declarations",
+  "arm64": "cross-link only (GOOS=windows GOARCH=arm64); native ARM64 execution is in the hosted CI receipts",
+  "race": "diagnostic lane (CGO_ENABLED=1, -race), workflow selection; never a product gate"
+ },
+ "not_run": [
+  "native Windows ARM64 execution on a local host"
+ ],
+ "omitted_fields": [
+  "absolute paths",
+  "process identifiers",
+  "raw logs",
+  "inherited environment"
+ ],
+ "harness_note": "The first packaging attempt (r01) passed a relative clone directory that the clone step resolved against a different working directory; the harness stopped right after cloning, before any check ran. It was rerun once (r02) with absolute paths; the steps below are r02. The r01 receipt and log are kept locally.",
+ "modulezip_note": "modulezip_sha256 identifies the local tools/modulezip helper executable, not a module ZIP; the module ZIP identities are modules[].sha256 in packaging-local.json."
+}

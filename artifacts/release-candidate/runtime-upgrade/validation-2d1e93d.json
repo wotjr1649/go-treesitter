@@ -1,0 +1,268 @@
+{
+ "record_kind": "public projection of local candidate verification receipts",
+ "commit": "2d1e93d2a21b4f8f314d4e0dd655167eddbfde98",
+ "tree": "24f7e56c02940d355879033daedc0632abab304e",
+ "runtime_manifest_sha256": "c96bc328e0b86c428a10e81d04bcffba2709841e3efb7467c51b01ff8dd0754f",
+ "identity_source": "internal/provenance/identities.json",
+ "environment": {
+  "GOOS": "windows",
+  "GOARCH": "amd64",
+  "CGO_ENABLED": "0",
+  "GOENV": "off",
+  "GOWORK": "off",
+  "GOTOOLCHAIN": "local",
+  "go_version": "go1.27.4"
+ },
+ "checkout": "clean detached checkout of exactly this commit (main after PR #8)",
+ "original_receipt_sha256": {
+  "product": "4c0c846e32f20ba5af310d6aab563076ca0e3893b9bdcfe177f174ca60827322",
+  "carrier_reproduction": "7cf74c0ecf5b5ae0c170fe21164e09981f70f177827a4c8defe846998c18317e"
+ },
+ "runs": [
+  {
+   "check": "build",
+   "command": [
+    "go",
+    "build",
+    "-p=1",
+    "./..."
+   ],
+   "exit_code": 0,
+   "elapsed_seconds": 10.376,
+   "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "check": "vet",
+   "command": [
+    "go",
+    "vet",
+    "-p=1",
+    "./..."
+   ],
+   "exit_code": 0,
+   "elapsed_seconds": 3.133,
+   "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "check": "test",
+   "command": [
+    "go",
+    "test",
+    "-json",
+    "./...",
+    "-count=1",
+    "-timeout=120s",
+    "-p=1"
+   ],
+   "exit_code": 0,
+   "elapsed_seconds": 33.32,
+   "stdout_sha256": "1b3cdd5dcf6956c71e92c8e8d3d1692ffcab59eb48d4e8814e56b2953bcb6f8e",
+   "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "terminal_tests": {
+    "total": 933,
+    "counts": {
+     "pass": 933
+    }
+   }
+  },
+  {
+   "check": "subset",
+   "command": [
+    "go",
+    "test",
+    "-json",
+    "-tags",
+    "grammar_subset,grammar_subset_go,grammar_subset_python,grammar_subset_javascript,grammar_subset_typescript,grammar_subset_tsx,grammar_subset_c_sharp",
+    "./...",
+    "-count=1",
+    "-timeout=120s",
+    "-p=1"
+   ],
+   "exit_code": 0,
+   "elapsed_seconds": 25.826,
+   "stdout_sha256": "0f6470731906675d5869eb70588789536122fa6a2523e6ffc1dbd40c96c3f124",
+   "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "terminal_tests": {
+    "total": 914,
+    "counts": {
+     "pass": 914
+    }
+   }
+  },
+  {
+   "check": "private",
+   "command": [
+    "python",
+    "tools/runtime-bundle/check.py"
+   ],
+   "exit_code": 0,
+   "elapsed_seconds": 5.723,
+   "stdout_sha256": "c8ae725b2bed0417e78fe5315108d2f344643e37ad538e88120cfad39ad26a8b",
+   "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "terminal_tests": {
+    "total": 9,
+    "counts": {
+     "pass": 9
+    }
+   }
+  },
+  {
+   "check": "consumer-build",
+   "command": [
+    "go",
+    "build",
+    "-o",
+    "<local-output>/native-consumer.exe",
+    "./testdata/consumer"
+   ],
+   "exit_code": 0,
+   "elapsed_seconds": 0.753,
+   "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "check": "consumer-execute",
+   "command": [
+    "<local-output>/native-consumer.exe"
+   ],
+   "exit_code": 0,
+   "elapsed_seconds": 0.211,
+   "stdout_sha256": "3ad4ed416a0145252456770a27e6725d58c5d1fe95c062b92cfa7d54fd3591bb",
+   "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "check": "oracle-tools",
+   "command": [
+    "python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/native-oracle",
+    "-p",
+    "test_*.py"
+   ],
+   "exit_code": 0,
+   "elapsed_seconds": 0.496,
+   "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stderr_sha256": "95f123a15b56b59cff8f028058f5949d1ebbfd6ec6a326a5054bee97163ec7c9"
+  },
+  {
+   "check": "release-tools",
+   "command": [
+    "python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/release",
+    "-p",
+    "test_*.py"
+   ],
+   "exit_code": 0,
+   "elapsed_seconds": 0.322,
+   "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stderr_sha256": "2e43f0c172048e93f4ea2bfaf501baaf2a4219964187b155dc122d174932a446"
+  },
+  {
+   "check": "lane-tools",
+   "command": [
+    "python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/lane",
+    "-p",
+    "test_*.py"
+   ],
+   "exit_code": 0,
+   "elapsed_seconds": 3.303,
+   "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stderr_sha256": "a4ebd8193f9cceaf22799e94a050d4eb203639359bb5a6a8e42754a262933fa8"
+  },
+  {
+   "check": "separator",
+   "command": [
+    "python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/runtime-bundle",
+    "-p",
+    "test_separate.py"
+   ],
+   "exit_code": 0,
+   "elapsed_seconds": 0.114,
+   "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stderr_sha256": "6db5414056f12ab722eda33f0dbe6e60d33e9778d8f882a7dfcf8ecfb9e4c93b"
+  },
+  {
+   "check": "gpl-local",
+   "command": [
+    "go",
+    "test",
+    "-json",
+    "-count=1",
+    "-mod=readonly",
+    "-timeout=120s",
+    "./..."
+   ],
+   "exit_code": 0,
+   "elapsed_seconds": 2.442,
+   "stdout_sha256": "d831fd3c0a8d859a25bcec918329dda5b301ea3f0ae70b6be1999f16a7b87da9",
+   "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "lane": "local go.work diagnostic, not official ZIP",
+   "cwd": "grammars/gpl",
+   "env_override": {
+    "GOWORK": "<local go.work using the checkout root and grammars/gpl>"
+   },
+   "terminal_tests": {
+    "total": 2,
+    "counts": {
+     "pass": 2
+    }
+   }
+  }
+ ],
+ "resource_tests": {
+  "TestCancellationDuringWork": "pass",
+  "TestCancellationDuringSnapshot": "pass",
+  "TestCancellationDuringRecovery": "pass",
+  "TestRequestBudgets": "pass",
+  "TestMemoryReceiptAfterWarmup": "pass",
+  "TestNestedInputStopsAtWorkLimit": "pass",
+  "TestInvalidOptionsAndCancellation": "pass",
+  "TestRuntimeTimeoutReleasesPartialTree": "pass",
+  "TestReachableOutcomes": "pass",
+  "TestInvalidEditDoesNotMutatePrevious": "pass"
+ },
+ "carrier_reproduction": {
+  "source_archive_sha256": "0925d93fadca3ad943e20594d602c3639d79f9ad8f82d466262672890d7592a6",
+  "patches": 31,
+  "files_matched": 1561,
+  "runtime_files_differing": [],
+  "manifest_equals_committed": true,
+  "optional_payload_files_unchanged": 9,
+  "note": "tools/runtime-bundle/import.py replayed into a new directory inside the same clean checkout; git status was clean before and after"
+ },
+ "not_run": [
+  "native Windows ARM64 execution on a local host (hosted CI covers it: native-2d1e93d)"
+ ],
+ "verdict": "Local AMD64 product checks pass; no Release verdict",
+ "omitted_fields": [
+  "absolute working directories",
+  "machine-specific executable paths",
+  "process identifiers",
+  "raw console logs",
+  "local CPU-load samples",
+  "per-run timed_out flags (all false)",
+  "Python version",
+  "go env, the local go.work text and inherited environment names"
+ ],
+ "command_normalization": "Python install path becomes python; native consumer output path becomes <local-output>/native-consumer.exe. Original receipts and logs remain local.",
+ "harness_note": "The first importer replay (r01) exited 1 before writing anything: the harness passed a manifest path outside the checkout, which import.py rejects. It was rerun once (r02) with the output inside the same clean checkout and is the carrier_reproduction entry. That failure is kept locally. The product steps ran once."
+}
