@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "abi": 1,
+  "name": "tsx",
+  "module": "github.com/wotjr1649/go-treesitter/grammars/tsx",
+  "identity": {
+    "Runtime": "v0.27.2",
+    "GrammarRepo": "https://github.com/tree-sitter/tree-sitter-typescript",
+    "GrammarRev": "75b3874edb2dc714fb1fd77a32013d0f8699989f",
+    "SourceSHA256": {
+      "grammar.LICENSE": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
+      "grammar.parser.c": "1902cb53fa7ff5179df89b2eea863165e84c8cc866226419dc26921d8c055885",
+      "grammar.scanner.c": "d563cd30b2f39718c9ae4292795c5ce03a2ad01954ba3a86ef84c2781a736673",
+      "grammar.tree": "9668ab33b56aa4e64f6a2cc704040bf1d78c0beb2900586c693cbd93254d75af",
+      "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
+      "shim.tsg_abi.c": "eca21d17b1a4d97e2b774f9e2fd00afb0751b529ccbbf03442ff1cbf15907241"
+    },
+    "RecipeSHA256": "e05fe7a1b25a98576641a838542a2f1ff73a941981fadc0638ef026126d62c9d",
+    "Tools": {
+      "binaryen": "wasm-opt version 133 (version_133)",
+      "clang": "clang version 23.1.0-rc3 (https://github.com/llvm/llvm-project 895aa2c896ada719451be2e3673c83da8ddf1141)",
+      "go": "go1.27.4",
+      "recipe": "v2-O3",
+      "wasi-sdk": "34.0",
+      "wasm2go": "v0.4.21"
+    }
+  },
+  "outputs": {
+    "engine_gen.dat": "d7a41cd9b8f360ea6e7cb3c6341b444f94aaf7721aedc567a13e7458e1a2606b",
+    "engine_gen.go": "86c69a472f3fbeff1f287af672604b7a83e2ff1bd7e289ddb21094797c3ff18f",
+    "wasm": "2f0f37a16c9d2d28ade4dd5d60d948cf18c01ba9c526c9b03780aa2685fcd619",
+    "wasm.clang": "f557ebae22567e79827e2b237be56c0fc23f2c2a292e7cac89808b65bcc089b5"
+  }
+}

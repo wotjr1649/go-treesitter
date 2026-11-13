@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "abi": 1,
+  "name": "golang",
+  "module": "github.com/wotjr1649/go-treesitter/grammars/golang",
+  "identity": {
+    "Runtime": "v0.27.2",
+    "GrammarRepo": "https://github.com/tree-sitter/tree-sitter-go",
+    "GrammarRev": "2346a3ab1bb3857b48b29d779a1ef9799a248cd7",
+    "SourceSHA256": {
+      "grammar.LICENSE": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+      "grammar.parser.c": "3dbf6ed1238b5dfcf2be4d2f2d4cb27a14d34f34d7784eccccbfd532fd4a6d85",
+      "grammar.tree": "e56fa3589679079b0eda074a1391e798b64023ab85228e8ae7cfdb331bcb1ca5",
+      "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
+      "shim.tsg_abi.c": "eca21d17b1a4d97e2b774f9e2fd00afb0751b529ccbbf03442ff1cbf15907241"
+    },
+    "RecipeSHA256": "2f329bc12e2d36c4889550f1f95946ecb8406bd314261c6363b90485fb19e8bc",
+    "Tools": {
+      "binaryen": "wasm-opt version 133 (version_133)",
+      "clang": "clang version 23.1.0-rc3 (https://github.com/llvm/llvm-project 895aa2c896ada719451be2e3673c83da8ddf1141)",
+      "go": "go1.27.4",
+      "recipe": "v2-O3",
+      "wasi-sdk": "34.0",
+      "wasm2go": "v0.4.21"
+    }
+  },
+  "outputs": {
+    "engine_gen.dat": "26efe19187c02c90b2f4f1410a0d674fb0ac6fc2af7b230145edc34fba9ffb70",
+    "engine_gen.go": "e432c678fe5fbe79f111dd6d6593c0365f924069305a892c9c02e51f08c3afd9",
+    "wasm": "4cc238da35fee0c77bf4307e958a60c00842a19eb8277d3433a5df618df06679",
+    "wasm.clang": "dd64f48a565933e2e13e8527115bc94c21e6bebccd622cd199cd5e1be0adbe89"
+  }
+}

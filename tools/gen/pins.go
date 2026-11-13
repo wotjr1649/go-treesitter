@@ -17,6 +17,7 @@ import (
 type Pins struct {
 	Schema           int                   `json:"schema"`
 	ABI              int                   `json:"abi"`
+	Recipe           string                `json:"recipe"` // build variant, a key of recipes in recipe.go (-recipe overrides it for comparisons)
 	Runtime          RuntimePin            `json:"runtime"`
 	Tools            ToolPins              `json:"tools"`
 	MemoryGrowSHA256 string                `json:"memoryGrowSHA256"` // sha256 of the original wasm2go memory_grow function text
@@ -41,6 +42,10 @@ type ToolPins struct {
 	Wasm2go       string `json:"wasm2go"`       // module version recorded in the binary
 	Wasm2goSHA256 string `json:"wasm2goSHA256"` // the pinned binary (host specific)
 	Go            string `json:"go"`            // Go version wasm2go was built with
+	// Binaryen is needed only by the recipes that run wasm-opt.
+	Binaryen              string `json:"binaryen,omitempty"`              // first line of `wasm-opt --version`
+	BinaryenSHA256        string `json:"binaryenSHA256,omitempty"`        // the pinned wasm-opt binary (host specific)
+	BinaryenArchiveSHA256 string `json:"binaryenArchiveSHA256,omitempty"` // upstream release archive the binary was extracted from (provenance only)
 }
 
 type GrammarPin struct {

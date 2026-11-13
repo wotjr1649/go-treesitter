@@ -100,3 +100,24 @@ func TestTreeSHA256IsPathAndContentBound(t *testing.T) {
 		t.Fatal("missing dir accepted")
 	}
 }
+
+func TestRecipes(t *testing.T) {
+	pins := &Pins{Tools: ToolPins{Binaryen: "b", BinaryenSHA256: "h"}}
+	if got := recipes["v0"].recipeLines("v0", pins); got != "" {
+		t.Fatalf("v0 must not change the baseline recipe hash, got %q", got)
+	}
+	for name, r := range recipes {
+		if _, err := lookupRecipe(name); err != nil {
+			t.Fatal(err)
+		}
+		if name != "v0" && !strings.Contains(r.recipeLines(name, pins), "recipe="+name) {
+			t.Fatalf("%s: recipe name not bound into the hash", name)
+		}
+		if r.embed != (len(r.wasm2goFlags()) == 2) || (r.opt != "") != strings.Contains(r.recipeLines(name, pins), "wasm-opt") {
+			t.Fatalf("%s: flags and hash lines disagree", name)
+		}
+	}
+	if _, err := lookupRecipe("nope"); err == nil {
+		t.Fatal("unknown recipe accepted")
+	}
+}

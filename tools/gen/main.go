@@ -35,8 +35,8 @@ var (
 )
 
 type opts struct {
-	lang, root, src, dl, sdk, wasm2go, out, work, repo string
-	hash, noAPI                                        bool
+	lang, root, src, dl, sdk, wasm2go, wasmOpt, recipe, out, work, repo string
+	hash, noAPI                                                         bool
 }
 
 func main() {
@@ -47,6 +47,8 @@ func main() {
 	flag.StringVar(&o.dl, "dl", "", "optional directory holding the upstream archives (verifies their sha256)")
 	flag.StringVar(&o.sdk, "sdk", "", "wasi-sdk directory")
 	flag.StringVar(&o.wasm2go, "wasm2go", "", "wasm2go binary")
+	flag.StringVar(&o.wasmOpt, "wasm-opt", "", "wasm-opt binary (binaryen; only for recipes that run it)")
+	flag.StringVar(&o.recipe, "recipe", "", "build variant; overrides the recipe field of pins.json (size comparisons), recorded in provenance.json")
 	flag.StringVar(&o.out, "out", "", "output module directory")
 	flag.StringVar(&o.work, "work", "", "scratch directory (wasm, meta runner)")
 	flag.StringVar(&o.repo, "repo", "../..", "repository root (only for the meta runner's replace directive)")
@@ -77,8 +79,16 @@ func run(o opts) error {
 	if o.sdk == "" || o.wasm2go == "" || o.out == "" || o.work == "" {
 		return fmt.Errorf("-sdk, -wasm2go, -out and -work are required")
 	}
+	rname := pins.Recipe
+	if o.recipe != "" {
+		rname = o.recipe
+	}
+	rc, err := lookupRecipe(rname)
+	if err != nil {
+		return err
+	}
 	tm := map[string]float64{}
-	id, err := verify(o, pins, g, tm)
+	id, err := verify(o, pins, g, rc, tm)
 	if err != nil {
 		return err
 	}
@@ -93,10 +103,26 @@ func run(o opts) error {
 		return err
 	}
 	tm["clang_s"] = since(t0)
+	outputs := map[string]string{}
+	if rc.opt != "" {
+		clangWasm, err := os.ReadFile(wasm)
+		if err != nil {
+			return err
+		}
+		outputs["wasm.clang"] = sumBytes(clangWasm)
+		t0 = time.Now()
+		opt := filepath.Join(work, o.lang+".opt.wasm")
+		if out, err := runCmd("", nil, o.wasmOpt, append(rc.wasmOptArgs(), wasm, "-o", opt)...); err != nil {
+			return fmt.Errorf("wasm-opt: %w\n%s", err, out)
+		}
+		wasm = opt
+		tm["wasm_opt_s"] = since(t0)
+	}
 
 	t0 = time.Now()
-	genGo := filepath.Join(work, "gen.go")
-	if out, err := runCmd("", nil, o.wasm2go, "-unsafe", "-pkg", o.lang, "-o", genGo, wasm); err != nil {
+	// engine_gen.go in the work dir: with -embed wasm2go names the data file after it (engine_gen.dat) and go:embeds that name.
+	genGo := filepath.Join(work, "engine_gen.go")
+	if out, err := runCmd("", nil, o.wasm2go, append(rc.wasm2goFlags(), "-pkg", o.lang, "-o", genGo, wasm)...); err != nil {
 		return fmt.Errorf("wasm2go: %w\n%s", err, out)
 	}
 	raw, err := os.ReadFile(genGo)
@@ -110,12 +136,28 @@ func run(o opts) error {
 	if err != nil {
 		return err
 	}
+	if rc.embed { // wasm2go -embed leaves no blank line before the directive, which gofmt -l reports
+		patched = strings.Replace(patched, "}\n//go:embed engine_gen.dat\n", "}\n\n//go:embed engine_gen.dat\n", 1)
+	}
 	tm["wasm2go_s"] = since(t0)
 
 	wasmBytes, _ := os.ReadFile(wasm)
 	files := map[string][]byte{
 		"engine_gen.go": []byte(patched),
 		"go.mod":        []byte(goMod(o.lang)),
+	}
+	if rc.embed {
+		dat, err := os.ReadFile(filepath.Join(work, "engine_gen.dat"))
+		if err != nil {
+			return fmt.Errorf("wasm2go -embed wrote no engine_gen.dat: %w", err)
+		}
+		if !strings.Contains(patched, "//go:embed engine_gen.dat\n") {
+			return fmt.Errorf("wasm2go -embed output has no //go:embed engine_gen.dat directive")
+		}
+		files["engine_gen.dat"] = dat
+		outputs["engine_gen.dat"] = sumBytes(dat)
+	} else if err := os.Remove(filepath.Join(o.out, "engine_gen.dat")); err != nil && !errors.Is(err, fs.ErrNotExist) { // stale file of another recipe
+		return err
 	}
 	if err := writeFiles(o.out, files); err != nil {
 		return err
@@ -128,8 +170,11 @@ func run(o opts) error {
 	}
 	tm["meta_s"] = since(t0)
 
-	id.RecipeSHA256 = recipeSHA256(pins, g)
-	id.Tools = map[string]string{"wasi-sdk": pins.Tools.WasiSDK, "clang": pins.Tools.Clang, "wasm2go": pins.Tools.Wasm2go, "go": pins.Tools.Go}
+	id.RecipeSHA256 = recipeSHA256(pins, g, rname, rc)
+	id.Tools = map[string]string{"wasi-sdk": pins.Tools.WasiSDK, "clang": pins.Tools.Clang, "wasm2go": pins.Tools.Wasm2go, "go": pins.Tools.Go, "recipe": rname}
+	if rc.opt != "" {
+		id.Tools["binaryen"] = pins.Tools.Binaryen
+	}
 	lic, err := os.ReadFile(filepath.Join(o.src, g.ExtractDir, "LICENSE"))
 	if err != nil {
 		return err
@@ -140,8 +185,8 @@ func run(o opts) error {
 			return err
 		}
 	}
-	prov := provenance{Schema: 1, ABI: uint32(pins.ABI), Name: o.lang, Module: modulePrefix + o.lang, Identity: id,
-		Outputs: map[string]string{"engine_gen.go": sumBytes([]byte(patched)), "wasm": sumBytes(wasmBytes)}}
+	outputs["engine_gen.go"], outputs["wasm"] = sumBytes([]byte(patched)), sumBytes(wasmBytes)
+	prov := provenance{Schema: 1, ABI: uint32(pins.ABI), Name: o.lang, Module: modulePrefix + o.lang, Identity: id, Outputs: outputs}
 	provJSON, err := marshal(prov)
 	if err != nil {
 		return err
@@ -181,7 +226,7 @@ func run(o opts) error {
 func since(t time.Time) float64 { return float64(time.Since(t).Milliseconds()) / 1000 }
 
 // verify checks every pinned input and tool, and returns the identity inputs.
-func verify(o opts, pins *Pins, g GrammarPin, tm map[string]float64) (Identity, error) {
+func verify(o opts, pins *Pins, g GrammarPin, rc recipe, tm map[string]float64) (Identity, error) {
 	id := Identity{Runtime: pins.Runtime.Release, GrammarRepo: g.Repo, GrammarRev: g.Commit, SourceSHA256: map[string]string{}}
 	rt := pins.Runtime
 	got, err := treeSHA256(filepath.Join(o.src, rt.ExtractDir), rt.Dirs)
@@ -270,6 +315,24 @@ func verify(o opts, pins *Pins, g GrammarPin, tm map[string]float64) (Identity, 
 	if err := expect("wasm2go built with", bi.GoVersion, pins.Tools.Go); err != nil {
 		return id, err
 	}
+	if rc.opt != "" {
+		if o.wasmOpt == "" {
+			return id, fmt.Errorf("-wasm-opt is required by this recipe")
+		}
+		if got, err = sumFile(o.wasmOpt); err != nil {
+			return id, err
+		}
+		if err := expect("wasm-opt binary", got, pins.Tools.BinaryenSHA256); err != nil {
+			return id, err
+		}
+		out, err := runCmd("", nil, o.wasmOpt, "--version")
+		if err != nil {
+			return id, fmt.Errorf("wasm-opt: %w", err)
+		}
+		if err := expect("wasm-opt version", strings.TrimSpace(strings.SplitN(out, "\n", 2)[0]), pins.Tools.Binaryen); err != nil {
+			return id, err
+		}
+	}
 	return id, nil
 }
 
@@ -302,7 +365,7 @@ func compile(o opts, pins *Pins, g GrammarPin, wasm string) error {
 }
 
 // recipeSHA256 binds the fixed recipe (flags, exports, tool invocations, the patch) to one identity string.
-func recipeSHA256(pins *Pins, g GrammarPin) string {
+func recipeSHA256(pins *Pins, g GrammarPin, name string, rc recipe) string {
 	var b strings.Builder
 	fmt.Fprintf(&b, "abi=%d\nclang=%s\n", pins.ABI, strings.Join(clangFlags, " "))
 	fmt.Fprintf(&b, "define=TSG_LANG_FN=%s\ninclude=runtime/lib/src runtime/lib/include grammar/%s\n", g.CSymbol, g.GrammarDir)
@@ -314,6 +377,7 @@ func recipeSHA256(pins *Pins, g GrammarPin) string {
 	srcs = append(srcs, "tsg_abi.c")
 	fmt.Fprintf(&b, "sources=%s\nexports=%s\nwasm2go=-unsafe\n", strings.Join(srcs, " "), strings.Join(exports, " "))
 	fmt.Fprintf(&b, "memory_grow.original=%s\nmemory_grow.replacement=%s", pins.MemoryGrowSHA256, replacementBody)
+	b.WriteString(rc.recipeLines(name, pins))
 	return sumBytes([]byte(b.String()))
 }
 

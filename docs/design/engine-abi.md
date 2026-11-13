@@ -43,7 +43,9 @@ Imports: module `tsg`, `should_stop() i32` (non-zero halts the parse). WASI prev
 `52` (ENOSYS); the generator fails if a grammar needs an import outside `internal/engine`'s stub set.
 
 Build flags (from the spike, fixed): `clang --target=wasm32-wasip1 -mexec-model=reactor -O2 -DNDEBUG
--Wl,--gc-sections -Wl,--no-entry -Wl,--strip-all` + `--export=` for the table above; then `wasm2go -unsafe`.
+-Wl,--gc-sections -Wl,--no-entry -Wl,--strip-all` + `--export=` for the table above; then `wasm-opt -O3` (binaryen, explicit feature flags) and `wasm2go -unsafe -embed`
+(data sections in `engine_gen.dat`, loaded with `go:embed`). Recipe name `v2-O3` in `tools/gen/pins.json`; chosen by the
+pre-declared size round of 2026-11-14 (76.0 -> 25.6 MB raw, same conformance, speed within 1 %).
 
 ## 2. Export chunk buffer (snapshot block format 1)
 

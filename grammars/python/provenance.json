@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "abi": 1,
+  "name": "python",
+  "module": "github.com/wotjr1649/go-treesitter/grammars/python",
+  "identity": {
+    "Runtime": "v0.27.2",
+    "GrammarRepo": "https://github.com/tree-sitter/tree-sitter-python",
+    "GrammarRev": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64",
+    "SourceSHA256": {
+      "grammar.LICENSE": "d724405ce238a22c0d35769c5a36b386ad5958192efe8bbb304fb2896254575f",
+      "grammar.parser.c": "53a7bd87ba22c4fdbb8566a2caf848a1478f3ac9d47a1b32677a71de75d75db6",
+      "grammar.scanner.c": "6db82134ac2d4c90a1a1475487a625cface02662ebda9b7478cad9c7147e9afe",
+      "grammar.tree": "2102a9fe2ccb7e008975e8b0acb906d8340fe14c399c6bc5c28d1be60417d39d",
+      "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
+      "shim.tsg_abi.c": "eca21d17b1a4d97e2b774f9e2fd00afb0751b529ccbbf03442ff1cbf15907241"
+    },
+    "RecipeSHA256": "e74e90ace100cf99d81f8c71f5b0881d36eba48107b306ebd479f993dd4d9a15",
+    "Tools": {
+      "binaryen": "wasm-opt version 133 (version_133)",
+      "clang": "clang version 23.1.0-rc3 (https://github.com/llvm/llvm-project 895aa2c896ada719451be2e3673c83da8ddf1141)",
+      "go": "go1.27.4",
+      "recipe": "v2-O3",
+      "wasi-sdk": "34.0",
+      "wasm2go": "v0.4.21"
+    }
+  },
+  "outputs": {
+    "engine_gen.dat": "7c19462975d922fe9281932c9d22603bce7d37fea6404f91a039e1da0de87fa1",
+    "engine_gen.go": "6f38ed84c2286afde54ec5aafd106b330c748cc3ea67121f51c0131c5fac7d7f",
+    "wasm": "b42d48849d668c52932e4c09f8966e5082be05216761d8fd245a12785c333263",
+    "wasm.clang": "fc08c2b12963d8a9099410d3c96d586050cb989f45316712624a3910a0d95cbe"
+  }
+}

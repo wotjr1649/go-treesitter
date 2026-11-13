@@ -12,7 +12,7 @@ Every grammar module is generated, never hand-edited, from:
 | tree-sitter runtime C (`lib/src/lib.c` tree) | an upstream **release**, unmodified |
 | grammar `parser.c`, `scanner.c`, headers | upstream grammar repository at a full commit, unmodified (wave 1: the six repositories of ADR-0020) |
 | `tools/gen/shim/tsg_abi.c` | this repository's own C, versioned by the engine ABI |
-| toolchain | wasi-sdk (clang), wasm2go with `-unsafe`, Go; versions recorded per generation |
+| toolchain | wasi-sdk (clang), binaryen `wasm-opt`, wasm2go with `-unsafe -embed`, Go; versions and the recipe name recorded per generation |
 | post-processing | the hash-checked `memory_grow` replacement of `tools/gen` (ADR-0020 §8) |
 
 Upstream files are never edited. A fix to an upstream file goes upstream as a contribution; until it lands, the

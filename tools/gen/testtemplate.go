@@ -259,13 +259,21 @@ func TestIdentityMatchesProvenance(t *testing.T) {
 	if !reflect.DeepEqual(pj.Identity, grammar.Identity) {
 		t.Fatalf("provenance.json identity differs from the compiled one:\n%+v\n%+v", pj.Identity, grammar.Identity)
 	}
-	gen, err := os.ReadFile("engine_gen.go")
-	if err != nil {
-		t.Fatal(err)
-	}
-	sum := sha256.Sum256(gen)
-	if got := hex.EncodeToString(sum[:]); got != pj.Outputs["engine_gen.go"] {
-		t.Fatalf("engine_gen.go sha256 %s, provenance %s", got, pj.Outputs["engine_gen.go"])
+	// every generated source file of the module is bound by provenance; engine_gen.dat exists only for the embed recipes
+	for _, name := range []string{"engine_gen.go", "engine_gen.dat"} {
+		gen, err := os.ReadFile(name)
+		if errors.Is(err, os.ErrNotExist) && name == "engine_gen.dat" {
+			if _, ok := pj.Outputs[name]; ok {
+				t.Fatalf("provenance lists %s but the file is absent", name)
+			}
+			continue
+		} else if err != nil {
+			t.Fatal(err)
+		}
+		sum := sha256.Sum256(gen)
+		if got := hex.EncodeToString(sum[:]); got != pj.Outputs[name] {
+			t.Fatalf("%s sha256 %s, provenance %s", name, got, pj.Outputs[name])
+		}
 	}
 	if grammar.ABI != engine.ABIVersion {
 		t.Fatalf("grammar ABI %d, engine ABI %d", grammar.ABI, engine.ABIVersion)

@@ -1,6 +1,7 @@
 {
   "schema": 1,
   "abi": 1,
+  "recipe": "v2-O3",
   "runtime": {
     "release": "v0.27.2",
     "repo": "https://github.com/tree-sitter/tree-sitter",
@@ -18,7 +19,10 @@
     "clang": "clang version 23.1.0-rc3 (https://github.com/llvm/llvm-project 895aa2c896ada719451be2e3673c83da8ddf1141)",
     "wasm2go": "v0.4.21",
     "wasm2goSHA256": "13c118b5ffef76e397b5c32db5ad9e63ab039894ab75bf26d8b6e0ed9d0d97e1",
-    "go": "go1.27.4"
+    "go": "go1.27.4",
+    "binaryen": "wasm-opt version 133 (version_133)",
+    "binaryenSHA256": "4217d75f81cf33c4032d82b5d531120069af1a4b43eb7737977bdb2c99a8f4ba",
+    "binaryenArchiveSHA256": "17a2cbeac6b5693c5fbafab3838d3c65fd9c1eb38b05f5baec6c657e8c84995b"
   },
   "memoryGrowSHA256": "9e1db9d4db30f9f71e30319cbc3b782ae348fd530bd4bd26d00f31dafcabe93a",
   "shimSHA256": "eca21d17b1a4d97e2b774f9e2fd00afb0751b529ccbbf03442ff1cbf15907241",
