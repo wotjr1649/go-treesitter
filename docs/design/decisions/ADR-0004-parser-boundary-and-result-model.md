@@ -1,6 +1,6 @@
 # ADR-0004 — Parser boundary and result model
 
-**Status:** Accepted · 2026-09-22
+**Status:** Superseded in part by [ADR-0021](ADR-0021-public-api-v2.md) (package layout, outcome set) · 2026-11-13 (accepted 2026-09-22)
 
 ## Context
 

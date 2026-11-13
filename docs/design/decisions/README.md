@@ -37,12 +37,12 @@ understand whether the contract is still right.
 | 0001 | Strategy A — pinned upstream dependency, fork as escalation | Superseded in part by ADR-0013 |
 | 0002 | Inherit the existing oracle epoch | Superseded by ADR-0020 |
 | 0003 | Windows Tier-1, CGO-free production | Accepted |
-| 0004 | Parser boundary and result model | Accepted |
+| 0004 | Parser boundary and result model | Superseded in part by ADR-0021 |
 | 0005 | Git branching and commit discipline | Superseded in part by ADR-0019 |
 | 0006 | Instruction architecture — AGENTS kernel, docs router, no skill | Accepted |
 | 0007 | Dynamic generator selection, immutable evidence inputs | Accepted |
 | 0008 | Windows native C oracle execution | Accepted |
-| 0009 | Public consumer entry | Accepted |
+| 0009 | Public consumer entry | Superseded by ADR-0021 |
 | 0010 | Request resource limits | Accepted |
 | 0011 | Snapshot lookup | Accepted |
 | 0012 | Complete maintained TypeScript oracle patch | Accepted |
@@ -54,3 +54,4 @@ understand whether the contract is still right.
 | 0018 | Evaluate the approved runtime baseline transition | Superseded by ADR-0020 |
 | 0019 | Explicit authority for every main merge | Accepted |
 | 0020 | A public CGO-free tree-sitter library built from unmodified upstream C | Accepted |
+| 0021 | Public API v2: owned immutable snapshots on a confined parser | Accepted |
