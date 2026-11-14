@@ -21,6 +21,11 @@ against the engine. The one ratcheted divergence in the engine lane is native-C 
 edit cases whose incremental reparse differs from a fresh parse in C v0.27.2 and in the engine alike
 (`knownIncrementalDiffs` in `tools/conformance/edits_test.go`). A new failure opens a new record.
 
+The remaining fixed-oracle catalogs were removed after `be31f49f3e4d645a929a9aebc961be150de16e37`, the last
+commit containing them. They remain available in Git history; catalog filenames below refer to that retired
+directory. The older C observations and digests remain in Git history at `9ad82eb`. The current C reference
+is built from the same runtime and grammar pins as the engine.
+
 ## Record format
 
 ```
@@ -172,7 +177,8 @@ F4/F5 in both JSX and TSX, and retained edit tests agree with C (E5). The new
 94-input carrier campaign exactly matches the isolated scanner candidate,
 including 20 fresh repeats per ordinary input, 100 per C# regression and all
 21 catalog edits. A separate versioned-module consumer with no replace also
-executes the correction (E3). Public controls and original expectations are retained in `testdata/oracle/`;
+executes the correction (E3). Public controls and original expectations remain in Git history in the
+retired fixed-oracle directory;
 selected final observations are in `artifacts/release-candidate/historical/`.
 
 The historical failure and original source-bound records below are preserved.
@@ -272,7 +278,7 @@ erroneous in Go in **both** grammars (E5). F6/F7, 24 JSX boundary controls,
 the seven smoke routes, two generic-arrow controls and two clean C# corpus
 files have equal ordered snapshots for the fields represented by syntax.Node.
 
-Exact source/Go/C digests are in `testdata/oracle/known-differences.json`.
+Exact source/Go/C digests are in the historical `known-differences.json`.
 Phase 2 logs and its fresh C receipts bind the comparison independently of
 Session 05. No numeric-symbol, separate alias metadata, query or incremental
 C-comparison claim is made. Product baseline remains unchanged.
@@ -331,19 +337,19 @@ The four patched features and controls additionally agree on 26 inputs, with
 20 fresh repeats per runtime and 26 Go plus 78 C edit comparisons. The original
 94-input campaign changes only the four registered contextual C differences.
 Original adoption receipts are retained locally; public Candidate C inputs,
-manifest and expected C trees remain in `testdata/oracle/`.
+manifest and expected C trees remain in Git history in the retired fixed-oracle directory.
 The following original definition and signature files are preserved as history.
 
 | Field | Value |
 |---|---|
 | Related upstream work | gotreesitter #1108, merged PR #1112; merge commit is an ancestor of the pinned baseline |
 | Baseline | `v0.53.0` identities, including its TypeScript/TSX blobs (historical identity of this record) |
-| Fixtures | `testdata/oracle/typescript-contextual-cases.json`, eight authored LF sources with per-source hashes |
+| Fixtures | `typescript-contextual-cases.json`, eight authored LF sources with per-source hashes |
 | Affected set | `ts-newline-in`, `ts-newline-optional-in`, `tsx-newline-in`, `tsx-newline-optional-in` only |
 | Go state | accepted_clean, accepted, full root, no error or missing nodes |
 | C state | full root with errors; ordered snapshot differs |
 | Controls | binary `in` across a newline and semicolon-separated `in` properties, in both routes, remain clean and equal |
-| Exact signatures | Four source/Go/C hashes in `testdata/oracle/typescript-contextual-differences.json` |
+| Exact signatures | Four source/Go/C hashes in `typescript-contextual-differences.json` |
 | Evidence | Session 07 Phase 2, fresh Windows C execution and retained product test, E5 |
 | Release impact | At record time, TypeScript and TSX Release-Critical were red until oracle policy and upstream grammar differences were resolved. Retired; not a current blocker |
 | Retirement | Explicitly authorized grammar/oracle reconciliation followed by fresh exact comparisons; never silently add a C patch or make valid Go input erroneous |
@@ -367,10 +373,10 @@ and does not approve a release.
 |---|---|
 | Upstream issue | None filed; local bounded diagnosis, separate from KR-0002 |
 | Baseline | `v0.53.0` identities and C# grammar `88366631` blob (historical identity of this record) |
-| Fixture | `CS-excerpt-no-enum` in `testdata/oracle/csharp-recovery-cases.json`; original MIT excerpt with only the enum section removed |
+| Fixture | `CS-excerpt-no-enum` in `csharp-recovery-cases.json`; original MIT excerpt with only the enum section removed |
 | Go state | accepted_clean, accepted, full root, HasError=false, HasMissing=false; 1,910 nodes |
 | C state | full root, HasError=true; 2,051 nodes |
-| Exact signature | Source and ordered Go/C hashes in `testdata/oracle/csharp-recovery-differences.json` |
+| Exact signature | Source and ordered Go/C hashes in `csharp-recovery-differences.json` |
 | Controls | Original excerpt retains KR-0002; directive-free diagnostic control remains clean and equal |
 | Evidence | Session 07 Phase 2, fresh native C and retained product comparison, E5 |
 | Release impact | At record time, C# Release-Critical was red; accepted_clean was not a C# correctness guarantee on affected recovery shapes. Retired; not a current blocker |
@@ -389,7 +395,7 @@ expansion of KR-0002. Every changed or disappearing signature fails the test.
 |---|---|
 | Upstream issue | None filed. Cause in upstream `v0.56.0` C-recovery port (see below); retired by the carrier patch `c-oracle-recovery-summary-all-links.patch` |
 | Baseline | `v0.56.0` candidate identities in `internal/provenance/identities.json`; C# grammar `9150f7d5`; C build `e00a14ff…` |
-| Fixture | `CS-lambda-unclosed-params` in `testdata/oracle/csharp-kr0005-cases.json` (authored, MIT); source `3815cc16…`, 85 bytes |
+| Fixture | `CS-lambda-unclosed-params` in `csharp-kr0005-cases.json` (authored, MIT); source `3815cc16…`, 85 bytes |
 | Go state | accepted_with_errors, full root, HasError=true, HasMissing=false; 40 ordered nodes |
 | C state | full root, HasError=true; 41 ordered nodes in `windows-c-v2/cs-kr0005/` |
 | Exact signature (historical) | Source `3815cc16…`, ordered Go digest `0f373385…`, C digest `dfcbf933…`, first differing node 32 |
@@ -450,7 +456,7 @@ and its result was lost in the summary walk.
 |---|---|
 | Upstream issue | None filed. Cause in upstream `v0.56.0` stack-order handling (see below); retired by the carrier patch `c-oracle-packed-version-order-no-promotion.patch` |
 | Baseline | `v0.56.0` candidate identities with 29 carrier patches; C# grammar `9150f7d5`; C build `e00a14ff…` |
-| Fixtures | `testdata/oracle/csharp-generic-call-cases.json` (5 failing shapes, 1 edit, 5 controls) and `typescript-generic-call-cases.json` (3 failing shapes, 2 controls); authored, MIT |
+| Fixtures | `csharp-generic-call-cases.json` (5 failing shapes, 1 edit, 5 controls) and `typescript-generic-call-cases.json` (3 failing shapes, 2 controls); authored, MIT |
 | Go state | accepted_clean; `G<A, B>(7)` parsed as two comparisons (`binary_expression`), likewise TypeScript `g<A, B>(7)` |
 | C state | accepted, no error; C# `invocation_expression` over `generic_name`, TypeScript `call_expression` |
 | Affected set | a generic call as an argument (C#: one or two type arguments, a member call, a field initializer, `a < b, c > (d)`, and the edit; TypeScript: an argument, `a < b, c > (d)` and two generic calls as arguments). Not affected: a statement, an assignment, one of two C# arguments, `F(a < b, c > d)` (C reads a declaration expression) and parenthesized comparisons |
