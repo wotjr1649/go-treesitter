@@ -5,6 +5,14 @@ runtime `lib/` plus one unmodified grammar, `parser.c` and `scanner.c`), linked 
 `c/native_ref.c`. The executables produce the reference results the CGO-free conformance lane compares against
 (`docs/specs/oracle.md`). CGO is used only by the C compiler here, never by the Go product lanes.
 
+Scanner calls to `iswalnum`, `iswalpha`, `iswdigit`, `iswspace`, `towupper`, `towlower` and narrow `isdigit`
+use the engine's character semantics: `wctype.h`/`ctype.h` shims route them to namespaced functions compiled from
+the wasi-libc sources pinned in `tools/gen/pins.json`. The wasi-libc archive is SHA-256-checked before extraction,
+as are the runtime and grammar archives; upstream C stays unmodified. Private headers compile those sources with
+32-bit character types and a 32-bit `wcschr` for musl's whitespace table; `-fno-builtin` prevents host-width compiler
+builtins from replacing that lookup. This keeps classification and case conversion independent of the host locale,
+glibc or UCRT, including full code points on Windows, whose host `wint_t` is narrower.
+
 ```
 cd tools/native-ref
 go run . -pins ../gen/pins.json -dl <archive dir> -work <empty dir> -out <exe dir> [-fetch] [-cc gcc|clang] [lang ...]
@@ -15,10 +23,15 @@ go run . -pins ../gen/pins.json -dl <archive dir> -work <empty dir> -out <exe di
   pinned `archiveURL`, or the GitHub API tarball of the pinned commit when absent), and every grammar source file against
   the pinned `files` hash. Transient network failures get at most three attempts, with 1/2-second backoff and a two-minute
   timeout per attempt; HTTP errors and hash mismatches are not retried. Failed transfers leave no partial archive. Only
-  the pinned `dirs` are extracted into `-work`; nothing in them is run.
+  the required source directories are extracted into `-work` (the pinned grammar/runtime `dirs` and wasi-libc's
+  `libc-top-half/musl/src/ctype`); nothing in them is run.
 - `-static` on Windows (no MinGW DLLs needed); upstream's `_POSIX_C_SOURCE`/`_DEFAULT_SOURCE` flags elsewhere.
 - Needs a C11 compiler (gcc or clang) on `PATH`; large grammars (csharp, tsql, typescript, tsx) take a few GB of RAM to
   compile at `-O2`.
+
+`go test ./...` compiles and runs a C probe through the same shim, including non-ASCII and supplementary code
+points. It fetches and verifies the pinned wasi-libc archive; set `TSG_NATIVE_DL` to an existing archive directory
+to reuse a local copy, and `CC` to select clang instead of the default gcc.
 
 Executable CLI (stdout is binary, `\n` line ends on every platform):
 

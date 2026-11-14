@@ -42,6 +42,7 @@ type source struct {
 
 type pins struct {
 	Runtime  source            `json:"runtime"`
+	WasiLibc source            `json:"wasiLibc"`
 	Grammars map[string]source `json:"grammars"`
 }
 
@@ -102,6 +103,13 @@ func run(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuil
 	if err != nil {
 		return err
 	}
+	var ctypeObjects []string
+	if !nobuild {
+		ctypeObjects, err = buildCtype(p.WasiLibc, dl, work, here, cc, opt, fetch)
+		if err != nil {
+			return fmt.Errorf("wasi-libc ctype: %w", err)
+		}
+	}
 	for _, l := range langs {
 		switch l {
 		case "go":
@@ -142,7 +150,7 @@ func run(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuil
 		if runtime.GOOS == "windows" {
 			exe += ".exe"
 		}
-		args := []string{"-std=c11", opt, "-I" + filepath.Join(lib, "include"), "-I" + filepath.Join(lib, "src"),
+		args := []string{"-std=c11", opt, "-I" + filepath.Join(here, "shim"), "-I" + filepath.Join(lib, "include"), "-I" + filepath.Join(lib, "src"),
 			"-I" + gdir, "-DTSG_LANG_FN=" + g.CSymbol}
 		if runtime.GOOS == "windows" {
 			args = append(args, "-static") // runs without the MinGW runtime DLLs next to it
@@ -156,6 +164,7 @@ func run(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuil
 		if _, ok := g.Files["scanner.c"]; ok {
 			args = append(args, filepath.Join(gdir, "scanner.c"))
 		}
+		args = append(args, ctypeObjects...)
 		args = append(args, filepath.Join(here, "native_ref.c"), "-o", exe)
 		fmt.Println(cc, strings.Join(args, " "))
 		cmd := exec.Command(cc, args...)
