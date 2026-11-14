@@ -21,6 +21,13 @@ new engine.
 3. **Release-memory criterion:** after `Close`, every engine region is returned to the OS (100 %), and process
    private bytes are within start + 16 MB. Previous criterion: working set within start + 16 MB (worst measured
    15.2 MB; the remainder was mostly image pages). The peak criterion (100 x input + 64 MB) is unchanged.
+   **macOS amendment (owner, 2026-11-14):** private bytes are the vmmap physical footprint, which keeps counting heap
+   pages the Go runtime has already returned (`MADV_FREE_REUSABLE`; `GODEBUG=madvdontneed` has no effect on darwin).
+   Bench run 43577876668 showed it on five snapshot cases (delta up to 97 MB) while the snapshot had been collected,
+   the live heap was under 1 MB and `heap/released` covered the delta. On darwin the gate is therefore
+   footprint delta minus the growth of the runtime's released bytes (`/memory/classes/heap/released:bytes`) within
+   16 MB, and for snapshot cases the snapshot must have been collected. The raw footprint delta is still reported. Other
+   platforms are unchanged.
 4. **Carrier removal now:** `internal/runtime` (gotreesitter carrier and its patches), `syntax`,
    `internal/gtsadapter`, the old `treesitter.New`, `grammars/gpl` and tooling that only serves them are removed on the
    session-15 branch. They remain in Git history; their evidence stays in `artifacts/`.

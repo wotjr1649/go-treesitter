@@ -21,6 +21,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/debug"
+	"runtime/metrics"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -135,10 +136,22 @@ func corpus(list string, reps int) {
 	}
 }
 
+// releasedBytes is the Go runtime's count of heap bytes it has returned to the OS. On darwin the footprint keeps counting
+// those pages (MADV_FREE_REUSABLE), so benchci subtracts their growth from the private-bytes delta (ADR-0022 §3).
+func releasedBytes() int64 {
+	s := []metrics.Sample{{Name: "/memory/classes/heap/released:bytes"}}
+	metrics.Read(s)
+	if s[0].Value.Kind() != metrics.KindUint64 {
+		fatal("runtime/metrics: heap/released unavailable")
+	}
+	return int64(s[0].Value.Uint64())
+}
+
 // mem: start = working set at main (before the input is read); peak = OS peak working set of the whole process;
 // after = working set once parser, tree/snapshot and input are dropped and the Go heap is returned (GC + FreeOSMemory).
 func mem(file, op string) {
 	var snapCollected atomic.Bool
+	relStart := releasedBytes()
 	start := counters()
 	regStart, _ := engineRegions()
 	src, err := os.ReadFile(file)
@@ -179,9 +192,8 @@ func mem(file, op string) {
 		peakParse, privParsed = c.peakWorkingSetSize, c.privateUsage
 		regParsed, regParsedCommit = engineRegions() // the parser is still open here
 		diagStage("open")
-		if diagOn {
-			runtime.AddCleanup(snap, func(c *atomic.Bool) { c.Store(true) }, &snapCollected)
-		}
+		// the darwin gate needs to know that the snapshot was collected
+		runtime.AddCleanup(snap, func(c *atomic.Bool) { c.Store(true) }, &snapCollected)
 		p.Close() // instance gone, snapshot still alive: its working set is the snapshot's own size
 		src = nil
 		runtime.GC()
@@ -197,10 +209,20 @@ func mem(file, op string) {
 	src = nil
 	runtime.GC()
 	debug.FreeOSMemory()
+	relAfter := releasedBytes()
 	after := counters()
 	regAfter, regAfterCommit := engineRegions()
+	collected := int64(-1) // -1: not a snapshot run
+	if op == "snapshot" {
+		collected = 0
+		for i := 0; i < 50 && !snapCollected.Load(); i++ { // the cleanup runs on its own goroutine
+			time.Sleep(20 * time.Millisecond)
+		}
+		if snapCollected.Load() {
+			collected = 1
+		}
+	}
 	if diagOn {
-		time.Sleep(100 * time.Millisecond) // the cleanup runs on its own goroutine
 		diagStage("final")
 		if op == "snapshot" {
 			fmt.Println("diag d_snapshot_collected=" + fmt.Sprint(snapCollected.Load()))
@@ -211,7 +233,9 @@ func mem(file, op string) {
 	}
 	fmt.Printf("priv_start=%d priv_after_init=%d priv_parsed=%d priv_after=%d peak_priv=%d regions_start=%d regions_parsed=%d region_commit_parsed=%d regions_after=%d region_commit_after=%d ",
 		start.privateUsage, afterInit.privateUsage, privParsed, after.privateUsage, after.peakPagefileUsage, regStart, regParsed, regParsedCommit, regAfter, regAfterCommit)
-	fmt.Printf("op=%s bytes=%d end=%d outcome=%s nodes=%d start_ws=%d ws_after_init=%d peak_after_init=%d peak_after_parse=%d peak_ws=%d ws_after_close_gc=%d ws_instance_closed_snapshot_kept=%d ws_after_parse=%d\n",
+	fmt.Printf("op=%s bytes=%d end=%d outcome=%s nodes=%d start_ws=%d ws_after_init=%d peak_after_init=%d peak_after_parse=%d peak_ws=%d ws_after_close_gc=%d ws_instance_closed_snapshot_kept=%d ws_after_parse=%d ",
 		op, n, end, outcome, nodes, start.workingSetSize, afterInit.workingSetSize, afterInit.peakWorkingSetSize, peakParse, after.peakWorkingSetSize,
 		after.workingSetSize, keptWS, afterParse.workingSetSize)
+	// Appended last so that existing parsers keep working; the darwin gate in benchci reads them (ADR-0022 §3).
+	fmt.Printf("rel_start=%d rel_after=%d snap_collected=%d\n", relStart, relAfter, collected)
 }
