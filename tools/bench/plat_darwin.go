@@ -41,9 +41,9 @@ func counters() processMemoryCounters {
 }
 
 var (
-	vmmapCalls       int
-	baselineVMRanges [][2]uint64
-	baselineSet      bool
+	vmmapCalls  int
+	baselineVM  []vmRegion
+	baselineSet bool
 )
 
 // vmmap runs `vmmap -wide <pid>`. If BENCH_VMMAP_DUMP names a directory, each raw output is saved there (benchci sets
@@ -76,19 +76,21 @@ func firstBytes(b []byte) string {
 }
 
 // engineRegions is the vmmap counterpart of the Windows/Linux scans: the first call (at process start) records the
-// large reservations present then and reports none; later calls count the new ones of at least engineRegionMin.
+// address space of the anonymous regions then and reports none; later calls count the engine-sized mappings in the
+// address space that was not mapped at start (see newEngineGroups for why the baseline is subtracted, not matched).
 func engineRegions() (n int, committed uint64) {
 	rs, err := parseVmmapRegions(vmmap())
 	if err != nil {
 		fatal("vmmap:", err)
 	}
-	gs := vmGroups(rs, engineRegionMin)
 	if !baselineSet {
 		baselineSet = true
-		for _, g := range gs {
-			baselineVMRanges = append(baselineVMRanges, [2]uint64{g.start, g.end})
-		}
+		baselineVM = anonRegions(rs)
 		return 0, 0
 	}
-	return newGroups(gs, baselineVMRanges)
+	for _, g := range newEngineGroups(rs, baselineVM, engineRegionMin) {
+		n++
+		committed += g.committed
+	}
+	return n, committed
 }

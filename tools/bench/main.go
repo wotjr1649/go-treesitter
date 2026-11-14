@@ -22,6 +22,8 @@ import (
 	"runtime"
 	"runtime/debug"
 	"strings"
+	"sync/atomic"
+	"time"
 
 	treesitter "github.com/wotjr1649/go-treesitter"
 )
@@ -136,6 +138,7 @@ func corpus(list string, reps int) {
 // mem: start = working set at main (before the input is read); peak = OS peak working set of the whole process;
 // after = working set once parser, tree/snapshot and input are dropped and the Go heap is returned (GC + FreeOSMemory).
 func mem(file, op string) {
+	var snapCollected atomic.Bool
 	start := counters()
 	regStart, _ := engineRegions()
 	src, err := os.ReadFile(file)
@@ -146,6 +149,7 @@ func mem(file, op string) {
 	ctx := context.Background()
 	p := newParser()
 	afterInit := counters()
+	diagStage("init")
 	var end int64 = -1
 	var outcome string
 	var nodes int
@@ -163,6 +167,7 @@ func mem(file, op string) {
 		c := counters()
 		peakParse, privParsed = c.peakWorkingSetSize, c.privateUsage
 		regParsed, regParsedCommit = engineRegions()
+		diagStage("open")
 		tree.Close()
 	} else {
 		snap, err := p.ParseSnapshot(ctx, src)
@@ -173,11 +178,16 @@ func mem(file, op string) {
 		c := counters()
 		peakParse, privParsed = c.peakWorkingSetSize, c.privateUsage
 		regParsed, regParsedCommit = engineRegions() // the parser is still open here
-		p.Close()                                    // instance gone, snapshot still alive: its working set is the snapshot's own size
+		diagStage("open")
+		if diagOn {
+			runtime.AddCleanup(snap, func(c *atomic.Bool) { c.Store(true) }, &snapCollected)
+		}
+		p.Close() // instance gone, snapshot still alive: its working set is the snapshot's own size
 		src = nil
 		runtime.GC()
 		debug.FreeOSMemory()
 		keptWS = counters().workingSetSize
+		diagStage("closed_snapshot_alive")
 		runtime.KeepAlive(snap)
 	}
 	afterParse := counters()
@@ -189,6 +199,16 @@ func mem(file, op string) {
 	debug.FreeOSMemory()
 	after := counters()
 	regAfter, regAfterCommit := engineRegions()
+	if diagOn {
+		time.Sleep(100 * time.Millisecond) // the cleanup runs on its own goroutine
+		diagStage("final")
+		if op == "snapshot" {
+			fmt.Println("diag d_snapshot_collected=" + fmt.Sprint(snapCollected.Load()))
+		}
+		time.Sleep(3 * time.Second) // does the OS take the pages back lazily?
+		debug.FreeOSMemory()
+		diagStage("final_after_3s")
+	}
 	fmt.Printf("priv_start=%d priv_after_init=%d priv_parsed=%d priv_after=%d peak_priv=%d regions_start=%d regions_parsed=%d region_commit_parsed=%d regions_after=%d region_commit_after=%d ",
 		start.privateUsage, afterInit.privateUsage, privParsed, after.privateUsage, after.peakPagefileUsage, regStart, regParsed, regParsedCommit, regAfter, regAfterCommit)
 	fmt.Printf("op=%s bytes=%d end=%d outcome=%s nodes=%d start_ws=%d ws_after_init=%d peak_after_init=%d peak_after_parse=%d peak_ws=%d ws_after_close_gc=%d ws_instance_closed_snapshot_kept=%d ws_after_parse=%d\n",
