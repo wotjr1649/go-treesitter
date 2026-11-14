@@ -1,6 +1,6 @@
 # go-treesitter
 
-**Preview (v0.2.0).** A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
+**Preview (v0.3.0).** A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
 module is generated from the unmodified upstream tree-sitter runtime and grammar C (wasm translated to Go by
 `tools/gen`), and is checked against a native C build of the same sources.
 
@@ -12,10 +12,9 @@ Start with [AGENTS.md](AGENTS.md) and the [documentation map](docs/README.md). T
 
 ## Use
 
-The root module has no grammar. Add the grammar modules you need under `grammars/`. Wave 1 contains `csharp`,
-`golang`, `json`, `python`, `tsql`, `tsx`, `typescript`. Wave-2 batch 1 adds development candidates `javascript`
-(including JSX), `html`, `css`, `java`, `c`, `rust`, `bash`, `cpp`. Local Windows gates passed for these eight.
-Hosted gates for these candidates have not run.
+The root module has no grammar. Add the grammar modules you need under `grammars/`: `bash`, `c`, `cpp`, `csharp`,
+`css`, `golang`, `html`, `java`, `javascript` (including JSX), `json`, `python`, `rust`, `tsql`, `tsx`,
+`typescript`.
 
 ```go
 import (
