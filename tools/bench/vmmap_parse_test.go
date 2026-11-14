@@ -1,6 +1,10 @@
 package main
 
-import "testing"
+import (
+	"os"
+	"path/filepath"
+	"testing"
+)
 
 // vmmapSample is written from the documented layout of `vmmap -wide` (header with "Physical footprint", then
 // "Non-writable"/"Writable regions" tables). It is NOT recorded tool output: replace it with a file from the
@@ -101,5 +105,30 @@ func TestEngineGroupsAndBaseline(t *testing.T) {
 	after := rs[:len(rs)-2] // Close: the mapping is gone
 	if n, _ := newGroups(vmGroups(after, 512<<20), nil); n != 0 {
 		t.Errorf("regions after Close = %d, want 0", n)
+	}
+}
+
+// Real macOS 26 arm64 output (bench run 43567021988). It contains a kernel accounting line without an address range,
+// which the first parser rejected; every other region line must still parse.
+func TestParseVmmapRealOutput(t *testing.T) {
+	files := []string{filepath.Join("testdata", "vmmap-macos26-arm64.txt")}
+	if dir := os.Getenv("TSG_VMMAP_DIR"); dir != "" {
+		more, _ := filepath.Glob(filepath.Join(dir, "*", "*.txt"))
+		files = append(files, more...)
+	}
+	for _, f := range files {
+		b, err := os.ReadFile(f)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if fp, err := parseVmmapFootprint(string(b)); err != nil || fp == 0 {
+			t.Errorf("%s: footprint %d, %v", f, fp, err)
+		}
+		rs, err := parseVmmapRegions(string(b))
+		if err != nil || len(rs) == 0 {
+			t.Errorf("%s: %d regions, %v", f, len(rs), err)
+			continue
+		}
+		t.Logf("%s: %d regions, %d groups >= 512 MiB", filepath.Base(f), len(rs), len(vmGroups(rs, 512<<20)))
 	}
 }
