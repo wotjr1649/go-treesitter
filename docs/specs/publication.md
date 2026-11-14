@@ -37,6 +37,10 @@ This includes a local merge into main, whatever the branch size (ADR-0019).
 No publication workflow may infer those permissions from a passing test, and
 no one acting under this contract uses a ruleset administrator bypass.
 
+Rulesets (2026-11-14): `main-protection` (no deletion or non-fast-forward; 12 required CI checks), `branch-creation`
+(new branches only by the owner), `tag-protection` (no tag update or deletion) and `tag-creation` (tags other than
+`v*` and `grammars/*/v*` only by the owner). Version tags therefore need authority, not a bypass, and stay immutable.
+
 Accepted ADRs preserve their original reasoning. Historical references in them
 may identify local records; current public contracts and selected evidence must
 be sufficient for the current product and its stated claims. ADR-0016 records
