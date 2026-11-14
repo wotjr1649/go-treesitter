@@ -57,3 +57,4 @@ understand whether the contract is still right.
 | 0021 | Public API v2: owned immutable snapshots on a confined parser | Accepted |
 | 0022 | Wave-1 preview, multi-module versioning, release-memory criterion, carrier removal | Accepted |
 | 0023 | Temporary, retirable patches to upstream grammar C | Accepted; amends ADR-0020 §1, §4 for grammars |
+| 0024 | Grammar source tiers: one upstream per language | Accepted |

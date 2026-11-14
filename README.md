@@ -14,7 +14,9 @@ Start with [AGENTS.md](AGENTS.md) and the [documentation map](docs/README.md). T
 
 The root module has no grammar. Add the grammar modules you need under `grammars/`: `bash`, `c`, `cpp`, `csharp`,
 `css`, `golang`, `html`, `java`, `javascript` (including JSX), `json`, `python`, `rust`, `tsql`, `tsx`,
-`typescript`.
+`typescript`. Each language has exactly one upstream grammar repository, chosen by the tiers of
+[ADR-0024](docs/design/decisions/ADR-0024-grammar-source-tiers.md): all of these come from the `tree-sitter`
+organisation except `tsql` (`meloncholera/tree-sitter-mssql`, owner-designated).
 
 ```go
 import (
