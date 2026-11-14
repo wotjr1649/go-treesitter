@@ -7,7 +7,10 @@
 # checked before extraction, and nothing inside an extracted archive is run by an interpreter. The fetch plan
 # (URLs, sha256, destinations) comes from tools/gen/pins.json via `gen -plan`; wasm2go is built from its pinned
 # module version with `go install -trimpath`. Output goes to grammars/<lang> in this repository.
-# ROOT_VERSION=vX.Y.Z selects the release go.mod form (default: local development form).
+# go.mod form: derived from the committed grammars/*/go.mod. Release form (`require ... vX.Y.Z`, no `replace`) regenerates
+# the release form with that version; development form (`replace`) regenerates the development form; the seven modules
+# must agree, else this fails. ROOT_VERSION=vX.Y.Z overrides the derivation (how step 4 of docs/specs/publication.md
+# switches a development tree to the release form).
 set -euo pipefail
 
 W=${1:?usage: regen.sh <work-dir> [lang ...]}
@@ -22,6 +25,21 @@ if command -v cygpath >/dev/null 2>&1; then # Git Bash: native paths for the Go 
 fi
 EXE=""
 [ "$(go env GOOS)" = windows ] && EXE=.exe
+
+ALL=(csharp golang json python tsql tsx typescript)
+if [ -z "${ROOT_VERSION:-}" ]; then
+  # one line per module: "dev" (replace present), the release version, or nothing (unknown form -> count below 7)
+  forms=$(for l in "${ALL[@]}"; do
+    if grep -q '^replace ' "$REPO/grammars/$l/go.mod"; then echo dev
+    else sed -n 's|^require github\.com/wotjr1649/go-treesitter \(v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)$|\1|p' "$REPO/grammars/$l/go.mod"
+    fi
+  done | sort | uniq -c | tr -s ' ' | sed 's/^ //')
+  [ "$(echo "$forms" | grep -c .)" = 1 ] && [ "${forms%% *}" = ${#ALL[@]} ] || {
+    echo "regen: the ${#ALL[@]} grammars/*/go.mod files must all be in one form (dev: replace; release: require vX.Y.Z, no replace); found:" >&2
+    echo "$forms" >&2; exit 1; }
+  ROOT_VERSION=${forms#* }
+  [ "$ROOT_VERSION" != dev ] || ROOT_VERSION=
+fi
 
 mkdir -p "$W/bin" "$W/dl" "$W/src" "$W/work"
 (cd "$REPO/tools/gen" && CGO_ENABLED=0 go build -trimpath -o "$W/bin/gen$EXE" .)
@@ -47,7 +65,7 @@ done <"$W/plan.tsv"
 
 LANGS=("$@")
 if [ ${#LANGS[@]} -eq 0 ]; then
-  LANGS=(csharp golang json python tsql tsx typescript)
+  LANGS=("${ALL[@]}")
 fi
 cd "$REPO"
 for lang in "${LANGS[@]}"; do
