@@ -27,7 +27,16 @@ import (
 
 // cliLib maps a corpus language to the shared library file stem and the CLI --lang-name.
 var cliLib = map[string][2]string{"json": {"json", "json"}, "go": {"go", "go"}, "python": {"python", "python"},
-	"typescript": {"typescript", "typescript"}, "tsx": {"tsx", "tsx"}, "csharp": {"c_sharp", "c_sharp"}, "tsql": {"mssql", "mssql"}}
+	"typescript": {"typescript", "typescript"}, "tsx": {"tsx", "tsx"}, "csharp": {"c_sharp", "c_sharp"}, "tsql": {"mssql", "mssql"},
+	"javascript": {"javascript", "javascript"},
+	"html":       {"html", "html"},
+	"css":        {"css", "css"},
+	"java":       {"java", "java"},
+	"c":          {"c", "c"},
+	"rust":       {"rust", "rust"},
+	"bash":       {"bash", "bash"},
+	"cpp":        {"cpp", "cpp"},
+}
 
 // predicateSuite runs over the json corpus (the grammar with the simplest tree). Each entry states what it probes.
 var predicateSuite = []queryFile{

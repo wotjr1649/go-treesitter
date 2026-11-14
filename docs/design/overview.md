@@ -32,7 +32,7 @@ go.mod                 root module: the treesitter package and internal/engine
 *.go                   treesitter package (parser_v2.go, snapshot.go, node.go, pool.go, ...)
 internal/engine/       engine ABI; the only importers are treesitter and generated grammar modules
 
-grammars/<name>/       one generated Go module per grammar (csharp golang json python tsql tsx typescript); never hand-edited
+grammars/<name>/       one generated Go module per entry in tools/gen/pins.json (currently 15); never hand-edited
 tools/gen/             generator and its pins (pins.json); regenerates modules reproducibly
 tools/conformance/     compares the public API with native C reference dumps (needs the local reference data)
 tools/bench/           speed and memory measurements

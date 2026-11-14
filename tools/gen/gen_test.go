@@ -169,8 +169,8 @@ func TestPinsPlan(t *testing.T) {
 				t.Fatalf("%s: unpinned download %q", plat, l)
 			}
 		}
-		// sdk + binaryen, wasm2go, runtime + wasi-libc + 6 distinct grammar repositories (typescript and tsx share one archive)
-		if kinds["tool"] != 2 || kinds["goinstall"] != 1 || kinds["source"] != 8 {
+		// Runtime + wasi-libc + 14 grammar repositories (typescript and tsx share one archive).
+		if kinds["tool"] != 2 || kinds["goinstall"] != 1 || kinds["source"] != 16 {
 			t.Fatalf("%s: plan kinds %v", plat, kinds)
 		}
 	}
@@ -194,6 +194,31 @@ func TestTarballURL(t *testing.T) {
 	if _, err := tarballURL("https://github.com/x/y", "abc"); err == nil {
 		t.Fatal("short commit accepted")
 	}
+}
+
+func TestGrammarArchiveURL(t *testing.T) {
+	pins, err := loadPins("pins.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	const url = "https://codeload.github.com/tree-sitter/tree-sitter-html/tar.gz/pinned"
+	g := pins.Grammars["html"]
+	g.ArchiveURL = url
+	pins.Grammars["html"] = g
+	lines, err := pins.plan("windows-amd64")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, line := range lines {
+		f := strings.Split(line, "\t")
+		if f[1] == g.Archive {
+			if f[2] != url || f[3] != g.ArchiveSHA256 {
+				t.Fatalf("explicit archive identity lost: %s", line)
+			}
+			return
+		}
+	}
+	t.Fatal("grammar archive absent")
 }
 
 // The recipe hash binds tool versions, not host binaries: two hosts with different binaries must agree.

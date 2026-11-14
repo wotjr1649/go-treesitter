@@ -18,7 +18,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"os/exec"
 	"path"
@@ -33,6 +32,7 @@ type source struct {
 	Commit        string            `json:"commit"`
 	ExtractDir    string            `json:"extractDir"`
 	Archive       string            `json:"archive"`
+	ArchiveURL    string            `json:"archiveURL"`
 	ArchiveSHA256 string            `json:"archiveSHA256"`
 	GrammarDir    string            `json:"grammarDir"`
 	Dirs          []string          `json:"dirs"`
@@ -103,8 +103,11 @@ func run(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuil
 		return err
 	}
 	for _, l := range langs {
-		if l == "go" {
+		switch l {
+		case "go":
 			l = "golang" // the corpus calls it go, pins.json golang
+		case "jsx":
+			l = "javascript" // JSX uses the JavaScript parser
 		}
 		g, ok := p.Grammars[l]
 		if !ok {
@@ -199,7 +202,11 @@ func prepare(s source, dl, work string, fetch bool, done map[string]bool) error 
 		if !strings.HasPrefix(s.Repo, gh) || len(s.Commit) != 40 {
 			return fmt.Errorf("cannot derive a tarball url from %q @ %q", s.Repo, s.Commit)
 		}
-		if err := download("https://api.github.com/repos/"+strings.TrimPrefix(s.Repo, gh)+"/tarball/"+s.Commit, arc); err != nil {
+		url := s.ArchiveURL
+		if url == "" {
+			url = "https://api.github.com/repos/" + strings.TrimPrefix(s.Repo, gh) + "/tarball/" + s.Commit
+		}
+		if err := download(url, arc); err != nil {
 			return err
 		}
 	}
@@ -211,33 +218,6 @@ func prepare(s source, dl, work string, fetch bool, done map[string]bool) error 
 	}
 	done[key] = true
 	return nil
-}
-
-func download(url, dst string) error {
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return err
-	}
-	if tok := os.Getenv("GITHUB_TOKEN"); tok != "" { // optional: lifts the anonymous API rate limit on shared CI runners; net/http drops it on the cross-host redirect
-		req.Header.Set("Authorization", "Bearer "+tok)
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("GET %s: %s", url, resp.Status)
-	}
-	f, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	if _, err := io.Copy(f, resp.Body); err != nil {
-		f.Close()
-		return err
-	}
-	return f.Close()
 }
 
 // extract writes the regular files under dirs (top directory of the archive stripped) into dst. Entries that would

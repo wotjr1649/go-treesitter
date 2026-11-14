@@ -32,7 +32,7 @@ func TestQuerySmoke(t *testing.T) {
 			if pinName == "go" {
 				pinName = "golang"
 			}
-			files, err := filepath.Glob(filepath.Join(root, "src", pins.Grammars[pinName].ExtractDir, "queries", "*.scm"))
+			files, err := filepath.Glob(filepath.Join(queryDirFor(root), pins.Grammars[pinName].ExtractDir, "queries", "*.scm"))
 			if err != nil {
 				t.Fatal(err)
 			}

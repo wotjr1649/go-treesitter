@@ -9,7 +9,7 @@ Everything a generation consumes is pinned, and the identity of a generated modu
 
 | Input | Pinned as |
 |---|---|
-| tree-sitter runtime, grammars | full commit, GitHub API tarball sha256 (`api.github.com/repos/<owner>/<repo>/tarball/<commit>`), tree and file sha256 |
+| tree-sitter runtime, grammars | canonical `https://github.com/...` repository and full commit, archive sha256 (GitHub API tarball by default; grammar `archiveURL` preserves a pinned codeload URL), tree and file sha256 |
 | wasi-sdk, binaryen | version plus the upstream release archive sha256 **per host platform** (`<GOOS>-<GOARCH>`; windows-amd64 and linux-amd64) |
 | wasi-libc license texts | `wasiLibc`: the commit named by the sdk's `VERSION` file (the sdk ships no license text), tarball sha256, and each copied file's sha256; copied to `LICENSES/wasi-libc/` in every module and listed in its `provenance.json` outputs |
 | wasm2go | module version and its `go.sum` `h1:` hash; built per host with `go install -trimpath` |
@@ -21,14 +21,20 @@ Everything a generation consumes is pinned, and the identity of a generated modu
 ## Regenerate
 
 ```
-bash tools/gen/regen.sh <new-empty-work-dir> [lang ...]      # all seven modules by default
+bash tools/gen/regen.sh <new-empty-work-dir> [lang ...]      # all 15 modules by default
 ROOT_VERSION=v0.1.0 bash tools/gen/regen.sh <work-dir>       # switch a development tree to the release go.mod form
 ```
 
 `regen.sh` builds `gen`, prints the fetch plan (`gen -plan host`), downloads every archive into the new directory,
 verifies its sha256 **before** extracting, builds wasm2go from the pinned version, then runs `gen` per module into
 `grammars/<lang>`. `.github/workflows/regen.yml` runs it on Linux and requires `git diff --exit-code -- grammars/`.
-Without `ROOT_VERSION`, `regen.sh` derives the go.mod form from the committed `grammars/*/go.mod` (all seven must be in the same form: development with `replace`, or release `require vX.Y.Z` without `replace`; otherwise it fails), so the drift check regenerates the committed form unchanged.
+Without `ROOT_VERSION`, `regen.sh` derives the go.mod form from the committed `grammars/*/go.mod` (all 15 must be in the same form: development with `replace`, or release `require vX.Y.Z` without `replace`; otherwise it fails), so the drift check regenerates the committed form unchanged.
+
+The modules are `bash`, `c`, `cpp`, `csharp`, `css`, `golang`, `html`, `java`, `javascript` (including JSX), `json`,
+`python`, `rust`, `tsql`, `tsx`, and `typescript`. Each has a grammar-specific generated smoke-test sample.
+Downloads allow three attempts with 1s/2s backoff only for transient transport failures. HTTP, certificate and local
+write errors fail immediately; sha256 verification remains mandatory before extraction. The retry self-check is
+`bash tools/gen/fetch_test.sh`.
 
 ## go.mod forms
 
@@ -47,8 +53,9 @@ and product shim in `probe/balance.c`. It uses the normal recipe and memory prov
 output outside `grammars/`, rejects `-root-version`, and marks its provenance `testOnly: "balancing-cancel"`; its wrapper
 hash and extra exports are bound into its identity. These modules are test artifacts, never product grammar modules.
 
-`bash tools/gen/balance-probe.sh <new-empty-work-dir>` fetches SHA-verified pinned inputs and builds all seven probes
+`bash tools/gen/balance-probe.sh <new-empty-work-dir> [lang ...]` fetches SHA-verified pinned inputs and builds all 15 probes
 under `<work-dir>/probes/` and native references under `<work-dir>/native/`, without regenerating product modules.
+With language arguments it builds only those probes and native executables, for example `... <work-dir> javascript`.
 Then, from `tools/conformance`:
 
 ```sh

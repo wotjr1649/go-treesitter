@@ -328,6 +328,14 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 }
 
 var samples = map[string]string{
+	"javascript": "const C = (p) => <div id=\"a\">{p.n + 1}</div>;\n",
+	"html":       "<!doctype html><html><body><p>Hello</p></body></html>\n",
+	"css":        "body { color: red; margin: 0; }\n",
+	"java":       "class A { int f(int x) { return x + 1; } }\n",
+	"c":          "int f(int x) { return x + 1; }\n",
+	"rust":       "fn f(x: i32) -> i32 { x + 1 }\n",
+	"bash":       "#!/bin/bash\nfor x in one two; do echo \"$x\"; done\n",
+	"cpp":        "template <class T> T add(T a, T b) { return a + b; }\n",
 	"json":       "{\"a\": [1, 2.5, true, null, {\"b\": \"c\"}]}\n",
 	"golang":     "package main\n\nfunc main() {\n\tx := []int{1, 2}\n\t_ = x\n}\n",
 	"python":     "def f(x):\n    return [i * 2 for i in x]\n\nprint(f([1, 2]))\n",

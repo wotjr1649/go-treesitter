@@ -12,10 +12,14 @@ permissions:
   contents: read
 
 jobs:
-  regen:
-    name: regenerate and diff (ubuntu-24.04)
+  regen-grammar:
+    name: regenerate ${{ matrix.lang }} and diff (ubuntu-24.04)
+    strategy:
+      fail-fast: false
+      matrix:
+        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp]
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 30
     env:
       CGO_ENABLED: "0"
       GOENV: "off"
@@ -31,12 +35,25 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: 1.27.x # newest supported; go.mod states the floor (1.26.0)
+      - name: Transient fetch retry regression checks
+        run: bash tools/gen/fetch_test.sh
       # Downloads each pinned archive into a new empty directory and checks its sha256 before extracting;
-      # builds wasm2go from its pinned module version; regenerates all seven modules into grammars/.
+      # builds wasm2go from its pinned module version; regenerates the selected module into grammars/.
       - name: Regenerate grammar modules
-        run: bash tools/gen/regen.sh "$RUNNER_TEMP/regen"
+        run: bash tools/gen/regen.sh "$RUNNER_TEMP/regen" "${{ matrix.lang }}"
       - name: Compare with the committed modules
         run: |
           git status --porcelain -- grammars/
           git diff --exit-code --stat -- grammars/
           test -z "$(git status --porcelain -- grammars/)"
+
+  regen:
+    name: regenerate and diff (ubuntu-24.04)
+    if: ${{ always() }}
+    needs: regen-grammar
+    runs-on: ubuntu-24.04
+    steps:
+      - name: All grammar shards matched
+        env:
+          RESULT: ${{ needs.regen-grammar.result }}
+        run: test "$RESULT" = success

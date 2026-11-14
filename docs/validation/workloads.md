@@ -22,6 +22,36 @@ directory. The older C observations and digests remain in Git history at `9ad82e
 
 The identity rules below still apply: bind every result to the pinned runtime and grammar identities.
 
+## Wave-2 batch 1 large inputs (Q7)
+
+`tools/bench/ci/large.json` pins one real source file for each new grammar. The fetch command verifies both the
+source SHA-256 and its license SHA-256, and writes the license beside the input as `<file>.LICENSE`.
+`-langs` selects the same grammar for fetch and measurement. Files are not concatenated or enlarged.
+
+Q7 gate measurements used `tools/gen/pins.json` SHA-256
+`34bb8edcd9bd17c44aabad17e20d1836f0f527e890fd491d918133a3c21cb514`, before YAML was removed.
+After that removal the pins file is `c17b1b5e7b0c6f024284ee68f33bbbf3622cdef7810e9c0ee9b9e58807902af4`;
+the eight grammars listed below retain identical pins and generated module bytes. The recorded gate results
+keep their original measurement identity.
+
+| Grammar | Source | Bytes | SHA-256 | License |
+|---|---|---:|---|---|
+| javascript | [typescript.js](https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz#package/lib/typescript.js) | 9,144,216 | `569177652966bd528c319171c7dd22860dbf72bde116cbc4f644f1d02bb12e39` | [Apache-2.0](https://raw.githubusercontent.com/microsoft/TypeScript/050880ce59e30b356b686bd3144efe24f875ebc8/LICENSE.txt) |
+| html | [dom_sort.html](https://raw.githubusercontent.com/DataTables/DataTables/f60c41290255c3fcab38999161f9529226b655c9/examples/plug-ins/dom_sort.html) | 57,738 | `8eed4937dc497a478d12199dfbe0fa2aa070ae5104ccc5f18e92c4d5235c9c53` | [MIT](https://raw.githubusercontent.com/DataTables/DataTables/f60c41290255c3fcab38999161f9529226b655c9/license.txt) |
+| css | [bootstrap.css](https://raw.githubusercontent.com/twbs/bootstrap/f9a7a8941e7c1c91b0cae8a0c906537c26086ae2/dist/css/bootstrap.css) | 496,025 | `ad0d5123040e043dad1451a6d4483dad4df4e2835e6687d6cf5af8a757283371` | [MIT](https://raw.githubusercontent.com/twbs/bootstrap/f9a7a8941e7c1c91b0cae8a0c906537c26086ae2/LICENSE) |
+| java | [Proto3GencodeTestProto.java](https://raw.githubusercontent.com/protocolbuffers/protobuf/1633873a4e9a6cf3df2e0f0d69cb2693b8f006b5/compatibility/smoke/v25.8/legacy_gencode_test/proto3/Proto3GencodeTestProto.java) | 909,661 | `80413d76f6b02e978a4d5a569008371b192f1e219a2802c53bdb1083f4d8dfbe` | [BSD-3-Clause](https://raw.githubusercontent.com/protocolbuffers/protobuf/1633873a4e9a6cf3df2e0f0d69cb2693b8f006b5/LICENSE) |
+| c | [openssl.c](https://raw.githubusercontent.com/curl/curl/4f2b5fba5212a32c4e4a889492cc153e1220e619/lib/vtls/openssl.c) | 175,997 | `c542b52edee1dbd827ede82f10fb21519674ebe93ec335c56d2cec20f39d81aa` | [curl](https://raw.githubusercontent.com/curl/curl/4f2b5fba5212a32c4e4a889492cc153e1220e619/COPYING) |
+| rust | [ast.rs](https://raw.githubusercontent.com/rust-lang/rust/5f4effd579500175af844241eb179e756190f1e7/compiler/rustc_ast/src/ast.rs) | 154,408 | `09609e4e241bc21662722f6423437b53fc2fabe9f711621806b94c9cde0f84f5` | [MIT](https://raw.githubusercontent.com/rust-lang/rust/5f4effd579500175af844241eb179e756190f1e7/LICENSE-MIT) |
+| bash | [nvm.sh](https://raw.githubusercontent.com/nvm-sh/nvm/09e620c401382f4b3d3147333dd64c1e09188fdb/nvm.sh) | 243,120 | `caca749b75b598322d6f03674f3440e99a7efb8c4f60265750b6d867b3a1d65b` | [MIT](https://raw.githubusercontent.com/nvm-sh/nvm/09e620c401382f4b3d3147333dd64c1e09188fdb/LICENSE.md) |
+| cpp | [json.hpp](https://raw.githubusercontent.com/nlohmann/json/81888ff9f005c022e60f2de572327b2e50222222/single_include/nlohmann/json.hpp) | 1,929,376 | `686e19239b9135b5822f96876fd59de90bde335d598c2e71ded84201d6f5e584` | [MIT](https://raw.githubusercontent.com/nlohmann/json/81888ff9f005c022e60f2de572327b2e50222222/LICENSE.MIT) |
+
+The Java input is real generated protobuf compatibility code,
+and C++ is nlohmann/json's single-header distribution (the Q6 input, retained unchanged). These files represent their
+specific shapes, not all applications in each language. HTML, CSS, Java, C, Rust, and Bash are below 1 MB; each
+exceeds the small-file lane's 25 KB boundary. All source bytes are LF and their hashes refer to the downloaded bytes.
+CSS, C, Bash, and C++ inputs contain syntax the pinned grammars recover from on both native C and Go; their outcomes
+must remain visible in the evidence.
+
 ## Rules
 
 - Every fixture has a recorded SHA-256 **of its LF bytes** and a recorded license/provenance.

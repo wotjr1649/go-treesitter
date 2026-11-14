@@ -9,6 +9,8 @@ permissions:
 
 jobs:
   engine:
+    needs: grammar
+    if: ${{ always() }}
     name: engine (${{ matrix.runner }})
     strategy:
       fail-fast: false
@@ -30,6 +32,10 @@ jobs:
       run:
         shell: bash
     steps:
+      - name: Grammar shards passed
+        env:
+          RESULT: ${{ needs.grammar.result }}
+        run: test "$RESULT" = success
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
@@ -48,19 +54,6 @@ jobs:
         if: ${{ !cancelled() }}
         working-directory: tools/gen
         run: go test -count=1 -timeout 300s ./...
-      # Embedded sample only: TSG_CORPUS stays unset. csharp and tsql take minutes to compile on a cold cache.
-      - name: Grammar modules
-        if: ${{ !cancelled() }}
-        run: |
-          unset TSG_CORPUS
-          rc=0
-          for d in grammars/*/; do
-            lang=$(basename "$d")
-            echo "::group::grammars/$lang"
-            (cd "$d" && go test -count=1 -timeout 900s .) || { echo "::error::grammars/$lang failed"; rc=1; }
-            echo "::endgroup::"
-          done
-          exit $rc
       # Its tests need the local session data tree (TSG_S15_DIR) and skip, so only vet runs here.
       - name: Conformance module (vet only)
         if: ${{ !cancelled() }}
@@ -69,9 +62,53 @@ jobs:
 
   # The oldest supported Go (go.mod floor 1.26): engine, root package and grammar modules must build and pass there too.
   engine-go126:
+    needs: grammar
+    if: ${{ always() }}
     name: engine, oldest supported Go (ubuntu-24.04)
     runs-on: ubuntu-24.04
     timeout-minutes: 45
+    env:
+      CGO_ENABLED: "0"
+      GOENV: "off"
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Grammar shards passed
+        env:
+          RESULT: ${{ needs.grammar.result }}
+        run: test "$RESULT" = success
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version: 1.26.x
+      - name: Go version
+        run: go version | grep -q 'go1\.26\.' || { echo "expected Go 1.26.x"; exit 1; }
+      - name: Engine and root package
+        run: |
+          go vet ./internal/engine ./internal/langid ./experimental/... .
+          go test -count=1 -timeout 600s ./internal/engine ./experimental/... .
+
+  grammar:
+    name: grammar (${{ matrix.runner }}, Go ${{ matrix.go }}, ${{ matrix.lang }})
+    strategy:
+      fail-fast: false
+      matrix:
+        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp]
+        target: [linux-amd64, linux-arm64, macos-arm64, windows-amd64, windows-arm64, go126]
+        include:
+          - {target: linux-amd64, runner: ubuntu-24.04, goos: linux, goarch: amd64, go: 1.27.x}
+          - {target: linux-arm64, runner: ubuntu-24.04-arm, goos: linux, goarch: arm64, go: 1.27.x}
+          - {target: macos-arm64, runner: macos-latest, goos: darwin, goarch: arm64, go: 1.27.x}
+          - {target: windows-amd64, runner: windows-latest, goos: windows, goarch: amd64, go: 1.27.x}
+          - {target: windows-arm64, runner: windows-11-arm, goos: windows, goarch: arm64, go: 1.27.x}
+          - {target: go126, runner: ubuntu-24.04, goos: linux, goarch: amd64, go: 1.26.x}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
     env:
       CGO_ENABLED: "0"
       GOENV: "off"
@@ -86,22 +123,11 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-go@v7
         with:
-          go-version: 1.26.x
-      - name: Go version
-        run: go version | grep -q 'go1\.26\.' || { echo "expected Go 1.26.x"; exit 1; }
-      - name: Engine and root package
-        run: |
-          go vet ./internal/engine ./internal/langid ./experimental/... .
-          go test -count=1 -timeout 600s ./internal/engine ./experimental/... .
-      - name: Grammar modules
-        if: ${{ !cancelled() }}
+          go-version: ${{ matrix.go }}
+      - name: Native architecture
+        run: test "$(go env GOOS)" = "${{ matrix.goos }}" && test "$(go env GOARCH)" = "${{ matrix.goarch }}"
+      - name: Grammar module embedded sample tests
+        working-directory: grammars/${{ matrix.lang }}
         run: |
           unset TSG_CORPUS
-          rc=0
-          for d in grammars/*/; do
-            lang=$(basename "$d")
-            echo "::group::grammars/$lang"
-            (cd "$d" && go test -count=1 -timeout 900s .) || { echo "::error::grammars/$lang failed"; rc=1; }
-            echo "::endgroup::"
-          done
-          exit $rc
+          go test -count=1 -timeout 900s .

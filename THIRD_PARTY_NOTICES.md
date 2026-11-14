@@ -13,11 +13,18 @@ own `LICENSE`.
 | tree-sitter | Runtime C inside every grammar module; native C reference builds | [MIT](LICENSES/tree-sitter.txt) |
 | tree-sitter-go | `grammars/golang` | [MIT](LICENSES/tree-sitter-go.txt) |
 | tree-sitter-python | `grammars/python` | [MIT](LICENSES/tree-sitter-python.txt) |
-| tree-sitter-javascript | Base grammar of the TypeScript and TSX grammars | [MIT](LICENSES/tree-sitter-javascript.txt) |
+| tree-sitter-javascript | `grammars/javascript` (including JSX); base grammar of TypeScript and TSX | [MIT](LICENSES/tree-sitter-javascript.txt) |
 | tree-sitter-typescript | `grammars/typescript`, `grammars/tsx` | [MIT](LICENSES/tree-sitter-typescript.txt) |
 | tree-sitter-c-sharp | `grammars/csharp` | [MIT](LICENSES/tree-sitter-c-sharp.txt) |
 | tree-sitter-json | `grammars/json` | MIT, [grammars/json/LICENSE](grammars/json/LICENSE) |
 | tree-sitter-tsql | `grammars/tsql` | MIT, [grammars/tsql/LICENSE](grammars/tsql/LICENSE) |
+| tree-sitter-java | `grammars/java` | [MIT](LICENSES/tree-sitter-java.txt) |
+| tree-sitter-c | `grammars/c` | [MIT](LICENSES/tree-sitter-c.txt) |
+| tree-sitter-cpp | `grammars/cpp` | [MIT](LICENSES/tree-sitter-cpp.txt) |
+| tree-sitter-rust | `grammars/rust` | [MIT](LICENSES/tree-sitter-rust.txt) |
+| tree-sitter-bash | `grammars/bash` | [MIT](LICENSES/tree-sitter-bash.txt) |
+| tree-sitter-html | `grammars/html` | [MIT](LICENSES/tree-sitter-html.txt) |
+| tree-sitter-css | `grammars/css` | [MIT](LICENSES/tree-sitter-css.txt) |
 | Newtonsoft.Json | Copied C# test fixtures | [MIT](testdata/newtonsoft/LICENSE.md) |
 
 [The license manifest](LICENSES/manifest.json) records the exact public source
@@ -31,8 +38,7 @@ tooling, not a product dependency.
 
 The wasm that `tools/gen` translates is linked against the libc of wasi-sdk 34
 ([wasi-libc](https://github.com/WebAssembly/wasi-libc) `2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13`),
-so each module's `engine_gen.go` contains translated wasi-libc code: 59 `libc.a`
-members plus `crt1-reactor.o`, the same set for all seven grammars. wasi-libc as a
+so each module's `engine_gen.go` contains translated wasi-libc code. wasi-libc as a
 whole is multi-licensed under Apache-2.0 WITH LLVM-exception, Apache-2.0 and MIT, and
 includes works under their own licenses: musl (MIT), cloudlibc (BSD-2-Clause) and
 dlmalloc (CC0). The license texts are copied byte for byte into every module under
@@ -40,6 +46,6 @@ dlmalloc (CC0). The license texts are copied byte for byte into every module und
 [grammars/json/LICENSES/wasi-libc/](grammars/json/LICENSES/wasi-libc/)); `LICENSE`
 there is the index. Their source commit and sha256 are pinned in
 `tools/gen/pins.json` and recorded in each module's `provenance.json`. `compiler-rt`
-builtins are on the link line, but a linker trace of the pinned recipe shows that no
-member of it is linked into any of the seven modules; a change that links one needs
-its notice (Apache-2.0 WITH LLVM-exception) added.
+builtins are on the link line; generation checks the linker trace and rejects any
+linked archive member outside `libc.a`. A change that links compiler-rt needs its
+notice (Apache-2.0 WITH LLVM-exception) added.

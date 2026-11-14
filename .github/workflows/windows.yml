@@ -31,7 +31,7 @@
       "timeout-minutes": 5,
       "steps": [
         {"uses": "actions/checkout@v7", "with": {"persist-credentials": false}},
-        {"name": "License notices present", "run": "$expected = @('LICENSE', 'LICENSES/tree-sitter.txt') + (Get-ChildItem grammars -Directory | ForEach-Object { \"grammars/$($_.Name)/LICENSE\" })\n$missing = $expected | Where-Object { -not (Test-Path $_) }\nif ($missing) { throw \"missing license files: $missing\" }\n$expected\n$pins = Get-Content -Raw tools/gen/pins.json | ConvertFrom-Json\n$actual = (Get-FileHash -Algorithm SHA256 LICENSES/tree-sitter.txt).Hash.ToLowerInvariant()\nif ($actual -ne $pins.runtime.licenseSHA256) { throw \"runtime license hash mismatch: $actual\" }"}
+        {"name": "License notices present", "run": "$expected = @('LICENSE', 'LICENSES/tree-sitter.txt') + (Get-ChildItem grammars -Directory | ForEach-Object { \"grammars/$($_.Name)/LICENSE\" })\n$missing = $expected | Where-Object { -not (Test-Path $_) }\nif ($missing) { throw \"missing license files: $missing\" }\n$expected\n$pins = Get-Content -Raw tools/gen/pins.json | ConvertFrom-Json\n$actual = (Get-FileHash -Algorithm SHA256 LICENSES/tree-sitter.txt).Hash.ToLowerInvariant()\nif ($actual -ne $pins.runtime.licenseSHA256) { throw \"runtime license hash mismatch: $actual\" }\n$manifest = Get-Content -Raw LICENSES/manifest.json | ConvertFrom-Json\nforeach ($entry in $manifest) {\n  $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $entry.path).Hash.ToLowerInvariant()\n  if ($actual -ne $entry.sha256) { throw \"license hash mismatch: $($entry.path)\" }\n}"}
       ]
     },
     "race": {

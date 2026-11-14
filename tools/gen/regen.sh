@@ -8,7 +8,7 @@
 # (URLs, sha256, destinations) comes from tools/gen/pins.json via `gen -plan`; wasm2go is built from its pinned
 # module version with `go install -trimpath`. Output goes to grammars/<lang> in this repository.
 # go.mod form: derived from the committed grammars/*/go.mod. Release form (`require ... vX.Y.Z`, no `replace`) regenerates
-# the release form with that version; development form (`replace`) regenerates the development form; the seven modules
+# the release form with that version; development form (`replace`) regenerates the development form; all modules
 # must agree, else this fails. ROOT_VERSION=vX.Y.Z overrides the derivation (how step 4 of docs/specs/publication.md
 # switches a development tree to the release form).
 set -euo pipefail
@@ -16,6 +16,7 @@ set -euo pipefail
 W=${1:?usage: regen.sh <work-dir> [lang ...]}
 shift || true
 REPO=$(cd "$(dirname "$0")/../.." && pwd)
+source "$REPO/tools/gen/fetch.sh"
 mkdir -p "$W"
 [ -z "$(ls -A "$W")" ] || { echo "regen: $W is not empty" >&2; exit 1; }
 W=$(cd "$W" && pwd)
@@ -26,9 +27,9 @@ fi
 EXE=""
 [ "$(go env GOOS)" = windows ] && EXE=.exe
 
-ALL=(csharp golang json python tsql tsx typescript)
+ALL=(bash c cpp csharp css golang html java javascript json python rust tsql tsx typescript)
 if [ -z "${ROOT_VERSION:-}" ]; then
-  # one line per module: "dev" (replace present), the release version, or nothing (unknown form -> count below 7)
+  # one line per module: "dev" (replace present), the release version, or nothing (unknown form -> count below ALL)
   forms=$(for l in "${ALL[@]}"; do
     if grep -q '^replace ' "$REPO/grammars/$l/go.mod"; then echo dev
     else sed -n 's|^require github\.com/wotjr1649/go-treesitter \(v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)$|\1|p' "$REPO/grammars/$l/go.mod"
@@ -54,7 +55,7 @@ while IFS=$'\t' read -r kind file url sum dest; do
       (cd "$W" && GOBIN="$W/bin" CGO_ENABLED=0 go install -trimpath "$file")
       ;;
     tool | source)
-      curl -fsSL --retry 3 -o "$W/dl/$file" "$url"
+      fetch_archive "$W/dl/$file" "$url"
       echo "$sum  $W/dl/$file" | sha256sum -c -
       mkdir -p "$W/$dest"
       (cd "$W" && tar -xzf "dl/$file" --strip-components=1 -C "$dest") # relative paths: GNU tar reads "D:/x" as a remote host

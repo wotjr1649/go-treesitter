@@ -223,6 +223,181 @@
       "licenseSHA256": "cffa335b2bf899b98e49d14a7f96464b6823a98f9a5d544bef5c6d3b5e46d42c",
       "noticeSHA256": "fe7b7e195134b018606dc3d40250c240f2bb9e1f5bbadb6542c169c49b21dcb1",
       "cSymbol": "tree_sitter_mssql"
+    },
+    "javascript": {
+      "repo": "https://github.com/tree-sitter/tree-sitter-javascript",
+      "commit": "58404d8cf191d69f2674a8fd507bd5776f46cb11",
+      "extractDir": "javascript",
+      "archive": "javascript-58404d8cf191.tar.gz",
+      "archiveSHA256": "f3e51e9f7b129f62a817551ae22a878dac5c18d71c456d5ad73e9c82d687f33d",
+      "archiveURL": "https://codeload.github.com/tree-sitter/tree-sitter-javascript/tar.gz/58404d8cf191d69f2674a8fd507bd5776f46cb11",
+      "grammarDir": "src",
+      "dirs": [
+        "src"
+      ],
+      "treeSHA256": "1d8476efdf88ebb8b8ceb4a5eb8ff7baa6dae6c8ba9eef944a3877d38c9c9627",
+      "files": {
+        "parser.c": "67209ca7ef6e1a4f74e29e48b5928455f892fe1821a3960fbcd62f4e972f7384",
+        "scanner.c": "b3d3f64284d97bf80749c026862427782cf7ecc0b7dc094e6698ab311c9a42c7",
+        "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+        "tree_sitter/array.h": "5bdf6ed1a78e3409fd443e085ca967a64c188a5d082aaf7f819bccd53a471c94",
+        "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
+      },
+      "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+      "cSymbol": "tree_sitter_javascript"
+    },
+    "html": {
+      "repo": "https://github.com/tree-sitter/tree-sitter-html",
+      "commit": "73a3947324f6efddf9e17c0ea58d454843590cc0",
+      "extractDir": "html",
+      "archive": "html-73a3947324f6.tar.gz",
+      "archiveSHA256": "892f6b732e08bcb90918a985fdee58d6a0fd7a90326af601a2536a5d477583fa",
+      "archiveURL": "https://codeload.github.com/tree-sitter/tree-sitter-html/tar.gz/73a3947324f6efddf9e17c0ea58d454843590cc0",
+      "grammarDir": "src",
+      "dirs": [
+        "src"
+      ],
+      "treeSHA256": "bbbdf7eccd23d57c2bc5720ce98a2f63992605f5778cefbd2da1ce294b287031",
+      "files": {
+        "parser.c": "65768172733b3bbe461cbdc14ea928f00fbfcc51d8ac68f0a5c72071c6a0bbf1",
+        "scanner.c": "5c0a0567e010277b81fe63be0acd04f6b44c3ef3063ac01429b910c1d22f0dca",
+        "tag.h": "aaf1a10c8a2f685ef51a4aa6c01a2cbe166bff67eeccf6b9501a625b71f9ab70",
+        "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+        "tree_sitter/array.h": "4ff743903dc46f5db6aa54f31c6b4d160a8a9779e5b2ab1ee59ae7ebcd850ea1",
+        "tree_sitter/parser.h": "a1f6ef161fbaf48a0e10fca90ef5290a062462b307b3898aa562993853b9f80a"
+      },
+      "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+      "cSymbol": "tree_sitter_html"
+    },
+    "css": {
+      "repo": "https://github.com/tree-sitter/tree-sitter-css",
+      "commit": "dda5cfc5722c429eaba1c910ca32c2c0c5bb1a3f",
+      "extractDir": "css",
+      "archive": "css-dda5cfc5722c.tar.gz",
+      "archiveSHA256": "c47392e483feb9137d8f0acf9ca6e916b820122c260324454a9980c75c98c3c5",
+      "archiveURL": "https://codeload.github.com/tree-sitter/tree-sitter-css/tar.gz/dda5cfc5722c429eaba1c910ca32c2c0c5bb1a3f",
+      "grammarDir": "src",
+      "dirs": [
+        "src"
+      ],
+      "treeSHA256": "3b1278791cb60bb9bb1a7442370ae069dc925e171081151ce65ed08fbf5be991",
+      "files": {
+        "parser.c": "2e5150071220012ee635ac9e2119f4f3a93e0b51a7a3b69ab0cd87c18cf5e51e",
+        "scanner.c": "18dae8c8c4f515f28a3dc7ffb5bda259b06013a752921dc411a2fad8ecf78988",
+        "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+        "tree_sitter/array.h": "5bdf6ed1a78e3409fd443e085ca967a64c188a5d082aaf7f819bccd53a471c94",
+        "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
+      },
+      "licenseSHA256": "c5cfb43042b6b72045f4ba997834d0a7786d2793d91680868b5815b39f14fc78",
+      "cSymbol": "tree_sitter_css"
+    },
+    "java": {
+      "repo": "https://github.com/tree-sitter/tree-sitter-java",
+      "commit": "e10607b45ff745f5f876bfa3e94fbcc6b44bdc11",
+      "extractDir": "java",
+      "archive": "java-e10607b45ff7.tar.gz",
+      "archiveSHA256": "95a46b6b7b545b48cd6c3a0d5b1014fed271a63a71164cdc4382d9d441e3609f",
+      "archiveURL": "https://codeload.github.com/tree-sitter/tree-sitter-java/tar.gz/e10607b45ff745f5f876bfa3e94fbcc6b44bdc11",
+      "grammarDir": "src",
+      "dirs": [
+        "src"
+      ],
+      "treeSHA256": "ae56607d8f59d4707f14679454978d0f4d02a2ad15b1606e33cc6b0ff0ba10de",
+      "files": {
+        "parser.c": "4add5150cf4531eb5dd97f3343dcf65cd11704c84711348b328582b83424a0e4",
+        "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+        "tree_sitter/array.h": "5bdf6ed1a78e3409fd443e085ca967a64c188a5d082aaf7f819bccd53a471c94",
+        "tree_sitter/parser.h": "a1f6ef161fbaf48a0e10fca90ef5290a062462b307b3898aa562993853b9f80a"
+      },
+      "licenseSHA256": "52ed137b039cd9c46409bc22e89938af911c95b157feae2d040b51e6084369a7",
+      "cSymbol": "tree_sitter_java"
+    },
+    "c": {
+      "repo": "https://github.com/tree-sitter/tree-sitter-c",
+      "commit": "b780e47fc780ddc8da13afa35a3f4ed5c157823d",
+      "extractDir": "c",
+      "archive": "c-b780e47fc780.tar.gz",
+      "archiveSHA256": "dc3979e40fce678c27273ba8ab93b48b5acd6b91d1dfde6a4451222d366d689f",
+      "archiveURL": "https://codeload.github.com/tree-sitter/tree-sitter-c/tar.gz/b780e47fc780ddc8da13afa35a3f4ed5c157823d",
+      "grammarDir": "src",
+      "dirs": [
+        "src"
+      ],
+      "treeSHA256": "69eea1eb0f42b4d38abcf2c4d8d916a247ffa12faebcc781b421f61fd7cc9b53",
+      "files": {
+        "parser.c": "f2883ff9b21f4a5bd5553c1b10366c418947d17a7bc6bf256124a7542f079dd2",
+        "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+        "tree_sitter/array.h": "31e60a1bff6f715afacce03b5b70efe42b58371b4f9595dd4af52a577ff9608c",
+        "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
+      },
+      "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+      "cSymbol": "tree_sitter_c"
+    },
+    "rust": {
+      "repo": "https://github.com/tree-sitter/tree-sitter-rust",
+      "commit": "77a3747266f4d621d0757825e6b11edcbf991ca5",
+      "extractDir": "rust",
+      "archive": "rust-77a3747266f4.tar.gz",
+      "archiveSHA256": "dee82ddfd01bfc3a8ed201cc03b56448107d3217a4b3a7a8fc7fa6bc32b2405b",
+      "archiveURL": "https://codeload.github.com/tree-sitter/tree-sitter-rust/tar.gz/77a3747266f4d621d0757825e6b11edcbf991ca5",
+      "grammarDir": "src",
+      "dirs": [
+        "src"
+      ],
+      "treeSHA256": "5e95789104c9348ed9284cec6876611571759e9adede7a6e80946734a54aab61",
+      "files": {
+        "parser.c": "9602518f9e57919910bf0e777e52f6bfc9325d4c182e998bdb4efd5682b76e4a",
+        "scanner.c": "9609a2f92dbb7c32bc056fd8fb94e5478428f04496696aa08b048a9b66caf283",
+        "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+        "tree_sitter/array.h": "31e60a1bff6f715afacce03b5b70efe42b58371b4f9595dd4af52a577ff9608c",
+        "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
+      },
+      "licenseSHA256": "31d5b6f4243d5c7c6e1c4ebbbb9f6407bd1457a08bcc4f706521710341acba36",
+      "cSymbol": "tree_sitter_rust"
+    },
+    "bash": {
+      "repo": "https://github.com/tree-sitter/tree-sitter-bash",
+      "commit": "a06c2e4415e9bc0346c6b86d401879ffb44058f7",
+      "extractDir": "bash",
+      "archive": "bash-a06c2e4415e9.tar.gz",
+      "archiveSHA256": "879e8951ea2cc82455407e3eda0293319657ec53e83191e0fb5a67430d10d804",
+      "archiveURL": "https://codeload.github.com/tree-sitter/tree-sitter-bash/tar.gz/a06c2e4415e9bc0346c6b86d401879ffb44058f7",
+      "grammarDir": "src",
+      "dirs": [
+        "src"
+      ],
+      "treeSHA256": "0266bd0458d06e55957a96ed7cd6237c177c855c624a626a410566a8982c482e",
+      "files": {
+        "parser.c": "5ad30bb1a260c76df5397490b8bd97e272e62ed9c99be36fa53da959d7667e7f",
+        "scanner.c": "7cc25d70626f8939b35ecd504bf724e2001b817412aa29bceb4c4955a91558a9",
+        "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+        "tree_sitter/array.h": "5bdf6ed1a78e3409fd443e085ca967a64c188a5d082aaf7f819bccd53a471c94",
+        "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
+      },
+      "licenseSHA256": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
+      "cSymbol": "tree_sitter_bash"
+    },
+    "cpp": {
+      "repo": "https://github.com/tree-sitter/tree-sitter-cpp",
+      "commit": "c009222808634c1014f82438d4883753516a2c24",
+      "extractDir": "cpp",
+      "archive": "cpp-c00922280863.tar.gz",
+      "archiveSHA256": "6c6efaf024f5c02fee0403e4e2373346eeadc40828587bcfad9351df2f0a7986",
+      "archiveURL": "https://codeload.github.com/tree-sitter/tree-sitter-cpp/tar.gz/c009222808634c1014f82438d4883753516a2c24",
+      "grammarDir": "src",
+      "dirs": [
+        "src"
+      ],
+      "treeSHA256": "185515d451ca9d87309cd3e4084e6b7f0a94cc32759bc74c8a8760160f995172",
+      "files": {
+        "parser.c": "0007727b6e1fbc07657b6a4bf5dc39f524c6009fa347f9faaf180fa9ab17e999",
+        "scanner.c": "cf60387d290271f4d2fb558d0569b2b9ef879cb72206a9df5cc73b0b1a4b20ff",
+        "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+        "tree_sitter/array.h": "4483dc3d37ab62fc8cabd5cfbd7de8267a2b1e3b12da3a90a5b8b324dacd5498",
+        "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
+      },
+      "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+      "cSymbol": "tree_sitter_cpp"
     }
   }
 }

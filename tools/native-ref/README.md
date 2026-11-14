@@ -10,10 +10,12 @@ cd tools/native-ref
 go run . -pins ../gen/pins.json -dl <archive dir> -work <empty dir> -out <exe dir> [-fetch] [-cc gcc|clang] [lang ...]
 ```
 
-- `lang` is a key of `pins.json` `grammars` (`go` is accepted for `golang`); none = all seven.
+- `lang` is a key of `pins.json` `grammars` (`go` is accepted for `golang`, `jsx` for `javascript`); none = all pinned grammars.
 - Every archive's sha256 is checked against `archiveSHA256` before extraction (`-fetch` downloads a missing one from the
-  GitHub API tarball of the pinned commit, as `tools/gen/regen.sh` does), and every grammar source file against the
-  pinned `files` hash. Only the pinned `dirs` are extracted into `-work`; nothing in them is run.
+  pinned `archiveURL`, or the GitHub API tarball of the pinned commit when absent), and every grammar source file against
+  the pinned `files` hash. Transient network failures get at most three attempts, with 1/2-second backoff and a two-minute
+  timeout per attempt; HTTP errors and hash mismatches are not retried. Failed transfers leave no partial archive. Only
+  the pinned `dirs` are extracted into `-work`; nothing in them is run.
 - `-static` on Windows (no MinGW DLLs needed); upstream's `_POSIX_C_SOURCE`/`_DEFAULT_SOURCE` flags elsewhere.
 - Needs a C11 compiler (gcc or clang) on `PATH`; large grammars (csharp, tsql, typescript, tsx) take a few GB of RAM to
   compile at `-O2`.
@@ -39,9 +41,11 @@ range, 3 unreadable input, 4 parse failure, 5 write failure.
 native-ref -pins tools/gen/pins.json -fetch -dl <dl> -work <work> -out <exe dir> -corpus <corpus dir>   # build + extract corpora
 #   -queries <dir>: also extract each archive's queries/ into <dir>/<extractDir>/queries (sha256-verified; TSG_QUERY_DIR for the query lane)
 #   -nobuild: verify and extract only (no compiler); GITHUB_TOKEN, when set, authenticates -fetch against API rate limits
-cd tools/native-ref && go run ./ciconf -pins ../gen/pins.json -corpus <corpus dir> -exe <exe dir> -out <data dir> [-seed N] [-j N]
+cd tools/native-ref && go run ./ciconf -pins ../gen/pins.json -corpus <corpus dir> -exe <exe dir> -out <data dir> [-seed N] [-j N] [-lang javascript,html,...]
 cd tools/conformance && TSG_DATA_DIR=<data dir> TSG_NATIVE_EXE_DIR=<exe dir> go test -run 'TestCorpus|TestEdits|TestParserPoolRealEngine' .
 ```
+
+`-lang` limits corpus preparation to the comma-separated conformance language names (default: all). JSX inputs use the JavaScript corpus and parser.
 
 `ciconf` is its own `main` (stdlib only) because `native-ref` itself only fetches and compiles; it parses the corpus
 format (`===` header with name and `:attribute` lines, input, `---`, expected tree), writes each input once as

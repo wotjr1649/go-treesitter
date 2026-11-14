@@ -3,8 +3,14 @@
 # The fetch plan and archive verification match regen.sh. The output directory must be new or empty.
 set -euo pipefail
 
-W=${1:?usage: balance-probe.sh <new-empty-work-dir>}
+W=${1:?usage: balance-probe.sh <new-empty-work-dir> [lang ...]}
+shift
+LANGS=("$@")
+if [ ${#LANGS[@]} -eq 0 ]; then
+  LANGS=(bash c cpp csharp css golang html java javascript json python rust tsql tsx typescript)
+fi
 REPO=$(cd "$(dirname "$0")/../.." && pwd)
+source "$REPO/tools/gen/fetch.sh"
 mkdir -p "$W"
 [ -z "$(ls -A "$W")" ] || { echo "balance-probe: $W is not empty" >&2; exit 1; }
 W=$(cd "$W" && pwd)
@@ -26,7 +32,7 @@ while IFS=$'\t' read -r kind file url sum dest; do
       (cd "$W" && GOBIN="$W/bin" go install -trimpath "$file")
       ;;
     tool | source)
-      curl -fsSL --retry 3 -o "$W/dl/$file" "$url"
+      fetch_archive "$W/dl/$file" "$url"
       echo "$sum  $W/dl/$file" | sha256sum -c -
       mkdir -p "$W/$dest"
       (cd "$W" && tar -xzf "dl/$file" --strip-components=1 -C "$dest")
@@ -37,7 +43,7 @@ done <"$W/plan.tsv"
 
 cd "$REPO"
 sha256sum tools/gen/shim/tsg_abi.c >"$W/shim-before.sha256"
-for lang in csharp golang json python tsql tsx typescript; do
+for lang in "${LANGS[@]}"; do
   echo "== test-only $lang"
   "$GEN" -balance-probe -lang "$lang" -root tools/gen -src "$W/src" -dl "$W/dl" -sdk "$W/sdk" \
     -wasm2go "$W/bin/wasm2go$EXE" -wasm-opt "$W/binaryen/bin/wasm-opt$EXE" \
@@ -46,4 +52,4 @@ done
 sha256sum -c "$W/shim-before.sha256"
 (cd tools/native-ref && go build -trimpath -o "$W/bin/native-ref$EXE" .)
 "$W/bin/native-ref$EXE" -pins tools/gen/pins.json -cc "${CC:-gcc}" \
-  -dl "$W/dl" -work "$W/native-work" -out "$W/native"
+  -dl "$W/dl" -work "$W/native-work" -out "$W/native" "${LANGS[@]}"
