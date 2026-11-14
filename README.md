@@ -1,6 +1,6 @@
 # go-treesitter
 
-**v0.1.0 preview (unreleased).** A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
+**Preview (v0.2.0).** A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
 module is generated from the unmodified upstream tree-sitter runtime and grammar C (wasm translated to Go by
 `tools/gen`), and is checked against a native C build of the same sources.
 
@@ -35,6 +35,29 @@ if err != nil {
 	return err
 }
 fmt.Println(snap.Root().Kind()) // source_file
+```
+
+Queries run on a `*Tree` and stream matches whose captures are snapshot nodes:
+
+```go
+q, err := treesitter.NewQuery(golang.Language(), `(function_declaration name: (identifier) @name)`)
+if err != nil {
+	return err // *QueryError carries the offset and type
+}
+ctx := context.Background()
+tree, err := parser.Parse(ctx, []byte("package p\nfunc F() {}\n"), nil)
+if err != nil {
+	return err
+}
+defer tree.Close()
+for m, err := range tree.Matches(ctx, q, nil) {
+	if err != nil {
+		return err
+	}
+	for _, c := range m.Captures {
+		fmt.Println(q.CaptureNames()[c.Index], c.Node.Text())
+	}
+}
 ```
 
 - `ParseSnapshot` returns an immutable `*Snapshot` that needs no `Close` and is safe to share between goroutines.

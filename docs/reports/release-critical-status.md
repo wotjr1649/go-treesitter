@@ -36,8 +36,19 @@ to the new engine.
   eight modules; an empty-cache external module with default Go settings installs root + csharp + tsql, builds, runs
   and cross-builds linux/arm64 without `replace`.
 
+## v0.2.0 gates (queries; CI on `acbb8da` unless stated)
+
+| Gate | State | Evidence level |
+|---|---|---|
+| Raw query matches vs native C (grammars' own `queries/*.scm` + probe queries over the corpora) | PASS, 0 differences: 22,047 query/input pairs on Windows amd64 (local); 12,584 per platform in CI on Linux x64 and arm64 | E5 (those queries and inputs) |
+| Query predicates vs tree-sitter CLI 0.27.2 | Agree except the RE2/Rust regex difference (Unicode `\w`); 20/20 acceptance probes agree | E5 (those probes) |
+| Cancel during balancing, then reparse (all 7 grammars, test-only probe builds) | PASS: 1,729 stops in balancing, 2,411/2,411 next parses equal native, no-reset control 3/3 mismatches (Windows); Linux x64 run 43583147260 PASS with identical callback counts | E5 (probe builds, those inputs) |
+| Large-input speed (bench run 43584133627) | PASS: geomean 1.705x (Linux x64), 1.959x (Linux arm64), 1.818x (macOS arm64); limit 2.5x | bench lane |
+| Memory peak / release (same run) | PASS on all three; macOS private bytes under the ADR-0022 §3 macOS amendment | bench lane |
+| Engine, conformance, regeneration, licenses, race (required checks) | PASS on `acbb8da` | E3-E5 per lane |
+| Release rehearsal (module ZIPs from a file proxy, empty-cache consumer, Go 1.26 and 1.27, linux/arm64 build, v0.1.0 grammar on root v0.2.0 returns `ErrQueryUnsupported`) | PASS | local |
+
 ## Next
 
-- Continuous verification: nightly differential fuzzing against native C, Linux/macOS speed and memory lanes,
-  the balancing-cancel probe for all grammars in CI, weekly detection of new tree-sitter releases.
-- Queries (v0.1 API, `docs/design/api-v2.md` §8), then wave-2 grammars.
+- Wave-2 grammars in three batches (one minor release each): web and systems languages first, then PHP/PowerShell/
+  R/Dart/XML/Ruby/Kotlin, then Swift and PostgreSQL (parser.c generated with the pinned CLI).
