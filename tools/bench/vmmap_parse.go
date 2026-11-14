@@ -20,7 +20,8 @@ import (
 var (
 	footprintRe = regexp.MustCompile(`(?m)^\s*Physical footprint:\s+([0-9.]+)\s*([BKMGT]?)\s*$`)
 	// name  START-END  [ sizes ]  cur/max  SM=xx  [PURGE=x]  [detail]
-	regionRe = regexp.MustCompile(`^\s*(\S.*?)\s+([0-9a-f]{6,})-([0-9a-f]{6,})\s+\[[^\]]*\]\s+([r-][w-][x-])/([r-][w-][x-])\s+SM=(\S+)(.*)$`)
+	kernelLineRe = regexp.MustCompile(`\skernel-kernel\s+\[`)
+	regionRe     = regexp.MustCompile(`^\s*(\S.*?)\s+([0-9a-f]{6,})-([0-9a-f]{6,})\s+\[[^\]]*\]\s+([r-][w-][x-])/([r-][w-][x-])\s+SM=(\S+)(.*)$`)
 )
 
 // parseSize reads vmmap's size notation: digits with an optional fraction and a B/K/M/G/T suffix (powers of 1024).
@@ -61,6 +62,10 @@ func parseVmmapRegions(out string) ([]vmRegion, error) {
 	var rs []vmRegion
 	for _, line := range strings.Split(out, "\n") {
 		if !strings.Contains(line, "[") || !strings.Contains(line, "SM=") {
+			continue
+		}
+		// Kernel-side accounting ("page table in kernel  kernel-kernel [...]") has no user address range.
+		if kernelLineRe.MatchString(line) {
 			continue
 		}
 		m := regionRe.FindStringSubmatch(line)
