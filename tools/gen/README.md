@@ -22,17 +22,20 @@ Everything a generation consumes is pinned, and the identity of a generated modu
 
 ```
 bash tools/gen/regen.sh <new-empty-work-dir> [lang ...]      # all seven modules by default
-ROOT_VERSION=v0.1.0 bash tools/gen/regen.sh <work-dir>       # release go.mod form
+ROOT_VERSION=v0.1.0 bash tools/gen/regen.sh <work-dir>       # switch a development tree to the release go.mod form
 ```
 
 `regen.sh` builds `gen`, prints the fetch plan (`gen -plan host`), downloads every archive into the new directory,
 verifies its sha256 **before** extracting, builds wasm2go from the pinned version, then runs `gen` per module into
 `grammars/<lang>`. `.github/workflows/regen.yml` runs it on Linux and requires `git diff --exit-code -- grammars/`.
+Without `ROOT_VERSION`, `regen.sh` derives the go.mod form from the committed `grammars/*/go.mod` (all seven must be in the same form: development with `replace`, or release `require vX.Y.Z` without `replace`; otherwise it fails), so the drift check regenerates the committed form unchanged.
 
 ## go.mod forms
 
 - default (development): `require github.com/wotjr1649/go-treesitter v0.0.0` and `replace … => ../..`;
-- `-root-version vX.Y.Z` (release, ADR-0022): `require github.com/wotjr1649/go-treesitter vX.Y.Z`, no `replace`.
+- `-root-version vX.Y.Z` (release, ADR-0022): `require github.com/wotjr1649/go-treesitter vX.Y.Z`, no `replace`, and a `go.sum` with the root module's two `h1:` lines taken from
+  `go mod download -json` through the default GOPROXY/GOSUMDB (generation fails if they are unavailable). The development
+  form writes no `go.sum` and removes a stale one. `go.mod` and `go.sum` are not listed in `provenance.json`.
 
 The release form cannot be built before the root tag exists; the generator's meta runner always uses its own local
 `replace`, so generating in release mode works before then.

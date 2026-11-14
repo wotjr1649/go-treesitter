@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"go/format"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -113,6 +114,23 @@ func goMod(lang, rootVersion string) string {
 	return head + "require github.com/wotjr1649/go-treesitter v0.0.0\n\n" +
 		"// Local development: the grammar modules live in the root repository. Removed when the root module is tagged.\n" +
 		"replace github.com/wotjr1649/go-treesitter => ../..\n"
+}
+
+// rootGoSum returns the two go.sum lines of the root module at version, taken from `go mod download -json` through
+// the default GOPROXY and GOSUMDB (so the checksum database has verified them). It fails when they are unavailable.
+func rootGoSum(version string) (string, error) {
+	const root = "github.com/wotjr1649/go-treesitter"
+	c := exec.Command("go", "mod", "download", "-json", root+"@"+version)
+	c.Env = append(os.Environ(), "GOWORK=off", "GOTOOLCHAIN=local", "GOFLAGS=")
+	c.Dir = os.TempDir()
+	var stderr bytes.Buffer
+	c.Stderr = &stderr
+	out, err := c.Output()
+	var r struct{ Sum, GoModSum, Error string }
+	if jerr := json.Unmarshal(out, &r); err != nil || jerr != nil || r.Error != "" || r.Sum == "" || r.GoModSum == "" {
+		return "", fmt.Errorf("go mod download %s@%s: sums unavailable (err=%v, json=%v, %s%s)", root, version, err, jerr, r.Error, stderr.String())
+	}
+	return fmt.Sprintf("%s %s %s\n%s %s/go.mod %s\n", root, version, r.Sum, root, version, r.GoModSum), nil
 }
 
 // ---- language meta ----

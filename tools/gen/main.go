@@ -86,6 +86,13 @@ func run(o opts) error {
 	if o.rootVersion != "" && !rootVersionRx.MatchString(o.rootVersion) {
 		return fmt.Errorf("-root-version %q is not a semantic version vX.Y.Z", o.rootVersion)
 	}
+	goSum := "" // release mode only; dev mode writes none and removes a stale one
+	if o.rootVersion != "" {
+		var err error
+		if goSum, err = rootGoSum(o.rootVersion); err != nil {
+			return err
+		}
+	}
 	if o.src == "" {
 		return fmt.Errorf("-src is required")
 	}
@@ -180,6 +187,11 @@ func run(o opts) error {
 		files["engine_gen.dat"] = dat
 		outputs["engine_gen.dat"] = sumBytes(dat)
 	} else if err := os.Remove(filepath.Join(o.out, "engine_gen.dat")); err != nil && !errors.Is(err, fs.ErrNotExist) { // stale file of another recipe
+		return err
+	}
+	if goSum != "" {
+		files["go.sum"] = []byte(goSum)
+	} else if err := os.Remove(filepath.Join(o.out, "go.sum")); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return err
 	}
 	if err := writeFiles(o.out, files); err != nil {
