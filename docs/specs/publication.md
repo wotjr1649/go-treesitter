@@ -72,8 +72,10 @@ Notes:
   every nested module: `grammars/*`, `tools/gen`, `tools/bench`, `tools/conformance`, `tools/modulezip`, `artifacts`.
   Local-only paths (`docs/plans`, `docs/prompts`, `artifacts/handoff`, `.scratch`) must not be tracked, because a
   tracked file is published by the tag; check `git ls-files` before step 2.
-- After the tags, development continues with the `replace ../..` form (`tools/gen` without `-root-version`), so the
-  release commit is not the tip of `main` unless the owner decides otherwise.
+- After the tags, `main` keeps the release form: grammar modules require the released root and CI tests them
+  against it; `tools/conformance` and `tools/bench` test the working tree through `replace`. Use an uncommitted
+  `go.work` to build a grammar module against an unreleased root. The next release regenerates with the new
+  `-root-version`.
 - **Rollback.** A pushed tag and any version a proxy has served are never deleted, moved or re-tagged. A bad
   version is retracted: add `retract vX.Y.Z // reason` to the `go.mod` of a newer version of the same module and tag
   that (`vX.Y.(Z+1)`). A bad grammar is retracted in that grammar's module only; the root is unaffected. A bad

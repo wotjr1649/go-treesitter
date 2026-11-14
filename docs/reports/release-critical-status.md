@@ -29,10 +29,15 @@ to the new engine.
 | `-race` (diagnostic) | all 7 grammars: no race (sampled edits, quick cancel) | diagnostic |
 | Linux amd64/arm64, macOS arm64, Windows amd64/arm64 execution | PASS: engine CI run 43499796838 on `1c9a204`, 10/10 packages per platform (engine, root, generator, 7 grammar modules with embedded samples). C-reference conformance ran on Windows amd64 only | E3 per platform |
 
-## Open items before the v0.1.0 preview
+## Released
 
-- Limitations list for the release notes (experimental `Match`, C agreement only on the listed inputs, incremental may
-  differ from fresh where native C does) and a short `MIGRATING.md` from the removed `syntax` API.
-- Owner authority, each separately: PR to `main`, merge, root tag, grammar tags, release (procedure:
-  `docs/specs/publication.md` § Multi-module release).
-- After v0.1.0: wave-2 grammars, queries (v0.1 API), speed/memory measurement on Linux and macOS.
+- **v0.1.0 preview** (2026-11-14, GitHub pre-release): root tag `v0.1.0` on `98165ce`, grammar tags
+  `grammars/<lang>/v0.1.0` on `2b0c9ec`. Verified after tagging: `GOPROXY=direct` and proxy.golang.org resolve all
+  eight modules; an empty-cache external module with default Go settings installs root + csharp + tsql, builds, runs
+  and cross-builds linux/arm64 without `replace`.
+
+## Next
+
+- Continuous verification: nightly differential fuzzing against native C, Linux/macOS speed and memory lanes,
+  the balancing-cancel probe for all grammars in CI, weekly detection of new tree-sitter releases.
+- Queries (v0.1 API, `docs/design/api-v2.md` §8), then wave-2 grammars.
