@@ -1,6 +1,6 @@
 module github.com/wotjr1649/go-treesitter/grammars/golang
 
-go 1.27.2
+go 1.26.0
 
 require github.com/wotjr1649/go-treesitter v0.0.0
 

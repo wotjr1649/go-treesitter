@@ -106,7 +106,7 @@ func checkImports(src string) error {
 // goMod is a grammar module's go.mod. rootVersion "" is the local-development form (replace ../..); a version
 // emits the release form of ADR-0022: the exact root version, no replace.
 func goMod(lang, rootVersion string) string {
-	head := "module " + modulePrefix + lang + "\n\ngo 1.27.2\n\n"
+	head := "module " + modulePrefix + lang + "\n\ngo 1.26.0\n\n"
 	if rootVersion != "" {
 		return head + "require github.com/wotjr1649/go-treesitter " + rootVersion + "\n"
 	}
@@ -177,7 +177,7 @@ func dumpMeta(o opts, work string) (*langMeta, error) {
 		return nil, err
 	}
 	mod := modulePrefix + o.lang
-	gm := fmt.Sprintf("module github.com/wotjr1649/go-treesitter/tools/gen/metarun\n\ngo 1.27.2\n\nrequire (\n\t%s v0.0.0\n\tgithub.com/wotjr1649/go-treesitter v0.0.0\n)\n\n"+
+	gm := fmt.Sprintf("module github.com/wotjr1649/go-treesitter/tools/gen/metarun\n\ngo 1.26.0\n\nrequire (\n\t%s v0.0.0\n\tgithub.com/wotjr1649/go-treesitter v0.0.0\n)\n\n"+
 		"replace %s => %s\n\nreplace github.com/wotjr1649/go-treesitter => %s\n", mod, mod, filepath.ToSlash(out), filepath.ToSlash(repo))
 	if err := writeFiles(dir, map[string][]byte{"go.mod": []byte(gm), "main.go": []byte(fmt.Sprintf(metaRunner, mod))}); err != nil {
 		return nil, err
@@ -302,8 +302,10 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 		"`tools/gen` (docs/design/engine-abi.md, ADR-0020).\n\n"+
 		"- upstream grammar: %s at `%s`\n- tree-sitter runtime: %s (unmodified)\n- engine ABI: %d\n"+
 		"- recipe sha256: `%s`\n- identity and output hashes: `provenance.json` (equals the compiled `engine.Identity`; `go test` checks it)\n\n"+
-		"%s Regenerate with `tools/gen` (see its README); regenerating gives identical bytes.\n",
-		modulePrefix, lang, g.Repo, g.Commit, pins.Runtime.Release, pins.ABI, id.RecipeSHA256, files)
+		"%s `LICENSES/tree-sitter.txt` is the license of the tree-sitter runtime C translated into `engine_gen.go`. `LICENSES/wasi-libc/` holds the license texts of the wasi-libc code translated into `engine_gen.go` (wasi-libc `%s`;\n"+
+		"its `LICENSE` is the index: musl MIT, cloudlibc BSD-2-Clause, dlmalloc CC0, the rest Apache-2.0 WITH LLVM-exception, Apache-2.0 or MIT;\n"+
+		"every file's hash is in `provenance.json`). Regenerate with `tools/gen` (see its README); regenerating gives identical bytes.\n",
+		modulePrefix, lang, g.Repo, g.Commit, pins.Runtime.Release, pins.ABI, id.RecipeSHA256, files, pins.WasiLibc.Commit)
 }
 
 var samples = map[string]string{

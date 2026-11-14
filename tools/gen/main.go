@@ -119,10 +119,13 @@ func run(o opts) error {
 	}
 	wasm := filepath.Join(work, o.lang+".wasm")
 	t0 := time.Now()
-	if err := compile(o, pins, g, wasm); err != nil {
+	if _, err := compile(o, pins, g, wasm); err != nil {
 		return err
 	}
 	tm["clang_s"] = since(t0)
+	if err := checkLink(o, pins, g, filepath.Join(work, o.lang+".linkcheck.wasm")); err != nil {
+		return err
+	}
 	outputs := map[string]string{}
 	if rc.opt != "" {
 		clangWasm, err := os.ReadFile(wasm)
@@ -199,6 +202,17 @@ func run(o opts) error {
 	if err != nil {
 		return err
 	}
+	notices, err := wasiLibcNotices(o, pins)
+	if err != nil {
+		return err
+	}
+	rtn, err := runtimeNotice(o, pins)
+	if err != nil {
+		return err
+	}
+	for name, b := range rtn {
+		notices[name] = b
+	}
 	var noticeBytes []byte
 	if g.NoticeSHA256 != "" {
 		if noticeBytes, err = os.ReadFile(filepath.Join(o.src, g.ExtractDir, "NOTICE")); err != nil {
@@ -206,6 +220,9 @@ func run(o opts) error {
 		}
 	}
 	outputs["engine_gen.go"], outputs["wasm"] = sumBytes([]byte(patched)), sumBytes(wasmBytes)
+	for name, b := range notices {
+		outputs[name] = sumBytes(b)
+	}
 	prov := provenance{Schema: 1, ABI: uint32(pins.ABI), Name: o.lang, Module: modulePrefix + o.lang, Identity: id, Outputs: outputs}
 	provJSON, err := marshal(prov)
 	if err != nil {
@@ -228,6 +245,9 @@ func run(o opts) error {
 	}
 	if noticeBytes != nil {
 		files["NOTICE"] = noticeBytes
+	}
+	for name, b := range notices {
+		files[name] = b
 	}
 	if !o.noAPI {
 		files["language_api.go"] = []byte(languageAPI(o.lang))
@@ -301,7 +321,7 @@ func verify(o opts, pins *Pins, g GrammarPin, rc recipe, tm map[string]float64) 
 	}
 	id.SourceSHA256["shim.tsg_abi.c"] = got
 	if o.dl != "" {
-		for _, a := range [][2]string{{rt.Archive, rt.ArchiveSHA256}, {g.Archive, g.ArchiveSHA256}} {
+		for _, a := range [][2]string{{rt.Archive, rt.ArchiveSHA256}, {g.Archive, g.ArchiveSHA256}, {pins.WasiLibc.Archive, pins.WasiLibc.ArchiveSHA256}} {
 			got, err := sumFile(filepath.Join(o.dl, a[0]))
 			if err != nil {
 				return id, err
@@ -331,6 +351,9 @@ func verify(o opts, pins *Pins, g GrammarPin, rc recipe, tm map[string]float64) 
 		return id, err
 	}
 	if err := expect("wasi-sdk version", strings.TrimSpace(strings.SplitN(string(sdkVer), "\n", 2)[0]), pins.Tools.WasiSDK); err != nil {
+		return id, err
+	}
+	if err := checkWasiLibcCommit(string(sdkVer), pins); err != nil {
 		return id, err
 	}
 	bi, err := buildinfo.ReadFile(o.wasm2go)
@@ -396,10 +419,12 @@ func clangPath(sdk string) string {
 	return p
 }
 
-func compile(o opts, pins *Pins, g GrammarPin, wasm string) error {
+// compile builds the wasm; extra are additional clang flags that must not change the output (the link check passes -Wl,-t).
+func compile(o opts, pins *Pins, g GrammarPin, wasm string, extra ...string) (string, error) {
 	rt := filepath.Join(o.src, pins.Runtime.ExtractDir, "lib")
 	gd := filepath.Join(o.src, g.ExtractDir, filepath.FromSlash(g.GrammarDir))
 	args := append([]string{}, clangFlags...)
+	args = append(args, extra...)
 	args = append(args, "--sysroot="+filepath.Join(o.sdk, "share", "wasi-sysroot"), "-DTSG_LANG_FN="+g.CSymbol,
 		"-I"+filepath.Join(rt, "src"), "-I"+filepath.Join(rt, "include"), "-I"+gd)
 	for _, e := range exports {
@@ -410,10 +435,11 @@ func compile(o opts, pins *Pins, g GrammarPin, wasm string) error {
 		args = append(args, filepath.Join(gd, "scanner.c"))
 	}
 	args = append(args, filepath.Join(o.root, "shim", "tsg_abi.c"), "-o", wasm)
-	if out, err := runCmd("", nil, clangPath(o.sdk), args...); err != nil {
-		return fmt.Errorf("clang: %w\n%s", err, out)
+	out, err := runCmd("", nil, clangPath(o.sdk), args...)
+	if err != nil {
+		return out, fmt.Errorf("clang: %w\n%s", err, out)
 	}
-	return nil
+	return out, nil
 }
 
 // recipeSHA256 binds the fixed recipe (flags, exports, tool invocations, the patch) to one identity string.
@@ -453,7 +479,11 @@ func writeFiles(dir string, files map[string][]byte) error {
 	}
 	sort.Strings(names)
 	for _, n := range names {
-		if err := os.WriteFile(filepath.Join(dir, n), files[n], 0o644); err != nil {
+		p := filepath.Join(dir, filepath.FromSlash(n))
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			return err
+		}
+		if err := os.WriteFile(p, files[n], 0o644); err != nil {
 			return err
 		}
 	}

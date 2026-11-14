@@ -25,6 +25,7 @@ type Pins struct {
 	Tools            ToolPins              `json:"tools"`
 	MemoryGrowSHA256 string                `json:"memoryGrowSHA256"` // sha256 of the original wasm2go memory_grow function text
 	ShimSHA256       string                `json:"shimSHA256"`       // shim/tsg_abi.c
+	WasiLibc         WasiLibcPin           `json:"wasiLibc"`         // source of the libc linked into every module: notices only
 	Grammars         map[string]GrammarPin `json:"grammars"`
 }
 
@@ -37,6 +38,26 @@ type RuntimePin struct {
 	ArchiveSHA256 string   `json:"archiveSHA256"`
 	Dirs          []string `json:"dirs"` // hashed trees, relative to ExtractDir
 	TreeSHA256    string   `json:"treeSHA256"`
+	LicenseSHA256 string   `json:"licenseSHA256"` // LICENSE of the release archive, copied to LICENSES/tree-sitter.txt in every module
+}
+
+// WasiLibcPin is the wasi-libc source tree the pinned wasi-sdk's libc.a was built from (the sdk's VERSION file names
+// the commit; the sdk ships no license text). Only its license files are used: gen copies them into every module.
+type WasiLibcPin struct {
+	Repo          string      `json:"repo"`
+	Commit        string      `json:"commit"` // full commit; its first 12 hex digits must equal the sdk's VERSION "wasi-libc:" line
+	ExtractDir    string      `json:"extractDir"`
+	Archive       string      `json:"archive"`
+	ArchiveSHA256 string      `json:"archiveSHA256"`
+	Notices       []NoticePin `json:"notices"`
+}
+
+// NoticePin is one license text copied to LICENSES/wasi-libc/<Name> in every module.
+type NoticePin struct {
+	Name         string `json:"name"`
+	Path         string `json:"path"`                   // relative to ExtractDir
+	SHA256       string `json:"sha256"`                 // of the whole source file
+	LeadingLines int    `json:"leadingLines,omitempty"` // >0: only the first N lines (a notice embedded in a source file's header)
 }
 
 // Archive is one upstream release archive; its sha256 is verified before anything inside it is used.
@@ -182,6 +203,11 @@ func (p *Pins) plan(platform string) ([]string, error) {
 		return nil, err
 	}
 	add("source", rt.Archive, u, rt.ArchiveSHA256, "src/"+rt.ExtractDir)
+	wl := p.WasiLibc
+	if u, err = tarballURL(wl.Repo, wl.Commit); err != nil {
+		return nil, err
+	}
+	add("source", wl.Archive, u, wl.ArchiveSHA256, "src/"+wl.ExtractDir)
 	seen := map[string]bool{}
 	names := make([]string, 0, len(p.Grammars))
 	for n := range p.Grammars {

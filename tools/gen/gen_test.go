@@ -128,7 +128,7 @@ func TestGoModModes(t *testing.T) {
 		t.Fatalf("dev go.mod lost its local form:\n%s", dev)
 	}
 	rel := goMod("json", "v0.1.0")
-	want := "module github.com/wotjr1649/go-treesitter/grammars/json\n\ngo 1.27.2\n\nrequire github.com/wotjr1649/go-treesitter v0.1.0\n"
+	want := "module github.com/wotjr1649/go-treesitter/grammars/json\n\ngo 1.26.0\n\nrequire github.com/wotjr1649/go-treesitter v0.1.0\n"
 	if rel != want {
 		t.Fatalf("release go.mod:\n%s\nwant:\n%s", rel, want)
 	}
@@ -169,8 +169,8 @@ func TestPinsPlan(t *testing.T) {
 				t.Fatalf("%s: unpinned download %q", plat, l)
 			}
 		}
-		// sdk + binaryen, wasm2go, runtime + 6 distinct grammar repositories (typescript and tsx share one archive)
-		if kinds["tool"] != 2 || kinds["goinstall"] != 1 || kinds["source"] != 7 {
+		// sdk + binaryen, wasm2go, runtime + wasi-libc + 6 distinct grammar repositories (typescript and tsx share one archive)
+		if kinds["tool"] != 2 || kinds["goinstall"] != 1 || kinds["source"] != 8 {
 			t.Fatalf("%s: plan kinds %v", plat, kinds)
 		}
 	}
@@ -242,5 +242,74 @@ func TestPinsHostIndependentStrings(t *testing.T) {
 	}
 	if pins.Tools.Clang != "23.1.0" || len(pins.Tools.LLVMCommit) != 40 || pins.Tools.Binaryen != "133" {
 		t.Fatalf("tool pins carry host strings: %+v", pins.Tools)
+	}
+}
+
+func TestWasiLibcNotices(t *testing.T) {
+	pins, err := loadPins("pins.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := checkWasiLibcCommit("34.0\nwasi-libc: 2e6fb9d8ee0c\nllvm: 895aa2c896ad\n", pins); err != nil {
+		t.Fatal(err)
+	}
+	for _, bad := range []string{"34.0\n", "wasi-libc: 000000000000\n", "wasi-libc: 2e6f\n"} {
+		if checkWasiLibcCommit(bad, pins) == nil {
+			t.Fatalf("%q accepted", bad)
+		}
+	}
+	// a header excerpt keeps exactly the first N lines; a mismatching file hash fails
+	dir := t.TempDir()
+	body := "a\nb\nc\n"
+	if err := os.WriteFile(filepath.Join(dir, "f"), []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	p := &Pins{WasiLibc: WasiLibcPin{Notices: []NoticePin{{Name: "n", Path: "f", SHA256: sumBytes([]byte(body)), LeadingLines: 2}}}}
+	got, err := wasiLibcNotices(opts{src: dir}, p)
+	if err != nil || string(got[noticeDir+"n"]) != "a\nb\n" {
+		t.Fatalf("got %q, %v", got, err)
+	}
+	p.WasiLibc.Notices[0].SHA256 = strings.Repeat("0", 64)
+	if _, err := wasiLibcNotices(opts{src: dir}, p); err == nil {
+		t.Fatal("a changed source file must fail")
+	}
+}
+
+func TestNonLibcMembers(t *testing.T) {
+	win := `D:\sdk\lib\wasm32-wasip1\crt1-reactor.o` + "\n" +
+		`C:\Temp\lib-1.o` + "\n" +
+		`D:\sdk\lib\wasm32-wasip1\libc.a(abort.c.obj)` + "\n" +
+		`D:\sdk\lib\wasm32-wasip1\libc.a(strlen.c.obj)` + "\n"
+	lin := "/sdk/lib/wasm32-wasip1/libc.a(abort.c.obj)\n"
+	for _, tr := range []string{win, lin} {
+		if o, n := nonLibcMembers(tr); len(o) != 0 || n == 0 {
+			t.Fatalf("%q: others %v libc %d", tr, o, n)
+		}
+	}
+	rt := lin + "/sdk/lib/clang/23/lib/wasm32-unknown-wasip1/libclang_rt.builtins.a(multi3.c.obj)\n" +
+		`D:\sdk\lib\wasm32-wasip1\libm.a(sin.c.obj)` + "\n"
+	if o, _ := nonLibcMembers(rt); len(o) != 2 {
+		t.Fatalf("compiler-rt/libm members not reported: %v", o)
+	}
+	if _, n := nonLibcMembers("clang: nothing\n"); n != 0 {
+		t.Fatal("garbage counted as libc members")
+	}
+}
+
+func TestRuntimeNotice(t *testing.T) {
+	pins, err := loadPins("pins.json")
+	if err != nil || len(pins.Runtime.LicenseSHA256) != 64 {
+		t.Fatalf("runtime licenseSHA256 not pinned: %v", err)
+	}
+	dir := t.TempDir()
+	rtd := filepath.Join(dir, pins.Runtime.ExtractDir)
+	if err := os.MkdirAll(rtd, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(rtd, "LICENSE"), []byte("changed\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := runtimeNotice(opts{src: dir}, pins); err == nil {
+		t.Fatal("a changed runtime LICENSE must fail")
 	}
 }

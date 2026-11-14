@@ -11,6 +11,7 @@ Everything a generation consumes is pinned, and the identity of a generated modu
 |---|---|
 | tree-sitter runtime, grammars | full commit, GitHub API tarball sha256 (`api.github.com/repos/<owner>/<repo>/tarball/<commit>`), tree and file sha256 |
 | wasi-sdk, binaryen | version plus the upstream release archive sha256 **per host platform** (`<GOOS>-<GOARCH>`; windows-amd64 and linux-amd64) |
+| wasi-libc license texts | `wasiLibc`: the commit named by the sdk's `VERSION` file (the sdk ships no license text), tarball sha256, and each copied file's sha256; copied to `LICENSES/wasi-libc/` in every module and listed in its `provenance.json` outputs |
 | wasm2go | module version and its `go.sum` `h1:` hash; built per host with `go install -trimpath` |
 | host binaries | `localBinarySHA256`, checked only with `-verify-binaries`; never part of an identity |
 

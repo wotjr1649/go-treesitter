@@ -26,3 +26,20 @@ separately binds that corpus and its license. The exact grammar commits and file
 hashes of each module are in its `provenance.json`. No third-party license text
 was rewritten as this project's license. The native C reference is development
 tooling, not a product dependency.
+
+## wasi-libc, translated into every grammar module
+
+The wasm that `tools/gen` translates is linked against the libc of wasi-sdk 34
+([wasi-libc](https://github.com/WebAssembly/wasi-libc) `2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13`),
+so each module's `engine_gen.go` contains translated wasi-libc code: 59 `libc.a`
+members plus `crt1-reactor.o`, the same set for all seven grammars. wasi-libc as a
+whole is multi-licensed under Apache-2.0 WITH LLVM-exception, Apache-2.0 and MIT, and
+includes works under their own licenses: musl (MIT), cloudlibc (BSD-2-Clause) and
+dlmalloc (CC0). The license texts are copied byte for byte into every module under
+`LICENSES/wasi-libc/` (for example
+[grammars/json/LICENSES/wasi-libc/](grammars/json/LICENSES/wasi-libc/)); `LICENSE`
+there is the index. Their source commit and sha256 are pinned in
+`tools/gen/pins.json` and recorded in each module's `provenance.json`. `compiler-rt`
+builtins are on the link line, but a linker trace of the pinned recipe shows that no
+member of it is linked into any of the seven modules; a change that links one needs
+its notice (Apache-2.0 WITH LLVM-exception) added.

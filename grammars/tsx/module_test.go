@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/wotjr1649/go-treesitter/internal/engine"
@@ -270,6 +271,24 @@ func TestIdentityMatchesProvenance(t *testing.T) {
 		if got := hex.EncodeToString(sum[:]); got != pj.Outputs[name] {
 			t.Fatalf("%s sha256 %s, provenance %s", name, got, pj.Outputs[name])
 		}
+	}
+	// the license texts of the linked wasi-libc are bound by provenance too
+	notices := 0
+	for name, want := range pj.Outputs {
+		if !strings.HasPrefix(name, "LICENSES/") {
+			continue
+		}
+		b, err := os.ReadFile(name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if sum := sha256.Sum256(b); hex.EncodeToString(sum[:]) != want {
+			t.Fatalf("%s differs from provenance", name)
+		}
+		notices++
+	}
+	if notices == 0 {
+		t.Fatal("provenance lists no license notices")
 	}
 	if grammar.ABI != engine.ABIVersion {
 		t.Fatalf("grammar ABI %d, engine ABI %d", grammar.ABI, engine.ABIVersion)
