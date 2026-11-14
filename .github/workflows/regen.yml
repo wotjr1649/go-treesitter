@@ -30,7 +30,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-go@v7
         with:
-          go-version-file: go.mod
+          go-version: 1.27.x # newest supported; go.mod states the floor (1.26.0)
       # Downloads each pinned archive into a new empty directory and checks its sha256 before extracting;
       # builds wasm2go from its pinned module version; regenerates all seven modules into grammars/.
       - name: Regenerate grammar modules

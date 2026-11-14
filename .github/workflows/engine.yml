@@ -35,15 +35,15 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-go@v7
         with:
-          go-version-file: go.mod
+          go-version: 1.27.x # newest supported; go.mod now states the floor (1.26.0), see engine-go126
       - name: Native architecture
         run: |
           go env GOOS GOARCH CGO_ENABLED
           test "$(go env GOOS)" = "${{ matrix.goos }}" && test "$(go env GOARCH)" = "${{ matrix.goarch }}" || { echo "native target mismatch"; exit 1; }
       - name: Engine and root package
         run: |
-          go vet ./internal/engine .
-          go test -count=1 -timeout 600s ./internal/engine .
+          go vet ./internal/engine ./internal/langid ./experimental/... .
+          go test -count=1 -timeout 600s ./internal/engine ./experimental/... .
       - name: Generator unit tests
         if: ${{ !cancelled() }}
         working-directory: tools/gen
@@ -66,3 +66,42 @@ jobs:
         if: ${{ !cancelled() }}
         working-directory: tools/conformance
         run: go vet ./...
+
+  # The oldest supported Go (go.mod floor 1.26): engine, root package and grammar modules must build and pass there too.
+  engine-go126:
+    name: engine, oldest supported Go (ubuntu-24.04)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      CGO_ENABLED: "0"
+      GOENV: "off"
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version: 1.26.x
+      - name: Go version
+        run: go version | grep -q 'go1\.26\.' || { echo "expected Go 1.26.x"; exit 1; }
+      - name: Engine and root package
+        run: |
+          go vet ./internal/engine ./internal/langid ./experimental/... .
+          go test -count=1 -timeout 600s ./internal/engine ./experimental/... .
+      - name: Grammar modules
+        if: ${{ !cancelled() }}
+        run: |
+          unset TSG_CORPUS
+          rc=0
+          for d in grammars/*/; do
+            lang=$(basename "$d")
+            echo "::group::grammars/$lang"
+            (cd "$d" && go test -count=1 -timeout 900s .) || { echo "::error::grammars/$lang failed"; rc=1; }
+            echo "::endgroup::"
+          done
+          exit $rc
