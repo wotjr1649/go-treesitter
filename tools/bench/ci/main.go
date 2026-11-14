@@ -585,6 +585,11 @@ func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lround
 			regParsed, regAfter, runs := int64(math.MaxInt64), int64(0), 0
 			regStartBad := false
 			for i := 0; i < mruns; i++ {
+				if i == 0 { // darwin: keep the raw vmmap output of one run per input as evidence/fixtures
+					os.Setenv("BENCH_VMMAP_DUMP", filepath.Join(out, "vmmap-raw", in.lang+"-"+in.file+"-"+op))
+				} else {
+					os.Unsetenv("BENCH_VMMAP_DUMP")
+				}
 				r := runCmd(15*time.Minute, exeName(benchDir, in.lang), "mem", "-file", in.path, "-op", op)
 				if r.code != 0 {
 					fail("mem %s/%s %s run %d: exit %d %s", in.lang, in.file, op, i, r.code, r.errOut)
@@ -597,6 +602,10 @@ func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lround
 							kv[k] = n
 						}
 					}
+				}
+				if _, ok := kv["priv_after"]; !ok { // a missing number must not read as a zero delta
+					fail("mem %s/%s %s run %d: no priv_after in %q", in.lang, in.file, op, i, r.out)
+					continue
 				}
 				runs++
 				peak = max(peak, kv["peak_ws"])

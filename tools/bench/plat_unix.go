@@ -6,8 +6,8 @@ import "time"
 
 // Linux and macOS counterparts of plat_windows.go. The field names of processMemoryCounters are kept so mem() is
 // shared; what each field means here: workingSetSize = resident set now, peakWorkingSetSize = peak resident set
-// (VmHWM / ru_maxrss), privateUsage = resident anonymous memory (Linux RssAnon; macOS has no per-process equivalent
-// without cgo, so it is the resident set), peakPagefileUsage = the peak resident set (no peak-private counter exists).
+// (VmHWM / ru_maxrss), privateUsage = resident anonymous memory (Linux RssAnon; macOS phys_footprint from vmmap, see
+// plat_darwin.go), peakPagefileUsage = the peak resident set (no peak-private counter exists).
 type processMemoryCounters struct {
 	workingSetSize, peakWorkingSetSize, privateUsage, peakPagefileUsage uintptr
 }
