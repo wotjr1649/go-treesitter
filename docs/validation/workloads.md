@@ -3,6 +3,21 @@
 Authoritative inventory of every input used to make a claim. Identity rules live in
 `docs/specs/baseline-provenance.md`; this file holds the values.
 
+## Current workloads (engine, ADR-0020/0022)
+
+The tiers below this section record the removed `gotreesitter` carrier's inputs and oracle records (`testdata/`,
+`windows-c*`); they are **historical** (Git history at `9ad82eb`) and no current test or gate reads the oracle
+digests they describe. The current lanes use:
+
+| Workload | Where | Used by |
+|---|---|---|
+| Fresh corpus (1,586 inputs, 7 grammars), edit cases (5,919), large inputs (12), UTF-8 cases | local tree `$TSG_S15_DIR` (`corpus/`, `edits/`, `large/`, `native/dumps/`); not tracked | `tools/conformance`, `tools/bench` |
+| Native C reference dumps, edit dumps and changed ranges for those inputs | built and recorded with `tools/native-ref` from `tools/gen/pins.json` | the same |
+| Built-in fuzz seeds (one small sample per grammar) | `tools/conformance/fuzz_test.go` (`FuzzParse<Lang>`); crashers go to `tools/conformance/testdata/fuzz/` | `go test -fuzz` |
+| Embedded samples | each `grammars/<lang>` module | its own tests |
+
+The identity rules below still apply: bind every result to the pinned runtime and grammar identities.
+
 ## Rules
 
 - Every fixture has a recorded SHA-256 **of its LF bytes** and a recorded license/provenance.

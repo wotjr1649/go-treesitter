@@ -1,0 +1,9 @@
+tree-sitter-mssql started as a fork of tree-sitter-sql
+(https://github.com/DerekStride/tree-sitter-sql), copyright (c) 2021 Derek Stride,
+licensed under the MIT License. See LICENSE for the full license text.
+
+The general-SQL core of this grammar (expression precedence, SELECT, CTEs, joins,
+window functions, and the surrounding tooling scaffold) derives from that project.
+The T-SQL-specific surface — the SSMS header, bracketed parameterized types, IF/WHILE
+control flow, TRY/CATCH, cursors, table hints, and the rest of T-SQL's distinguishing
+constructs — is original work added on top of that base.

@@ -1,184 +1,76 @@
 # Parser result and consumer contract
 
-Normative. Defines what a parse must report and what a consumer may never assume.
-Derived from observed downstream failures recorded in
-`artifacts/handoff/2026-09-22-code-map-memo-findings-and-adoption-review.md`.
-Transfer the contract, not any downstream product logic.
+Normative for the `treesitter` package (API v2, ADR-0021). Signatures and rationale: `docs/design/api-v2.md`; engine
+side: `docs/design/engine-abi.md`. Where this document and the code disagree, the code is a defect or this document
+is; fix one of them, never leave both.
 
-## The three traps this contract exists to prevent
+Transition: the old `syntax` package, `treesitter.New` and `internal/gtsadapter` remain until their approved removal
+(ADR-0020 §7). They follow the previous contract, kept in Git history at commit `9ad82eb`; nothing below applies to them.
 
-1. **A returned `error == nil` does not mean the parse completed.** The upstream runtime can return
-   a tree *and* a nil error on a timeout.
-2. **`root.EndByte() == len(source)` does not mean the parse completed.** A real observation: root
-   span covered the full input while the last consumed token was at byte 3233 of 5986, and the stop
-   reason was `timeout`.
-3. **`stopReason == accepted` does not mean the tree is clean.** A real observation: `accepted`,
-   not stopped early, full root span, and `HasError() == true`.
+## The traps this contract prevents
 
-Any of these three checked alone will silently publish a wrong result.
+1. **A tree that looks complete but is not.** `Parse` returns a non-nil `*Tree` only for a complete tree, and every
+   accepted tree is checked: root end == input length, otherwise `EngineFault`.
+2. **A halted C parse resuming on the next call.** Every path that returns no tree leaves the C parser reset
+   (`ts_parser_reset`) or the instance recreated. Required regression: cancel a parse, then parse a different source
+   and require that source's own tree (`tools/conformance` `TestCancelThenReparse`).
+3. **Using memory that belongs to a parser after it moved on.** Trees are confined to their parser and invalidated by
+   generation; snapshots own their data and never point into the engine.
 
-## Outcome vocabulary
+## Outcome vocabulary (closed set)
 
-A parse returns exactly one outcome. The set is closed; adding a member is a contract change.
+| Outcome | Tree | Go error | Instance afterwards |
+|---|---|---|---|
+| `AcceptedClean` | yes | `nil` | kept |
+| `AcceptedWithErrors` (ERROR or MISSING nodes; root `has_error`) | yes | `nil` — syntax errors are not Go errors | kept |
+| `Timeout` (ctx deadline) | no | `*ParseError`, `errors.Is` `ErrTimeout` and `context.DeadlineExceeded` | kept, parser reset |
+| `Cancelled` (ctx cancel) | no | `*ParseError`, `errors.Is` `ErrCancelled` and `context.Canceled` | kept, parser reset |
+| `ResourceLimit` — input over `WithMaxInputBytes`, snapshot over `WithMaxSnapshotNodes` (checked with the descendant count before export) | no | `ErrResourceLimit` | kept |
+| `ResourceLimit` — a refused `memory.grow` during the call, even if a tree came back | no | `ErrResourceLimit` | recreated (`InstanceReset`) |
+| `InvalidInput` — nil ctx, invalid option value (never clamped), `old` from another parser or invalidated, non-UTF-8 with `WithStrictUTF8` | no | `ErrInvalidInput` | kept |
+| `EngineFault` — any other trap, root-end mismatch, an ABI violation by the module | no | `ErrEngineFault` | recreated (`InstanceReset`) |
+| `IncompatibleLanguage` — engine ABI version or export-block magic/format mismatch | no parser | `ErrIncompatibleLanguage` | none created |
 
-| Outcome | Meaning |
-|---|---|
-| `accepted_clean` | Parse reached input EOF, valid root span ending at EOF, no error and no missing nodes. |
-| `accepted_with_errors` | Parse finished, but the tree contains error or missing nodes. |
-| `early_stop` | Runtime reported it stopped before natural completion. |
-| `timeout` | The parse deadline was reached. |
-| `cancelled` | The caller's context or cancellation flag fired. |
-| `resource_limit` | An iteration, stack-depth, node-count, or memory budget was hit. |
-| `invariant_violation` | The runtime reported an internal invariant failure. |
-| `unsupported_input` | Invalid UTF-8, or no grammar registered for the input. |
-| `not_run` | Nothing was attempted (precondition failed, or the lane is unavailable). |
-
-Only `accepted_clean` may be treated as a complete, trustworthy tree.
-`accepted_with_errors` is a *usable* tree with an explicit caveat; it is never silently equivalent
-to clean.
+Adding a member is a contract change and needs an ADR. Lifetime errors are separate sentinels: `ErrTreeInvalidated`,
+`ErrTreeEdited`, `ErrParserClosed`.
 
 ## Required evaluation order
 
-Request admission precedes runtime work: a nil context or negative timeout/limit
-is `not_run`; an already cancelled context takes precedence over source checks.
-A positive `Limits.MaxInputBytes` rejects oversized input as `resource_limit`
-before UTF-8 scanning, grammar loading or source copying. No raw runtime stop
-reason is invented for a request that never entered the runtime.
+nil or already-done `ctx` → option and input checks (size, strict UTF-8, ownership and validity of `old`) → engine.
+Checks before the engine never touch the instance. Cancellation during the engine call is detected in the progress
+callback; the call returns after the C parser's cleanup.
 
-Evaluate in this order. Stopping early at any step and skipping the rest is the defect class above.
+## Input
 
-```
-1  caller context cancelled / deadline exceeded      -> cancelled
-2  input not valid UTF-8, or no grammar              -> unsupported_input
-3  returned error != nil                             -> record the error TYPE (never the message)
-4  returned tree == nil                              -> not_run / invariant_violation
-5  runtime stop reason                               -> timeout | cancelled | resource_limit |
-                                                        invariant_violation
-6  runtime reported "stopped early"                  -> early_stop
-7  root == nil                                       -> invariant_violation
-8  root has error or missing nodes                   -> accepted_with_errors
-9  otherwise                                         -> accepted_clean
-```
+Bytes are parsed like C tree-sitter (UTF-8; a leading BOM is skipped; invalid bytes become decode errors in the
+tree). `HasInvalidUTF8` reports `!utf8.Valid(src)`. `NewSource`/`NewSourceUTF16` convert UTF-16 or BOM-prefixed input
+to UTF-8 and map offsets back to the original bytes.
 
-On any non-`accepted_*` outcome the tree must be released and not handed to a consumer as if it
-were a result.
+## Ownership, lifetime, concurrency
 
-## Required diagnostic surface
-
-Every parse produces a diagnostic record alongside the outcome. Minimum fields:
-
-```
-outcome                    input bytes             grammar / language id
-stop reason (raw)          stopped-early flag      root present / root span
-has-error / has-missing    error type (not text)   deadline applied
-tokens consumed            last token end byte     expected EOF byte
-iterations + limit         nodes + limit           peak stack depth + limit
-arena / scratch bytes      memory budget           truncated flag
-route taken                fallback reason (raw upstream string, verbatim)
-snapshot complete          snapshot node count / cap
-input byte cap             adapter-owned limit reason
-```
-
-Rules:
-
-- **Store raw upstream reason strings verbatim.** They are the stable join key to upstream code and
-  to `docs/validation/known-regressions.md`. Do not paraphrase or normalize them.
-- **Never put timing values into anything that forms a deterministic identity** (digests, semantic
-  IDs, golden files). Timing goes in the evidence record, never in the result identity.
-- Error *messages* may embed source text. Record the error **type** only. Prefer
-  the upstream error type when present; otherwise record the adapter error type.
-  Cancellation preserves the context error for `errors.Is` checks.
-- `ExpectedEOFByte` is uint64 so a rejected input beyond the runtime's uint32
-  range can still report its length without wrapping. Node offsets remain uint32.
-
-`Result.Complete` additionally requires a completed snapshot walk. An accepted
-runtime receipt alone cannot make a snapshot stopped by cancellation or a node
-cap appear complete. `LimitReason` identifies `input_bytes`, `snapshot_nodes`
-or `runtime_memory`; it never replaces or normalizes the raw `StopReason`.
-
-Completion checks both `LastTokenEndByte == len(source)` and
-`ExpectedEOFByte == len(source)`, plus an ordered root span ending at input EOF.
-The root need not start at byte zero: some grammars exclude leading hidden
-extras from that node. The pinned COBOL C grammar starts at byte 7 after seven
-spaces, or at byte 6 after fixed-format sequence numbers. Preserve those raw
-coordinates. Do not widen or relabel the root to satisfy a completion test.
-Root coverage alone still cannot establish completion; the stop, EOF, snapshot,
-truncation, cancellation and error/missing observations all remain required.
-
-## Request limits
-
-`syntax.Limits` exposes an input byte cap, snapshot node cap, runtime memory
-budget, and runtime iteration/node/stack-depth limits. Zero preserves upstream
-defaults and imposes no additional adapter cap; negative values are rejected.
-The snapshot cap is exact for returned snapshot nodes. Traversal state grows
-with tree depth, not the number of pending siblings.
-
-The runtime budget checks growth beyond retained arena and scratch slabs, so a
-warm parse can report accepted with a footprint above that budget. The adapter
-also rejects a result when reported arena plus scratch bytes exceed the explicit
-budget, before constructing its snapshot. The raw accepted stop remains intact
-and `LimitReason=runtime_memory` explains this local result-admission failure.
-It is not a hard process-RSS cap and excludes grammar caches, input
-copies, snapshots and other workers. A parser step can exceed work thresholds.
-Configured runtime limits may change the selected parsing route. Callers needing
-a total process-memory boundary must manage the process and worker concurrency.
-Context cancellation also interrupts snapshot construction. The existing
-`Timeout` continues to bound the parse API only, with grammar loading outside it.
-
-## Failure propagation
-
-- A non-clean outcome must reach the caller as an explicit state. It must never be published as an
-  authoritative result with the failure dropped.
-- A consumer that keeps a previous good state must be able to distinguish
-  "legitimately empty input" from "empty because the parse failed". Those are different outcomes,
-  not the same empty result.
-- Whether to publish, keep the previous state, or mark something stale is a **downstream** policy.
-  This repository's job is to make the distinction unambiguous, not to choose the policy.
+- A `Parser` and its `Tree`s are one confinement unit: one goroutine at a time. Concurrent use is detected and
+  rejected, not serialized.
+- `Close`, `Reset`, an instance reset and `ParserPool.Put` invalidate the parser's live trees (`ErrTreeInvalidated`).
+- `Tree.Edit` mutates in place (C semantics); the tree is then only valid as `old` of the next parse, and
+  `Snapshot` returns `ErrTreeEdited`. Take snapshots before editing.
+- A leaked tree or parser is cleaned up by queueing; only the owning goroutine calls into the engine.
+- `Snapshot`, `Node`, `Index`, `LineIndex` are immutable and safe for any number of goroutines. A snapshot owns its
+  source (one copy; none with `ParseOwned`, whose caller must never modify the bytes again) and stays valid after the
+  parser is closed. `Node.Text` is a zero-allocation substring of that source.
+- The zero `Node` is C's null node (`IsZero`). Every method on it returns its zero value (false, 0, `""`, the zero `Node`, an
+  empty iterator, `(Node{}, false)` for the `(Node, bool)` methods) and none panics.
 
 ## Comparison discipline
 
-When comparing two trees or two derived fact sets:
-
-1. **Check completeness on both sides first.** Never compare a complete result against an incomplete
-   one — that produces a false "drift" report. This exact mistake cost a downstream session a
-   misattributed failure.
-2. **Capture both sides and the first difference *before* asserting.** An assertion that fires
-   without having recorded the two inputs destroys the only evidence that could diagnose it.
-   Record at least: both lengths, nil-ness, the first differing index, and both values at that index.
-3. **Do not sort before comparing.** Ordering defects are real defects; sorting hides them.
-4. Compare the dimensions listed in `docs/specs/oracle.md`, not an ad-hoc subset.
-
-## Timing and lane separation
-
-- Phases are distinct and separately budgeted: grammar load, parser construction, token-source
-  setup, **parse API**, tree validation, and everything after. A parse deadline applies to the parse
-  API only; grammar loading happens outside it.
-- Cold and warm are different conditions. Profiler-on and profiler-off are different conditions.
-  Never mix them in one number.
-- The CGO-free product lane and the CGO+race diagnostic lane are different lanes.
-  A race-lane timeout is **not** a product-gate failure. See `docs/specs/validation.md`.
-
-## Ownership and lifetime
-
-- Parser, query, and scanner objects are **worker-local** unless stronger sharing has been proven by
-  a test. Shared-parser thread safety is not assumed.
-- Trees are explicitly released. Release exactly once, on every path including failure paths.
-- Do not introduce a global pool or cache without a measurement that shows it is needed.
-- Upstream exposes some diagnostics as **process-global counters**. Deltas around a parse are only
-  valid when parses are sequential within the process. Any concurrent use must not read them.
-  If per-parse routing information is required under concurrency, that is an upstream request, not a
-  local workaround.
-
-## Language availability
-
-The release's C-oracle gate covers only the seven Release-Critical routes; other grammars have
-the basic catalog check plus any retained regression controls (`docs/reports/release-critical-status.md`). No result states an
-assurance level. Before v1, which grammars outside those routes are available, and whether
-`New()` parses them by default, may change without a compatibility promise (ADR-0017).
+- C agreement means byte-identical canonical dumps against a native C build of the same runtime release and grammar
+  sources (`docs/specs/oracle.md`). It holds for the corpus it was measured on, not for arbitrary input.
+- `incremental == fresh` is self-consistency, not C agreement, and is not guaranteed (upstream behavior).
+- `ChangedRanges` is compared with native `ts_tree_get_changed_ranges`; an empty result for a changed dump is valid C
+  behavior.
+- Result evidence is bound to the identity in `docs/specs/baseline-provenance.md`; it is not carried to another runtime
+  release, grammar commit, toolchain, recipe or platform.
 
 ## Scope boundary
 
-This layer resolves **syntax**. It does not resolve names, scopes, overloads, types, imports, or any
-language semantics. Those belong to a downstream consumer. A fixture may be shared between the two,
-but the judgments must not be mixed: "the parser produced this node" and "this identifier binds
-there" are separate claims with separate oracles.
+Syntax only: parse trees, positions, hashes and structural matching over one grammar. No semantic resolution, code
+graph, persistence or application logic. Queries arrive in v0.1 with the signatures fixed in api-v2 §8.

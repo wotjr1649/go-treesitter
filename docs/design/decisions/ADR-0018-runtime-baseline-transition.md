@@ -1,6 +1,6 @@
 # ADR-0018 — Evaluate the approved runtime baseline transition
 
-**Status:** Accepted · 2026-11-06
+**Status:** Superseded by [ADR-0020](ADR-0020-cgo-free-library-on-unmodified-tree-sitter.md) · 2026-11-13 (accepted 2026-11-06)
 
 This records the approved direction and candidate migration. Runtime adoption remains pending the completion gate; this is not release approval.
 

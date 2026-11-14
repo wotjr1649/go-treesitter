@@ -1,0 +1,58 @@
+# tools/native-ref — native C reference
+
+Builds one native executable per grammar from the sources pinned in `tools/gen/pins.json` (the unmodified tree-sitter
+runtime `lib/` plus one unmodified grammar, `parser.c` and `scanner.c`), linked with this repository's own driver
+`c/native_ref.c`. The executables produce the reference results the CGO-free conformance lane compares against
+(`docs/specs/oracle.md`). CGO is used only by the C compiler here, never by the Go product lanes.
+
+```
+cd tools/native-ref
+go run . -pins ../gen/pins.json -dl <archive dir> -work <empty dir> -out <exe dir> [-fetch] [-cc gcc|clang] [lang ...]
+```
+
+- `lang` is a key of `pins.json` `grammars` (`go` is accepted for `golang`); none = all seven.
+- Every archive's sha256 is checked against `archiveSHA256` before extraction (`-fetch` downloads a missing one from the
+  GitHub API tarball of the pinned commit, as `tools/gen/regen.sh` does), and every grammar source file against the
+  pinned `files` hash. Only the pinned `dirs` are extracted into `-work`; nothing in them is run.
+- `-static` on Windows (no MinGW DLLs needed); upstream's `_POSIX_C_SOURCE`/`_DEFAULT_SOURCE` flags elsewhere.
+- Needs a C11 compiler (gcc or clang) on `PATH`; large grammars (csharp, tsql, typescript, tsx) take a few GB of RAM to
+  compile at `-O2`.
+
+Executable CLI (stdout is binary, `\n` line ends on every platform):
+
+| Command | Output |
+|---|---|
+| `<exe> dump <file>` | `#tsg-dump/1 root_has_error=<0\|1> nodes=<n>` then one tab-separated line per node in cursor preorder: `depth field type named extra missing is_error has_error start_byte end_byte row:col row:col` |
+| `<exe> edit <old> <new> <start> <old_end> <new_end>` | the same dump of `<new>` reparsed incrementally from the edited `<old>` tree |
+| `<exe> changed-ranges <old> <new> <start> <old_end> <new_end>` | `ts_tree_get_changed_ranges(old, new)`, one `start_byte end_byte start_row start_col end_row end_col` line per range |
+
+Points are byte columns with `\n` rows (the same as `treesitter.EditFor`). Exit codes: 0 ok, 2 usage / edit out of
+range, 3 unreadable input, 4 parse failure, 5 write failure.
+
+## CI conformance data (`ciconf`)
+
+`.github/workflows/conformance.yml` needs no local data. Inputs are the pinned grammar repositories' own
+`test/corpus/*.txt` (under each grammar's license; the archive is sha256-verified before anything is read):
+
+```
+native-ref -pins tools/gen/pins.json -fetch -dl <dl> -work <work> -out <exe dir> -corpus <corpus dir>   # build + extract corpora
+#   -nobuild: verify and extract only (no compiler); GITHUB_TOKEN, when set, authenticates -fetch against API rate limits
+cd tools/native-ref && go run ./ciconf -pins ../gen/pins.json -corpus <corpus dir> -exe <exe dir> -out <data dir> [-seed N] [-j N]
+cd tools/conformance && TSG_DATA_DIR=<data dir> TSG_NATIVE_EXE_DIR=<exe dir> go test -run 'TestCorpus|TestEdits|TestParserPoolRealEngine' .
+```
+
+`ciconf` is its own `main` (stdlib only) because `native-ref` itself only fetches and compiles; it parses the corpus
+format (`===` header with name and `:attribute` lines, input, `---`, expected tree), writes each input once as
+`corpus/<lang>/<file stem>-<nnn>.in`, runs the native executables, and writes the data directory read by
+`tools/conformance` (same layout as the local session-15 tree, plus `ci.json`):
+
+- Every test is an input except `:skip` entries and `:language(x)` entries for another language (typescript and tsx
+  share one corpus); both groups go to `corpus/skipped.csv` with the reason. `:error` entries are kept (error recovery
+  is exactly what the comparison should cover); the attributes are recorded in the manifest's `attrs` column. The
+  expected trees are not used: the reference is the native C dump of the same bytes.
+- Three seeded edits per input (`insert`, `delete`, `replace`; `insert` only for an empty input), positions snapped to
+  UTF-8 boundaries, inserted text ASCII or a slice of the input. The seed is `-seed` mixed with the input id, so the
+  same pins and seed give the same data on every host; the per-edit seed is in `edits/manifest.csv`.
+- Native results: `native/dumps/<lang>/<name>.dump` (fresh dump), `edits/results-native.csv` (sha256 of the native
+  incremental dump and of the native fresh dump of the new text), `edits/<lang>/<name>.ranges` (native
+  `changed-ranges`). A native run that fails is listed in `native-failures.csv` and `ciconf` exits 1.

@@ -1,0 +1,228 @@
+{
+  "schema": 2,
+  "abi": 1,
+  "recipe": "v2-O3",
+  "runtime": {
+    "release": "v0.27.2",
+    "repo": "https://github.com/tree-sitter/tree-sitter",
+    "commit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "extractDir": "tree-sitter-v0.27.2",
+    "archive": "tree-sitter-v0.27.2.tar.gz",
+    "archiveSHA256": "9f33b10babb69ef84ac700731a11795b13a4b404dafaa8064e7acbf005fd0732",
+    "dirs": [
+      "lib"
+    ],
+    "treeSHA256": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
+    "licenseSHA256": "c5cfb43042b6b72045f4ba997834d0a7786d2793d91680868b5815b39f14fc78"
+  },
+  "tools": {
+    "wasi-sdk": "34.0",
+    "clang": "23.1.0",
+    "wasiSDKArchives": {
+      "windows-amd64": {
+        "url": "https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-34/wasi-sdk-34.0-x86_64-windows.tar.gz",
+        "sha256": "cccb5c323a9b34f0349a9b09e8804a0a7632c68c3310f4b5f437ed57d7e71d8f"
+      },
+      "linux-amd64": {
+        "url": "https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-34/wasi-sdk-34.0-x86_64-linux.tar.gz",
+        "sha256": "b761e3a0721dbae9c09a0059e5fdb2bf917d1b4a8a7b430fb3b5aafb0984b2c4"
+      }
+    },
+    "wasm2go": "v0.4.21",
+    "wasm2goModule": "github.com/ncruces/wasm2go",
+    "wasm2goSum": "h1:F9xQyNnXIjWesQgt7tLxqVUg2pmxwBOrRCLpEFv3QUc=",
+    "binaryen": "133",
+    "binaryenArchives": {
+      "windows-amd64": {
+        "url": "https://github.com/WebAssembly/binaryen/releases/download/version_133/binaryen-version_133-x86_64-windows.tar.gz",
+        "sha256": "17a2cbeac6b5693c5fbafab3838d3c65fd9c1eb38b05f5baec6c657e8c84995b"
+      },
+      "linux-amd64": {
+        "url": "https://github.com/WebAssembly/binaryen/releases/download/version_133/binaryen-version_133-x86_64-linux.tar.gz",
+        "sha256": "2dc9c7813f5375db93d96ead4b78222fcc3e2677bbb832297af4797782a37489"
+      }
+    },
+    "localBinarySHA256": {
+      "windows-amd64": {
+        "wasm-opt": "4217d75f81cf33c4032d82b5d531120069af1a4b43eb7737977bdb2c99a8f4ba"
+      }
+    },
+    "llvmCommit": "895aa2c896ada719451be2e3673c83da8ddf1141"
+  },
+  "memoryGrowSHA256": "9e1db9d4db30f9f71e30319cbc3b782ae348fd530bd4bd26d00f31dafcabe93a",
+  "shimSHA256": "eca21d17b1a4d97e2b774f9e2fd00afb0751b529ccbbf03442ff1cbf15907241",
+  "wasiLibc": {
+    "repo": "https://github.com/WebAssembly/wasi-libc",
+    "commit": "2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13",
+    "extractDir": "wasi-libc-2e6fb9d8ee0c",
+    "archive": "wasi-libc-2e6fb9d8ee0c.tar.gz",
+    "archiveSHA256": "2b3e2dca9825487e35a5ed6867c3e226eb021d948c3288b5dbff112b7d362517",
+    "notices": [
+      {
+        "name": "LICENSE",
+        "path": "LICENSE",
+        "sha256": "2711a8b5a5cdfef0e639f96c1aca12ae23d7d64a02d0507f1bdf14d2b27bbc3a"
+      },
+      {
+        "name": "LICENSE-APACHE",
+        "path": "LICENSE-APACHE",
+        "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+      },
+      {
+        "name": "LICENSE-APACHE-LLVM",
+        "path": "LICENSE-APACHE-LLVM",
+        "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5"
+      },
+      {
+        "name": "LICENSE-MIT",
+        "path": "LICENSE-MIT",
+        "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      },
+      {
+        "name": "musl-COPYRIGHT",
+        "path": "libc-top-half/musl/COPYRIGHT",
+        "sha256": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b"
+      },
+      {
+        "name": "cloudlibc-LICENSE",
+        "path": "libc-bottom-half/cloudlibc/LICENSE",
+        "sha256": "c8b789cf5a746611e6300a0cc7750dbf92b61912a709d04e639245f7290656d0"
+      },
+      {
+        "name": "dlmalloc-CC0-notice.txt",
+        "path": "dlmalloc/src/malloc.c",
+        "sha256": "9e7ce51d813331ae87ef235f6ca2d5ce2167692e30bb51a173513e3754a67f8f",
+        "leadingLines": 5
+      }
+    ]
+  },
+  "grammars": {
+    "json": {
+      "repo": "https://github.com/tree-sitter/tree-sitter-json",
+      "commit": "254c42a6476413b776221e03982ac8ae159eeb72",
+      "extractDir": "tree-sitter-json-254c42a64764",
+      "archive": "tree-sitter-json-254c42a64764.tar.gz",
+      "archiveSHA256": "7012af647a2d3fd302ad82e93ef5359dcb14e32a19198e13fe620082db6d6c5e",
+      "grammarDir": "src",
+      "dirs": [
+        "src"
+      ],
+      "treeSHA256": "dcb6caf08e6f2122eede3b6d38886cb4507e67dc77f6e55d501e23f04d9e3d06",
+      "files": {
+        "parser.c": "9a266ae4a0305b8a2769bee90a14ac06914bdc83a509f16428311eac2845637e"
+      },
+      "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+      "cSymbol": "tree_sitter_json"
+    },
+    "golang": {
+      "repo": "https://github.com/tree-sitter/tree-sitter-go",
+      "commit": "2346a3ab1bb3857b48b29d779a1ef9799a248cd7",
+      "extractDir": "tree-sitter-go-2346a3ab1bb3",
+      "archive": "tree-sitter-go-2346a3ab1bb3.tar.gz",
+      "archiveSHA256": "7e12d9859417baca2e61b7ade4a29380416fa400b85d93b7a98fa30d5f8b8a50",
+      "grammarDir": "src",
+      "dirs": [
+        "src"
+      ],
+      "treeSHA256": "e56fa3589679079b0eda074a1391e798b64023ab85228e8ae7cfdb331bcb1ca5",
+      "files": {
+        "parser.c": "3dbf6ed1238b5dfcf2be4d2f2d4cb27a14d34f34d7784eccccbfd532fd4a6d85"
+      },
+      "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+      "cSymbol": "tree_sitter_go"
+    },
+    "python": {
+      "repo": "https://github.com/tree-sitter/tree-sitter-python",
+      "commit": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64",
+      "extractDir": "tree-sitter-python-26855eabccb1",
+      "archive": "tree-sitter-python-26855eabccb1.tar.gz",
+      "archiveSHA256": "5b9c8cd9f184a016321b7b06135b189d66d7e71f6d8fcab114506900b3601819",
+      "grammarDir": "src",
+      "dirs": [
+        "src"
+      ],
+      "treeSHA256": "2102a9fe2ccb7e008975e8b0acb906d8340fe14c399c6bc5c28d1be60417d39d",
+      "files": {
+        "parser.c": "53a7bd87ba22c4fdbb8566a2caf848a1478f3ac9d47a1b32677a71de75d75db6",
+        "scanner.c": "6db82134ac2d4c90a1a1475487a625cface02662ebda9b7478cad9c7147e9afe"
+      },
+      "licenseSHA256": "d724405ce238a22c0d35769c5a36b386ad5958192efe8bbb304fb2896254575f",
+      "cSymbol": "tree_sitter_python"
+    },
+    "typescript": {
+      "repo": "https://github.com/tree-sitter/tree-sitter-typescript",
+      "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f",
+      "extractDir": "tree-sitter-typescript-75b3874edb2d",
+      "archive": "tree-sitter-typescript-75b3874edb2d.tar.gz",
+      "archiveSHA256": "891d088a997537a44d61e7d7f67737b5ba4ba25a415d3a7b7e7e3c7cde3d4a5c",
+      "grammarDir": "typescript/src",
+      "dirs": [
+        "typescript/src",
+        "common"
+      ],
+      "treeSHA256": "b5748a3b788124e0e09a269a16bb52e39971a14b0740049cdabec7fc94178ccc",
+      "files": {
+        "parser.c": "74fe453edd70f4eae9af0a1050cbd7943d8971d59165b6aaebbaa0a0b716d1aa",
+        "scanner.c": "9125013b42cb888379d9be909f1d73dfb75a37626c2cdbf4122718a2b431a6d3"
+      },
+      "licenseSHA256": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
+      "cSymbol": "tree_sitter_typescript"
+    },
+    "tsx": {
+      "repo": "https://github.com/tree-sitter/tree-sitter-typescript",
+      "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f",
+      "extractDir": "tree-sitter-typescript-75b3874edb2d",
+      "archive": "tree-sitter-typescript-75b3874edb2d.tar.gz",
+      "archiveSHA256": "891d088a997537a44d61e7d7f67737b5ba4ba25a415d3a7b7e7e3c7cde3d4a5c",
+      "grammarDir": "tsx/src",
+      "dirs": [
+        "tsx/src",
+        "common"
+      ],
+      "treeSHA256": "9668ab33b56aa4e64f6a2cc704040bf1d78c0beb2900586c693cbd93254d75af",
+      "files": {
+        "parser.c": "1902cb53fa7ff5179df89b2eea863165e84c8cc866226419dc26921d8c055885",
+        "scanner.c": "d563cd30b2f39718c9ae4292795c5ce03a2ad01954ba3a86ef84c2781a736673"
+      },
+      "licenseSHA256": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
+      "cSymbol": "tree_sitter_tsx"
+    },
+    "csharp": {
+      "repo": "https://github.com/tree-sitter/tree-sitter-c-sharp",
+      "commit": "9150f7d56bb47f1a809fa23623f1ba1413e93fa9",
+      "extractDir": "tree-sitter-c-sharp-9150f7d56bb4",
+      "archive": "tree-sitter-c-sharp-9150f7d56bb4.tar.gz",
+      "archiveSHA256": "2cda5e9e9731a58a7a4c29eaf64c71db052688f2b3fd43dd73cebe2da2be6197",
+      "grammarDir": "src",
+      "dirs": [
+        "src"
+      ],
+      "treeSHA256": "74dfd5925f30f5cf43d510481f24ec709fd4ed5496d02e2c62d1200f06bb0943",
+      "files": {
+        "parser.c": "2549deeed0c8aeb84f42f9ccd3cf9de047a0c609387075a97784fddb2d1770cd",
+        "scanner.c": "2ee1241a6a275e72a06838f5df927700bd405c16b48f986e2c33d1264cae4818"
+      },
+      "licenseSHA256": "778fb7d63b8c1844da315648c02f325c4713a6f4a5d19644fd413421422776d3",
+      "cSymbol": "tree_sitter_c_sharp"
+    },
+    "tsql": {
+      "repo": "https://github.com/meloncholera/tree-sitter-mssql",
+      "commit": "8620fbcfca9438e1ff7104835bcb8305aba3bdfa",
+      "extractDir": "tree-sitter-mssql-8620fbcfca94",
+      "archive": "tree-sitter-mssql-8620fbcfca94.tar.gz",
+      "archiveSHA256": "66c05cc00ad2b0a9e91c4814a39c2c066015fb912828ec3bf360d164fe8a9149",
+      "grammarDir": "src",
+      "dirs": [
+        "src"
+      ],
+      "treeSHA256": "4f1dd72a101035d88532d13aa228edacb2e18e09ae6cd0dec2e5b6ae7eb9907c",
+      "files": {
+        "parser.c": "869b54a39e38e73da254cece5085e497063e699d30e689e0d20b93e5fb3bc2a2",
+        "scanner.c": "392bf26c2295e8ee3dd584dbea619d39573495244b4bbd2b59dab387a8494aec"
+      },
+      "licenseSHA256": "cffa335b2bf899b98e49d14a7f96464b6823a98f9a5d544bef5c6d3b5e46d42c",
+      "noticeSHA256": "fe7b7e195134b018606dc3d40250c240f2bb9e1f5bbadb6542c169c49b21dcb1",
+      "cSymbol": "tree_sitter_mssql"
+    }
+  }
+}

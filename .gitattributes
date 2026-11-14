@@ -12,6 +12,8 @@
 *.zip -text
 *.png -text
 *.pdf -text
+# wasm2go -embed data sections of generated grammar modules (hashed in provenance.json).
+*.dat -text
 # Preserve the exact bytes whose hashes identify downloaded CI receipts.
 artifacts/release-candidate/native-*/licenses.json -text
 # Preserve the exact sample bytes whose SHA-256 the runtime comparison projection records.

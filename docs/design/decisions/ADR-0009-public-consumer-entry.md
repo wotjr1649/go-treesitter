@@ -1,6 +1,6 @@
 # ADR-0009 — Public parser construction
 
-Status: Accepted, 2026-09-22, Session 07 consumer integration work.
+Status: Superseded by [ADR-0021](ADR-0021-public-api-v2.md) · 2026-11-13 (accepted 2026-09-22, Session 07 consumer integration work).
 
 An external module can import syntax types but cannot construct the internal
 adapter. Add treesitter.New at the module root, returning the existing

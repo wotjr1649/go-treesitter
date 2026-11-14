@@ -1,186 +1,38 @@
 # Release-Critical status board
 
-Updated 2026-11-13. The runtime baseline candidate is described in
-[baseline-provenance](../specs/baseline-provenance.md). The current gate rows
-below ran on main `2d1e93d`, which carries 31 carrier patches (runtime manifest
-`c96bc328…`). It is not release-approved. PR #1 integrated the 28-patch carrier
-into main as merge commit `402b52c`. A 29th patch,
-`c-oracle-recovery-summary-all-links.patch`, retired KR-0005; a 30th,
-`c-oracle-packed-version-order-no-promotion.patch`, retired KR-0006; and a 31st,
-`c-oracle-packed-version-order-opt-out-promotion.patch`, retired KR-0007.
+Updated 2026-11-14 for the W2 engine (ADR-0020, ADR-0021). Status, not a promise. Nothing here is release-approved.
+The previous board for the `gotreesitter` carrier is in Git history at main `9ad82eb`; none of its results transfer
+to the new engine.
 
-The next paragraph describes the earlier checks of the 28-patch carrier (runtime
-manifest `b54a07c1…`, committed as `0eee29e`); they do not transfer to later
-identities.
+## Scope
 
-[The 28-patch candidate's verification projection](../../artifacts/release-candidate/runtime-upgrade/validation-0eee29e.json)
-binds commit, tree, commands, log hashes and omitted private fields. The checks ran
-on a clean checkout of a commit with exactly the tree of `0eee29e`, before
-`0eee29e` itself was created. The full product run passed 889
-terminal tests, the selected-grammar run passed 874, and the private runtime
-checker passed 6. None of those selections skipped a test. The 703-case core
-bundle includes ordered C comparisons and regression controls; it is not a count
-of unique C input records. All previously retained candidate C mismatches,
-including GO-third, are resolved for that identity. An earlier working-tree run
-of the same manifest is projected in
-[validation-28.json](../../artifacts/release-candidate/runtime-upgrade/validation-28.json).
+- **Release-Critical (wave 1, engine gate):** C#, T-SQL (tree-sitter-mssql), TypeScript, TSX, Python, Go, JSON.
+- **First release:** the grammar-kit's 26 routes (25 parsers); wave 2 adds the remaining routes after wave 1.
+- Identity: tree-sitter v0.27.2 and the grammar commits in `tools/gen/pins.json`; Go 1.27.4; `CGO_ENABLED=0`.
 
-| Gate | Current candidate state |
-|---|---|
-| Windows AMD64 product | PASS (E3) on main `2d1e93d` (31-patch carrier, runtime manifest `c96bc328…`; [projection](../../artifacts/release-candidate/runtime-upgrade/validation-2d1e93d.json)), from a clean checkout of that commit: build, vet, 933 full and 914 selected-grammar terminal tests, private invariants (9), native consumer execution, tool tests and the local GPL check. Earlier PASS on `b52f8ce` and on the tree of `0eee29e`. |
-| Retained core C comparisons | PASS (E5) on `2d1e93d`, inside the test run above (the retained oracle-record tests pass), for their pinned inputs and represented node/result fields. Earlier PASS on `b52f8ce` and on the tree of `0eee29e`. |
-| Runtime and grammar provenance | Product provenance checks pass. On a clean checkout of `2d1e93d`, the importer replay from the pinned archive reproduces all 1,561 inventoried carrier files with 31 patches. It also reproduces the committed manifest and leaves the optional GPL payload unchanged. |
-| Local optional GPL module | Checks pass on `2d1e93d` using a local go.work; official ZIP consumers are the separate gate below. |
-| Performance | A predeclared paired [whole-product comparison](../../artifacts/release-candidate/runtime-upgrade/runtime-comparison-2d1e93d.json) of v0.53.0 (`64660a4`) against main `2d1e93d` completed: 10 pairs, 59 workloads, all runs exit 0. Source, runtime and grammar bundle change together, so it is an observation for these two identities, not an E4 result. It binds both trees, both manifests, both test binaries, and the benchmark inputs, which are identical in both. Per seed the ratio is main's time over v0.53.0's. Exploratory per-workload intervals, without multiplicity correction, lie below 1 for 20 workloads and above 1 for 10. The 10 are insert or delete edits in Go, JavaScript, JSX, Python, TypeScript and TSX, plus a Python replace (geometric-mean ratios 1.35 to 3.27). Nine of these 10 were also above 1 in the earlier 5-pair comparison for manifest `b54a07c1…` ([projection](../../artifacts/release-candidate/runtime-upgrade/runtime-comparison.json)). Allocations fall in every pair for 32 workloads and rise in every pair for 4. Host CPU load sampled before and after each run varied from 24 to 96 percent. No speed claim is made. |
-| C# grammar-kit pin check (ADR-0017 Decision 5) | Run with tsgk v0.2.0 (E2, local receipts). Origin: the commit-addressed GitHub tar.gz of tree-sitter-c-sharp `9150f7d5`, downloaded again, is byte-identical to the archive the oracle lane recorded, and its 8 grammar inputs match. `verify --archive` of the same commit's GitHub ZIP against an expected document built from those inputs: PASS, no differences (`parser.c` read under the kit's registered large-file exception; the expected document is caller-declared from the oracle snapshot). Product blob identity: observed (NOT_ASSESSED). Update review against the previous pin: verify FAIL on four changed files and schema diff FAIL with 28 static node-types changes (27 additions; `lambda_expression.parameters` widened to multiple). Both outcomes are expected for a pin update and do not approve the change. The previous pin's `parser.c` exceeds the kit file limit, so its old-to-new difference is not kit-reported. Fingerprints identify bytes, not authorship. |
-| C# constructs added by the new pin | `csharp-constructs-cases.json` adds 16 authored records at the new pin: lambdas with several or typed parameters, `async` and `static` lambdas, collection expressions with spreads, an extension block, list and slice patterns, compound-assignment operator declarations, null-conditional assignment, 7 edits and 2 erroneous lambdas. All agree with C (E5, these inputs only). A third erroneous lambda, `(a, b => a + b;`, first differed from C as KR-0005; it is now retired and requires exact agreement. Those records give each lambda a single `parameters` child. `csharp-lambda-modifier-cases.json` adds 7 records (2 edits, 2 erroneous) whose implicit parameters carry `ref`, `out`, `in`, `scoped` or `readonly`. C emits the multi-child field (modifiers, `,` and `)`) in 6 of them, including the missing-body error; it parses the unclosed variant as a tuple argument holding a single-parameter lambda, so no unclosed multi-child list is covered. Go agrees exactly with all 7, including both edits, which C# handles by full reparse (E5, these inputs only). |
-| TypeScript generic calls | KR-0006 also covered TypeScript `f(g<A, B>(7))`; the 30- and 31-patch carriers agree exactly with C on `typescript-generic-call-cases.json` (E5, those inputs). |
-| C++ template/comparison ambiguity | Not Release-Critical. The 30th patch moved two upstream C++ corpus examples off C (KR-0007); the 31-patch carrier restores the earlier trees, and `TestCppPackedVersionOrderControls` requires 4 digests recorded from a local native C build, fresh and after an edit (E2; C++ is outside the oracle epoch). |
-| C# Release-Critical | PASS at the 31-patch carrier: KR-0005 and KR-0006 are retired, and every retained C# record, including their fixtures, agrees exactly with C (E5, those inputs). The packaging and hosted CI rows above ran on `2d1e93d`, whose tree equals that of the commit that added the 31st patch. |
-| Official module ZIPs and empty-cache consumers | PASS on `2d1e93d`: locally from a fresh regular clone ([receipts](../../artifacts/release-candidate/local-2d1e93d/index.json)) and in hosted CI on AMD64 and ARM64 ([receipts](../../artifacts/release-candidate/native-2d1e93d/index.json)). The checks cover the module ZIP split, consumers without replace and with empty caches, CGO-free graphs, and all 204 basic catalog cases. The main and GPL module ZIPs are byte-identical in all three runs. Earlier PASS on `b52f8ce` and `650d133`. |
-| Release license gate | PASS on `2d1e93d`, locally and in hosted CI: 204 grammars, no unresolved declarations. |
-| Windows ARM64 native | PASS in hosted CI on `2d1e93d` ([run 43333301306](https://github.com/wotjr1649/go-treesitter/actions/runs/43333301306), job `product (windows-11-arm, arm64)`): build, vet, full and selected-grammar tests, tool tests, native consumer, private invariants, official module ZIPs and empty-cache consumers. A local cross-link of `2d1e93d` also passed. |
-| Race diagnostic | PASS locally and in hosted CI on `2d1e93d`, using the workflow's selection (diagnostic lane; never a product gate). |
-| Remote/hosted CI | PASS on `2d1e93d` ([run 43333301306](https://github.com/wotjr1649/go-treesitter/actions/runs/43333301306)): licenses, product AMD64, product ARM64 and race. |
-| Release decision | Not made. |
+## Wave 1 gates (session 15, Windows amd64, working-tree grammar modules generated by `tools/gen`)
 
-The current gate rows above were run on main `2d1e93d` itself (the merge of PR #8,
-31-patch carrier). The commit that records them changes only this board and
-`artifacts/`; results from `2d1e93d` do not transfer to it.
-The earlier results for `b52f8ce` (local) and `650d133` (hosted CI) remain in the
-projections and receipts they link to.
-
-The C# construct records and KR-0005 were added after `b52f8ce`. Their commit passed
-a local CGO-free `go vet` and full product test run on its own tree; it was not
-itself packaged, and the gate rows above do not transfer to it. The commit that
-adds the 29th patch passed the local product gate on its own tree (build, vet,
-full and selected-grammar tests, private checker, native consumer and GPL
-check); it was not packaged. In the retained tests only C# recovery reaches the
-changed summary walk, so other grammars are not evidenced either way. The
-commit that adds the 30th patch passed the same local gate on its own tree. That
-patch applies to every grammar with packed GSS version order. Apart from the
-KR-0006 records, no retained result changes. C++, Dart, Erlang and Swift are not
-evidenced either way by the retained suite; a later E2 measurement found the C++
-regression KR-0007. The commit that adds the 31st patch, which exempts grammars that opt out of
-the default C recovery port (C++) from the 30th, passed the same local gate on its own
-tree. It changes no retained result and adds the C++ controls.
-
-The exact current source and patch inventory remain in
-`internal/provenance/identities.json` and `tools/runtime-bundle/source.json`.
-No allocation optimization is part of this candidate's patch inventory. Native CI results for earlier identities do not apply to `2d1e93d`; its own
-are in the rows above. Current release requirements are in
-[validation](../specs/validation.md) and [publication](../specs/publication.md).
-
-## Historical evidence at the pre-upgrade identity
-
-Everything below is retained as historical evidence from the earlier
-v0.53.0 carrier and its candidate commits. It is not the status of the current
-candidate and does not satisfy its product or release gates.
-
-Updated 2026-10-23 (ADR-0017). **Release is not yet executed.** Brightscript
-and Cooklang are no longer distributed. At `d6c802a` the whole Windows workflow
-passed for the first time ([run 39949173766](https://github.com/wotjr1649/go-treesitter/actions/runs/39949173766)):
-native AMD64 and ARM64 product jobs, the license gate (204 grammars) and the race
-diagnostic. On 2026-10-23 the owner made `main` (this curated history) the
-default branch and removed the old `session/07-product-hardening` ref; its
-commits stay reachable by SHA and in earlier copies. Tags remain held. Development, Integration and the retained
-seven-route Release-Critical correctness gates pass on this carrier
-(`0f32d229…`): a local Windows AMD64 CGO=0 rerun passed all 911 product
-test/subtest results, including the recorded C comparisons. This is finite-corpus
-E5 evidence for those routes only, not proof for all source programs or for the
-other grammars, which have the basic check. [Selected evidence](../../artifacts/release-candidate/README.md).
-
-The historical measured product source commit is `23d6885ebe8709616614c89ffb6511ea815fb23f`.
-At `e4e6a56` the curated candidate preserved all 1,807 files of that production
-identity. ADR-0017 deletes 15 of them and changes 11 (carrier, provenance,
-catalog and tooling), so the historical measurements below stay bound to
-`23d6885` and are not transferred to this candidate.
-Runtime origin remains `gotreesitter v0.53.0`; the internal carrier manifest is
-`0f32d22943e7e636f1ccdf03ec677871f67f81bc22db106a739d88a950ffa6e6` (ADR-0017;
-the receipts below at `e4e6a56` bind the earlier
-`5d1f526c35e223341914cbfada8abe1c4c49d52824a09950bde05d331ff41e46`).
-The Go product blob now derives from the already pinned C tables (ADR-0015).
-C runtime v0.25.1 and grammar base commits remain pinned. Candidate C's complete
-TypeScript patch remains the approved C artifact (ADR-0012).
-
-| Route | Retained Release-Critical gate | Limitation |
+| Gate | State | Evidence level |
 |---|---|---|
-| Go | PASS, fresh/edit/C agreement | C-derived Go artifact has its own identity; generic compact admission is not a transferred certificate. |
-| Python | PASS, fresh/edit/C agreement | Scanner-prefix checks may require an explicit fresh fallback. |
-| JavaScript | PASS, fresh/edit/C agreement | Recovery can decline compact admission. |
-| JSX | PASS, fresh/edit/C agreement | Bare `&` remains a C grammar error; the recovered tree now agrees exactly. |
-| TypeScript | PASS, fresh/edit/C agreement | Maintained Candidate C patch is required for the pinned oracle artifacts. |
-| TSX | PASS, fresh/edit/C agreement | Conservative reuse and recovery checks have a measured deletion cost. |
-| C# | PASS, fresh/edit/C agreement | KR-0002/4 retired; the external scanner still uses an explicit full reparse on edits. |
+| Fresh corpus vs native C (1,586 inputs) | PASS, 0 differences | E5 (that corpus only) |
+| Edit cases vs native C (5,919) incremental and fresh | PASS, 0 differences; 5 `incremental != fresh` T-SQL cases also differ in native C (ratcheted) | E5 |
+| `ChangedRanges` vs native `ts_tree_get_changed_ranges` (5,919) | PASS | E5 |
+| Invalid UTF-8 inputs (189) | PASS | E5 |
+| Cancel then reparse a different source (7 grammars x large inputs) | PASS | E3 |
+| Cancel during balancing, then reparse (deterministic k-th callback stop; json 5 MB, typescript.js; test-only probe build with the product shim) | PASS: 494 of 682 stops landed in balancing; 682/682 next parses equal native; without the reset 6/6 fail | E5 (probe build, those inputs) |
+| C agreement in CI from the grammars' own `test/corpus` (943 inputs, 2,829 seeded edits) | PASS on Linux x64 and arm64 and Windows x64, 0 differences | E5 (those inputs) |
+| Fuzz (7 grammars, ~2.6M execs) | 0 crashers | E3 |
+| Large-input speed (12 inputs) | PASS, geomean 1.356x native on the committed bytes `3bb05a4` (limit 2.5x; host load 71-78 %) | bench lane |
+| Small-file speed (1,586) | PASS, 1,586/1,586 on `3bb05a4` | bench lane |
+| Memory peak / release (ADR-0022 criterion) | PASS 72/72: worst peak 0.53 of limit; engine regions returned 72/72; worst private delta 6.0 MB of 16 MB | bench lane |
+| Reproducible generation | PASS for the modules checked (byte-identical regeneration) | E3 |
+| `-race` (diagnostic) | all 7 grammars: no race (sampled edits, quick cancel) | diagnostic |
+| Linux amd64/arm64, macOS arm64, Windows amd64/arm64 execution | PASS: engine CI run 43499796838 on `1c9a204`, 10/10 packages per platform (engine, root, generator, 7 grammar modules with embedded samples). C-reference conformance ran on Windows amd64 only | E3 per platform |
 
-KR-0001b, KR-0002, KR-0003 and KR-0004 are retired for their retained controls.
-Original failures remain recorded. No active C-tree exception or unexplained
-comparison mismatch remains in the executed final corpus. Controlled fallback
-reasons are enumerated in `artifacts/release-candidate/historical/fallbacks.json`.
+## Open items before the v0.1.0 preview
 
-## Executed evidence
-
-- 688 C records, 439 edited records; repeated fresh recovery observations and
-  three native C executions per record. One additional 8,192-declaration Go
-  edit agrees with C over all 57,348 ordered nodes.
-- 206 basic grammar checks at `e4e6a56`, before ADR-0017: 203 in the base
-  module and 3 in the optional GPL module; three fresh runs, edit/fresh equality, cancellation, admission and
-  close. This does not certify C parity for the entire catalog.
-- Product and selected-grammar suites, vet, oracle-tool tests, four private
-  runtime invariants, 66 race test/subtest results and two 60-second fuzz runs.
-- 193 memory cycles / 3,281 closed trees. Post-GC heap stayed within
-  83,966,168–83,967,832 bytes; peak RSS was 295,403,520 bytes on the measured
-  Windows AMD64 host. This finite observation is not a hard RSS guarantee.
-- Five randomized paired performance seeds plus longer lookup samples and
-  profiles. Correctness has costs: TSX delete median +41.8%, Go replace +23.8%
-  versus the earlier `2e18f90` baseline. Profiled avoidable raw-cost walks and
-  conflict-driven stack copying were fixed; all samples remain recorded.
-- Official Go module ZIP creation and checks, empty-cache consumers without
-  replace, 100 external-consumer C comparisons, and separate GPL consumption.
-
-## Platform and remaining release blockers
-
-| Gate | State |
-|---|---|
-| Windows AMD64 native | PASS: CGO=0 build/tests/consumer execution, rerun locally for the ADR-0017 carrier. |
-| Product dependency/PE audit | PASS: 137 dependency packages, zero CgoFiles, no runtime/cgo; ordinary PE imports kernel32.dll only. |
-| Windows ARM64 | PASS natively at `d6c802a` and earlier at `e4e6a56`: all native CGO=0 product, recorded-C, selected-grammar, oracle-tool, runtime-invariant, official-ZIP consumer and 206-entry catalog steps completed. |
-| Linux AMD64, Darwin ARM64, wasip1/wasm | CGO=0 cross-link PASS; execution NOT_RUN and outside first-release native scope. |
-| Hosted CI | PASS at `d6c802a`: all four jobs ([receipts](../../artifacts/release-candidate/native-d6c802a/index.json)). At `e4e6a56` it failed only on the license gate. |
-| License release gate | PASS for 204 grammars, local and hosted at `d6c802a` (ADR-0017). |
-
-Own code remains MIT. The optional GPL module contains caddy, disassembly and
-jq with source archives and notices. All 204 inventory rows have identified
-license evidence. A local candidate ZIP is not publication approval.
-
-The initial version remains `v0.0.1`. The owner authorized publication of
-`session/07-product-hardening` at `2494b35499a3b87281e6837de0f9820a28a6f7ec`.
-[The first hosted run](https://github.com/wotjr1649/go-treesitter/actions/runs/35799931220)
-records the native checks and the retained tooling failure. The independent
-`validation/release-v0.0.1` candidate excludes the raw session/experiment history
-and publishes technical contracts and selected evidence. Its local pre-commit
-checks passed 911 product and 895 selected-grammar test/subtest results, six
-oracle-tool tests, one packaging boundary test, four private runtime invariants
-and vet. See [the receipt](../../artifacts/release-candidate/precommit.json).
-
-The Windows workflow runs official module ZIP and empty-cache consumer checks
-on both native architectures, including every basic catalog case against the
-packaged modules (206 at `e4e6a56`; 204 after ADR-0017). [Run 35804758357](https://github.com/wotjr1649/go-treesitter/actions/runs/35804758357)
-completed these checks at `e4e6a56bc5ee0e6a5a283381e2c929dea48ae2c4`.
-[Its retained receipts](../../artifacts/release-candidate/native-e4e6a56/index.json)
-bind the candidate, toolchains, executables, module graphs and downloadable CI
-artifacts. The local, hosted AMD64 and hosted ARM64 ZIP hashes match exactly:
-main `e914918acd95eb85e58eae6adca26fcf0853e53b93f41d49bd610259c620a239`,
-GPL `ec4e23ff5684793cc9a0e2b11a37923e11450fda8bd96dee8cb72411724ce56d`.
-These are that commit's ZIP identities; documentation-only commits produce new
-ZIPs and their own workflow receipts.
-
-No gate is waived by another job passing. Existing published
-session history is a separate disclosure surface; the curated branch does not
-erase it. No main merge, tag or release was performed.
-
-MemoryBudgetBytes covers parser-managed accounting, not total process
-RSS; grammar caches, source copies, snapshots and concurrent workers require
-separate application budgets. The independent private-diff review limitation is
-retained in the local audit: the primary agent reviewed the owned diff;
-independent public-source reviews did not review the private repository diff.
+- Limitations list for the release notes (experimental `Match`, C agreement only on the listed inputs, incremental may
+  differ from fresh where native C does) and a short `MIGRATING.md` from the removed `syntax` API.
+- Owner authority, each separately: PR to `main`, merge, root tag, grammar tags, release (procedure:
+  `docs/specs/publication.md` § Multi-module release).
+- After v0.1.0: wave-2 grammars, queries (v0.1 API), speed/memory measurement on Linux and macOS.

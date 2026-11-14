@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "abi": 1,
+  "name": "json",
+  "module": "github.com/wotjr1649/go-treesitter/grammars/json",
+  "identity": {
+    "Runtime": "v0.27.2",
+    "GrammarRepo": "https://github.com/tree-sitter/tree-sitter-json",
+    "GrammarRev": "254c42a6476413b776221e03982ac8ae159eeb72",
+    "SourceSHA256": {
+      "grammar.LICENSE": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+      "grammar.parser.c": "9a266ae4a0305b8a2769bee90a14ac06914bdc83a509f16428311eac2845637e",
+      "grammar.tree": "dcb6caf08e6f2122eede3b6d38886cb4507e67dc77f6e55d501e23f04d9e3d06",
+      "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
+      "shim.tsg_abi.c": "eca21d17b1a4d97e2b774f9e2fd00afb0751b529ccbbf03442ff1cbf15907241"
+    },
+    "RecipeSHA256": "384df6a3b99fe76f748dab04e8ace0e400690018380a24d943be522213ff61a0",
+    "Tools": {
+      "binaryen": "133",
+      "clang": "23.1.0",
+      "llvm": "895aa2c896ada719451be2e3673c83da8ddf1141",
+      "recipe": "v2-O3",
+      "wasi-sdk": "34.0",
+      "wasm2go": "v0.4.21",
+      "wasm2go-sum": "h1:F9xQyNnXIjWesQgt7tLxqVUg2pmxwBOrRCLpEFv3QUc="
+    }
+  },
+  "outputs": {
+    "LICENSES/tree-sitter.txt": "c5cfb43042b6b72045f4ba997834d0a7786d2793d91680868b5815b39f14fc78",
+    "LICENSES/wasi-libc/LICENSE": "2711a8b5a5cdfef0e639f96c1aca12ae23d7d64a02d0507f1bdf14d2b27bbc3a",
+    "LICENSES/wasi-libc/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+    "LICENSES/wasi-libc/LICENSE-APACHE-LLVM": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+    "LICENSES/wasi-libc/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+    "LICENSES/wasi-libc/cloudlibc-LICENSE": "c8b789cf5a746611e6300a0cc7750dbf92b61912a709d04e639245f7290656d0",
+    "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
+    "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
+    "engine_gen.dat": "9518456bbde0f72d3b68641d2a3339a44d05b23669ccac9a64034506e93547d1",
+    "engine_gen.go": "27b41b37eb3e6a88c79693e8b4b519e67a9d4e656c76bf33bce8ae768dbe0813",
+    "wasm": "8e24c6596eacbe0a4730918015b315106c76654f9aa5a481aa1999101c5f8d47",
+    "wasm.clang": "91523561306f3c2eff7643ec2461f10a5a4b5a45bdd8c6f876f0cef8e9538a78"
+  }
+}

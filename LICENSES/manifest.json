@@ -1,12 +1,5 @@
 [
   {
-    "component": "gotreesitter",
-    "path": "LICENSES/gotreesitter.txt",
-    "license": "MIT",
-    "source": "https://github.com/odvcencio/gotreesitter/blob/ac4e027e02525e9d1d005c54ed5e54979271e4ed/LICENSE",
-    "sha256": "b174fbe1e1cffafb096528de3e8361c90a0d97e7e3f1a32061aae51e983a7cfc"
-  },
-  {
     "component": "tree-sitter",
     "path": "LICENSES/tree-sitter.txt",
     "license": "MIT",

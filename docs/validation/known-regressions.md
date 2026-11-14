@@ -12,6 +12,15 @@ Each record is bound to the baseline identity it names. In a retired record, "cu
 the `v0.56.0` candidate of ADR-0018. The candidate's own re-verification is recorded separately at
 the end of this register; no result transfers between the two identities.
 
+## Status after ADR-0022
+
+Every record below describes the removed `gotreesitter` carrier (the Go port of the runtime and its patches) and is
+**historical**; the engine runs unmodified upstream C, so these signatures and the tests, tools and paths they cite
+(`TestKR*`, `tools/runtime-bundle`, `windows-c-v2/`) no longer exist; Git history at `9ad82eb`. No record is open
+against the engine. The one ratcheted divergence in the engine lane is native-C behaviour, not a Go defect: five T-SQL
+edit cases whose incremental reparse differs from a fresh parse in C v0.27.2 and in the engine alike
+(`knownIncrementalDiffs` in `tools/conformance/edits_test.go`). A new failure opens a new record.
+
 ## Record format
 
 ```
@@ -649,8 +658,7 @@ and `TestJSXEqualsEdits`. The candidate passes all of them; see
   KR-0001b behavior. The bare `&` characterization holds through that patch,
   not through upstream.
 - `tools/runtime-bundle/source.json` lists the patches the candidate applies.
-  Patch files of the `v0.53.0` inventory that are not listed are not applied.
-  They remain in the repository until a separate retirement decision under
-  ADR-0013.
+  The `v0.53.0` patch files outside that list were removed in commit
+  `7fe7ef9`; the patch directory now holds exactly the listed files.
 - KR-0005, KR-0006 and KR-0007 were opened and retired at the candidate (29th, 30th and 31st carrier patches). A new failure opens a new record; it is
   never absorbed into a retired one.

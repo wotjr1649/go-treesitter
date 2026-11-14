@@ -1,6 +1,6 @@
 # ADR-0002 — Inherit the existing oracle epoch
 
-**Status:** Accepted · 2026-09-22
+**Status:** Superseded by [ADR-0020](ADR-0020-cgo-free-library-on-unmodified-tree-sitter.md) · 2026-11-13 (accepted 2026-09-22)
 
 ## Context
 

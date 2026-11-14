@@ -1,6 +1,6 @@
 # ADR-0013 — Distribute the approved runtime inside the module
 
-**Status:** Accepted by the project owner · 2026-09-23
+**Status:** Superseded by [ADR-0020](ADR-0020-cgo-free-library-on-unmodified-tree-sitter.md) · 2026-11-13 (accepted by the project owner 2026-09-23)
 
 ## Context
 

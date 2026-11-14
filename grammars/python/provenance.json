@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "abi": 1,
+  "name": "python",
+  "module": "github.com/wotjr1649/go-treesitter/grammars/python",
+  "identity": {
+    "Runtime": "v0.27.2",
+    "GrammarRepo": "https://github.com/tree-sitter/tree-sitter-python",
+    "GrammarRev": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64",
+    "SourceSHA256": {
+      "grammar.LICENSE": "d724405ce238a22c0d35769c5a36b386ad5958192efe8bbb304fb2896254575f",
+      "grammar.parser.c": "53a7bd87ba22c4fdbb8566a2caf848a1478f3ac9d47a1b32677a71de75d75db6",
+      "grammar.scanner.c": "6db82134ac2d4c90a1a1475487a625cface02662ebda9b7478cad9c7147e9afe",
+      "grammar.tree": "2102a9fe2ccb7e008975e8b0acb906d8340fe14c399c6bc5c28d1be60417d39d",
+      "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
+      "shim.tsg_abi.c": "eca21d17b1a4d97e2b774f9e2fd00afb0751b529ccbbf03442ff1cbf15907241"
+    },
+    "RecipeSHA256": "abc70cbc93484eef62354774da17298e623d5a36893f995abe24af15ccd92972",
+    "Tools": {
+      "binaryen": "133",
+      "clang": "23.1.0",
+      "llvm": "895aa2c896ada719451be2e3673c83da8ddf1141",
+      "recipe": "v2-O3",
+      "wasi-sdk": "34.0",
+      "wasm2go": "v0.4.21",
+      "wasm2go-sum": "h1:F9xQyNnXIjWesQgt7tLxqVUg2pmxwBOrRCLpEFv3QUc="
+    }
+  },
+  "outputs": {
+    "LICENSES/tree-sitter.txt": "c5cfb43042b6b72045f4ba997834d0a7786d2793d91680868b5815b39f14fc78",
+    "LICENSES/wasi-libc/LICENSE": "2711a8b5a5cdfef0e639f96c1aca12ae23d7d64a02d0507f1bdf14d2b27bbc3a",
+    "LICENSES/wasi-libc/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+    "LICENSES/wasi-libc/LICENSE-APACHE-LLVM": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+    "LICENSES/wasi-libc/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+    "LICENSES/wasi-libc/cloudlibc-LICENSE": "c8b789cf5a746611e6300a0cc7750dbf92b61912a709d04e639245f7290656d0",
+    "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
+    "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
+    "engine_gen.dat": "7c19462975d922fe9281932c9d22603bce7d37fea6404f91a039e1da0de87fa1",
+    "engine_gen.go": "6f38ed84c2286afde54ec5aafd106b330c748cc3ea67121f51c0131c5fac7d7f",
+    "wasm": "b42d48849d668c52932e4c09f8966e5082be05216761d8fd245a12785c333263",
+    "wasm.clang": "fc08c2b12963d8a9099410d3c96d586050cb989f45316712624a3910a0d95cbe"
+  }
+}

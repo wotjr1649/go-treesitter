@@ -35,21 +35,24 @@ understand whether the contract is still right.
 | ADR | Title | Status |
 |---|---|---|
 | 0001 | Strategy A — pinned upstream dependency, fork as escalation | Superseded in part by ADR-0013 |
-| 0002 | Inherit the existing oracle epoch | Accepted |
+| 0002 | Inherit the existing oracle epoch | Superseded by ADR-0020 |
 | 0003 | Windows Tier-1, CGO-free production | Accepted |
-| 0004 | Parser boundary and result model | Accepted |
+| 0004 | Parser boundary and result model | Superseded in part by ADR-0021 |
 | 0005 | Git branching and commit discipline | Superseded in part by ADR-0019 |
 | 0006 | Instruction architecture — AGENTS kernel, docs router, no skill | Accepted |
 | 0007 | Dynamic generator selection, immutable evidence inputs | Accepted |
 | 0008 | Windows native C oracle execution | Accepted |
-| 0009 | Public consumer entry | Accepted |
+| 0009 | Public consumer entry | Superseded by ADR-0021 |
 | 0010 | Request resource limits | Accepted |
 | 0011 | Snapshot lookup | Accepted |
 | 0012 | Complete maintained TypeScript oracle patch | Accepted |
-| 0013 | Bundle the approved runtime | Accepted |
-| 0014 | Separate GPL grammar distribution | Accepted |
-| 0015 | Derived Go grammar and recovery | Accepted |
+| 0013 | Bundle the approved runtime | Superseded by ADR-0020 |
+| 0014 | Separate GPL grammar distribution | Superseded by ADR-0022 (removed) |
+| 0015 | Derived Go grammar and recovery | Superseded by ADR-0022 (removed) |
 | 0016 | Curated publication and release evidence | Accepted |
-| 0017 | Exclude unclear grammars; assurance by release scope | Accepted |
-| 0018 | Evaluate the approved runtime baseline transition | Accepted |
+| 0017 | Exclude unclear grammars; assurance by release scope | Superseded in part by ADR-0020 |
+| 0018 | Evaluate the approved runtime baseline transition | Superseded by ADR-0020 |
 | 0019 | Explicit authority for every main merge | Accepted |
+| 0020 | A public CGO-free tree-sitter library built from unmodified upstream C | Accepted; §4 amended by ADR-0022 |
+| 0021 | Public API v2: owned immutable snapshots on a confined parser | Accepted |
+| 0022 | Wave-1 preview, multi-module versioning, release-memory criterion, carrier removal | Accepted |
