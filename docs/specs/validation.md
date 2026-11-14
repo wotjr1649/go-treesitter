@@ -11,7 +11,7 @@ Definition of Done.
 | **race** | CGO + `-race` | no | Data-race and concurrency diagnostics. |
 | **engine CI** | `CGO_ENABLED=0` on hosted Linux/macOS/Windows, amd64 and arm64 (`.github/workflows/engine.yml`) | yes, for the platform it ran on | Execution evidence per platform; a platform is claimed only after this lane ran there. |
 | **cross** | `CGO_ENABLED=0`, other `GOOS/GOARCH` | scope-limited | Link-only proof that no C toolchain is required. |
-| **native reference** | C compiler, same runtime release and grammar sources (ADR-0020); `tools/native-ref` | yes, for C-agreement claims | Produces the reference dumps. See `docs/specs/oracle.md`. |
+| **native reference** | C compiler, same runtime release and grammar sources (ADR-0020), with the engine's pinned wasi-libc character semantics; `tools/native-ref` | yes, for C-agreement claims | Produces the reference dumps. See `docs/specs/oracle.md`. |
 | **conformance** | `CGO_ENABLED=0`, `tools/conformance` with reference data: local (`TSG_S15_DIR`) or built in CI from the pinned grammars' own `test/corpus` plus seeded edits (`.github/workflows/conformance.yml`, `TSG_DATA_DIR`) | yes, for C-agreement claims on the inputs used | Byte-for-byte comparison of the public API's dumps, edits and changed ranges with the native reference. |
 | **bench** | `CGO_ENABLED=0`, `tools/bench` paired with native executables | yes, for resource gates | Speed and memory gates on the product build. |
 | **nightly diff** | `CGO_ENABLED=0` on hosted Linux amd64/arm64; native reference from the pins (`.github/workflows/nightly-diff.yml`, `TestNightlyDiff`) | no, finds regressions | Daily time-budgeted random mutations and edits of the CI corpora, compared byte-for-byte with the native reference (dumps, incremental dumps, changed ranges), plus a short run of the Go fuzz targets. A mismatch uploads a shrunk reproducer with seed and commands. It is `E5` evidence only for the cases it ran, bound to the date seed and commit; absence of a finding is not parity. |
@@ -37,7 +37,7 @@ Every claim carries a level. Do not state a claim above the level you actually p
 | `E2` | focused probe | A one-off executable check, not retained in the repository. |
 | `E3` | retained test | A test in this repository that re-runs in the product lane. |
 | `E4` | controlled comparison | A/B with exactly one variable changed and all identities bound. |
-| `E5` | C reference differential | Compared byte-for-byte with native C reference dumps of the same runtime release and grammar sources. |
+| `E5` | C reference differential | Compared byte-for-byte with native C reference dumps of the same runtime release and grammar sources, built with the engine's pinned wasi-libc character semantics. |
 | `E6` | release gate | Full lane set, provenance, budgets, packaging, and limitations. |
 
 ### Claim vocabulary

@@ -34,17 +34,19 @@ permissions:
   contents: read
 
 jobs:
-  bench:
-    name: bench (${{ matrix.runner }})
+  bench-grammar:
+    name: bench (${{ matrix.runner }}, ${{ matrix.lang }})
     strategy:
       fail-fast: false
       matrix:
+        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp]
+        runner: [ubuntu-24.04, ubuntu-24.04-arm, macos-latest]
         include:
           - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
           - {runner: ubuntu-24.04-arm, goos: linux, goarch: arm64}
           - {runner: macos-latest, goos: darwin, goarch: arm64}
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 240
+    timeout-minutes: 60
     env:
       GOENV: "off"
       GOWORK: "off"
@@ -81,23 +83,23 @@ jobs:
           go build -o "$RUNNER_TEMP/ciconf" ./ciconf
           cd "$GITHUB_WORKSPACE"
           "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -fetch -cc gcc \
-            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus"
-          "$RUNNER_TEMP/ciconf" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data"
+            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" "${{ matrix.lang }}"
+          "$RUNNER_TEMP/ciconf" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "${{ matrix.lang == 'golang' && 'go' || matrix.lang }}"
       - name: Build the product bench binaries and the driver
         working-directory: tools/bench
         run: |
-          for l in json golang python typescript tsx csharp tsql; do
+          for l in "${{ matrix.lang }}"; do
             go build -trimpath -tags "lang_$l" -o "$RUNNER_TEMP/bench/$l" .
           done
           go build -o "$RUNNER_TEMP/benchci" ./ci
       - name: Fetch the large inputs (sha256-verified)
         run: |
-          "$RUNNER_TEMP/benchci" fetch -manifest tools/bench/ci/large.json -data "$RUNNER_TEMP/data" -out "$RUNNER_TEMP/large"
+          "$RUNNER_TEMP/benchci" fetch -manifest tools/bench/ci/large.json -data "$RUNNER_TEMP/data" -out "$RUNNER_TEMP/large" -langs "${{ matrix.lang }}"
       - name: Measure and apply the criteria
         run: |
           rc=0
           "$RUNNER_TEMP/benchci" run -bench "$RUNNER_TEMP/bench" -native "$RUNNER_TEMP/exe" -data "$RUNNER_TEMP/data" \
-            -large "$RUNNER_TEMP/large" -out "$RUNNER_TEMP/bench-out" \
+            -large "$RUNNER_TEMP/large" -out "$RUNNER_TEMP/bench-out" -langs "${{ matrix.lang }}" \
             -large-rounds "$LARGE_ROUNDS" -large-reps "$LARGE_REPS" -corpus-rounds "$CORPUS_ROUNDS" -corpus-reps "$CORPUS_REPS" \
             -mem-runs "$MEM_RUNS" || rc=$?
           [ -f "$RUNNER_TEMP/bench-out/summary.md" ] && cat "$RUNNER_TEMP/bench-out/summary.md" >> "$GITHUB_STEP_SUMMARY"
@@ -106,7 +108,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
-          name: bench-${{ matrix.runner }}
+          name: bench-${{ matrix.runner }}-${{ matrix.lang }}
           path: ${{ runner.temp }}/bench-out
           if-no-files-found: ignore
           retention-days: 90

@@ -12,9 +12,13 @@ permissions:
 
 jobs:
   balancing-cancel:
-    name: balancing cancel (ubuntu-24.04)
+    name: balancing cancel (ubuntu-24.04, ${{ matrix.lang }})
+    strategy:
+      fail-fast: false
+      matrix:
+        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp]
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 30
     env:
       CGO_ENABLED: "0"
       GOENV: "off"
@@ -35,6 +39,16 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: 1.27.x
+      - name: Select one grammar for conformance builds
+        run: |
+          lang="${{ matrix.lang }}"
+          [ "$lang" != golang ] || lang=go
+          echo "TSG_S15_LANGS=$lang" >> "$GITHUB_ENV"
+          tags=""
+          for other in csharp go json python tsql tsx typescript javascript html css java c rust bash cpp; do
+            [ "$other" = "$lang" ] || tags="${tags:+$tags,}no_$other"
+          done
+          echo "GOFLAGS=-tags=$tags" >> "$GITHUB_ENV"
       - name: Record identity and native architecture
         run: |
           test "$(go env GOOS)" = linux && test "$(go env GOARCH)" = amd64 || { echo "native target mismatch"; exit 1; }
@@ -42,11 +56,11 @@ jobs:
           go version
           gcc --version | head -1
           sha256sum tools/gen/pins.json tools/gen/shim/tsg_abi.c
-      - name: Fetch pinned inputs and build 7 test-only probes and native references
-        run: bash tools/gen/balance-probe.sh "$RUNNER_TEMP/balance" 2>&1 | tee "$RUNNER_TEMP/balance-build.log"
+      - name: Fetch pinned inputs and build one test-only probe and native reference
+        run: bash tools/gen/balance-probe.sh "$RUNNER_TEMP/balance" "${{ matrix.lang }}" 2>&1 | tee "$RUNNER_TEMP/balance-build.log"
       - name: Deterministic balancing-cancel sweeps against native C
         working-directory: tools/conformance
-        run: go test -count=1 -timeout 90m -v -run '^TestBalancingCancel$' . 2>&1 | tee "$RUNNER_TEMP/balance-tests.log"
+        run: go test -count=1 -timeout 10m -v -run '^TestBalancingCancel$' . 2>&1 | tee "$RUNNER_TEMP/balance-tests.log"
       - name: Product files unchanged
         if: ${{ always() }}
         run: |
@@ -59,7 +73,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v7
         with:
-          name: balancing-cancel-linux-amd64
+          name: balancing-cancel-linux-amd64-${{ matrix.lang }}
           path: |
             ${{ runner.temp }}/balance/out
             ${{ runner.temp }}/balance/probes/*/provenance.json

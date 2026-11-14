@@ -7,18 +7,23 @@ Normative. Defines what "correct syntax" means here (ADR-0020 §3).
 The correctness reference for a generated grammar module is a **native C build of the same inputs**: the same
 tree-sitter runtime release and the same grammar `parser.c`/`scanner.c` bytes (`docs/specs/baseline-provenance.md`),
 compiled unmodified by this repository's own tooling (`tools/native-ref`: our own dump/edit/changed-ranges driver,
-sources verified against `tools/gen/pins.json`). There is no long-lived pinned
-oracle epoch: the reference moves with the runtime release and is rebuilt for it.
+sources verified against `tools/gen/pins.json`). Scanner character classification and case conversion use the
+engine's same pinned wasi-libc sources through `wctype.h`/`ctype.h` shims, rather than the host libc's semantics;
+the wasi-libc archive is SHA-256-checked against the pin before its sources are compiled. The upstream runtime and
+grammar sources stay unmodified. There is no long-lived pinned oracle epoch: the reference moves with the runtime
+release and is rebuilt for it.
 
 A reference result is identified by the tuple
 
 ```
-runtime release + tree hash · grammar commit + source sha256s · driver/shim sha256 · compiler identity + flags · OS/arch
+runtime release + tree hash · grammar commit + source sha256s · wasi-libc commit + archive sha256
+· driver/shim sha256 · compiler identity + flags · OS/arch
 ```
 
 and a generated-module result by its `provenance.json` identity. A comparison is valid only when both sides share the
-runtime release and grammar source hashes. Other C builds (for example grammar-kit's patched runtime) are not a
-reference.
+runtime release, grammar source hashes and pinned wasi-libc character semantics. A native build using glibc or UCRT
+character functions can differ for non-ASCII input and is not this reference. Other C builds (for example
+grammar-kit's patched runtime) are not a reference.
 
 ## Comparison dimensions
 

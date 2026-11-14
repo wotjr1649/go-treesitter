@@ -54,7 +54,7 @@ needs the owner's explicit authority for that act (above); one grant does not co
 
 | # | Step | Owner authority |
 |---|---|---|
-| 1 | On the release commit, run the release gates (`docs/specs/validation.md`) and the rehearsal: module ZIPs for the root and the seven grammars at `vX.Y.Z` served from a file `GOPROXY`, built by an empty-cache consumer with `CGO_ENABLED=0`, plus `GOOS=linux GOARCH=arm64 go build`. | no (local) |
+| 1 | On the release commit, run the release gates (`docs/specs/validation.md`) and the rehearsal: module ZIPs for the root and every generated grammar listed in `tools/gen/pins.json` (currently 15 grammar modules) at `vX.Y.Z` served from a file `GOPROXY`, built by an empty-cache consumer with `CGO_ENABLED=0`, plus `GOOS=linux GOARCH=arm64 go build`. | no (local) |
 | 2 | Tag the root `vX.Y.Z` on the release commit and push the tag. | **yes** |
 | 3 | Verify the root: `GOPROXY=direct go list -m github.com/wotjr1649/go-treesitter@vX.Y.Z` from an empty module; then the same through `GOPROXY=https://proxy.golang.org`. | no (read-only) |
 | 4 | Regenerate the grammar modules in release form: `ROOT_VERSION=vX.Y.Z bash tools/gen/regen.sh <work-dir>` (`-root-version`). Only `go.mod` and the generated `go.sum` (the root's two sum lines, verified through the checksum database) change; `engine_gen.*` must stay byte-identical. Raise the root `require` of the in-repository tool modules (`tools/conformance`, `tools/bench`) to the same version. Commit through a pull request. No `replace` may remain in a grammar module; `tools/gen/regen.sh` derives the release version from the committed `go.mod` files. | no (local commit) |

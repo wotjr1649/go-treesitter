@@ -12,8 +12,10 @@ Start with [AGENTS.md](AGENTS.md) and the [documentation map](docs/README.md). T
 
 ## Use
 
-The root module has no grammar. Add the grammar modules you need (wave 1: `csharp`, `golang`, `json`, `python`, `tsql`,
-`tsx`, `typescript` under `grammars/`):
+The root module has no grammar. Add the grammar modules you need under `grammars/`. Wave 1 contains `csharp`,
+`golang`, `json`, `python`, `tsql`, `tsx`, `typescript`. Wave-2 batch 1 adds development candidates `javascript`
+(including JSX), `html`, `css`, `java`, `c`, `rust`, `bash`, `cpp`. Local Windows gates passed for these eight.
+Hosted gates for these candidates have not run.
 
 ```go
 import (

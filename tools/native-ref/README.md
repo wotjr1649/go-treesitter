@@ -5,18 +5,33 @@ runtime `lib/` plus one unmodified grammar, `parser.c` and `scanner.c`), linked 
 `c/native_ref.c`. The executables produce the reference results the CGO-free conformance lane compares against
 (`docs/specs/oracle.md`). CGO is used only by the C compiler here, never by the Go product lanes.
 
+Scanner calls to `iswalnum`, `iswalpha`, `iswdigit`, `iswspace`, `towupper`, `towlower` and narrow `isdigit`
+use the engine's character semantics: `wctype.h`/`ctype.h` shims route them to namespaced functions compiled from
+the wasi-libc sources pinned in `tools/gen/pins.json`. The wasi-libc archive is SHA-256-checked before extraction,
+as are the runtime and grammar archives; upstream C stays unmodified. Private headers compile those sources with
+32-bit character types and a 32-bit `wcschr` for musl's whitespace table; `-fno-builtin` prevents host-width compiler
+builtins from replacing that lookup. This keeps classification and case conversion independent of the host locale,
+glibc or UCRT, including full code points on Windows, whose host `wint_t` is narrower.
+
 ```
 cd tools/native-ref
 go run . -pins ../gen/pins.json -dl <archive dir> -work <empty dir> -out <exe dir> [-fetch] [-cc gcc|clang] [lang ...]
 ```
 
-- `lang` is a key of `pins.json` `grammars` (`go` is accepted for `golang`); none = all seven.
+- `lang` is a key of `pins.json` `grammars` (`go` is accepted for `golang`, `jsx` for `javascript`); none = all pinned grammars.
 - Every archive's sha256 is checked against `archiveSHA256` before extraction (`-fetch` downloads a missing one from the
-  GitHub API tarball of the pinned commit, as `tools/gen/regen.sh` does), and every grammar source file against the
-  pinned `files` hash. Only the pinned `dirs` are extracted into `-work`; nothing in them is run.
+  pinned `archiveURL`, or the GitHub API tarball of the pinned commit when absent), and every grammar source file against
+  the pinned `files` hash. Transient network failures get at most three attempts, with 1/2-second backoff and a two-minute
+  timeout per attempt; HTTP errors and hash mismatches are not retried. Failed transfers leave no partial archive. Only
+  the required source directories are extracted into `-work` (the pinned grammar/runtime `dirs` and wasi-libc's
+  `libc-top-half/musl/src/ctype`); nothing in them is run.
 - `-static` on Windows (no MinGW DLLs needed); upstream's `_POSIX_C_SOURCE`/`_DEFAULT_SOURCE` flags elsewhere.
 - Needs a C11 compiler (gcc or clang) on `PATH`; large grammars (csharp, tsql, typescript, tsx) take a few GB of RAM to
   compile at `-O2`.
+
+`go test ./...` compiles and runs a C probe through the same shim, including non-ASCII and supplementary code
+points. It fetches and verifies the pinned wasi-libc archive; set `TSG_NATIVE_DL` to an existing archive directory
+to reuse a local copy, and `CC` to select clang instead of the default gcc.
 
 Executable CLI (stdout is binary, `\n` line ends on every platform):
 
@@ -39,9 +54,11 @@ range, 3 unreadable input, 4 parse failure, 5 write failure.
 native-ref -pins tools/gen/pins.json -fetch -dl <dl> -work <work> -out <exe dir> -corpus <corpus dir>   # build + extract corpora
 #   -queries <dir>: also extract each archive's queries/ into <dir>/<extractDir>/queries (sha256-verified; TSG_QUERY_DIR for the query lane)
 #   -nobuild: verify and extract only (no compiler); GITHUB_TOKEN, when set, authenticates -fetch against API rate limits
-cd tools/native-ref && go run ./ciconf -pins ../gen/pins.json -corpus <corpus dir> -exe <exe dir> -out <data dir> [-seed N] [-j N]
+cd tools/native-ref && go run ./ciconf -pins ../gen/pins.json -corpus <corpus dir> -exe <exe dir> -out <data dir> [-seed N] [-j N] [-lang javascript,html,...]
 cd tools/conformance && TSG_DATA_DIR=<data dir> TSG_NATIVE_EXE_DIR=<exe dir> go test -run 'TestCorpus|TestEdits|TestParserPoolRealEngine' .
 ```
+
+`-lang` limits corpus preparation to the comma-separated conformance language names (default: all). JSX inputs use the JavaScript corpus and parser.
 
 `ciconf` is its own `main` (stdlib only) because `native-ref` itself only fetches and compiles; it parses the corpus
 format (`===` header with name and `:attribute` lines, input, `---`, expected tree), writes each input once as

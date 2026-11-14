@@ -90,8 +90,9 @@ type GrammarPin struct {
 	ExtractDir    string            `json:"extractDir"`
 	Archive       string            `json:"archive"`
 	ArchiveSHA256 string            `json:"archiveSHA256"`
-	GrammarDir    string            `json:"grammarDir"` // directory with parser.c, relative to ExtractDir
-	Dirs          []string          `json:"dirs"`       // hashed trees, relative to ExtractDir
+	ArchiveURL    string            `json:"archiveURL,omitempty"` // explicit upstream archive URL when its bytes differ from the API tarball
+	GrammarDir    string            `json:"grammarDir"`           // directory with parser.c, relative to ExtractDir
+	Dirs          []string          `json:"dirs"`                 // hashed trees, relative to ExtractDir
 	TreeSHA256    string            `json:"treeSHA256"`
 	Files         map[string]string `json:"files"` // parser.c / scanner.c -> sha256
 	LicenseSHA256 string            `json:"licenseSHA256"`
@@ -222,6 +223,9 @@ func (p *Pins) plan(platform string) ([]string, error) {
 		seen[g.Archive] = true
 		if u, err = tarballURL(g.Repo, g.Commit); err != nil {
 			return nil, err
+		}
+		if g.ArchiveURL != "" {
+			u = g.ArchiveURL
 		}
 		add("source", g.Archive, u, g.ArchiveSHA256, "src/"+g.ExtractDir)
 	}

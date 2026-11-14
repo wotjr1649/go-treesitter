@@ -43,7 +43,7 @@ const (
 	smallLimit = 25 * 1024
 )
 
-var allLangs = []string{"json", "golang", "python", "typescript", "tsx", "csharp", "tsql"}
+var allLangs = []string{"json", "golang", "python", "typescript", "tsx", "csharp", "tsql", "javascript", "html", "css", "java", "c", "rust", "bash", "cpp"}
 
 // dataLang is the directory name of a language in the ciconf data tree (it calls golang "go").
 func dataLang(l string) string {
@@ -54,13 +54,15 @@ func dataLang(l string) string {
 }
 
 type entry struct {
-	Lang   string `json:"lang"`
-	File   string `json:"file"`
-	Kind   string `json:"kind"` // url | npm | concat | json
-	URL    string `json:"url,omitempty"`
-	Member string `json:"member,omitempty"`
-	Seed   uint64 `json:"seed,omitempty"`
-	SHA256 string `json:"sha256"`
+	Lang          string `json:"lang"`
+	File          string `json:"file"`
+	Kind          string `json:"kind"` // url | npm | concat | json
+	URL           string `json:"url,omitempty"`
+	Member        string `json:"member,omitempty"`
+	Seed          uint64 `json:"seed,omitempty"`
+	SHA256        string `json:"sha256"`
+	LicenseURL    string `json:"license_url,omitempty"`
+	LicenseSHA256 string `json:"license_sha256,omitempty"`
 }
 
 func main() {
@@ -75,7 +77,7 @@ func main() {
 	benchDir := fs.String("bench", "", "directory of product bench binaries")
 	nativeDir := fs.String("native", "", "directory of native-ref executables")
 	large := fs.String("large", "", "directory filled by fetch")
-	langsFlag := fs.String("langs", strings.Join(allLangs, ","), "languages to run")
+	langsFlag := fs.String("langs", strings.Join(allLangs, ","), "languages to fetch or run")
 	lr := fs.Int("large-rounds", 5, "paired rounds per large input")
 	lreps := fs.Int("large-reps", 5, "timed reps per round (plus one warm-up)")
 	cr := fs.Int("corpus-rounds", 3, "paired rounds over the small corpus")
@@ -84,7 +86,7 @@ func main() {
 	fs.Parse(os.Args[2:])
 	switch os.Args[1] {
 	case "fetch":
-		must(fetch(*manifest, *data, *out, *printOnly))
+		must(fetch(*manifest, *data, *out, *printOnly, strings.Split(*langsFlag, ",")))
 	case "run":
 		ok, err := run(*benchDir, *nativeDir, *data, *large, *out, strings.Split(*langsFlag, ","), *lr, *lreps, *cr, *creps, *mruns)
 		must(err)
@@ -107,7 +109,7 @@ func sum(b []byte) string { h := sha256.Sum256(b); return hex.EncodeToString(h[:
 
 // ---- fetch ----
 
-func fetch(manifest, data, out string, printOnly bool) error {
+func fetch(manifest, data, out string, printOnly bool, langs []string) error {
 	raw, err := os.ReadFile(manifest)
 	if err != nil {
 		return err
@@ -118,6 +120,9 @@ func fetch(manifest, data, out string, printOnly bool) error {
 	}
 	var rows [][]string
 	for _, e := range es {
+		if !slices.Contains(langs, e.Lang) {
+			continue
+		}
 		b, src, err := produce(e, data)
 		if err != nil {
 			return fmt.Errorf("%s/%s: %w", e.Lang, e.File, err)
@@ -128,12 +133,27 @@ func fetch(manifest, data, out string, printOnly bool) error {
 		} else if got != e.SHA256 {
 			return fmt.Errorf("%s/%s: sha256 %s, pinned %s", e.Lang, e.File, got, e.SHA256)
 		}
+		var license []byte
+		if e.LicenseURL != "" {
+			license, err = get(e.LicenseURL)
+			if err != nil {
+				return fmt.Errorf("%s/%s license: %w", e.Lang, e.File, err)
+			}
+			if got := sum(license); got != e.LicenseSHA256 {
+				return fmt.Errorf("%s/%s license: sha256 %s, pinned %s", e.Lang, e.File, got, e.LicenseSHA256)
+			}
+		}
 		p := filepath.Join(out, e.Lang, e.File)
 		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
 			return err
 		}
 		if err := os.WriteFile(p, b, 0o644); err != nil {
 			return err
+		}
+		if license != nil {
+			if err := os.WriteFile(p+".LICENSE", license, 0o644); err != nil {
+				return err
+			}
 		}
 		rows = append(rows, []string{e.Lang, e.File, src, strconv.Itoa(len(b)), got})
 	}
@@ -655,7 +675,7 @@ func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lround
 			case regAfter != 0:
 				rg = "FAIL"
 			}
-			P("| %s | %s | %.1f | %.1f | %.1f | %.1f | %d/%d | %v | %s | %s | %s |",in.file, op, float64(peak)/mb, float64(limit)/mb, float64(delta)/mb, float64(adj)/mb, regParsed, regAfter, endBad == 0, pk, pv, rg)
+			P("| %s | %s | %.1f | %.1f | %.1f | %.1f | %d/%d | %v | %s | %s | %s |", in.file, op, float64(peak)/mb, float64(limit)/mb, float64(delta)/mb, float64(adj)/mb, regParsed, regAfter, endBad == 0, pk, pv, rg)
 			if pk == "FAIL" || pv == "FAIL" || rg == "FAIL" || endBad > 0 {
 				fail("memory %s/%s %s: peak %s, private %s (%s), regions %s, end mismatches %d", in.lang, in.file, op, pk, pv, privWhy, rg, endBad)
 			}

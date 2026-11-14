@@ -53,6 +53,38 @@ func FuzzParseTSQL(f *testing.F) {
 	fuzzParse(f, "tsql", "SELECT a, b FROM t WHERE a > 1;\n", "CREATE TABLE", "SELECT (", "DECLARE @x INT = 1;\nGO\n", "")
 }
 
+func FuzzParseJavaScript(f *testing.F) {
+	fuzzParse(f, "javascript", "function f(x) { return x + 1; }\n", "const x = <div/>;\n", "function (", "")
+}
+
+func FuzzParseHTML(f *testing.F) {
+	fuzzParse(f, "html", "<main><p>Hello</p></main>\n", "<div", "<!--", "")
+}
+
+func FuzzParseCSS(f *testing.F) {
+	fuzzParse(f, "css", "a { color: red; }\n", "@media screen {", "a { color:", "")
+}
+
+func FuzzParseJava(f *testing.F) {
+	fuzzParse(f, "java", "class A { int f() { return 1; } }\n", "interface A {", "class {", "")
+}
+
+func FuzzParseC(f *testing.F) {
+	fuzzParse(f, "c", "int f(void) { return 1; }\n", "struct A {", "int f(", "")
+}
+
+func FuzzParseRust(f *testing.F) {
+	fuzzParse(f, "rust", "fn f() -> i32 { 1 }\n", "struct A {", "fn f(", "")
+}
+
+func FuzzParseBash(f *testing.F) {
+	fuzzParse(f, "bash", "echo \"$HOME\"\n", "f() { echo a; }\n", "if true; then", "")
+}
+
+func FuzzParseCPP(f *testing.F) {
+	fuzzParse(f, "cpp", "int f() { return 1; }\n", "template <typename T> struct A {};\n", "class A {", "")
+}
+
 func fuzzParse(f *testing.F, lang string, seeds ...string) {
 	mk, ok := languages[lang]
 	if !ok {

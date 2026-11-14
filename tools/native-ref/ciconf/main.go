@@ -37,7 +37,11 @@ import (
 )
 
 // langs maps the conformance language name to its pins.json key.
-var langs = map[string]string{"csharp": "csharp", "go": "golang", "json": "json", "python": "python", "tsql": "tsql", "tsx": "tsx", "typescript": "typescript"}
+var langs = map[string]string{
+	"bash": "bash", "c": "c", "cpp": "cpp", "csharp": "csharp", "css": "css", "go": "golang",
+	"html": "html", "java": "java", "javascript": "javascript", "json": "json", "python": "python",
+	"rust": "rust", "tsql": "tsql", "tsx": "tsx", "typescript": "typescript",
+}
 
 type entry struct {
 	file, name string
@@ -52,12 +56,13 @@ func main() {
 	out := flag.String("out", "", "data directory to create (must be empty or absent)")
 	seed := flag.Uint64("seed", 1, "edit seed")
 	jobs := flag.Int("j", runtime.NumCPU(), "parallel native runs")
+	selected := flag.String("lang", "", "comma-separated languages (default: all)")
 	flag.Parse()
 	if *corpus == "" || *exeDir == "" || *out == "" {
-		fmt.Fprintln(os.Stderr, "usage: ciconf -corpus DIR -exe DIR -out DIR [-pins F] [-seed N] [-j N]")
+		fmt.Fprintln(os.Stderr, "usage: ciconf -corpus DIR -exe DIR -out DIR [-pins F] [-seed N] [-j N] [-lang LANG,...]")
 		os.Exit(2)
 	}
-	if err := run(*pinsFile, *corpus, *exeDir, *out, *seed, max(1, *jobs)); err != nil {
+	if err := run(*pinsFile, *corpus, *exeDir, *out, *seed, max(1, *jobs), *selected); err != nil {
 		fmt.Fprintln(os.Stderr, "ciconf:", err)
 		os.Exit(1)
 	}
@@ -71,7 +76,7 @@ type job struct {
 	seq            int
 }
 
-func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int) error {
+func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected string) error {
 	pinsRaw, err := os.ReadFile(pinsFile)
 	if err != nil {
 		return err
@@ -87,11 +92,10 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int) error {
 	if ents, err := os.ReadDir(out); err == nil && len(ents) > 0 {
 		return fmt.Errorf("%s is not empty", out)
 	}
-	names := make([]string, 0, len(langs))
-	for l := range langs {
-		names = append(names, l)
+	names, err := selectedLanguages(selected)
+	if err != nil {
+		return err
 	}
-	slices.Sort(names)
 
 	var inputs []job
 	var skipped [][]string
@@ -244,6 +248,25 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int) error {
 		return fmt.Errorf("%d native reference runs failed (see %s)", len(fails.rows), filepath.Join(out, "native-failures.csv"))
 	}
 	return nil
+}
+
+func selectedLanguages(selected string) ([]string, error) {
+	var names []string
+	if selected == "" {
+		for l := range langs {
+			names = append(names, l)
+		}
+	} else {
+		for _, l := range strings.Split(selected, ",") {
+			l = strings.TrimSpace(l)
+			if _, ok := langs[l]; !ok {
+				return nil, fmt.Errorf("unknown language %q", l)
+			}
+			names = append(names, l)
+		}
+	}
+	slices.Sort(names)
+	return slices.Compact(names), nil
 }
 
 func skipReason(attrs []string, lang string) string {

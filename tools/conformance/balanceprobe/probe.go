@@ -196,6 +196,22 @@ func inputs(lang string) (string, []string) {
 		return strings.Repeat("const a = <div/>;\n", count), []string{"const Next = () => <span>next</span>;\n", "interface Other { text: string }\n", "const broken = <div\n"}
 	case "csharp":
 		return "class A { void F() {\n" + strings.Repeat("F();\n", count) + "} }\n", []string{"class Next { int F() => 2; }\n", "namespace Other { class B { string S; } }\n", "class Broken { void F(\n"}
+	case "javascript":
+		return strings.Repeat("const a = <div/>;\n", count), []string{"function next(x) { return x + 2; }\n", "const other = <span>next</span>;\n", "function broken(\n"}
+	case "html":
+		return strings.Repeat("<div>a</div>\n", count), []string{"<section>next</section>\n", "<p>other</p>\n", "<div\n"}
+	case "css":
+		return strings.Repeat("a { color: red; }\n", count), []string{"p { width: 2px; }\n", "span { display: block; }\n", "a { color:\n"}
+	case "java":
+		return "class A { void f() {\n" + strings.Repeat("f();\n", count) + "} }\n", []string{"class Next { int f() { return 2; } }\n", "class Other { String s; }\n", "class Broken { void f(\n"}
+	case "c":
+		return "void f(void) {\n" + strings.Repeat("f();\n", count) + "}\n", []string{"int next(void) { return 2; }\n", "struct Other { char *s; };\n", "void broken(\n"}
+	case "rust":
+		return "fn f() {\n" + strings.Repeat("f();\n", count) + "}\n", []string{"fn next() -> i32 { 2 }\n", "struct Other { s: String }\n", "fn broken(\n"}
+	case "bash":
+		return strings.Repeat("echo a\n", count), []string{"printf '%s\\n' next\n", "other=2\necho \"$other\"\n", "if true; then\n"}
+	case "cpp":
+		return "void f() {\n" + strings.Repeat("f();\n", count) + "}\n", []string{"int next() { return 2; }\n", "class Other { public: int n; };\n", "void broken(\n"}
 	case "tsql":
 		return strings.Repeat("SELECT 1;\n", count), []string{"SELECT x FROM next_table WHERE x > 2;\n", "CREATE TABLE other_table (id INT);\n", "SELECT (\n"}
 	}

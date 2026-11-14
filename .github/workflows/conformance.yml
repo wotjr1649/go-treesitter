@@ -6,22 +6,26 @@ name: C-reference conformance (CI corpora)
 
 on:
   push:
+    branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  conformance:
-    name: conformance (${{ matrix.runner }})
+  conformance-grammar:
+    name: conformance (${{ matrix.runner }}, ${{ matrix.lang }})
     strategy:
       fail-fast: false
       matrix:
+        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp]
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
         include:
           - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
           - {runner: ubuntu-24.04-arm, goos: linux, goarch: arm64}
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 120
+    timeout-minutes: 60
     env:
       GOENV: "off"
       GOWORK: "off"
@@ -41,30 +45,41 @@ jobs:
           go env GOOS GOARCH
           test "$(go env GOOS)" = "${{ matrix.goos }}" && test "$(go env GOARCH)" = "${{ matrix.goarch }}" || { echo "native target mismatch"; exit 1; }
           gcc --version | head -1
+      - name: Select one grammar for conformance builds
+        run: |
+          lang="${{ matrix.lang }}"
+          [ "$lang" != golang ] || lang=go
+          echo "TSG_S15_LANGS=$lang" >> "$GITHUB_ENV"
+          tags=""
+          for other in csharp go json python tsql tsx typescript javascript html css java c rust bash cpp; do
+            [ "$other" = "$lang" ] || tags="${tags:+$tags,}no_$other"
+          done
+          echo "GOFLAGS=-tags=$tags" >> "$GITHUB_ENV"
       # Archives are fetched from the pinned commits and their sha256 checked against tools/gen/pins.json before use.
-      - name: Fetch pinned sources, build the 7 native executables, extract corpora and queries
+      - name: Fetch pinned sources, build one native executable, extract its corpus and queries
         working-directory: tools/native-ref
         env:
           CGO_ENABLED: "0"
           GITHUB_TOKEN: ${{ github.token }}
         run: |
+          go test -count=1 ./...
           go build -o "$RUNNER_TEMP/native-ref" .
           go build -o "$RUNNER_TEMP/ciconf" ./ciconf
           cd "$GITHUB_WORKSPACE"
           "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -fetch -cc gcc \
-            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" -queries "$RUNNER_TEMP/queries"
+            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" -queries "$RUNNER_TEMP/queries" "${{ matrix.lang }}"
       - name: Extract inputs and edits, record native results
         env:
           CGO_ENABLED: "0"
         run: |
-          "$RUNNER_TEMP/ciconf" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data"
+          "$RUNNER_TEMP/ciconf" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "$TSG_S15_LANGS"
       - name: Go conformance against the native results
         working-directory: tools/conformance
         env:
           CGO_ENABLED: "0"
           TSG_DATA_DIR: ${{ runner.temp }}/data
           TSG_NATIVE_EXE_DIR: ${{ runner.temp }}/exe
-        run: go test -count=1 -timeout 5400s -v -run 'TestCorpus|TestEdits|TestParserPoolRealEngine' .
+        run: go test -count=1 -timeout 20m -v -run 'TestCorpus|TestEdits|TestParserPoolRealEngine' .
       # Query raw matches: every grammar's own queries/*.scm (pinned archive, sha256-verified) plus structural probes,
       # over the corpus inputs, byte-identical to `<native exe> query` (docs/design/query-abi.md, "Verification").
       # The comparison with the tree-sitter CLI (predicates) is local only: TestQueryCLI skips without TSG_TS_CLI.
@@ -76,7 +91,8 @@ jobs:
           TSG_DATA_DIR: ${{ runner.temp }}/data
           TSG_NATIVE_EXE_DIR: ${{ runner.temp }}/exe
           TSG_QUERY_DIR: ${{ runner.temp }}/queries
-        run: go test -count=1 -timeout 5400s -v -run 'TestStripPredicates|TestQueryNative' .
+          TSG_QUERY_PROBE_STRIDE: "1"
+        run: go test -count=1 -timeout 20m -v -run 'TestStripPredicates|TestQueryNative' .
       # The fuzz targets need no data: this runs their seed corpora once (no fuzzing).
       - name: Fuzz seed corpora
         if: ${{ !cancelled() }}
@@ -84,3 +100,17 @@ jobs:
         env:
           CGO_ENABLED: "0"
         run: go test -count=1 -timeout 1800s -run Fuzz .
+
+  conformance:
+    name: conformance (${{ matrix.runner }})
+    if: ${{ always() }}
+    needs: conformance-grammar
+    strategy:
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: All grammar shards passed
+        env:
+          RESULT: ${{ needs.conformance-grammar.result }}
+        run: test "$RESULT" = success
