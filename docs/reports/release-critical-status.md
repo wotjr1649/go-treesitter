@@ -53,7 +53,19 @@ to the new engine.
 | Engine, conformance, regeneration, licenses, race (required checks) | PASS on `acbb8da` | E3-E5 per lane |
 | Release rehearsal (module ZIPs from a file proxy, empty-cache consumer, Go 1.26 and 1.27, linux/arm64 build, v0.1.0 grammar on root v0.2.0 returns `ErrQueryUnsupported`) | PASS | local |
 
+## v0.3.0 gates (wave-2 batch 1; CI on `2f9e000`/`3212a5a`)
+
+| Gate | State | Evidence level |
+|---|---|---|
+| Corpus + seeded edits + changed ranges vs native C (15 grammars, 1,761 inputs, 5,283 edits) | PASS, 0 differences on Linux x64/arm64 (CI) and Windows (local); 13 native-identical incremental != fresh cases recorded | E5 (those inputs) |
+| Raw query matches vs native C (each grammar's `queries/*.scm` + probes) | PASS, 0 differences (CI, stride 1) | E5 |
+| Native reference character semantics | scanners built with the pinned wasi-libc `isw*`/`tow*` on every platform (PR #25; glibc's C locale differed on U+00E9 in html) | definition |
+| Cancel during balancing, then reparse (15 grammars) | PASS, nightly run 43603462204 | E5 (probe builds) |
+| Nightly differential fuzzing (15 grammars, Linux x64/arm64) | PASS, run 43603459593 | E5 (those cases) |
+| Large-input speed (bench run 43606388464, per grammar) | PASS: 1.46x-2.38x native; highest HTML 2.375x (Linux x64), Python 2.23x (macOS); TSX has no large input | bench lane |
+| Memory peak / release (same run) | PASS on Linux x64/arm64 and macOS arm64 | bench lane |
+
 ## Next
 
-- Wave-2 grammars in three batches (one minor release each): web and systems languages first, then PHP/PowerShell/
-  R/Dart/XML/Ruby/Kotlin, then Swift and PostgreSQL (parser.c generated with the pinned CLI).
+- Wave-2 batch 2: PHP, PowerShell, R, Dart, XML, Ruby and YAML (with an ADR-0023 patch); Kotlin after an upstream
+  scanner fix. Batch 3: Swift and PostgreSQL (parser.c generated with the pinned CLI).
