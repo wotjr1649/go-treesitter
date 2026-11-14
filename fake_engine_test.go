@@ -111,6 +111,7 @@ func (m *fakeMem) Slice() *[]byte        { return &m.b }
 func (m *fakeMem) Grow(_, _ int64) int64 { return -1 }
 
 type fakeModule struct {
+	query *fakeQueryState
 	h     *engine.Host
 	m     *fakeMem
 	brk   int32

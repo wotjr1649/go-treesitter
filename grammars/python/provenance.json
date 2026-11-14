@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "abi": 1,
+  "abi": 2,
   "name": "python",
   "module": "github.com/wotjr1649/go-treesitter/grammars/python",
   "identity": {
@@ -13,9 +13,9 @@
       "grammar.scanner.c": "6db82134ac2d4c90a1a1475487a625cface02662ebda9b7478cad9c7147e9afe",
       "grammar.tree": "2102a9fe2ccb7e008975e8b0acb906d8340fe14c399c6bc5c28d1be60417d39d",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-      "shim.tsg_abi.c": "eca21d17b1a4d97e2b774f9e2fd00afb0751b529ccbbf03442ff1cbf15907241"
+      "shim.tsg_abi.c": "1298874dca939b637ad5aa4dfbb73421171eec8b01eeaab6f43ef97b706c3156"
     },
-    "RecipeSHA256": "abc70cbc93484eef62354774da17298e623d5a36893f995abe24af15ccd92972",
+    "RecipeSHA256": "d95740790416a680d245e52dd26f5273a74a05dcc8cb61a12de6cac1e3dbb380",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -35,9 +35,9 @@
     "LICENSES/wasi-libc/cloudlibc-LICENSE": "c8b789cf5a746611e6300a0cc7750dbf92b61912a709d04e639245f7290656d0",
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
-    "engine_gen.dat": "7c19462975d922fe9281932c9d22603bce7d37fea6404f91a039e1da0de87fa1",
-    "engine_gen.go": "6f38ed84c2286afde54ec5aafd106b330c748cc3ea67121f51c0131c5fac7d7f",
-    "wasm": "b42d48849d668c52932e4c09f8966e5082be05216761d8fd245a12785c333263",
-    "wasm.clang": "fc08c2b12963d8a9099410d3c96d586050cb989f45316712624a3910a0d95cbe"
+    "engine_gen.dat": "c0f58ccec23059fd572599e118026ff66bf12b6350b5b2f2ea28efdf1ff8774b",
+    "engine_gen.go": "c5e723ef92e299294058b3d15e808ad6964161586b31f13f9eee2e0f359bd810",
+    "wasm": "40106f98e95a9019ba7d9eca220ab6176edd35f04a1dbf264d7f645f145340c2",
+    "wasm.clang": "cdfb8ccd9092ffd4db9b5258aa07c57628c715ca901b4315a1d0878e433fc360"
   }
 }

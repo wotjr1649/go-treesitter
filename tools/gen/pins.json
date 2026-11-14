@@ -1,6 +1,6 @@
 {
   "schema": 2,
-  "abi": 1,
+  "abi": 2,
   "recipe": "v2-O3",
   "runtime": {
     "release": "v0.27.2",
@@ -50,7 +50,7 @@
     "llvmCommit": "895aa2c896ada719451be2e3673c83da8ddf1141"
   },
   "memoryGrowSHA256": "9e1db9d4db30f9f71e30319cbc3b782ae348fd530bd4bd26d00f31dafcabe93a",
-  "shimSHA256": "eca21d17b1a4d97e2b774f9e2fd00afb0751b529ccbbf03442ff1cbf15907241",
+  "shimSHA256": "1298874dca939b637ad5aa4dfbb73421171eec8b01eeaab6f43ef97b706c3156",
   "wasiLibc": {
     "repo": "https://github.com/WebAssembly/wasi-libc",
     "commit": "2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13",

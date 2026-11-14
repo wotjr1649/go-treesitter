@@ -34,7 +34,10 @@ var (
 		"-Wl,--gc-sections", "-Wl,--no-entry", "-Wl,--strip-all"}
 	exports = []string{"tsg_abi_version", "tsg_init", "tsg_parse", "tsg_parser_reset", "tsg_root_end", "tsg_root_has_error", "tsg_descendant_count",
 		"tsg_tree_edit", "tsg_tree_delete", "tsg_changed_ranges", "tsg_export_begin", "tsg_export_next", "tsg_export_err",
-		"tsg_export_buf", "tsg_export_end", "tsg_lang_meta", "malloc", "free"}
+		"tsg_export_buf", "tsg_export_end", "tsg_lang_meta", "malloc", "free",
+		"tsg_query_new", "tsg_query_error_offset", "tsg_query_error_type", "tsg_query_delete", "tsg_query_meta",
+		"tsg_qcursor_new", "tsg_qcursor_delete", "tsg_qcursor_exec", "tsg_qcursor_next", "tsg_qcursor_halted",
+		"tsg_qcursor_exceeded", "tsg_qcursor_buf"}
 )
 
 type opts struct {

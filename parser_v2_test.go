@@ -301,13 +301,13 @@ func TestOldTreeChecks(t *testing.T) {
 
 func TestIncompatibleLanguage(t *testing.T) {
 	fl := newFakeLang(nil)
-	fl.lang.g.ABI = 2
+	fl.lang.g.ABI = engine.ABIVersion + 1
 	_, err := NewParser(fl.lang)
 	wantPE(t, err, IncompatibleLanguage, false)
 	if !errors.Is(err, ErrIncompatibleLanguage) || len(fl.mods) != 0 {
 		t.Fatalf("literal ABI mismatch must not create an instance: %v, %d", err, len(fl.mods))
 	}
-	fl = newFakeLang(func(_ *fakeLang, f *fakeModule) { f.abi = 2 })
+	fl = newFakeLang(func(_ *fakeLang, f *fakeModule) { f.abi = engine.ABIVersion + 1 })
 	_, err = NewParser(fl.lang)
 	wantPE(t, err, IncompatibleLanguage, false)
 	if !fl.mods[0].released.Load() {
