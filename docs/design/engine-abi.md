@@ -153,7 +153,10 @@ captureCount}`, followed by captures `{captureIndex, nodeIndex, symbol, startByt
 single tree). On the first returned match, a single preorder traversal records ts_tree_cursor_current_descendant_index
 for every node. Subsequent forward or backward captures use expected O(1) lookups; building the table polls should_stop
 every 256 nodes. A missing ID yields UINT32_MAX, which the host rejects. The table has power-of-two capacity at least
-twice the node count and uses 8 bytes per slot on wasm32 (fewer than 32 bytes per node), released with the cursor.
+twice the node count and uses 8 bytes per slot on wasm32 (fewer than 32 bytes per node). Exec retains the table for
+the same tree and frees it when switching trees. The shim tracks cursors and frees their tables before deleting a
+referenced tree, clearing the tree pointer so a reused allocator address cannot preserve stale indices. An interrupted
+build frees its partial table. Cursor deletion or release of the entire instance also releases the table.
 Symbol and byte range are included so the host can validate the mapping against its snapshot, including zero-width
 nodes. This extends the abbreviated two-word capture in the design draft.
 
@@ -164,8 +167,30 @@ shim cursor (never on a returned C stack frame). Allocation failures abort and b
 The root validates NewQuery using a scratch instance. Queries compile once per parser instance. The cache uses weak Query keys; runtime cleanup only queues a retirement
 with weak owner/instance identities. The next owner engine operation deletes that TSQuery, ignoring entries for an
 already replaced instance. The cache is also released with the instance. Matches holds the existing busy guard through snapshot export, compilation, streaming,
-predicate filtering and cursor deletion; break/panic releases it. Context cancellation retains the instance, while
+predicate filtering; break/panic releases it. The host lazily allocates one cursor per instance and re-execs it for
+each Matches call, including different queries; the next exec resets C's match state and options. Context cancellation retains the instance, while
 refused growth (even without a trap) becomes ResourceLimit with instance reset; other traps, malformed blocks and
 capture mapping mismatches become EngineFault with instance reset. A match-limit error is ErrQueryMatchLimit and
-retains the instance. On each error the cursor is deleted if its instance still exists; cleanup traps follow the same
-reset rule. Go predicate validation errors use QueryError type 7 and the pattern start byte.
+retains the instance. Reset/Close and traps release the entire instance with its cursor. Go predicate validation
+errors use QueryError type 7 and the pattern start byte.
+
+## Test-only balancing-cancel lane
+
+`tools/gen -balance-probe` builds a separate instrumented module into a new temporary output directory outside
+`grammars/`; it cannot emit a release dependency form. `tools/gen/probe/balance.c` includes the unchanged pinned
+`lib.c` and product `tsg_abi.c` in one translation unit. Only the shim's calls to `ts_parser_reset` are redirected to
+an observation wrapper: it records `canceled_balancing` before calling the real reset. Five extra exports expose the
+live flag, last pre-reset flag, reset count, observation clear and a deliberately no-reset parse for negative controls.
+These exports are not part of the product engine ABI. The probe uses the same recipe and memory_grow patch, carries
+`testOnly: "balancing-cancel"` provenance, and binds its wrapper hash and exports to its distinct recipe identity.
+
+`tools/conformance`'s `TestBalancingCancel` runs the generated tests through `balanceprobe`. A custom test host stops
+at the kth progress callback; it counts an uncancelled baseline, locates the balancing boundary and samples the full
+parse, boundary and tail (including callbacks beyond completion). Each trial is followed on the same instance by a
+different input whose dump must equal the native reference. Every grammar must observe at least one balancing stop.
+JSON additionally requires the no-reset negative control to produce a mismatching next parse, then recover correctly.
+The test artifacts retain per-trial results and source/native identities. This is evidence for the sampled probe
+builds and inputs, not direct observation inside product module bytes or an exhaustive sweep of every callback.
+
+`.github/workflows/balancing-cancel.yml` runs the seven-grammar lane nightly and manually on Linux amd64. Its separate
+toolchain build and sweep cost stay outside PR-required checks; changing required checks remains a separate decision.

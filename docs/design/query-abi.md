@@ -86,9 +86,22 @@ type QueryMatch struct{ Pattern int; Captures []QueryCapture }   // Captures[i].
   records each node's descendant index on the first returned match; later captures, including backward captures, use
   expected constant-time lookups. Mapping costs expected O(nodes + captures), with 8 bytes per slot in wasm32 and fewer
   than four slots per node. The table is freed with the query cursor. Building it polls should_stop every 256 nodes.
-  The table is rebuilt on every exec and covers the whole tree, so a narrow byte range still costs O(nodes) once a
-  match exists (P18: 2.28 MB JSON, about 0.48 s per call on Windows amd64). Reusing it across execs on the same tree
-  is a follow-up, not v0.1.
+  The host lazily allocates one cursor per parser instance and reuses it across Matches calls, queries and ranges.
+  Its index covers the whole tree: the first match on a different tree costs O(nodes), even for a narrow range;
+  consecutive execs on the same tree reuse it. Switching trees frees the old table. The shim registers its cursors
+  and drops tables referencing a tree before deleting that tree, so allocator reuse of a TSTree address cannot reuse
+  stale indices. A cancelled index build frees its partial table before the next exec. Tree edits are rejected by
+  Matches. Reset, Close and traps release the whole instance, including its cursor and table.
+  For N nodes, the index allocation is `8 * 2^ceil(log2(2*N))` bytes in wasm32: less than 32 bytes per
+  node, excluding allocator overhead. At most the last queried live tree's index is retained per instance,
+  until that tree is deleted (Tree.Close, leak drain or ParserPool.Put), a different tree is queried, or the
+  instance is discarded. The query-dependent TSQueryCursor arrays and match buffer remain allocated until
+  instance discard (Parser.Reset, Parser.Close, recycling or a trap), even after the tree is deleted or switched.
+  These retained allocations count against WithMaxMemoryBytes, leaving less room for subsequent parsing;
+  neither a narrow byte range nor MatchLimit bounds the whole-tree index. Freeing the index makes its space
+  reusable inside the instance; linear memory is returned to the OS only on instance discard.
+  TestQueryNarrowRangeReuse retains a 2.28 MB JSON regression: after warming, 20 narrow-range calls must finish within
+  1 second (P18's per-exec rebuild took 9.65 seconds). This is a regression bound, not a platform speed guarantee.
 - Predicate validation follows CLI v0.27.2: #any-of? and #not-any-of? accept a capture with an empty alternative list.
   #set!, #is? and #is-not? accept one to three arguments containing one or two literals and at most one capture, in
   any order; a key literal is required. Properties exposes #set!'s key/value; capture qualification is validated but

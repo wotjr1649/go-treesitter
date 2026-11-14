@@ -80,7 +80,8 @@ TSTree *tsg_parse(const char *src, uint32_t len, TSTree *old) {
 uint32_t tsg_root_end(TSTree *t) { return ts_node_end_byte(ts_tree_root_node(t)); }
 uint32_t tsg_root_has_error(TSTree *t) { return ts_node_has_error(ts_tree_root_node(t)) ? 1u : 0u; }
 uint32_t tsg_descendant_count(TSTree *t) { return ts_node_descendant_count(ts_tree_root_node(t)); }
-void tsg_tree_delete(TSTree *t) { ts_tree_delete(t); }
+static void qcursor_drop_tree(TSTree *t);
+void tsg_tree_delete(TSTree *t) { qcursor_drop_tree(t); ts_tree_delete(t); }
 
 void tsg_tree_edit(TSTree *t, uint32_t start_byte, uint32_t old_end_byte, uint32_t new_end_byte, uint32_t start_row,
                    uint32_t start_col, uint32_t old_end_row, uint32_t old_end_col, uint32_t new_end_row,
@@ -274,7 +275,7 @@ uint8_t *tsg_query_meta(TSQuery *q) {
 
 typedef struct { const void *id; uint32_t index; } QNodeIndex;
 
-typedef struct {
+typedef struct TSGQCursor {
   TSQueryCursor *cursor;
   TSTree *tree;
   TSQueryCursorOptions options;
@@ -283,17 +284,31 @@ typedef struct {
   QNodeIndex *nodes;
   uint32_t node_capacity;
   bool halted;
+  struct TSGQCursor *next;
 } TSGQCursor;
 
+static TSGQCursor *q_cursors;
+static void qcursor_drop_index(TSGQCursor *c) {
+  free(c->nodes); c->nodes = NULL; c->node_capacity = 0;
+}
+static void qcursor_drop_tree(TSTree *t) {
+  for (TSGQCursor *c = q_cursors; c; c = c->next) {
+    if (c->tree == t) { qcursor_drop_index(c); c->tree = NULL; }
+  }
+}
 TSGQCursor *tsg_qcursor_new(void) {
   TSGQCursor *c = calloc(1, sizeof(TSGQCursor));
   if (!c) abort();
   c->cursor = ts_query_cursor_new();
   if (!c->cursor) abort();
+  c->next = q_cursors; q_cursors = c;
   return c;
 }
 void tsg_qcursor_delete(TSGQCursor *c) {
   if (!c) return;
+  TSGQCursor **link = &q_cursors;
+  while (*link && *link != c) link = &(*link)->next;
+  if (*link) *link = c->next;
   ts_query_cursor_delete(c->cursor); free(c->nodes); free(c->buf); free(c);
 }
 static bool qprogress(TSQueryCursorState *state) {
@@ -302,7 +317,7 @@ static bool qprogress(TSQueryCursorState *state) {
   return false;
 }
 int32_t tsg_qcursor_exec(TSGQCursor *c, TSQuery *q, TSTree *t, uint32_t start, uint32_t end, uint32_t limit) {
-  free(c->nodes); c->nodes = NULL; c->node_capacity = 0;
+  if (c->tree != t) qcursor_drop_index(c);
   c->tree = t; c->halted = false;
   c->options = (TSQueryCursorOptions){c, qprogress};
   ts_query_cursor_set_match_limit(c->cursor, limit ? limit : UINT32_MAX);
@@ -331,7 +346,7 @@ static bool qnode_build(TSGQCursor *c) {
   uint32_t visited = 0;
   do {
     if ((visited & 255u) == 0 && tsg_host_should_stop()) {
-      c->halted = true; ts_tree_cursor_delete(&cur); return false;
+      c->halted = true; ts_tree_cursor_delete(&cur); qcursor_drop_index(c); return false;
     }
     TSNode node = ts_tree_cursor_current_node(&cur);
     QNodeIndex *entry = qnode_slot(c, node.id);

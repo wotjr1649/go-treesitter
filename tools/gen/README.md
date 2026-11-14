@@ -39,3 +39,22 @@ Without `ROOT_VERSION`, `regen.sh` derives the go.mod form from the committed `g
 
 The release form cannot be built before the root tag exists; the generator's meta runner always uses its own local
 `replace`, so generating in release mode works before then.
+
+## Test-only balancing cancellation
+
+`-balance-probe` adds reset observations and a no-reset negative control by including the unmodified pinned runtime
+and product shim in `probe/balance.c`. It uses the normal recipe and memory provider patch. It requires a new empty
+output outside `grammars/`, rejects `-root-version`, and marks its provenance `testOnly: "balancing-cancel"`; its wrapper
+hash and extra exports are bound into its identity. These modules are test artifacts, never product grammar modules.
+
+`bash tools/gen/balance-probe.sh <new-empty-work-dir>` fetches SHA-verified pinned inputs and builds all seven probes
+under `<work-dir>/probes/` and native references under `<work-dir>/native/`, without regenerating product modules.
+Then, from `tools/conformance`:
+
+```sh
+CGO_ENABLED=0 GOWORK=off TSG_BALANCE_PROBE_DIR=<absolute-work-dir>/probes \
+  TSG_NATIVE_EXE_DIR=<absolute-work-dir>/native TSG_CONF_OUT=<absolute-work-dir>/out \
+  go test -count=1 -timeout 90m -v -run '^TestBalancingCancel$' .
+```
+
+The nightly/manual Linux job `.github/workflows/balancing-cancel.yml` runs this lane. It is not a PR-required check.

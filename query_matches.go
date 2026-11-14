@@ -15,6 +15,9 @@ import (
 // EndByte zero is unlimited, including zero-width nodes at EOF. An explicit EndByte equal to the
 // source length excludes those EOF nodes. MatchLimit zero uses C's default (unlimited); a nonzero
 // limit bounds in-progress match states, not the number of results.
+// Neither the byte range nor MatchLimit bounds the retained whole-tree capture index (less than
+// 32 bytes per node in wasm32, excluding allocator overhead) or query-dependent cursor arrays.
+// Both count against WithMaxMemoryBytes. See Tree.Matches for their release lifetimes.
 type QueryOptions struct {
 	StartByte, EndByte uint32
 	MatchLimit         uint32
@@ -32,7 +35,14 @@ type QueryMatch struct {
 // The parser remains busy until iteration ends (including an early break). Errors terminate the stream.
 // On match-limit overflow it ends with ErrQueryMatchLimit, discarding any match produced by that
 // same engine call. Earlier matches remain valid; a small limit may produce no matches before the error.
-// Cost: the first match of each call indexes the whole tree (O(nodes)), whatever StartByte/EndByte select.
+// Cost: the first match on a different tree indexes the whole tree (O(nodes)), whatever the byte range.
+// Consecutive calls on the same tree reuse that index, including calls with a different query or range.
+// The last queried live tree's index retains less than 32 bytes per node in wasm32, excluding allocator
+// overhead, until that tree is deleted (Close, leak drain or ParserPool.Put), another tree is queried,
+// or the instance is discarded. Query-dependent cursor arrays and the match buffer remain allocated
+// until the instance is discarded (Reset, parser Close, recycling or a trap).
+// All of this memory counts against WithMaxMemoryBytes, leaving less room for subsequent parsing.
+// Freeing the index allows reuse within the instance; linear memory shrinks only on instance discard.
 func (t *Tree) Matches(ctx context.Context, q *Query, opts *QueryOptions) iter.Seq2[QueryMatch, error] {
 	var options QueryOptions
 	if opts != nil {
@@ -114,20 +124,18 @@ func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, yield f
 	if ctx.Err() != nil {
 		return ctxError(ctx, "query compilation stopped by the context")
 	}
-	var cursor int32
-	if err = c.queryCall("tsg_qcursor_new", func() { cursor = m.Xtsg_qcursor_new() }); err != nil {
-		return err
+	if in.queryCursor == 0 {
+		if err = c.queryCall("tsg_qcursor_new", func() { in.queryCursor = m.Xtsg_qcursor_new() }); err != nil {
+			return err
+		}
+		if in.queryCursor <= 0 {
+			return c.engineFault("query cursor allocation returned NULL")
+		}
 	}
-	if cursor <= 0 {
-		return c.engineFault("query cursor allocation returned NULL")
-	}
+	cursor := in.queryCursor
 	defer func() {
 		if c.gen != gen || c.inst != in {
 			return
-		}
-		cleanupErr := c.queryCall("tsg_qcursor_delete", func() { m.Xtsg_qcursor_delete(cursor) })
-		if cleanupErr != nil {
-			err = cleanupErr
 		}
 		c.noteCommitted()
 	}()

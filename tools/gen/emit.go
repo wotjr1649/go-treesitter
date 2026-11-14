@@ -34,6 +34,7 @@ type provenance struct {
 	Module   string            `json:"module"`
 	Identity Identity          `json:"identity"`
 	Outputs  map[string]string `json:"outputs"` // sha256 of generated artifacts
+	TestOnly string            `json:"testOnly,omitempty"`
 }
 
 func marshal(v any) ([]byte, error) {
