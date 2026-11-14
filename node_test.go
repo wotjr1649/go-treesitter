@@ -293,3 +293,65 @@ func TestInvalidUTF8Flag(t *testing.T) {
 		t.Fatalf("%v %v", s, err)
 	}
 }
+
+// The zero Node is the null node: every method returns its zero value and none panics.
+func TestZeroNodeMethodsReturnZeroValues(t *testing.T) {
+	var z Node
+	if !z.IsZero() || z.Snapshot() != nil || z.Index() != 0 {
+		t.Error("IsZero/Snapshot/Index")
+	}
+	if z.Kind() != "" || z.Symbol() != 0 || z.Field() != "" || z.FieldID() != 0 {
+		t.Error("Kind/Symbol/Field/FieldID")
+	}
+	if z.IsNamed() || z.IsExtra() || z.IsMissing() || z.IsError() || z.HasError() {
+		t.Error("flags")
+	}
+	if z.StartByte() != 0 || z.EndByte() != 0 || z.StartPoint() != (Point{}) || z.EndPoint() != (Point{}) {
+		t.Error("positions")
+	}
+	if z.Text() != "" || z.String() != "" || z.Hash() != 0 || z.ShapeHash() != 0 || z.Atom() != 0 {
+		t.Error("Text/String/Hash/ShapeHash/Atom")
+	}
+	if got := z.AppendText([]byte("x")); string(got) != "x" {
+		t.Errorf("AppendText %q", got)
+	}
+	if z.ChildCount() != 0 || z.NamedChildCount() != 0 {
+		t.Error("child counts")
+	}
+	for name, f := range map[string]func() (Node, bool){
+		"Parent":           z.Parent,
+		"NextSibling":      z.NextSibling,
+		"PrevSibling":      z.PrevSibling,
+		"NextNamedSibling": z.NextNamedSibling,
+		"PrevNamedSibling": z.PrevNamedSibling,
+		"Child":            func() (Node, bool) { return z.Child(0) },
+		"NamedChild":       func() (Node, bool) { return z.NamedChild(0) },
+		"ChildByFieldName": func() (Node, bool) { return z.ChildByFieldName("left") },
+	} {
+		if n, ok := f(); ok || !n.IsZero() {
+			t.Errorf("%s: want (Node{}, false), got (%v, %v)", name, n, ok)
+		}
+	}
+	for name, seq := range map[string]func(func(Node) bool){
+		"Children": z.Children(), "NamedChildren": z.NamedChildren(), "ChildrenByFieldName": z.ChildrenByFieldName("left"),
+	} {
+		seq(func(Node) bool { t.Errorf("%s yielded a node", name); return true })
+	}
+}
+
+// A real node must still report false (and a zero Node, not a stale one) when a sibling/parent does not exist.
+func TestMissingRelativesAreZeroNodes(t *testing.T) {
+	s := sampleSnapshot(t)
+	for name, f := range map[string]func() (Node, bool){
+		"Parent of root":     s.Root().Parent,
+		"NextSibling of d":   s.Node(6).NextSibling,
+		"PrevSibling of a":   s.Node(2).PrevSibling,
+		"PrevSibling (root)": s.Root().PrevSibling,
+		"NextNamedSibling":   s.Node(6).NextNamedSibling,
+		"PrevNamedSibling":   s.Node(2).PrevNamedSibling,
+	} {
+		if n, ok := f(); ok || !n.IsZero() {
+			t.Errorf("%s: got (%v, %v)", name, n, ok)
+		}
+	}
+}

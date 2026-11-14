@@ -30,8 +30,11 @@ func (s *Snapshot) buildAtoms() {
 	s.atoms = t
 }
 
-// Atom is the interned text of a named leaf node (0 for every other node). The table is built once, on first use.
+// Atom is the interned text of a named leaf node (0 for every other node, and for the zero Node). The table is built once, on first use.
 func (n Node) Atom() Atom {
+	if n.s == nil {
+		return 0
+	}
 	n.s.atomOnce.Do(n.s.buildAtoms)
 	return n.s.atoms.col[n.i]
 }

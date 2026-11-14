@@ -16,6 +16,7 @@ import (
 	"unicode/utf8"
 
 	treesitter "github.com/wotjr1649/go-treesitter"
+	"github.com/wotjr1649/go-treesitter/experimental/match"
 )
 
 // Real-grammar checks of the v0.0.1 primitives (api-v2 section 7) on the fresh corpus, through the public API only.
@@ -416,8 +417,8 @@ func TestMatchOnEdits(t *testing.T) {
 					t.Fatalf("%s: %v %v", id, err1, err2)
 				}
 				cases++
-				m := treesitter.Match(so, sn)
-				if same := treesitter.Match(so, so); same.Len() != so.Len() {
+				m := match.Match(so, sn)
+				if same := match.Match(so, so); same.Len() != so.Len() {
 					t.Fatalf("%s: identical snapshots matched %d of %d", id, same.Len(), so.Len())
 				}
 				used := map[int]bool{}

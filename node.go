@@ -6,7 +6,9 @@ import (
 	"strings"
 )
 
-// Node is a small value handle (snapshot pointer + preorder index). The zero Node is invalid; its methods panic.
+// Node is a small value handle (snapshot pointer + preorder index). The zero Node is the "null node": every method
+// on it returns its zero value (false, 0, "", the zero Node, an empty iterator, or (Node{}, false) for the (Node, bool)
+// methods) instead of panicking.
 // Nodes are immutable and safe for concurrent use.
 type Node struct {
 	s *Snapshot
@@ -14,40 +16,91 @@ type Node struct {
 }
 
 // IsZero reports whether n is the zero Node, the "null node" returned for example by DescendantForByteRange when
-// start > end. Every other method panics on it.
+// start > end. Use it to tell a null node from a real one; the other methods return zero values on it.
 func (n Node) IsZero() bool { return n.s == nil }
 
-// Snapshot is the snapshot the node belongs to.
+// Snapshot is the snapshot the node belongs to (nil for the zero Node).
 func (n Node) Snapshot() *Snapshot { return n.s }
 
-// Index is the node's preorder index in its snapshot.
+// Index is the node's preorder index in its snapshot (0 for the zero Node).
 func (n Node) Index() int { return int(n.i) }
 
-// Kind is the node type name ("ERROR" for error nodes).
-func (n Node) Kind() string { return n.s.lang.SymbolName(Symbol(n.s.symbol[n.i])) }
+// flag reports whether the node has the flag bit; false on the zero Node.
+func (n Node) flag(f uint8) bool { return n.s != nil && n.s.flags[n.i]&f != 0 }
 
-func (n Node) Symbol() Symbol { return Symbol(n.s.symbol[n.i]) }
+// Kind is the node type name ("ERROR" for error nodes).
+func (n Node) Kind() string {
+	if n.s == nil {
+		return ""
+	}
+	return n.s.lang.SymbolName(Symbol(n.s.symbol[n.i]))
+}
+
+func (n Node) Symbol() Symbol {
+	if n.s == nil {
+		return 0
+	}
+	return Symbol(n.s.symbol[n.i])
+}
 
 // Field is the name of the field the node fills in its parent ("" for none).
-func (n Node) Field() string { return n.s.lang.FieldName(FieldID(n.s.field[n.i])) }
+func (n Node) Field() string {
+	if n.s == nil {
+		return ""
+	}
+	return n.s.lang.FieldName(FieldID(n.s.field[n.i]))
+}
 
-func (n Node) FieldID() FieldID { return FieldID(n.s.field[n.i]) }
+func (n Node) FieldID() FieldID {
+	if n.s == nil {
+		return 0
+	}
+	return FieldID(n.s.field[n.i])
+}
 
-func (n Node) IsNamed() bool   { return n.s.flags[n.i]&flagNamed != 0 }
-func (n Node) IsExtra() bool   { return n.s.flags[n.i]&flagExtra != 0 }
-func (n Node) IsMissing() bool { return n.s.flags[n.i]&flagMissing != 0 }
-func (n Node) IsError() bool   { return n.s.flags[n.i]&flagError != 0 }
+func (n Node) IsNamed() bool   { return n.flag(flagNamed) }
+func (n Node) IsExtra() bool   { return n.flag(flagExtra) }
+func (n Node) IsMissing() bool { return n.flag(flagMissing) }
+func (n Node) IsError() bool   { return n.flag(flagError) }
 
 // HasError reports an ERROR or MISSING node in the subtree (including the node itself).
-func (n Node) HasError() bool { return n.s.flags[n.i]&flagHasError != 0 }
+func (n Node) HasError() bool { return n.flag(flagHasError) }
 
-func (n Node) StartByte() uint32 { return n.s.startByte[n.i] }
-func (n Node) EndByte() uint32   { return n.s.endByte[n.i] }
-func (n Node) StartPoint() Point { return Point{n.s.startRow[n.i], n.s.startCol[n.i]} }
-func (n Node) EndPoint() Point   { return Point{n.s.endRow[n.i], n.s.endCol[n.i]} }
+func (n Node) StartByte() uint32 {
+	if n.s == nil {
+		return 0
+	}
+	return n.s.startByte[n.i]
+}
+
+func (n Node) EndByte() uint32 {
+	if n.s == nil {
+		return 0
+	}
+	return n.s.endByte[n.i]
+}
+
+func (n Node) StartPoint() Point {
+	if n.s == nil {
+		return Point{}
+	}
+	return Point{n.s.startRow[n.i], n.s.startCol[n.i]}
+}
+
+func (n Node) EndPoint() Point {
+	if n.s == nil {
+		return Point{}
+	}
+	return Point{n.s.endRow[n.i], n.s.endCol[n.i]}
+}
 
 // Text is the node's source text: a substring of the snapshot's owned source, no allocation.
-func (n Node) Text() string { return n.s.src[n.s.startByte[n.i]:n.s.endByte[n.i]] }
+func (n Node) Text() string {
+	if n.s == nil {
+		return ""
+	}
+	return n.s.src[n.s.startByte[n.i]:n.s.endByte[n.i]]
+}
 
 // AppendText appends the node's source text to dst.
 func (n Node) AppendText(dst []byte) []byte { return append(dst, n.Text()...) }
@@ -55,11 +108,22 @@ func (n Node) AppendText(dst []byte) []byte { return append(dst, n.Text()...) }
 func (n Node) at(i int32) Node { return Node{n.s, i} }
 
 func (n Node) Parent() (Node, bool) {
+	if n.s == nil {
+		return Node{}, false
+	}
 	p := n.s.parent[n.i]
-	return n.at(p), p >= 0
+	if p < 0 {
+		return Node{}, false
+	}
+	return n.at(p), true
 }
 
-func (n Node) ChildCount() int { return int(n.s.childCount[n.i]) }
+func (n Node) ChildCount() int {
+	if n.s == nil {
+		return 0
+	}
+	return int(n.s.childCount[n.i])
+}
 
 // Child returns the i-th child; it walks the siblings, so it costs O(i).
 func (n Node) Child(i int) (Node, bool) {
@@ -98,11 +162,20 @@ func (n Node) NamedChild(i int) (Node, bool) {
 }
 
 func (n Node) NextSibling() (Node, bool) {
+	if n.s == nil {
+		return Node{}, false
+	}
 	c, ok := n.s.nextSibling(n.i)
-	return n.at(c), ok
+	if !ok {
+		return Node{}, false
+	}
+	return n.at(c), true
 }
 
 func (n Node) PrevSibling() (Node, bool) {
+	if n.s == nil {
+		return Node{}, false
+	}
 	p := n.s.parent[n.i]
 	if p < 0 {
 		return Node{}, false
@@ -111,10 +184,16 @@ func (n Node) PrevSibling() (Node, bool) {
 	for c, ok := n.s.firstChild(p); ok && c != n.i; c, ok = n.s.nextSibling(c) {
 		prev, found = c, true
 	}
-	return n.at(prev), found
+	if !found {
+		return Node{}, false
+	}
+	return n.at(prev), true
 }
 
 func (n Node) NextNamedSibling() (Node, bool) {
+	if n.s == nil {
+		return Node{}, false
+	}
 	for c, ok := n.s.nextSibling(n.i); ok; c, ok = n.s.nextSibling(c) {
 		if n.s.flags[c]&flagNamed != 0 {
 			return n.at(c), true
@@ -124,6 +203,9 @@ func (n Node) NextNamedSibling() (Node, bool) {
 }
 
 func (n Node) PrevNamedSibling() (Node, bool) {
+	if n.s == nil {
+		return Node{}, false
+	}
 	p := n.s.parent[n.i]
 	if p < 0 {
 		return Node{}, false
@@ -134,12 +216,18 @@ func (n Node) PrevNamedSibling() (Node, bool) {
 			prev, found = c, true
 		}
 	}
-	return n.at(prev), found
+	if !found {
+		return Node{}, false
+	}
+	return n.at(prev), true
 }
 
 // Children iterates the children in order.
 func (n Node) Children() iter.Seq[Node] {
 	return func(yield func(Node) bool) {
+		if n.s == nil {
+			return
+		}
 		for c, ok := n.s.firstChild(n.i); ok; c, ok = n.s.nextSibling(c) {
 			if !yield(n.at(c)) {
 				return
@@ -170,6 +258,9 @@ func (n Node) ChildByFieldName(name string) (Node, bool) {
 // ChildrenByFieldName iterates the children filling the named field (none for an unknown name).
 func (n Node) ChildrenByFieldName(name string) iter.Seq[Node] {
 	return func(yield func(Node) bool) {
+		if n.s == nil {
+			return
+		}
 		id, ok := n.s.lang.FieldForName(name)
 		if !ok {
 			return
@@ -183,8 +274,11 @@ func (n Node) ChildrenByFieldName(name string) iter.Seq[Node] {
 }
 
 // String is an S-expression of the named nodes (like C's ts_node_string, for tests and debugging). Anonymous nodes
-// are omitted unless MISSING; ERROR nodes print as (ERROR).
+// are omitted unless MISSING; ERROR nodes print as (ERROR). The zero Node prints as "".
 func (n Node) String() string {
+	if n.s == nil {
+		return ""
+	}
 	var b strings.Builder
 	n.writeSexp(&b, true)
 	return b.String()

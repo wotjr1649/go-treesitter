@@ -57,7 +57,8 @@ to UTF-8 and map offsets back to the original bytes.
 - `Snapshot`, `Node`, `Index`, `LineIndex` are immutable and safe for any number of goroutines. A snapshot owns its
   source (one copy; none with `ParseOwned`, whose caller must never modify the bytes again) and stays valid after the
   parser is closed. `Node.Text` is a zero-allocation substring of that source.
-- The zero `Node` is C's null node (`IsZero`); other methods on it panic.
+- The zero `Node` is C's null node (`IsZero`). Every method on it returns its zero value (false, 0, `""`, the zero `Node`, an
+  empty iterator, `(Node{}, false)` for the `(Node, bool)` methods) and none panics.
 
 ## Comparison discipline
 

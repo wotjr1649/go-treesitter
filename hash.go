@@ -67,12 +67,23 @@ func (s *Snapshot) merkle(shape bool) []uint64 {
 // collide only with ordinary 64-bit probability, so treat equality as a strong hint and compare structure when a
 // collision would matter. The hash array (8 bytes per node) is computed once, on first use of Hash.
 func (n Node) Hash() uint64 {
+	if n.s == nil {
+		return 0
+	}
 	return n.s.hashes()[n.i]
 }
 
 // ShapeHash is Hash that ignores extra nodes (comments and other trivia) among the descendants and the extra flag, so
 // a subtree keeps its ShapeHash when only comments change. Computed once, on first use of ShapeHash.
 func (n Node) ShapeHash() uint64 {
+	if n.s == nil {
+		return 0
+	}
 	n.s.shapeOnce.Do(func() { n.s.shape = n.s.merkle(true) })
 	return n.s.shape[n.i]
+}
+
+func (s *Snapshot) hashes() []uint64 {
+	s.hashOnce.Do(func() { s.hash = s.merkle(false) })
+	return s.hash
 }

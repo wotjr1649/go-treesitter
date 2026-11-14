@@ -132,7 +132,9 @@ All are lazy (computed on first use, once, safe for concurrent readers) and meas
   subtree-level caching (instead of per-file), duplicate and clone detection, change detection.
 - **Atoms.** `Node.Atom()` and `(*Snapshot).AtomText(a)` intern leaf-token text per snapshot (6–11 ns/node, +10 %
   memory, texts are substrings of the owned source). Frequency/equality work is 6–13x faster than with strings.
-- **Match (experimental).** `Match(old, new *Snapshot) *Mapping` pairs nodes across an edit (top-down equal-hash
+- **Match (experimental, separate package).** `match.Match(old, new *treesitter.Snapshot) *match.Mapping` in
+  `github.com/wotjr1649/go-treesitter/experimental/match` (same module, no compatibility promise, built on the public
+  `Node` API) pairs nodes across an edit (top-down equal-hash
   subtrees + LCS, bottom-up dice). Measured: 100 % on large single-token edits; 77–97 % matched with 0.1–0.3 % wrong
   on small edits (Go 3.7 % wrong), weak when the edit produces ERROR recovery. Marked experimental; accuracy work
   continues before it is promoted.
@@ -147,7 +149,8 @@ func NewLineIndex(src string) *LineIndex; (*Snapshot) Lines() *LineIndex
 func (*LineIndex) NumLines() int; LineStart(line int) uint32; Line(off uint32) int; Pos(off uint32) Position // {Line, ByteCol, UTF16Col, RuneCol}
 func (Node) Hash() uint64; ShapeHash() uint64          // comparable within one grammar only (symbol ids are hashed)
 func (Node) Atom() Atom; (*Snapshot) AtomText(Atom) string; NumAtoms() int   // named non-empty leaves only
-func Match(old, new *Snapshot) *Mapping               // EXPERIMENTAL; NewOf/OldOf(Node) (Node, bool), Len; other grammar -> empty
+// package experimental/match (not part of the stable treesitter API):
+func Match(old, new *treesitter.Snapshot) *Mapping    // EXPERIMENTAL; NewOf/OldOf(Node) (Node, bool), Len; other grammar -> empty
 func NewParserPool(lang *Language, maxParsers int, opts ...Option) (*ParserPool, error) // Get(ctx), Put, Close
 func NewIndex(*Snapshot) *Index; (*Snapshot) Index() *Index  // OfType, OfSymbol -> iter.Seq[Node]; NodeAt(off uint32) (Node, bool)
 ```
