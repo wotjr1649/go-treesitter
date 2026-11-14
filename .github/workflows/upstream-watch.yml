@@ -1,0 +1,43 @@
+name: Upstream release watch
+
+# Weekly: compares tools/gen/pins.json with upstream. A pinned tool or runtime (tree-sitter, wasi-sdk, binaryen, wasm2go)
+# with a newer stable release fails the job; a grammar repository or wasi-libc head ahead of its pinned commit is only
+# listed. It changes nothing: pins move only with explicit authority (AGENTS.md).
+
+on:
+  schedule:
+    - cron: "43 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  watch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GOENV: "off"
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+      CGO_ENABLED: "0"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version: 1.27.x
+      - name: Unit tests of the version comparison
+        working-directory: tools/native-ref
+        run: go test -count=1 ./upstreamwatch
+      - name: Compare the pins with upstream
+        working-directory: tools/native-ref
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          rc=0
+          go run ./upstreamwatch -pins ../gen/pins.json > "$RUNNER_TEMP/watch.md" || rc=$?
+          grep '^::' "$RUNNER_TEMP/watch.md" || true # error annotations
+          grep -v '^::' "$RUNNER_TEMP/watch.md" | tee -a "$GITHUB_STEP_SUMMARY"
+          exit $rc

@@ -1,0 +1,112 @@
+name: Speed and memory lanes (Linux, macOS)
+
+# Weekly: the product bench binaries against the native C executables in the same time window (paired rounds, order
+# alternating), on the large inputs listed in tools/bench/ci/large.json (pinned sources, sha256-verified) and on the
+# pinned grammars' own test/corpus inputs. The pre-declared criteria of docs/specs/validation.md decide: large geomean
+# <= 2.5x native; small files (<= 25 KB) median <= 1 ms or <= 2.5x native; peak <= 100 x input + 64 MB; after Close
+# every engine region returned and private bytes within start + 16 MB. A measured breach fails the job; a criterion the
+# platform cannot measure (the region count on macOS) is reported as NOT_RUN. Hosted runners are shared machines: the
+# ratios are measured in one window, absolute times are not comparable between runs, and a noisy result is reported
+# with its spread, never rerun until it passes.
+
+on:
+  schedule:
+    - cron: "29 4 * * 0"
+  workflow_dispatch:
+    inputs:
+      large_rounds:
+        description: Paired rounds per large input
+        default: "5"
+      large_reps:
+        description: Timed reps per round
+        default: "5"
+      corpus_rounds:
+        description: Paired rounds over the small corpus
+        default: "3"
+      corpus_reps:
+        description: Timed reps per small file
+        default: "7"
+      mem_runs:
+        description: Fresh processes per memory measurement
+        default: "3"
+
+permissions:
+  contents: read
+
+jobs:
+  bench:
+    name: bench (${{ matrix.runner }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
+          - {runner: ubuntu-24.04-arm, goos: linux, goarch: arm64}
+          - {runner: macos-latest, goos: darwin, goarch: arm64}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 240
+    env:
+      GOENV: "off"
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+      CGO_ENABLED: "0"
+      LARGE_ROUNDS: ${{ inputs.large_rounds || '5' }}
+      LARGE_REPS: ${{ inputs.large_reps || '5' }}
+      CORPUS_ROUNDS: ${{ inputs.corpus_rounds || '3' }}
+      CORPUS_REPS: ${{ inputs.corpus_reps || '7' }}
+      MEM_RUNS: ${{ inputs.mem_runs || '3' }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version: 1.27.x
+      - name: Native architecture and parameters
+        run: |
+          test "$(go env GOOS)" = "${{ matrix.goos }}" && test "$(go env GOARCH)" = "${{ matrix.goarch }}" || { echo "native target mismatch"; exit 1; }
+          for v in "$LARGE_ROUNDS" "$LARGE_REPS" "$CORPUS_ROUNDS" "$CORPUS_REPS" "$MEM_RUNS"; do
+            [[ "$v" =~ ^[0-9]{1,3}$ ]] || { echo "::error::round, rep and run counts must be digits"; exit 1; }
+          done
+          go version; gcc --version | head -1
+      - name: Fetch pinned sources, build the native executables, extract the corpus inputs
+        working-directory: tools/native-ref
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          go build -o "$RUNNER_TEMP/native-ref" .
+          go build -o "$RUNNER_TEMP/ciconf" ./ciconf
+          cd "$GITHUB_WORKSPACE"
+          "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -fetch -cc gcc \
+            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus"
+          "$RUNNER_TEMP/ciconf" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data"
+      - name: Build the product bench binaries and the driver
+        working-directory: tools/bench
+        run: |
+          for l in json golang python typescript tsx csharp tsql; do
+            go build -trimpath -tags "lang_$l" -o "$RUNNER_TEMP/bench/$l" .
+          done
+          go build -o "$RUNNER_TEMP/benchci" ./ci
+      - name: Fetch the large inputs (sha256-verified)
+        run: |
+          "$RUNNER_TEMP/benchci" fetch -manifest tools/bench/ci/large.json -data "$RUNNER_TEMP/data" -out "$RUNNER_TEMP/large"
+      - name: Measure and apply the criteria
+        run: |
+          rc=0
+          "$RUNNER_TEMP/benchci" run -bench "$RUNNER_TEMP/bench" -native "$RUNNER_TEMP/exe" -data "$RUNNER_TEMP/data" \
+            -large "$RUNNER_TEMP/large" -out "$RUNNER_TEMP/bench-out" \
+            -large-rounds "$LARGE_ROUNDS" -large-reps "$LARGE_REPS" -corpus-rounds "$CORPUS_ROUNDS" -corpus-reps "$CORPUS_REPS" \
+            -mem-runs "$MEM_RUNS" || rc=$?
+          [ -f "$RUNNER_TEMP/bench-out/summary.md" ] && cat "$RUNNER_TEMP/bench-out/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+      - name: Upload the raw measurements
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: bench-${{ matrix.runner }}
+          path: ${{ runner.temp }}/bench-out
+          if-no-files-found: ignore
+          retention-days: 90

@@ -6,6 +6,9 @@
  *   <exe> changed-ranges <old> <new> <start> <old_end> <new_end>
  *                                                      ts_tree_get_changed_ranges(old, new), one range per line:
  *                                                      "start_byte end_byte start_row start_col end_row end_col"
+ *   <exe> speed <file> <reps>                          timing: reps+1 whitespace-separated ms values (the first is the warm-up),
+ *                                                      each one ts_parser_parse_string + ts_tree_delete on a reused parser
+ *   <exe> corpus <list> <reps>                         speed for every path in <list> (one per line): "name,bytes,outcome,ms0;ms1;..."
  * Points are byte columns with '\n' rows, the same as treesitter.EditFor. Exit: 0 ok, 2 usage, 3 cannot read input,
  * 4 parse failed.
  *
@@ -20,6 +23,11 @@
 #ifdef _WIN32
 #include <fcntl.h>
 #include <io.h>
+#include <windows.h>
+#elif defined(__APPLE__)
+#include <mach/mach_time.h>
+#else
+#include <time.h>
 #endif
 #include "tree_sitter/api.h"
 
@@ -124,14 +132,92 @@ static int emit(Buf b) {
   return 0;
 }
 
+static double now_ms(void) {
+#ifdef _WIN32
+  LARGE_INTEGER f, c;
+  QueryPerformanceFrequency(&f);
+  QueryPerformanceCounter(&c);
+  return (double)c.QuadPart * 1000.0 / (double)f.QuadPart;
+#elif defined(__APPLE__) /* CLOCK_MONOTONIC needs feature macros the upstream flags may hide */
+  static mach_timebase_info_data_t tb;
+  if (!tb.denom) mach_timebase_info(&tb);
+  return (double)mach_absolute_time() * tb.numer / tb.denom / 1e6;
+#else
+  struct timespec t;
+  clock_gettime(CLOCK_MONOTONIC, &t);
+  return (double)t.tv_sec * 1000.0 + (double)t.tv_nsec / 1e6;
+#endif
+}
+
+/* One timed rep: parse + delete, like bench's Parse + Tree.Close. Returns -1 when the parse fails. */
+static double time_parse(TSParser *p, const char *src, uint32_t n, int *has_error) {
+  double t0 = now_ms();
+  TSTree *t = ts_parser_parse_string(p, NULL, src, n);
+  if (!t) return -1;
+  *has_error = ts_node_has_error(ts_tree_root_node(t));
+  ts_tree_delete(t);
+  return now_ms() - t0;
+}
+
+static int speed(const char *arg, int reps, int is_list) {
+  TSParser *p = new_parser();
+  if (!p) { fputs("set language failed\n", stderr); return 4; }
+  char path[4096];
+  FILE *l = NULL;
+  if (is_list && !(l = fopen(arg, "r"))) { fputs("open failed\n", stderr); return 3; }
+  int rc = 0;
+  for (; !rc;) {
+    if (is_list) {
+      if (!fgets(path, sizeof path, l)) break;
+      size_t k = strlen(path);
+      while (k && (path[k - 1] == '\n' || path[k - 1] == '\r')) path[--k] = 0;
+      if (!k) continue;
+    } else {
+      snprintf(path, sizeof path, "%s", arg);
+    }
+    uint32_t n;
+    char *src = slurp(path, &n);
+    if (!src) { fputs("open failed\n", stderr); rc = 3; break; }
+    int err = 0;
+    Buf ms = {0};
+    for (int i = 0; i <= reps; i++) {
+      double d = time_parse(p, src, n, &err);
+      if (d < 0) { fputs("parse failed\n", stderr); rc = 4; break; }
+      char t[48];
+      snprintf(t, sizeof t, is_list ? (i ? ";%.4f" : "%.4f") : "%.4f\n", d);
+      str(&ms, t);
+    }
+    if (!rc) {
+      if (is_list) {
+        const char *base = path, *c;
+        for (c = path; *c; c++) if (*c == '/' || *c == '\\') base = c + 1;
+        printf("%s,%u,%s,%s\n", base, n, err ? "errors" : "clean", ms.p);
+      } else {
+        fputs(ms.p, stdout);
+      }
+    }
+    free(ms.p);
+    free(src);
+    if (!is_list) break;
+  }
+  if (l) fclose(l);
+  ts_parser_delete(p);
+  return rc;
+}
+
 int main(int argc, char **argv) {
 #ifdef _WIN32
   _setmode(_fileno(stdout), _O_BINARY);
 #endif
   const char *cmd = argc > 1 ? argv[1] : "";
+  if (argc == 4 && (!strcmp(cmd, "speed") || !strcmp(cmd, "corpus"))) {
+    int reps = atoi(argv[3]);
+    if (reps < 1) { fputs("reps must be >= 1\n", stderr); return 2; }
+    return speed(argv[2], reps, cmd[0] == 'c');
+  }
   int edit = !strcmp(cmd, "edit"), cr = !strcmp(cmd, "changed-ranges");
   if (!((argc == 3 && !strcmp(cmd, "dump")) || (argc == 7 && (edit || cr)))) {
-    fputs("usage: <exe> dump <file> | edit|changed-ranges <old> <new> <start> <old_end> <new_end>\n", stderr);
+    fputs("usage: <exe> dump <file> | edit|changed-ranges <old> <new> <start> <old_end> <new_end> | speed <file> <reps> | corpus <list> <reps>\n", stderr);
     return 2;
   }
   uint32_t n1, n2 = 0;

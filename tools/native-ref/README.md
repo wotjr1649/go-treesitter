@@ -56,3 +56,21 @@ format (`===` header with name and `:attribute` lines, input, `---`, expected tr
 - Native results: `native/dumps/<lang>/<name>.dump` (fresh dump), `edits/results-native.csv` (sha256 of the native
   incremental dump and of the native fresh dump of the new text), `edits/<lang>/<name>.ranges` (native
   `changed-ranges`). A native run that fails is listed in `native-failures.csv` and `ciconf` exits 1.
+
+## Timing modes (`tools/bench/ci`)
+
+| Command | Output |
+|---|---|
+| `<exe> speed <file> <reps>` | `reps+1` lines, each the milliseconds of one `ts_parser_parse_string` + `ts_tree_delete` on a reused parser (the first is the warm-up). |
+| `<exe> corpus <list> <reps>` | `speed` for every path in `<list>`, one line each: `name,bytes,clean\|errors,ms0;ms1;...`. |
+
+Timer: `QueryPerformanceCounter` on Windows, `mach_absolute_time` on macOS, `CLOCK_MONOTONIC` elsewhere. Used by
+`.github/workflows/bench.yml` through `tools/bench/ci` (`benchci`).
+
+## Upstream watch (`upstreamwatch`)
+
+`cd tools/native-ref && go run ./upstreamwatch -pins ../gen/pins.json` compares the pins with the newest stable
+tree-sitter, wasi-sdk, binaryen and wasm2go releases (exit 1 when one is newer) and lists how far the grammar repositories'
+and wasi-libc's default-branch heads are ahead of the pinned commits (reported only). Exit 2 means the GitHub API could not
+be read (for example the anonymous rate limit: set `GITHUB_TOKEN`). It reads only `pins.json` and public API answers and
+changes nothing. Run by `.github/workflows/upstream-watch.yml`.

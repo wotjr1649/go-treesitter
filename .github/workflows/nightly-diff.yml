@@ -1,0 +1,125 @@
+name: Nightly differential fuzzing
+
+# Every night: builds the native C reference from the pinned sources (as conformance.yml does), then draws fresh random
+# cases (mutations of the pinned grammars' own test/corpus inputs plus random edits, seeded from the UTC date) and
+# compares the CGO-free engine with the native executables byte for byte (dumps, incremental edits, changed ranges)
+# for a fixed time budget per grammar (tools/conformance TestNightlyDiff). The Go fuzz targets run for a short budget
+# afterwards. A mismatch uploads the shrunk reproducer (input, both outputs, seed, commands) and fails the job.
+# Not a release gate: it finds regressions, the conformance lane stays the gate.
+
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: Minutes of differential fuzzing per grammar
+        default: "4"
+      fuzz_seconds:
+        description: Seconds per Go fuzz target
+        default: "30"
+      seed:
+        description: Seed, digits only (empty = UTC date YYYYMMDD); the same seed and pins replay the same cases
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  diff:
+    name: diff (${{ matrix.runner }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
+          - {runner: ubuntu-24.04-arm, goos: linux, goarch: arm64}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 150
+    env:
+      GOENV: "off"
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+      MINUTES: ${{ inputs.minutes || '4' }}
+      FUZZ_SECONDS: ${{ inputs.fuzz_seconds || '30' }}
+      SEED_INPUT: ${{ inputs.seed }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version: 1.27.x # newest supported; go.mod states the floor (1.26.0)
+      - name: Native architecture and parameters
+        run: |
+          test "$(go env GOOS)" = "${{ matrix.goos }}" && test "$(go env GOARCH)" = "${{ matrix.goarch }}" || { echo "native target mismatch"; exit 1; }
+          seed="${SEED_INPUT:-$(date -u +%Y%m%d)}"
+          [[ "$seed" =~ ^[0-9]{1,18}$ && "$MINUTES" =~ ^[0-9]{1,3}$ && "$FUZZ_SECONDS" =~ ^[0-9]{1,4}$ ]] || { echo "::error::seed, minutes and fuzz_seconds must be digits"; exit 1; }
+          echo "TSG_NIGHTLY_SEED=$seed" >> "$GITHUB_ENV"
+          echo "TSG_CONF_OUT=$RUNNER_TEMP/out" >> "$GITHUB_ENV"
+          echo "seed $seed, $MINUTES min per grammar, $FUZZ_SECONDS s per fuzz target, commit $GITHUB_SHA"
+      - name: Fetch pinned sources, build the 7 native executables, extract corpora
+        working-directory: tools/native-ref
+        env:
+          CGO_ENABLED: "0"
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          go build -o "$RUNNER_TEMP/native-ref" .
+          go build -o "$RUNNER_TEMP/ciconf" ./ciconf
+          cd "$GITHUB_WORKSPACE"
+          "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -fetch -cc gcc \
+            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus"
+      # The corpus inputs are the mutation seeds; the edits and results it also writes are not used here.
+      - name: Extract the corpus inputs
+        env:
+          CGO_ENABLED: "0"
+        run: |
+          "$RUNNER_TEMP/ciconf" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data"
+      - name: Differential fuzzing against the native reference
+        working-directory: tools/conformance
+        env:
+          CGO_ENABLED: "0"
+          TSG_DATA_DIR: ${{ runner.temp }}/data
+          TSG_NATIVE_EXE_DIR: ${{ runner.temp }}/exe
+        run: |
+          export TSG_NIGHTLY_BUDGET="${MINUTES}m"
+          go test -count=1 -timeout "$((7 * MINUTES + 40))m" -run '^TestNightlyDiff$' -v . 2>&1 | tee "$RUNNER_TEMP/nightly.log"
+      - name: Go fuzz targets (short budget)
+        if: ${{ !cancelled() }}
+        working-directory: tools/conformance
+        env:
+          CGO_ENABLED: "0"
+        run: |
+          rc=0
+          for target in $(go test -list '^Fuzz' . | grep '^Fuzz'); do
+            echo "::group::$target"
+            go test -run '^$' -fuzz "^${target}\$" -fuzztime "${FUZZ_SECONDS}s" . || { echo "::error::$target failed"; rc=1; }
+            echo "::endgroup::"
+          done
+          exit $rc
+      - name: Summary
+        if: ${{ !cancelled() }}
+        run: |
+          {
+            echo "### Nightly differential fuzzing (${{ matrix.runner }}, seed $TSG_NIGHTLY_SEED)"
+            echo
+            echo "| grammar | cases | seconds | mismatch |"
+            echo "|---|---|---|---|"
+            if [ -f "$TSG_CONF_OUT/summary.jsonl" ]; then
+              jq -r 'select(.test | startswith("TestNightlyDiff/")) | "| \(.lang) | \(.cases) | \(.seconds | floor) | \(.mismatch) |"' "$TSG_CONF_OUT/summary.jsonl"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload reproducers
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: nightly-repro-${{ matrix.runner }}-${{ env.TSG_NIGHTLY_SEED }}
+          path: |
+            ${{ runner.temp }}/out
+            ${{ runner.temp }}/nightly.log
+            tools/conformance/testdata/fuzz
+          if-no-files-found: ignore
+          retention-days: 90

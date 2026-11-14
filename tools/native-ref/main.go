@@ -138,6 +138,9 @@ func run(pinsFile, dl, work, out, cc, opt, corpus string, fetch, nobuild bool, l
 			args = append(args, "-static") // runs without the MinGW runtime DLLs next to it
 		} else {
 			args = append(args, "-D_POSIX_C_SOURCE=200112L", "-D_DEFAULT_SOURCE") // upstream's own Makefile flags
+			if runtime.GOOS == "darwin" {
+				args = append(args, "-D_DARWIN_C_SOURCE") // likewise: without it _POSIX_C_SOURCE hides macOS extensions
+			}
 		}
 		args = append(args, filepath.Join(lib, "src", "lib.c"), filepath.Join(gdir, "parser.c"))
 		if _, ok := g.Files["scanner.c"]; ok {
