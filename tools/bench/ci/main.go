@@ -655,7 +655,7 @@ func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lround
 			case regAfter != 0:
 				rg = "FAIL"
 			}
-			P("| %s | %s | %.1f | %.1f | %.1f | %d/%d | %v | %s | %s | %s |", in.file, op, float64(peak)/mb, float64(limit)/mb, float64(delta)/mb, float64(adj)/mb, regParsed, regAfter, endBad == 0, pk, pv, rg)
+			P("| %s | %s | %.1f | %.1f | %.1f | %.1f | %d/%d | %v | %s | %s | %s |",in.file, op, float64(peak)/mb, float64(limit)/mb, float64(delta)/mb, float64(adj)/mb, regParsed, regAfter, endBad == 0, pk, pv, rg)
 			if pk == "FAIL" || pv == "FAIL" || rg == "FAIL" || endBad > 0 {
 				fail("memory %s/%s %s: peak %s, private %s (%s), regions %s, end mismatches %d", in.lang, in.file, op, pk, pv, privWhy, rg, endBad)
 			}
