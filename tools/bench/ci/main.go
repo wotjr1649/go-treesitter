@@ -157,6 +157,10 @@ func fetch(manifest, data, out string, printOnly bool, langs []string) error {
 		}
 		rows = append(rows, []string{e.Lang, e.File, src, strconv.Itoa(len(b)), got})
 	}
+	// A grammar may have no pinned large input (tsx); its shard still writes an empty manifest.
+	if err := os.MkdirAll(out, 0o755); err != nil {
+		return err
+	}
 	return writeCSV(filepath.Join(out, "manifest.csv"), []string{"lang", "file", "source", "bytes", "sha256"}, rows)
 }
 
@@ -475,6 +479,9 @@ func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lround
 		}
 		perFile, all = append(perFile, med(rs)), append(all, rs...)
 		P("| %s | %s | %d | `%.12s` | %.1f | %.1f | %.2f |", in.lang, in.file, in.bytes, in.sha, med(nm), med(mm), med(rs))
+	}
+	if len(larges) == 0 {
+		P("NOT_RUN: no large input is pinned for %s in tools/bench/ci/large.json.", strings.Join(langs, ", "))
 	}
 	if len(all) > 0 {
 		gAll, gFile := geo(all), geo(perFile)
