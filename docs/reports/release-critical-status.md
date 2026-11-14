@@ -31,6 +31,11 @@ to the new engine.
 
 ## Released
 
+- **v0.2.0 preview** (2026-11-14, immutable GitHub pre-release, attestation verified): queries. Root tag `v0.2.0` on
+  `bd4d01e`, grammar tags `grammars/<lang>/v0.2.0` on `b4af8ce`. Verified after tagging: `GOPROXY=direct` and
+  proxy.golang.org resolve all eight modules with the rehearsal checksums; an empty-cache external module installs
+  root + all seven grammars, builds, runs (parse and query) and cross-builds linux/arm64 without `replace`. The
+  release carries the pinned T-SQL grammar source archive (its commit is not on the upstream default branch).
 - **v0.1.0 preview** (2026-11-14, GitHub pre-release): root tag `v0.1.0` on `98165ce`, grammar tags
   `grammars/<lang>/v0.1.0` on `2b0c9ec`. Verified after tagging: `GOPROXY=direct` and proxy.golang.org resolve all
   eight modules; an empty-cache external module with default Go settings installs root + csharp + tsql, builds, runs
