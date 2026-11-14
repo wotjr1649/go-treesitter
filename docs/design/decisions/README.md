@@ -53,6 +53,7 @@ understand whether the contract is still right.
 | 0017 | Exclude unclear grammars; assurance by release scope | Superseded in part by ADR-0020 |
 | 0018 | Evaluate the approved runtime baseline transition | Superseded by ADR-0020 |
 | 0019 | Explicit authority for every main merge | Accepted |
-| 0020 | A public CGO-free tree-sitter library built from unmodified upstream C | Accepted; §4 amended by ADR-0022 |
+| 0020 | A public CGO-free tree-sitter library built from unmodified upstream C | Accepted; §4 amended by ADR-0022; grammar sources by ADR-0023 |
 | 0021 | Public API v2: owned immutable snapshots on a confined parser | Accepted |
 | 0022 | Wave-1 preview, multi-module versioning, release-memory criterion, carrier removal | Accepted |
+| 0023 | Temporary, retirable patches to upstream grammar C | Accepted; amends ADR-0020 §1, §4 for grammars |
