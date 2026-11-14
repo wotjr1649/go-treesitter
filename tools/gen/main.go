@@ -43,6 +43,7 @@ var (
 type opts struct {
 	lang, root, src, dl, sdk, wasm2go, wasmOpt, recipe, out, work, repo, rootVersion, plan string
 	hash, noAPI, verifyBinaries                                                            bool
+	balanceProbe                                                                           bool
 }
 
 func main() {
@@ -63,6 +64,7 @@ func main() {
 	flag.BoolVar(&o.verifyBinaries, "verify-binaries", false, "also check the host binary hashes pinned in localBinarySHA256 (optional local verification, not an identity)")
 	flag.BoolVar(&o.hash, "hash", false, "print the computed values of every pin and exit")
 	flag.BoolVar(&o.noAPI, "no-api", false, "do not emit language_api.go (Language() needs the root treesitter package)")
+	flag.BoolVar(&o.balanceProbe, "balance-probe", false, "TEST ONLY: add balancing/reset observations and a deterministic conformance test; output must be a new directory outside grammars/")
 	flag.Parse()
 	if err := run(o); err != nil {
 		fmt.Fprintln(os.Stderr, "gen:", err)
@@ -88,6 +90,11 @@ func run(o opts) error {
 	}
 	if o.rootVersion != "" && !rootVersionRx.MatchString(o.rootVersion) {
 		return fmt.Errorf("-root-version %q is not a semantic version vX.Y.Z", o.rootVersion)
+	}
+	if o.balanceProbe {
+		if err := validateBalanceProbe(o); err != nil {
+			return err
+		}
 	}
 	goSum := "" // release mode only; dev mode writes none and removes a stale one
 	if o.rootVersion != "" {
@@ -210,6 +217,15 @@ func run(o opts) error {
 
 	id.RecipeSHA256 = recipeSHA256(pins, g, rname, rc)
 	id.Tools = map[string]string{"wasi-sdk": pins.Tools.WasiSDK, "clang": pins.Tools.Clang, "llvm": pins.Tools.LLVMCommit, "wasm2go": pins.Tools.Wasm2go, "wasm2go-sum": pins.Tools.Wasm2goSum, "recipe": rname}
+	if o.balanceProbe {
+		probeHash, err := sumFile(filepath.Join(o.root, "probe", "balance.c"))
+		if err != nil {
+			return err
+		}
+		id.SourceSHA256["probe.balance.c"] = probeHash
+		id.RecipeSHA256 = sumBytes([]byte(id.RecipeSHA256 + "\nbalancing-cancel=" + probeHash + "\nexports=" + strings.Join(balanceProbeExports, " ")))
+		id.Tools["test-only"] = "balancing-cancel"
+	}
 	if rc.opt != "" {
 		id.Tools["binaryen"] = pins.Tools.Binaryen
 	}
@@ -239,6 +255,9 @@ func run(o opts) error {
 		outputs[name] = sumBytes(b)
 	}
 	prov := provenance{Schema: 1, ABI: uint32(pins.ABI), Name: o.lang, Module: modulePrefix + o.lang, Identity: id, Outputs: outputs}
+	if o.balanceProbe {
+		prov.TestOnly = "balancing-cancel"
+	}
 	provJSON, err := marshal(prov)
 	if err != nil {
 		return err
@@ -266,6 +285,15 @@ func run(o opts) error {
 	}
 	if !o.noAPI {
 		files["language_api.go"] = []byte(languageAPI(o.lang))
+	}
+	if o.balanceProbe {
+		probeFiles, err := balanceProbeFiles(o)
+		if err != nil {
+			return err
+		}
+		for name, b := range probeFiles {
+			files[name] = b
+		}
 	}
 	if err := writeFiles(o.out, files); err != nil {
 		return err
@@ -442,14 +470,27 @@ func compile(o opts, pins *Pins, g GrammarPin, wasm string, extra ...string) (st
 	args = append(args, extra...)
 	args = append(args, "--sysroot="+filepath.Join(o.sdk, "share", "wasi-sysroot"), "-DTSG_LANG_FN="+g.CSymbol,
 		"-I"+filepath.Join(rt, "src"), "-I"+filepath.Join(rt, "include"), "-I"+gd)
-	for _, e := range exports {
+	buildExports := append([]string{}, exports...)
+	if o.balanceProbe {
+		buildExports = append(buildExports, balanceProbeExports...)
+		args = append(args, "-I"+filepath.Join(o.root, "shim"))
+	}
+	for _, e := range buildExports {
 		args = append(args, "-Wl,--export="+e)
 	}
-	args = append(args, filepath.Join(rt, "src", "lib.c"), filepath.Join(gd, "parser.c"))
+	if o.balanceProbe {
+		args = append(args, filepath.Join(o.root, "probe", "balance.c"))
+	} else {
+		args = append(args, filepath.Join(rt, "src", "lib.c"))
+	}
+	args = append(args, filepath.Join(gd, "parser.c"))
 	if _, ok := g.Files["scanner.c"]; ok {
 		args = append(args, filepath.Join(gd, "scanner.c"))
 	}
-	args = append(args, filepath.Join(o.root, "shim", "tsg_abi.c"), "-o", wasm)
+	if !o.balanceProbe {
+		args = append(args, filepath.Join(o.root, "shim", "tsg_abi.c"))
+	}
+	args = append(args, "-o", wasm)
 	out, err := runCmd("", nil, clangPath(o.sdk), args...)
 	if err != nil {
 		return out, fmt.Errorf("clang: %w\n%s", err, out)

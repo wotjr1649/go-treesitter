@@ -347,7 +347,7 @@ var grammar = engine.Grammar{
 			"grammar.scanner.c": "6db82134ac2d4c90a1a1475487a625cface02662ebda9b7478cad9c7147e9afe",
 			"grammar.tree":      "2102a9fe2ccb7e008975e8b0acb906d8340fe14c399c6bc5c28d1be60417d39d",
 			"runtime.tree":      "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-			"shim.tsg_abi.c":    "1298874dca939b637ad5aa4dfbb73421171eec8b01eeaab6f43ef97b706c3156",
+			"shim.tsg_abi.c":    "8cc04dfb09c35413c7d5a706f0a650b1b45c1516159777b2f14841a4e408dc43",
 		},
 		RecipeSHA256: "d95740790416a680d245e52dd26f5273a74a05dcc8cb61a12de6cac1e3dbb380",
 		Tools: map[string]string{

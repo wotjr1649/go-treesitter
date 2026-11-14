@@ -620,7 +620,7 @@ var grammar = engine.Grammar{
 			"grammar.scanner.c": "2ee1241a6a275e72a06838f5df927700bd405c16b48f986e2c33d1264cae4818",
 			"grammar.tree":      "74dfd5925f30f5cf43d510481f24ec709fd4ed5496d02e2c62d1200f06bb0943",
 			"runtime.tree":      "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-			"shim.tsg_abi.c":    "1298874dca939b637ad5aa4dfbb73421171eec8b01eeaab6f43ef97b706c3156",
+			"shim.tsg_abi.c":    "8cc04dfb09c35413c7d5a706f0a650b1b45c1516159777b2f14841a4e408dc43",
 		},
 		RecipeSHA256: "7c3e2b46cb2410cdaaa14f83d833f099efc4e828858ffbb30886e5294eb1e537",
 		Tools: map[string]string{

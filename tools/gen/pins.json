@@ -50,7 +50,7 @@
     "llvmCommit": "895aa2c896ada719451be2e3673c83da8ddf1141"
   },
   "memoryGrowSHA256": "9e1db9d4db30f9f71e30319cbc3b782ae348fd530bd4bd26d00f31dafcabe93a",
-  "shimSHA256": "1298874dca939b637ad5aa4dfbb73421171eec8b01eeaab6f43ef97b706c3156",
+  "shimSHA256": "8cc04dfb09c35413c7d5a706f0a650b1b45c1516159777b2f14841a4e408dc43",
   "wasiLibc": {
     "repo": "https://github.com/WebAssembly/wasi-libc",
     "commit": "2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13",

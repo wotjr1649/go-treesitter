@@ -58,7 +58,7 @@ var grammar = engine.Grammar{
 			"grammar.parser.c": "9a266ae4a0305b8a2769bee90a14ac06914bdc83a509f16428311eac2845637e",
 			"grammar.tree":     "dcb6caf08e6f2122eede3b6d38886cb4507e67dc77f6e55d501e23f04d9e3d06",
 			"runtime.tree":     "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-			"shim.tsg_abi.c":   "1298874dca939b637ad5aa4dfbb73421171eec8b01eeaab6f43ef97b706c3156",
+			"shim.tsg_abi.c":   "8cc04dfb09c35413c7d5a706f0a650b1b45c1516159777b2f14841a4e408dc43",
 		},
 		RecipeSHA256: "0c199bd19fb7bf4dc30b673c5ab5cd1c5009df31b2fa953c8340562e2e0d99ed",
 		Tools: map[string]string{

@@ -77,8 +77,8 @@ func TestQueryStreamingAndCache(t *testing.T) {
 		}
 		break
 	}
-	if fl.cur().count("query_new") != 1 || fl.cur().count("qcursor_delete") != 2 {
-		t.Fatal("cache/early cleanup")
+	if fl.cur().count("query_new") != 1 || fl.cur().count("qcursor_new") != 1 || fl.cur().count("qcursor_delete") != 0 {
+		t.Fatal("query/cursor cache was not retained after early break")
 	}
 	if _, err := collectQuery(tree, context.Background(), q, &QueryOptions{StartByte: 4, EndByte: 7, MatchLimit: 12}); err != nil {
 		t.Fatal(err)
@@ -86,8 +86,12 @@ func TestQueryStreamingAndCache(t *testing.T) {
 	if fl.cur().qs().options != [3]int32{4, 7, 12} {
 		t.Fatal("options")
 	}
+	old := fl.cur()
 	if err := p.Reset(); err != nil {
 		t.Fatal(err)
+	}
+	if !old.released.Load() {
+		t.Fatal("Reset did not release the cursor's instance")
 	}
 	next, err := p.Parse(context.Background(), []byte("new"), nil)
 	if err != nil {
@@ -97,14 +101,74 @@ func TestQueryStreamingAndCache(t *testing.T) {
 	if _, err := collectQuery(next, context.Background(), q, nil); err != nil {
 		t.Fatal(err)
 	}
-	if fl.cur().count("query_new") != 1 {
-		t.Fatal("cache survived reset")
+	if fl.cur().count("query_new") != 1 || fl.cur().count("qcursor_new") != 1 {
+		t.Fatal("query/cursor was not recreated after reset")
 	}
 	if _, err := collectQuery(tree, context.Background(), q, nil); !errors.Is(err, ErrTreeInvalidated) {
 		t.Fatal(err)
 	}
 	if got[0].Captures[0].Node.Text() != "one" {
 		t.Fatal("snapshot lost after reset")
+	}
+}
+
+func TestQueryCursorSharedAcrossQueriesAndTrees(t *testing.T) {
+	fl, p, tree, q := queryFixture(t, nil)
+	f := p.c.inst.m.(*fakeModule)
+	other, err := NewQuery(fl.lang, "other query")
+	if err != nil {
+		t.Fatal(err)
+	}
+	next, err := p.Parse(context.Background(), []byte("different words"), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer next.Close()
+	for _, tc := range []struct {
+		tree *Tree
+		q    *Query
+		want int
+	}{{tree, q, 3}, {tree, other, 3}, {next, other, 2}, {tree, q, 3}} {
+		got, err := collectQuery(tc.tree, context.Background(), tc.q, nil)
+		if err != nil || len(got) != tc.want {
+			t.Fatalf("matches=%d want=%d err=%v", len(got), tc.want, err)
+		}
+	}
+	if f.count("qcursor_new") != 1 || f.count("qcursor_exec") != 4 || f.count("qcursor_delete") != 0 {
+		t.Fatal("queries and trees did not share the instance cursor")
+	}
+	if err := p.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if !f.released.Load() {
+		t.Fatal("Close did not release the cursor's instance")
+	}
+}
+
+func TestQueryCachedCursorTrap(t *testing.T) {
+	fl, p, tree, q := queryFixture(t, nil)
+	if _, err := collectQuery(tree, context.Background(), q, nil); err != nil {
+		t.Fatal(err)
+	}
+	f := fl.cur()
+	f.onCall = func(name string) {
+		if name == "qcursor_exec" {
+			panic("cached cursor trap")
+		}
+	}
+	_, err := collectQuery(tree, context.Background(), q, nil)
+	var pe *ParseError
+	if !errors.As(err, &pe) || !pe.InstanceReset || pe.Outcome != EngineFault || tree.valid() || !f.released.Load() || p.c.busy.Load() {
+		t.Fatalf("cached cursor trap did not reset and release: %v", err)
+	}
+	next, err := p.Parse(context.Background(), []byte("next"), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer next.Close()
+	got, err := collectQuery(next, context.Background(), q, nil)
+	if err != nil || len(got) != 1 || fl.cur().count("qcursor_new") != 1 || f.count("qcursor_new") != 1 {
+		t.Fatalf("new instance cursor: matches=%d err=%v", len(got), err)
 	}
 }
 
@@ -217,13 +281,6 @@ func TestQueryOutcomes(t *testing.T) {
 				}
 			}
 		}, ErrResourceLimit, true},
-		{"cleanup trap", func(f *fakeModule) {
-			f.onCall = func(name string) {
-				if name == "qcursor_delete" {
-					panic("delete trap")
-				}
-			}
-		}, ErrEngineFault, true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			fl, _, tree, q := queryFixture(t, nil)
@@ -236,8 +293,8 @@ func TestQueryOutcomes(t *testing.T) {
 			if tc.reset && (!errors.As(err, &pe) || !pe.InstanceReset || tree.valid()) {
 				t.Fatalf("missing reset: %v", err)
 			}
-			if !tc.reset && fl.cur().count("qcursor_delete") != 1 {
-				t.Fatal("cursor leaked")
+			if !tc.reset && (fl.cur().count("qcursor_new") != 1 || fl.cur().count("qcursor_delete") != 0) {
+				t.Fatal("cursor was not retained after a recoverable error")
 			}
 		})
 	}
@@ -267,10 +324,14 @@ func TestQueryCancellationThenParse(t *testing.T) {
 				}
 			}
 			_, err := collectQuery(tree, ctx, q, nil)
-			if !errors.Is(err, want) || !tree.valid() || f.count("qcursor_delete") != 1 {
+			if !errors.Is(err, want) || !tree.valid() || f.count("qcursor_new") != 1 || f.count("qcursor_delete") != 0 {
 				t.Fatalf("%v valid=%v", err, tree.valid())
 			}
 			f.onCall = nil
+			f.qs().halted = 0
+			if got, err := collectQuery(tree, context.Background(), q, nil); err != nil || len(got) != 3 || f.count("qcursor_new") != 1 {
+				t.Fatalf("cursor reuse after cancellation: matches=%d err=%v", len(got), err)
+			}
 			next, err := p.Parse(context.Background(), []byte("different"), nil)
 			if err != nil {
 				t.Fatal(err)
@@ -396,7 +457,7 @@ func TestQueryABITraps(t *testing.T) {
 			}
 		})
 	}
-	for _, name := range []string{"query_new", "qcursor_new", "qcursor_exec", "qcursor_next", "qcursor_halted", "qcursor_exceeded", "qcursor_buf", "qcursor_delete"} {
+	for _, name := range []string{"query_new", "qcursor_new", "qcursor_exec", "qcursor_next", "qcursor_halted", "qcursor_exceeded", "qcursor_buf"} {
 		t.Run("iterator/"+name, func(t *testing.T) {
 			fl, _, tree, q := queryFixture(t, nil)
 			fl.cur().onCall = func(call string) {
@@ -484,8 +545,8 @@ func TestQueryTreeClosedDuringIteration(t *testing.T) {
 		}
 		tree.Close()
 	}
-	if !closed || fl.cur().count("qcursor_delete") != 1 {
-		t.Fatal("missing invalidation or cleanup")
+	if !closed || fl.cur().count("qcursor_new") != 1 || fl.cur().count("qcursor_delete") != 0 {
+		t.Fatal("missing invalidation or retained cursor")
 	}
 	next, err := p.Parse(context.Background(), []byte("safe"), nil)
 	if err != nil {
@@ -541,8 +602,8 @@ func TestQueryIteratorPanicCleanup(t *testing.T) {
 			panic("consumer")
 		}
 	}()
-	if fl.cur().count("qcursor_delete") != 1 {
-		t.Fatal("cursor leaked after panic")
+	if got, err := collectQuery(tree, context.Background(), q, nil); err != nil || len(got) != 3 || fl.cur().count("qcursor_new") != 1 {
+		t.Fatalf("cursor reuse after panic: matches=%d err=%v", len(got), err)
 	}
 	if err := p.Reset(); err != nil {
 		t.Fatal(err)

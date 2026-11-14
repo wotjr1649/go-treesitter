@@ -1,0 +1,71 @@
+name: Nightly balancing cancellation
+
+# Test-only instrumentation exposes the pinned runtime's balancing flag around the unchanged shim.
+# A nightly/manual job keeps the additional toolchain build and deterministic sweeps out of PR-required checks.
+on:
+  schedule:
+    - cron: "42 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  balancing-cancel:
+    name: balancing cancel (ubuntu-24.04)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      CGO_ENABLED: "0"
+      GOENV: "off"
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Set evidence paths
+        run: |
+          echo "TSG_BALANCE_PROBE_DIR=$RUNNER_TEMP/balance/probes" >> "$GITHUB_ENV"
+          echo "TSG_NATIVE_EXE_DIR=$RUNNER_TEMP/balance/native" >> "$GITHUB_ENV"
+          echo "TSG_CONF_OUT=$RUNNER_TEMP/balance/out" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version: 1.27.x
+      - name: Record identity and native architecture
+        run: |
+          test "$(go env GOOS)" = linux && test "$(go env GOARCH)" = amd64 || { echo "native target mismatch"; exit 1; }
+          git rev-parse HEAD
+          go version
+          gcc --version | head -1
+          sha256sum tools/gen/pins.json tools/gen/shim/tsg_abi.c
+      - name: Fetch pinned inputs and build 7 test-only probes and native references
+        run: bash tools/gen/balance-probe.sh "$RUNNER_TEMP/balance" 2>&1 | tee "$RUNNER_TEMP/balance-build.log"
+      - name: Deterministic balancing-cancel sweeps against native C
+        working-directory: tools/conformance
+        run: go test -count=1 -timeout 90m -v -run '^TestBalancingCancel$' . 2>&1 | tee "$RUNNER_TEMP/balance-tests.log"
+      - name: Product files unchanged
+        if: ${{ always() }}
+        run: |
+          if [ -f "$RUNNER_TEMP/balance/shim-before.sha256" ]; then
+            sha256sum -c "$RUNNER_TEMP/balance/shim-before.sha256"
+          fi
+          git diff --exit-code -- grammars/ tools/gen/shim/tsg_abi.c
+          test -z "$(git status --porcelain -- grammars/ tools/gen/shim/tsg_abi.c)"
+      - name: Upload probe evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: balancing-cancel-linux-amd64
+          path: |
+            ${{ runner.temp }}/balance/out
+            ${{ runner.temp }}/balance/probes/*/provenance.json
+            ${{ runner.temp }}/balance/plan.tsv
+            ${{ runner.temp }}/balance/shim-before.sha256
+            ${{ runner.temp }}/balance-build.log
+            ${{ runner.temp }}/balance-tests.log
+          if-no-files-found: warn
+          retention-days: 90

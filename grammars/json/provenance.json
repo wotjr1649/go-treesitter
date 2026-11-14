@@ -12,7 +12,7 @@
       "grammar.parser.c": "9a266ae4a0305b8a2769bee90a14ac06914bdc83a509f16428311eac2845637e",
       "grammar.tree": "dcb6caf08e6f2122eede3b6d38886cb4507e67dc77f6e55d501e23f04d9e3d06",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-      "shim.tsg_abi.c": "1298874dca939b637ad5aa4dfbb73421171eec8b01eeaab6f43ef97b706c3156"
+      "shim.tsg_abi.c": "8cc04dfb09c35413c7d5a706f0a650b1b45c1516159777b2f14841a4e408dc43"
     },
     "RecipeSHA256": "0c199bd19fb7bf4dc30b673c5ab5cd1c5009df31b2fa953c8340562e2e0d99ed",
     "Tools": {
@@ -34,9 +34,9 @@
     "LICENSES/wasi-libc/cloudlibc-LICENSE": "c8b789cf5a746611e6300a0cc7750dbf92b61912a709d04e639245f7290656d0",
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
-    "engine_gen.dat": "be9f716d636a316beabc91a638610518fae61895de7797145d6cfb45bd75063c",
-    "engine_gen.go": "5935c7edd5e5a7e16c007c316d9cf128c6f97ec5de2014eb7fbd913ad4d75b47",
-    "wasm": "2a140a19b84fe4d95e6e6dc67dcf0d2011e9c086026dca0b4dd31c4670163eee",
-    "wasm.clang": "14cead27bacddd100c82119eb9ee90c1565885422bb80839371a5a249396b9bb"
+    "engine_gen.dat": "4a0d84ca58b462b626f8e1284b58c2566c34a9bb4874dae9d58df79e7fd4d1cc",
+    "engine_gen.go": "b2972346c5ce64e0ba1c61794bf79377e574c7f79335c4568c87f8a6ef440f72",
+    "wasm": "94d23f082c034064e8adb55c3430dcfbfcd00c5b229213d999d362488bec832b",
+    "wasm.clang": "3a912c7b3844732476a22ac064331f69a8447222bf8b0dab401d6d45108bd88f"
   }
 }

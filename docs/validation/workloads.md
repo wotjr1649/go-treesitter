@@ -16,6 +16,10 @@ digests they describe. The current lanes use:
 | Built-in fuzz seeds (one small sample per grammar) | `tools/conformance/fuzz_test.go` (`FuzzParse<Lang>`); crashers go to `tools/conformance/testdata/fuzz/` | `go test -fuzz` |
 | Embedded samples | each `grammars/<lang>` module | its own tests |
 
+The remaining fixed-oracle catalogs were removed after `be31f49f3e4d645a929a9aebc961be150de16e37`, the last
+commit containing them. They remain available in Git history; catalog filenames below refer to that retired
+directory. The older C observations and digests remain in Git history at `9ad82eb`.
+
 The identity rules below still apply: bind every result to the pinned runtime and grammar identities.
 
 ## Rules
@@ -85,24 +89,24 @@ Never check in their output.
 `GEN-CS-BULK` matches the generator upstream itself uses for its C# recovered-structure parity
 witness. Keep it aligned with upstream's shape so results stay comparable.
 
-## Tier 5 — oracle digests (generated, checked in)
+## Tier 5 — historical fixed-oracle catalogs and digests (Git history only)
 
-Produced only in a declared oracle lane (`docs/specs/oracle.md`). One digest file per
-(language, fixture, oracle epoch). The Windows product lane compares against these and never needs a
-C toolchain. A digest file records the oracle tuple that produced it; a digest whose tuple does not
-match the current epoch is `NOT_RUN`, not a failure.
+These digests were produced only in a declared oracle lane (`docs/specs/oracle.md`), one per
+(language, fixture, oracle epoch). The retired carrier's Windows product lane compared against them
+without a C toolchain. Each digest recorded its oracle tuple; a tuple mismatch was `NOT_RUN`.
+The current lanes build a native C reference from the same pins, as listed above.
 
-Session 06 adds `testdata/oracle/cases.json`: 50 hashed inputs covering the seven
+Session 06 adds `cases.json`: 50 hashed inputs covering the seven
 smoke routes, both grammars' F1–F7, 24 JSX boundary controls, two generic-arrow
 controls, and the three licensed Tier-3 C# files. Inline sources are authored in
 this repository; C# sources retain their existing MIT origin and license.
 The JSON identifies each exact UTF-8 byte sequence without newline conversion.
 
-`testdata/oracle/windows-c/` holds one ordered C record per input plus its build
+`windows-c/` holds one ordered C record per input plus its build
 manifest. These are oracle observations, not assertions that the Go runtime
 agrees. Every comparison must check identities and completeness before trees.
 
-Session 07 adds a separate `testdata/oracle/extended-cases.json` catalog with
+Session 07 adds a separate `extended-cases.json` catalog with
 35 repository-authored fixed inputs (30,072 UTF-8 bytes in total). For each of
 the seven routes it contains a UTF-8/CRLF base, length-changing identifier
 rename, UTF-8 comment-row insertion, trailing-CRLF deletion, and a fixed
@@ -111,7 +115,7 @@ inside LF JSON; source SHA-256 checks include those CR bytes. The TypeScript
 base includes `type T = typeof a.b` to exercise field/alias edges. The three
 edit variants identify their exact previous fixture and byte ranges.
 
-`testdata/oracle/windows-c-extended/` stores the independently executed Session
+`windows-c-extended/` stores the independently executed Session
 07 C records and their own build identity. Product tests compare 35 fresh
 results and 21 incremental results against this set. This catalog does not
 change or widen any known-regression record. Bulk performance generators remain
@@ -131,7 +135,7 @@ require exact agreement; original observations remain historical. The inline
 both routes with 20 fresh repeats and one edit each. The separate 26-input
 Candidate C manifest, source hashes, full trees and runtime comparisons are
 retained in the local investigation archive. The approved public inputs and hashes
-are under `testdata/oracle/typescript-patched/` and `internal/provenance/identities.json`.
+are under `typescript-patched/` and `internal/provenance/identities.json`.
 
 `csharp-recovery-cases.json` holds the single `CS-excerpt-no-enum` derivative:
 remove the original excerpt's `internal enum` section through the next summary

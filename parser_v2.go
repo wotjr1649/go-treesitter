@@ -40,10 +40,11 @@ type core struct {
 }
 
 type instance struct {
-	m       engine.Module
-	h       *engine.Host
-	mem     *[]byte // dereference at every use: the slice header changes on grow
-	queries map[weak.Pointer[Query]]int32
+	m           engine.Module
+	h           *engine.Host
+	mem         *[]byte // dereference at every use: the slice header changes on grow
+	queries     map[weak.Pointer[Query]]int32
+	queryCursor int32
 }
 
 type leakedTree struct {
