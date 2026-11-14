@@ -1,6 +1,8 @@
 package main
 
 import (
+	"compress/gzip"
+	"io"
 	"os"
 	"path/filepath"
 	"testing"
@@ -92,19 +94,38 @@ func TestEngineGroupsAndBaseline(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	gs := vmGroups(rs, 512<<20)
+	gs := newEngineGroups(rs, nil, 512<<20)
 	if len(gs) != 1 || gs[0].start != 0x170000000 || gs[0].end != 0x1b0000000 || gs[0].committed != 4<<20 {
 		t.Fatalf("groups = %+v", gs)
 	}
-	if n, c := newGroups(gs, nil); n != 1 || c != 4<<20 {
-		t.Errorf("new groups = %d, %d; want 1, 4 MiB", n, c)
-	}
-	if n, _ := newGroups(gs, [][2]uint64{{gs[0].start, gs[0].end}}); n != 0 {
-		t.Errorf("a group present at start was counted")
+	if got := newEngineGroups(rs, anonRegions(rs), 512<<20); len(got) != 0 {
+		t.Errorf("a mapping present at start was counted: %+v", got)
 	}
 	after := rs[:len(rs)-2] // Close: the mapping is gone
-	if n, _ := newGroups(vmGroups(after, 512<<20), nil); n != 0 {
-		t.Errorf("regions after Close = %d, want 0", n)
+	if got := newEngineGroups(after, nil, 512<<20); len(got) != 0 {
+		t.Errorf("regions after Close = %d, want 0", len(got))
+	}
+}
+
+// The kernel can place the engine mapping directly behind a reservation the Go runtime made before main: merged, the
+// two overlap the baseline. Only the address space that was not mapped at start may count (run 43568897670).
+func TestEngineGroupAdjacentToBaseline(t *testing.T) {
+	const base = `VM_ALLOCATE                 302c4c000-320000000    [ 467.7M     0K     0K     0K] ---/rwx SM=NUL
+`
+	const now = base + `VM_ALLOCATE                 320000000-3200a0000    [  640K   640K   640K     0K] rw-/rwx SM=COW
+VM_ALLOCATE                 3200a0000-360000000    [  1.0G     0K     0K     0K] ---/rwx SM=NUL
+`
+	b, err := parseVmmapRegions(base)
+	if err != nil {
+		t.Fatal(err)
+	}
+	n, err := parseVmmapRegions(now)
+	if err != nil {
+		t.Fatal(err)
+	}
+	gs := newEngineGroups(n, anonRegions(b), 512<<20)
+	if len(gs) != 1 || gs[0].start != 0x320000000 || gs[0].end != 0x360000000 || gs[0].committed != 640<<10 {
+		t.Fatalf("groups = %+v, want one 1 GiB mapping at 320000000 with 640 KiB committed", gs)
 	}
 }
 
@@ -129,6 +150,77 @@ func TestParseVmmapRealOutput(t *testing.T) {
 			t.Errorf("%s: %d regions, %v", f, len(rs), err)
 			continue
 		}
-		t.Logf("%s: %d regions, %d groups >= 512 MiB", filepath.Base(f), len(rs), len(vmGroups(rs, 512<<20)))
+		t.Logf("%s: %d regions, %d groups >= 512 MiB", filepath.Base(f), len(rs), len(newEngineGroups(rs, nil, 512<<20)))
+	}
+}
+
+func readGz(t *testing.T, name string) string {
+	t.Helper()
+	f, err := os.Open(filepath.Join("testdata", "run43568897670", name))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	z, err := gzip.NewReader(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := io.ReadAll(z)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return string(b)
+}
+
+// Recorded vmmap output of three bench-lane processes (macOS 26.7.2 arm64, run 43568897670), each at the three points
+// the lane looks at: process start (baseline), parser open, parser closed. In json/snapshot and csharp/parse the
+// engine mapping (320000000-360000000 and the like) sits directly behind a Go reservation of the baseline, and the
+// old detector reported no region there; the footprint line, tag summary and engine mapping must all be found.
+func TestEngineRegionsRecordedRuns(t *testing.T) {
+	for _, c := range []struct {
+		name         string
+		minCommitted uint64 // the engine's rw part while open (the heap of the wasm instance), lower bound
+	}{{"json-snapshot", 100 << 20}, {"csharp-parse", 15 << 20}, {"pydecimal-parse", 1 << 20}} {
+		regs := func(phase string) []vmRegion {
+			rs, err := parseVmmapRegions(readGz(t, c.name+"-"+phase+".txt.gz"))
+			if err != nil {
+				t.Fatalf("%s %s: %v", c.name, phase, err)
+			}
+			return rs
+		}
+		base := anonRegions(regs("start"))
+		open := newEngineGroups(regs("open"), base, engineRegionMin)
+		if len(open) != 1 || open[0].end-open[0].start != 1<<30 || open[0].committed < c.minCommitted {
+			t.Errorf("%s: open = %+v, want one 1 GiB mapping with >= %d bytes committed", c.name, open, c.minCommitted)
+		}
+		if closed := newEngineGroups(regs("closed"), base, engineRegionMin); len(closed) != 0 {
+			t.Errorf("%s: after Close = %+v, want none", c.name, closed)
+		}
+		if got := newEngineGroups(regs("start"), base, engineRegionMin); len(got) != 0 {
+			t.Errorf("%s: baseline against itself = %+v, want none", c.name, got)
+		}
+	}
+}
+
+func TestParseVmmapTagsRecorded(t *testing.T) {
+	out := readGz(t, "json-snapshot-open.txt.gz")
+	tags, err := parseVmmapTags(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp, _ := parseVmmapFootprint(out)
+	total := tags["TOTAL"]
+	// The summary prints one decimal, the header too: the two footprint figures agree to about 0.1 MB per tag.
+	if d := int64(total.dirty) - int64(fp); d > 2<<20 || d < -2<<20 {
+		t.Errorf("TOTAL dirty %d vs footprint %d", total.dirty, fp)
+	}
+	if va := tags["VM_ALLOCATE"]; va.dirty < 200<<20 || va.virtual < 1<<30 || va.count == 0 {
+		t.Errorf("VM_ALLOCATE = %+v", va)
+	}
+	if _, ok := tags["MALLOC guard page"]; !ok {
+		t.Error("tag names with spaces were not parsed")
+	}
+	if _, err := parseVmmapTags("no summary here"); err == nil {
+		t.Error("output without a summary accepted")
 	}
 }

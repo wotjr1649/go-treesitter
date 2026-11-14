@@ -579,6 +579,11 @@ func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lround
 	P("| file | op | peak MB (max) | limit MB | private delta MB (max) | regions parsed/after | end==bytes | peak | private | regions |")
 	P("|---|---|---|---|---|---|---|---|---|---|")
 	var mcsv [][]string
+	type diagRun struct {
+		in large
+		op string
+	}
+	var privFailed []diagRun
 	for _, in := range larges {
 		for _, op := range []string{"parse", "snapshot"} {
 			var peak, delta, endBad int64
@@ -628,6 +633,7 @@ func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lround
 			}
 			if delta > 16*mb {
 				pv = "FAIL"
+				privFailed = append(privFailed, diagRun{in, op})
 			}
 			switch {
 			case regParsed < 0:
@@ -644,6 +650,26 @@ func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lround
 			if strings.HasPrefix(rg, "NOT_RUN") {
 				fmt.Printf("::warning::regions NOT_RUN for %s/%s %s\n", in.lang, in.file, op)
 			}
+		}
+	}
+	// Evidence only, never a gate: where a failed private-bytes check keeps its memory (see tools/bench/diag.go). The
+	// GODEBUG variants are separate runs; madvdontneed is a no-op on darwin (the runtime uses MADV_FREE_REUSABLE there)
+	// and is listed so that the log says so.
+	for _, d := range privFailed {
+		for _, v := range []struct{ name, godebug string }{{"default", ""}, {"scavtrace", "scavtrace=1"}, {"madvdontneed", "madvdontneed=1"}} {
+			base := filepath.Join(out, "mem-diag", d.in.lang+"-"+d.in.file+"-"+d.op+"-"+v.name)
+			os.Setenv("BENCH_MEM_DIAG", "1")
+			os.Setenv("GODEBUG", v.godebug)
+			if v.name == "default" {
+				os.Setenv("BENCH_VMMAP_DUMP", base+"-vmmap")
+			}
+			r := runCmd(15*time.Minute, exeName(benchDir, d.in.lang), "mem", "-file", d.in.path, "-op", d.op)
+			os.Unsetenv("BENCH_MEM_DIAG")
+			os.Unsetenv("GODEBUG")
+			os.Unsetenv("BENCH_VMMAP_DUMP")
+			must(os.MkdirAll(filepath.Dir(base), 0o755))
+			rec := "exit " + strconv.Itoa(r.code) + "\n" + r.out + "\n--- stderr ---\n" + r.errOut + "\n"
+			must(os.WriteFile(base+".txt", []byte(rec), 0o644))
 		}
 	}
 	must(writeCSV(filepath.Join(out, "mem.csv"), []string{"lang", "file", "op", "run", "peak_ws", "priv_start", "priv_after", "regions_parsed", "regions_after", "end"}, mcsv))

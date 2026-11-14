@@ -87,24 +87,40 @@ func parseVmmapRegions(out string) ([]vmRegion, error) {
 
 type vmGroup struct{ start, end, committed uint64 }
 
-// vmGroups merges adjacent anonymous regions into allocations (the engine's mprotect splits its one mapping into a
-// readable+writable part and a PROT_NONE tail; vmmap lists them as separate entries) and keeps those of at least min
-// bytes. committed is the readable+writable part.
-func vmGroups(rs []vmRegion, min uint64) []vmGroup {
-	sort.Slice(rs, func(i, j int) bool { return rs[i].start < rs[j].start })
-	var all []vmGroup
+// anonRegions returns the anonymous (not file-backed) regions sorted by address.
+func anonRegions(rs []vmRegion) []vmRegion {
+	var out []vmRegion
 	for _, r := range rs {
-		if r.fileBacked {
-			continue
+		if !r.fileBacked {
+			out = append(out, r)
 		}
-		c := uint64(0)
-		if strings.HasPrefix(r.cur, "rw") {
-			c = r.end - r.start
-		}
-		if n := len(all) - 1; n >= 0 && all[n].end == r.start {
-			all[n].end, all[n].committed = r.end, all[n].committed+c
-		} else {
-			all = append(all, vmGroup{r.start, r.end, c})
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].start < out[j].start })
+	return out
+}
+
+// newEngineGroups finds the engine's linear-memory mappings: the address space of anonymous regions that was not
+// mapped at process start (baseline, from anonRegions), with adjacent leftovers merged (the engine's mprotect splits
+// its one mapping into a readable+writable head and a PROT_NONE tail; vmmap lists them as separate entries), keeping
+// groups of at least min bytes. committed is the readable+writable part.
+//
+// Subtracting the baseline address space rather than rejecting any group that overlaps it matters on macOS: the kernel
+// places the 1 GiB engine mapping right after the Go runtime's own reservations, so the merged range of both overlaps
+// the baseline and the engine was reported as "no region" (run 43568897670: 0 of 1 in half of the rows).
+func newEngineGroups(rs, baseline []vmRegion, min uint64) []vmGroup {
+	var all []vmGroup
+	for _, r := range anonRegions(rs) {
+		rw := strings.HasPrefix(r.cur, "rw")
+		for _, p := range subtract(r.start, r.end, baseline) {
+			c := uint64(0)
+			if rw {
+				c = p[1] - p[0]
+			}
+			if n := len(all) - 1; n >= 0 && all[n].end == p[0] {
+				all[n].end, all[n].committed = p[1], all[n].committed+c
+			} else {
+				all = append(all, vmGroup{p[0], p[1], c})
+			}
 		}
 	}
 	var big []vmGroup
@@ -116,19 +132,72 @@ func vmGroups(rs []vmRegion, min uint64) []vmGroup {
 	return big
 }
 
-// newGroups counts the groups that overlap none of the baseline ranges (those present at process start: the Go
-// runtime's own large reservations) and sums their committed bytes. Limit, shared with the Linux detector: an engine
-// mapping that the kernel placed adjacent to a baseline reservation is merged into it and not counted.
-func newGroups(gs []vmGroup, baseline [][2]uint64) (n int, committed uint64) {
-	for _, g := range gs {
-		seen := false
-		for _, b := range baseline {
-			seen = seen || (g.start < b[1] && b[0] < g.end)
+// subtract returns the parts of [lo,hi) not covered by any baseline region (baseline sorted, non-overlapping).
+func subtract(lo, hi uint64, baseline []vmRegion) [][2]uint64 {
+	var out [][2]uint64
+	for _, b := range baseline {
+		if b.end <= lo {
+			continue
 		}
-		if !seen {
-			n++
-			committed += g.committed
+		if b.start >= hi {
+			break
+		}
+		if b.start > lo {
+			out = append(out, [2]uint64{lo, b.start})
+		}
+		lo = max(lo, b.end)
+		if lo >= hi {
+			return out
 		}
 	}
-	return n, committed
+	return append(out, [2]uint64{lo, hi})
+}
+
+// vmTag is one row of the "Summary for process" region-type table.
+type vmTag struct {
+	virtual, resident, dirty, swapped uint64
+	count                             int
+}
+
+var tagRowRe = regexp.MustCompile(`^(\S.*?)\s+([0-9.]+[BKMGT]?)\s+([0-9.]+[BKMGT]?)\s+([0-9.]+[BKMGT]?)\s+([0-9.]+[BKMGT]?)\s+[0-9.]+[BKMGT]?\s+[0-9.]+[BKMGT]?\s+[0-9.]+[BKMGT]?\s+(\d+)\b`)
+
+func splitSize(tok string) (uint64, error) {
+	if n := len(tok) - 1; n > 0 && strings.ContainsRune("BKMGT", rune(tok[n])) {
+		return parseSize(tok[:n], tok[n:])
+	}
+	return parseSize(tok, "")
+}
+
+// parseVmmapTags reads the region-type summary (VIRTUAL RESIDENT DIRTY SWAPPED ... COUNT per tag, TOTAL last). It is a
+// diagnostic aid: where the footprint sits by tag (VM_ALLOCATE holds the Go heap arenas and the engine mapping).
+func parseVmmapTags(out string) (map[string]vmTag, error) {
+	tags := map[string]vmTag{}
+	in := false
+	for _, line := range strings.Split(out, "\n") {
+		switch {
+		case strings.HasPrefix(line, "REGION TYPE") && strings.Contains(line, "(non-coalesced)"):
+			in = true
+		case !in || strings.HasPrefix(line, "=="):
+		case strings.TrimSpace(line) == "":
+			in = false
+		default:
+			m := tagRowRe.FindStringSubmatch(line)
+			if m == nil {
+				return nil, fmt.Errorf("unparsed vmmap summary line: %q", line)
+			}
+			var t vmTag
+			var err error
+			for i, dst := range []*uint64{&t.virtual, &t.resident, &t.dirty, &t.swapped} {
+				if *dst, err = splitSize(m[2+i]); err != nil {
+					return nil, fmt.Errorf("vmmap summary line %q: %v", line, err)
+				}
+			}
+			t.count, _ = strconv.Atoi(m[6])
+			tags[m[1]] = t
+		}
+	}
+	if _, ok := tags["TOTAL"]; !ok {
+		return nil, fmt.Errorf("no TOTAL row in the vmmap region-type summary")
+	}
+	return tags, nil
 }
