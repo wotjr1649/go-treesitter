@@ -8,7 +8,8 @@
 //
 // Criteria (unchanged from the Windows lane): large-input geomean of product/native <= 2.5; small (<= 25 KB) files:
 // per-file median <= 1 ms or <= 2.5x the same file's native median; peak resident set <= 100 x input + 64 MB; after
-// Close every engine region returned and private bytes within start + 16 MB. A criterion the platform cannot measure
+// Close every engine region returned and private bytes within start + 16 MB (darwin: net of the runtime's released
+// heap growth, see memgate.go). A criterion the platform cannot measure
 // is NOT_RUN (never PASS); a measured breach makes the exit status 1.
 package main
 
@@ -576,8 +577,13 @@ func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lround
 	// ---- memory: one fresh process per run ----
 	P("## Memory (large inputs; peak <= 100 x input + 64 MB; after Close all engine regions returned and private bytes <= start + 16 MB)")
 	P("")
-	P("| file | op | peak MB (max) | limit MB | private delta MB (max) | regions parsed/after | end==bytes | peak | private | regions |")
-	P("|---|---|---|---|---|---|---|---|---|---|")
+	P("Private-bytes gate on **%s/%s**: %s", runtime.GOOS, runtime.GOARCH, map[bool]string{
+		true:  "adjusted (ADR-0022 §3 macOS amendment): (footprint delta - growth of runtime heap/released bytes) <= 16 MB, and a snapshot case must have been collected; a missing field is a FAIL. The raw delta is shown too.",
+		false: "raw: private delta <= 16 MB (adjusted = raw; the macOS adjustment does not apply)",
+	}[runtime.GOOS == "darwin"])
+	P("")
+	P("| file | op | peak MB (max) | limit MB | private delta MB (raw, max) | private delta MB (adjusted, max) | regions parsed/after | end==bytes | peak | private | regions |")
+	P("|---|---|---|---|---|---|---|---|---|---|---|")
 	var mcsv [][]string
 	type diagRun struct {
 		in large
@@ -586,7 +592,8 @@ func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lround
 	var privFailed []diagRun
 	for _, in := range larges {
 		for _, op := range []string{"parse", "snapshot"} {
-			var peak, delta, endBad int64
+			var peak, delta, adj, endBad int64
+			privWhy := ""
 			regParsed, regAfter, runs := int64(math.MaxInt64), int64(0), 0
 			regStartBad := false
 			for i := 0; i < mruns; i++ {
@@ -614,14 +621,19 @@ func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lround
 				}
 				runs++
 				peak = max(peak, kv["peak_ws"])
-				delta = max(delta, kv["priv_after"]-kv["priv_start"])
+				rawD, adjD, ok, why := privGate(runtime.GOOS, op, kv)
+				delta, adj = max(delta, rawD), max(adj, adjD)
+				if !ok && privWhy == "" {
+					privWhy = fmt.Sprintf("run %d: %s", i, why)
+				}
 				if kv["end"] != int64(in.bytes) {
 					endBad++
 				}
 				regParsed, regAfter = min(regParsed, kv["regions_parsed"]), max(regAfter, kv["regions_after"])
 				regStartBad = regStartBad || kv["regions_start"] > 0
 				mcsv = append(mcsv, []string{in.lang, in.file, op, strconv.Itoa(i), strconv.FormatInt(kv["peak_ws"], 10), strconv.FormatInt(kv["priv_start"], 10), strconv.FormatInt(kv["priv_after"], 10),
-					strconv.FormatInt(kv["regions_parsed"], 10), strconv.FormatInt(kv["regions_after"], 10), strconv.FormatInt(kv["end"], 10)})
+					strconv.FormatInt(kv["regions_parsed"], 10), strconv.FormatInt(kv["regions_after"], 10), strconv.FormatInt(kv["end"], 10),
+					strconv.FormatInt(kv["rel_start"], 10), strconv.FormatInt(kv["rel_after"], 10), strconv.FormatInt(kv["snap_collected"], 10), strconv.FormatInt(adjD, 10)})
 			}
 			if runs == 0 {
 				continue
@@ -631,7 +643,7 @@ func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lround
 			if peak > limit {
 				pk = "FAIL"
 			}
-			if delta > 16*mb {
+			if privWhy != "" {
 				pv = "FAIL"
 				privFailed = append(privFailed, diagRun{in, op})
 			}
@@ -643,9 +655,9 @@ func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lround
 			case regAfter != 0:
 				rg = "FAIL"
 			}
-			P("| %s | %s | %.1f | %.1f | %.1f | %d/%d | %v | %s | %s | %s |", in.file, op, float64(peak)/mb, float64(limit)/mb, float64(delta)/mb, regParsed, regAfter, endBad == 0, pk, pv, rg)
+			P("| %s | %s | %.1f | %.1f | %.1f | %d/%d | %v | %s | %s | %s |", in.file, op, float64(peak)/mb, float64(limit)/mb, float64(delta)/mb, float64(adj)/mb, regParsed, regAfter, endBad == 0, pk, pv, rg)
 			if pk == "FAIL" || pv == "FAIL" || rg == "FAIL" || endBad > 0 {
-				fail("memory %s/%s %s: peak %s, private %s, regions %s, end mismatches %d", in.lang, in.file, op, pk, pv, rg, endBad)
+				fail("memory %s/%s %s: peak %s, private %s (%s), regions %s, end mismatches %d", in.lang, in.file, op, pk, pv, privWhy, rg, endBad)
 			}
 			if strings.HasPrefix(rg, "NOT_RUN") {
 				fmt.Printf("::warning::regions NOT_RUN for %s/%s %s\n", in.lang, in.file, op)
@@ -672,7 +684,7 @@ func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lround
 			must(os.WriteFile(base+".txt", []byte(rec), 0o644))
 		}
 	}
-	must(writeCSV(filepath.Join(out, "mem.csv"), []string{"lang", "file", "op", "run", "peak_ws", "priv_start", "priv_after", "regions_parsed", "regions_after", "end"}, mcsv))
+	must(writeCSV(filepath.Join(out, "mem.csv"), []string{"lang", "file", "op", "run", "peak_ws", "priv_start", "priv_after", "regions_parsed", "regions_after", "end", "rel_start", "rel_after", "snap_collected", "priv_delta_adjusted"}, mcsv))
 	P("")
 	if ok {
 		P("**All measured criteria passed** (rows marked NOT_RUN were not measured).")
