@@ -1,0 +1,14 @@
+[
+  {"lang": "json", "file": "generated_5mb.json", "kind": "json", "seed": 12345, "sha256": "9dc93c936707af87e87b56a85e4496ff9d357b0e07a98cf9010a42cfbd0a8fe1"},
+  {"lang": "golang", "file": "opGen.go", "kind": "url", "url": "https://raw.githubusercontent.com/golang/go/go1.26.0/src/cmd/compile/internal/ssa/opGen.go", "sha256": "fd9bb20543045745f38417ac47439685c3b35bf71af65858ce8392f9eb2c5dc8"},
+  {"lang": "golang", "file": "rewriteAMD64.go", "kind": "url", "url": "https://raw.githubusercontent.com/golang/go/go1.26.0/src/cmd/compile/internal/ssa/rewriteAMD64.go", "sha256": "045fc7a8d20edabd72411ce735675f4c07b69470fe68e50a999730004a226cee"},
+  {"lang": "golang", "file": "rewriteARM64.go", "kind": "url", "url": "https://raw.githubusercontent.com/golang/go/go1.26.0/src/cmd/compile/internal/ssa/rewriteARM64.go", "sha256": "ef456764c90d82399931fc2794dd05d4878aee17eec9d534a2da0759511673ab"},
+  {"lang": "python", "file": "topics.py", "kind": "url", "url": "https://raw.githubusercontent.com/python/cpython/v3.14.0/Lib/pydoc_data/topics.py", "sha256": "3247a7690ac0439ac98f0e9be0a9595896c73ad426143ade7e44e4a56d53654a"},
+  {"lang": "python", "file": "_pydecimal.py", "kind": "url", "url": "https://raw.githubusercontent.com/python/cpython/v3.14.0/Lib/_pydecimal.py", "sha256": "40df667a04926a73cb8b02001def578369a52d4f595068076d9b7e2dba382f7c"},
+  {"lang": "python", "file": "typing.py", "kind": "url", "url": "https://raw.githubusercontent.com/python/cpython/v3.14.0/Lib/typing.py", "sha256": "b7b20c5180b6be1dd5f17f3f5be5f1a77540802f360ccea8ebf4ecc35ce8a0b5"},
+  {"lang": "typescript", "file": "lib.dom.d.ts", "kind": "npm", "url": "https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz", "member": "package/lib/lib.dom.d.ts", "sha256": "d6b1eba8496bdd0eed6fc8a685768fe01b2da4a0388b5fe7df558290bffcf32f"},
+  {"lang": "typescript", "file": "typescript.js", "kind": "npm", "url": "https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz", "member": "package/lib/typescript.js", "sha256": "569177652966bd528c319171c7dd22860dbf72bde116cbc4f644f1d02bb12e39"},
+  {"lang": "csharp", "file": "Binder_Expressions.cs", "kind": "url", "url": "https://raw.githubusercontent.com/dotnet/roslyn/380343d9b1289048f0f28c052b15018ac6031397/src/Compilers/CSharp/Portable/Binder/Binder_Expressions.cs", "sha256": "38c8c5abf11f4e4ac56592a717840ed1b61baa5b714bee9cb7a9ef45206a9b36"},
+  {"lang": "csharp", "file": "LanguageParser.cs", "kind": "url", "url": "https://raw.githubusercontent.com/dotnet/roslyn/6f4fb6dbba6652102f048e0f421c4999d8f12cb0/src/Compilers/CSharp/Portable/Parser/LanguageParser.cs", "sha256": "733d12c22f9c043d6fa331b5d528ab6cc3e3728ab838d00177ee8be2e6f39b16"},
+  {"lang": "tsql", "file": "corpus_go_concat_1mb.sql", "kind": "concat", "sha256": "388688f2c7ec8152ab7680d25eee7735adf9cec348d90bc63747006d7fd343b2"}
+]
