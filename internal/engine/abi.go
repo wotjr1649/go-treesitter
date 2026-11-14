@@ -7,8 +7,8 @@ import (
 	"sync/atomic"
 )
 
-// ABIVersion is the engine ABI this root module speaks. A grammar module generated for another version is rejected.
-const ABIVersion = 1
+// ABIVersion is the newest engine ABI. ABI 1 remains supported for parsing.
+const ABIVersion = 2
 
 // Export chunk buffer header (snapshot block format) and language meta block identifiers.
 const (
@@ -48,8 +48,25 @@ type Module interface {
 	Xtsg_export_end()
 }
 
+// QueryModule extends Module for ABI 2, keeping ABI 1 modules source compatible.
+type QueryModule interface {
+	Module
+	Xtsg_query_new(src, n int32) int32
+	Xtsg_query_error_offset() int32
+	Xtsg_query_error_type() int32
+	Xtsg_query_delete(q int32)
+	Xtsg_query_meta(q int32) int32
+	Xtsg_qcursor_new() int32
+	Xtsg_qcursor_delete(c int32)
+	Xtsg_qcursor_exec(c, q, t, start, end, limit int32) int32
+	Xtsg_qcursor_next(c int32) int32
+	Xtsg_qcursor_halted(c int32) int32
+	Xtsg_qcursor_exceeded(c int32) int32
+	Xtsg_qcursor_buf(c int32) int32
+}
+
 // Host implements the instance's imports: tsg.should_stop and the WASI preview1 stubs.
-// Set Stop to non-zero to halt a parse at its next progress callback.
+// Set Stop to non-zero to halt a parse or query at its next progress callback.
 type Host struct{ Stop atomic.Int32 }
 
 const enosys = 52

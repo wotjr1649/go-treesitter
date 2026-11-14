@@ -1,7 +1,7 @@
-# Engine ABI v1 (draft for session 15 step 2)
+# Engine ABI v2 (session 15 queries)
 
-Status: draft fixed by the main session on 2026-11-13 for the step-2 implementation; becomes the reference once the
-first grammar module passes its tests. Inputs: ADR-0020, ADR-0021, `docs/design/api-v2.md`, the session-15 spike
+Status: ABI 1 parsing contract plus the additive ABI 2 query implementation (Q1, 2026-11-14).
+Inputs: ADR-0020, ADR-0021, `docs/design/api-v2.md`, `docs/design/query-abi.md`, the session-15 spike
 (`.scratch/s15/w2/mem/combo`, shims `tsg_ext.c` and `tsg_export_s2.c`).
 
 The ABI is the contract between three parts that are versioned separately:
@@ -12,7 +12,7 @@ The ABI is the contract between three parts that are versioned separately:
 | Go side of the ABI, memory provider, trap capture | `internal/engine` (root module) | engine |
 | Per-grammar generated module | `grammars/<lang>/` (one Go module each) | generator output |
 
-`ABIVersion = 1`. Any change to an export signature or semantics, the chunk layout or the meta block bumps it.
+`ABIVersion = 2`. The root accepts ABI 1 for parsing and ABI 2 for parsing and queries. Any change to an export signature or semantics, the chunk layout or the meta block bumps it.
 
 ## 1. C exports (wasm reactor, one instance = one `TSParser`)
 
@@ -21,7 +21,7 @@ All pointers are wasm32 offsets (`int32` in Go). `TSTree*` handles are opaque. O
 
 | Export | Semantics |
 |---|---|
-| `uint32_t tsg_abi_version(void)` | returns `1` |
+| `uint32_t tsg_abi_version(void)` | returns `2` |
 | `int32_t tsg_init(void)` | create the parser, set the language, allocate the export chunk buffer and write its header (section 2); `0` ok, `-1` the runtime rejected the language (language ABI) or allocation failed |
 | `TSTree *tsg_parse(const char *src, uint32_t len, TSTree *old)` | `ts_parser_parse_with_options`, UTF-8 input, progress callback = host `should_stop`; `old` may be `0`. **If the result is `NULL` the shim calls `ts_parser_reset` before returning.** |
 | `void tsg_parser_reset(void)` | `ts_parser_reset` (host calls it on any no-tree path it creates itself) |
@@ -66,7 +66,7 @@ Go data; nothing at run time needs an instance to read names.
 ## 4. Go side (`internal/engine`)
 
 ```go
-const ABIVersion = 1
+const ABIVersion = 2
 
 type Memory = interface{ Slice() *[]byte; Grow(delta, max int64) int64 } // alias: identical to wasm2go's type
 
@@ -106,7 +106,7 @@ Memory provider: reserve-then-commit, `VirtualAlloc` on Windows, `mmap` on Unix 
 recorded in the generator; mismatch = generation failure).
 
 Instance sequence (the `treesitter` package): `m := g.New(h)` → `SetLimit(m.Xmemory().Slice(), limit)` →
-`engine.Call(m.X_initialize)` → `Xtsg_abi_version() == ABIVersion` → `Xtsg_init() == 0` → export header magic/format; any failure =
+`engine.Call(m.X_initialize)` → `Xtsg_abi_version() == g.ABI` (accepted: 1 or 2) → `Xtsg_init() == 0` → export header magic/format; any failure =
 `ErrIncompatibleLanguage` (version) or `EngineFault`. A trap with `Refused` set maps to `ResourceLimit`; any other trap
 to `EngineFault`; both discard the instance (`Release`) and create a new one.
 
@@ -120,3 +120,52 @@ patched), `language.go` (static `engine.Grammar` + `func Language() *treesitter.
 
 `treesitter` exposes `func NewLanguage(g *engine.Grammar) *Language` for generated modules only (the argument type is
 internal, so other modules cannot construct one).
+
+## 6. Query additions (ABI 2)
+
+ABI 1's `Module` interface and all export/snapshot layouts above stay unchanged. ABI 2 additionally implements
+`engine.QueryModule`, an interface embedding `Module`; instance creation rejects ABI 2 without these exports.
+This separate extension is required so old grammar modules still compile against the new root.
+
+| C export (wasm32 opaque handles) | Go method | Meaning |
+|---|---|---|
+| `tsg_query_new(src, len) -> q` | `Xtsg_query_new(src, n int32) int32` | Compile for the instance language; NULL on query error |
+| `tsg_query_error_offset() -> u32` | `Xtsg_query_error_offset() int32` | Last compilation error byte offset |
+| `tsg_query_error_type() -> u32` | `Xtsg_query_error_type() int32` | C TSQueryError (1 syntax, 2 node type, 3 field, 4 capture, 5 structure, 6 language) |
+| `tsg_query_delete(q)` | `Xtsg_query_delete(q int32)` | Free query |
+| `tsg_query_meta(q) -> ptr` | `Xtsg_query_meta(q int32) int32` | Allocated metadata block; host frees it |
+| `tsg_qcursor_new() -> c` | `Xtsg_qcursor_new() int32` | Allocate opaque shim cursor wrapping TSQueryCursor, persistent callback options and match buffer |
+| `tsg_qcursor_delete(c)` | `Xtsg_qcursor_delete(c int32)` | Free cursor and buffer |
+| `tsg_qcursor_exec(c,q,t,start,end,limit) -> i32` | `Xtsg_qcursor_exec(c,q,t,start,end,limit int32) int32` | Root execution with byte intersection range and host should_stop callback; 0 success, -1 invalid range; limit 0 uses UINT32_MAX |
+| `tsg_qcursor_next(c) -> u32` | `Xtsg_qcursor_next(c int32) int32` | Fill buffer, return match count (currently capacity 1); 0 means done/halted |
+| `tsg_qcursor_halted(c) -> u32` | `Xtsg_qcursor_halted(c int32) int32` | Progress callback halted execution |
+| `tsg_qcursor_exceeded(c) -> u32` | `Xtsg_qcursor_exceeded(c int32) int32` | C did_exceed_match_limit |
+| `tsg_qcursor_buf(c) -> ptr` | `Xtsg_qcursor_buf(c int32) int32` | Current buffer; read only after a nonzero next result |
+
+All words below are little endian u32; no alignment padding. Query meta header: `"TSGQ", format=1, totalBytes,
+patternCount, captureCount, stringCount` (24 bytes). Capture names then literal strings, each `{byteLength, bytes}`;
+then each pattern `{startByte, stepCount, stepCount * {TSQueryPredicateStepType, valueID}}`. The host validates all
+lengths, counts, step types and capture/string IDs before evaluation. Type 0 terminates one predicate.
+
+Match buffer header (16 bytes): `"TSGM", format=1, matchCapacity, payloadBytes`. Each match is `{patternIndex,
+captureCount}`, followed by captures `{captureIndex, nodeIndex, symbol, startByte, endByte}` (20 bytes each).
+`nodeIndex` is read from a cursor-owned hash table keyed by TSNode ID (the identity used by ts_node_eq within a
+single tree). On the first returned match, a single preorder traversal records ts_tree_cursor_current_descendant_index
+for every node. Subsequent forward or backward captures use expected O(1) lookups; building the table polls should_stop
+every 256 nodes. A missing ID yields UINT32_MAX, which the host rejects. The table has power-of-two capacity at least
+twice the node count and uses 8 bytes per slot on wasm32 (fewer than 32 bytes per node), released with the cursor.
+Symbol and byte range are included so the host can validate the mapping against its snapshot, including zero-width
+nodes. This extends the abbreviated two-word capture in the design draft.
+
+The match buffer currently holds one match and grows to fit its captures; each next call replaces it. The host copies
+records into Go values before yielding; no engine pointer or memory slice escapes. The cursor options live in the
+shim cursor (never on a returned C stack frame). Allocation failures abort and become host traps.
+
+The root validates NewQuery using a scratch instance. Queries compile once per parser instance. The cache uses weak Query keys; runtime cleanup only queues a retirement
+with weak owner/instance identities. The next owner engine operation deletes that TSQuery, ignoring entries for an
+already replaced instance. The cache is also released with the instance. Matches holds the existing busy guard through snapshot export, compilation, streaming,
+predicate filtering and cursor deletion; break/panic releases it. Context cancellation retains the instance, while
+refused growth (even without a trap) becomes ResourceLimit with instance reset; other traps, malformed blocks and
+capture mapping mismatches become EngineFault with instance reset. A match-limit error is ErrQueryMatchLimit and
+retains the instance. On each error the cursor is deleted if its instance still exists; cleanup traps follow the same
+reset rule. Go predicate validation errors use QueryError type 7 and the pattern start byte.

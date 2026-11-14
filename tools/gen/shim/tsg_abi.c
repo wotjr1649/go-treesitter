@@ -1,4 +1,4 @@
-// tsg_abi.c - the C side of engine ABI v1 (docs/design/engine-abi.md). This repository's own code; upstream files are
+// tsg_abi.c - the C side of engine ABI v2 (docs/design/engine-abi.md). This repository's own code; upstream files are
 // compiled unmodified next to it. One wasm instance = one TSParser; trees are opaque TSTree* handles (wasm32 offsets).
 // Build: clang --target=wasm32-wasip1 -mexec-model=reactor -DTSG_LANG_FN=<tree_sitter_xxx> (see tools/gen).
 // Any change to an export signature or semantics, the chunk layout or the meta block bumps TSG_ABI_VERSION and
@@ -9,7 +9,7 @@
 #include <string.h>
 #include "tree_sitter/api.h"
 
-#define TSG_ABI_VERSION 1u
+#define TSG_ABI_VERSION 2u
 
 #ifndef TSG_LANG_FN
 #error "define TSG_LANG_FN"
@@ -224,3 +224,154 @@ uint8_t *tsg_lang_meta(void) {
   fldOff[nField] = pp;
   return blk;
 }
+
+// ---- queries (ABI 2) ----
+static uint32_t q_error_offset;
+static TSQueryError q_error_type;
+TSQuery *tsg_query_new(const char *src, uint32_t len) {
+  q_error_offset = 0; q_error_type = TSQueryErrorNone;
+  return ts_query_new(TSG_LANG_FN(), src, len, &q_error_offset, &q_error_type);
+}
+uint32_t tsg_query_error_offset(void) { return q_error_offset; }
+uint32_t tsg_query_error_type(void) { return (uint32_t)q_error_type; }
+void tsg_query_delete(TSQuery *q) { ts_query_delete(q); }
+
+// Header: TSGQ, u32 format, total bytes, patterns, captures, strings. Length-prefixed UTF-8 strings
+// (capture names then literals), then per-pattern start byte, step count, {type,value} predicate steps.
+uint8_t *tsg_query_meta(TSQuery *q) {
+  uint32_t np = ts_query_pattern_count(q), nc = ts_query_capture_count(q), ns = ts_query_string_count(q);
+  uint64_t size = 24;
+  for (uint32_t i = 0, n; i < nc; i++) { ts_query_capture_name_for_id(q, i, &n); size += 4ull + n; }
+  for (uint32_t i = 0, n; i < ns; i++) { ts_query_string_value_for_id(q, i, &n); size += 4ull + n; }
+  for (uint32_t i = 0, n; i < np; i++) { ts_query_predicates_for_pattern(q, i, &n); size += 8ull + 8ull * n; }
+  if (size > UINT32_MAX) abort();
+  uint8_t *b = malloc((uint32_t)size);
+  if (!b) abort();
+  memcpy(b, "TSGQ", 4);
+  uint32_t h[] = {1, (uint32_t)size, np, nc, ns};
+  memcpy(b + 4, h, sizeof(h));
+  uint32_t pos = 24;
+  for (uint32_t kind = 0; kind < 2; kind++) {
+    uint32_t count = kind ? ns : nc;
+    for (uint32_t i = 0; i < count; i++) {
+      uint32_t n;
+      const char *s = kind ? ts_query_string_value_for_id(q, i, &n) : ts_query_capture_name_for_id(q, i, &n);
+      memcpy(b + pos, &n, 4); pos += 4;
+      memcpy(b + pos, s, n); pos += n;
+    }
+  }
+  for (uint32_t i = 0; i < np; i++) {
+    uint32_t n, start = ts_query_start_byte_for_pattern(q, i);
+    const TSQueryPredicateStep *steps = ts_query_predicates_for_pattern(q, i, &n);
+    memcpy(b + pos, &start, 4); memcpy(b + pos + 4, &n, 4); pos += 8;
+    for (uint32_t j = 0; j < n; j++) {
+      uint32_t pair[] = {(uint32_t)steps[j].type, steps[j].value_id};
+      memcpy(b + pos, pair, 8); pos += 8;
+    }
+  }
+  return b;
+}
+
+typedef struct { const void *id; uint32_t index; } QNodeIndex;
+
+typedef struct {
+  TSQueryCursor *cursor;
+  TSTree *tree;
+  TSQueryCursorOptions options;
+  uint8_t *buf;
+  uint32_t bytes;
+  QNodeIndex *nodes;
+  uint32_t node_capacity;
+  bool halted;
+} TSGQCursor;
+
+TSGQCursor *tsg_qcursor_new(void) {
+  TSGQCursor *c = calloc(1, sizeof(TSGQCursor));
+  if (!c) abort();
+  c->cursor = ts_query_cursor_new();
+  if (!c->cursor) abort();
+  return c;
+}
+void tsg_qcursor_delete(TSGQCursor *c) {
+  if (!c) return;
+  ts_query_cursor_delete(c->cursor); free(c->nodes); free(c->buf); free(c);
+}
+static bool qprogress(TSQueryCursorState *state) {
+  TSGQCursor *c = state->payload;
+  if (tsg_host_should_stop()) { c->halted = true; return true; }
+  return false;
+}
+int32_t tsg_qcursor_exec(TSGQCursor *c, TSQuery *q, TSTree *t, uint32_t start, uint32_t end, uint32_t limit) {
+  free(c->nodes); c->nodes = NULL; c->node_capacity = 0;
+  c->tree = t; c->halted = false;
+  c->options = (TSQueryCursorOptions){c, qprogress};
+  ts_query_cursor_set_match_limit(c->cursor, limit ? limit : UINT32_MAX);
+  if (!ts_query_cursor_set_byte_range(c->cursor, start, end)) return -1;
+  ts_query_cursor_exec_with_options(c->cursor, q, ts_tree_root_node(t), &c->options);
+  return 0;
+}
+// One preorder traversal and a half-full ID table avoid rescanning siblings for every capture.
+static QNodeIndex *qnode_slot(TSGQCursor *c, const void *id) {
+  uint32_t hash = (uint32_t)(uintptr_t)id;
+  hash ^= hash >> 16; hash *= 0x7feb352du; hash ^= hash >> 15;
+  uint32_t slot = hash & (c->node_capacity - 1);
+  while (c->nodes[slot].id && c->nodes[slot].id != id) slot = (slot + 1) & (c->node_capacity - 1);
+  return &c->nodes[slot];
+}
+static bool qnode_build(TSGQCursor *c) {
+  TSNode root = ts_tree_root_node(c->tree);
+  uint32_t count = ts_node_descendant_count(root);
+  uint64_t capacity = 1;
+  while (capacity < 2ull * count) capacity *= 2;
+  if (capacity > UINT32_MAX / sizeof(QNodeIndex)) abort();
+  c->node_capacity = (uint32_t)capacity;
+  c->nodes = calloc(c->node_capacity, sizeof(QNodeIndex));
+  if (!c->nodes) abort();
+  TSTreeCursor cur = ts_tree_cursor_new(root);
+  uint32_t visited = 0;
+  do {
+    if ((visited & 255u) == 0 && tsg_host_should_stop()) {
+      c->halted = true; ts_tree_cursor_delete(&cur); return false;
+    }
+    TSNode node = ts_tree_cursor_current_node(&cur);
+    QNodeIndex *entry = qnode_slot(c, node.id);
+    if (entry->id) abort();
+    *entry = (QNodeIndex){node.id, ts_tree_cursor_current_descendant_index(&cur)};
+    visited++;
+    if (ts_tree_cursor_goto_first_child(&cur)) continue;
+    while (!ts_tree_cursor_goto_next_sibling(&cur)) {
+      if (!ts_tree_cursor_goto_parent(&cur)) goto done;
+    }
+  } while (true);
+done:
+  ts_tree_cursor_delete(&cur);
+  if (visited != count) abort();
+  return true;
+}
+static uint32_t qnode_index(TSGQCursor *c, TSNode node) {
+  QNodeIndex *entry = qnode_slot(c, node.id);
+  return entry->id ? entry->index : UINT32_MAX;
+}
+uint32_t tsg_qcursor_next(TSGQCursor *c) {
+  TSQueryMatch m;
+  if (!ts_query_cursor_next_match(c->cursor, &m)) return 0;
+  if (!c->nodes && !qnode_build(c)) return 0;
+  uint32_t bytes = 24u + 20u * m.capture_count;
+  if (bytes > c->bytes) {
+    uint8_t *b = realloc(c->buf, bytes);
+    if (!b) abort();
+    c->buf = b; c->bytes = bytes;
+  }
+  memcpy(c->buf, "TSGM", 4);
+  uint32_t h[] = {1, 1, bytes - 16, m.pattern_index, m.capture_count};
+  memcpy(c->buf + 4, h, sizeof(h));
+  for (uint32_t i = 0; i < m.capture_count; i++) {
+    TSNode n = m.captures[i].node;
+    uint32_t cap[] = {m.captures[i].index, qnode_index(c, n), ts_node_symbol(n), ts_node_start_byte(n), ts_node_end_byte(n)};
+    memcpy(c->buf + 24 + 20u * i, cap, sizeof(cap));
+  }
+  return 1;
+}
+uint32_t tsg_qcursor_halted(TSGQCursor *c) { return c->halted; }
+uint32_t tsg_qcursor_exceeded(TSGQCursor *c) { return ts_query_cursor_did_exceed_match_limit(c->cursor); }
+uint8_t *tsg_qcursor_buf(TSGQCursor *c) { return c->buf; }

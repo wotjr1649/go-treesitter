@@ -9,6 +9,10 @@
  *   <exe> speed <file> <reps>                          timing: reps+1 whitespace-separated ms values (the first is the warm-up),
  *                                                      each one ts_parser_parse_string + ts_tree_delete on a reused parser
  *   <exe> corpus <list> <reps>                         speed for every path in <list> (one per line): "name,bytes,outcome,ms0;ms1;..."
+ *   <exe> query <query-file> <source>                  raw query matches of a fresh parse; text predicates are NOT evaluated (the C engine
+ *                                                      never does): "#tsg-query/1 patterns=<n> captures=<n>", then per match "m\t<pattern>\t<n>"
+ *                                                      and per capture "c\t<capture>\t<node preorder index>\t<symbol>\t<start>\t<end>";
+ *                                                      a rejected query prints "#tsg-query/1 error offset=<o> type=<t>" (exit 0)
  * Points are byte columns with '\n' rows, the same as treesitter.EditFor. Exit: 0 ok, 2 usage, 3 cannot read input,
  * 4 parse failed.
  *
@@ -205,6 +209,81 @@ static int speed(const char *arg, int reps, int is_list) {
   return rc;
 }
 
+typedef struct { const void *id; uint32_t index; } NodeRef;
+static int cmp_ref(const void *a, const void *b) {
+  const NodeRef *x = a, *y = b;
+  return x->id < y->id ? -1 : x->id > y->id;
+}
+
+/* Preorder index of every visible node (the cursor order of dump_tree), found by node id: independent of the engine's
+ * own descendant-index logic that the Go side's capture mapping is compared with. */
+static NodeRef *index_nodes(TSTree *tree, uint32_t *count) {
+  uint32_t n = 0, cap = 1024;
+  NodeRef *refs = malloc(cap * sizeof *refs);
+  if (!refs) abort();
+  TSTreeCursor cur = ts_tree_cursor_new(ts_tree_root_node(tree));
+  for (;;) {
+    if (n == cap) { cap *= 2; refs = realloc(refs, cap * sizeof *refs); if (!refs) abort(); }
+    refs[n].id = ts_tree_cursor_current_node(&cur).id;
+    refs[n].index = n;
+    n++;
+    if (ts_tree_cursor_goto_first_child(&cur)) continue;
+    for (;;) {
+      if (ts_tree_cursor_goto_next_sibling(&cur)) break;
+      if (!ts_tree_cursor_goto_parent(&cur)) goto done;
+    }
+  }
+done:
+  ts_tree_cursor_delete(&cur);
+  qsort(refs, n, sizeof *refs, cmp_ref);
+  *count = n;
+  return refs;
+}
+
+static int query_cmd(const char *qpath, const char *spath) {
+  uint32_t qn, sn;
+  char *qsrc = slurp(qpath, &qn), *src = slurp(spath, &sn);
+  if (!qsrc || !src) { fputs("open failed\n", stderr); return 3; }
+  Buf out = {0};
+  uint32_t eo = 0;
+  TSQueryError et = TSQueryErrorNone;
+  TSQuery *q = ts_query_new(TSG_LANG_FN(), qsrc, qn, &eo, &et);
+  if (!q) {
+    str(&out, "#tsg-query/1 error offset="); u32(&out, eo); str(&out, " type="); u32(&out, (uint32_t)et); str(&out, "\n");
+    return emit(out);
+  }
+  TSParser *p = new_parser();
+  if (!p) { fputs("set language failed\n", stderr); return 4; }
+  TSTree *tree = ts_parser_parse_string(p, NULL, src, sn);
+  if (!tree) { fputs("parse failed\n", stderr); return 4; }
+  uint32_t nrefs;
+  NodeRef *refs = index_nodes(tree, &nrefs);
+  str(&out, "#tsg-query/1 patterns="); u32(&out, ts_query_pattern_count(q));
+  str(&out, " captures="); u32(&out, ts_query_capture_count(q)); str(&out, "\n");
+  TSQueryCursor *cur = ts_query_cursor_new();
+  ts_query_cursor_exec(cur, q, ts_tree_root_node(tree));
+  TSQueryMatch m;
+  while (ts_query_cursor_next_match(cur, &m)) {
+    str(&out, "m\t"); u32(&out, m.pattern_index); str(&out, "\t"); u32(&out, m.capture_count); str(&out, "\n");
+    for (uint16_t i = 0; i < m.capture_count; i++) {
+      TSNode n = m.captures[i].node;
+      NodeRef key = {n.id, 0}, *hit = bsearch(&key, refs, nrefs, sizeof *refs, cmp_ref);
+      if (!hit) { fputs("captured node is not a visible node of the tree\n", stderr); return 4; }
+      str(&out, "c\t"); u32(&out, m.captures[i].index); str(&out, "\t"); u32(&out, hit->index);
+      str(&out, "\t"); u32(&out, ts_node_symbol(n)); str(&out, "\t"); u32(&out, ts_node_start_byte(n));
+      str(&out, "\t"); u32(&out, ts_node_end_byte(n)); str(&out, "\n");
+    }
+  }
+  int exceeded = ts_query_cursor_did_exceed_match_limit(cur);
+  ts_query_cursor_delete(cur);
+  free(refs);
+  ts_tree_delete(tree);
+  ts_parser_delete(p);
+  ts_query_delete(q);
+  if (exceeded) { fputs("match limit exceeded\n", stderr); return 4; }
+  return emit(out);
+}
+
 int main(int argc, char **argv) {
 #ifdef _WIN32
   _setmode(_fileno(stdout), _O_BINARY);
@@ -215,9 +294,10 @@ int main(int argc, char **argv) {
     if (reps < 1) { fputs("reps must be >= 1\n", stderr); return 2; }
     return speed(argv[2], reps, cmd[0] == 'c');
   }
+  if (argc == 4 && !strcmp(cmd, "query")) return query_cmd(argv[2], argv[3]);
   int edit = !strcmp(cmd, "edit"), cr = !strcmp(cmd, "changed-ranges");
   if (!((argc == 3 && !strcmp(cmd, "dump")) || (argc == 7 && (edit || cr)))) {
-    fputs("usage: <exe> dump <file> | edit|changed-ranges <old> <new> <start> <old_end> <new_end> | speed <file> <reps> | corpus <list> <reps>\n", stderr);
+    fputs("usage: <exe> dump <file> | edit|changed-ranges <old> <new> <start> <old_end> <new_end> | speed <file> <reps> | corpus <list> <reps> | query <query-file> <source>\n", stderr);
     return 2;
   }
   uint32_t n1, n2 = 0;

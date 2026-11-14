@@ -10,6 +10,7 @@ import (
 	"sync/atomic"
 	"unicode/utf8"
 	"unsafe"
+	"weak"
 
 	"github.com/wotjr1649/go-treesitter/internal/engine"
 )
@@ -33,14 +34,16 @@ type core struct {
 	closed  bool
 	busy    atomic.Bool
 
-	mu     sync.Mutex // guards leaked only: the GC goroutine enqueues, the owner drains
-	leaked []leakedTree
+	mu            sync.Mutex // guards cleanup queues only: the GC goroutine enqueues, the owner drains
+	leaked        []leakedTree
+	leakedQueries []queryRetirement
 }
 
 type instance struct {
-	m   engine.Module
-	h   *engine.Host
-	mem *[]byte // dereference at every use: the slice header changes on grow
+	m       engine.Module
+	h       *engine.Host
+	mem     *[]byte // dereference at every use: the slice header changes on grow
+	queries map[weak.Pointer[Query]]int32
 }
 
 type leakedTree struct {
@@ -91,7 +94,7 @@ func (c *core) recreate() (err error) {
 
 func (c *core) newInstance() (*instance, *ParseError) {
 	g := c.lang.g
-	if g.ABI != engine.ABIVersion {
+	if g.ABI != 1 && g.ABI != engine.ABIVersion {
 		return nil, perr(IncompatibleLanguage, fmt.Sprintf("grammar module %q has engine ABI %d, this root module speaks %d", g.Name, g.ABI, engine.ABIVersion), nil)
 	}
 	in := &instance{h: &engine.Host{}}
@@ -122,8 +125,13 @@ func (c *core) newInstance() (*instance, *ParseError) {
 	if err := ops.call(func() { ver = in.m.Xtsg_abi_version() }); err != nil {
 		return trap("tsg_abi_version", err)
 	}
-	if ver != engine.ABIVersion {
-		return fail(IncompatibleLanguage, fmt.Sprintf("module reports engine ABI %d, expected %d", ver, engine.ABIVersion), nil)
+	if uint32(ver) != g.ABI {
+		return fail(IncompatibleLanguage, fmt.Sprintf("module reports engine ABI %d, expected %d", ver, g.ABI), nil)
+	}
+	if ver == 2 {
+		if _, ok := in.m.(engine.QueryModule); !ok {
+			return fail(IncompatibleLanguage, "ABI 2 module lacks query exports", nil)
+		}
 	}
 	if err := ops.call(func() { rc = in.m.Xtsg_init() }); err != nil {
 		return trap("tsg_init", err)
@@ -151,6 +159,7 @@ func (c *core) discard() {
 	c.live, c.recycle, c.ptrs = 0, false, nil
 	c.mu.Lock()
 	c.leaked = nil
+	c.leakedQueries = nil
 	c.mu.Unlock()
 }
 
@@ -201,6 +210,10 @@ func (c *core) begin(ctx context.Context) error {
 			c.busy.Store(false)
 			return err
 		}
+	}
+	if err := c.drainQueries(); err != nil {
+		c.busy.Store(false)
+		return err
 	}
 	return nil
 }

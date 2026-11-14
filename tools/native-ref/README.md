@@ -25,6 +25,7 @@ Executable CLI (stdout is binary, `\n` line ends on every platform):
 | `<exe> dump <file>` | `#tsg-dump/1 root_has_error=<0\|1> nodes=<n>` then one tab-separated line per node in cursor preorder: `depth field type named extra missing is_error has_error start_byte end_byte row:col row:col` |
 | `<exe> edit <old> <new> <start> <old_end> <new_end>` | the same dump of `<new>` reparsed incrementally from the edited `<old>` tree |
 | `<exe> changed-ranges <old> <new> <start> <old_end> <new_end>` | `ts_tree_get_changed_ranges(old, new)`, one `start_byte end_byte start_row start_col end_row end_col` line per range |
+| `<exe> query <query-file> <source>` | raw matches of a fresh parse, text predicates not evaluated (the C engine never does): `#tsg-query/1 patterns=<n> captures=<n>`, then per match `m<TAB><pattern><TAB><n>` and per capture `c<TAB><capture><TAB><node preorder index><TAB><symbol><TAB><start byte><TAB><end byte>` (the index comes from a full cursor walk by node id, independent of the engine's descendant index; symbol is `ts_node_symbol`). A rejected query prints `#tsg-query/1 error offset=<o> type=<t>` and exits 0. |
 
 Points are byte columns with `\n` rows (the same as `treesitter.EditFor`). Exit codes: 0 ok, 2 usage / edit out of
 range, 3 unreadable input, 4 parse failure, 5 write failure.
@@ -36,6 +37,7 @@ range, 3 unreadable input, 4 parse failure, 5 write failure.
 
 ```
 native-ref -pins tools/gen/pins.json -fetch -dl <dl> -work <work> -out <exe dir> -corpus <corpus dir>   # build + extract corpora
+#   -queries <dir>: also extract each archive's queries/ into <dir>/<extractDir>/queries (sha256-verified; TSG_QUERY_DIR for the query lane)
 #   -nobuild: verify and extract only (no compiler); GITHUB_TOKEN, when set, authenticates -fetch against API rate limits
 cd tools/native-ref && go run ./ciconf -pins ../gen/pins.json -corpus <corpus dir> -exe <exe dir> -out <data dir> [-seed N] [-j N]
 cd tools/conformance && TSG_DATA_DIR=<data dir> TSG_NATIVE_EXE_DIR=<exe dir> go test -run 'TestCorpus|TestEdits|TestParserPoolRealEngine' .

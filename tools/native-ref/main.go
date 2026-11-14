@@ -54,19 +54,20 @@ func main() {
 	opt := flag.String("opt", "-O2", "optimization flag")
 	fetch := flag.Bool("fetch", false, "download a missing archive from GitHub (sha256 still verified)")
 	corpus := flag.String("corpus", "", "also extract each grammar archive's test/corpus into DIR/<extractDir>/test/corpus (the archive is sha256-verified first)")
+	queries := flag.String("queries", "", "also extract each grammar archive's queries/ into DIR/<extractDir>/queries (the archive is sha256-verified first)")
 	nobuild := flag.Bool("nobuild", false, "verify and extract only; do not compile (-out is then optional)")
 	flag.Parse()
 	if *dl == "" || *work == "" || (*out == "" && !*nobuild) {
-		fmt.Fprintln(os.Stderr, "usage: native-ref -dl DIR -work DIR -out DIR [-pins F] [-cc gcc] [-fetch] [-corpus DIR] [-nobuild] [lang ...]")
+		fmt.Fprintln(os.Stderr, "usage: native-ref -dl DIR -work DIR -out DIR [-pins F] [-cc gcc] [-fetch] [-corpus DIR] [-queries DIR] [-nobuild] [lang ...]")
 		os.Exit(2)
 	}
-	if err := run(*log, *dl, *work, *out, *cc, *opt, *corpus, *fetch, *nobuild, flag.Args()); err != nil {
+	if err := run(*log, *dl, *work, *out, *cc, *opt, *corpus, *queries, *fetch, *nobuild, flag.Args()); err != nil {
 		fmt.Fprintln(os.Stderr, "native-ref:", err)
 		os.Exit(1)
 	}
 }
 
-func run(pinsFile, dl, work, out, cc, opt, corpus string, fetch, nobuild bool, langs []string) error {
+func run(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuild bool, langs []string) error {
 	raw, err := os.ReadFile(pinsFile)
 	if err != nil {
 		return err
@@ -93,7 +94,7 @@ func run(pinsFile, dl, work, out, cc, opt, corpus string, fetch, nobuild bool, l
 		}
 	}
 	extracted := map[string]bool{} // typescript and tsx share one archive
-	corpusDone := map[string]bool{}
+	corpusDone, queriesDone := map[string]bool{}, map[string]bool{}
 	if err := prepare(p.Runtime, dl, work, fetch, extracted); err != nil {
 		return fmt.Errorf("runtime: %w", err)
 	}
@@ -123,6 +124,12 @@ func run(pinsFile, dl, work, out, cc, opt, corpus string, fetch, nobuild bool, l
 				return fmt.Errorf("%s: corpus: %w", l, err)
 			}
 			corpusDone[g.Archive] = true
+		}
+		if queries != "" && !queriesDone[g.Archive] { // likewise verified; typescript and tsx share one archive
+			if err := extract(filepath.Join(dl, g.Archive), filepath.Join(queries, g.ExtractDir), []string{"queries"}); err != nil {
+				return fmt.Errorf("%s: queries: %w", l, err)
+			}
+			queriesDone[g.Archive] = true
 		}
 		if nobuild {
 			continue
