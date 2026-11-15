@@ -5,6 +5,26 @@ with each grammar change. The file is read from the pinned upstream archive afte
 `tools/gen/pins.json`; it is not generated or modified by this repository. A schema hash says nothing about parse
 behaviour: equal schemas can still parse differently (for example after a precedence change).
 
+## Offline strict-check inputs
+
+The current pin set contains 23 grammars, including the Q17 PHP, PowerShell and Dart revisions below;
+`tools/gen/pins.json` SHA-256 is `18a8497b6e0fa028b4d7d1607ff2505a51fc3a182a4989f61dd55b114255c3a1`. All 23 schemas pass the
+strict check at this pin set (Windows amd64, Go 1.27.4).
+The tables below record each schema once, grouped by the release that first recorded it; archive SHA-256
+values identify the pinned upstream inputs. `tsx` and `typescript` share one archive. Schema bytes come from
+`<grammarDir>/node-types.json` in that archive, after checking its digest, and match the generator's extracted input.
+
+`TestPinnedSchemas` is an opt-in, offline strict format check; its invocation is documented in
+[tools/gen](../../tools/gen/README.md#offline-node-type-schema-commands). Python's schema produces one
+`REFERENCE_UNDECLARED` warning at `/9/fields/alias/types/0`: `as_pattern_target` (`named: true`) has no
+separate node declaration. This warning can accompany `PASS`; it does not establish parse behaviour.
+
+None of the current pins regenerates `parser.c` from grammar source. For a future source-generated grammar,
+record `node-types.json` from the same generation run as `parser.c`, with that run's CLI and input identities;
+an archived upstream schema alone is not the generated result. YAML's ADR-0023 C-only patch
+[`0001-no-early-eof.patch`](../../tools/gen/patches/yaml/0001-no-early-eof.patch) changes `parser.c`;
+the upstream schema does not describe that patch's behavioural effect.
+
 A new grammar's first entry is its baseline. When a pin moves, the entry records the old and new hashes and the
 reviewed node-type diff (tooling: `docs/design/decisions/ADR-0025` once accepted; until then the diff is written by
 hand in the pin-change pull request).
@@ -13,23 +33,23 @@ hand in the pin-change pull request).
 
 Pins as on `main` at `a44ea38`. `tsx` and `typescript` come from one archive.
 
-| Grammar | Repository | Commit | Directory | Bytes | `node-types.json` SHA-256 | Status |
-|---|---|---|---|---:|---|---|
-| bash | tree-sitter/tree-sitter-bash | `a06c2e4415e9` | `src` | 51167 | `b644629f7f9460cb0af080cb88f3bef898e6c47b6f8a76ed512b67ae16ef5ac5` | baseline (new in v0.3.0) |
-| c | tree-sitter/tree-sitter-c | `b780e47fc780` | `src` | 83057 | `23e819ef1eefd357bb6eba844f47f8492f6a88da3e5046b06ec4acd4da8a9fd6` | baseline (new in v0.3.0) |
-| cpp | tree-sitter/tree-sitter-cpp | `c00922280863` | `src` | 164416 | `bc49c50d6b8af62df4cfda2675e5142bfba85bc1790ff2693aa0ca1286d5c7fe` | baseline (new in v0.3.0) |
-| csharp | tree-sitter/tree-sitter-c-sharp | `9150f7d56bb4` | `src` | 133257 | `54bf9fa925bac6fcdc05e0221ae8d4a62c155eb43ccd72b5bc2a4bdbebb7997e` | pin unchanged since v0.2.0; first recorded here |
-| css | tree-sitter/tree-sitter-css | `dda5cfc5722c` | `src` | 43620 | `fbbf8d22d82608f6d2f61cfdb374e6758779754fb2f42643e9dc5af6ead0d5d2` | baseline (new in v0.3.0) |
-| golang | tree-sitter/tree-sitter-go | `2346a3ab1bb3` | `src` | 52032 | `8d77e723df0f0dfccb66d4571a5c3c17ecfb6c90959044c0992146b21f383bff` | pin unchanged since v0.2.0; first recorded here |
-| html | tree-sitter/tree-sitter-html | `73a3947324f6` | `src` | 5195 | `e04d0a6e667ee3773ceeb0751466ce314f29bafc9b1c7d2466414c39c3eda178` | baseline (new in v0.3.0) |
-| java | tree-sitter/tree-sitter-java | `e10607b45ff7` | `src` | 81249 | `19c46facc653381c337ff6cad75dd8b052524179a366c80825d6d0010520eef2` | baseline (new in v0.3.0) |
-| javascript | tree-sitter/tree-sitter-javascript | `58404d8cf191` | `src` | 64022 | `188a8baa97018edaf63bf7ece372c07bc0d74d1301004bc8f211eb7dee5a6e70` | baseline (new in v0.3.0) |
-| json | tree-sitter/tree-sitter-json | `254c42a64764` | `src` | 2698 | `620b6f5d38676a97526e9d128972d4b156ddbdf6e130cd7e6b9c35e6823e943f` | pin unchanged since v0.2.0; first recorded here |
-| python | tree-sitter/tree-sitter-python | `26855eabccb1` | `src` | 65198 | `6d26089d798b66b9a68dd5f6e278cf1ea00b31537ac48a7efbbe5bb63094c473` | pin unchanged since v0.2.0; first recorded here |
-| rust | tree-sitter/tree-sitter-rust | `77a3747266f4` | `src` | 99023 | `4b73a1248978340336100db455bf0731c23f9190568c9ae62265fa4a80a327d5` | baseline (new in v0.3.0) |
-| tsql | meloncholera/tree-sitter-mssql | `8620fbcfca94` | `src` | 404735 | `d49356aed210b6522a6e130fdfb3081ff004b74c1cc3a8aee8c5f76eb73d30b9` | pin unchanged since v0.2.0; first recorded here |
-| tsx | tree-sitter/tree-sitter-typescript | `75b3874edb2d` | `tsx/src` | 113345 | `78b5789145286799a27a0a7ecc36cc1bcb151f94ec7fa631b248459867010c8c` | pin unchanged since v0.2.0; first recorded here |
-| typescript | tree-sitter/tree-sitter-typescript | `75b3874edb2d` | `typescript/src` | 108583 | `c790a733fc756b54d4e54dceeb7d2d51e40d8b57136e70277753a75804cce3e3` | pin unchanged since v0.2.0; first recorded here |
+| Grammar | Repository | Commit | Directory | Bytes | `node-types.json` SHA-256 | Archive SHA-256 | Status |
+|---|---|---|---|---:|---|---|---|
+| bash | tree-sitter/tree-sitter-bash | `a06c2e4415e9` | `src` | 51167 | `b644629f7f9460cb0af080cb88f3bef898e6c47b6f8a76ed512b67ae16ef5ac5` | `879e8951ea2cc82455407e3eda0293319657ec53e83191e0fb5a67430d10d804` | baseline (new in v0.3.0) |
+| c | tree-sitter/tree-sitter-c | `b780e47fc780` | `src` | 83057 | `23e819ef1eefd357bb6eba844f47f8492f6a88da3e5046b06ec4acd4da8a9fd6` | `dc3979e40fce678c27273ba8ab93b48b5acd6b91d1dfde6a4451222d366d689f` | baseline (new in v0.3.0) |
+| cpp | tree-sitter/tree-sitter-cpp | `c00922280863` | `src` | 164416 | `bc49c50d6b8af62df4cfda2675e5142bfba85bc1790ff2693aa0ca1286d5c7fe` | `6c6efaf024f5c02fee0403e4e2373346eeadc40828587bcfad9351df2f0a7986` | baseline (new in v0.3.0) |
+| csharp | tree-sitter/tree-sitter-c-sharp | `9150f7d56bb4` | `src` | 133257 | `54bf9fa925bac6fcdc05e0221ae8d4a62c155eb43ccd72b5bc2a4bdbebb7997e` | `2cda5e9e9731a58a7a4c29eaf64c71db052688f2b3fd43dd73cebe2da2be6197` | pin unchanged since v0.2.0; first recorded here |
+| css | tree-sitter/tree-sitter-css | `dda5cfc5722c` | `src` | 43620 | `fbbf8d22d82608f6d2f61cfdb374e6758779754fb2f42643e9dc5af6ead0d5d2` | `c47392e483feb9137d8f0acf9ca6e916b820122c260324454a9980c75c98c3c5` | baseline (new in v0.3.0) |
+| golang | tree-sitter/tree-sitter-go | `2346a3ab1bb3` | `src` | 52032 | `8d77e723df0f0dfccb66d4571a5c3c17ecfb6c90959044c0992146b21f383bff` | `7e12d9859417baca2e61b7ade4a29380416fa400b85d93b7a98fa30d5f8b8a50` | pin unchanged since v0.2.0; first recorded here |
+| html | tree-sitter/tree-sitter-html | `73a3947324f6` | `src` | 5195 | `e04d0a6e667ee3773ceeb0751466ce314f29bafc9b1c7d2466414c39c3eda178` | `892f6b732e08bcb90918a985fdee58d6a0fd7a90326af601a2536a5d477583fa` | baseline (new in v0.3.0) |
+| java | tree-sitter/tree-sitter-java | `e10607b45ff7` | `src` | 81249 | `19c46facc653381c337ff6cad75dd8b052524179a366c80825d6d0010520eef2` | `95a46b6b7b545b48cd6c3a0d5b1014fed271a63a71164cdc4382d9d441e3609f` | baseline (new in v0.3.0) |
+| javascript | tree-sitter/tree-sitter-javascript | `58404d8cf191` | `src` | 64022 | `188a8baa97018edaf63bf7ece372c07bc0d74d1301004bc8f211eb7dee5a6e70` | `f3e51e9f7b129f62a817551ae22a878dac5c18d71c456d5ad73e9c82d687f33d` | baseline (new in v0.3.0) |
+| json | tree-sitter/tree-sitter-json | `254c42a64764` | `src` | 2698 | `620b6f5d38676a97526e9d128972d4b156ddbdf6e130cd7e6b9c35e6823e943f` | `7012af647a2d3fd302ad82e93ef5359dcb14e32a19198e13fe620082db6d6c5e` | pin unchanged since v0.2.0; first recorded here |
+| python | tree-sitter/tree-sitter-python | `26855eabccb1` | `src` | 65198 | `6d26089d798b66b9a68dd5f6e278cf1ea00b31537ac48a7efbbe5bb63094c473` | `5b9c8cd9f184a016321b7b06135b189d66d7e71f6d8fcab114506900b3601819` | pin unchanged since v0.2.0; first recorded here |
+| rust | tree-sitter/tree-sitter-rust | `77a3747266f4` | `src` | 99023 | `4b73a1248978340336100db455bf0731c23f9190568c9ae62265fa4a80a327d5` | `dee82ddfd01bfc3a8ed201cc03b56448107d3217a4b3a7a8fc7fa6bc32b2405b` | baseline (new in v0.3.0) |
+| tsql | meloncholera/tree-sitter-mssql | `8620fbcfca94` | `src` | 404735 | `d49356aed210b6522a6e130fdfb3081ff004b74c1cc3a8aee8c5f76eb73d30b9` | `66c05cc00ad2b0a9e91c4814a39c2c066015fb912828ec3bf360d164fe8a9149` | pin unchanged since v0.2.0; first recorded here |
+| tsx | tree-sitter/tree-sitter-typescript | `75b3874edb2d` | `tsx/src` | 113345 | `78b5789145286799a27a0a7ecc36cc1bcb151f94ec7fa631b248459867010c8c` | `891d088a997537a44d61e7d7f67737b5ba4ba25a415d3a7b7e7e3c7cde3d4a5c` | pin unchanged since v0.2.0; first recorded here |
+| typescript | tree-sitter/tree-sitter-typescript | `75b3874edb2d` | `typescript/src` | 108583 | `c790a733fc756b54d4e54dceeb7d2d51e40d8b57136e70277753a75804cce3e3` | `891d088a997537a44d61e7d7f67737b5ba4ba25a415d3a7b7e7e3c7cde3d4a5c` | pin unchanged since v0.2.0; first recorded here |
 
 ## v0.4.0 candidate (wave-2 batch 2)
 
@@ -37,16 +57,16 @@ First schema baselines for the eight new grammar pins in the wave-2 batch 2 pull
 The 15 v0.3.0 records above remain unchanged. These are schema identities, not release or parse-behaviour claims.
 YAML's ADR-0023 patch changes `src/parser.c` only; the schema below is the unmodified pinned upstream file.
 
-| Grammar | Repository | Commit | Directory | Bytes | `node-types.json` SHA-256 | Status |
-|---|---|---|---|---:|---|---|
-| dart | UserNobody14/tree-sitter-dart | `be07cf7118d3` | `src` | 314023 | `ea858f11158d4b176b32e7fdbdff6b49c587b2e7ee70e5fbe90751865a1912fe` | baseline (Q14 v0.4.0 candidate) |
-| kotlin | fwcd/tree-sitter-kotlin | `d6af96d2e23e` | `src` | 211132 | `c52aeae846963fe9bc82cc81e2715344e9976fff99469a127c91988ad3787c72` | baseline (Q14 v0.4.0 candidate) |
-| php | tree-sitter/tree-sitter-php | `92b5271b60be` | `php/src` | 115690 | `c487d95cf9ddce3b7fe2120a257e5e43f7e9e4842cb5988707a984887143b788` | baseline (Q14 v0.4.0 candidate) |
-| powershell | airbus-cert/tree-sitter-powershell | `e7bd348c49fd` | `src` | 72248 | `dc314fa2746de2c2048ad5c95e0c6488d1b2873e524a95473356c685f18a9707` | baseline (Q14 v0.4.0 candidate) |
-| r | r-lib/tree-sitter-r | `58a22794466c` | `src` | 69859 | `94d900768d13cfc5daa8eefa829c297c1bc0c09582574f381f9ff8a6c5103062` | baseline (Q14 v0.4.0 candidate) |
-| ruby | tree-sitter/tree-sitter-ruby | `ad907a69da0c` | `src` | 70025 | `9683f80e7be3dd93f1d6f575800de3f3445cda8af1f313f1f80003229c328e8b` | baseline (Q14 v0.4.0 candidate) |
-| xml | tree-sitter-grammars/tree-sitter-xml | `5000ae8f22d1` | `xml/src` | 17444 | `3b63e111187a0f9b2282e1748db2dd6b10e968f0cdb3676772def93bf89f2a7b` | baseline (Q14 v0.4.0 candidate) |
-| yaml | tree-sitter-grammars/tree-sitter-yaml | `a1c4812a73ec` | `src` | 9026 | `1238b6c89fc6afb9723b6463a365843aa87e478025490660e5acfc9adaaf809b` | baseline (Q14 v0.4.0 candidate) |
+| Grammar | Repository | Commit | Directory | Bytes | `node-types.json` SHA-256 | Archive SHA-256 | Status |
+|---|---|---|---|---:|---|---|---|
+| dart | UserNobody14/tree-sitter-dart | `be07cf7118d3` | `src` | 314023 | `ea858f11158d4b176b32e7fdbdff6b49c587b2e7ee70e5fbe90751865a1912fe` | `b126efb8dfeeba8b71f0c6ae1f0cd09cf8b205560786b31d44cc16b283e782f2` | baseline (Q14 v0.4.0 candidate) |
+| kotlin | fwcd/tree-sitter-kotlin | `d6af96d2e23e` | `src` | 211132 | `c52aeae846963fe9bc82cc81e2715344e9976fff99469a127c91988ad3787c72` | `8be2036317c39784f3a93a62c79be76f21b9f5222deeb1a498896d2a75702939` | baseline (Q14 v0.4.0 candidate) |
+| php | tree-sitter/tree-sitter-php | `92b5271b60be` | `php/src` | 115690 | `c487d95cf9ddce3b7fe2120a257e5e43f7e9e4842cb5988707a984887143b788` | `2dfa7643857b94a273b6b413b4cb694aef9c9898e17403f97b66a9ba9c163891` | baseline (Q14 v0.4.0 candidate) |
+| powershell | airbus-cert/tree-sitter-powershell | `e7bd348c49fd` | `src` | 72248 | `dc314fa2746de2c2048ad5c95e0c6488d1b2873e524a95473356c685f18a9707` | `0c66318caf62f788b717e8dee74b75552917d1f22ecca0b01b621f79fc0d49f1` | baseline (Q14 v0.4.0 candidate) |
+| r | r-lib/tree-sitter-r | `58a22794466c` | `src` | 69859 | `94d900768d13cfc5daa8eefa829c297c1bc0c09582574f381f9ff8a6c5103062` | `642b13978f724c78f067e6b17edd8ffff223c48e8ea09776324e1f4e8e75ca1c` | baseline (Q14 v0.4.0 candidate) |
+| ruby | tree-sitter/tree-sitter-ruby | `ad907a69da0c` | `src` | 70025 | `9683f80e7be3dd93f1d6f575800de3f3445cda8af1f313f1f80003229c328e8b` | `f7aa2408f1b39922f85add38cacd60b59828a8222c609a240f08779d46d079d9` | baseline (Q14 v0.4.0 candidate) |
+| xml | tree-sitter-grammars/tree-sitter-xml | `5000ae8f22d1` | `xml/src` | 17444 | `3b63e111187a0f9b2282e1748db2dd6b10e968f0cdb3676772def93bf89f2a7b` | `1b7611ba3f2af55768acfbfbaf2fd2eb404ba61b14a85056d4f8d8326fc55146` | baseline (Q14 v0.4.0 candidate) |
+| yaml | tree-sitter-grammars/tree-sitter-yaml | `a1c4812a73ec` | `src` | 9026 | `1238b6c89fc6afb9723b6463a365843aa87e478025490660e5acfc9adaaf809b` | `6548cd059983e8073dfa39f102641f71d045b37f3a05b7ebd799ad17df8471d1` | baseline (Q14 v0.4.0 candidate) |
 
 ## v0.4.0 candidate (Q17 nvim-treesitter pin refresh)
 
