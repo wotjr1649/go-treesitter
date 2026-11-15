@@ -31,13 +31,8 @@ to the new engine.
 
 ## Released
 
-- **v0.4.0 preview — preparation skeleton, NOT YET RELEASED.** Twenty-three grammars, engine ABI 3; root plus
-  23 grammar modules (24 modules). [FILL AT RELEASE: publication date, immutable pre-release and attestation result].
-  Root tag `v0.4.0`: [FILL AT RELEASE: root commit and precomputed ZIP h1]; grammar tags
-  `grammars/<lang>/v0.4.0`: [FILL AT RELEASE: release-form commit].
-  [FILL AT RELEASE: empty-cache direct/proxy.golang.org resolution, root + every grammar parse/query and linux/arm64
-  consumer results, with identity and evidence level]. Assets: 24 source archives plus `SHA256SUMS` (six toolchain archives excluded).
-  [FILL AT RELEASE: source asset inventory/digests, gh release verify result, first-base source-row download/hash results].
+- **v0.4.0 preview** — release candidate at the tagged root commit; this entry (publication date, tags, ZIP h1,
+  assets and verification) is completed by the post-publication pull request.
 
 - **v0.3.0 preview** (2026-11-15, immutable GitHub pre-release, attestation verified): fifteen grammars. Root tag
   `v0.3.0` on `60f1d33`, grammar tags `grammars/<lang>/v0.3.0` on `ee25291`. Verified after tagging: `GOPROXY=direct`
@@ -200,19 +195,24 @@ new three pins (base `dc3b23d`, candidate tree `a0f905db15810e380dac3256317931ea
 
 Q16's edited-tree `ChildByFieldName` E5 evidence covers the original fifteen grammars (5,283 seeded edits and five
 retained T-SQL cases, Windows amd64, base `2a1d01d`); it does not cover the eight additions. CI now has the strict
-edited-field shard for every grammar; [FILL AT RELEASE: release-commit conformance run and per-platform counts].
+edited-field shard for every grammar; release-commit conformance run [43718543939](https://github.com/wotjr1649/go-treesitter/actions/runs/43718543939) (`f8a9f29`) passed it for all 23 grammars on Linux x64 and arm64 (per platform: 12,798 edits, 97,858 edited-field native result rows, zero differences).
 
-[FILL AT RELEASE: release-commit engine, regeneration, Windows, bench (all 23), balancing-cancel, packaging and
-compatibility results with commits and run IDs]. Ruby headroom: [FILL AT RELEASE: minimum/maximum MiB from the
-named bench run raw snapshot measurements].
+Release commit `f8a9f29`: engine [43718543915](https://github.com/wotjr1649/go-treesitter/actions/runs/43718543915) 144/144 jobs, regeneration [43718543860](https://github.com/wotjr1649/go-treesitter/actions/runs/43718543860) 24/24, Windows
+[43718543945](https://github.com/wotjr1649/go-treesitter/actions/runs/43718543945) 4/4, bench [43718548275](https://github.com/wotjr1649/go-treesitter/actions/runs/43718548275) 69/69 (highest large-input ratio 2.334x, YAML Linux x64),
+balancing-cancel [43718551120](https://github.com/wotjr1649/go-treesitter/actions/runs/43718551120) 23/23, upstream watch [43718596677](https://github.com/wotjr1649/go-treesitter/actions/runs/43718596677) pass (T-SQL pin reachable).
+Packaging and compatibility (P39 local rehearsal on `f8a9f29`, Windows amd64): release-form regeneration leaves all 23
+`engine_gen.*` byte-identical; empty-cache consumers on Go 1.26.0 and 1.27.4 parse every grammar and run six
+queries; linux/arm64 builds; `grammars/json` v0.1.0 (ABI 1) and v0.3.0 (ABI 2) work with root v0.4.0.
+Ruby headroom: 2.0 MiB (macOS arm64) to 8.3 MiB (Linux x64).
 
 The prior fifteen-grammar nightly run
 [43699872727](https://github.com/wotjr1649/go-treesitter/actions/runs/43699872727) (`a9c0077`, seed 20261115)
 failed on Bash linux/arm64 at iteration 43175. P37's maintainer-local evidence archive classifies it as native C
 `char` signedness: signed/unsigned probes on Windows reproduce the runner's Go/native dumps respectively (E2 probe,
 that input); Ruby also shows a native signedness difference. Baseline `506e4f7` does not yet force signed `char` in
-the native reference. [FILL AT RELEASE: reference-fix identity and conformance result, owner disposition of this
-finding, and the required 23-grammar nightly-diff run, including any failures]. Do not erase the failed run.
+the native reference. The reference now builds with `-fsigned-char` (PR #36, `3213f3c`); conformance run
+[43718543939](https://github.com/wotjr1649/go-treesitter/actions/runs/43718543939) passed, and the required 23-grammar nightly-diff run [43718545692](https://github.com/wotjr1649/go-treesitter/actions/runs/43718545692) (`f8a9f29`) passed
+46/46 jobs. Owner disposition (2026-11-15): native-reference platform difference, not an engine defect. Do not erase the failed run.
 
 Mirror coverage follows the configured bases and their immutable contents. After publication and first-base
 asset checks, one PR sets `mirrors` to the v0.4.0 base followed by v0.3.0 and restores the development module form,
