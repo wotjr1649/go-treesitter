@@ -17,7 +17,7 @@ release and is rebuilt for it.
 A reference result is identified by the tuple
 
 ```
-runtime release + tree hash · grammar commit + source sha256s · wasi-libc commit + archive sha256
+runtime release + tree hash · grammar commit + original/result source sha256s + patch identities · wasi-libc commit + archive sha256
 · driver/shim sha256 · compiler identity + flags · OS/arch
 ```
 
@@ -43,6 +43,10 @@ The root may start after leading padding (whitespace, BOM); its range must equal
 
 - **Corpus:** fresh parses of the reference corpus and incremental edit cases, per grammar.
 - **Large inputs:** the large-input set (also the speed and memory gate inputs).
+- **Unpatched comparison:** build each patched grammar natively with `native-ref -unpatched`. Compare original and
+  patched native dumps over its corpus and retained fuzz seeds, keeping every changed input. Error-free original
+  trees must remain identical except the documented fix. YAML permits NUL-truncated originals only when the patch
+  produces a full-length error tree. This does not replace the product-vs-patched-native lane.
 - Reference dumps are produced by the native lane (C compiler required) and compared by the product lane
   (`CGO_ENABLED=0`, no compiler). Windows results do not imply Linux, macOS or arm64 results; an environment that did
   not run stays `NOT_RUN`.

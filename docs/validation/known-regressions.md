@@ -14,17 +14,99 @@ the end of this register; no result transfers between the two identities.
 
 ## Status after ADR-0022
 
-Every record below describes the removed `gotreesitter` carrier (the Go port of the runtime and its patches) and is
-**historical**; the engine runs unmodified upstream C, so these signatures and the tests, tools and paths they cite
+Every `KR-*` record below describes the removed `gotreesitter` carrier (the Go port of the runtime and its patches) and is
+**historical**; the engine runs the unmodified upstream runtime C (grammar patches follow ADR-0023), so these signatures and the tests, tools and paths they cite
 (`TestKR*`, `tools/runtime-bundle`, `windows-c-v2/`) no longer exist; Git history at `9ad82eb`. No record is open
-against the engine. The one ratcheted divergence in the engine lane is native-C behaviour, not a Go defect: five T-SQL
+against the engine. The existing ratcheted divergence in the engine lane is native-C behaviour, not a Go defect: five T-SQL
 edit cases whose incremental reparse differs from a fresh parse in C v0.27.2 and in the engine alike
-(`knownIncrementalDiffs` in `tools/conformance/edits_test.go`). A new failure opens a new record.
+(`knownIncrementalDiffs` in `tools/conformance/edits_test.go`). The [Q9 seed-1 characterization](#q9-seed-1-native-incremental-vs-fresh-characterization)
+adds six same-native observations for PHP, Dart and Ruby; [Q10 Kotlin](#q10-seed-1-kotlin-native-incremental-vs-fresh-characterization)
+adds three. Neither is an open product-blocking `KR-*` record. A new failure opens a new record.
 
 The remaining fixed-oracle catalogs were removed after `be31f49f3e4d645a929a9aebc961be150de16e37`, the last
 commit containing them. They remain available in Git history; catalog filenames below refer to that retired
 directory. The older C observations and digests remain in Git history at `9ad82eb`. The current C reference
 is built from the same runtime and grammar pins as the engine.
+
+The Q9/Q10 observations below precede the Q14 ABI 3 integration. Their original input/result signatures remain
+reference material; current engine/native comparisons must pass independently.
+
+## Q9 seed-1 native incremental-vs-fresh characterization
+
+Observed 2026-11-14 on Windows amd64, Go 1.27.4, GCC 16.2.0 (MSYS2 Rev3), product `CGO_ENABLED=0 GOWORK=off`.
+This characterizes the native oracle: the incremental dump differs from the fresh dump in both native C and the
+engine. Each engine incremental dump, fresh dump and changed-range result agrees with its corresponding native
+result (**E5**, 3,012 seeded edits; six differing pairs). This is not an E3 self-consistency claim and does not
+claim incremental equals fresh. No upstream issue was published or root cause isolated beyond the pinned native sources.
+
+**Identity.** Measurement worktree `tools/gen/pins.json` raw CRLF SHA256 `804f0b75b889033b1cb620235557172373dfb258b92ed33116ce849a6805728f`;
+canonical Git LF SHA256 `fb195b7510f6b63de5a298019181a78bbeac8ddedf05235a30a0c536675b7f02` (identical decoded pin values).
+Runtime `v0.27.2` at `3fb7be49145acfb07e33b61ed5689e2b6771b2e9`;
+wasi-libc `2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13`, including the pinned character functions in the native reference.
+
+| Grammar | Pinned commit |
+|---|---|
+| php | `92b5271b60bec77fb65b5e5bc41561e8dac81299` |
+| dart | `be07cf7118d3dba06236a3f19541685a68209934` |
+| ruby | `ad907a69da0c8a4f7a943a7fe012712208da6dee` |
+
+**Exact affected set, ciconf `-seed 1`.** Coordinates are byte offsets `(start, old_end, new_end)`. Hashes below
+are SHA256 of the source bytes, canonical native dumps, and canonical changed-range output respectively.
+
+| Case | Edit coordinates | Old input | New input | Native incremental | Native fresh | Native ranges |
+|---|---|---|---|---|---|---|
+| `dart/declarations-030-e2` | `(1, 16, 1)` | `7b0ff3f3f20e8e25da5a072429547622041394a86da316d8c9d0604bcdec01f7` | `d839b0bbba63c231fdd88085add5b90c2504cb47e21a96884e4efda94a2b9772` | `616ec9712babfd0c5945864d3fc512495f1df9405052fd91fb6e2652ad1da70f` | `6715ff0492adddcc989a29901d7ebc30bba71a6475caf914e4695fe1da3034a0` | `bf4ac9a8f0be894ceca65e4cf9258a09917f340c903fd050a945a56e1164402a` |
+| `php/statements-001-e1` | `(127, 127, 128)` | `8450039ea19aead51c4967ca3c233e4e6c8a971566234bfea42194d803f3c707` | `709da4aa56807a69c75d56bdf407a6e8f996de3fbb61b5fb1ece2ff5bc9d8bf6` | `706c2c9175ab8b4b22ead3e4485531b36d363201e05c499fd3f51c7ac3cc779e` | `7ea1c21a2fc340be27a6f1473d76a87e5db07c8003b6801076737fe51fe99324` | `70f6fce9ec84d6a399d799f3c3a604d82a84fa09084a2c35048b64b6509d5d6c` |
+| `php/statements-001-e2` | `(42, 46, 42)` | `8450039ea19aead51c4967ca3c233e4e6c8a971566234bfea42194d803f3c707` | `92111c1fb3efc735808e09d484a7a4bee9c71e882604ec5cc9b0f9fe59cbe15a` | `df6a00f83fdefd86ff8f3dce3b643e7e22d255fd624218dbac264151b365d6ff` | `7494f237becf85a41c95cab9e89f02551f140d1fa883c0c2da1e83693560ad1d` | `6c634078ea85336d9a87aded9c864255427242c2d36cddae5534a5d119842cd8` |
+| `php/statements-002-e1` | `(11, 11, 12)` | `252d3b5b480831fb73201be26b13de52d2bda59b653b4ec3785526ca0b7f63bc` | `69a8fe7b970b7b5e7672ec9ecdcb50e26b817cfa22dbc43eafb0a929ccdda0f2` | `4a83dac4e2c313ee80ab0809d983d07913b301fa62d82b4c5461bebcde3b63dc` | `4aa0640e0b421408e22154845b3cde9bc3836d1fc0cd7b25fd404b1cc00dc0d1` | `dc01377e52cf3747774827a006994a471a3615a19942a02cac5654066edf4757` |
+| `php/statements-007-e3` | `(10, 12, 11)` | `9519a7d8e5700fcabe3a412d3113fbffa2b082bfa4caae6de1720e1d096d8150` | `ceb5e806ba20b0fd4c38835d69a313fa386a062b125eb4b39338c18890a1af02` | `260b706b1ef796aa0b5ef42829e93f31509722e726b746bef215f545802f52a5` | `a82956162dbedaa89e62a45da170d3d2664c697b4dd4154a2b30814926490626` | `84644a6be401c814eae72c3da782daf7746bc740700bda9818607dccb5ef3d4b` |
+| `ruby/literals-051-e3` | `(56, 61, 57)` | `3fa85574a46ab94a0fbb88cff35cdbe5f4236b6948aa83db5b992857b6994632` | `b4ac1127542c9d2cf9d6a734a7aef0e2d91fb822f033de1643b32a615df49ff6` | `6f247b6ffe7af87ac407f3876c64cdc535f8646749f70a668497833d90765e22` | `027c317da49a7e68a1b42410cb2db331a95e7cc9ce22cd45cfeca2bf6bb5f9fd` | `103045569806899172a8c5eb958b3845a36eb1ddc3a5fa985b4ac8aa9fea8c52` |
+
+**Replay.** From `tools/native-ref`, with the pinned archives in `<dl>` and new output directories:
+
+```sh
+CGO_ENABLED=0 GOWORK=off go run . -pins ../gen/pins.json -dl <dl> -work <work> -out <exe> -corpus <corpus> php dart ruby
+CGO_ENABLED=0 GOWORK=off go run ./ciconf -pins ../gen/pins.json -corpus <corpus> -exe <exe> -out <data> -seed 1 -lang php,dart,ruby
+```
+
+From `tools/conformance`, run the retained public-API comparison against that data:
+
+```sh
+CGO_ENABLED=0 GOWORK=off TSG_DATA_DIR=<data> TSG_NATIVE_EXE_DIR=<exe> TSG_S15_LANGS=php,dart,ruby go test -count=1 -run '^TestEdits$' .
+```
+
+**Expected state and retirement.** For this identity and seed, exactly these six pairs differ; every other tested
+edit pair is equal. Each engine result must still equal the corresponding native result, including ranges. The
+existing CI-data rule in `TestEdits` accepts a difference only when native shows that same difference on the same
+input; neither its assertions nor `knownIncrementalDiffs` changed for Q9. This characterization does not waive a
+native mismatch, root-end failure or other product gate, and does not open a release blocker by itself.
+
+A disappearing, additional or changed signature at these pins is a new observation requiring investigation, not
+an automatic update to this table. A permitted runtime/grammar/wasi-libc pin move requires a fresh native build,
+same-seed corpus/edit comparison, exact old/new input hashes, and review of the full affected set; record the new
+identity separately and retire this characterization only when the native behavior changes and engine agreement
+still passes. Preserve this observed signature and its evidence when retiring it.
+
+## Q10 seed-1 Kotlin native incremental-vs-fresh characterization
+
+Observed 2026-11-15 on Windows amd64, Go 1.27.4, GCC 16.2.0 (MSYS2 Rev3), `CGO_ENABLED=0 GOWORK=off`.
+Kotlin uses the unmodified tier-3 `fwcd/tree-sitter-kotlin` commit
+`d6af96d2e23ef0a8ff5ab512864378cf08fba311`, runtime v0.27.2 and the same pinned wasi-libc character functions.
+The pins file SHA-256 is `f5818118c7ea51daed99320751df42817756c17d730670880f8af5c9a8bce514`.
+
+All 4,386 incremental, fresh and changed-range outputs matched native C (**E5**, those inputs).
+Exactly three native incremental dumps differ from native fresh dumps, identically in the engine; this
+characterization does not waive a gate or open a product-blocking KR record.
+
+| Case | Edit coordinates | Old input | New input | Native incremental | Native fresh | Native ranges |
+|---|---|---|---|---|---|---|
+| `kotlin/jetbrains_FloatingPointLiteral-001-e3` | `(1, 7, 4)` | `e28f5fff0beeb01d4c2c4915e9659c03433126b1ae3e26d82ae6ca55dbcbc209` | `836b7869d412bac61193a3fd247c84cb8a4f11d8933a7307d8ddfd23eb79d17e` | `6031593b1b9c0f57235a450d9b967d3a65e5aeada4fdefa54fe71de3c7e30100` | `94d3b49628342017359956f57209c22375ee53fe572b0e06906f703c43acb34b` | `8130c0d69390831602a0379349b44ab6a253c28f2340ce48cdfde8e85ddcced3` |
+| `kotlin/jetbrains_annotation_modifiersMigration_newModifiers-001-e2` | `(276, 282, 276)` | `12100d321c9db5820af6447648558f7f4ac790f4df2870546f5b8396bca2fdac` | `c74e1814f81de553b8b30aeb47617ceeed52ab6d294b9dbd6e09991fe4b034e3` | `6da2bb89337fac62fe762f72034892e7eccfad808d4e929250fc5d2c74864d01` | `6a664bf8cbc42c7eefe87907f914b14bff45d4a0e06101764d4b0d1ec2b6c505` | `030199e62255a10d3d156d126a6d677e0f64a1142df931d1f44d040ecbd5742f` |
+| `kotlin/literals-027-e1` | `(45, 45, 47)` | `e36bc58b1d3a8c67a756af24dfc270740ef3d935a3d646008f2aa1c479a8a070` | `b770697ec2c7e2417cc96874d9280f82e595246aec0247d6f1664dc5ef289707` | `d5e10e2427751de8738728ab9e83e2537e29e666194aecd5c3551b74c4cee44e` | `44949ab1dd550e03b39d1b892bd1283145cde69f2556c189eaefd967c6a41f1b` | `3cd092350dec28a2f2181542574035860f33d7e94ed9defe4a93a0bc4d7e269a` |
+
+Replay with the Q9 commands above, selecting `kotlin` and `-seed 1`. The same exact-set and retirement
+rules apply: a changed or additional signature requires investigation; every engine result must still match
+its corresponding native output. No upstream issue or scanner patch was created.
 
 ## Record format
 

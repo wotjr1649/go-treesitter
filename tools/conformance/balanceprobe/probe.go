@@ -188,6 +188,8 @@ func (e *env) dump(tree int32) []byte {
 func inputs(lang string) (string, []string) {
 	const count = 20000
 	switch lang {
+	case "kotlin":
+		return "fun f() {\n" + strings.Repeat("println(1)\n", count) + "}\n", []string{"fun next(x: Int): Int { return x + 2 }\n", "class Other { val n = 2 }\n", "fun broken(\n"}
 	case "json":
 		return "[" + strings.Repeat(`{"a":1},`, count-1) + `{"a":1}]`, []string{`{"next":[2,3]}`, `[false,null,"different"]`, `{"broken":`}
 	case "golang":
@@ -216,6 +218,20 @@ func inputs(lang string) (string, []string) {
 		return strings.Repeat("echo a\n", count), []string{"printf '%s\\n' next\n", "other=2\necho \"$other\"\n", "if true; then\n"}
 	case "cpp":
 		return "void f() {\n" + strings.Repeat("f();\n", count) + "}\n", []string{"int next() { return 2; }\n", "class Other { public: int n; };\n", "void broken(\n"}
+	case "yaml":
+		return strings.Repeat("a: 1\n", count), []string{"next: [2, 3]\n", "other: true\n", "broken: [\n"}
+	case "php":
+		return "<?php\n" + strings.Repeat("$a = 1;\n", count), []string{"<?php function next_fn() { return 2; }\n", "<?php class Other {}\n", "<?php function broken(\n"}
+	case "powershell":
+		return strings.Repeat("$a = 1\n", count), []string{"function next_fn { return 2 }\n", "$other = @(2, 3)\n", "function broken {\n"}
+	case "r":
+		return strings.Repeat("a <- 1\n", count), []string{"next_fn <- function(x) { x + 2 }\n", "other <- c(2, 3)\n", "broken <- function(\n"}
+	case "dart":
+		return "void f() {\n" + strings.Repeat("f();\n", count) + "}\n", []string{"int nextFn() { return 2; }\n", "class Other { int n = 2; }\n", "void broken(\n"}
+	case "xml":
+		return "<root>\n" + strings.Repeat("<a>1</a>\n", count) + "</root>\n", []string{"<next>2</next>\n", "<other id=\"2\"/>\n", "<broken\n"}
+	case "ruby":
+		return strings.Repeat("a = 1\n", count), []string{"def next_fn(x)\n  x + 2\nend\n", "class Other\nend\n", "def broken(\n"}
 	case "tsql":
 		return strings.Repeat("SELECT 1;\n", count), []string{"SELECT x FROM next_table WHERE x > 2;\n", "CREATE TABLE other_table (id INT);\n", "SELECT (\n"}
 	}

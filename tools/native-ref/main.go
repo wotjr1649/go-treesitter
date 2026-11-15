@@ -170,13 +170,13 @@ func run(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuil
 			gdir = filepath.Join(patched, filepath.FromSlash(g.GrammarDir))
 		}
 		if corpus != "" && !corpusDone[g.Archive] { // prepare has verified the archive's sha256
-			if err := extract(filepath.Join(dl, g.Archive), filepath.Join(corpus, g.ExtractDir), []string{"test/corpus"}); err != nil {
+			if err := extract(filepath.Join(dl, g.Archive), filepath.Join(corpus, g.ExtractDir), []string{"test/corpus", path.Join(path.Dir(g.GrammarDir), "test/corpus")}); err != nil {
 				return fmt.Errorf("%s: corpus: %w", l, err)
 			}
 			corpusDone[g.Archive] = true
 		}
 		if queries != "" && !queriesDone[g.Archive] { // likewise verified; typescript and tsx share one archive
-			if err := extract(filepath.Join(dl, g.Archive), filepath.Join(queries, g.ExtractDir), []string{"queries"}); err != nil {
+			if err := extract(filepath.Join(dl, g.Archive), filepath.Join(queries, g.ExtractDir), []string{"queries", path.Join(path.Dir(g.GrammarDir), "queries")}); err != nil {
 				return fmt.Errorf("%s: queries: %w", l, err)
 			}
 			queriesDone[g.Archive] = true

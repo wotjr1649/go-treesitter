@@ -330,6 +330,14 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 		"its `LICENSE` is the index: musl MIT, cloudlibc BSD-2-Clause, dlmalloc CC0, the rest Apache-2.0 WITH LLVM-exception, Apache-2.0 or MIT;\n"+
 		"every file's hash is in `provenance.json`). Regenerate with `tools/gen` (see its README); regenerating gives identical bytes.\n",
 		modulePrefix, lang, g.Repo, g.Commit, pins.Runtime.Release, pins.ABI, id.RecipeSHA256, files, pins.WasiLibc.Commit)
+	switch lang {
+	case "php", "ruby":
+		result += "\nSource tier: 1 (core), per ADR-0024.\n"
+	case "yaml", "xml":
+		result += "\nSource tier: 2 (tree-sitter-grammars), per ADR-0024.\n"
+	case "kotlin", "powershell", "r", "dart":
+		result += "\nSource tier: 3 (third party), per ADR-0024.\n"
+	}
 	if len(g.Patches) > 0 {
 		result += "\nThis grammar differs temporarily from upstream under ADR-0023. Applied patches (full hashes in `provenance.json`):\n"
 		if lang == "yaml" {
@@ -343,6 +351,15 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 }
 
 var samples = map[string]string{
+	"kotlin":     "fun add(a: Int, b: Int): Int = a + b\n",
+	"yaml":       "items:\n  - name: one\n    value: 1\n",
+	"php":        "<?php function add($a, $b) { return $a + $b; }\n",
+	"powershell": "$items = @(1, 2, 3)\nforeach ($item in $items) { Write-Output $item }\n",
+	"r":          "f <- function(x) { x + 1 }\ny <- f(2)\n",
+	"dart":       "int add(int a, int b) { return a + b; }\n",
+	"xml":        "<?xml version=\"1.0\"?><root><item id=\"1\">value</item></root>\n",
+	"ruby":       "def add(a, b)\n  a + b\nend\n",
+
 	"javascript": "const C = (p) => <div id=\"a\">{p.n + 1}</div>;\n",
 	"html":       "<!doctype html><html><body><p>Hello</p></body></html>\n",
 	"css":        "body { color: red; margin: 0; }\n",

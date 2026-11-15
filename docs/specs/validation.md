@@ -12,7 +12,7 @@ Definition of Done.
 | **engine CI** | `CGO_ENABLED=0` on hosted Linux/macOS/Windows, amd64 and arm64 (`.github/workflows/engine.yml`) | yes, for the platform it ran on | Execution evidence per platform; a platform is claimed only after this lane ran there. |
 | **cross** | `CGO_ENABLED=0`, other `GOOS/GOARCH` | scope-limited | Link-only proof that no C toolchain is required. |
 | **native reference** | C compiler, same runtime release and grammar sources (ADR-0020), with the engine's pinned wasi-libc character semantics; `tools/native-ref` | yes, for C-agreement claims | Produces the reference dumps. See `docs/specs/oracle.md`. |
-| **conformance** | `CGO_ENABLED=0`, `tools/conformance` with reference data: local (`TSG_S15_DIR`) or built in CI from the pinned grammars' own `test/corpus` plus seeded edits (`.github/workflows/conformance.yml`, `TSG_DATA_DIR`) | yes, for C-agreement claims on the inputs used | Byte-for-byte comparison of the public API's dumps, edits and changed ranges with the native reference. |
+| **conformance** | `CGO_ENABLED=0`, `tools/conformance` with reference data: local (`TSG_S15_DIR`) or built in CI from the pinned grammars' own `test/corpus` plus seeded edits (`.github/workflows/conformance.yml`, `TSG_DATA_DIR`) | yes, for C-agreement claims on the inputs used | Byte-for-byte comparison of the public API's dumps, edits and changed ranges with the native reference. The strict field-lookup shard also compares `ChildByFieldName` on fresh corpus trees; `TSG_REQUIRE_FIELD_LOOKUP=1` fails missing prerequisites or zero inputs. |
 | **bench** | `CGO_ENABLED=0`, `tools/bench` paired with native executables | yes, for resource gates | Speed and memory gates on the product build. |
 | **nightly diff** | `CGO_ENABLED=0` on hosted Linux amd64/arm64; native reference from the pins (`.github/workflows/nightly-diff.yml`, `TestNightlyDiff`) | no, finds regressions | Daily time-budgeted random mutations and edits of the CI corpora, compared byte-for-byte with the native reference (dumps, incremental dumps, changed ranges), plus a short run of the Go fuzz targets. A mismatch uploads a shrunk reproducer with seed and commands. It is `E5` evidence only for the cases it ran, bound to the date seed and commit; absence of a finding is not parity. |
 | **bench CI** | `CGO_ENABLED=0` on hosted Linux amd64/arm64 and macOS arm64 (`.github/workflows/bench.yml`, `tools/bench/ci`) | yes, for the platform it ran on | Weekly paired-window speed and memory measurement against the native executables on sha256-pinned large inputs and the CI corpora, with the criteria of the Release gate (private bytes on macOS: the ADR-0022 macOS amendment gate, reported next to the raw delta; a missing measurement field there is a FAIL). A criterion the platform cannot measure (engine-region count on macOS) is `NOT_RUN`. Shared runners: ratios only, never absolute times. |
@@ -25,6 +25,31 @@ Rules:
   Race instrumentation has been measured at roughly **14×** the product lane on the same input.
 - Windows amd64 is Tier-1. Linux, macOS and arm64 are claimed only for platforms where the engine CI lane
   executed; otherwise they stay `NOT_RUN`.
+
+## Nightly input watchdog
+
+`TestNightlyDiff` gives each Go case (old/new fresh parses, incremental parse and changed ranges together) and each
+native operation a **30 second wall-clock limit**, including process startup. The Go case runs in a disposable test
+binary process: a scanner that never polls the context can therefore be killed. The native executable has the same
+process watchdog. The supervisor waits for process exit before proceeding. `TSG_NIGHTLY_INPUT_TIMEOUT` sets the
+limit; the workflow pins it to `30s` and records it in each summary/reproducer.
+
+The bound was selected from the Q9 Windows amd64 product/native measurements at base `2f9e000` plus batch2-v1:
+the maximum corpus per-input median was **0.7535 ms** (Dart, `flutter-002.in`, engine), the maximum large-input
+individual sample was **925.9276 ms** (Ruby, `gb18030-tbl.rb`, engine), and the maximum native edit process duration
+was **3006.6 ms** (Ruby, `expressions-068-e1`, including process startup). Thirty seconds gives about 10x the largest
+observed operation; nightly mutations can still expose slower inputs, which are failures to investigate, not reasons
+to silently raise the limit. These measurements select a diagnostic bound and do not claim hosted timing evidence.
+
+A timeout is a FAIL for that grammar. It saves the exact original old/new bytes, edit offsets, side, limit, seed and
+replay command under `$TSG_CONF_OUT/nightly/`; it does not shrink or retry a hung case. The next grammar still runs
+(the workflow matrix also has `fail-fast: false`), and failure artifacts retain the input. This watchdog bounds the
+nightly differential comparisons; `ciconf -inputs-only` extracts their seeds without unsupervised preflight parses.
+Go fuzz targets retain their separate fuzz/test budgets.
+
+The Q10 fwcd Kotlin run also stayed within this diagnostic bound: its largest large-input sample was
+3.702327 s (`_Arrays.kt`, engine), leaving about an 8.1x margin under 30 s. The nightly mutation inputs
+are bounded by its existing `maxCase` policy; this observation does not change any resource gate.
 
 ## Evidence levels
 

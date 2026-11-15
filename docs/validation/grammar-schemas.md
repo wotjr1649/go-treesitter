@@ -30,3 +30,20 @@ Pins as on `main` at `a44ea38`. `tsx` and `typescript` come from one archive.
 | tsql | meloncholera/tree-sitter-mssql | `8620fbcfca94` | `src` | 404735 | `d49356aed210b6522a6e130fdfb3081ff004b74c1cc3a8aee8c5f76eb73d30b9` | pin unchanged since v0.2.0; first recorded here |
 | tsx | tree-sitter/tree-sitter-typescript | `75b3874edb2d` | `tsx/src` | 113345 | `78b5789145286799a27a0a7ecc36cc1bcb151f94ec7fa631b248459867010c8c` | pin unchanged since v0.2.0; first recorded here |
 | typescript | tree-sitter/tree-sitter-typescript | `75b3874edb2d` | `typescript/src` | 108583 | `c790a733fc756b54d4e54dceeb7d2d51e40d8b57136e70277753a75804cce3e3` | pin unchanged since v0.2.0; first recorded here |
+
+## v0.4.0 candidate (wave-2 batch 2)
+
+First schema baselines for the eight new grammar pins in the wave-2 batch 2 pull request, based on main `2a1d01d` (engine ABI 3).
+The 15 v0.3.0 records above remain unchanged. These are schema identities, not release or parse-behaviour claims.
+YAML's ADR-0023 patch changes `src/parser.c` only; the schema below is the unmodified pinned upstream file.
+
+| Grammar | Repository | Commit | Directory | Bytes | `node-types.json` SHA-256 | Status |
+|---|---|---|---|---:|---|---|
+| dart | UserNobody14/tree-sitter-dart | `be07cf7118d3` | `src` | 314023 | `ea858f11158d4b176b32e7fdbdff6b49c587b2e7ee70e5fbe90751865a1912fe` | baseline (Q14 v0.4.0 candidate) |
+| kotlin | fwcd/tree-sitter-kotlin | `d6af96d2e23e` | `src` | 211132 | `c52aeae846963fe9bc82cc81e2715344e9976fff99469a127c91988ad3787c72` | baseline (Q14 v0.4.0 candidate) |
+| php | tree-sitter/tree-sitter-php | `92b5271b60be` | `php/src` | 115690 | `c487d95cf9ddce3b7fe2120a257e5e43f7e9e4842cb5988707a984887143b788` | baseline (Q14 v0.4.0 candidate) |
+| powershell | airbus-cert/tree-sitter-powershell | `e7bd348c49fd` | `src` | 72248 | `dc314fa2746de2c2048ad5c95e0c6488d1b2873e524a95473356c685f18a9707` | baseline (Q14 v0.4.0 candidate) |
+| r | r-lib/tree-sitter-r | `58a22794466c` | `src` | 69859 | `94d900768d13cfc5daa8eefa829c297c1bc0c09582574f381f9ff8a6c5103062` | baseline (Q14 v0.4.0 candidate) |
+| ruby | tree-sitter/tree-sitter-ruby | `ad907a69da0c` | `src` | 70025 | `9683f80e7be3dd93f1d6f575800de3f3445cda8af1f313f1f80003229c328e8b` | baseline (Q14 v0.4.0 candidate) |
+| xml | tree-sitter-grammars/tree-sitter-xml | `5000ae8f22d1` | `xml/src` | 17444 | `3b63e111187a0f9b2282e1748db2dd6b10e968f0cdb3676772def93bf89f2a7b` | baseline (Q14 v0.4.0 candidate) |
+| yaml | tree-sitter-grammars/tree-sitter-yaml | `a1c4812a73ec` | `src` | 9026 | `1238b6c89fc6afb9723b6463a365843aa87e478025490660e5acfc9adaaf809b` | baseline (Q14 v0.4.0 candidate) |

@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp]
+        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin]
         runner: [ubuntu-24.04, ubuntu-24.04-arm]
         include:
           - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
@@ -51,7 +51,7 @@ jobs:
           [ "$lang" != golang ] || lang=go
           echo "TSG_S15_LANGS=$lang" >> "$GITHUB_ENV"
           tags=""
-          for other in csharp go json python tsql tsx typescript javascript html css java c rust bash cpp; do
+          for other in csharp go json python tsql tsx typescript javascript html css java c rust bash cpp yaml php powershell r dart xml ruby kotlin; do
             [ "$other" = "$lang" ] || tags="${tags:+$tags,}no_$other"
           done
           echo "GOFLAGS=-tags=$tags" >> "$GITHUB_ENV"
@@ -73,6 +73,25 @@ jobs:
           CGO_ENABLED: "0"
         run: |
           "$RUNNER_TEMP/ciconf" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "$TSG_S15_LANGS"
+      - name: YAML patch comparison against the original upstream grammar
+        if: ${{ matrix.lang == 'yaml' }}
+        working-directory: tools/native-ref
+        env:
+          CGO_ENABLED: "0"
+        run: |
+          go run . -pins ../gen/pins.json -dl "$RUNNER_TEMP/dl" \
+            -work "$RUNNER_TEMP/unpatched-work" -out "$RUNNER_TEMP/unpatched-exe" -unpatched yaml
+          go run ./patchcompare -before "$RUNNER_TEMP/unpatched-exe/yaml" -after "$RUNNER_TEMP/exe/yaml" \
+            -corpus "$RUNNER_TEMP/data/corpus/yaml" -fuzz-source ../conformance/fuzz_test.go \
+            -fuzz-target FuzzParseYAML -allow-nul-truncation -out "$RUNNER_TEMP/patch-comparison"
+      - name: Upload YAML patch comparison
+        if: ${{ always() && matrix.lang == 'yaml' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: yaml-patch-comparison-${{ matrix.runner }}
+          path: ${{ runner.temp }}/patch-comparison
+          if-no-files-found: warn
+          retention-days: 90
       - name: Go conformance against the native results
         working-directory: tools/conformance
         env:

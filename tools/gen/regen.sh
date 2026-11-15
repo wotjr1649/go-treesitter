@@ -28,7 +28,7 @@ fi
 EXE=""
 [ "$(go env GOOS)" = windows ] && EXE=.exe
 
-ALL=(bash c cpp csharp css golang html java javascript json python rust tsql tsx typescript)
+ALL=(bash c cpp csharp css dart golang html java javascript json php powershell python r ruby rust tsql tsx typescript xml yaml kotlin)
 if [ -z "${ROOT_VERSION:-}" ]; then
   # one line per module: "dev" (replace present), the release version, or nothing (unknown form -> count below ALL)
   forms=$(for l in "${ALL[@]}"; do

@@ -9,7 +9,7 @@ The ABI is the contract between three parts that are versioned separately:
 
 | Part | Location | Owner |
 |---|---|---|
-| C shim (our own C, compiled into every grammar's wasm with unmodified upstream C) | `tools/gen/shim/tsg_abi.c` | generator |
+| C shim (our own C, compiled into every grammar's wasm with the unmodified runtime and pinned grammar C, including ADR-0023 patches) | `tools/gen/shim/tsg_abi.c` | generator |
 | Go side of the ABI, memory provider, trap capture | `internal/engine` (root module) | engine |
 | Per-grammar generated module | `grammars/<lang>/` (one Go module each) | generator output |
 
@@ -265,5 +265,5 @@ JSON additionally requires the no-reset negative control to produce a mismatchin
 The test artifacts retain per-trial results and source/native identities. This is evidence for the sampled probe
 builds and inputs, not direct observation inside product module bytes or an exhaustive sweep of every callback.
 
-`.github/workflows/balancing-cancel.yml` runs every generated grammar (currently 15 modules) nightly and manually on Linux amd64. Its separate
+`.github/workflows/balancing-cancel.yml` runs every generated grammar (currently 23 modules) nightly and manually on Linux amd64. Its separate
 toolchain build and sweep cost stay outside PR-required checks; changing required checks remains a separate decision.
