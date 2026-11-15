@@ -1,0 +1,24 @@
+--- a/src/scanner.c
++++ b/src/scanner.c
+@@ -667,6 +667,12 @@
+     return false;
+ }
+
++// The word keeps one byte per code point: ASCII is compared exactly and a non-ASCII byte
++// only against the low byte of the lookahead (non-ASCII code points with that byte still alias).
++static inline bool word_byte_matches(char stored, int32_t lookahead) {
++    return (unsigned char)stored < 0x80 ? (int32_t)(unsigned char)stored == lookahead : stored == (char)lookahead;
++}
++
+ static inline bool scan_heredoc_content(Scanner *scanner, TSLexer *lexer) {
+     Heredoc *heredoc = array_get(&scanner->open_heredocs, 0);
+     size_t position_in_word = 0;
+@@ -707,7 +713,7 @@
+             return true;
+         }
+
+-        if (lexer->lookahead == *array_get(&heredoc->word, position_in_word) && look_for_heredoc_end) {
++        if (word_byte_matches(*array_get(&heredoc->word, position_in_word), lexer->lookahead) && look_for_heredoc_end) {
+             advance(lexer);
+             position_in_word++;
+         } else {

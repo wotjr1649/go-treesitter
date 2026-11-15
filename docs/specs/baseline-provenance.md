@@ -17,8 +17,9 @@ Every grammar module is generated, never hand-edited, from:
 
 The runtime stays unmodified. Grammar changes require the recorded, hash-checked patch and retirement mechanism
 of ADR-0023; grammar-input changes regenerate C with the pinned CLI, identically for the engine and native reference.
-YAML patch `0001-no-early-eof` is a C-only patch; original/result source hashes and the patch identity are recorded
-in its pin and generated provenance. The unpatched native comparison is separate from the product comparison.
+The YAML early-EOF fix, Bash/Ruby heredoc comparisons and YAML/Python serialization bounds are C-only patches;
+original/result source hashes and each patch identity are recorded in the pins and generated provenance.
+The unpatched native comparison is separate from the product comparison.
 
 ## Machine-readable source of truth
 

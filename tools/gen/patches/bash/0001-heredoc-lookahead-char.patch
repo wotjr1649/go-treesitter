@@ -1,0 +1,24 @@
+--- a/src/scanner.c
++++ b/src/scanner.c
+@@ -223,6 +223,12 @@
+     return found_delimiter;
+ }
+
++// The delimiter keeps one byte per code point: ASCII is compared exactly and a non-ASCII byte
++// only against the low byte of the lookahead (non-ASCII code points with that byte still alias).
++static inline bool delimiter_byte_matches(char stored, int32_t lookahead) {
++    return (unsigned char)stored < 0x80 ? (int32_t)(unsigned char)stored == lookahead : stored == (char)lookahead;
++}
++
+ static bool scan_heredoc_end_identifier(Heredoc *heredoc, TSLexer *lexer) {
+     reset_string(&heredoc->current_leading_word);
+     // Scan the first 'n' characters on this line, to see if they match the
+@@ -230,7 +236,7 @@
+     int32_t size = 0;
+     if (heredoc->delimiter.size > 0) {
+         while (lexer->lookahead != '\0' && lexer->lookahead != '\n' &&
+-               (int32_t)*array_get(&heredoc->delimiter, size) == lexer->lookahead &&
++               delimiter_byte_matches(*array_get(&heredoc->delimiter, size), lexer->lookahead) &&
+                heredoc->current_leading_word.size < heredoc->delimiter.size) {
+             array_push(&heredoc->current_leading_word, lexer->lookahead);
+             advance(lexer);

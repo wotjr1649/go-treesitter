@@ -65083,7 +65083,7 @@ func (m *Module) fn100(v0, v1 int32) int32 {
 	t2 := int32(load32(m.memory, uint64(uint32(v0))+8))
 	var p3 int32
 	if t2 != 0 {
-	l3:
+	l4:
 		{
 			t4 := int32(load32(m.memory, uint64(uint32(v1))))
 			v4 = t4
@@ -65091,11 +65091,21 @@ func (m *Module) fn100(v0, v1 int32) int32 {
 			case 0, 10:
 				goto l0
 			default:
-				t5 := int32(load32(m.memory, uint64(uint32(v0))+4))
-				t6 := int32(int8(m.memory[uint64(uint32(t5+v6))]))
-				if v4 != t6 {
-					goto l0
+				{
+					t5 := int32(load32(m.memory, uint64(uint32(v0))+4))
+					t6 := int32(int8(m.memory[uint64(uint32(t5+v6))]))
+					v2 = t6
+					if v2 >= i32(0) {
+						if v2 == v4 {
+							goto l2
+						}
+						goto l0
+					}
+					if int32(int8(v4)) != v2 {
+						goto l0
+					}
 				}
+			l2:
 				t7 := int32(load32(m.memory, uint64(uint32(v0))+20))
 				v2 = t7
 				t8 := int32(load32(m.memory, uint64(uint32(v0))+8))
@@ -65127,12 +65137,12 @@ func (m *Module) fn100(v0, v1 int32) int32 {
 							v3 = t15
 							t16 := int32(load32(m.memory, uint64(uint32(v1))))
 							v4 = t16
-							goto l2
+							goto l3
 						}
 						t17 := m.fn163(v2)
 						v3 = t17
 					}
-				l2:
+				l3:
 					store32(m.memory, uint64(uint32(v0))+24, uint32(v2))
 					store32(m.memory, uint64(uint32(v0))+16, uint32(v3))
 					t18 := int32(load32(m.memory, uint64(uint32(v0))+20))
@@ -65146,7 +65156,7 @@ func (m *Module) fn100(v0, v1 int32) int32 {
 				t19 := int32(load32(m.memory, uint64(uint32(v1))+8))
 				m.t0[uint(t19)].(func(int32, int32))(v1, i32(0))
 				v6 = v6 + i32(1)
-				goto l3
+				goto l4
 			}
 		}
 	l0:
@@ -65181,12 +65191,12 @@ func (m *Module) fn100(v0, v1 int32) int32 {
 			if v2 != 0 {
 				t29 := m.fn167(v2, v1)
 				p28 = t29
-				goto l4
+				goto l5
 			}
 			t30 := m.fn163(v1)
 			p28 = t30
 		}
-	l4:
+	l5:
 		v2 = p28
 		store32(m.memory, uint64(uint32(v0))+24, uint32(v1))
 		store32(m.memory, uint64(uint32(v0))+16, uint32(v2))
@@ -65211,30 +65221,30 @@ func (m *Module) fn100(v0, v1 int32) int32 {
 			t37 := int32(m.memory[uint64(uint32(v2))])
 			v0 = t37
 			if v0 == 0 {
-				goto l5
+				goto l6
 			}
 			if v0 != v1 {
-				goto l5
+				goto l6
 			}
 			v2 = v2 + i32(1)
 			v3 = v3 + i32(1)
-		l6:
+		l7:
 			{
 				t38 := int32(m.memory[uint64(uint32(v3))])
 				v1 = t38
 				t39 := int32(m.memory[uint64(uint32(v2))])
 				v0 = t39
 				if v0 == 0 {
-					goto l5
+					goto l6
 				}
 				v2 = v2 + i32(1)
 				v3 = v3 + i32(1)
 				if v0 == v1 {
-					goto l6
+					goto l7
 				}
 			}
 		}
-	l5:
+	l6:
 		p33 = v0 - v1
 	} else {
 		p33 = i32(1)

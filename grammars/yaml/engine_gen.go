@@ -18946,7 +18946,7 @@ func (m *Module) fn97(v0 int32) {
 	m.fn173(v0)
 }
 func (m *Module) fn98(v0, v1 int32) int32 {
-	var v2, v3, v4, v5, _ int32
+	var v2, v3, v4, v5 int32
 	t0 := int32(load16(m.memory, uint64(uint32(v0))))
 	store16(m.memory, uint64(uint32(v1)), uint16(t0))
 	t1 := int32(load16(m.memory, uint64(uint32(v0))+2))
@@ -18968,28 +18968,23 @@ func (m *Module) fn98(v0, v1 int32) int32 {
 		t6 := int32(load32(m.memory, uint64(uint32(v0))+12))
 		v4 = t6 + i32(2)
 		t7 := int32(load32(m.memory, uint64(uint32(v0))+24))
-		v5 = t7 + i32(2)
-		v0 = i32(10)
+		v0 = t7 + i32(2)
 	l1:
 		{
-			v2 = v0 + v1
+			v5 = v1 + v2
 			t8 := int32(load16(m.memory, uint64(uint32(v4))))
-			store16(m.memory, uint64(uint32(v2)), uint16(t8))
-			t9 := int32(load16(m.memory, uint64(uint32(v5))))
-			store16(m.memory, uint64(uint32(v2+i32(2))), uint16(t9))
-			v2 = v0 + i32(4)
-			if v3 == 0 {
+			store16(m.memory, uint64(uint32(v5)), uint16(t8))
+			t9 := int32(load16(m.memory, uint64(uint32(v0))))
+			store16(m.memory, uint64(uint32(v5+i32(2))), uint16(t9))
+			v2 = v2 + i32(4)
+			if uint32(v2) > uint32(i32(1020)) {
 				goto l0
 			}
-			v5 = v5 + i32(2)
-			v3 = v3 - i32(2)
+			v0 = v0 + i32(2)
+			v5 = v3
+			v3 = v5 - i32(2)
 			v4 = v4 + i32(2)
-			var p10 int32
-			if uint32(v0) < uint32(i32(1020)) {
-				p10 = 1
-			}
-			v0 = v2
-			if p10 != 0 {
+			if v5 != 0 {
 				goto l1
 			}
 		}

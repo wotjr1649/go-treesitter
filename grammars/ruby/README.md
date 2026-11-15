@@ -14,3 +14,9 @@ its `LICENSE` is the index: musl MIT, cloudlibc BSD-2-Clause, dlmalloc CC0, the 
 every file's hash is in `provenance.json`). Regenerate with `tools/gen` (see its README); regenerating gives identical bytes.
 
 Source tier: 1 (core), per ADR-0024.
+
+This grammar differs temporarily from upstream under ADR-0023. Applied patches (full hashes in `provenance.json`):
+
+The heredoc patch compares an ASCII delimiter byte exactly and a non-ASCII one by its stored low byte, so non-ASCII delimiters close; two non-ASCII code points with the same low byte still match each other.
+
+- `patches/ruby/0001-heredoc-lookahead-char.patch` changes `src/scanner.c`; upstream defect report: https://github.com/tree-sitter/tree-sitter-ruby/issues/305.

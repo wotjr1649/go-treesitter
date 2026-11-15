@@ -157,7 +157,7 @@ func fetch(manifest, data, out string, printOnly bool, langs []string) error {
 		}
 		rows = append(rows, []string{e.Lang, e.File, src, strconv.Itoa(len(b)), got})
 	}
-	// A grammar may have no pinned large input (tsx); its shard still writes an empty manifest.
+	// A grammar may have no pinned large input; its shard still writes an empty manifest.
 	if err := os.MkdirAll(out, 0o755); err != nil {
 		return err
 	}

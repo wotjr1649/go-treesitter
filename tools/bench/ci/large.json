@@ -344,5 +344,15 @@
     "license_spdx": "Apache-2.0",
     "license_url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/license/LICENSE.txt",
     "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "lang": "tsx",
+    "file": "App.tsx",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/excalidraw/excalidraw/817d8c553c3389650f8b4503984a6d4a5d2f0c11/packages/excalidraw/components/App.tsx",
+    "sha256": "7b3e614cf314d29d0285b69079cc3e67986b75c56f57088c17f9bc01b3b96dbe",
+    "license_spdx": "MIT",
+    "license_url": "https://raw.githubusercontent.com/excalidraw/excalidraw/817d8c553c3389650f8b4503984a6d4a5d2f0c11/LICENSE",
+    "license_sha256": "1352d204fdb90d5e482c13139d848bc2c9300a9a7de358a0a558a23e72d0d8be"
   }
 ]

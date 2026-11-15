@@ -7,6 +7,14 @@
       "beforeSHA256": "02c5d32e95fa018a3c3ba7d7134d84bb7d5595c8874aa7ae6582745d9b40dede",
       "afterSHA256": "91564e108b65d2dd9487cf5b419d4d161e339b41c3e7ad462da91971ee52383f",
       "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/14"
+    },
+    {
+      "file": "patches/yaml/0002-bound-serialized-indent-bytes.patch",
+      "sha256": "b36738e2cc1d30273d02f0e55daba26e77459eea3c210138ba4d84085dd39535",
+      "source": "src/scanner.c",
+      "beforeSHA256": "a510c0ca699cf3853bd2192bf103e11132414bc002fe952a88a7106ffb5d44e9",
+      "afterSHA256": "c1177bf7a0ecf12160807a86a61c874101f81d764512f6bca3b8e4a03fccde32",
+      "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/48"
     }
   ],
   "schema": 1,
@@ -29,7 +37,9 @@
       "grammar.tree_sitter/array.h": "5bdf6ed1a78e3409fd443e085ca967a64c188a5d082aaf7f819bccd53a471c94",
       "grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
       "patch.patches/yaml/0001-no-early-eof.patch": "f505f72705387aa9eed400fae2fb3b04d59a04820131df83c5059dfb179ba1fb",
+      "patch.patches/yaml/0002-bound-serialized-indent-bytes.patch": "b36738e2cc1d30273d02f0e55daba26e77459eea3c210138ba4d84085dd39535",
       "patched.src/parser.c": "91564e108b65d2dd9487cf5b419d4d161e339b41c3e7ad462da91971ee52383f",
+      "patched.src/scanner.c": "c1177bf7a0ecf12160807a86a61c874101f81d764512f6bca3b8e4a03fccde32",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
       "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
     },
@@ -54,8 +64,8 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "5014038967de4a9bcfd6dc8f726adab932af0783d765d034a529de9747554fa2",
-    "engine_gen.go": "9ef385b99a0b612deb8f86cd22c330167c594c1e802de09e8e2b80d06d48b306",
-    "wasm": "0d5fae591dda9607a30f95672901f320c06ca82bd5bc448167110c0303dffa49",
-    "wasm.clang": "535b52e7d3e3193bb6a0d7a9abe2f171e3c2741f14fa88a4ea1b3177408c1706"
+    "engine_gen.go": "8130dd48c57b2874f0c2b587752a2d131e4dbc538ab462aaaa254bbd5211e69e",
+    "wasm": "38770366e590a31cbdab68f3908ccfe5a8d16cffe3b97c3388b979b7bae23f3f",
+    "wasm.clang": "674e38c99cac5ae601d510ea9eb013afa4e3d230d631536c4f1103053c4ec241"
   }
 }

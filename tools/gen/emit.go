@@ -340,8 +340,16 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 	}
 	if len(g.Patches) > 0 {
 		result += "\nThis grammar differs temporarily from upstream under ADR-0023. Applied patches (full hashes in `provenance.json`):\n"
-		if lang == "yaml" {
+		switch lang {
+		case "bash", "ruby":
+			result += "\nThe heredoc patch compares an ASCII delimiter byte exactly and a non-ASCII one by its stored low byte, so non-ASCII delimiters close; two non-ASCII code points with the same low byte still match each other.\n"
+		case "yaml":
 			result += "\nYAML patch 0001 prevents premature end-of-input acceptance and silent source truncation.\n"
+			if len(g.Patches) > 1 {
+				result += "\nYAML patch 0002 bounds serialized indentation by bytes written, preventing deep-nesting buffer overruns (upstream PR #47).\n"
+			}
+		case "python":
+			result += "\nThe indentation patch bounds serialization by bytes written, preventing the state-buffer overrun that deep indentation causes when an odd number of string delimiters is open, e.g. inside one string literal (upstream PR #351).\n"
 		}
 		for _, p := range g.Patches {
 			result += fmt.Sprintf("\n- `%s` changes `%s`; upstream defect report: %s.\n", p.File, p.Source, p.UpstreamReport)
