@@ -3,7 +3,7 @@
 Generated tree-sitter grammar module for go-treesitter. **Do not edit**: `engine_gen.go` and `language.go` are output of
 `tools/gen` (docs/design/engine-abi.md, ADR-0020).
 
-- upstream grammar: https://github.com/airbus-cert/tree-sitter-powershell at `e7bd348c49fdfd5c853a146a670965ba516a6239`
+- upstream grammar: https://github.com/airbus-cert/tree-sitter-powershell at `65ea6919e816a7ac142acec7ee72757f89db8439`
 - tree-sitter runtime: v0.27.2 (unmodified)
 - engine ABI: 3
 - recipe sha256: `f80a095eb15ac42f0d729a6834bc16e2602bf10fcf0030c688197433208aa950`

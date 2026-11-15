@@ -415,19 +415,19 @@
     },
     "php": {
       "repo": "https://github.com/tree-sitter/tree-sitter-php",
-      "commit": "92b5271b60bec77fb65b5e5bc41561e8dac81299",
+      "commit": "58d5643086ae60e93a3746cca648363ee97c8761",
       "extractDir": "php",
-      "archive": "php-92b5271b60be.tar.gz",
-      "archiveSHA256": "2dfa7643857b94a273b6b413b4cb694aef9c9898e17403f97b66a9ba9c163891",
-      "archiveURL": "https://codeload.github.com/tree-sitter/tree-sitter-php/tar.gz/92b5271b60bec77fb65b5e5bc41561e8dac81299",
+      "archive": "php-58d5643086ae.tar.gz",
+      "archiveSHA256": "139701b185691b6f82d81ef6387de5cfe23b7833a75fa1eeca9b80416aa58039",
+      "archiveURL": "https://codeload.github.com/tree-sitter/tree-sitter-php/tar.gz/58d5643086ae60e93a3746cca648363ee97c8761",
       "grammarDir": "php/src",
       "dirs": [
         "php/src",
         "common"
       ],
-      "treeSHA256": "34296f257a6d433bb74753e9d2e2d50dbe4afc15f05edc938753d30d6b405630",
+      "treeSHA256": "6739b1121cf6dfb3c151d606fa70eb3f181b3e8bbb839e57e08ad2307c067987",
       "files": {
-        "parser.c": "80a9bb8d671ff300717de63939fc9b82c6ca6c7b38805fcbb33705dcc322eec3",
+        "parser.c": "8a42ccdbb0f18c934de610baab4cdf8f89086bc8f5a7dc89fb60350d61912e73",
         "scanner.c": "58c92cafe4ebda509c3ad3864fa6fc0e9877bbac26e17a03d23ea2101c291ad5",
         "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
         "tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
@@ -438,19 +438,19 @@
     },
     "powershell": {
       "repo": "https://github.com/airbus-cert/tree-sitter-powershell",
-      "commit": "e7bd348c49fdfd5c853a146a670965ba516a6239",
+      "commit": "65ea6919e816a7ac142acec7ee72757f89db8439",
       "extractDir": "powershell",
-      "archive": "powershell-e7bd348c49fd.tar.gz",
-      "archiveSHA256": "0c66318caf62f788b717e8dee74b75552917d1f22ecca0b01b621f79fc0d49f1",
-      "archiveURL": "https://codeload.github.com/airbus-cert/tree-sitter-powershell/tar.gz/e7bd348c49fdfd5c853a146a670965ba516a6239",
+      "archive": "powershell-65ea6919e816.tar.gz",
+      "archiveSHA256": "ce077de1a8537476750152afa984346a65519b7b795348cc8fb7f1e0e28e4a4a",
+      "archiveURL": "https://codeload.github.com/airbus-cert/tree-sitter-powershell/tar.gz/65ea6919e816a7ac142acec7ee72757f89db8439",
       "grammarDir": "src",
       "dirs": [
         "src"
       ],
-      "treeSHA256": "d38f5d3d8e98678d40f7f58bb18ea69dc208f544e385d78c56192575d86237b3",
+      "treeSHA256": "bf4bebd9b3525c74e7c4971750e3c5852ea0230f46d4a18cd720f9d68b6501d9",
       "files": {
-        "parser.c": "f39f67abaae4c488ccea5d9bbd003ef0b00c303779e0491950886a12a9305720",
-        "scanner.c": "cf366b70e258a0ac1eb264ac0f4165c8f0c1b943d1a6e9db9d291c6cf178221f",
+        "parser.c": "185404a0acfeb8dc351a9c934aca8c60552644344acd2f9a8008baca4b4e1c09",
+        "scanner.c": "dab03ff73a44495c72e6b51f43fd2f5128a1a29344a29974f12fba250328cf99",
         "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
         "tree_sitter/array.h": "31e60a1bff6f715afacce03b5b70efe42b58371b4f9595dd4af52a577ff9608c",
         "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
@@ -482,18 +482,18 @@
     },
     "dart": {
       "repo": "https://github.com/UserNobody14/tree-sitter-dart",
-      "commit": "be07cf7118d3dba06236a3f19541685a68209934",
+      "commit": "0038280b774b65c1b89ba7fec50624d8baed9fe1",
       "extractDir": "dart",
-      "archive": "dart-be07cf7118d3.tar.gz",
-      "archiveSHA256": "b126efb8dfeeba8b71f0c6ae1f0cd09cf8b205560786b31d44cc16b283e782f2",
-      "archiveURL": "https://codeload.github.com/UserNobody14/tree-sitter-dart/tar.gz/be07cf7118d3dba06236a3f19541685a68209934",
+      "archive": "dart-0038280b774b.tar.gz",
+      "archiveSHA256": "7d9f51b4ff20756a21935ce69a2386e6db1e2fda325835d41790e745270e0db8",
+      "archiveURL": "https://codeload.github.com/UserNobody14/tree-sitter-dart/tar.gz/0038280b774b65c1b89ba7fec50624d8baed9fe1",
       "grammarDir": "src",
       "dirs": [
         "src"
       ],
-      "treeSHA256": "02daac8faaf4b54a43d3fda17abaee1008dc173450d06c308ee1b72c8c4dffc8",
+      "treeSHA256": "18763e1c430871dd9a834d38e2d3efe7e6dfd2bf4fa5124423a07d39c0ae2828",
       "files": {
-        "parser.c": "af2c6d473ddd54f56603db77fa35e0bdbc8e4fb92d41c4bac69dc7e510eb9ca4",
+        "parser.c": "9570f47f9912a4b169f5d959f6db06859087eb95c3f1203e312a33c12da66309",
         "scanner.c": "07a7b7818b175e9460523e705dd88d20f7b5141bac95c593d4426e6d52284996",
         "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
         "tree_sitter/array.h": "31e60a1bff6f715afacce03b5b70efe42b58371b4f9595dd4af52a577ff9608c",

@@ -6,12 +6,12 @@
   "identity": {
     "Runtime": "v0.27.2",
     "GrammarRepo": "https://github.com/airbus-cert/tree-sitter-powershell",
-    "GrammarRev": "e7bd348c49fdfd5c853a146a670965ba516a6239",
+    "GrammarRev": "65ea6919e816a7ac142acec7ee72757f89db8439",
     "SourceSHA256": {
       "grammar.LICENSE": "1fca8454c0d77a73f9922a52d39e1f7c339f5da5d03f2766eff66b859fa19477",
-      "grammar.parser.c": "f39f67abaae4c488ccea5d9bbd003ef0b00c303779e0491950886a12a9305720",
-      "grammar.scanner.c": "cf366b70e258a0ac1eb264ac0f4165c8f0c1b943d1a6e9db9d291c6cf178221f",
-      "grammar.tree": "d38f5d3d8e98678d40f7f58bb18ea69dc208f544e385d78c56192575d86237b3",
+      "grammar.parser.c": "185404a0acfeb8dc351a9c934aca8c60552644344acd2f9a8008baca4b4e1c09",
+      "grammar.scanner.c": "dab03ff73a44495c72e6b51f43fd2f5128a1a29344a29974f12fba250328cf99",
+      "grammar.tree": "bf4bebd9b3525c74e7c4971750e3c5852ea0230f46d4a18cd720f9d68b6501d9",
       "grammar.tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
       "grammar.tree_sitter/array.h": "31e60a1bff6f715afacce03b5b70efe42b58371b4f9595dd4af52a577ff9608c",
       "grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
@@ -38,9 +38,9 @@
     "LICENSES/wasi-libc/cloudlibc-LICENSE": "c8b789cf5a746611e6300a0cc7750dbf92b61912a709d04e639245f7290656d0",
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
-    "engine_gen.dat": "7d9f4626a4a7872a742b12b8c8b5224002629df4652fcf5f7ac23cd95f1122e0",
-    "engine_gen.go": "7ff18293622db64c059cff3c852f85f236d6b354fa4ec4392d1f7ccb634198d2",
-    "wasm": "dc658d0a3c28dff111c5e4ea9dc68963d361322fd59992e87734009e7fac385e",
-    "wasm.clang": "253cb466ce2041584cd7a8fb445fcbc7cd88f2877bb928ecb575fd679e437f1a"
+    "engine_gen.dat": "3bb226f021450329a794771446b3849f807bc4051bbb4addf71e86f7813a81cb",
+    "engine_gen.go": "adebdbd57fa610ab4cb13eb47433a22c9bd48934b8f2a2d10f65454f1ea15bf4",
+    "wasm": "c5edae24596546eccccffe9a3ba3f23d7ecd8931a049306400dfcf5fd68d81d5",
+    "wasm.clang": "25df1d6eca97f7a69697d6c23a8371c7ee5765f6e066fe08d4db53df7998104c"
   }
 }

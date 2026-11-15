@@ -53,6 +53,13 @@ type opts struct {
 }
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "schema" {
+		if err := runSchemaCommand(os.Args[2:], os.Stdout); err != nil {
+			fmt.Fprintln(os.Stderr, "gen schema:", err)
+			os.Exit(1)
+		}
+		return
+	}
 	var o opts
 	flag.StringVar(&o.lang, "lang", "", "grammar module to generate (key in pins.json)")
 	flag.StringVar(&o.root, "root", ".", "tools/gen directory (pins.json, shim/)")

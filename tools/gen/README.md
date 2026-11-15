@@ -3,6 +3,74 @@
 Generates one grammar module (`grammars/<lang>`) from pinned upstream C: clang (wasi-sdk) → wasm → wasm-opt
 (recipe-dependent) → `wasm2go` → patched `memory_grow` → Go module. Design: `docs/design/engine-abi.md`, ADR-0020, ADR-0022.
 
+## Offline node-type schema commands
+
+From `tools/gen`, use only local `node-types.json` files:
+
+```sh
+go run . schema check /path/to/node-types.json
+go run . schema diff /path/to/old/node-types.json /path/to/new/node-types.json
+```
+
+These commands run before generation flag parsing and do not load pins, fetch inputs, or need a C compiler.
+JSON output binds the input filenames, byte counts and SHA-256 hashes. `staticOnly: true` means a static
+contract check: it does not establish parse correctness, C agreement, SemVer safety, or release readiness.
+Supertypes are compared as declared, without expansion. Entries, alternatives and object-key order do not
+change the diff. Output order is node `(type, named)` (false first), then code order below, field and member.
+
+`check` returns `PASS`, `FAIL` for malformed input, or `BLOCKED` for unsupported keys alone. Exact keys are
+required at every level; duplicate decoded keys (including escape-equivalent keys), invalid UTF-8 or
+unpaired Unicode surrogate escapes, null/missing/wrongly typed required values, duplicate `(type, named)`
+identities or alternatives, unresolved subtype references and subtype cycles fail. Empty alias types are
+valid. Undeclared field/children alternatives are warnings and can accompany `PASS`. JSON syntax errors
+stop at the first error; structural findings are collected. The CLI limits inputs to 16 MiB. JSON nesting
+allows at most 64 containers (the outermost array is level 1); decoded object keys are limited to 1024 UTF-8
+bytes (`JSON_KEY_LIMIT`). Top-level nodes are decoded and checked one at a time. At most 1000 findings
+are retained, followed by one error `FINDINGS_TRUNCATED` with the total number seen. All findings still
+contribute to `FAIL`/`BLOCKED`; truncating warnings alone yields `FAIL` rather than an incomplete `PASS`.
+
+`diff` checks both inputs first and emits no differences for invalid/unsupported inputs. A valid equal
+pair has assessment `PASS`; a changed pair has assessment `FAIL` (a contract difference, not invalid input).
+Both valid outcomes exit **0**, so differences can be reviewed. Invalid/unsupported input, usage or I/O
+errors exit **1**. A check with warnings still exits 0. No baseline is inferred from Git or from missing files.
+
+The 20 change codes retain the kit's six review risks, rather than a safety verdict:
+
+| Codes (comparison order within a node) | Risk |
+|---|---|
+| `NODE_REMOVED`, `NODE_ADDED` | `REMOVAL`, `ADDITION` respectively |
+| `NODE_NAMED_CHANGED`, `ROOT_CHANGED` | `IDENTITY` |
+| `EXTRA_CHANGED` | `CLASSIFICATION` |
+| `FIELDS_PRESENCE_CHANGED` | `IDENTITY` |
+| `FIELD_REMOVED`, `FIELD_ADDED` | `REMOVAL`, `ADDITION` respectively |
+| `FIELD_REQUIRED_CHANGED`, `FIELD_MULTIPLE_CHANGED` | required false→true or multiple true→false: `CARDINALITY_NARROWED`; inverse: `CARDINALITY_WIDENED` |
+| `FIELD_TYPE_REMOVED`, `FIELD_TYPE_ADDED` | `REMOVAL`, `ADDITION` respectively |
+| `CHILDREN_PRESENCE_CHANGED` | `ADDITION` when present after, otherwise `REMOVAL` |
+| `CHILDREN_REQUIRED_CHANGED`, `CHILDREN_MULTIPLE_CHANGED` | same cardinality rule as fields |
+| `CHILDREN_TYPE_REMOVED`, `CHILDREN_TYPE_ADDED` | `REMOVAL`, `ADDITION` respectively |
+| `SUBTYPES_PRESENCE_CHANGED` | `ADDITION` when present after, otherwise `REMOVAL` |
+| `SUBTYPE_REMOVED`, `SUBTYPE_ADDED` | `REMOVAL`, `ADDITION` respectively |
+
+`NODE_NAMED_CHANGED` applies only to one removed and one added identity of the same spelling. Absence,
+explicit false and empty fields are distinct. Added/removed whole nodes or fields emit the whole change;
+children/subtype presence changes also list their added/removed alternatives. Before/after values use
+canonical key and alternative order. Findings carry JSON Pointers; diff changes identify node, field and member.
+Definitions and reused test data are attributed in [schema/NOTICE.md](schema/NOTICE.md); implementation uses
+the Go 1.26 standard library only.
+
+To exercise every pin against SHA-256-checked archives without downloading or modifying them:
+
+```sh
+TSG_SCHEMA_ARCHIVES=/absolute/regen-work/dl CGO_ENABLED=0 GOWORK=off go test -count=1 -v -run '^TestPinnedSchemas$' .
+# Optional explicit pin file for reviewing a pin change:
+TSG_SCHEMA_ARCHIVES=/absolute/regen-work/dl TSG_SCHEMA_PINS=/absolute/review/tools/gen/pins.json CGO_ENABLED=0 GOWORK=off go test -count=1 -v -run '^TestPinnedSchemas$' .
+```
+
+Without `TSG_SCHEMA_ARCHIVES`, this archive integration test is explicitly skipped; ordinary unit tests stay
+offline. Archive hash mismatches and strict schema failures fail the test, with no allowlist. Schema provenance
+is recorded in [the schema register](../../docs/validation/grammar-schemas.md#offline-strict-check-inputs). No CI wiring is added;
+the first pin move also needs explicit base/head selection and an old/new native tree comparison.
+
 ## Pins (`pins.json`)
 
 Everything a generation consumes is pinned, and the identity of a generated module never depends on the host:
