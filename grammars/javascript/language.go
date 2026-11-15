@@ -8,7 +8,7 @@ var _ engine.Module = (*Module)(nil)
 
 // grammar is the static description handed to treesitter.NewLanguage; its Identity equals provenance.json.
 var grammar = engine.Grammar{
-	ABI:  2,
+	ABI:  3,
 	Name: "javascript",
 	New:  func(h *engine.Host) engine.Module { return New(h, h) },
 	Meta: engine.LangMeta{
@@ -344,9 +344,9 @@ var grammar = engine.Grammar{
 			"grammar.tree_sitter/array.h":  "5bdf6ed1a78e3409fd443e085ca967a64c188a5d082aaf7f819bccd53a471c94",
 			"grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
 			"runtime.tree":                 "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-			"shim.tsg_abi.c":               "8cc04dfb09c35413c7d5a706f0a650b1b45c1516159777b2f14841a4e408dc43",
+			"shim.tsg_abi.c":               "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05",
 		},
-		RecipeSHA256: "bf1c543a483988a6ff90d475c75c6fa81db720b3b52aa062937532fdf534fe70",
+		RecipeSHA256: "bd05cca105aadaf26e623677dd01a8b39a8ab8d2ff85e6de440f204ba6753a68",
 		Tools: map[string]string{
 			"binaryen":    "133",
 			"clang":       "23.1.0",

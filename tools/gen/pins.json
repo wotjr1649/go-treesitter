@@ -3,7 +3,7 @@
   "mirrors": [
     "https://github.com/wotjr1649/go-treesitter/releases/download/v0.3.0"
   ],
-  "abi": 2,
+  "abi": 3,
   "recipe": "v2-O3",
   "runtime": {
     "release": "v0.27.2",
@@ -64,7 +64,7 @@
     "llvmCommit": "895aa2c896ada719451be2e3673c83da8ddf1141"
   },
   "memoryGrowSHA256": "9e1db9d4db30f9f71e30319cbc3b782ae348fd530bd4bd26d00f31dafcabe93a",
-  "shimSHA256": "8cc04dfb09c35413c7d5a706f0a650b1b45c1516159777b2f14841a4e408dc43",
+  "shimSHA256": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05",
   "wasiLibc": {
     "repo": "https://github.com/WebAssembly/wasi-libc",
     "commit": "2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13",

@@ -8,7 +8,7 @@ var _ engine.Module = (*Module)(nil)
 
 // grammar is the static description handed to treesitter.NewLanguage; its Identity equals provenance.json.
 var grammar = engine.Grammar{
-	ABI:  2,
+	ABI:  3,
 	Name: "tsql",
 	New:  func(h *engine.Host) engine.Module { return New(h, h) },
 	Meta: engine.LangMeta{
@@ -1006,9 +1006,9 @@ var grammar = engine.Grammar{
 			"grammar.scanner.c": "392bf26c2295e8ee3dd584dbea619d39573495244b4bbd2b59dab387a8494aec",
 			"grammar.tree":      "4f1dd72a101035d88532d13aa228edacb2e18e09ae6cd0dec2e5b6ae7eb9907c",
 			"runtime.tree":      "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-			"shim.tsg_abi.c":    "8cc04dfb09c35413c7d5a706f0a650b1b45c1516159777b2f14841a4e408dc43",
+			"shim.tsg_abi.c":    "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05",
 		},
-		RecipeSHA256: "e7dee5e2399c8898067d401086612cbb5ac8fdc23e1f4a0813ae95885cd0b3f1",
+		RecipeSHA256: "00002fc28f845d1121357c3690210d2ad59133b67078a9936c0ed376fd53f6fa",
 		Tools: map[string]string{
 			"binaryen":    "133",
 			"clang":       "23.1.0",

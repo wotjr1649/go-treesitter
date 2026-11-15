@@ -32,6 +32,10 @@ engine ABI version and snapshot block magic/version and returns `ErrIncompatible
 module against the newest root. Language metadata (symbol/field names, identity) is static Go data; no instance is
 needed to read it.
 
+The root accepts engine ABI 1, 2 and 3 grammar modules. ABI 1 supports parsing; ABI 2 adds queries; ABI 3 adds
+single-child field-lookup exceptions through snapshot format 2. ABI 1/2 modules keep their older direct-child field lookup
+for alias-inherited fields; upgrading the root alone cannot supply the missing snapshot exceptions.
+
 ## 3. Parsing
 
 ```go
@@ -96,8 +100,8 @@ func EditFor(old, new []byte, start, oldEnd, newEnd uint32) InputEdit  // O(n); 
 ## 6. Snapshot and Node
 
 The snapshot owns the source: by default one copy (about 0.07 ms per MB; +5–22 % of the snapshot's own memory, no
-disk use); with `ParseOwned` no copy. Struct-of-arrays, about 41 B/node plus `descendantEnd` and `childCount`
-(+8 B/node) for O(1) subtree skip, child access and range lookup.
+disk use); with `ParseOwned` no copy. Struct-of-arrays, about 41 B/node including `descendantEnd` and `childCount`
+for O(1) subtree skips and child counts, plus sparse field-lookup exceptions in ABI 3 snapshots.
 
 ```go
 func (*Snapshot) Root() Node; Len() int; Node(i int) Node; Language() *Language; Source() string
@@ -119,6 +123,23 @@ func (Node) String() string        // S-expression, for tests and debugging
 func (*Language) SymbolForName(name string, named bool) (Symbol, bool)
 ```
 `Index` (ADR-0011) remains for repeated position/kind lookups and gains `OfSymbol`.
+
+With an ABI 3 grammar module, `ChildByFieldName` follows C's `ts_node_child_by_field_id`: an inherited field may
+refer to a descendant inside a visible alias rather than a direct child. The snapshot stores only the exceptions
+to selecting the first direct child with the matching cursor field. ABI 1/2 snapshots have no exception table and
+retain that direct-child rule, so they can differ from C on alias-inherited fields. `Node.Field()` continues to
+report the cursor field in the visible parent; it does not imply that C field lookup selects that node.
+Both field-lookup methods return nothing on an ERROR node, for an unknown field name or on the zero `Node`,
+including when the grammar module uses ABI 1 or 2.
+`ChildrenByFieldName` yields the C exception target first, then matching direct children in order without
+duplicating that target; an explicit no-node exception yields nothing. Without an exception it retains the
+direct-child iteration. Thus the first result remains `ChildByFieldName`, but it need not be a direct child.
+`ChildrenByFieldName` is not a C-verified API: v0.27.2 has no children-by-field API. Its first element equals
+`ChildByFieldName`; the iterator order and explicit-null behavior are this Go API's semantics (E3 tests).
+Historical Q13 E5 agreement for `ChildByFieldName` is limited to fresh parses of the reproducible pinned
+1,761-input corpus on Windows amd64. Q13 also checked 2,779 additional local inputs, recorded separately in the
+[archived evidence and identities](engine-abi.md#field-lookup-evidence). Q14 reran the P31 guard on the same reproducible corpus with E5 agreement; its input and source identities are archived with that evidence.
+Edited trees' fields have not been re-compared with C; edit gates compare dumps and changed ranges.
 
 ## 7. Primitives that set this library apart (v0.0.1)
 

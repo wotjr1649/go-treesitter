@@ -36,6 +36,8 @@ Downloads allow three attempts with 1s/2s backoff only for transient transport f
 write errors end that URL attempt; transient HTTP 408/429/5xx responses also receive bounded retries. A failed upstream download or hash check then tries each configured mirror; sha256 verification remains mandatory before extraction. The retry self-check is
 `bash tools/gen/fetch_test.sh`.
 
+Compare raw format-2 field-exception records with `python tools/gen/check-field-export.py --before BEFORE_TREE --after AFTER_TREE --jobs JOBS_JSON --out NEW_DIR`; exact Q13 arguments are archived in [q13/run.py (`differential-final`)](../../artifacts/handoff/2026-11-15-q13-field-export-cost/q13/run.py), with input hashes in the adjacent `differential-jobs.json` and results in `differential-final/receipt.json`.
+
 ## go.mod forms
 
 - default (development): `require github.com/wotjr1649/go-treesitter v0.0.0` and `replace … => ../..`;

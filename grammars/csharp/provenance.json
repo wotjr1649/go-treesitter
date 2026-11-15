@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "abi": 2,
+  "abi": 3,
   "name": "csharp",
   "module": "github.com/wotjr1649/go-treesitter/grammars/csharp",
   "identity": {
@@ -13,9 +13,9 @@
       "grammar.scanner.c": "2ee1241a6a275e72a06838f5df927700bd405c16b48f986e2c33d1264cae4818",
       "grammar.tree": "74dfd5925f30f5cf43d510481f24ec709fd4ed5496d02e2c62d1200f06bb0943",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-      "shim.tsg_abi.c": "8cc04dfb09c35413c7d5a706f0a650b1b45c1516159777b2f14841a4e408dc43"
+      "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
     },
-    "RecipeSHA256": "7c3e2b46cb2410cdaaa14f83d833f099efc4e828858ffbb30886e5294eb1e537",
+    "RecipeSHA256": "7f6cbc28749e5e05aafef47b53d9de652571cf988d734ce6c66c6dc64f461633",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -35,9 +35,9 @@
     "LICENSES/wasi-libc/cloudlibc-LICENSE": "c8b789cf5a746611e6300a0cc7750dbf92b61912a709d04e639245f7290656d0",
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
-    "engine_gen.dat": "da27b9ce23e817b9ebfd4ae67394ca7f3dfcb1d71e355cec2dd7ae260875fc9d",
-    "engine_gen.go": "398592d42c7a632bb789de8cdedf1c330e0c6160b10ffa67459aca933e49c108",
-    "wasm": "260f3425a933169887abf3557497ebd76f4a3cb8e040510920a3e3cd42d94c3e",
-    "wasm.clang": "c95851538b6af63cf74632a7e79c6bc0b3703ca36f6178e8dce78cdac29b99ff"
+    "engine_gen.dat": "2557b37a66cc1f14972e7a3e709108ef258608f13f5dee4cf542ac506ff6f87f",
+    "engine_gen.go": "e382cadd99f7ed8337f1ae54810365cffad2c8b6e345071a8dbf931f5bfc9593",
+    "wasm": "8ac50b8f0b89611530e688703d9336d0aa17da4461178a170f7d93a7674af03b",
+    "wasm.clang": "6b031bb2c875f07840b4d3fd58a90c11bb52eddcc8b08c0f2dfeb98bedef906a"
   }
 }

@@ -7,13 +7,13 @@ import (
 	"sync/atomic"
 )
 
-// ABIVersion is the newest engine ABI. ABI 1 remains supported for parsing.
-const ABIVersion = 2
+// ABIVersion is the newest engine ABI. ABI 1 and 2 remain supported with their original snapshot format.
+const ABIVersion = 3
 
 // Export chunk buffer header (snapshot block format) and language meta block identifiers.
 const (
 	ExportMagic  = "TSGX"
-	ExportFormat = 1
+	ExportFormat = 2
 	MetaMagic    = "TSGM"
 	MetaFormat   = 1
 )
