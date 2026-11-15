@@ -31,6 +31,11 @@ to the new engine.
 
 ## Released
 
+- **v0.3.0 preview** (2026-11-15, immutable GitHub pre-release, attestation verified): fifteen grammars. Root tag
+  `v0.3.0` on `60f1d33`, grammar tags `grammars/<lang>/v0.3.0` on `ee25291`. Verified after tagging: `GOPROXY=direct`
+  and proxy.golang.org resolve all sixteen modules with the precomputed root checksum; an empty-cache external module
+  installs root + all fifteen grammars, parses with each, runs a query and cross-builds linux/arm64 without `replace`.
+  The release carries its sixteen pinned source archives (grammars, runtime, wasi-libc) with `SHA256SUMS`.
 - **v0.2.0 preview** (2026-11-14, immutable GitHub pre-release, attestation verified): queries. Root tag `v0.2.0` on
   `bd4d01e`, grammar tags `grammars/<lang>/v0.2.0` on `b4af8ce`. Verified after tagging: `GOPROXY=direct` and
   proxy.golang.org resolve all eight modules with the rehearsal checksums; an empty-cache external module installs
