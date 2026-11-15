@@ -11,8 +11,8 @@ import (
 // mirrorAssets lists the union of host plans; shared source archives appear once.
 func (p *Pins) mirrorAssets() ([]string, error) {
 	files := map[string]string{}
-	add := func(file, sum, upstream string) error {
-		line := strings.Join([]string{file, sum, upstream}, "\t")
+	add := func(file, sum, upstream, kind string) error {
+		line := strings.Join([]string{file, sum, upstream, kind}, "\t")
 		if old, ok := files[file]; ok && old != line {
 			return fmt.Errorf("conflicting release asset %s", file)
 		}
@@ -29,13 +29,17 @@ func (p *Pins) mirrorAssets() ([]string, error) {
 			if f[0] == "goinstall" {
 				continue
 			}
-			if err := add(f[1], f[3], f[2]); err != nil {
+			kind := "toolchain"
+			if f[0] == "source" {
+				kind = "source"
+			}
+			if err := add(f[1], f[3], f[2], kind); err != nil {
 				return nil, err
 			}
 		}
 	}
 	for _, archive := range p.Tools.TreeSitterCLIArchives {
-		if err := add(path.Base(archive.URL), archive.SHA256, archive.URL); err != nil {
+		if err := add(path.Base(archive.URL), archive.SHA256, archive.URL, "toolchain"); err != nil {
 			return nil, err
 		}
 	}

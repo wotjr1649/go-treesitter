@@ -104,7 +104,7 @@ Downloads allow three attempts with 1s/2s backoff only for transient transport f
 write errors end that URL attempt; transient HTTP 408/429/5xx responses also receive bounded retries. A failed upstream download or hash check then tries each configured mirror; sha256 verification remains mandatory before extraction. The retry self-check is
 `bash tools/gen/fetch_test.sh`.
 
-Compare raw format-2 field-exception records with `python tools/gen/check-field-export.py --before BEFORE_TREE --after AFTER_TREE --jobs JOBS_JSON --out NEW_DIR`; exact Q13 arguments are archived in [q13/run.py (`differential-final`)](../../artifacts/handoff/2026-11-15-q13-field-export-cost/q13/run.py), with input hashes in the adjacent `differential-jobs.json` and results in `differential-final/receipt.json`.
+Compare raw format-2 field-exception records with `python tools/gen/check-field-export.py --before BEFORE_TREE --after AFTER_TREE --jobs JOBS_JSON --out NEW_DIR`; exact Q13 arguments (`q13/run.py`, `differential-final`), input hashes (`differential-jobs.json`) and results (`differential-final/receipt.json`) are kept in the maintainer-local evidence archive. The source and result identities are recorded in [engine-abi.md](../../docs/design/engine-abi.md#field-lookup-evidence).
 
 ## go.mod forms
 
@@ -171,16 +171,26 @@ transport/HTTP failure or a wrong SHA-256 tries the next mirror. Both `regen.sh`
 archive hash before extraction. `native-ref -fetch` follows the same rule. Existing cached native archives are still
 checked and a corrupt cache fails, rather than being silently replaced.
 
-List the exact release attachments from all pinned platforms (deduplicated filename, SHA-256, upstream URL):
+List the pinned archive candidates from all platforms (deduplicated TSV: filename, SHA-256, upstream URL,
+kind `source`/`toolchain`; no header):
 
 ```sh
 (cd tools/gen && CGO_ENABLED=0 go run . -mirror-assets) > release-assets.tsv
+awk -F '\t' '$4 == "source"' release-assets.tsv > release-source-assets.tsv
 ```
 
-The list includes the runtime, every grammar archive, wasi-libc, both host SDK/binaryen archives, and the pinned
-CLI executables' gzip archives, including when no real grammar patch uses the CLI yet. Download each listed upstream
-URL into a file named by column one, check column two, and attach these unchanged files to each immutable `vX.Y.Z`
-release. Before releasing a new pin set, update `mirrors` to that release and retain older bases only when useful.
-Published releases are immutable: archives added by a later pin set (for example the eight wave-2 batch-2 grammars) have no mirror until the next release carries them. This command does not upload anything.
-`wasm2go` remains a Go module installed through Go's checksum-verified module mechanism (`wasm2goSum`), not an archive
-in this list. The Go toolchain and system C compiler are host prerequisites, not downloads managed by this pin file.
+The command lists 30 rows for the current pins: 24 `source` archives and six `toolchain` archives. v0.4.0 release
+assets are **only the 24 rows with column 4 equal to `source`, plus `SHA256SUMS`**. Check their filenames against `runtime.archive`,
+`wasiLibc.archive`, and each grammar's `archive` in `pins.json`, deduplicating TypeScript/TSX's shared archive;
+the [publication procedure](../../docs/specs/publication.md#pinned-archive-release-assets) specifies the inventory
+and digest checks. The six SDK/binaryen/CLI host archives are excluded until complete bundled notices can be
+established. Those tools are fetched from their official releases with pinned SHA-256 checks and have no assets
+in this release to provide mirror fallback, even if the fetch plan lists URLs at the configured bases.
+
+After publishing and checking all selected source rows at the new release base, update `mirrors` in a follow-up PR;
+for v0.4.0 that PR sets the ordered bases to v0.4.0 then v0.3.0 and restores the development module form. A configured
+base can supply only the exact files already published there; a new source archive gains fallback coverage when a
+carrying release is published and its base is configured. Published releases are immutable. This command does not
+upload anything. `wasm2go` remains a Go module installed through Go's checksum-verified module mechanism
+(`wasm2goSum`), not an archive in this list. The Go toolchain and system C compiler are host prerequisites, not
+downloads managed by this pin file.

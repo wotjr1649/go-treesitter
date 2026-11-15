@@ -40,6 +40,10 @@
 #endif
 #include "tree_sitter/api.h"
 
+// Scanners store lookahead in plain char (bash/ruby heredoc delimiters); the engine is wasm32 clang, where char is
+// signed. Hosts with unsigned char (AArch64 Linux) must build with -fsigned-char or the reference diverges.
+_Static_assert((char)-1 < 0, "build the native reference with -fsigned-char");
+
 #ifndef TSG_LANG_FN
 #error "define TSG_LANG_FN, e.g. -DTSG_LANG_FN=tree_sitter_json"
 #endif

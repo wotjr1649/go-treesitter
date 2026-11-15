@@ -5,7 +5,7 @@ runtime `lib/` plus one grammar's `parser.c` and `scanner.c`, including any appr
 `c/native_ref.c`. The executables produce the reference results the CGO-free conformance lane compares against
 (`docs/specs/oracle.md`). CGO is used only by the C compiler here, never by the Go product lanes.
 
-Scanner calls to `iswalnum`, `iswalpha`, `iswdigit`, `iswspace`, `towupper`, `towlower` and narrow `isdigit`
+Scanner calls to all twelve `isw*` classifiers, `towupper`, `towlower` and narrow `isdigit`
 use the engine's character semantics: `wctype.h`/`ctype.h` shims route them to namespaced functions compiled from
 the wasi-libc sources pinned in `tools/gen/pins.json`. The wasi-libc archive is SHA-256-checked before extraction,
 as are the runtime and grammar archives; runtime and wasi-libc C stay unmodified. Private headers compile those sources with
@@ -26,7 +26,10 @@ go run . -pins ../gen/pins.json -dl <archive dir> -work <empty dir> -out <exe di
   the required source directories are extracted into `-work` (the pinned grammar/runtime `dirs` and wasi-libc's
   `libc-top-half/musl/src/ctype`). Approved grammar-input patches additionally extract the full grammar archive
   into a private directory and execute its grammar JS with the pinned CLI's native JS runtime (ADR-0023).
-- `-static` on Windows (no MinGW DLLs needed); upstream's `_POSIX_C_SOURCE`/`_DEFAULT_SOURCE` flags elsewhere.
+- `-fsigned-char` and `-DNDEBUG` match the engine's plain-char signedness and disabled assertions for the driver,
+  grammar and runtime. `-static` on Windows (no MinGW DLLs needed); upstream's `_POSIX_C_SOURCE`/`_DEFAULT_SOURCE`
+  flags elsewhere. Windows retains 16-bit `wchar_t`, so C++ raw string delimiters and XML names with supplementary
+  characters can differ from the engine; CI native references run on Linux ([oracle contract](../../docs/specs/oracle.md)).
 - Needs a C11 compiler (gcc or clang) on `PATH`; large grammars (csharp, tsql, typescript, tsx) take a few GB of RAM to
   compile at `-O2`.
 

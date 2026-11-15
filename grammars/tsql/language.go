@@ -997,8 +997,8 @@ var grammar = engine.Grammar{
 	},
 	Identity: engine.Identity{
 		Runtime:     "v0.27.2",
-		GrammarRepo: "https://github.com/meloncholera/tree-sitter-mssql",
-		GrammarRev:  "8620fbcfca9438e1ff7104835bcb8305aba3bdfa",
+		GrammarRepo: "https://github.com/alfpricot/tree-sitter-mssql",
+		GrammarRev:  "2e34d86ec58f3d1a771efc0ca1e71c536690a0b7",
 		SourceSHA256: map[string]string{
 			"grammar.LICENSE":   "cffa335b2bf899b98e49d14a7f96464b6823a98f9a5d544bef5c6d3b5e46d42c",
 			"grammar.NOTICE":    "fe7b7e195134b018606dc3d40250c240f2bb9e1f5bbadb6542c169c49b21dcb1",

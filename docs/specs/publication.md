@@ -54,13 +54,17 @@ needs the owner's explicit authority for that act (above); one grant does not co
 
 | # | Step | Owner authority |
 |---|---|---|
-| 1 | On the release commit, run the release gates (`docs/specs/validation.md`) and the rehearsal: module ZIPs for the root and every generated grammar listed in `tools/gen/pins.json` (currently 23 grammar modules) at `vX.Y.Z` served from a file `GOPROXY`, built by an empty-cache consumer with `CGO_ENABLED=0`, plus `GOOS=linux GOARCH=arm64 go build`. | no (local) |
+| 1 | On the release commit, run the release gates (`docs/specs/validation.md`), including one 23-grammar nightly-diff run before v0.4.0 (retain and classify failures), and the rehearsal: module ZIPs for the root and every generated grammar listed in `tools/gen/pins.json` (currently 23 grammar modules) at `vX.Y.Z` served from a file `GOPROXY`, built by an empty-cache consumer with `CGO_ENABLED=0`, plus `GOOS=linux GOARCH=arm64 go build`. | no (local) |
 | 2 | Tag the root `vX.Y.Z` on the release commit and push the tag. | **yes** |
 | 3 | Verify the root: `GOPROXY=direct go list -m github.com/wotjr1649/go-treesitter@vX.Y.Z` from an empty module; then the same through `GOPROXY=https://proxy.golang.org`. | no (read-only) |
 | 4 | Regenerate the grammar modules in release form: `ROOT_VERSION=vX.Y.Z bash tools/gen/regen.sh <work-dir>` (`-root-version`). Only `go.mod` and the generated `go.sum` (the root's two sum lines, verified through the checksum database) change; `engine_gen.*` must stay byte-identical. Raise the root `require` of the in-repository tool modules (`tools/conformance`, `tools/bench`) to the same version. Commit through a pull request. No `replace` may remain in a grammar module; `tools/gen/regen.sh` derives the release version from the committed `go.mod` files. | no (local commit) |
 | 5 | Tag each grammar `grammars/<dir>/vX.Y.Z` on that commit and push the tags. | **yes** |
-| 6 | Verify every grammar with `GOPROXY=direct`, then through `proxy.golang.org`: an empty consumer with no `replace` runs `go get` for the root and two grammars, builds with `CGO_ENABLED=0`, runs, and also builds for `linux/arm64`. | no (read-only) |
-| 7 | Create the release notes/GitHub release, if wanted. | **yes** |
+| 6 | Verify every grammar with `GOPROXY=direct`, then through `proxy.golang.org`: an empty consumer with no `replace` runs `go get` for the root and every grammar, builds with `CGO_ENABLED=0`, runs, and also builds for `linux/arm64`. | no (read-only) |
+| 7 | Create a **draft** GitHub release and release notes for the root tag; v0.4.0 remains a Preview (pre-release). Upload the 24 archive rows with column 4 equal to `source` in `gen -mirror-assets` as described below, plus `SHA256SUMS`; toolchain archives are excluded. | **yes** |
+| 8 | Before publication, compare the uploaded asset digests (`gh release view vX.Y.Z --json assets`) with local `SHA256SUMS`; the uploaded inventory must equal the rows with column 4 equal to `source` in `gen -mirror-assets` / release pins (24 archives for v0.4.0), plus `SHA256SUMS`, with no toolchain rows. Stop on missing or differing digests. | no (read-only) |
+| 9 | Publish the draft only after step 8 passes; publication makes the assets immutable. Then run `gh release verify vX.Y.Z` and retain its attestation result. | **yes** (publish); verification is read-only |
+| 10 | From the published new release base (the intended first mirror base), download **every row with column 4 equal to `source`** in `gen -mirror-assets` (all 24 for v0.4.0) by its exact filename into an empty directory and check its SHA-256 against the row and `SHA256SUMS`. Listing assets alone is insufficient. Record the base, pins identity and every result. | no (read-only) |
+| 11 | In **one PR** after step 10, set `pins.json` `mirrors` to `[v0.4.0 base, v0.3.0 base]` for v0.4.0 and restore the development form: restore every grammar `go.mod` from the commit immediately before step 4, delete the release-generated grammar `go.sum` files, and restore the previous root `require` in `tools/conformance` and `tools/bench`. Confirm only those intended module/config changes and no generated engine-byte changes; update the status board. | local preparation; remote integration needs authority |
 
 Notes:
 
@@ -74,8 +78,7 @@ Notes:
   tracked file is published by the tag; check `git ls-files` before step 2.
 - Between releases `main` keeps the grammar modules in the development form (`require` root `v0.0.0` with
   `replace ../..`, no `go.sum`), so they build against the working root, including engine ABI changes the released
-  root cannot load. The release form exists only in the release commit of step 4; the next change after the grammar
-  tags returns to the development form.
+  root cannot load. The release form exists only in the release commit of step 4; the post-publication PR in step 11 returns to the development form together with the mirror-base update.
 - **Rollback.** A pushed tag and any version a proxy has served are never deleted, moved or re-tagged. A bad
   version is retracted: add `retract vX.Y.Z // reason` to the `go.mod` of a newer version of the same module and tag
   that (`vX.Y.(Z+1)`). A bad grammar is retracted in that grammar's module only; the root is unaffected. A bad
@@ -85,9 +88,30 @@ Notes:
 
 ## Pinned archive release assets
 
-Every immutable root `vX.Y.Z` release carries the unchanged archives listed by
-`(cd tools/gen && CGO_ENABLED=0 go run . -mirror-assets)` for its `pins.json`, including all pinned host platforms.
-The command emits filenames, SHA-256 pins and upstream download URLs; it does not publish. Verify every file against
-that list before attaching it. The ordered `pins.json` `mirrors` bases name releases carrying these exact archives.
-Generation and the native reference try upstream first, then these mirrors, with the same mandatory SHA-256 check.
-Go modules (including wasm2go) continue to use Go's module checksum mechanism; host toolchains remain prerequisites.
+Under the [2026-11-15 ADR-0026 amendment](../design/decisions/ADR-0026-never-block-on-upstream.md#amendment-2026-11-15),
+immutable releases mirror source archives; v0.4.0 carries **24 source archives plus `SHA256SUMS`**.
+`(cd tools/gen && CGO_ENABLED=0 go run . -mirror-assets)` lists 30 candidate rows for the current pins as
+headerless TSV: filename, SHA-256, upstream URL, kind (`source`/`toolchain`). Select column 4 equal to `source`
+(for example, `awk -F '\t' '$4 == "source"' release-assets.tsv`), excluding the six `toolchain` rows.
+Check the selected filenames equal `runtime.archive`, `wasiLibc.archive`, or a
+`grammars` entry's `archive` in the release `pins.json`, deduplicating shared filenames: 22 grammar archives
+(TypeScript and TSX share one), the runtime and wasi-libc. Check that all 24 selected rows are present, that every
+row's hash equals its pin, and that no other row is attached.
+
+The excluded rows are `binaryen-version_133-x86_64-linux.tar.gz`, `binaryen-version_133-x86_64-windows.tar.gz`, `tree-sitter-linux-x64.gz`, `tree-sitter-windows-x64.gz`, `wasi-sdk-34.0-x86_64-linux.tar.gz`, `wasi-sdk-34.0-x86_64-windows.tar.gz`, because the exact toolchain archives' bundled licence/notice inventory is incomplete.
+Toolchains continue to be fetched from their official releases with pinned SHA-256 checks; releases supply no
+toolchain fallback assets until the complete notices can be established, for example from an SBOM of the exact
+archives. Preserve the collected upstream licence texts as maintainer-local evidence for that later work.
+
+Download each selected source row unchanged, check its listed SHA-256, and attach it with `SHA256SUMS` covering
+those source files. The command emits filenames, SHA-256 pins, upstream URLs and kinds; it does not publish or filter the
+output to the release scope. Existing source notices remain in the repository and grammar modules; this policy
+adds no redistributed-toolchain licence bundle. Go modules (including wasm2go) continue to use Go's module checksum
+mechanism; host toolchains remain prerequisites.
+
+The draft digest comparison happens before publication; the anonymous first-base download check happens after
+publication and covers every selected source row. Until step 11 is integrated, generation uses the previously
+configured mirror bases. Do not point a base at a draft or imply that an older immutable release contains a newly
+pinned archive. After step 11, repeat the source-row download/hash check against the **configured first base** to
+confirm the effective configuration. Fetch plans may still list toolchain URLs at these bases; that does not mean
+the releases contain those files or provide toolchain fallback coverage.
