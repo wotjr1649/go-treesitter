@@ -64,7 +64,7 @@ cd tools/native-ref && go run ./ciconf -pins ../gen/pins.json -corpus <corpus di
 cd tools/conformance && TSG_DATA_DIR=<data dir> TSG_NATIVE_EXE_DIR=<exe dir> go test -run 'TestCorpus|TestEdits|TestParserPoolRealEngine' .
 ```
 
-`-lang` limits corpus preparation to the comma-separated conformance language names (default: all 23). JSX inputs use the JavaScript corpus and parser. PHP selects the PHP parser; XML selects XML, not DTD.
+`-lang` limits corpus preparation to the comma-separated conformance language names (default: all 24). JSX inputs use the JavaScript corpus and parser. PHP selects the PHP parser; XML selects XML, not DTD.
 Nested corpus directories follow each pin's `grammarDir`; XML upstream queries are under `queries/xml`.
 
 `-inputs-only` writes only corpus inputs, manifests and `inputs.json`; it needs no `-exe` and executes no parser.
@@ -120,11 +120,12 @@ Run by `.github/workflows/upstream-watch.yml` with its read-only token.
 
 ## Recorded grammar patches
 
-Both builders use the ADR-0023 patch records in `pins.json`; grammar-input patches with `regenerate: true` use
+Both builders support `regenerate: true` without patches (for example PostgreSQL LFS source) and use the ADR-0023 patch records in `pins.json`; grammar-input patches with `regenerate: true` use
 `tools/gen/grammarpatch` to compare two independent generated source trees with the pinned CLI. `-fetch` also
 retrieves the required CLI gzip upstream-first, with the release mirror as fallback and the original SHA-256
 still mandatory. A generation record is kept at `<work>/patches-<lang>/provenance.json`.
-`-unpatched` builds the original C for the required before/after comparison; it never changes the pin set.
+`-unpatched` omits recorded patches for the before/after comparison; a `regenerate: true` pin still generates
+its original grammar inputs, since its archived C may be absent or an LFS pointer. It never changes the pin set.
 `-patch-alert N` sets the patch-count warning threshold (default 3). See `tools/gen/README.md` for the record schema.
 
 ## Unpatched comparison (ADR-0023)

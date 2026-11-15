@@ -335,6 +335,8 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 		result += "\nSource tier: 1 (core), per ADR-0024.\n"
 	case "yaml", "xml":
 		result += "\nSource tier: 2 (tree-sitter-grammars), per ADR-0024.\n"
+	case "postgres":
+		result += "\nSource tier: owner-designated, per ADR-0024. PostgreSQL SQL only; PL/pgSQL is not included.\n"
 	case "kotlin", "powershell", "r", "dart":
 		result += "\nSource tier: 3 (third party), per ADR-0024.\n"
 	}
@@ -359,6 +361,7 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 }
 
 var samples = map[string]string{
+	"postgres":   "SELECT customer_id, count(*) FROM rental WHERE return_date IS NULL GROUP BY customer_id;\n",
 	"kotlin":     "fun add(a: Int, b: Int): Int = a + b\n",
 	"yaml":       "items:\n  - name: one\n    value: 1\n",
 	"php":        "<?php function add($a, $b) { return $a + $b; }\n",

@@ -238,3 +238,7 @@ func checkTree(t *testing.T, what string, tree *treesitter.Tree, snap *treesitte
 func FuzzParseKotlin(f *testing.F) {
 	fuzzParse(f, "kotlin", "fun f(x: Int): Int { return x + 1 }\n", "class A\n", "fun f(", "", "val a = 1 2\nval b = 3\n")
 }
+
+func FuzzParsePostgres(f *testing.F) {
+	fuzzParse(f, "postgres", "SELECT customer_id FROM rental WHERE return_date IS NULL;\n", "CREATE TABLE film (id integer PRIMARY KEY, title text NOT NULL);\n", "SELECT (", "", "SELECT 1;\x00SELECT 2;\n")
+}

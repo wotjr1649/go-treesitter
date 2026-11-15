@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin]
+        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin, postgres]
         runner: [ubuntu-24.04, ubuntu-24.04-arm, macos-latest]
         include:
           - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
@@ -90,6 +90,9 @@ jobs:
         run: |
           for l in "${{ matrix.lang }}"; do
             go build -trimpath -tags "lang_$l" -o "$RUNNER_TEMP/bench/$l" .
+            if [ "$l" = postgres ]; then
+              go test -count=1 -tags lang_postgres -run '^TestPostgresSmallWorkload$' .
+            fi
           done
           go build -o "$RUNNER_TEMP/benchci" ./ci
       - name: Fetch the large inputs (sha256-verified)

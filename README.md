@@ -14,9 +14,10 @@ Start with [AGENTS.md](AGENTS.md) and the [documentation map](docs/README.md). T
 
 ## Use
 
-The root module has no grammar. v0.4.0 provides 23 grammar modules using engine ABI 3. Add the modules you need
+The root module has no grammar. This candidate provides 24 grammar modules using engine ABI 3 (released v0.4.0 has 23).
+Add the modules you need
 under `grammars/`: `bash`, `c`, `cpp`, `csharp`, `css`, `dart`, `golang`, `html`, `java`, `javascript` (including JSX),
-`json`, `kotlin`, `php` (PHP parser only), `powershell`, `python`, `r`, `ruby`, `rust`, `tsql`, `tsx`, `typescript`,
+`json`, `kotlin`, `postgres` (PostgreSQL SQL only; PL/pgSQL excluded), `php` (PHP parser only), `powershell`, `python`, `r`, `ruby`, `rust`, `tsql`, `tsx`, `typescript`,
 `xml` (XML parser only), and `yaml`.
 
 Use `typescript` for `.ts` and `tsx` for `.tsx`: the same upstream repository provides two grammars.
@@ -30,7 +31,7 @@ Each language has exactly one upstream repository, chosen by the tiers of
 | 1 | `bash`, `c`, `cpp`, `csharp`, `css`, `golang`, `html`, `java`, `javascript`, `json`, `php`, `python`, `ruby`, `rust`, `tsx`, `typescript` | `tree-sitter` organisation (`golang` uses `tree-sitter-go`; TSX and TypeScript share `tree-sitter-typescript`); `c` follows the maintained fork `tree-sitter-grammars/tree-sitter-c` that nvim-treesitter adopted (ADR-0024 rule 6) |
 | 2 | `xml`, `yaml` | `tree-sitter-grammars/tree-sitter-xml`, `tree-sitter-grammars/tree-sitter-yaml` |
 | 3 | `dart`, `kotlin`, `powershell`, `r` | `UserNobody14/tree-sitter-dart`, `fwcd/tree-sitter-kotlin`, `airbus-cert/tree-sitter-powershell`, `r-lib/tree-sitter-r` |
-| Owner-designated | `tsql` | `alfpricot/tree-sitter-mssql` |
+| Owner-designated | `tsql`, `postgres` | `alfpricot/tree-sitter-mssql`, `gmr/tree-sitter-postgres` |
 
 Exact revisions are in [pins.json](tools/gen/pins.json). Bash, Ruby, YAML and Python carry recorded temporary C-only patches
 ([ADR-0023](docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md); each module's README lists them).

@@ -354,5 +354,15 @@
     "license_spdx": "MIT",
     "license_url": "https://raw.githubusercontent.com/excalidraw/excalidraw/817d8c553c3389650f8b4503984a6d4a5d2f0c11/LICENSE",
     "license_sha256": "1352d204fdb90d5e482c13139d848bc2c9300a9a7de358a0a558a23e72d0d8be"
+  },
+  {
+    "lang": "postgres",
+    "file": "pagila-insert-data.sql",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/devrimgunduz/pagila/6ea53f812254c91a602f61c0ef62beca3fa676b1/pagila-insert-data.sql",
+    "sha256": "14c39f6e24822177d4cf8b09390fd1bec35c95ded626d7a71c083f429d73182a",
+    "license_spdx": "PostgreSQL",
+    "license_url": "https://raw.githubusercontent.com/devrimgunduz/pagila/6ea53f812254c91a602f61c0ef62beca3fa676b1/LICENSE.txt",
+    "license_sha256": "dcc10ac50b94172e627f7a5ec9c08f9e4568e6dd51a952f96ec09506f70163fb"
   }
 ]

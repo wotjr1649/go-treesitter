@@ -19,9 +19,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin]
+        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin, postgres]
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     env:
       CGO_ENABLED: "0"
       GOENV: "off"
@@ -43,6 +43,14 @@ jobs:
       # builds wasm2go from its pinned module version; regenerates the selected module into grammars/.
       - name: Regenerate grammar modules
         run: bash tools/gen/regen.sh "$RUNNER_TEMP/regen" "${{ matrix.lang }}"
+      - name: Pinned CLI integration tests (patched and unpatched inputs)
+        if: ${{ matrix.lang == 'postgres' }}
+        working-directory: tools/gen
+        env:
+          TREE_SITTER_CLI_ARCHIVE: ${{ runner.temp }}/regen/dl/tree-sitter-linux-x64.gz
+        run: |
+          test -s "$TREE_SITTER_CLI_ARCHIVE"
+          go test -count=1 -timeout 60s -v ./grammarpatch -run '^(TestSyntheticGrammarRegeneration|TestUnpatchedGrammarRegeneration)$'
       - name: Compare with the committed modules
         run: |
           git status --porcelain -- grammars/

@@ -141,6 +141,9 @@ func queryDirFor(root string) string {
 // XML stores XML and DTD queries separately; only the XML parser is linked.
 func upstreamQueryGlob(root, extractDir, lang string) string {
 	dir := filepath.Join(queryDirFor(root), extractDir, "queries")
+	if lang == "postgres" {
+		dir = filepath.Join(queryDirFor(root), extractDir, "postgres", "queries")
+	}
 	if lang == "xml" {
 		dir = filepath.Join(dir, "xml")
 	}
@@ -394,5 +397,13 @@ func TestQueryNative(t *testing.T) {
 				t.Fatalf("%d of %d comparisons differ from native", mism, compared)
 			}
 		})
+	}
+}
+
+func TestPostgresUpstreamQueryGlob(t *testing.T) {
+	t.Setenv("TSG_QUERY_DIR", "queries")
+	want := filepath.Join("queries", "upstream", "postgres", "queries", "*.scm")
+	if got := upstreamQueryGlob("unused", "upstream", "postgres"); got != want {
+		t.Fatalf("got %s, want %s", got, want)
 	}
 }

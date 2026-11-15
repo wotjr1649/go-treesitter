@@ -30,7 +30,7 @@ func printPatchStatus(p *Pins, threshold int) error {
 }
 
 func preparePatches(o *opts, p *Pins, g GrammarPin, work string, id *Identity) (*grammarpatch.Provenance, error) {
-	if len(g.Patches) == 0 {
+	if len(g.Patches) == 0 && !g.Regenerate {
 		return nil, nil
 	}
 	if err := grammarpatch.Validate(g.Patches, g.Regenerate); err != nil {
@@ -42,7 +42,7 @@ func preparePatches(o *opts, p *Pins, g GrammarPin, work string, id *Identity) (
 		return nil, err
 	}
 	if o.dl == "" {
-		return nil, fmt.Errorf("-dl is required for recorded grammar patches")
+		return nil, fmt.Errorf("-dl is required for grammar regeneration")
 	}
 	cli := p.Tools.TreeSitterCLIArchives[hostPlatform()]
 	bin := o.treeSitter

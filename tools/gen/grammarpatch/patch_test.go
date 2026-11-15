@@ -101,12 +101,19 @@ func TestPatchRejectsUnrecordedOrWrongInputs(t *testing.T) {
 	}
 }
 
-func TestSyntheticGrammarRegeneration(t *testing.T) {
+func TestSyntheticGrammarRegeneration(t *testing.T) { testGrammarRegeneration(t, true) }
+
+func TestUnpatchedGrammarRegeneration(t *testing.T) { testGrammarRegeneration(t, false) }
+
+func testGrammarRegeneration(t *testing.T, patched bool) {
 	archive := os.Getenv("TREE_SITTER_CLI_ARCHIVE")
 	if archive == "" {
 		t.Skip("set TREE_SITTER_CLI_ARCHIVE to the pinned host .gz for the real CLI integration test")
 	}
 	c := fixture(t, true)
+	if !patched {
+		c.Patches = nil
+	}
 	b, err := os.ReadFile(filepath.Join("..", "pins.json"))
 	if err != nil {
 		t.Fatal(err)
@@ -152,10 +159,10 @@ func TestSyntheticGrammarRegeneration(t *testing.T) {
 		t.Fatal(err)
 	}
 	parser, err := os.ReadFile(filepath.Join(root, "src", "parser.c"))
-	if err != nil || !bytes.Contains(parser, []byte("tree_sitter_tiny")) || !bytes.Contains(parser, []byte("anon_sym_b")) {
-		t.Fatalf("regenerated parser missing patched 'b': %v", err)
+	if err != nil || !bytes.Contains(parser, []byte("tree_sitter_tiny")) || (bytes.Contains(parser, []byte("anon_sym_b")) != patched) {
+		t.Fatalf("regenerated parser has wrong patch state: %v", err)
 	}
-	if prov.CLI != c.CLIVersion || prov.JSRuntime != "native" || !prov.Deterministic || prov.Outputs["node-types.json"] == "" {
+	if len(prov.Patches) != len(c.Patches) || prov.InputSHA256 == "" || prov.CLI != c.CLIVersion || prov.JSRuntime != "native" || !prov.Deterministic || prov.Outputs["node-types.json"] == "" {
 		t.Fatalf("incomplete generation provenance: %+v", prov)
 	}
 	// The second independent generation's entire tree has already been compared by Prepare.
@@ -166,5 +173,13 @@ func TestSyntheticGrammarRegeneration(t *testing.T) {
 	}
 	if err := verifyCLI(c); err == nil || !strings.Contains(err.Error(), "CLI differs") {
 		t.Fatalf("modified CLI accepted: %v", err)
+	}
+}
+
+func TestUnpatchedRegenerationRequiresCLI(t *testing.T) {
+	c := fixture(t, true)
+	c.Patches = nil
+	if _, _, err := Prepare(c); err == nil || !strings.Contains(err.Error(), "pinned tree-sitter CLI") {
+		t.Fatalf("unpatched regeneration bypassed CLI validation: %v", err)
 	}
 }

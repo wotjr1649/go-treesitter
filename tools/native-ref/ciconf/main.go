@@ -40,7 +40,7 @@ import (
 var langs = map[string]string{
 	"bash": "bash", "c": "c", "cpp": "cpp", "csharp": "csharp", "css": "css", "go": "golang",
 	"html": "html", "java": "java", "javascript": "javascript", "json": "json", "python": "python",
-	"php": "php", "powershell": "powershell", "r": "r", "dart": "dart", "xml": "xml", "ruby": "ruby", "yaml": "yaml", "kotlin": "kotlin",
+	"php": "php", "powershell": "powershell", "r": "r", "dart": "dart", "xml": "xml", "ruby": "ruby", "yaml": "yaml", "kotlin": "kotlin", "postgres": "postgres",
 	"rust": "rust", "tsql": "tsql", "tsx": "tsx", "typescript": "typescript",
 }
 
