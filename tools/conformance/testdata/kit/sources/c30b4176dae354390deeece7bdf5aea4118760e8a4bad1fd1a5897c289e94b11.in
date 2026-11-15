@@ -1,0 +1,5 @@
+type EmailLocaleIDs = `${Email | Footer}_id`;
+type Lang = `${Lowercase<Name>}-${number}`;
+type Getters<T> = { [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K] };
+type RemoveKind<T> = { [K in keyof T as Exclude<K, "kind">]: T[K] };
+type AbstractConstructor<T> = abstract new (...args: any[]) => T;

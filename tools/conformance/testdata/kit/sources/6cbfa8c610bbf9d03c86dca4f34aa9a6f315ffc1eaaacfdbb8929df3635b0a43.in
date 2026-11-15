@@ -1,0 +1,4 @@
+const before: number = 1;
+export type * from "./types";
+export type * as from "./types";
+export type { Shape } from "./shapes";

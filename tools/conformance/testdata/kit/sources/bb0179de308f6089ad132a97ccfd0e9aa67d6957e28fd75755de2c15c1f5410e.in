@@ -1,0 +1,11 @@
+match command.split():
+    case [action]:
+        pass
+    case ["go", direction] if direction:
+        pass
+    case [first, *rest] as whole:
+        pass
+    case (1 | 2) | []:
+        pass
+    case _:
+        pass

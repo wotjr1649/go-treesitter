@@ -1,0 +1,38 @@
+;/* Owned synthetic r6 case. */
+SELECT 상품명, 가격2 FROM 상품;
+GO
+sp_who
+GO
+CREATE PROCEDURE dbo.Tick @n INT AS
+BEGIN
+    SET @n = @n + 1;;
+    ;WITH t AS (SELECT 1 AS v) SELECT v FROM t;;
+END
+GO
+;WITH c AS (SELECT 1 AS x) SELECT x FROM c;;
+CREATE TABLE dbo.Memo (
+    Id INT NOT NULL CONSTRAINT PK_Memo PRIMARY KEY (Id),
+    Code VARCHAR(10) DEFAULT ('x') NOT NULL,
+    Kind INT,
+);
+ALTER TABLE dbo.Memo ADD Flag BIT NOT NULL CONSTRAINT DF_Memo_Flag DEFAULT 0 WITH VALUES;
+DROP INDEX IX_Memo ON dbo.Memo WITH (ONLINE = OFF);
+CHECKPOINT 10;
+CREATE DATABASE Sample ON PRIMARY (NAME = Sample_dat, FILENAME = 'sample.mdf', SIZE = 10MB)
+    LOG ON (NAME = Sample_log, FILENAME = 'sample.ldf', FILEGROWTH = 10 %);
+BACKUP DATABASE Sample TO DISK = 'sample.bak';
+RESTORE DATABASE @db FROM DISK = @file WITH MOVE 'Sample_dat' TO 'new.mdf', MOVE Sample_log TO 'new.ldf', REPLACE, STATS = 10;
+BACKUP SERVICE MASTER KEY TO FILE = 'smk.key' ENCRYPTION BY PASSWORD = 'placeholder';
+BACKUP CERTIFICATE Cert1 TO FILE = 'cert1.cer' WITH PRIVATE KEY (FILE = 'cert1.pvk', ENCRYPTION BY PASSWORD = 'placeholder');
+RESTORE MASTER KEY FROM FILE = 'mk.key' DECRYPTION BY PASSWORD = 'placeholder' ENCRYPTION BY PASSWORD = 'placeholder';
+DECLARE @s NVARCHAR(MAX) = N'';
+SELECT @s += Code + N',' FROM dbo.Memo;
+SELECT 1 AS a WHERE @s <> N'';
+IF ((SELECT COUNT(*) FROM dbo.Memo) = 0) PRINT N'empty';
+SELECT a FROM (SELECT TOP 5 Id AS a FROM dbo.Memo ORDER BY Id DESC
+    UNION ALL SELECT TOP 5 Kind FROM dbo.Memo ORDER BY Kind) AS d;
+SELECT a FROM (SELECT Code AS a FROM dbo.Memo
+    UNION SELECT TOP 5 Code FROM dbo.Memo ORDER BY a OFFSET 0 ROWS) AS e;
+GO
+CHECKPOINT;
+GO

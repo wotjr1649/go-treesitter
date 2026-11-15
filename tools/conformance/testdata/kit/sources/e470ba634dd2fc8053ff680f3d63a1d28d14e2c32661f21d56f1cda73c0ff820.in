@@ -1,0 +1,8 @@
+const before: number = 1;
+declare function open(): Disposable;
+declare function connect(): AsyncDisposable;
+async function run() {
+  using res = open();
+  await using conn = connect();
+  for (using item of [open()]) { }
+}

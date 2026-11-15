@@ -1,0 +1,7 @@
+const settings = { port: 80 } satisfies ;
+
+interface Producer<out T> {
+  make(): T;
+}
+
+type First<T> = T extends [infer H extends string, ...unknown[]] ? H : never;

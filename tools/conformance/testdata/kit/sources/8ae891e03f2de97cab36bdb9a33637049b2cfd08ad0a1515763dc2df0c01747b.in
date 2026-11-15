@@ -1,0 +1,16 @@
+class Point {
+  x: number;
+  y = 0;
+  name!: string;
+  readonly id: string = "p";
+  private static count = 0;
+  protected z?: number;
+  public w: number = 1;
+  [s: string]: any;
+  constructor(x: number, y: string);
+  constructor(s: string);
+  constructor(xs: any, y?: any) { this.x = 0; }
+  get size(): number { return 1; }
+  set size(value: number) {}
+  public static check(s: string): boolean { return true; }
+}

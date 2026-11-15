@@ -1,0 +1,46 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Demo.Inventory;
+
+public record Item(string Name, int Quantity, decimal Price);
+
+public enum Status { Active, Retired }
+
+public class Store
+{
+    private readonly List<Item> _items = new();
+
+    public int Count => _items.Count;
+
+    // Adds an item after validating it.
+    public void Add(Item item)
+    {
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+        _items.Add(item);
+    }
+
+    public decimal Total()
+    {
+        decimal sum = 0m;
+        foreach (var item in _items)
+        {
+            sum += item.Price * item.Quantity;
+        }
+        return sum;
+    }
+
+    public string Describe(Item item) => item.Quantity switch
+    {
+        0 => "empty",
+        < 10 => $"low: {item.Name}",
+        _ => $"ok: {item.Name}",
+    };
+
+    public IEnumerable<string> Names() =>
+        from i in _items where i.Quantity > 0 orderby i.Name select i.Name;
+}

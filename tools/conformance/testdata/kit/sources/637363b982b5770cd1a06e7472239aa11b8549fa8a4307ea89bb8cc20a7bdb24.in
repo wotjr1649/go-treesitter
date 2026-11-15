@@ -1,0 +1,31 @@
+using System;
+
+public partial class Widget
+{
+    public partial Widget(int size);
+    public partial Widget(int size) : this() { Size = size; }
+    public Widget() { }
+
+    public partial event EventHandler? Changed;
+    public partial event EventHandler? Changed
+    {
+        add { }
+        remove { }
+    }
+
+    public int Size
+    {
+        get;
+        set => field = Math.Max(0, value);
+    }
+
+    public void operator -=(int delta)
+    {
+        Size += delta;
+    }
+
+    public void operator ++()
+    {
+        Size++;
+    }
+}

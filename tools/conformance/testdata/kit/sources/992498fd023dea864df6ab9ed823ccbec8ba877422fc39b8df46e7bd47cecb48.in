@@ -1,0 +1,2 @@
+module Foo { export const bar = 10; }
+module A.B { export function f() {} }

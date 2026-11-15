@@ -58,9 +58,16 @@ distributions such as nvim-treesitter pick one per language.
    none). The weekly upstream watch reports a different repository as a warning, never a failure or automatic move.
 
    A move is one pull request with: new identity and hashes in `tools/gen/pins.json` (licence bytes compared);
-   `schema check`/`schema diff` old→new; native tree diff old→new over the pinned corpus and large input (any
-   ok→error blocks); regenerated module and the usual gates (conformance including the new repository's queries,
+   strict `schema check`/`schema diff` old→new; native tree diff old→new over both pins' corpora and the pinned
+   large inputs (`pin-move.yml`, exact fetched/verified base/head). Missing/invalid evidence fails; any ok→error
+   blocks unless the PR body explicitly names that input on a `PIN-MOVE-ALLOW-OK-TO-ERROR <input-id>` line,
+   retained visibly in the report. Schema removal/narrowing risks and changed trees are reported for review;
+   regenerated module and the usual gates (conformance including the new repository's queries,
    bench); updated README, module README, schema register and `limitations.md`; owner approval per pin.
+
+   The automated evidence procedure, including added/removed grammars and runs without explicit refs, is in
+   [publication.md](../../specs/publication.md#grammar-pin-move-evidence); local replay and exact input-ID syntax
+   are in [tools/gen](../../../tools/gen/README.md#pin-move-ci-evidence). The workflow does not authorize a move.
 
    First application, C (P43, 2026-11-16): `tree-sitter/tree-sitter-c@b780e47` → `tree-sitter-grammars/tree-sitter-c@f3202ac`
    (fork of the original, 2 commits ahead, 0 behind). `grammar.js`, `node-types.json`, licence and test corpus are

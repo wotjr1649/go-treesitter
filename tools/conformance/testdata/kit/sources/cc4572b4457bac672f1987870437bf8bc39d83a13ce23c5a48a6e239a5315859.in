@@ -1,0 +1,6 @@
+type ElementType<T> = T extends (infer U)[] ? U : never;
+type Mutable<T> = { -readonly [K in keyof T]-?: T[K] };
+type Loader = typeof import("./loader");
+type Config = import("./config").Config;
+declare function tag<T>(strings: TemplateStringsArray, ...values: T[]): string;
+const out = tag<string>`hello ${"world"}`;

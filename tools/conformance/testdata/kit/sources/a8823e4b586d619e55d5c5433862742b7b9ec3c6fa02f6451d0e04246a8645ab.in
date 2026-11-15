@@ -1,0 +1,10 @@
+const before: number = 1;
+function View(props: { ok: boolean; items: string[] }) {
+  return (
+    <div>
+      {props.ok && <span>yes</span>}
+      {props.ok ? <b>a</b> : null}
+      {props.items.map((s) => <i key={s}>{s}</i>)}
+    </div>
+  );
+}

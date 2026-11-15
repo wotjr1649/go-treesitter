@@ -1,0 +1,131 @@
+name: Grammar pin move evidence
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      base:
+        description: Explicit old commit or remote ref (omit both to report diff skipped)
+        type: string
+      head:
+        description: Explicit new commit or remote ref
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  pin-move:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      GOENV: "off"
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+      CGO_ENABLED: "0"
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || inputs.head || github.sha }}
+          persist-credentials: false
+          # Pull requests are compared from the merge base, which needs the full history.
+          fetch-depth: 0
+      - name: Fetch and verify the explicit comparison refs
+        id: refs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          INPUT_BASE: ${{ inputs.base }}
+          INPUT_HEAD: ${{ inputs.head }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text())
+          Path(os.environ["RUNNER_TEMP"], "pin-move-pr-body.txt").write_text(
+              event.get("pull_request", {}).get("body") or "", encoding="utf-8")
+          PY
+          base=""
+          head=""
+          if [ "$EVENT_NAME" = pull_request ]; then
+            base="$PR_BASE"
+            head="$PR_HEAD"
+            [[ "$base" =~ ^[0-9a-f]{40}$ && "$head" =~ ^[0-9a-f]{40}$ ]]
+            git fetch --no-tags origin "$base"
+            test "$(git rev-parse 'FETCH_HEAD^{commit}')" = "$base"
+          elif [ "$EVENT_NAME" = workflow_dispatch ] && { [ -n "$INPUT_BASE" ] || [ -n "$INPUT_HEAD" ]; }; then
+            test -n "$INPUT_BASE" && test -n "$INPUT_HEAD"
+            [[ "$INPUT_BASE" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*$ && "$INPUT_HEAD" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*$ ]]
+            git fetch --no-tags origin "$INPUT_BASE"
+            base=$(git rev-parse 'FETCH_HEAD^{commit}')
+            git fetch --no-tags origin "$INPUT_HEAD"
+            head=$(git rev-parse 'FETCH_HEAD^{commit}')
+          fi
+          if [ -n "$head" ]; then
+            test "$(git rev-parse 'HEAD^{commit}')" = "$head"
+            git cat-file -e "$base^{commit}"
+            git cat-file -e "$head^{commit}"
+            # A pull request is judged against the merge base, never the moved base tip; no merge base fails the step.
+            flags=()
+            if [ "$EVENT_NAME" = pull_request ]; then flags+=(--merge-base); fi
+            python3 tools/gen/pin-move.py --detect "${flags[@]}" --base "$base" --head "$head" > "$RUNNER_TEMP/pin-move-refs.txt"
+            cat "$RUNNER_TEMP/pin-move-refs.txt" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=" >> "$GITHUB_OUTPUT"
+            echo "head=" >> "$GITHUB_OUTPUT"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-go@v7
+        if: ${{ steps.refs.outputs.changed == 'true' }}
+        with:
+          go-version: 1.27.x
+      - name: Pin diff and classification tests
+        run: python3 -m unittest discover -s tools/gen -p pin_move_test.py
+      - name: Cache SHA-256-addressed downloads
+        if: ${{ steps.refs.outputs.changed == 'true' }}
+        uses: actions/cache@v5
+        with:
+          path: ${{ runner.temp }}/pin-move-cache
+          key: ${{ runner.os }}-pin-move-${{ steps.refs.outputs.base }}-${{ steps.refs.outputs.head }}
+          restore-keys: ${{ runner.os }}-pin-move-
+      - name: Schema and old/new native tree comparison
+        env:
+          BASE: ${{ steps.refs.outputs.base }}
+          HEAD: ${{ steps.refs.outputs.head }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          args=()
+          if [ -n "$BASE" ] || [ -n "$HEAD" ]; then
+            args+=(--base "$BASE" --head "$HEAD")
+          fi
+          python3 tools/gen/pin-move.py "${args[@]}" \
+            --out "$RUNNER_TEMP/pin-move-out" --cache "$RUNNER_TEMP/pin-move-cache" \
+            --pr-body-file "$RUNNER_TEMP/pin-move-pr-body.txt"
+      - name: Publish comparison summary
+        if: ${{ always() }}
+        run: |
+          if [ -f "$RUNNER_TEMP/pin-move-out/summary.md" ]; then
+            cat "$RUNNER_TEMP/pin-move-out/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Pin move report unavailable: an earlier step failed; inspect its log.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Retain comparison evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: pin-move-evidence
+          path: |
+            ${{ runner.temp }}/pin-move-out
+            !${{ runner.temp }}/pin-move-out/**/work/**
+            !${{ runner.temp }}/pin-move-out/**/exe/**
+            !${{ runner.temp }}/pin-move-out/**/dl/**
+            !${{ runner.temp }}/pin-move-out/**/bin/**
+          if-no-files-found: warn
+          retention-days: 30

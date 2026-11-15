@@ -1,0 +1,10 @@
+using System;
+
+static class R11
+{
+    static string Json() => """{"ok": true}""";
+
+    static ReadOnlySpan<byte> Bytes() => "ok"u8;
+
+    static int Count(int[] xs) => xs is [_, .. ? 1 : 0;
+}

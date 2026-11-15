@@ -1,0 +1,20 @@
+name = "world"
+template = t"Hello {name!r:>10}"
+raw = rt"\d{name}"
+
+
+def run():
+    try:
+        return int(name)
+    except ValueError, TypeError:
+        return None
+
+
+def run_group():
+    try:
+        pass
+    except* OSError, KeyError:
+        pass
+
+
+done = True

@@ -1,0 +1,7 @@
+interface StringArray { [index: number]: string; readonly [k: string]: any }
+interface Box<Type> { contents: Type }
+type Pair = [string, number];
+type Fn = (a: string) => void;
+type Describable = { description: string; (someArg: number): boolean };
+type SomeConstructor = { new (s: string): object };
+interface CallOrConstruct { (n?: number): string; new (s: string): Date }

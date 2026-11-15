@@ -1,0 +1,116 @@
+{
+  "Schema": 1,
+  "EvidenceBase": "a2fec5f2ba66547602a24012517460f771e2bb37",
+  "EvidencePlatform": "windows/amd64",
+  "Runtime": "v0.27.2",
+  "Grammars": {
+    "python": {
+      "Name": "Python",
+      "Commit": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64",
+      "PinSHA256": "541729622eee59fa4885980a139ec10badbc43394468e0aa6d327149f6925932",
+      "ProvenanceSHA256": "99acbb437ac979fa8f0d30b074d11396b03357f9febe25ce275bb5c8eef80756",
+      "PatchCount": 1
+    },
+    "csharp": {
+      "Name": "C#",
+      "Commit": "9150f7d56bb47f1a809fa23623f1ba1413e93fa9",
+      "PinSHA256": "fd3a1d3d78d51e89f50b3da162e251ab091242d606aa8a582939dc1e5baa1532",
+      "ProvenanceSHA256": "16408d4d74390f4287b34fadf53248d954a87ef4b95aff38fe7777e013ed1981",
+      "PatchCount": 0
+    }
+  },
+  "Entries": [
+    {
+      "ID": "python-bitwise-precedence",
+      "Grammar": "python",
+      "Input": "a ^ b & c",
+      "InputSHA256": "03545f6a4d6bce1014bb6e30b243104f137f8ee3ad2c3656e7980e5a66a3cb39",
+      "DumpSHA256": "dcf314e5282f04508b5d8e8fd8d1d4e689aee0fc4471e959e04a0acffb4d6b5b",
+      "Observed": "The error-free outer binary_operator is & over [0,9), with a left ^ subtree over [0,5): (a ^ b) & c.",
+      "Expected": "& binds tighter than ^, so the expression must group as a ^ (b & c).",
+      "Specs": [
+        {
+          "Title": "Python reference 6.9: Binary bitwise operations",
+          "URL": "https://docs.python.org/3/reference/expressions.html#binary-bitwise-operations"
+        }
+      ],
+      "Upstream": ""
+    },
+    {
+      "ID": "python-await-power",
+      "Grammar": "python",
+      "Input": "async def g():\n    await f() ** 2\n",
+      "InputSHA256": "cd893c4c0e887b6f60b5b21dc8d9b61bdd2b8c01787f314ae4ad69b45e3e065e",
+      "DumpSHA256": "28cca2fdede80ce83a60920a29c26db0f0f2f8d29e1e6f7f212e3cdfbc87e021",
+      "Observed": "The named await node spans [19,33), containing the ** binary_operator over [25,33): await (f() ** 2), without errors.",
+      "Expected": "await_expr takes a primary; power takes await_expr on its left. Group as (await f()) ** 2; the await operand ends at byte 28.",
+      "Specs": [
+        {
+          "Title": "Python reference 6.4: Await expression",
+          "URL": "https://docs.python.org/3/reference/expressions.html#await-expression"
+        },
+        {
+          "Title": "Python reference 6.5: The power operator",
+          "URL": "https://docs.python.org/3/reference/expressions.html#the-power-operator"
+        }
+      ],
+      "Upstream": ""
+    },
+    {
+      "ID": "csharp-default-constraint",
+      "Grammar": "csharp",
+      "Input": "class C : B { override void M<T>() where T : default {} }",
+      "InputSHA256": "e450432afe015af75c5a4af54439ce6ca792b177ffe4396304ae322f1e18cda1",
+      "DumpSHA256": "bb2cf264e2d5097bc483b0285a3e3ccafa53a1888bc862366b61a7407d72c442",
+      "Observed": "The error-free type_parameter_constraint contains type: identifier over [45,52), whose text is default.",
+      "Expected": "The default keyword is a primary constraint in its own right, not a class/type identifier constraint. The input uses an override; name/type resolution is outside this syntax test.",
+      "Specs": [
+        {
+          "Title": "C# specification 15.2.5: Type parameter constraints",
+          "URL": "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/classes#1525-type-parameter-constraints"
+        },
+        {
+          "Title": "C# 9 specification: default constraint",
+          "URL": "https://github.com/dotnet/csharplang/blob/main/proposals/csharp-9.0/unconstrained-type-parameter-annotations.md#default-constraint"
+        }
+      ],
+      "Upstream": ""
+    },
+    {
+      "ID": "csharp-directive-eof",
+      "Grammar": "csharp",
+      "Input": "#define A",
+      "InputSHA256": "e4342cebc1c4b162457213203ce862cac93c73b402f3ac7a004b6c2be418629c",
+      "DumpSHA256": "0422ba44c497c2475466bbbecc090af5aa3251adc3ec6e21963b4a02ff9fc33e",
+      "Observed": "The root and preproc_define over [0,9) have has_error=1; there is no explicit ERROR or missing node.",
+      "Expected": "A nonempty compilation unit receives an implicit final line terminator, so #define A at EOF must parse without errors.",
+      "Specs": [
+        {
+          "Title": "C# specification 6.3.2: Line terminators",
+          "URL": "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#632-line-terminators"
+        },
+        {
+          "Title": "C# specification 6.5.4: Definition directives",
+          "URL": "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#654-definition-directives"
+        }
+      ],
+      "Upstream": ""
+    },
+    {
+      "ID": "csharp-empty-interpolation",
+      "Grammar": "csharp",
+      "Input": "var s = $\"\";",
+      "InputSHA256": "55e49735e3373f85215a805a55fa39d41b3330363c66c8cd842737f26668e7b6",
+      "DumpSHA256": "44b803dd1798e548026b8f1e848b7768ffb1065838a23f8424f56b79489f7579",
+      "Observed": "The root has errors: an ERROR over [8,9) contains interpolation_start ($), followed by an ordinary string_literal over [9,11).",
+      "Expected": "The interpolated regular string production permits zero content and zero interpolations. $\"\" is a valid empty interpolated string and must parse without errors.",
+      "Specs": [
+        {
+          "Title": "C# specification 12.8.3: Interpolated string expressions",
+          "URL": "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/expressions#1283-interpolated-string-expressions"
+        }
+      ],
+      "Upstream": ""
+    }
+  ]
+}

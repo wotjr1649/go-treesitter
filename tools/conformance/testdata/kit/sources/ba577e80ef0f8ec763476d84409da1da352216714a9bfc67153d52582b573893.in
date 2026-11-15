@@ -1,0 +1,7 @@
+function f(x?: number) {}
+function makeDate(timestamp: number): Date;
+function makeDate(m: number, d: number, y: number): Date;
+function makeDate(mOrTimestamp: number, d?: number, y?: number): Date { return new Date(); }
+function filterUsers(this: User) {}
+function multiply(n: number, ...m: number[]) { return m.map((x) => n * x); }
+function sum({ a, b, c }: { a: number; b: number; c: number }) {}

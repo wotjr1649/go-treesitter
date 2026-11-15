@@ -1,0 +1,5 @@
+a &&= b;
+a ||= b;
+a ??= b;
+try { f(); } catch (e: unknown) {}
+try { f(); } catch (e: any) {}

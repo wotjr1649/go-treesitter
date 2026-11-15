@@ -1,0 +1,2 @@
+import defer * as feature from "./some-feature.js";
+console.log(feature.specialConstant);

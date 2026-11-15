@@ -1,0 +1,12 @@
+import math
+
+
+def area(radius: float) -> float:
+    return math.pi * radius ** 2
+
+
+def describe(values: list[float]) -> str:
+    parts = []
+    for v in values
+        parts.append(f"{v:.2f}")
+    return ", ".join(parts)

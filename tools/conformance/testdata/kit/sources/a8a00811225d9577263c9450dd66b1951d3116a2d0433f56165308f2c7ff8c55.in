@@ -1,0 +1,52 @@
+package inventory
+
+import (
+	"errors"
+	"fmt"
+	"strings"
+)
+
+// Item is a stock entry.
+type Item struct {
+	Name  string `json:"name"`
+	Count int    `json:"count"`
+}
+
+type Store[K comparable, V any] struct {
+	items map[K]V
+}
+
+const maxItems = 1_000
+
+var ErrFull = errors.New("store is full")
+
+func (s *Store[K, V]) Len() int {
+	return len(s.items)
+}
+
+func (s *Store[K, V]) Put(key K, value V) error {
+	if len(s.items) >= maxItems {
+		return ErrFull
+	}
+	s.items[key] = value
+	return nil
+}
+
+func Summarize(items []Item) string {
+	var b strings.Builder
+	total := 0
+	for i, it := range items {
+		switch {
+		case it.Count == 0:
+			continue
+		case it.Count > 500:
+			fmt.Fprintf(&b, "%d:%s(bulk) ", i, it.Name)
+		default:
+			fmt.Fprintf(&b, "%d:%s ", i, it.Name)
+		}
+		total += it.Count
+	}
+	ch := make(chan int, 1)
+	go func() { ch <- total }()
+	return b.String() + fmt.Sprint(<-ch)
+}

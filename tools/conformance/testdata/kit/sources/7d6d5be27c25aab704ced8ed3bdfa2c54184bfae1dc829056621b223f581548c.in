@@ -1,0 +1,37 @@
+package stmt
+
+import (
+	f "fmt"
+	_ "os"
+)
+
+func run(ch chan int, done chan struct{}) {
+	for i := 0; i < 3 {
+		ch <- i
+	}
+	for k, v := range map[string]int{"a": 1} {
+		f.Println(k, v)
+	}
+	switch x := 2; x {
+	case 1, 2:
+		fallthrough
+	default:
+	}
+	var y interface{} = 1
+	switch t := y.(type) {
+	case int:
+		_ = t
+	}
+outer:
+	for {
+		select {
+		case v := <-ch:
+			_ = v
+			break outer
+		case <-done:
+			return
+		}
+	}
+	go f.Println("bg")
+	defer f.Println("end")
+}

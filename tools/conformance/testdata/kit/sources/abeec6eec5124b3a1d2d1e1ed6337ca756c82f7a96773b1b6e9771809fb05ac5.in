@@ -1,0 +1,8 @@
+import type { SomeThing } from "./some-module.js";
+import type Def from "./def.js";
+import type * as types from "./types.js";
+export type { SomeThing };
+export type { Other } from "./other.js";
+export * as utilities from "./utilities.js";
+class Person { #name: string; constructor(name: string) { this.#name = name; } }
+const response = await fetch("...");

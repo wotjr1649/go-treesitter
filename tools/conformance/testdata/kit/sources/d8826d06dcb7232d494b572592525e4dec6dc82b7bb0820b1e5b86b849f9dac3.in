@@ -1,0 +1,2 @@
+SELECT 0 AS issue131_review_anchor;
+UPDATE dbo.t SET t.c = DEFAULT;

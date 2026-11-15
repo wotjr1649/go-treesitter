@@ -1,0 +1,4 @@
+SELECT 0 AS issue131_anchor;
+SELECT * FROM s..[schema].t;
+GO
+SELECT 1 FROM dbo.t GROUP BY CUBE((a,b),());

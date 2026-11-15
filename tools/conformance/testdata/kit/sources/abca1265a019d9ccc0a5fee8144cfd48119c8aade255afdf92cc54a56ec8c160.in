@@ -1,0 +1,9 @@
+const before: number = 1;
+declare function logged(value: unknown, context: unknown): void;
+declare function tag(name: string): (value: unknown, context: unknown) => void;
+@tag("box")
+class Box {
+  @logged @tag("v") accessor value = 1;
+  static accessor count: number = 0;
+  @logged method(): void {}
+}

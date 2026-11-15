@@ -1,0 +1,4 @@
+function foo(arr: readonly string[]) {}
+function bar(pair: readonly [string, string]) {}
+let x = 10 as const;
+let z = { text: "hello" } as const;

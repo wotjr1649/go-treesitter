@@ -1,0 +1,12 @@
+if (n := len(a)) > 10:
+    print(f"{n=} {n = !r:>10}")
+while chunk := read():
+    pass
+def f(a, b, /, c, d=1, *, e): pass
+def g(a, b=1, /, c=2): pass
+def h(a, /): pass
+def h2(a=1, /): pass
+l1 = lambda a, /, b: 0
+l2 = lambda a=1, /, b=2: 0
+l3 = lambda a, /: 0
+l4 = lambda a=1, /: 0

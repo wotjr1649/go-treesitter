@@ -1,0 +1,9 @@
+function firstElement<Type>(arr: Type[]): Type | undefined { return arr[0]; }
+function longest<Type extends { length: number }>(a: Type, b: Type) { return a; }
+const arr = combine<string | number>([1, 2], ["hello"]);
+function getProperty<Type, Key extends keyof Type>(obj: Type, key: Key) { return obj[key]; }
+function create<T extends HTMLElement = HTMLDivElement, U = T[]>(element?: T, children?: U): Container<T, U> { return c; }
+let myIdentity: <Type>(arg: Type) => Type = identity;
+let gen: { <Type>(arg: Type): Type } = identity;
+function createInstance<A extends Animal>(c: new () => A): A { return new c(); }
+function create2<Type>(c: { new (): Type }): Type { return new c(); }

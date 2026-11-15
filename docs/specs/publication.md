@@ -46,6 +46,24 @@ may identify local records; current public contracts and selected evidence must
 be sufficient for the current product and its stated claims. ADR-0016 records
 the publication and commit-boundary decision.
 
+## Grammar pin-move evidence
+
+A grammar pin move includes the evidence required by [ADR-0024 rule 6](../design/decisions/ADR-0024-grammar-source-tiers.md#amendment-2026-11-16-rule-6-following-a-maintained-fork).
+The `pin-move.yml` workflow compares a PR's head with the merge base of its fetched/verified base and head, and publishes strict old/new
+schema checks, schema diff codes/risks and native old/new tree comparisons over both pins' corpora plus the
+grammar's SHA-256-pinned large inputs. Added grammars receive a schema check only; removed grammars are listed.
+Push/manual runs without explicit comparison refs state **diff skipped**. Missing baseline/inputs, invalid
+schema/dump evidence, native process failures and timeouts fail; schema removal/narrowing risks and changed
+trees are review findings. An ok→error result also fails unless the PR body names its exact input on a visible
+`PIN-MOVE-ALLOW-OK-TO-ERROR <input-id>` line. Overrides are retained with the result and cannot excuse missing
+or invalid evidence. Existing error trees remain reported as errors.
+
+The job summary and evidence artifact bind the selected commits, pins, input hashes, native results and overrides.
+Keep the relevant artifact with the pin-review record; it contains source corpus and large-input bytes and tree
+dumps, so review the artifact before any separate publication. The workflow has read-only repository permissions,
+posts no PR comments and changes no pins. It does not replace conformance, bench, licence comparison or owner
+approval. Commands, limits and input-ID syntax are documented in [tools/gen](../../tools/gen/README.md#pin-move-ci-evidence).
+
 ## Multi-module release
 
 The root module and each grammar module are versioned and tagged separately (ADR-0022 §2). Go versions are

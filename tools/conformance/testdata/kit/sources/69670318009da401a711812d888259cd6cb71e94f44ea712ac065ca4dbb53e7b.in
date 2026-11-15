@@ -1,0 +1,2 @@
+declare const config: { port?: number } | undefined;
+const port = config?.;

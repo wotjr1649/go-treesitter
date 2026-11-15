@@ -1,0 +1,2 @@
+SELECT 0 AS merge131_anchor;
+INSERT dbo.log SELECT act FROM (MERGE dbo.t AS t USING dbo.s AS s ON t.id=s.id WHEN MATCHED THEN DELETE OUTPUT $action AS act) AS changes;

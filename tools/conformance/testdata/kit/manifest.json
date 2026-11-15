@@ -1,0 +1,2468 @@
+{
+  "kind": "kit-inputs/1",
+  "repository": "https://github.com/wotjr1649/tree-sitter-grammar-kit",
+  "commit": "0a12156",
+  "archiveSHA256": "83d792c6453a5f316e101a76885f637b4397ba7a601cfebbd7a388f23cab07d3",
+  "license": "MIT License\n\nCopyright (c) 2026 tree-sitter-grammar-kit contributors\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n",
+  "selection": "24 cases/grammar; routes,gaps x edited,unedited round-robin; SHA256(id),id order; exclude sample; dedup(source hash,edits)",
+  "projection": "UTF-8 bytes unchanged; first find in preceding step; empty find appends; one fresh-old/EditFor/reparse pair per edit; fresh inputs dedup(lang,SHA256)",
+  "sourceBudgetBytes": 262144,
+  "cases": [
+    {
+      "lang": "csharp",
+      "id": "csharp-issue179-nested-else-edit",
+      "file": "src/testdata/native/routes/csharp.json",
+      "fileSHA256": "1d7fa511d74642dcdef857cea218866902c4f53be197c480c369fc5bdda31ad0",
+      "sourceSHA256": "8670d5a1d0b862bf73dcccf0f5c597acd2f5dc0c40ef1673140ac82d4cb7b405",
+      "edits": [
+        {
+          "find": "#if true\n#else\n#else\n#endif",
+          "replace": "#if true\n#elif false\n#else\n#endif",
+          "oldSHA256": "8670d5a1d0b862bf73dcccf0f5c597acd2f5dc0c40ef1673140ac82d4cb7b405",
+          "newSHA256": "2cb98c12bff858c3d4cf16b18ca852a6bf940e4704c85dc02ccf283964426fc0"
+        },
+        {
+          "find": "#if true\n#elif false\n#else\n#endif",
+          "replace": "#if true\n#else\n#else\n#endif",
+          "oldSHA256": "2cb98c12bff858c3d4cf16b18ca852a6bf940e4704c85dc02ccf283964426fc0",
+          "newSHA256": "8670d5a1d0b862bf73dcccf0f5c597acd2f5dc0c40ef1673140ac82d4cb7b405"
+        }
+      ]
+    },
+    {
+      "lang": "csharp",
+      "id": "probe-csharp-V11-R-1",
+      "file": "src/testdata/native/routes/csharp.json",
+      "fileSHA256": "1d7fa511d74642dcdef857cea218866902c4f53be197c480c369fc5bdda31ad0",
+      "sourceSHA256": "308477ccf56bda78672714aa002585623ac40a334f8aa0fc2cc97543f9b056ac",
+      "edits": []
+    },
+    {
+      "lang": "csharp",
+      "id": "csharp-issue182-if-header-paren-edit",
+      "file": "src/testdata/native/gaps/csharp.json",
+      "fileSHA256": "65326f8ec471f9d53e0e3d5a1bebdca79b89bfa74dac087bb7992887dc47d51b",
+      "sourceSHA256": "dcb256f9f45398a3067b8c784428e3ac8a8e86220eb3ac28dfdfeaa5bb6fb774",
+      "edits": [
+        {
+          "find": "if(F()\n",
+          "replace": "if(F())\n",
+          "oldSHA256": "dcb256f9f45398a3067b8c784428e3ac8a8e86220eb3ac28dfdfeaa5bb6fb774",
+          "newSHA256": "bc45778cf07fe6fa1bc2d21a9080e1b24100de7a2ac989deb2ad95c21008f941"
+        },
+        {
+          "find": "if(F())\n",
+          "replace": "if(F()\n",
+          "oldSHA256": "bc45778cf07fe6fa1bc2d21a9080e1b24100de7a2ac989deb2ad95c21008f941",
+          "newSHA256": "dcb256f9f45398a3067b8c784428e3ac8a8e86220eb3ac28dfdfeaa5bb6fb774"
+        }
+      ]
+    },
+    {
+      "lang": "csharp",
+      "id": "csharp-issue182-if-header-false-else",
+      "file": "src/testdata/native/gaps/csharp.json",
+      "fileSHA256": "65326f8ec471f9d53e0e3d5a1bebdca79b89bfa74dac087bb7992887dc47d51b",
+      "sourceSHA256": "96d87e730677881ddbc13b229d1d4f2c0fca487af37d4149c89beb21adebf7c8",
+      "edits": []
+    },
+    {
+      "lang": "csharp",
+      "id": "csharp-feature-r1",
+      "file": "src/testdata/native/routes/csharp.json",
+      "fileSHA256": "1d7fa511d74642dcdef857cea218866902c4f53be197c480c369fc5bdda31ad0",
+      "sourceSHA256": "2e0f23827fc25e2c8915c21b564eca5ee6552bb571f44020056c10d18ef30ce7",
+      "edits": [
+        {
+          "find": "    public int Count => _items.Count;\n",
+          "replace": "    public int Count => _items.Count;\n\n    public bool IsEmpty => _items.Count == 0;\n",
+          "oldSHA256": "2e0f23827fc25e2c8915c21b564eca5ee6552bb571f44020056c10d18ef30ce7",
+          "newSHA256": "9c50d78515907514f8814473356829ec7628b27a01e8dc1a6f39f6d96eacaaea"
+        },
+        {
+          "find": "0 => \"empty\",",
+          "replace": "0 => \"none\",",
+          "oldSHA256": "9c50d78515907514f8814473356829ec7628b27a01e8dc1a6f39f6d96eacaaea",
+          "newSHA256": "a0ac3c5cf730f7f589e0b49bdb17dd9a586eb02e2562711d6a62d0588c3ce3d5"
+        },
+        {
+          "find": "public enum Status { Active, Retired }\n\n",
+          "replace": "",
+          "oldSHA256": "a0ac3c5cf730f7f589e0b49bdb17dd9a586eb02e2562711d6a62d0588c3ce3d5",
+          "newSHA256": "f653a4cdc7c98b3d554f895c09d2716a459f27bea293772164a45012702d4b69"
+        }
+      ]
+    },
+    {
+      "lang": "csharp",
+      "id": "alt-csharp-B04-03",
+      "file": "src/testdata/native/routes/csharp.json",
+      "fileSHA256": "1d7fa511d74642dcdef857cea218866902c4f53be197c480c369fc5bdda31ad0",
+      "sourceSHA256": "712a1c7c0bff14b5a858853fca239983fee64cb4e634807185267a51c59c6005",
+      "edits": []
+    },
+    {
+      "lang": "csharp",
+      "id": "csharp-issue184-endif-active-block-edit",
+      "file": "src/testdata/native/gaps/csharp.json",
+      "fileSHA256": "65326f8ec471f9d53e0e3d5a1bebdca79b89bfa74dac087bb7992887dc47d51b",
+      "sourceSHA256": "4562966b2d940b97f8ad6cf8f1f938ab7aa187ea92673b0b17c632ac89126c62",
+      "edits": [
+        {
+          "find": "/* bad */",
+          "replace": "// valid",
+          "oldSHA256": "4562966b2d940b97f8ad6cf8f1f938ab7aa187ea92673b0b17c632ac89126c62",
+          "newSHA256": "3d3d941541b7e207dbaa7fed05c1790e7f2c5e6b351a3cf936b7a81fecd2a56c"
+        },
+        {
+          "find": "// valid",
+          "replace": "/* bad */",
+          "oldSHA256": "3d3d941541b7e207dbaa7fed05c1790e7f2c5e6b351a3cf936b7a81fecd2a56c",
+          "newSHA256": "4562966b2d940b97f8ad6cf8f1f938ab7aa187ea92673b0b17c632ac89126c62"
+        }
+      ]
+    },
+    {
+      "lang": "csharp",
+      "id": "csharp-issue157-line-split-r1",
+      "file": "src/testdata/native/gaps/csharp.json",
+      "fileSHA256": "65326f8ec471f9d53e0e3d5a1bebdca79b89bfa74dac087bb7992887dc47d51b",
+      "sourceSHA256": "5d2a607640c33c42f482cd97fcc6e520986f0c257ddec374e0d26757676a390e",
+      "edits": []
+    },
+    {
+      "lang": "csharp",
+      "id": "csharp-issue179-nested-expression-edit",
+      "file": "src/testdata/native/routes/csharp.json",
+      "fileSHA256": "1d7fa511d74642dcdef857cea218866902c4f53be197c480c369fc5bdda31ad0",
+      "sourceSHA256": "dd48be66da80967f4cf2ef1bf87b88a6f41130dca45b3276f44e9a0e319bc3af",
+      "edits": [
+        {
+          "find": "#if 123\nopaque code\n#endif",
+          "replace": "#if true\nopaque code\n#endif",
+          "oldSHA256": "dd48be66da80967f4cf2ef1bf87b88a6f41130dca45b3276f44e9a0e319bc3af",
+          "newSHA256": "bd78194b288f0076d0169f88d33a6f9429fc3c457225fd33287900556bfc4aea"
+        },
+        {
+          "find": "#if true\nopaque code\n#endif",
+          "replace": "#if 123\nopaque code\n#endif",
+          "oldSHA256": "bd78194b288f0076d0169f88d33a6f9429fc3c457225fd33287900556bfc4aea",
+          "newSHA256": "dd48be66da80967f4cf2ef1bf87b88a6f41130dca45b3276f44e9a0e319bc3af"
+        }
+      ]
+    },
+    {
+      "lang": "csharp",
+      "id": "alt-csharp-V09-02",
+      "file": "src/testdata/native/routes/csharp.json",
+      "fileSHA256": "1d7fa511d74642dcdef857cea218866902c4f53be197c480c369fc5bdda31ad0",
+      "sourceSHA256": "24bf5a59696d07d37093b5191aa82ea5b71b898c6bcfba506147f6ed408f3c0f",
+      "edits": []
+    },
+    {
+      "lang": "csharp",
+      "id": "csharp-issue182-nested-initializer-edit",
+      "file": "src/testdata/native/gaps/csharp.json",
+      "fileSHA256": "65326f8ec471f9d53e0e3d5a1bebdca79b89bfa74dac087bb7992887dc47d51b",
+      "sourceSHA256": "9685ff5450376c7da3e27fe354e4bf2bc0296471329c0b079fa3504a8dc91a6d",
+      "edits": [
+        {
+          "find": "1;",
+          "replace": "1 2;",
+          "oldSHA256": "9685ff5450376c7da3e27fe354e4bf2bc0296471329c0b079fa3504a8dc91a6d",
+          "newSHA256": "146ef6e48556880ab048c3d816379b827fc5814ec64d53f2eaca9f5a41c218f6"
+        },
+        {
+          "find": "1 2;",
+          "replace": "1;",
+          "oldSHA256": "146ef6e48556880ab048c3d816379b827fc5814ec64d53f2eaca9f5a41c218f6",
+          "newSHA256": "9685ff5450376c7da3e27fe354e4bf2bc0296471329c0b079fa3504a8dc91a6d"
+        }
+      ]
+    },
+    {
+      "lang": "csharp",
+      "id": "csharp-issue157-pp-undef-bad-27-r1",
+      "file": "src/testdata/native/gaps/csharp.json",
+      "fileSHA256": "65326f8ec471f9d53e0e3d5a1bebdca79b89bfa74dac087bb7992887dc47d51b",
+      "sourceSHA256": "f5c0ca36b7bb831ada01e0af62db25883f101400dcac6c093cec82a17c32311d",
+      "edits": []
+    },
+    {
+      "lang": "csharp",
+      "id": "csharp-issue179-line-edit",
+      "file": "src/testdata/native/routes/csharp.json",
+      "fileSHA256": "1d7fa511d74642dcdef857cea218866902c4f53be197c480c369fc5bdda31ad0",
+      "sourceSHA256": "9fff0136b4e3032586aed824facd828230ce05f0a9733eb6be9c85391c10234a",
+      "edits": [
+        {
+          "find": "#line abc",
+          "replace": "#line 123 \"x\\y\"",
+          "oldSHA256": "9fff0136b4e3032586aed824facd828230ce05f0a9733eb6be9c85391c10234a",
+          "newSHA256": "548e3510dc1862a8b86c3d1e27261853e8ddfd3b281fd4b8544137ba381c0af4"
+        },
+        {
+          "find": "#line 123 \"x\\y\"",
+          "replace": "#line abc",
+          "oldSHA256": "548e3510dc1862a8b86c3d1e27261853e8ddfd3b281fd4b8544137ba381c0af4",
+          "newSHA256": "9fff0136b4e3032586aed824facd828230ce05f0a9733eb6be9c85391c10234a"
+        }
+      ]
+    },
+    {
+      "lang": "csharp",
+      "id": "issue152-escaped-keyword",
+      "file": "src/testdata/native/routes/csharp.json",
+      "fileSHA256": "1d7fa511d74642dcdef857cea218866902c4f53be197c480c369fc5bdda31ad0",
+      "sourceSHA256": "f2920ba5ca60c6b2b3fb6319f0dba68d742295d8cf76c283805bf99848957b69",
+      "edits": []
+    },
+    {
+      "lang": "csharp",
+      "id": "csharp-issue182-argument-separator-edit",
+      "file": "src/testdata/native/gaps/csharp.json",
+      "fileSHA256": "65326f8ec471f9d53e0e3d5a1bebdca79b89bfa74dac087bb7992887dc47d51b",
+      "sourceSHA256": "19197c319ecbaaecbb2aa680312d796843eae0004195dbcf7c7e990730a76841",
+      "edits": [
+        {
+          "find": "1 2,",
+          "replace": "1, 2,",
+          "oldSHA256": "19197c319ecbaaecbb2aa680312d796843eae0004195dbcf7c7e990730a76841",
+          "newSHA256": "d60a14e164e024be33bee36e33d50cebadf4343957043af2e11fb1c8ad9a4bfd"
+        },
+        {
+          "find": "1, 2,",
+          "replace": "1 2,",
+          "oldSHA256": "d60a14e164e024be33bee36e33d50cebadf4343957043af2e11fb1c8ad9a4bfd",
+          "newSHA256": "19197c319ecbaaecbb2aa680312d796843eae0004195dbcf7c7e990730a76841"
+        }
+      ]
+    },
+    {
+      "lang": "csharp",
+      "id": "csharp-issue182-initializer-terminated-symbol",
+      "file": "src/testdata/native/gaps/csharp.json",
+      "fileSHA256": "65326f8ec471f9d53e0e3d5a1bebdca79b89bfa74dac087bb7992887dc47d51b",
+      "sourceSHA256": "5a4cc42ff7049d542456bf79b8c57983f61e715123a324597c083209ca5268c4",
+      "edits": []
+    },
+    {
+      "lang": "csharp",
+      "id": "csharp-issue179-undef-edit",
+      "file": "src/testdata/native/routes/csharp.json",
+      "fileSHA256": "1d7fa511d74642dcdef857cea218866902c4f53be197c480c369fc5bdda31ad0",
+      "sourceSHA256": "770d3eac21610813135f1bd417bd50bc8c240649ff1838f5ed4baca73ab253f1",
+      "edits": [
+        {
+          "find": "#undef true",
+          "replace": "#undef ABC",
+          "oldSHA256": "770d3eac21610813135f1bd417bd50bc8c240649ff1838f5ed4baca73ab253f1",
+          "newSHA256": "3f261059df037217776971f0b93d7fc1744ca083b1cbc23683079207f36ce8a3"
+        },
+        {
+          "find": "#undef ABC",
+          "replace": "#undef true",
+          "oldSHA256": "3f261059df037217776971f0b93d7fc1744ca083b1cbc23683079207f36ce8a3",
+          "newSHA256": "770d3eac21610813135f1bd417bd50bc8c240649ff1838f5ed4baca73ab253f1"
+        }
+      ]
+    },
+    {
+      "lang": "csharp",
+      "id": "alt-csharp-B05-07",
+      "file": "src/testdata/native/routes/csharp.json",
+      "fileSHA256": "1d7fa511d74642dcdef857cea218866902c4f53be197c480c369fc5bdda31ad0",
+      "sourceSHA256": "713996390731f48967545bbd6dab4db7e2a0653803f9c07df6a17d8b0846f6d5",
+      "edits": []
+    },
+    {
+      "lang": "csharp",
+      "id": "csharp-issue182-nested-argument-edit",
+      "file": "src/testdata/native/gaps/csharp.json",
+      "fileSHA256": "65326f8ec471f9d53e0e3d5a1bebdca79b89bfa74dac087bb7992887dc47d51b",
+      "sourceSHA256": "58c1ee3c91ec7deb1f5ef4f8889af8e9bf025378210e24b5ed04f18cc238a08b",
+      "edits": [
+        {
+          "find": "1,",
+          "replace": "1 2,",
+          "oldSHA256": "58c1ee3c91ec7deb1f5ef4f8889af8e9bf025378210e24b5ed04f18cc238a08b",
+          "newSHA256": "3772fc49b450168292ea03190734200a28e014447841f96313c26ceb78c93a30"
+        },
+        {
+          "find": "1 2,",
+          "replace": "1,",
+          "oldSHA256": "3772fc49b450168292ea03190734200a28e014447841f96313c26ceb78c93a30",
+          "newSHA256": "58c1ee3c91ec7deb1f5ef4f8889af8e9bf025378210e24b5ed04f18cc238a08b"
+        }
+      ]
+    },
+    {
+      "lang": "csharp",
+      "id": "csharp-issue157-pp-after-hash-space-12-r1",
+      "file": "src/testdata/native/gaps/csharp.json",
+      "fileSHA256": "65326f8ec471f9d53e0e3d5a1bebdca79b89bfa74dac087bb7992887dc47d51b",
+      "sourceSHA256": "7ba4d4bb9683fb74166e10e5a9621ae2d3098f6a4d839933763d2f91b0d0cb17",
+      "edits": []
+    },
+    {
+      "lang": "csharp",
+      "id": "probe-csharp-V14b-PE-1",
+      "file": "src/testdata/native/routes/csharp.json",
+      "fileSHA256": "1d7fa511d74642dcdef857cea218866902c4f53be197c480c369fc5bdda31ad0",
+      "sourceSHA256": "91565815ffa3fcbded4b3728f6d88f46d7213b7fec2596cc013ecc1b96311a6e",
+      "edits": [
+        {
+          "find": "value < 0 ? 0 : value",
+          "replace": "Math.Max(0, value)",
+          "oldSHA256": "91565815ffa3fcbded4b3728f6d88f46d7213b7fec2596cc013ecc1b96311a6e",
+          "newSHA256": "2e6156bd6e30c4ccfc9408ded57f40742b810ca935855577c6787841d05ba9b3"
+        },
+        {
+          "find": "operator +=(int delta)",
+          "replace": "operator -=(int delta)",
+          "oldSHA256": "2e6156bd6e30c4ccfc9408ded57f40742b810ca935855577c6787841d05ba9b3",
+          "newSHA256": "637363b982b5770cd1a06e7472239aa11b8549fa8a4307ea89bb8cc20a7bdb24"
+        },
+        {
+          "find": "remove { }",
+          "replace": "remove { Size--; }",
+          "oldSHA256": "637363b982b5770cd1a06e7472239aa11b8549fa8a4307ea89bb8cc20a7bdb24",
+          "newSHA256": "262898aa275ba77abc7d0c9ce597f4f17ea0dc85a715f06e22848ea3e6aac892"
+        }
+      ]
+    },
+    {
+      "lang": "csharp",
+      "id": "issue152-supplementary-literal",
+      "file": "src/testdata/native/routes/csharp.json",
+      "fileSHA256": "1d7fa511d74642dcdef857cea218866902c4f53be197c480c369fc5bdda31ad0",
+      "sourceSHA256": "37e264a3ed72139815fbfa0f8caf3314f99efe05e1cba2fa6f903da751b5cadd",
+      "edits": []
+    },
+    {
+      "lang": "csharp",
+      "id": "csharp-gap-generic-arg-r1",
+      "file": "src/testdata/native/gaps/csharp.json",
+      "fileSHA256": "65326f8ec471f9d53e0e3d5a1bebdca79b89bfa74dac087bb7992887dc47d51b",
+      "sourceSHA256": "5759eadeae2642464f7c55c6c4c4c05687d6bf27e5cd12bf0e3fbaf8192fd6ff",
+      "edits": [
+        {
+          "find": "List<var> v;",
+          "replace": "List<var v;",
+          "oldSHA256": "5759eadeae2642464f7c55c6c4c4c05687d6bf27e5cd12bf0e3fbaf8192fd6ff",
+          "newSHA256": "9aba38467011fecf013724452ac2fcb58dd6928676a64ca4c47e3924d74b1fe8"
+        },
+        {
+          "find": "List<var v;",
+          "replace": "List<var> v;",
+          "oldSHA256": "9aba38467011fecf013724452ac2fcb58dd6928676a64ca4c47e3924d74b1fe8",
+          "newSHA256": "5759eadeae2642464f7c55c6c4c4c05687d6bf27e5cd12bf0e3fbaf8192fd6ff"
+        }
+      ]
+    },
+    {
+      "lang": "csharp",
+      "id": "csharp-issue157-pp-if-ok-1-r1",
+      "file": "src/testdata/native/gaps/csharp.json",
+      "fileSHA256": "65326f8ec471f9d53e0e3d5a1bebdca79b89bfa74dac087bb7992887dc47d51b",
+      "sourceSHA256": "f086fa42d989b4df91e594e0098c4cb1f5d4542ecee96f503d845d6dd55a03e3",
+      "edits": []
+    },
+    {
+      "lang": "go",
+      "id": "probe-go-B01-NR-1",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "af7dc032b5393e134e32cbe70a712700e4ce637d4ae13f679735dd95bfbe15ce",
+      "edits": [
+        {
+          "find": "func sum(a, b int) int {",
+          "replace": "func sum(a, b int) int\n{",
+          "oldSHA256": "af7dc032b5393e134e32cbe70a712700e4ce637d4ae13f679735dd95bfbe15ce",
+          "newSHA256": "fe6a58bfd7aea9d5b4954fd835d74857c2d1765bf5bc65e70d87c851eada135d"
+        },
+        {
+          "find": "func sum(a, b int) int\n{",
+          "replace": "func sum(a, b int) int {",
+          "oldSHA256": "fe6a58bfd7aea9d5b4954fd835d74857c2d1765bf5bc65e70d87c851eada135d",
+          "newSHA256": "af7dc032b5393e134e32cbe70a712700e4ce637d4ae13f679735dd95bfbe15ce"
+        },
+        {
+          "find": "'x'",
+          "replace": "'xy'",
+          "oldSHA256": "af7dc032b5393e134e32cbe70a712700e4ce637d4ae13f679735dd95bfbe15ce",
+          "newSHA256": "9e9e175b7a68615fc764f5e2c51a32d103fab450635aaab064fe445c6e9c7d50"
+        }
+      ]
+    },
+    {
+      "lang": "go",
+      "id": "probe-go-B01-N-4",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "cc97f5ba8337c52dd023925911feac94f4c7a845e587c80eb1a0368d78dc21dc",
+      "edits": []
+    },
+    {
+      "lang": "go",
+      "id": "probe-go-B02-N-1",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "10de2dfed2ec191306f71f6004f1b7837eb8cf238f4a0928d3009ee79eb745bb",
+      "edits": [
+        {
+          "find": "index map[string]int",
+          "replace": "index map[string]",
+          "oldSHA256": "10de2dfed2ec191306f71f6004f1b7837eb8cf238f4a0928d3009ee79eb745bb",
+          "newSHA256": "88dc082207186854a006f9aed275c4ed8ed58c6b744cf5f719ca75f24be09e82"
+        },
+        {
+          "find": "index map[string]",
+          "replace": "index map[string]int",
+          "oldSHA256": "88dc082207186854a006f9aed275c4ed8ed58c6b744cf5f719ca75f24be09e82",
+          "newSHA256": "10de2dfed2ec191306f71f6004f1b7837eb8cf238f4a0928d3009ee79eb745bb"
+        }
+      ]
+    },
+    {
+      "lang": "go",
+      "id": "issue205-mark-cont-0300",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "36787cbb0feaf458801b91d0f93a75b58e02fbe8d79a1e2f37cda6e451902e98",
+      "edits": []
+    },
+    {
+      "lang": "go",
+      "id": "probe-go-B04-R-1",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "c1b05923e0131b0b7d3921e541f6a4113cb32c69809f100944ccacb3d62bbf82",
+      "edits": [
+        {
+          "find": "for i := 0; i < 3; i++ {",
+          "replace": "for i := 0; i < 3 {",
+          "oldSHA256": "c1b05923e0131b0b7d3921e541f6a4113cb32c69809f100944ccacb3d62bbf82",
+          "newSHA256": "7d6d5be27c25aab704ced8ed3bdfa2c54184bfae1dc829056621b223f581548c"
+        },
+        {
+          "find": "for i := 0; i < 3 {",
+          "replace": "for i := 0; i < 3; i++ {",
+          "oldSHA256": "7d6d5be27c25aab704ced8ed3bdfa2c54184bfae1dc829056621b223f581548c",
+          "newSHA256": "c1b05923e0131b0b7d3921e541f6a4113cb32c69809f100944ccacb3d62bbf82"
+        }
+      ]
+    },
+    {
+      "lang": "go",
+      "id": "issue205-spacing-mark-cont-0903",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "5616353c15ed4ee48fcf1abdee10f89d331f3d90fc7d86cc1c7147d608d2725b",
+      "edits": []
+    },
+    {
+      "lang": "go",
+      "id": "probe-go-V18-N-1",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "84a57885a964483cd361fd8728cf6f4c9c80aed28d3a53436fe68d783d31ed95",
+      "edits": [
+        {
+          "find": "~int | ~int64 | float64",
+          "replace": "~int | ~ | float64",
+          "oldSHA256": "84a57885a964483cd361fd8728cf6f4c9c80aed28d3a53436fe68d783d31ed95",
+          "newSHA256": "5a9395d0a84816c48361189d48086a2bbd24585222a8e8a103f6288c25138063"
+        },
+        {
+          "find": "~int | ~ | float64",
+          "replace": "~int | ~int64 | float64",
+          "oldSHA256": "5a9395d0a84816c48361189d48086a2bbd24585222a8e8a103f6288c25138063",
+          "newSHA256": "84a57885a964483cd361fd8728cf6f4c9c80aed28d3a53436fe68d783d31ed95"
+        }
+      ]
+    },
+    {
+      "lang": "go",
+      "id": "alt-go-B01-02",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "c39a24697fa670259230aa298776b88e78310f9d9eb3f388ec6bbc90a3651eee",
+      "edits": []
+    },
+    {
+      "lang": "go",
+      "id": "go-feature-r1",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "d27baa5482f1bfb6cda3af27ff577fc98c794ffb66e350a0434cfdeb64fdec76",
+      "edits": [
+        {
+          "find": "var ErrFull = errors.New(\"store is full\")\n",
+          "replace": "var ErrFull = errors.New(\"store is full\")\n\nfunc (s *Store[K, V]) Len() int {\n\treturn len(s.items)\n}\n",
+          "oldSHA256": "d27baa5482f1bfb6cda3af27ff577fc98c794ffb66e350a0434cfdeb64fdec76",
+          "newSHA256": "92a1430e79f679349c5c2ac91d67cc1b8ef949540e65b08a7c678151c1dd87c8"
+        },
+        {
+          "find": "case it.Count > 100:",
+          "replace": "case it.Count > 500:",
+          "oldSHA256": "92a1430e79f679349c5c2ac91d67cc1b8ef949540e65b08a7c678151c1dd87c8",
+          "newSHA256": "5392dd622013ac041257d310e7c122d7c9c9942f3557ce2831a589a1bd40d86a"
+        },
+        {
+          "find": "\tdefer close(ch)\n",
+          "replace": "",
+          "oldSHA256": "5392dd622013ac041257d310e7c122d7c9c9942f3557ce2831a589a1bd40d86a",
+          "newSHA256": "a8a00811225d9577263c9450dd66b1951d3116a2d0433f56165308f2c7ff8c55"
+        }
+      ]
+    },
+    {
+      "lang": "go",
+      "id": "issue205-number-cont-1369",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "9d00e410a623b8fb2869c007d9bea491807aea4f0806a0bd8a35ec9bd6b88165",
+      "edits": []
+    },
+    {
+      "lang": "go",
+      "id": "probe-go-B03-R-1",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "8b7b405cbee68496cb066f590e2b03a4b4a6688002f25628476ecb5f25805c89",
+      "edits": [
+        {
+          "find": "(xs[1] * 2)",
+          "replace": "(xs[1] * 2",
+          "oldSHA256": "8b7b405cbee68496cb066f590e2b03a4b4a6688002f25628476ecb5f25805c89",
+          "newSHA256": "f3a3f102e1ad3c5d5e33a4c95e2ac76ccf288effdd347d02ee90c3fe0e95624e"
+        },
+        {
+          "find": "(xs[1] * 2",
+          "replace": "(xs[1] * 2)",
+          "oldSHA256": "f3a3f102e1ad3c5d5e33a4c95e2ac76ccf288effdd347d02ee90c3fe0e95624e",
+          "newSHA256": "8b7b405cbee68496cb066f590e2b03a4b4a6688002f25628476ecb5f25805c89"
+        }
+      ]
+    },
+    {
+      "lang": "go",
+      "id": "probe-go-B04-P-3",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "03fe04866bb3f4f249dc2ba2f8c12f7b87df2813ed1b0b50092e5cdc08f9cb51",
+      "edits": []
+    },
+    {
+      "lang": "go",
+      "id": "issue205-type-restore",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "5ca1a38b4996195ac64b9338504f4af60f1dc345b367e53ba1b85116d4d1a0da",
+      "edits": [
+        {
+          "find": "࢏",
+          "replace": "x‌y",
+          "oldSHA256": "5ca1a38b4996195ac64b9338504f4af60f1dc345b367e53ba1b85116d4d1a0da",
+          "newSHA256": "0bcbeffc2bbdd31c5f1385a4f8c1d06b2d3fe89b45ac9fd1877784dd5887ed33"
+        },
+        {
+          "find": "x‌y",
+          "replace": "࢏",
+          "oldSHA256": "0bcbeffc2bbdd31c5f1385a4f8c1d06b2d3fe89b45ac9fd1877784dd5887ed33",
+          "newSHA256": "5ca1a38b4996195ac64b9338504f4af60f1dc345b367e53ba1b85116d4d1a0da"
+        }
+      ]
+    },
+    {
+      "lang": "go",
+      "id": "alt-go-V18-01",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "51e834e3590d254659aab891052316b4eb5a6164605c9318bea24bf7d4495784",
+      "edits": []
+    },
+    {
+      "lang": "go",
+      "id": "issue205-field-restore",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "40b121ef92710f27282d71e3f59ac12c77ac76a4fc650cfb6d7b176d06c113b0",
+      "edits": [
+        {
+          "find": "࢏",
+          "replace": "x‌y",
+          "oldSHA256": "40b121ef92710f27282d71e3f59ac12c77ac76a4fc650cfb6d7b176d06c113b0",
+          "newSHA256": "13bd2d42c75cd8c52a5096518734313526d46ebc66ce6b6b3915b6024fec7056"
+        },
+        {
+          "find": "x‌y",
+          "replace": "࢏",
+          "oldSHA256": "13bd2d42c75cd8c52a5096518734313526d46ebc66ce6b6b3915b6024fec7056",
+          "newSHA256": "40b121ef92710f27282d71e3f59ac12c77ac76a4fc650cfb6d7b176d06c113b0"
+        }
+      ]
+    },
+    {
+      "lang": "go",
+      "id": "probe-go-B01-N-5",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "71d5b324412db7e5b3e2716cf36d84d18fb6eb58b47203b1eb8e23cef2d82e9b",
+      "edits": []
+    },
+    {
+      "lang": "go",
+      "id": "go-recovery-r1",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "1af9236bb20fcdc86dad092aa97d79dec4c9948823362a803bdb2fc806e03389",
+      "edits": [
+        {
+          "find": "add(i, i))",
+          "replace": "add(i, i)",
+          "oldSHA256": "1af9236bb20fcdc86dad092aa97d79dec4c9948823362a803bdb2fc806e03389",
+          "newSHA256": "5bda79f1c2fc972898f9d2bb9ca543c92ed85e561f6f6b668cc7f5bab0ca0f5d"
+        },
+        {
+          "find": "add(i, i)",
+          "replace": "add(i, i))",
+          "oldSHA256": "5bda79f1c2fc972898f9d2bb9ca543c92ed85e561f6f6b668cc7f5bab0ca0f5d",
+          "newSHA256": "1af9236bb20fcdc86dad092aa97d79dec4c9948823362a803bdb2fc806e03389"
+        }
+      ]
+    },
+    {
+      "lang": "go",
+      "id": "alt-go-B03-01",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "b8baafb330b07ddfa6526dc7a17b034ff5636da1a206d4af130dcda1b50114b1",
+      "edits": []
+    },
+    {
+      "lang": "go",
+      "id": "probe-go-V27-PNE-1",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "a8a66a9178fd60fe4f39fdfd17d0b53836e9dfb048668ad6a98324f8d618129c",
+      "edits": [
+        {
+          "find": "Name: \"a\"",
+          "replace": "Name: \"b\"",
+          "oldSHA256": "a8a66a9178fd60fe4f39fdfd17d0b53836e9dfb048668ad6a98324f8d618129c",
+          "newSHA256": "e11273acb0c9a13ebe027afc8410bd9cb96f37da609444e2d58a180996867c45"
+        },
+        {
+          "find": "Map[U any]",
+          "replace": "Map[]",
+          "oldSHA256": "e11273acb0c9a13ebe027afc8410bd9cb96f37da609444e2d58a180996867c45",
+          "newSHA256": "664c66d494f09e92739ae0060f1260f9223bc4c5ee5524f8610edf05cef7bc77"
+        },
+        {
+          "find": "Map[]",
+          "replace": "Map[U any]",
+          "oldSHA256": "664c66d494f09e92739ae0060f1260f9223bc4c5ee5524f8610edf05cef7bc77",
+          "newSHA256": "e11273acb0c9a13ebe027afc8410bd9cb96f37da609444e2d58a180996867c45"
+        },
+        {
+          "find": "Outer{X: 1,",
+          "replace": "Outer{.X: 1,",
+          "oldSHA256": "e11273acb0c9a13ebe027afc8410bd9cb96f37da609444e2d58a180996867c45",
+          "newSHA256": "32243f36ba916a1d6f374f28a4327a5cf6cc44950d5d34689745b647095cc3db"
+        }
+      ]
+    },
+    {
+      "lang": "go",
+      "id": "issue205-underscore-control",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "426bbd6e76d6135626504421671649f60a8281316e478094575edf5c99674644",
+      "edits": []
+    },
+    {
+      "lang": "go",
+      "id": "issue205-package-restore",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "5e2c87572e20cce86a5fc5b35e38e06c9bd2898e5953ddb3e3ab3ff8ce9f365e",
+      "edits": [
+        {
+          "find": "࢏",
+          "replace": "x‌y",
+          "oldSHA256": "5e2c87572e20cce86a5fc5b35e38e06c9bd2898e5953ddb3e3ab3ff8ce9f365e",
+          "newSHA256": "c0e2e3d79eeafbc9ce6659c66583364e763cfbc99f8e8d38805b9584f362cbf2"
+        },
+        {
+          "find": "x‌y",
+          "replace": "࢏",
+          "oldSHA256": "c0e2e3d79eeafbc9ce6659c66583364e763cfbc99f8e8d38805b9584f362cbf2",
+          "newSHA256": "5e2c87572e20cce86a5fc5b35e38e06c9bd2898e5953ddb3e3ab3ff8ce9f365e"
+        }
+      ]
+    },
+    {
+      "lang": "go",
+      "id": "issue205-symbol-start-2118",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "8512a7f7d7a56781a82216d1962b251dfbaf72ee0f9f3550d41077341ae12837",
+      "edits": []
+    },
+    {
+      "lang": "go",
+      "id": "issue205-label-restore",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "ba99a15bb6126a3709e5445709a71f8ce93df17a301efd03536aa2a9efd8e7b4",
+      "edits": [
+        {
+          "find": "࢏",
+          "replace": "x‌y",
+          "oldSHA256": "ba99a15bb6126a3709e5445709a71f8ce93df17a301efd03536aa2a9efd8e7b4",
+          "newSHA256": "4d8567b098fe798b0dc7cca4ef93e419b1bc1a9e8c3d3520f1d4fc5628f06b03"
+        },
+        {
+          "find": "x‌y",
+          "replace": "࢏",
+          "oldSHA256": "4d8567b098fe798b0dc7cca4ef93e419b1bc1a9e8c3d3520f1d4fc5628f06b03",
+          "newSHA256": "ba99a15bb6126a3709e5445709a71f8ce93df17a301efd03536aa2a9efd8e7b4"
+        }
+      ]
+    },
+    {
+      "lang": "go",
+      "id": "issue205-unicode17-start-a7ce",
+      "file": "src/testdata/native/routes/go.json",
+      "fileSHA256": "d3b4bf7e23e00c7feb46f4e91ba2d5feba5f4ca291924a81ebc92cc8f5783ee4",
+      "sourceSHA256": "6338ca1f24014c7a3b17704130736ab7454e1a0843f252aabfef5cdc6ef16330",
+      "edits": []
+    },
+    {
+      "lang": "json",
+      "id": "probe-json-B02-R-4",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "fd28a48cea82ee76905d7a07f570de5f609cb9a86a5f3d0de49f97efe1c17fda",
+      "edits": [
+        {
+          "find": "\\u00e9",
+          "replace": "\\q",
+          "oldSHA256": "fd28a48cea82ee76905d7a07f570de5f609cb9a86a5f3d0de49f97efe1c17fda",
+          "newSHA256": "48ff4f1efc1824404704511c7b2276e1d7d954d7e96e6f8b96f18bcb8fb4d89b"
+        },
+        {
+          "find": "\\q",
+          "replace": "\\u00e9",
+          "oldSHA256": "48ff4f1efc1824404704511c7b2276e1d7d954d7e96e6f8b96f18bcb8fb4d89b",
+          "newSHA256": "fd28a48cea82ee76905d7a07f570de5f609cb9a86a5f3d0de49f97efe1c17fda"
+        }
+      ]
+    },
+    {
+      "lang": "json",
+      "id": "alt-json-B01-09",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "9f92d8c16430b43868fda730c732947ab09f81da2d40ac6802520e86f3b0ba30",
+      "edits": []
+    },
+    {
+      "lang": "json",
+      "id": "probe-json-B01-R-2",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "700bbf9256a76236e6d3f641760a8ee5bb6bf030def585ffd2554e3ab3741f5c",
+      "edits": [
+        {
+          "find": "  \"a\": 1,\n",
+          "replace": "  \"a\": 1, // note\n",
+          "oldSHA256": "700bbf9256a76236e6d3f641760a8ee5bb6bf030def585ffd2554e3ab3741f5c",
+          "newSHA256": "652c0e5d02e973322eb8567189a931e577cf1f4dc963051305298223d7ed75b9"
+        },
+        {
+          "find": " // note",
+          "replace": "",
+          "oldSHA256": "652c0e5d02e973322eb8567189a931e577cf1f4dc963051305298223d7ed75b9",
+          "newSHA256": "700bbf9256a76236e6d3f641760a8ee5bb6bf030def585ffd2554e3ab3741f5c"
+        }
+      ]
+    },
+    {
+      "lang": "json",
+      "id": "alt-json-B01-03",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "0f4657778ae14ff7aeeb2c2190ede79099aa9c4e8a9e54829462f0e92af659e5",
+      "edits": []
+    },
+    {
+      "lang": "json",
+      "id": "probe-json-B01-R-3",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "2129b52a8d23d9831b3990b9f81a377b3fdeb253ee79543e5a829e39181ce996",
+      "edits": [
+        {
+          "find": "[\"a\", \"b\"]",
+          "replace": "[\"a\", \"b\",]",
+          "oldSHA256": "2129b52a8d23d9831b3990b9f81a377b3fdeb253ee79543e5a829e39181ce996",
+          "newSHA256": "a7b1da051da72a15229456ff28834d956b1806ab705a24432154ad1bf076f900"
+        },
+        {
+          "find": "[\"a\", \"b\",]",
+          "replace": "[\"a\", \"b\"]",
+          "oldSHA256": "a7b1da051da72a15229456ff28834d956b1806ab705a24432154ad1bf076f900",
+          "newSHA256": "2129b52a8d23d9831b3990b9f81a377b3fdeb253ee79543e5a829e39181ce996"
+        }
+      ]
+    },
+    {
+      "lang": "json",
+      "id": "alt-json-B01-04",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "edits": []
+    },
+    {
+      "lang": "json",
+      "id": "json-recovery-r1",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "d4d41cc6e66204fbc31ee6ed87b11165e247fee3bbc36262562e1416d58abd27",
+      "edits": [
+        {
+          "find": "\"port\": 8080",
+          "replace": "\"port\" 8080",
+          "oldSHA256": "d4d41cc6e66204fbc31ee6ed87b11165e247fee3bbc36262562e1416d58abd27",
+          "newSHA256": "688f90a555d35a878d2c50791bb4d1a29fc33ec2789e31f0a8141b740d21241b"
+        },
+        {
+          "find": "\"port\" 8080",
+          "replace": "\"port\": 8080",
+          "oldSHA256": "688f90a555d35a878d2c50791bb4d1a29fc33ec2789e31f0a8141b740d21241b",
+          "newSHA256": "d4d41cc6e66204fbc31ee6ed87b11165e247fee3bbc36262562e1416d58abd27"
+        }
+      ]
+    },
+    {
+      "lang": "json",
+      "id": "alt-json-B01-01",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "ddd0d39e88446fbcd91e9ffecb0a5dac35c75c77e8ea8fa6afd6cc6ae6371670",
+      "edits": []
+    },
+    {
+      "lang": "json",
+      "id": "probe-json-B02-R-2",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "379c467e8824ae20e2422d7a2055b52647e2466e04fccf4aae9ad9fa6767a17f",
+      "edits": [
+        {
+          "find": "\"count\": 7,",
+          "replace": "\"count\": 007,",
+          "oldSHA256": "379c467e8824ae20e2422d7a2055b52647e2466e04fccf4aae9ad9fa6767a17f",
+          "newSHA256": "afbd9cd0c4870dcb61d062473d33e52699eb0d8965296b488a960b0ce234de0e"
+        },
+        {
+          "find": "\"count\": 007,",
+          "replace": "\"count\": 7,",
+          "oldSHA256": "afbd9cd0c4870dcb61d062473d33e52699eb0d8965296b488a960b0ce234de0e",
+          "newSHA256": "379c467e8824ae20e2422d7a2055b52647e2466e04fccf4aae9ad9fa6767a17f"
+        }
+      ]
+    },
+    {
+      "lang": "json",
+      "id": "alt-json-B01-02",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "7907111dd23c95e5c5bb17f9dea53da43bf8824ac8a8d71d327beedd266f5f30",
+      "edits": []
+    },
+    {
+      "lang": "json",
+      "id": "probe-json-B02-R-5",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "f53e4fa8530a1bbb7ab82b1c7cce4105a782a381763b90e5c9d006f0120bf463",
+      "edits": [
+        {
+          "find": "\"a\\tb\"",
+          "replace": "\"a\tb\"",
+          "oldSHA256": "f53e4fa8530a1bbb7ab82b1c7cce4105a782a381763b90e5c9d006f0120bf463",
+          "newSHA256": "17f6c5d192c4f3a2be33a32fb01888b1677df1e3d071923ebc6873349640fd9e"
+        },
+        {
+          "find": "\"a\tb\"",
+          "replace": "\"a\\tb\"",
+          "oldSHA256": "17f6c5d192c4f3a2be33a32fb01888b1677df1e3d071923ebc6873349640fd9e",
+          "newSHA256": "f53e4fa8530a1bbb7ab82b1c7cce4105a782a381763b90e5c9d006f0120bf463"
+        }
+      ]
+    },
+    {
+      "lang": "json",
+      "id": "alt-json-B02-01",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "18af1ab2f74b48b83440d28c8b3da82467b1b2df1c0fec97b0e3e8f1426f83c3",
+      "edits": []
+    },
+    {
+      "lang": "json",
+      "id": "probe-json-B01-R-1",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "52b0c34dbd02692623e513ee16c9ad86811fe5f997e8145b74870c88a709886d",
+      "edits": [
+        {
+          "find": "[\"a\", \"b\"],",
+          "replace": "[\"a\", \"b\"]",
+          "oldSHA256": "52b0c34dbd02692623e513ee16c9ad86811fe5f997e8145b74870c88a709886d",
+          "newSHA256": "72bc04457c4922525c7d60926123aa5da5403568f5f7745e1fc946e9e6ad3581"
+        },
+        {
+          "find": "[\"a\", \"b\"]",
+          "replace": "[\"a\", \"b\"],",
+          "oldSHA256": "72bc04457c4922525c7d60926123aa5da5403568f5f7745e1fc946e9e6ad3581",
+          "newSHA256": "52b0c34dbd02692623e513ee16c9ad86811fe5f997e8145b74870c88a709886d"
+        }
+      ]
+    },
+    {
+      "lang": "json",
+      "id": "alt-json-B01-08",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "edits": []
+    },
+    {
+      "lang": "json",
+      "id": "probe-json-B02-R-1",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "99d57a79d6977059723a2707cb679070a154785fff3299136a3b46a254b90c54",
+      "edits": [
+        {
+          "find": "\"d\": 4}}\n",
+          "replace": "\"d\": 4}}\n{\"b\": 3}\n",
+          "oldSHA256": "99d57a79d6977059723a2707cb679070a154785fff3299136a3b46a254b90c54",
+          "newSHA256": "fedef7fb9a0f6799574e4004c320c598d2c8068d2e449dc0b983c693ecd30501"
+        },
+        {
+          "find": "{\"b\": 3}\n",
+          "replace": "",
+          "oldSHA256": "fedef7fb9a0f6799574e4004c320c598d2c8068d2e449dc0b983c693ecd30501",
+          "newSHA256": "99d57a79d6977059723a2707cb679070a154785fff3299136a3b46a254b90c54"
+        }
+      ]
+    },
+    {
+      "lang": "json",
+      "id": "alt-json-B02-02",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "78cdc1afe5a98eac59af9e62e7a32291404df58d476a3b32f7eb454d96ef6601",
+      "edits": []
+    },
+    {
+      "lang": "json",
+      "id": "json-feature-r1",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "ddf24207b018c12ada8a3f8f96d308da812901a2f04efd72b4c0f8d7663a73c0",
+      "edits": [
+        {
+          "find": "  \"owner\": null,\n",
+          "replace": "  \"owner\": null,\n  \"archived\": false,\n",
+          "oldSHA256": "ddf24207b018c12ada8a3f8f96d308da812901a2f04efd72b4c0f8d7663a73c0",
+          "newSHA256": "f563419972010a78be921558667b0078e1d58357b2ba69d22c78df175232d740"
+        },
+        {
+          "find": "\"count\": 4,",
+          "replace": "\"count\": 40,",
+          "oldSHA256": "f563419972010a78be921558667b0078e1d58357b2ba69d22c78df175232d740",
+          "newSHA256": "8ac809ae65291c0cd393a318ee6d479f07ccc0e08a0953cf02fa3c330f00d6d6"
+        },
+        {
+          "find": ",\n    {\"id\": 3, \"name\": \"washer\", \"count\": 0, \"price\": 0.05}",
+          "replace": "",
+          "oldSHA256": "8ac809ae65291c0cd393a318ee6d479f07ccc0e08a0953cf02fa3c330f00d6d6",
+          "newSHA256": "de816cf17773c3061f2c267cc6a00af0bd2b0ecee2df5956ffbbe246eaa39263"
+        }
+      ]
+    },
+    {
+      "lang": "json",
+      "id": "alt-json-B01-05",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "edits": []
+    },
+    {
+      "lang": "json",
+      "id": "probe-json-B02-R-3",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "3d0835b28c85195a106fc1040d14a1a0c611948b33d4e199c84c32751003c800",
+      "edits": [
+        {
+          "find": "\"delta\": 1,",
+          "replace": "\"delta\": +1,",
+          "oldSHA256": "3d0835b28c85195a106fc1040d14a1a0c611948b33d4e199c84c32751003c800",
+          "newSHA256": "0195c120d7ef3c077da2b90d93b501206f2767dc05c1db56d55988de44a77929"
+        },
+        {
+          "find": "\"delta\": +1,",
+          "replace": "\"delta\": 1,",
+          "oldSHA256": "0195c120d7ef3c077da2b90d93b501206f2767dc05c1db56d55988de44a77929",
+          "newSHA256": "3d0835b28c85195a106fc1040d14a1a0c611948b33d4e199c84c32751003c800"
+        }
+      ]
+    },
+    {
+      "lang": "json",
+      "id": "alt-json-B01-06",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "76047ad45a1bddad4f527793e37985f0332e809a5e6d8f15e6bddcd682323524",
+      "edits": []
+    },
+    {
+      "lang": "json",
+      "id": "alt-json-B01-07",
+      "file": "src/testdata/native/routes/json.json",
+      "fileSHA256": "32170d23d6946675ed097736ffbfdc2ec4574997fcdd652ce0cb7bcf745f9989",
+      "sourceSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "edits": []
+    },
+    {
+      "lang": "python",
+      "id": "probe-python-V314-PNRE-1",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "e0e6511ef2e8a13e3c3450d7c22e7e8989b53a37d66e4ae0636af9efbeb402d5",
+      "edits": [
+        {
+          "find": "    except ValueError, TypeError:\n",
+          "replace": "    except ValueError, TypeError as exc:\n",
+          "oldSHA256": "e0e6511ef2e8a13e3c3450d7c22e7e8989b53a37d66e4ae0636af9efbeb402d5",
+          "newSHA256": "691b56d06fe2d96a63fdccc378ce148d8b5ba941b8da298aa684cbf3cb1c771d"
+        },
+        {
+          "find": "    except ValueError, TypeError as exc:\n",
+          "replace": "    except ValueError, TypeError:\n",
+          "oldSHA256": "691b56d06fe2d96a63fdccc378ce148d8b5ba941b8da298aa684cbf3cb1c771d",
+          "newSHA256": "e0e6511ef2e8a13e3c3450d7c22e7e8989b53a37d66e4ae0636af9efbeb402d5"
+        },
+        {
+          "find": "{name!r:>10}\"",
+          "replace": "{name!r:>10\"",
+          "oldSHA256": "e0e6511ef2e8a13e3c3450d7c22e7e8989b53a37d66e4ae0636af9efbeb402d5",
+          "newSHA256": "bdc45e3693150a7d10a5f13c55b3fc07d2d474c4633bda1b313f315800b31837"
+        },
+        {
+          "find": "{name!r:>10\"",
+          "replace": "{name!r:>10}\"",
+          "oldSHA256": "bdc45e3693150a7d10a5f13c55b3fc07d2d474c4633bda1b313f315800b31837",
+          "newSHA256": "e0e6511ef2e8a13e3c3450d7c22e7e8989b53a37d66e4ae0636af9efbeb402d5"
+        }
+      ]
+    },
+    {
+      "lang": "python",
+      "id": "alt-python-V310-04",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "d799f723cc38f12f602c60255d06ed88b7556ba7a4c9113c6dd9831ce28bac61",
+      "edits": []
+    },
+    {
+      "lang": "python",
+      "id": "python-recovery-r1",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "8f6003692223e49b91eacca6c3f9f7ec487e23aad5a836759c804cb1f3cd74e3",
+      "edits": [
+        {
+          "find": "for v in values:",
+          "replace": "for v in values",
+          "oldSHA256": "8f6003692223e49b91eacca6c3f9f7ec487e23aad5a836759c804cb1f3cd74e3",
+          "newSHA256": "59d14790c1262d3bf49a662c2809374b3fe11a312d1b3c86ebd315300bf987e8"
+        },
+        {
+          "find": "for v in values",
+          "replace": "for v in values:",
+          "oldSHA256": "59d14790c1262d3bf49a662c2809374b3fe11a312d1b3c86ebd315300bf987e8",
+          "newSHA256": "8f6003692223e49b91eacca6c3f9f7ec487e23aad5a836759c804cb1f3cd74e3"
+        }
+      ]
+    },
+    {
+      "lang": "python",
+      "id": "alt-python-B01-03",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "5ac6409558440ecb00dda1010a6317933f218f3350b2cd28e08dd61a7d0bce4a",
+      "edits": []
+    },
+    {
+      "lang": "python",
+      "id": "probe-python-V313-PN-1",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "6cdbdb09f146f8dc179289019d5239d3caf9a5a296b894703dbc76a986bf8666",
+      "edits": [
+        {
+          "find": "T = int]",
+          "replace": "T = ]",
+          "oldSHA256": "6cdbdb09f146f8dc179289019d5239d3caf9a5a296b894703dbc76a986bf8666",
+          "newSHA256": "f2a836d37b72fc56e8fba6fb04ca53c59c83c3b298bab85d065a581001db9831"
+        },
+        {
+          "find": "T = ]",
+          "replace": "T = int]",
+          "oldSHA256": "f2a836d37b72fc56e8fba6fb04ca53c59c83c3b298bab85d065a581001db9831",
+          "newSHA256": "6cdbdb09f146f8dc179289019d5239d3caf9a5a296b894703dbc76a986bf8666"
+        }
+      ]
+    },
+    {
+      "lang": "python",
+      "id": "alt-python-B03-05",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "d65ac09dc62e5f27fc05365418f141cfc119b108c3772afd1f4aa612a7a58084",
+      "edits": []
+    },
+    {
+      "lang": "python",
+      "id": "probe-python-B01-R-1",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "bc6d50fc51a5f48a1282940d12995b5e89aa50c9b0c8113a93ff6763a7932f09",
+      "edits": [
+        {
+          "find": "    return x\n",
+          "replace": "  return x\n",
+          "oldSHA256": "bc6d50fc51a5f48a1282940d12995b5e89aa50c9b0c8113a93ff6763a7932f09",
+          "newSHA256": "82856cfe30e8ec0483888115d910f0a81bacd49f61ba32fec51b4cb8d299b0e7"
+        },
+        {
+          "find": "  return x\n",
+          "replace": "    return x\n",
+          "oldSHA256": "82856cfe30e8ec0483888115d910f0a81bacd49f61ba32fec51b4cb8d299b0e7",
+          "newSHA256": "bc6d50fc51a5f48a1282940d12995b5e89aa50c9b0c8113a93ff6763a7932f09"
+        }
+      ]
+    },
+    {
+      "lang": "python",
+      "id": "alt-python-B01-02",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "acb251afbb6b3aaa88012660e2a1bfd3874f48587b50c77414a9d2f93fcfb966",
+      "edits": []
+    },
+    {
+      "lang": "python",
+      "id": "probe-python-B03-R-1",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "15da3f094ed665281b426eb752b87d7c13ba48985f282c3305ed2c5324643426",
+      "edits": [
+        {
+          "find": "    except OSError as exc:\n",
+          "replace": "    except OSError as exc\n",
+          "oldSHA256": "15da3f094ed665281b426eb752b87d7c13ba48985f282c3305ed2c5324643426",
+          "newSHA256": "8bc04d8bf0a65bcd8b832ad5e05c70d39e43d49c9917669767286a9fbbfc637e"
+        },
+        {
+          "find": "    except OSError as exc\n",
+          "replace": "    except OSError as exc:\n",
+          "oldSHA256": "8bc04d8bf0a65bcd8b832ad5e05c70d39e43d49c9917669767286a9fbbfc637e",
+          "newSHA256": "15da3f094ed665281b426eb752b87d7c13ba48985f282c3305ed2c5324643426"
+        }
+      ]
+    },
+    {
+      "lang": "python",
+      "id": "alt-python-V310-03",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "292b116142ebc6d5916e70cb2f24d18498eaf12ad448600be31de80be5b090ce",
+      "edits": []
+    },
+    {
+      "lang": "python",
+      "id": "probe-python-V310-NR-1",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "6de61e036372a5db7a45210b13e857583e4cac1b79f9593e62f2bb04637e5552",
+      "edits": [
+        {
+          "find": " if direction in DIRS:",
+          "replace": " if :",
+          "oldSHA256": "6de61e036372a5db7a45210b13e857583e4cac1b79f9593e62f2bb04637e5552",
+          "newSHA256": "26148a639512c2240cbf65f25094433f1e066e7a002ece431a303a676f4e1b5f"
+        },
+        {
+          "find": " if :",
+          "replace": " if direction in DIRS:",
+          "oldSHA256": "26148a639512c2240cbf65f25094433f1e066e7a002ece431a303a676f4e1b5f",
+          "newSHA256": "6de61e036372a5db7a45210b13e857583e4cac1b79f9593e62f2bb04637e5552"
+        },
+        {
+          "find": "case Point(x=0, y=0) | {\"origin\": True}:",
+          "replace": "case Point(x=0, y=0) | {\"origin\": True}",
+          "oldSHA256": "6de61e036372a5db7a45210b13e857583e4cac1b79f9593e62f2bb04637e5552",
+          "newSHA256": "ec6464d174425e940831a88c0a9364d77589a86fea387d8b0a76018f007fccef"
+        },
+        {
+          "find": "case Point(x=0, y=0) | {\"origin\": True}",
+          "replace": "case Point(x=0, y=0) | {\"origin\": True}:",
+          "oldSHA256": "ec6464d174425e940831a88c0a9364d77589a86fea387d8b0a76018f007fccef",
+          "newSHA256": "6de61e036372a5db7a45210b13e857583e4cac1b79f9593e62f2bb04637e5552"
+        }
+      ]
+    },
+    {
+      "lang": "python",
+      "id": "alt-python-B02-02",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "a845a753c754a17cbd390011390599c7be10cedd0b766ebbd766fda43ba6ba0d",
+      "edits": []
+    },
+    {
+      "lang": "python",
+      "id": "probe-python-V38-N-1",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "4993af68304ceb534b1d27724002dde82bed935fe7c4a0af2baa91a087010496",
+      "edits": [
+        {
+          "find": "/, c, *",
+          "replace": "*, c, /",
+          "oldSHA256": "4993af68304ceb534b1d27724002dde82bed935fe7c4a0af2baa91a087010496",
+          "newSHA256": "a7558ffd5f93fe7dd31871220c41bfdda7912b61a304291df9f2411f075c17c2"
+        },
+        {
+          "find": "*, c, /",
+          "replace": "/, c, *",
+          "oldSHA256": "a7558ffd5f93fe7dd31871220c41bfdda7912b61a304291df9f2411f075c17c2",
+          "newSHA256": "4993af68304ceb534b1d27724002dde82bed935fe7c4a0af2baa91a087010496"
+        }
+      ]
+    },
+    {
+      "lang": "python",
+      "id": "alt-python-B02-05",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "c51d3e90977f470902153aec1082db31e19cf5950bcebd64c802660ac1816861",
+      "edits": []
+    },
+    {
+      "lang": "python",
+      "id": "probe-python-V311-PNR-1",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "4b511988f3e52bd48ee6b723bd874ce2ea7f6808cba0b7b445c91cb33ab02656",
+      "edits": [
+        {
+          "find": "except* (TypeError, KeyError):",
+          "replace": "except (TypeError, KeyError):",
+          "oldSHA256": "4b511988f3e52bd48ee6b723bd874ce2ea7f6808cba0b7b445c91cb33ab02656",
+          "newSHA256": "bc53e87d1dc57ffcb9045a2e099723a3a54b3df3753e1ebecf4a6397821db3f3"
+        },
+        {
+          "find": "except (TypeError, KeyError):",
+          "replace": "except* (TypeError, KeyError):",
+          "oldSHA256": "bc53e87d1dc57ffcb9045a2e099723a3a54b3df3753e1ebecf4a6397821db3f3",
+          "newSHA256": "4b511988f3e52bd48ee6b723bd874ce2ea7f6808cba0b7b445c91cb33ab02656"
+        },
+        {
+          "find": "except* ValueError as group:",
+          "replace": "except* ValueError as group",
+          "oldSHA256": "4b511988f3e52bd48ee6b723bd874ce2ea7f6808cba0b7b445c91cb33ab02656",
+          "newSHA256": "efbcceda697682c5a2c02114284558ca505abab71b703f1e161c20c51956b81a"
+        },
+        {
+          "find": "except* ValueError as group\n",
+          "replace": "except* ValueError as group:\n",
+          "oldSHA256": "efbcceda697682c5a2c02114284558ca505abab71b703f1e161c20c51956b81a",
+          "newSHA256": "4b511988f3e52bd48ee6b723bd874ce2ea7f6808cba0b7b445c91cb33ab02656"
+        }
+      ]
+    },
+    {
+      "lang": "python",
+      "id": "alt-python-V311-01",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "0594871b1a63f4b52d8bc1c883967384794efa040e2c4aa726f80bcac26ec445",
+      "edits": []
+    },
+    {
+      "lang": "python",
+      "id": "probe-python-V312-NR-1",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "ecb55b237abe3748088c154a2534949e7372f9f1d6dcb08c1a608fbfcd8d1a15",
+      "edits": [
+        {
+          "find": "def first[T](",
+          "replace": "def first[](",
+          "oldSHA256": "ecb55b237abe3748088c154a2534949e7372f9f1d6dcb08c1a608fbfcd8d1a15",
+          "newSHA256": "1e6dd868836cfac2542433df87af937d6ca2381b014648eee67e49e16c153e3c"
+        },
+        {
+          "find": "def first[](",
+          "replace": "def first[T](",
+          "oldSHA256": "1e6dd868836cfac2542433df87af937d6ca2381b014648eee67e49e16c153e3c",
+          "newSHA256": "ecb55b237abe3748088c154a2534949e7372f9f1d6dcb08c1a608fbfcd8d1a15"
+        },
+        {
+          "find": "**P]:",
+          "replace": "**P:",
+          "oldSHA256": "ecb55b237abe3748088c154a2534949e7372f9f1d6dcb08c1a608fbfcd8d1a15",
+          "newSHA256": "0003d70c3d06a87e9ee8f577babe7be120f35e9f16fca0bc5fc87df7187a23e4"
+        },
+        {
+          "find": "**P:",
+          "replace": "**P]:",
+          "oldSHA256": "0003d70c3d06a87e9ee8f577babe7be120f35e9f16fca0bc5fc87df7187a23e4",
+          "newSHA256": "ecb55b237abe3748088c154a2534949e7372f9f1d6dcb08c1a608fbfcd8d1a15"
+        }
+      ]
+    },
+    {
+      "lang": "python",
+      "id": "alt-python-B01-05",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "b09886bedb1f7b122d014e1688437201a9429cbbae9f05f835d13e738ebbd548",
+      "edits": []
+    },
+    {
+      "lang": "python",
+      "id": "probe-python-B02-NR-1",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "93a5c8b83d485b70ab71a9085d37feaa98900be78ada956b09f70367fdb7265e",
+      "edits": [
+        {
+          "find": "if x % 2)",
+          "replace": "if x %)",
+          "oldSHA256": "93a5c8b83d485b70ab71a9085d37feaa98900be78ada956b09f70367fdb7265e",
+          "newSHA256": "ed2ad732b80c3c243d28b0266e5e8c1fdaa023e10e49bd915e34a8f27baa6318"
+        },
+        {
+          "find": "if x %)",
+          "replace": "if x % 2)",
+          "oldSHA256": "ed2ad732b80c3c243d28b0266e5e8c1fdaa023e10e49bd915e34a8f27baa6318",
+          "newSHA256": "93a5c8b83d485b70ab71a9085d37feaa98900be78ada956b09f70367fdb7265e"
+        },
+        {
+          "find": "[v * k for v in values if v]",
+          "replace": "[v * k for in values if v]",
+          "oldSHA256": "93a5c8b83d485b70ab71a9085d37feaa98900be78ada956b09f70367fdb7265e",
+          "newSHA256": "ffc58d8765553e5f9a3d0e9a9299db18318d10a7e8f337cdd07a3588899176ff"
+        },
+        {
+          "find": "[v * k for in values if v]",
+          "replace": "[v * k for v in values if v]",
+          "oldSHA256": "ffc58d8765553e5f9a3d0e9a9299db18318d10a7e8f337cdd07a3588899176ff",
+          "newSHA256": "93a5c8b83d485b70ab71a9085d37feaa98900be78ada956b09f70367fdb7265e"
+        }
+      ]
+    },
+    {
+      "lang": "python",
+      "id": "alt-python-V38-01",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "5d0976c16d145a6eeaa59d70212b0c428eb20de65be3792b56c2c160d7aadfe6",
+      "edits": []
+    },
+    {
+      "lang": "python",
+      "id": "probe-python-V39-PN-1",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "b5bc00f44632891e2e99d26591a9bdcb4770256df55ef8234d159d3045950a74",
+      "edits": [
+        {
+          "find": "@registry := make_registry()",
+          "replace": "@registry = make_registry()",
+          "oldSHA256": "b5bc00f44632891e2e99d26591a9bdcb4770256df55ef8234d159d3045950a74",
+          "newSHA256": "0588d90d8ac84c1c80bea0e2a490c94b31f2de068fe6b382614d0a8a610b054b"
+        },
+        {
+          "find": "@registry = make_registry()",
+          "replace": "@registry := make_registry()",
+          "oldSHA256": "0588d90d8ac84c1c80bea0e2a490c94b31f2de068fe6b382614d0a8a610b054b",
+          "newSHA256": "b5bc00f44632891e2e99d26591a9bdcb4770256df55ef8234d159d3045950a74"
+        }
+      ]
+    },
+    {
+      "lang": "python",
+      "id": "alt-python-B03-01",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "86bd2a8846d49dcd92c2218e68c991f65c45959bca327df53dd0fbf074245a8a",
+      "edits": []
+    },
+    {
+      "lang": "python",
+      "id": "python-feature-r1",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "a39c422969cfc690d6b84b96ce69044c0a6ef0ec34b268d34008fe7d83938997",
+      "edits": [
+        {
+          "find": "    tags: list[str] = field(default_factory=list)\n",
+          "replace": "    tags: list[str] = field(default_factory=list)\n    price: float = 0.0\n",
+          "oldSHA256": "a39c422969cfc690d6b84b96ce69044c0a6ef0ec34b268d34008fe7d83938997",
+          "newSHA256": "cb2641ae11c8509e05fe7f293fa4515e1dbd82714d13605e85521dd1ae7001fc"
+        },
+        {
+          "find": "return \"empty\"",
+          "replace": "return \"none\"",
+          "oldSHA256": "cb2641ae11c8509e05fe7f293fa4515e1dbd82714d13605e85521dd1ae7001fc",
+          "newSHA256": "1f901a4c7cd0d060f396bfe500e51819f4a5844d2352e8dd972eaa3ece30b8f4"
+        },
+        {
+          "find": "    finally:\n        pass\n",
+          "replace": "",
+          "oldSHA256": "1f901a4c7cd0d060f396bfe500e51819f4a5844d2352e8dd972eaa3ece30b8f4",
+          "newSHA256": "3a3ef6f3f5e4d486f30bf699ab6afd30a731943e84b96ae0a5edab922e301321"
+        }
+      ]
+    },
+    {
+      "lang": "python",
+      "id": "alt-python-V310-01",
+      "file": "src/testdata/native/routes/python.json",
+      "fileSHA256": "0b1e32da1b69a706106fb55c4af83c321da1561089e9a611d189151990277d1d",
+      "sourceSHA256": "bb0179de308f6089ad132a97ccfd0e9aa67d6957e28fd75755de2c15c1f5410e",
+      "edits": []
+    },
+    {
+      "lang": "tsql",
+      "id": "tsql-r6-feature-r1",
+      "file": "src/testdata/native/routes/tsql.json",
+      "fileSHA256": "7ab8ee7ce3fc7898fac6d646e4becc61dcb0b1c4a5e5cb7f9d7ec4f8ca6faaf4",
+      "sourceSHA256": "bb013445662884d442893330cbae9fdb28345ea1a8541c7ef00d63c435a633f6",
+      "edits": [
+        {
+          "find": "ONLINE = OFF",
+          "replace": "ONLINE = ON",
+          "oldSHA256": "bb013445662884d442893330cbae9fdb28345ea1a8541c7ef00d63c435a633f6",
+          "newSHA256": "c8b5ba57fa210785c3e9bc5c5fcaa849802a06b61cfedce315b540c8384fc346"
+        },
+        {
+          "find": "PRIMARY KEY (Id),",
+          "replace": "PRIMARY KEY (Id ASCX),",
+          "oldSHA256": "c8b5ba57fa210785c3e9bc5c5fcaa849802a06b61cfedce315b540c8384fc346",
+          "newSHA256": "c63fd863e0ae7f027caa172a69725e0fc55b23ece57d0cd115ff4ea2961ecb7f"
+        }
+      ]
+    },
+    {
+      "lang": "tsql",
+      "id": "alt-tsql-B03-r048",
+      "file": "src/testdata/native/routes/tsql.json",
+      "fileSHA256": "7ab8ee7ce3fc7898fac6d646e4becc61dcb0b1c4a5e5cb7f9d7ec4f8ca6faaf4",
+      "sourceSHA256": "301b3fff5d2ff70d487399a7e45406c31e2dc9c3c2c9d67257768ca836eb85e8",
+      "edits": []
+    },
+    {
+      "lang": "tsql",
+      "id": "tsql-issue137-policy-default-r1",
+      "file": "src/testdata/native/gaps/tsql.json",
+      "fileSHA256": "7ba3b02edb80bd900fa34b32ecd709971299fb21ccf311547699b2d933cd5fe5",
+      "sourceSHA256": "d4a2cd6de1e0bc38667a932dab128c7918fcf761512935a75dee5c8f1e026a53",
+      "edits": [
+        {
+          "find": "a",
+          "replace": "DEFAULT",
+          "oldSHA256": "d4a2cd6de1e0bc38667a932dab128c7918fcf761512935a75dee5c8f1e026a53",
+          "newSHA256": "23b00d9316c84549aaf30e0f45f1b112294760e402ef2eccb24a8a267dc36d67"
+        },
+        {
+          "find": "DEFAULT",
+          "replace": "a",
+          "oldSHA256": "23b00d9316c84549aaf30e0f45f1b112294760e402ef2eccb24a8a267dc36d67",
+          "newSHA256": "d4a2cd6de1e0bc38667a932dab128c7918fcf761512935a75dee5c8f1e026a53"
+        }
+      ]
+    },
+    {
+      "lang": "tsql",
+      "id": "tsql-gap-issue131-merge-boundary-merge-composable-cte-r1",
+      "file": "src/testdata/native/gaps/tsql.json",
+      "fileSHA256": "7ba3b02edb80bd900fa34b32ecd709971299fb21ccf311547699b2d933cd5fe5",
+      "sourceSHA256": "3e7c9a9cae7a683d2d4065daeaa0dccdafa96c9dc3678b2e4f3b720753d13fbc",
+      "edits": []
+    },
+    {
+      "lang": "tsql",
+      "id": "alt-tsql-B01-r002",
+      "file": "src/testdata/native/routes/tsql.json",
+      "fileSHA256": "7ab8ee7ce3fc7898fac6d646e4becc61dcb0b1c4a5e5cb7f9d7ec4f8ca6faaf4",
+      "sourceSHA256": "4bbf2680b4b3079e60ad09e15be183b7fe6bb12f742206fd3eabd635989417f9",
+      "edits": [
+        {
+          "find": "",
+          "replace": "\nGO\nSET QUOTED_IDENTIFIER -- c\r\n ON\r\nSELECT \"x\"\r\n",
+          "oldSHA256": "4bbf2680b4b3079e60ad09e15be183b7fe6bb12f742206fd3eabd635989417f9",
+          "newSHA256": "bacd536c1daad9d70905db6b2f68ef8fe0bc2c66142961ecc2970b40c66d432a"
+        },
+        {
+          "find": "\nGO\nSET QUOTED_IDENTIFIER -- c\r\n ON\r\nSELECT \"x\"\r\n",
+          "replace": "\nGO\n-- c\r\nSELECT 1;\r\n-- trailing",
+          "oldSHA256": "bacd536c1daad9d70905db6b2f68ef8fe0bc2c66142961ecc2970b40c66d432a",
+          "newSHA256": "ea3acb4b365a780c73f8d4bb75d673cec56df540ce8852eb5ace4e3c76ce033e"
+        },
+        {
+          "find": "\nGO\n-- c\r\nSELECT 1;\r\n-- trailing",
+          "replace": "\nGO\nSET QUOTED_IDENTIFIER -- c\r OFF\rSELECT \"x\"\r",
+          "oldSHA256": "ea3acb4b365a780c73f8d4bb75d673cec56df540ce8852eb5ace4e3c76ce033e",
+          "newSHA256": "7984072d449195cfdeb488e947afd06d4af7f238d9c280d88dc23910ba473289"
+        },
+        {
+          "find": "\nGO\nSET QUOTED_IDENTIFIER -- c\r OFF\rSELECT \"x\"\r",
+          "replace": "\nGO\nSET QUOTED_IDENTIFIER -- c\r ON\rSELECT \"x\"\r",
+          "oldSHA256": "7984072d449195cfdeb488e947afd06d4af7f238d9c280d88dc23910ba473289",
+          "newSHA256": "d36d9efc39a145be29df87d35d2f2639cb436c60e8f0070a114488dfc6679b8f"
+        }
+      ]
+    },
+    {
+      "lang": "tsql",
+      "id": "alt-tsql-B03-r223",
+      "file": "src/testdata/native/routes/tsql.json",
+      "fileSHA256": "7ab8ee7ce3fc7898fac6d646e4becc61dcb0b1c4a5e5cb7f9d7ec4f8ca6faaf4",
+      "sourceSHA256": "156b0a5d568a71bf04cc00ea8f993c3743007d1c00567916b16e1b2b94330da8",
+      "edits": []
+    },
+    {
+      "lang": "tsql",
+      "id": "tsql-issue137-between-not-between-r1",
+      "file": "src/testdata/native/gaps/tsql.json",
+      "fileSHA256": "7ba3b02edb80bd900fa34b32ecd709971299fb21ccf311547699b2d933cd5fe5",
+      "sourceSHA256": "d3e1792929dca2adc646cb81c446032b1131869be62d3bae263eb78d0492600d",
+      "edits": [
+        {
+          "find": " 2",
+          "replace": "",
+          "oldSHA256": "d3e1792929dca2adc646cb81c446032b1131869be62d3bae263eb78d0492600d",
+          "newSHA256": "6642f8b4a0a3af9a2a909131f51ff2f1cfcecba53926a1cada2669238bb99d68"
+        },
+        {
+          "find": " 1 AND",
+          "replace": " 1 AND 2",
+          "oldSHA256": "6642f8b4a0a3af9a2a909131f51ff2f1cfcecba53926a1cada2669238bb99d68",
+          "newSHA256": "d3e1792929dca2adc646cb81c446032b1131869be62d3bae263eb78d0492600d"
+        }
+      ]
+    },
+    {
+      "lang": "tsql",
+      "id": "tsql-gap-issue132-control-multi-predicate-r1",
+      "file": "src/testdata/native/gaps/tsql.json",
+      "fileSHA256": "7ba3b02edb80bd900fa34b32ecd709971299fb21ccf311547699b2d933cd5fe5",
+      "sourceSHA256": "d594cb7c3e0384b933e4e84697e7abb1b50c34e4084d8f5f8e246edf71ede4e8",
+      "edits": []
+    },
+    {
+      "lang": "tsql",
+      "id": "tsql-r6-begin-semicolon-r1",
+      "file": "src/testdata/native/routes/tsql.json",
+      "fileSHA256": "7ab8ee7ce3fc7898fac6d646e4becc61dcb0b1c4a5e5cb7f9d7ec4f8ca6faaf4",
+      "sourceSHA256": "62412c0212b2c47e45c47e493e89a4b57bb167815ba629ba0cb4181ad70c63fc",
+      "edits": [
+        {
+          "find": "    BEGIN;\n",
+          "replace": "    BEGIN\n",
+          "oldSHA256": "62412c0212b2c47e45c47e493e89a4b57bb167815ba629ba0cb4181ad70c63fc",
+          "newSHA256": "daf11d7da0d10ce5f750a208fd4d2b43dc726797561fd695b87f15b0eaa9ca3e"
+        }
+      ]
+    },
+    {
+      "lang": "tsql",
+      "id": "alt-tsql-B04-r060",
+      "file": "src/testdata/native/routes/tsql.json",
+      "fileSHA256": "7ab8ee7ce3fc7898fac6d646e4becc61dcb0b1c4a5e5cb7f9d7ec4f8ca6faaf4",
+      "sourceSHA256": "c04e6e58fbe77b9d0b57bfe0b83bdc0b915db8d3365dd056b67608482df9a771",
+      "edits": []
+    },
+    {
+      "lang": "tsql",
+      "id": "tsql-gap-issue134-drop-on-r1",
+      "file": "src/testdata/native/gaps/tsql.json",
+      "fileSHA256": "7ba3b02edb80bd900fa34b32ecd709971299fb21ccf311547699b2d933cd5fe5",
+      "sourceSHA256": "47bc893e1edfb605e3e2ae91212da13b3e75159bc75755e81a2c0f082a97f460",
+      "edits": [
+        {
+          "find": "SET QUOTED_IDENTIFIER OFF; ALTER ASSEMBLY a DROP FILE \"src\";",
+          "replace": "SET QUOTED_IDENTIFIER ON; ALTER ASSEMBLY a DROP FILE \"src\";",
+          "oldSHA256": "47bc893e1edfb605e3e2ae91212da13b3e75159bc75755e81a2c0f082a97f460",
+          "newSHA256": "ef850c8bd6dd3180b0448925d848fa944dbf1ea748f58ac1e615b660b51e8422"
+        },
+        {
+          "find": "SET QUOTED_IDENTIFIER ON; ALTER ASSEMBLY a DROP FILE \"src\";",
+          "replace": "SET QUOTED_IDENTIFIER OFF; ALTER ASSEMBLY a DROP FILE \"src\";",
+          "oldSHA256": "ef850c8bd6dd3180b0448925d848fa944dbf1ea748f58ac1e615b660b51e8422",
+          "newSHA256": "47bc893e1edfb605e3e2ae91212da13b3e75159bc75755e81a2c0f082a97f460"
+        }
+      ]
+    },
+    {
+      "lang": "tsql",
+      "id": "tsql-gap-issue132-control-next-cte-r1",
+      "file": "src/testdata/native/gaps/tsql.json",
+      "fileSHA256": "7ba3b02edb80bd900fa34b32ecd709971299fb21ccf311547699b2d933cd5fe5",
+      "sourceSHA256": "878637e44b4c6af029561bf55752df95683c6ef4e71a0b67462c6e3169fa1034",
+      "edits": []
+    },
+    {
+      "lang": "tsql",
+      "id": "tsql-feature-r1",
+      "file": "src/testdata/native/routes/tsql.json",
+      "fileSHA256": "7ab8ee7ce3fc7898fac6d646e4becc61dcb0b1c4a5e5cb7f9d7ec4f8ca6faaf4",
+      "sourceSHA256": "0135deac9c77821559a21e796d8d50c1bacfbe32931ff881b47e389aeb375571",
+      "edits": [
+        {
+          "find": "    Price DECIMAL(10, 2) NULL\n);\nGO\n",
+          "replace": "    Price DECIMAL(10, 2) NULL\n);\nGO\n\nCREATE INDEX IX_Items_Name ON dbo.Items (Name);\nGO\n",
+          "oldSHA256": "0135deac9c77821559a21e796d8d50c1bacfbe32931ff881b47e389aeb375571",
+          "newSHA256": "8e6a393ced382cd2c670a729c8c18b1e3ef68ab637ae7e18e7586ff659274339"
+        },
+        {
+          "find": "Quantity > 100",
+          "replace": "Quantity > 500",
+          "oldSHA256": "8e6a393ced382cd2c670a729c8c18b1e3ef68ab637ae7e18e7586ff659274339",
+          "newSHA256": "16bca84ec6ad347cd8298933ff6afd94c6c911878f957234640bfe692ff792e0"
+        },
+        {
+          "find": "-- Report items with their stock level.\n",
+          "replace": "",
+          "oldSHA256": "16bca84ec6ad347cd8298933ff6afd94c6c911878f957234640bfe692ff792e0",
+          "newSHA256": "a6bff2a284793cf26f476e26d5eeaca3896cba4686afd8d97d45325bf56ea38d"
+        }
+      ]
+    },
+    {
+      "lang": "tsql",
+      "id": "alt-tsql-B01-r007",
+      "file": "src/testdata/native/routes/tsql.json",
+      "fileSHA256": "7ab8ee7ce3fc7898fac6d646e4becc61dcb0b1c4a5e5cb7f9d7ec4f8ca6faaf4",
+      "sourceSHA256": "814d7c1c34ee51f3153cc6d2333a6e0b2b37924bf11c8cfd07f92c6a65b69c4c",
+      "edits": []
+    },
+    {
+      "lang": "tsql",
+      "id": "tsql-issue149-syntax-pair-09-r1",
+      "file": "src/testdata/native/gaps/tsql.json",
+      "fileSHA256": "7ba3b02edb80bd900fa34b32ecd709971299fb21ccf311547699b2d933cd5fe5",
+      "sourceSHA256": "dad9e38f2f2f01a58ba469f81c191469e75be56c697b0db3ea1d451ed4ce4cd0",
+      "edits": [
+        {
+          "find": "-- issue149-delete-target-arg-5\n-- issue149-delete-target-arg-5\nSELECT 1 AS recovery_value;\nGO\n",
+          "replace": "-- issue149-delete-target-arg-5\n-- issue149-delete-target-arg-5\nDECLARE @a int=1; DELETE FROM dbo.f(1+2);\n\nGO\n",
+          "oldSHA256": "dad9e38f2f2f01a58ba469f81c191469e75be56c697b0db3ea1d451ed4ce4cd0",
+          "newSHA256": "58b5566ca6f2924dd56b8c33dd85d4903d71eaca80572fd1e06df45053b9ae86"
+        },
+        {
+          "find": "-- issue149-delete-target-arg-5\n-- issue149-delete-target-arg-5\nDECLARE @a int=1; DELETE FROM dbo.f(1+2);\n\nGO\n",
+          "replace": "-- issue149-delete-target-arg-5\n-- issue149-delete-target-arg-5\nSELECT 1 AS recovery_value;\nGO\n",
+          "oldSHA256": "58b5566ca6f2924dd56b8c33dd85d4903d71eaca80572fd1e06df45053b9ae86",
+          "newSHA256": "dad9e38f2f2f01a58ba469f81c191469e75be56c697b0db3ea1d451ed4ce4cd0"
+        },
+        {
+          "find": "-- issue149-delete-target-arg-6\n-- issue149-delete-target-arg-6\nSELECT 1 AS recovery_value;\nGO\n",
+          "replace": "-- issue149-delete-target-arg-6\n-- issue149-delete-target-arg-6\nDECLARE @a int=1; DELETE FROM dbo.f((1));\n\nGO\n",
+          "oldSHA256": "dad9e38f2f2f01a58ba469f81c191469e75be56c697b0db3ea1d451ed4ce4cd0",
+          "newSHA256": "0b9a1b4bed4819ac51d720eed45a57896052f1a773e37a4e4fa9d4a618a47236"
+        },
+        {
+          "find": "-- issue149-delete-target-arg-6\n-- issue149-delete-target-arg-6\nDECLARE @a int=1; DELETE FROM dbo.f((1));\n\nGO\n",
+          "replace": "-- issue149-delete-target-arg-6\n-- issue149-delete-target-arg-6\nSELECT 1 AS recovery_value;\nGO\n",
+          "oldSHA256": "0b9a1b4bed4819ac51d720eed45a57896052f1a773e37a4e4fa9d4a618a47236",
+          "newSHA256": "dad9e38f2f2f01a58ba469f81c191469e75be56c697b0db3ea1d451ed4ce4cd0"
+        }
+      ]
+    },
+    {
+      "lang": "tsql",
+      "id": "tsql-gap-issue131-review-control-qualified-column-default-r1",
+      "file": "src/testdata/native/gaps/tsql.json",
+      "fileSHA256": "7ba3b02edb80bd900fa34b32ecd709971299fb21ccf311547699b2d933cd5fe5",
+      "sourceSHA256": "d8826d06dcb7232d494b572592525e4dec6dc82b7bb0820b1e5b86b849f9dac3",
+      "edits": []
+    },
+    {
+      "lang": "tsql",
+      "id": "probe-tsql-V22-PNREQ-1",
+      "file": "src/testdata/native/routes/tsql.json",
+      "fileSHA256": "7ab8ee7ce3fc7898fac6d646e4becc61dcb0b1c4a5e5cb7f9d7ec4f8ca6faaf4",
+      "sourceSHA256": "8f0ebaa2b47e668513a98dea8f47728b636552ad295bfd9345086abd33a1286f",
+      "edits": [
+        {
+          "find": "a IS DISTINCT FROM b",
+          "replace": "a IS DISTINCT b",
+          "oldSHA256": "8f0ebaa2b47e668513a98dea8f47728b636552ad295bfd9345086abd33a1286f",
+          "newSHA256": "02e862b125eecf9e65e82c35464968e665b06bf8beaf16544536c3d84fda1530"
+        },
+        {
+          "find": "a IS DISTINCT b",
+          "replace": "a IS DISTINCT FROM b",
+          "oldSHA256": "02e862b125eecf9e65e82c35464968e665b06bf8beaf16544536c3d84fda1530",
+          "newSHA256": "8f0ebaa2b47e668513a98dea8f47728b636552ad295bfd9345086abd33a1286f"
+        }
+      ]
+    },
+    {
+      "lang": "tsql",
+      "id": "alt-tsql-B03-r054",
+      "file": "src/testdata/native/routes/tsql.json",
+      "fileSHA256": "7ab8ee7ce3fc7898fac6d646e4becc61dcb0b1c4a5e5cb7f9d7ec4f8ca6faaf4",
+      "sourceSHA256": "af4443054238c100010a34e84323dc15d689f92e29091f8fea347b8056996444",
+      "edits": []
+    },
+    {
+      "lang": "tsql",
+      "id": "tsql-gap-issue131-schema-r1",
+      "file": "src/testdata/native/gaps/tsql.json",
+      "fileSHA256": "7ba3b02edb80bd900fa34b32ecd709971299fb21ccf311547699b2d933cd5fe5",
+      "sourceSHA256": "e2276975b8d3aff5840c3f71e857ad6fade7b25c85c6c2a5fa02afd058339b69",
+      "edits": [
+        {
+          "find": "[schema]",
+          "replace": "schema",
+          "oldSHA256": "e2276975b8d3aff5840c3f71e857ad6fade7b25c85c6c2a5fa02afd058339b69",
+          "newSHA256": "f8a77883696e8fcff6ba627a1d8cb882542b62193cae4d569741a5d64919c483"
+        },
+        {
+          "find": "schema",
+          "replace": "[schema]",
+          "oldSHA256": "f8a77883696e8fcff6ba627a1d8cb882542b62193cae4d569741a5d64919c483",
+          "newSHA256": "e2276975b8d3aff5840c3f71e857ad6fade7b25c85c6c2a5fa02afd058339b69"
+        },
+        {
+          "find": "t;",
+          "replace": "t;\nGO\nSELECT 1 FROM dbo.t GROUP BY CUBE(());",
+          "oldSHA256": "e2276975b8d3aff5840c3f71e857ad6fade7b25c85c6c2a5fa02afd058339b69",
+          "newSHA256": "9faf05b80b4475cba437c2a2327abe049ae636f16dd27578ce3e3857bbf5e6cc"
+        },
+        {
+          "find": "((",
+          "replace": "((a,b),(",
+          "oldSHA256": "9faf05b80b4475cba437c2a2327abe049ae636f16dd27578ce3e3857bbf5e6cc",
+          "newSHA256": "20d9c71fbccfce9295d53e018f30416d6269323ac68a3e928f69807c6ed92994"
+        }
+      ]
+    },
+    {
+      "lang": "tsql",
+      "id": "tsql-gap-issue134-control-multi-r1",
+      "file": "src/testdata/native/gaps/tsql.json",
+      "fileSHA256": "7ba3b02edb80bd900fa34b32ecd709971299fb21ccf311547699b2d933cd5fe5",
+      "sourceSHA256": "3a9d8b59f249dbd14b8991328fff1479a2ca50369ca5265da142d83be1822077",
+      "edits": []
+    },
+    {
+      "lang": "tsql",
+      "id": "alt-tsql-B01-r001",
+      "file": "src/testdata/native/routes/tsql.json",
+      "fileSHA256": "7ab8ee7ce3fc7898fac6d646e4becc61dcb0b1c4a5e5cb7f9d7ec4f8ca6faaf4",
+      "sourceSHA256": "f8e9d8978514ccf130d7aafd71da4ffd17ac51928ffb8e29c598da4acdf8dc2e",
+      "edits": [
+        {
+          "find": "",
+          "replace": "\nGO\nSET QUOTED_IDENTIFIER -- c\n OFF\nSELECT \"x\"\n",
+          "oldSHA256": "f8e9d8978514ccf130d7aafd71da4ffd17ac51928ffb8e29c598da4acdf8dc2e",
+          "newSHA256": "57b35f1abfe12dc17b5b20bd5effe6e010e1e346d59dbd6c517a4a17e157004c"
+        },
+        {
+          "find": "\nGO\nSET QUOTED_IDENTIFIER -- c\n OFF\nSELECT \"x\"\n",
+          "replace": "\nGO\nSET QUOTED_IDENTIFIER -- c\n ON\nSELECT \"x\"\n",
+          "oldSHA256": "57b35f1abfe12dc17b5b20bd5effe6e010e1e346d59dbd6c517a4a17e157004c",
+          "newSHA256": "e90c56c08d45307ece07e9873c12326fb0040d4c00a8d251d652a41a14c5b3ce"
+        },
+        {
+          "find": "\nGO\nSET QUOTED_IDENTIFIER -- c\n ON\nSELECT \"x\"\n",
+          "replace": "\nGO\n-- c\nSELECT 1;\n-- trailing",
+          "oldSHA256": "e90c56c08d45307ece07e9873c12326fb0040d4c00a8d251d652a41a14c5b3ce",
+          "newSHA256": "cadac1f1ef1970524ff50f43be56b5c8c87d52b39a96c0d1d158eb0071e3fe0e"
+        },
+        {
+          "find": "\nGO\n-- c\nSELECT 1;\n-- trailing",
+          "replace": "\nGO\nSET QUOTED_IDENTIFIER -- c\r\n OFF\r\nSELECT \"x\"\r\n",
+          "oldSHA256": "cadac1f1ef1970524ff50f43be56b5c8c87d52b39a96c0d1d158eb0071e3fe0e",
+          "newSHA256": "acde00321df1b96865420eaee55b2429cefc297a01bfb19685950b735f8e0ab2"
+        }
+      ]
+    },
+    {
+      "lang": "tsql",
+      "id": "alt-tsql-B03-r235",
+      "file": "src/testdata/native/routes/tsql.json",
+      "fileSHA256": "7ab8ee7ce3fc7898fac6d646e4becc61dcb0b1c4a5e5cb7f9d7ec4f8ca6faaf4",
+      "sourceSHA256": "45cadee7e47ae986a8114921972f41d524d44f596fe97d8159230aae81164322",
+      "edits": []
+    },
+    {
+      "lang": "tsql",
+      "id": "tsql-issue137-route-value-r1",
+      "file": "src/testdata/native/gaps/tsql.json",
+      "fileSHA256": "7ba3b02edb80bd900fa34b32ecd709971299fb21ccf311547699b2d933cd5fe5",
+      "sourceSHA256": "5865e9e939bfda6118360f635654492c63e643c0832fb700b27c975d6ab0c841",
+      "edits": [
+        {
+          "find": "'LOCAL'",
+          "replace": "1",
+          "oldSHA256": "5865e9e939bfda6118360f635654492c63e643c0832fb700b27c975d6ab0c841",
+          "newSHA256": "f26bc4159d1331ff1077b8d13720d199477d877edc03be74fef31cfa56802321"
+        },
+        {
+          "find": "1",
+          "replace": "'LOCAL'",
+          "oldSHA256": "f26bc4159d1331ff1077b8d13720d199477d877edc03be74fef31cfa56802321",
+          "newSHA256": "5865e9e939bfda6118360f635654492c63e643c0832fb700b27c975d6ab0c841"
+        }
+      ]
+    },
+    {
+      "lang": "tsql",
+      "id": "tsql-gap-issue131-merge-boundary-merge-composable-r1",
+      "file": "src/testdata/native/gaps/tsql.json",
+      "fileSHA256": "7ba3b02edb80bd900fa34b32ecd709971299fb21ccf311547699b2d933cd5fe5",
+      "sourceSHA256": "2f05bfa304c353790104f981afec102e8c31d19013754e43b5f550a182b69fef",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "tsx-feature-r1",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "b680059ca26462a6e8b591be4cdef64a707c91e2bed3192775c1d20778d102f2",
+      "edits": [
+        {
+          "find": "const identity = <T,>(value: T): T => value;\n",
+          "replace": "const identity = <T,>(value: T): T => value;\nconst MAX_ITEMS: number = 50;\n",
+          "oldSHA256": "b680059ca26462a6e8b591be4cdef64a707c91e2bed3192775c1d20778d102f2",
+          "newSHA256": "627c4a6ecfa687e840971bafe46d090a3ec4c9b2140f78d0972afea31e139593"
+        },
+        {
+          "find": "<p className=\"empty\">No items</p>",
+          "replace": "<p className=\"empty\">Empty list</p>",
+          "oldSHA256": "627c4a6ecfa687e840971bafe46d090a3ec4c9b2140f78d0972afea31e139593",
+          "newSHA256": "2cce47155a24dd3b641e4aa157e7e6183c99b06a93eea296bdd6ee5965be839a"
+        },
+        {
+          "find": "    <Button label=\"Add\" />\n",
+          "replace": "",
+          "oldSHA256": "2cce47155a24dd3b641e4aa157e7e6183c99b06a93eea296bdd6ee5965be839a",
+          "newSHA256": "08e37205efea62d0dfee1a852f3956988005ffe3ffb2098ec0fc0a400d99516b"
+        }
+      ]
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-33",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "4b9a69dd9817140f050909101f40b1243de8ec89901c2724024e263d7578eec4",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "tsx-gap-generic-arrow-r1",
+      "file": "src/testdata/native/gaps/tsx.json",
+      "fileSHA256": "ba00ff323496b110185bda9a34d06e4d4d784b36c778b8c3fa8651bc259d8065",
+      "sourceSHA256": "7a065213d32c7a39e4b1f2a839b338578b3bd691e78f32700acf7610b0989d41",
+      "edits": [
+        {
+          "find": "const wrap = <T,>",
+          "replace": "const wrap = <T>",
+          "oldSHA256": "7a065213d32c7a39e4b1f2a839b338578b3bd691e78f32700acf7610b0989d41",
+          "newSHA256": "7366dc716f3ada884304d90f60d737a42426856a6ca8ed98f4b2f25b2973aa70"
+        },
+        {
+          "find": "const wrap = <T>",
+          "replace": "const wrap = <T,>",
+          "oldSHA256": "7366dc716f3ada884304d90f60d737a42426856a6ca8ed98f4b2f25b2973aa70",
+          "newSHA256": "7a065213d32c7a39e4b1f2a839b338578b3bd691e78f32700acf7610b0989d41"
+        }
+      ]
+    },
+    {
+      "lang": "tsx",
+      "id": "tsx-recovery-r1",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "3e64f4e5702c82808c84885fbefc82ad534ff9cc52af4438cc235554afb4c1fd",
+      "edits": [
+        {
+          "find": "      <Hello name=\"tsx\" />\n    </main>\n",
+          "replace": "      <Hello name=\"tsx\" />\n",
+          "oldSHA256": "3e64f4e5702c82808c84885fbefc82ad534ff9cc52af4438cc235554afb4c1fd",
+          "newSHA256": "b1920ac4eaeeba1509fe16d6dcfc5e8ef0147377f5ed2287724f0e054b7b3266"
+        },
+        {
+          "find": "      <Hello name=\"tsx\" />\n",
+          "replace": "      <Hello name=\"tsx\" />\n    </main>\n",
+          "oldSHA256": "b1920ac4eaeeba1509fe16d6dcfc5e8ef0147377f5ed2287724f0e054b7b3266",
+          "newSHA256": "3e64f4e5702c82808c84885fbefc82ad534ff9cc52af4438cc235554afb4c1fd"
+        }
+      ]
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-09",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "ba577e80ef0f8ec763476d84409da1da352216714a9bfc67153d52582b573893",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "tsx-gap-conditional-render-r1",
+      "file": "src/testdata/native/gaps/tsx.json",
+      "fileSHA256": "ba00ff323496b110185bda9a34d06e4d4d784b36c778b8c3fa8651bc259d8065",
+      "sourceSHA256": "a8823e4b586d619e55d5c5433862742b7b9ec3c6fa02f6451d0e04246a8645ab",
+      "edits": [
+        {
+          "find": "{props.ok ? <b>a</b> : null}",
+          "replace": "{props.ok ? <b>a</b> : }",
+          "oldSHA256": "a8823e4b586d619e55d5c5433862742b7b9ec3c6fa02f6451d0e04246a8645ab",
+          "newSHA256": "eb7838ee748abb751edfaed7b954eb9b7e7778f2d12d161bf5788bf2f3ff9b17"
+        },
+        {
+          "find": "{props.ok ? <b>a</b> : }",
+          "replace": "{props.ok ? <b>a</b> : null}",
+          "oldSHA256": "eb7838ee748abb751edfaed7b954eb9b7e7778f2d12d161bf5788bf2f3ff9b17",
+          "newSHA256": "a8823e4b586d619e55d5c5433862742b7b9ec3c6fa02f6451d0e04246a8645ab"
+        }
+      ]
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-46",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "3389a722fbe042cc2b919d1abf7f231c20bee99630e9175bbdf558faa15a4617",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "tsx-gap-namespaced-spread-attr-r1",
+      "file": "src/testdata/native/gaps/tsx.json",
+      "fileSHA256": "ba00ff323496b110185bda9a34d06e4d4d784b36c778b8c3fa8651bc259d8065",
+      "sourceSHA256": "128838ca1e2819b29bb23aafa3e78b0f3725186f19b239cdafc1396fa7e60156",
+      "edits": [
+        {
+          "find": "{...rest} />",
+          "replace": "{...rest} data-x=\"1\" />",
+          "oldSHA256": "128838ca1e2819b29bb23aafa3e78b0f3725186f19b239cdafc1396fa7e60156",
+          "newSHA256": "b980bd27ed5c67e9b8f3db0534a045c1aa4a0fb0141af04ed2d764d16fb73881"
+        },
+        {
+          "find": "xlink:href=\"#a\"",
+          "replace": "xlink:=\"#a\"",
+          "oldSHA256": "b980bd27ed5c67e9b8f3db0534a045c1aa4a0fb0141af04ed2d764d16fb73881",
+          "newSHA256": "59c5e842d61e20a9a28a81bcf8e343bf7f69ee14d098b7168ecc56a85b4ee70b"
+        }
+      ]
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-23",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "8b2863f69046def4f637e70b3cc9bdbb4feb94f04d918317c3b25dae416bf257",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "tsx-gap-text-entities-r1",
+      "file": "src/testdata/native/gaps/tsx.json",
+      "fileSHA256": "ba00ff323496b110185bda9a34d06e4d4d784b36c778b8c3fa8651bc259d8065",
+      "sourceSHA256": "4230f81dc7b555b282d47760483060826f95bfb7a2c9a4619dd186116f26b1ba",
+      "edits": [
+        {
+          "find": "&amp;",
+          "replace": "&lt;",
+          "oldSHA256": "4230f81dc7b555b282d47760483060826f95bfb7a2c9a4619dd186116f26b1ba",
+          "newSHA256": "b72ec56e3e0ce4c383cd3e2e55265f0d8b6e2a20e6392e1104ef351d8d87ae6d"
+        },
+        {
+          "find": "{1 + 1}</p>",
+          "replace": "{1 + 1}</p",
+          "oldSHA256": "b72ec56e3e0ce4c383cd3e2e55265f0d8b6e2a20e6392e1104ef351d8d87ae6d",
+          "newSHA256": "5a78bf0b0e05a583ce46ec40cb276ae7b6813cf49e32343c47d02dccb312e62e"
+        }
+      ]
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-54",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "75c8ba05f4998f48c5df2c982b4b65082e2481754b444af884ab4ef8a127207a",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "tsx-gap-fragment-r1",
+      "file": "src/testdata/native/gaps/tsx.json",
+      "fileSHA256": "ba00ff323496b110185bda9a34d06e4d4d784b36c778b8c3fa8651bc259d8065",
+      "sourceSHA256": "fc31bed7dee621609032cb74cb87b2df753bf11f2b376917eb094f0a7cb8c11f",
+      "edits": [
+        {
+          "find": "<li key=\"b\">b</li></>;",
+          "replace": "<li key=\"b\">b</li>;",
+          "oldSHA256": "fc31bed7dee621609032cb74cb87b2df753bf11f2b376917eb094f0a7cb8c11f",
+          "newSHA256": "7b0ff49bd25f2663c2be1f8f7b025bb387b540c602e62c1fd4f35534d5d9fa89"
+        },
+        {
+          "find": "<li key=\"b\">b</li>;",
+          "replace": "<li key=\"b\">b</li></>;",
+          "oldSHA256": "7b0ff49bd25f2663c2be1f8f7b025bb387b540c602e62c1fd4f35534d5d9fa89",
+          "newSHA256": "fc31bed7dee621609032cb74cb87b2df753bf11f2b376917eb094f0a7cb8c11f"
+        }
+      ]
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-47",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "992498fd023dea864df6ab9ed823ccbec8ba877422fc39b8df46e7bd47cecb48",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-28",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "46e64aa9c572e4b8727ecf871fba7503cf2ee7b3dadea8850a0722ed2efc80e6",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-08",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "683f070e1401d9153c78ae2c5efd13135db8f547c5c241e86fbc4772290be90a",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-10",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "8ae891e03f2de97cab36bdb9a33637049b2cfd08ad0a1515763dc2df0c01747b",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-16",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "2f1ca5ae4ac9756c0b562145103b94c66ce2f1699d20323093e993bb67ddcf8c",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-04",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "84566ff18ff855920b3e9729c87d397df48d132f6a6fbebc9d3a82b1b5b48f25",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-39",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "a2a10e28d50b159298db2c09b6f84ebf60695bb89288b70b3c13696a41641dfc",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-13",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "50633aaf05dea81e8a74f558c791dc41c95a3f15cf1b017399b6fcc43a60bb0c",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-30",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "5bda67fea11ba3e952f7a043fed6f416ddd1d475f87535d8db0e1a6914d3262a",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-44",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "e23571190f8795bff07144679de360203a6e69d534af8541cabad54e024772da",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-26",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "79bfbc82a42d83e72aa3a9c956a8350412d1eadaaa94dae5eefd9d172d4f55db",
+      "edits": []
+    },
+    {
+      "lang": "tsx",
+      "id": "alt-tsx-B01-49",
+      "file": "src/testdata/native/routes/tsx.json",
+      "fileSHA256": "49c7abc451d5e8aa1b4c4a320dafc80e1a5e70c6500dcbc589de9076ec461b70",
+      "sourceSHA256": "d3398bdff4dcae20d7988cf318f06341e452cdeea7ca7618d73f8f7749a53f61",
+      "edits": []
+    },
+    {
+      "lang": "typescript",
+      "id": "typescript-recovery-r1",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "ae1d5b32ea1034e6f512c095b1682c3e502ec17f2464c7632a200eb2917baaf1",
+      "edits": [
+        {
+          "find": "dy * dy);",
+          "replace": "dy * dy;",
+          "oldSHA256": "ae1d5b32ea1034e6f512c095b1682c3e502ec17f2464c7632a200eb2917baaf1",
+          "newSHA256": "c8b69433d4a57b212809ec24357bd7e4389692651af57149919d9c21addb4764"
+        },
+        {
+          "find": "dy * dy;",
+          "replace": "dy * dy);",
+          "oldSHA256": "c8b69433d4a57b212809ec24357bd7e4389692651af57149919d9c21addb4764",
+          "newSHA256": "ae1d5b32ea1034e6f512c095b1682c3e502ec17f2464c7632a200eb2917baaf1"
+        }
+      ]
+    },
+    {
+      "lang": "typescript",
+      "id": "probe-typescript-V50-P-1",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "0dc5d2219863c7669316086cfa38ed2002b50e16d7af5b5cb3c1873419fed4ce",
+      "edits": []
+    },
+    {
+      "lang": "typescript",
+      "id": "typescript-gap-import-attributes-r1",
+      "file": "src/testdata/native/gaps/typescript.json",
+      "fileSHA256": "146cafcdcbbce86ebf4045d3d3264abcb3be2444a4cdfb979a4644b61616c969",
+      "sourceSHA256": "fcb7e4f5f0761fb982a148b355f068cfa2c6b4fc71f2855d61618ad9248eac18",
+      "edits": [
+        {
+          "find": "\"./data.json\" with { type: \"json\" }",
+          "replace": "\"./data.json\" with { type: \"json\"",
+          "oldSHA256": "fcb7e4f5f0761fb982a148b355f068cfa2c6b4fc71f2855d61618ad9248eac18",
+          "newSHA256": "e81abf67943553b75170e632b8c16b85bba867c5ab8db76fb9bfc76d096505ce"
+        },
+        {
+          "find": "\"./data.json\" with { type: \"json\";",
+          "replace": "\"./data.json\" with { type: \"json\" };",
+          "oldSHA256": "e81abf67943553b75170e632b8c16b85bba867c5ab8db76fb9bfc76d096505ce",
+          "newSHA256": "fcb7e4f5f0761fb982a148b355f068cfa2c6b4fc71f2855d61618ad9248eac18"
+        }
+      ]
+    },
+    {
+      "lang": "typescript",
+      "id": "typescript-feature-r1",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "abe63523c74c2fc6a89801a5dd90844f2a473cfb789be8dc7f673003efe27a6b",
+      "edits": [
+        {
+          "find": "type Status = 'active' | 'retired';\n",
+          "replace": "type Status = 'active' | 'retired';\ntype Handler<T> = (item: T) => void;\n",
+          "oldSHA256": "abe63523c74c2fc6a89801a5dd90844f2a473cfb789be8dc7f673003efe27a6b",
+          "newSHA256": "c716404908e8c2af61b573be6196c45a194ae6770e080fc7c1895d8651ec7905"
+        },
+        {
+          "find": "Low = 1,",
+          "replace": "Low = 0,",
+          "oldSHA256": "c716404908e8c2af61b573be6196c45a194ae6770e080fc7c1895d8651ec7905",
+          "newSHA256": "61f8e70fe721c09dc6b39551d5c99892a06ee0c5f900348b0b90b4ca9e32a45e"
+        },
+        {
+          "find": "const config = { retries: 3 } as const satisfies Record<string, number>;\n",
+          "replace": "",
+          "oldSHA256": "61f8e70fe721c09dc6b39551d5c99892a06ee0c5f900348b0b90b4ca9e32a45e",
+          "newSHA256": "e98dda459fbc12c2ca74760aa2eeda8d71f062dd988b0b422d152a72c43a22b7"
+        }
+      ]
+    },
+    {
+      "lang": "typescript",
+      "id": "alt-typescript-V50-01",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "94d715c6ca91175c4024746d98eefcc00f1337f0f669f30f19616acc67414064",
+      "edits": []
+    },
+    {
+      "lang": "typescript",
+      "id": "typescript-gap-accessor-decorator-r1",
+      "file": "src/testdata/native/gaps/typescript.json",
+      "fileSHA256": "146cafcdcbbce86ebf4045d3d3264abcb3be2444a4cdfb979a4644b61616c969",
+      "sourceSHA256": "fcc339a31e7f5a83b9861b71a5a8059c9a093da9f560ca8016d2fc193384d5be",
+      "edits": [
+        {
+          "find": "@logged accessor value = 1;",
+          "replace": "@logged @tag(\"v\") accessor value = 1;",
+          "oldSHA256": "fcc339a31e7f5a83b9861b71a5a8059c9a093da9f560ca8016d2fc193384d5be",
+          "newSHA256": "abca1265a019d9ccc0a5fee8144cfd48119c8aade255afdf92cc54a56ec8c160"
+        },
+        {
+          "find": "static accessor count: number = 0;",
+          "replace": "static accessor count: = 0;",
+          "oldSHA256": "abca1265a019d9ccc0a5fee8144cfd48119c8aade255afdf92cc54a56ec8c160",
+          "newSHA256": "d8ce46c2d6c12535aaff71df8130e1ed92cbaafb14673eff6c499851682c30af"
+        }
+      ]
+    },
+    {
+      "lang": "typescript",
+      "id": "probe-typescript-V59-PE-1",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "2cdfc1c9b7b107ebdf439ab2c7a6a28e6ed52638da9c71219eddeb0bf74203dd",
+      "edits": [
+        {
+          "find": "\"./some-feature.js\"",
+          "replace": "\"./other-feature.js\"",
+          "oldSHA256": "2cdfc1c9b7b107ebdf439ab2c7a6a28e6ed52638da9c71219eddeb0bf74203dd",
+          "newSHA256": "b01295fe067de2e0a128b7797e6d2ccf27f3425d5ed5b358f5f30cc8907074d8"
+        },
+        {
+          "find": "module Legacy {",
+          "replace": "namespace Legacy {",
+          "oldSHA256": "b01295fe067de2e0a128b7797e6d2ccf27f3425d5ed5b358f5f30cc8907074d8",
+          "newSHA256": "cde42b995c67f218382e11575395872ef47ded42570dfa950a4a0168e0472df9"
+        },
+        {
+          "find": "import legacy from",
+          "replace": "import defer * as extra from \"./extra.js\";\nimport legacy from",
+          "oldSHA256": "cde42b995c67f218382e11575395872ef47ded42570dfa950a4a0168e0472df9",
+          "newSHA256": "e6c09c0f60d88262f484dbe334abecdf2221e2ad591db7a54f0e5cd0632c515a"
+        }
+      ]
+    },
+    {
+      "lang": "typescript",
+      "id": "alt-typescript-V40-02",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "4b9a69dd9817140f050909101f40b1243de8ec89901c2724024e263d7578eec4",
+      "edits": []
+    },
+    {
+      "lang": "typescript",
+      "id": "typescript-gap-export-type-star-r1",
+      "file": "src/testdata/native/gaps/typescript.json",
+      "fileSHA256": "146cafcdcbbce86ebf4045d3d3264abcb3be2444a4cdfb979a4644b61616c969",
+      "sourceSHA256": "7389a6184c1c6c348f57db3ca51391c7427821ce5f837efb41337e708df7bd7f",
+      "edits": [
+        {
+          "find": "export type * as ns from",
+          "replace": "export type * as from",
+          "oldSHA256": "7389a6184c1c6c348f57db3ca51391c7427821ce5f837efb41337e708df7bd7f",
+          "newSHA256": "6cbfa8c610bbf9d03c86dca4f34aa9a6f315ffc1eaaacfdbb8929df3635b0a43"
+        },
+        {
+          "find": "export type * as from",
+          "replace": "export type * as ns from",
+          "oldSHA256": "6cbfa8c610bbf9d03c86dca4f34aa9a6f315ffc1eaaacfdbb8929df3635b0a43",
+          "newSHA256": "7389a6184c1c6c348f57db3ca51391c7427821ce5f837efb41337e708df7bd7f"
+        }
+      ]
+    },
+    {
+      "lang": "typescript",
+      "id": "alt-typescript-B01-09",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "ba577e80ef0f8ec763476d84409da1da352216714a9bfc67153d52582b573893",
+      "edits": []
+    },
+    {
+      "lang": "typescript",
+      "id": "typescript-gap-const-type-param-r1",
+      "file": "src/testdata/native/gaps/typescript.json",
+      "fileSHA256": "146cafcdcbbce86ebf4045d3d3264abcb3be2444a4cdfb979a4644b61616c969",
+      "sourceSHA256": "5359878a17d4130f3808007881ea474b0be84c1bc72f03f3c1a657ffa16ca887",
+      "edits": [
+        {
+          "find": "unknown[]>(xs",
+          "replace": "unknown[](xs",
+          "oldSHA256": "5359878a17d4130f3808007881ea474b0be84c1bc72f03f3c1a657ffa16ca887",
+          "newSHA256": "007def3529d0078e8d867852c7839e0318114aaf94f3a7b38edcbdadf0f17256"
+        },
+        {
+          "find": "unknown[](xs",
+          "replace": "unknown[]>(xs",
+          "oldSHA256": "007def3529d0078e8d867852c7839e0318114aaf94f3a7b38edcbdadf0f17256",
+          "newSHA256": "5359878a17d4130f3808007881ea474b0be84c1bc72f03f3c1a657ffa16ca887"
+        }
+      ]
+    },
+    {
+      "lang": "typescript",
+      "id": "alt-typescript-B01-07",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "44552b5f870b7ac514f08240e2676447c109d43ea010839729195435f373fd8d",
+      "edits": []
+    },
+    {
+      "lang": "typescript",
+      "id": "typescript-gap-satisfies-r1",
+      "file": "src/testdata/native/gaps/typescript.json",
+      "fileSHA256": "146cafcdcbbce86ebf4045d3d3264abcb3be2444a4cdfb979a4644b61616c969",
+      "sourceSHA256": "594f43542e47c402679e37131724796d81c85be95ec012f1deb7f195f9af67a1",
+      "edits": [
+        {
+          "find": "host: string };",
+          "replace": "host: string ;",
+          "oldSHA256": "594f43542e47c402679e37131724796d81c85be95ec012f1deb7f195f9af67a1",
+          "newSHA256": "4b62668576d8d0442a01a1da7ad5fc1589c95c701d64c345719a4bb6e3a7c83f"
+        },
+        {
+          "find": "host: string ;",
+          "replace": "host: string };",
+          "oldSHA256": "4b62668576d8d0442a01a1da7ad5fc1589c95c701d64c345719a4bb6e3a7c83f",
+          "newSHA256": "594f43542e47c402679e37131724796d81c85be95ec012f1deb7f195f9af67a1"
+        }
+      ]
+    },
+    {
+      "lang": "typescript",
+      "id": "alt-typescript-V45-04",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "08656544182279b3bf381d934f201602bf70912a436c2ef96ae5d67d41d98512",
+      "edits": []
+    },
+    {
+      "lang": "typescript",
+      "id": "typescript-gap-using-r1",
+      "file": "src/testdata/native/gaps/typescript.json",
+      "fileSHA256": "146cafcdcbbce86ebf4045d3d3264abcb3be2444a4cdfb979a4644b61616c969",
+      "sourceSHA256": "e470ba634dd2fc8053ff680f3d63a1d28d14e2c32661f21d56f1cda73c0ff820",
+      "edits": [
+        {
+          "find": "using res = open();",
+          "replace": "using res = open(), res2 = open();",
+          "oldSHA256": "e470ba634dd2fc8053ff680f3d63a1d28d14e2c32661f21d56f1cda73c0ff820",
+          "newSHA256": "8b641b2e5b81ec4a03fd70e438665a4ebf48773ed1682b531d146f27e6641cc2"
+        },
+        {
+          "find": "await using conn = connect();",
+          "replace": "await using conn = ;",
+          "oldSHA256": "8b641b2e5b81ec4a03fd70e438665a4ebf48773ed1682b531d146f27e6641cc2",
+          "newSHA256": "13be64dfa904943a0f4117a4d93db95b7c57aae7ba51ce96278df83c43d664be"
+        }
+      ]
+    },
+    {
+      "lang": "typescript",
+      "id": "probe-typescript-V3-N-1",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "69670318009da401a711812d888259cd6cb71e94f44ea712ac065ca4dbb53e7b",
+      "edits": []
+    },
+    {
+      "lang": "typescript",
+      "id": "alt-typescript-V40-03",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "c30b4176dae354390deeece7bdf5aea4118760e8a4bad1fd1a5897c289e94b11",
+      "edits": []
+    },
+    {
+      "lang": "typescript",
+      "id": "probe-typescript-V28-P-1",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "cc4572b4457bac672f1987870437bf8bc39d83a13ce23c5a48a6e239a5315859",
+      "edits": []
+    },
+    {
+      "lang": "typescript",
+      "id": "alt-typescript-V3-06",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "abeec6eec5124b3a1d2d1e1ed6337ca756c82f7a96773b1b6e9771809fb05ac5",
+      "edits": []
+    },
+    {
+      "lang": "typescript",
+      "id": "alt-typescript-V28-01",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "8b2863f69046def4f637e70b3cc9bdbb4feb94f04d918317c3b25dae416bf257",
+      "edits": []
+    },
+    {
+      "lang": "typescript",
+      "id": "probe-typescript-V45-R-1",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "79573f83ecc2d1b14c0245bfb9b09ef39c9097ccfe3640e4ade7a2fe061c05a3",
+      "edits": []
+    },
+    {
+      "lang": "typescript",
+      "id": "probe-typescript-V3-R-1",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "17249895e8c0fca62436f55209705af8b9df0a038736a5be4a11c4abc838a610",
+      "edits": []
+    },
+    {
+      "lang": "typescript",
+      "id": "alt-typescript-V45-03",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "a2a10e28d50b159298db2c09b6f84ebf60695bb89288b70b3c13696a41641dfc",
+      "edits": []
+    },
+    {
+      "lang": "typescript",
+      "id": "alt-typescript-V3-03",
+      "file": "src/testdata/native/routes/typescript.json",
+      "fileSHA256": "e275f043c8fae09417537ad1f8c14e029012dd8f84a80472d438cc763c37ae56",
+      "sourceSHA256": "52a4dc0d8f44a5fc7b28dfdab2b9e09256e24e1523b81cbb825e55e326c254e7",
+      "edits": []
+    }
+  ]
+}

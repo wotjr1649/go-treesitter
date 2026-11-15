@@ -1,0 +1,6 @@
+const makeHammerBox = makeBox<Hammer>;
+const ErrorMap = Map<string, Error>;
+type X<T> = T extends [infer S extends string, ...unknown[]] ? S : never;
+interface Consumer<in T> { consume: (arg: T) => void; }
+interface Producer<out T> { make(): T; }
+interface State<in out T> { get: () => T; set: (value: T) => void; }

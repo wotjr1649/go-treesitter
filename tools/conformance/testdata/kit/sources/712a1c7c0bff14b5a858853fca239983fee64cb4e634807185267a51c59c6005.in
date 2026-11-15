@@ -1,0 +1,17 @@
+using System.Threading.Tasks;
+class Exprs
+{
+    A a; int x;
+    async Task M(Task t)
+    {
+        M(t);
+        new Exprs();
+        x = 1;
+        x++;
+        x--;
+        ++x;
+        --x;
+        await t;
+        a?.M();
+    }
+}

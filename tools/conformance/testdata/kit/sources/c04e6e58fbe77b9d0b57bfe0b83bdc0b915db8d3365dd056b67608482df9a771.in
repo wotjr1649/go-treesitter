@@ -1,0 +1,3 @@
+DECLARE @db sysname = N'sales', @file sysname = N'sales_data2', @fg sysname = N'fg2', @name sysname = N'files_set', @text nvarchar(255) = N'file backup', @days int = 7, @mn sysname = N'media2', @bs int = 512, @bc int = 20, @mts int = 65536;
+BACKUP DATABASE sales FILE = N'sales_data', FILE = @file, FILEGROUP = N'fg_hist', FILEGROUP = @fg TO TAPE = N'\\.\Tape0' WITH NOINIT, NOSKIP, NOFORMAT, NO_COMPRESSION, NAME = @name, DESCRIPTION = @text, RETAINDAYS = @days, MEDIANAME = @mn, BLOCKSIZE = @bs, BUFFERCOUNT = @bc, MAXTRANSFERSIZE = @mts, NO_CHECKSUM, STOP_ON_ERROR, RESTART, NOREWIND, NOUNLOAD;
+BACKUP DATABASE @db FILEGROUP = N'fg_hist' TO DISK = N'D:\bak\fg.bak' WITH DIFFERENTIAL;

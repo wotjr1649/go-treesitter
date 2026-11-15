@@ -1,0 +1,10 @@
+package decl
+
+func before() {}
+
+type T int
+
+func (r T)
+M() {}
+
+func after() {}

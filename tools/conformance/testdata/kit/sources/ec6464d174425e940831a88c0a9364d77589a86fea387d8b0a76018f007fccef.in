@@ -1,0 +1,17 @@
+import re
+
+
+def handle(command):
+    match command.split():
+        case [action]:
+            return action
+        case ["go", direction] if direction in DIRS:
+            return direction
+        case Point(x=0, y=0) | {"origin": True}
+            return "origin"
+        case _:
+            return None
+
+
+with (open("a") as a, open("b") as b):
+    pass

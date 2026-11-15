@@ -1,0 +1,24 @@
+package types
+
+type Point struct {
+	X, Y int `json:"xy"`
+	*Base
+}
+
+type Base struct{}
+
+type Shape interface {
+	Area() float64
+	Base() *Base
+}
+
+type Handler func(int) error
+
+var (
+	grid  [3][3]int
+	names []string
+	index map[string]int
+	ch    <-chan int
+)
+
+func (p *Point) Move(dx int) { p.X += dx }

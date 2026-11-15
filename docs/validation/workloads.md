@@ -15,6 +15,25 @@ digests they describe. The current lanes use:
 | Native C reference dumps, edit dumps and changed ranges for those inputs | built and recorded with `tools/native-ref` from `tools/gen/pins.json` | the same |
 | Built-in fuzz seeds (one small sample per grammar) | `tools/conformance/fuzz_test.go` (`FuzzParse<Lang>`); crashers go to `tools/conformance/testdata/fuzz/` | `go test -fuzz` |
 | Embedded samples | each `grammars/<lang>` module | its own tests |
+| Known upstream grammar defects (5 minimal inputs, Python and C#) | [`register.json`](../../tools/conformance/testdata/known-gaps/register.json): exact JSON input strings, input/dump SHA-256, spec citations and source/module identities; adjacent `.dump` files | `TestKnownGaps` (engine and live native reference), `TestKnownGapRatchet`, `TestKnownGapDocs` |
+
+The known-gap inputs are original minimal reproductions written for this repository (repository MIT license),
+motivated by [grammar-kit handoff B](https://github.com/wotjr1649/tree-sitter-grammar-kit/blob/0a12156/docs/reports/repository-closure-handoff-b.md).
+No kit code or expectations are copied. Input bytes come from decoded JSON strings; only the Python await case has
+a final LF, and the C# EOF directive deliberately has none. Dumps are LF. Per-grammar consumer documents are generated
+from that register with `go generate ./...` in `tools/conformance`; `TestKnownGapDocs` regenerates in memory and
+compares all committed bytes, including detecting obsolete documents. CI runs all three tests in every grammar shard;
+the entries execute only in the shards of the grammars that have them (Python, C#), so a shard of any other grammar
+finishes `TestKnownGaps` with a skip.
+The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from `pins.json`, including patch records;
+an unrelated grammar pin move does not invalidate these entries. A changed identity of one grammar fails that
+grammar's shard and `TestKnownGapDocs` (not the other shards); the failure prints the recomputed hashes, and the
+register identity is updated only after a fresh engine/native reproduction of every entry. `TestKnownGaps` needs no
+corpus directory; without `TSG_NATIVE_EXE_DIR` only its native subtests skip (E3). With `TSG_NATIVE_EXE_DIR` set, a
+missing executable fails; with `TSG_REQUIRE_FIELD_LOOKUP=1` (CI), an unset variable or a selected but unlinked
+grammar fails too, and a shard whose grammar has entries must run at least one. CI builds the reference from the current
+pins and sets the variable, so publication evidence is a retained E5 differential, scoped to these exact inputs.
+The E5 summary logs input/dump/executable hashes, source/module identities and the executing OS/architecture.
 
 The remaining fixed-oracle catalogs were removed after `be31f49f3e4d645a929a9aebc961be150de16e37`, the last
 commit containing them. They remain available in Git history; catalog filenames below refer to that retired
@@ -329,3 +348,85 @@ not a concatenated or enlarged fixture; results describe this input's shape.
 | tsx | [App.tsx](https://raw.githubusercontent.com/excalidraw/excalidraw/817d8c553c3389650f8b4503984a6d4a5d2f0c11/packages/excalidraw/components/App.tsx) | 353,813 | `7b3e614cf314d29d0285b69079cc3e67986b75c56f57088c17f9bc01b3b96dbe` | [MIT](https://raw.githubusercontent.com/excalidraw/excalidraw/817d8c553c3389650f8b4503984a6d4a5d2f0c11/LICENSE) | `1352d204fdb90d5e482c13139d848bc2c9300a9a7de358a0a558a23e72d0d8be` |
 
 The fetch lane checks both hashes and writes `App.tsx.LICENSE` beside the input.
+
+## Bounded grammar-kit inputs
+
+`tools/conformance/testdata/kit/manifest.json` records 165 source cases from
+[tree-sitter-grammar-kit at `0a12156`](https://github.com/wotjr1649/tree-sitter-grammar-kit/tree/0a12156).
+The archive SHA-256 is
+`83d792c6453a5f316e101a76885f637b4397ba7a601cfebbd7a388f23cab07d3`.
+The manifest embeds the full MIT notice, also retained in `testdata/kit/LICENSE`.
+Only `source_utf8` and `edits` are projected; kit expectations, queries, native
+outputs and product code are not imported. Source JSON file hashes and case IDs
+identify every selected case.
+
+Selection is independent of parser results. For each of csharp, go, json,
+python, tsql, tsx and typescript, take at most 24 cases by round-robin over
+`routes/edited`, `routes/unedited`, `gaps/edited`, `gaps/unedited`, omitting
+missing/exhausted buckets. Each bucket sorts by `(SHA256(UTF-8 case ID), ID)`;
+duplicate `(source SHA-256, edits)` cases do not consume quota. Exclude every
+case with a `sample` field. Only routes/gaps are read: `n461` is the separate
+.NET Framework 4.6.1/C# 7.3 WinForms/DevExpress/WCF business workload, and is
+excluded in full. JSON exhausts its unique cases at 21.
+
+| Grammar | Source cases | Fresh inputs | Pair edits |
+|---|---:|---:|---:|
+| csharp | 24 | 40 | 26 |
+| go | 24 | 41 | 28 |
+| json | 21 | 33 | 21 |
+| python | 24 | 43 | 35 |
+| tsql | 24 | 48 | 32 |
+| tsx | 24 | 35 | 15 |
+| typescript | 24 | 39 | 20 |
+| Total | 165 | 279 | 177 |
+
+Projection preserves UTF-8 bytes, including CRLF, without normalization. Each
+edit replaces the first `find` in the preceding step; empty `find` appends,
+and absent targets fail. Offsets for `EditFor(old,new,start,oldEnd,newEnd)` are
+`start=byte index`, `oldEnd=start+len(find)`, `newEnd=start+len(replace)`;
+`EditFor` derives byte-column points. Steps are generated sequentially, but each
+edit test freshly parses its immediate old source and applies exactly one edit.
+This tests pairs, not tree reuse through the entire edit history.
+
+Fresh inputs are deduplicated by `(grammar, SHA-256)`; identical bytes across
+grammars still run for each grammar. Edit pairs are deduplicated separately by
+`(grammar, old SHA-256, new SHA-256, start, oldEnd, newEnd)`, preserving distinct
+edits of a shared source. The content-addressed store has 275 unique blobs,
+79,260 bytes, with a fixed 256 KiB source budget. `.gitattributes` disables
+newline conversion for them. Every initial and projected output hash is in the
+manifest; its own SHA-256 identifies the complete selection and projection.
+
+Reproduce into a new directory using Python's standard library only:
+
+```text
+python tools/native-ref/ciconf/select_kit.py KIT_ARCHIVE NEW_DIRECTORY
+```
+
+In review, regenerate into a new directory and `diff -r` it against
+`tools/conformance/testdata/kit`: the loader checks hashes, chains and budget but
+cannot prove the selection rules were followed, and it rejects files under
+`sources/` that the manifest does not reference.
+
+The generator verifies the archive hash before reading it. CI needs no kit
+checkout or Python: `ciconf -kit tools/conformance/testdata/kit` validates the
+committed manifest, MIT notice, every source hash, edit chain and budget, then
+adds rows to the existing conformance corpus/edit manifests. No seeded edits
+are added to kit inputs. The five existing corpus, edits, native-query, fresh
+field and edited-field tests compare them with freshly built native references.
+Kit native incremental/fresh differences are counted separately in
+`kitNativeIncrementalDiffersFromFresh`; every engine/native difference still
+fails. `ci.json`/`inputs.json` record `kitManifestSHA256`; nightly summaries, the
+job summary table and repro JSON include that identity plus `inputSetSHA256` (the
+complete generated corpus manifest hash, including upstream seeds). `ciconf`
+rejects an empty `-kit` value, and in the seven kit grammars' shards
+`TestCorpusKitInputs` (also the nightly test) fails when the manifest identity,
+kit fresh inputs or (for full CI data) kit pair edits are missing.
+
+Before widening, measure the current subset per affected shard locally and on
+a hosted PR run, retaining before/after native-data preparation and all five
+comparison timings. Existing limits remain 20 minutes per comparison step and
+60 minutes per job. A next proposal is at most 48 source cases per grammar
+(336 cases maximum), at most 600 fresh inputs, 400 pairs and the same 256 KiB
+source budget. Proceed only after measured full shards use less than half each
+existing step/job timeout; do not infer hosted timing from local measurements.
+This change does not widen to that proposal.

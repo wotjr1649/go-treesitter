@@ -1,0 +1,4 @@
+class Keep { int A; int B; }
+#if A
+class C {}
+#endif // valid

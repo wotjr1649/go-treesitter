@@ -57,6 +57,13 @@ func TestNightlyDiff(t *testing.T) {
 		}
 	}
 	root := dataRoot(t)
+	inputSetSHA := sha(readFile(t, filepath.Join(root, "corpus", "manifest.csv")))
+	var inputIdentity struct{ KitManifestSHA256 string }
+	if b, err := os.ReadFile(filepath.Join(root, "inputs.json")); err == nil {
+		if err := json.Unmarshal(b, &inputIdentity); err != nil {
+			t.Fatal(err)
+		}
+	}
 	replayLang, replayIt, replay := strings.Cut(os.Getenv("TSG_NIGHTLY_REPLAY"), ":")
 	for _, lang := range langs(t) {
 		if replay && lang != replayLang {
@@ -67,6 +74,9 @@ func TestNightlyDiff(t *testing.T) {
 			if !ok {
 				t.Fatalf("no native executable for %s in TSG_NATIVE_EXE_DIR", lang)
 			}
+			if err := kitInputsMissing(root, lang, false); err != nil {
+				t.Fatal(err)
+			}
 			files, _ := filepath.Glob(filepath.Join(root, "corpus", lang, "*.in"))
 			if len(files) == 0 {
 				t.Fatalf("no corpus inputs under %s/corpus/%s", root, lang)
@@ -75,7 +85,7 @@ func TestNightlyDiff(t *testing.T) {
 			for _, f := range files {
 				seeds = append(seeds, readFile(t, f))
 			}
-			nd := &nightly{t: t, lang: lang, exe: exe, tmp: t.TempDir(), limit: limit}
+			nd := &nightly{t: t, lang: lang, exe: exe, tmp: t.TempDir(), limit: limit, inputSetSHA: inputSetSHA, kitSHA: inputIdentity.KitManifestSHA256}
 			h := fnv.New64a()
 			h.Write([]byte(lang))
 			stream := h.Sum64()
@@ -97,7 +107,7 @@ func TestNightlyDiff(t *testing.T) {
 				}
 			}
 			summary(t, map[string]any{"lang": lang, "seed": seed, "cases": cases, "budget": budgetS, "goos": runtime.GOOS, "goarch": runtime.GOARCH,
-				"seconds": time.Since(start).Seconds(), "input_timeout": limit.String(), "mismatch": t.Failed()})
+				"seconds": time.Since(start).Seconds(), "input_timeout": limit.String(), "inputSetSHA256": inputSetSHA, "kitManifestSHA256": inputIdentity.KitManifestSHA256, "mismatch": t.Failed()})
 		})
 	}
 }
@@ -190,14 +200,15 @@ func splice(src []byte, at, del int, ins []byte) []byte {
 }
 
 type nightly struct {
-	t          *testing.T
-	lang       string
-	exe        string
-	p          *treesitter.Parser
-	tmp        string
-	limit      time.Duration
-	workerTest string   // test-only non-terminating worker substitute
-	exeArgs    []string // test-only native substitute arguments
+	inputSetSHA, kitSHA string
+	t                   *testing.T
+	lang                string
+	exe                 string
+	p                   *treesitter.Parser
+	tmp                 string
+	limit               time.Duration
+	workerTest          string   // test-only non-terminating worker substitute
+	exeArgs             []string // test-only native substitute arguments
 }
 
 // A process boundary is required: an external scanner can loop without polling the context.
@@ -482,6 +493,6 @@ func (n *nightly) report(seed uint64, it int, c kase, f finding, doShrink bool) 
 		n.lang, f.kind, f.detail, seed, it, runtime.GOOS, runtime.GOARCH, c.start, c.oe, c.start+len(c.ins), doShrink, len(orig.old), len(c.old),
 		filepath.Base(n.exe), nativeCmd, edit, n.limit.String(), seed, n.lang, it)
 	w("repro.txt", []byte(repro))
-	meta, _ := json.Marshal(map[string]any{"lang": n.lang, "seed": seed, "iteration": it, "kind": f.kind, "start": c.start, "oldEnd": c.oe, "newEnd": c.start + len(c.ins), "inputTimeout": n.limit.String()})
+	meta, _ := json.Marshal(map[string]any{"lang": n.lang, "seed": seed, "iteration": it, "kind": f.kind, "start": c.start, "oldEnd": c.oe, "newEnd": c.start + len(c.ins), "inputTimeout": n.limit.String(), "inputSetSHA256": n.inputSetSHA, "kitManifestSHA256": n.kitSHA})
 	w("repro.json", meta)
 }

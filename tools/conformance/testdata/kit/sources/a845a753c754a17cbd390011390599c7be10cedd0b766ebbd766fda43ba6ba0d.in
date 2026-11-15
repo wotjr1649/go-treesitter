@@ -1,0 +1,7 @@
+r = not a or b and c or d
+q = a and b and c
+t = a < b <= c > d >= e == f != g in h not in i is j is not k
+u = a | b ^ c & d << e >> f + g - h * i / j // k % l @ m
+v = -a + +b - ~c ** -d
+w = a if b else c
+z = lambda: 0

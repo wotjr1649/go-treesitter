@@ -1,0 +1,54 @@
+SET NOCOUNT ON;
+GO
+
+CREATE TABLE dbo.Items (
+    Id INT IDENTITY(1, 1) NOT NULL PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    Quantity INT NOT NULL DEFAULT 0,
+    Price DECIMAL(10, 2) NULL
+);
+GO
+
+CREATE INDEX IX_Items_Name ON dbo.Items (Name);
+GO
+
+CREATE OR ALTER PROCEDURE dbo.AddItem
+    @Name NVARCHAR(100),
+    @Quantity INT = 0
+AS
+BEGIN
+    DECLARE @Existing INT;
+    SELECT @Existing = Id FROM dbo.Items WHERE Name = @Name;
+    IF @Existing IS NULL
+    BEGIN
+        INSERT INTO dbo.Items (Name, Quantity) VALUES (@Name, @Quantity);
+    END
+    ELSE
+    BEGIN
+        UPDATE dbo.Items SET Quantity = Quantity + @Quantity WHERE Id = @Existing;
+    END
+END
+GO
+
+-- Report items with their stock level.
+WITH Levels AS (
+    SELECT Name, Quantity,
+        CASE WHEN Quantity > 500 THEN N'bulk' ELSE N'normal' END AS StockLevel
+    FROM dbo.Items
+)
+SELECT TOP (10) l.Name, l.StockLevel, COUNT(*) OVER (PARTITION BY l.StockLevel) AS LevelCount
+FROM Levels AS l
+WHERE l.Quantity >= 0
+ORDER BY l.Name;
+GO
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+    EXEC dbo.AddItem @Name = N'bolt', @Quantity = 120;
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    ROLLBACK TRANSACTION;
+    THROW;
+END CATCH
+GO

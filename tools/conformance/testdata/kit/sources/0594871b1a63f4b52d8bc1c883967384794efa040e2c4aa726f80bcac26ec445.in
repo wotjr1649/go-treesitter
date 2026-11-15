@@ -1,0 +1,16 @@
+try:
+    pass
+except* ValueError:
+    pass
+except* (TypeError, KeyError) as eg:
+    pass
+else:
+    pass
+finally:
+    pass
+def call(*args: *Ts): pass
+def call2(*args: *Ts, key): pass
+for x in *a, *b:
+    pass
+t = a[*b]
+t2 = a[1, *b]

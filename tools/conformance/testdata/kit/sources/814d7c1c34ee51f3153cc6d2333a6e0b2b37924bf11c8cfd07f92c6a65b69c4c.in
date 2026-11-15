@@ -1,0 +1,6 @@
+SELECT c1 FROM dbo.t1
+WHERE c1 = ALL (SELECT c1 FROM dbo.t2) AND c2 <> ALL (SELECT c2 FROM dbo.t2) AND c3 != ALL (SELECT c3 FROM dbo.t2)
+  AND c4 > ALL (SELECT c4 FROM dbo.t2) AND c5 >= ALL (SELECT c5 FROM dbo.t2) AND c6 !> ALL (SELECT c6 FROM dbo.t2)
+  AND c7 < ALL (SELECT c7 FROM dbo.t2) AND c8 <= ALL (SELECT c8 FROM dbo.t2) AND c9 !< ALL (SELECT c9 FROM dbo.t2);
+SELECT c1 FROM dbo.t1
+WHERE c1 < > ALL (SELECT c1 FROM dbo.t3) AND c2 ! > ALL (SELECT c2 FROM dbo.t3) AND c3 ! < ALL (SELECT c3 FROM dbo.t3);

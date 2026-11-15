@@ -1,0 +1,2 @@
+#undef \u0031
+class C {}
