@@ -7,9 +7,9 @@ behaviour: equal schemas can still parse differently (for example after a preced
 
 ## Offline strict-check inputs
 
-The current pin set contains 23 grammars, including the Q17 PHP, PowerShell and Dart revisions and the Q20
-tree-identical T-SQL pin move below; `tools/gen/pins.json` SHA-256 is
-`05f4b60acb1f193875529ff0a1785cd6bd1d6c3ce921cd91793a4c04797996ab`. All 23 schemas pass the
+The current pin set contains 23 grammars, including the Q17 PHP, PowerShell and Dart revisions, the Q20
+tree-identical T-SQL pin move and the C maintained-fork move below; `tools/gen/pins.json` SHA-256 is
+`98ca76530440ef57ec02654ff1b0f394367ce09016f0f44e9dd7074cac70f6b3`. All 23 schemas pass the
 strict check at this pin set (Windows amd64, Go 1.27.4).
 The tables below record each schema once, grouped by the release that first recorded it; archive SHA-256
 values identify the pinned upstream inputs. `tsx` and `typescript` share one archive. Schema bytes come from
@@ -116,3 +116,12 @@ are identical. The static `schema diff` is `PASS` with zero changes; the v0.3.0 
 | Grammar | Current repository | Old commit → new commit | Directory | Old → new bytes | Unchanged `node-types.json` SHA-256 | Old → new archive SHA-256 |
 |---|---|---|---|---:|---|---|
 | tsql | alfpricot/tree-sitter-mssql | `8620fbcfca9438e1ff7104835bcb8305aba3bdfa` → `2e34d86ec58f3d1a771efc0ca1e71c536690a0b7` | `src` | 404735 → 404735 | `d49356aed210b6522a6e130fdfb3081ff004b74c1cc3a8aee8c5f76eb73d30b9` | `66c05cc00ad2b0a9e91c4814a39c2c066015fb912828ec3bf360d164fe8a9149` → `82476f5880f6b46c83198ae24b4a4eca30941893dbee4d05ec9748fb55ee3b7b` |
+
+## C maintained-fork move (ADR-0024 rule 6, 2026-11-16)
+
+Owner-approved move to the fork nvim-treesitter pins. The schema is the same file; the static `schema diff` is `PASS`
+with zero changes. Only `src/parser.c` (gcc pragma, patch version) and `src/tree_sitter/array.h` differ in `src/`.
+
+| Grammar | Repository old → new | Old commit → new commit | Directory | Bytes | Unchanged `node-types.json` SHA-256 | Old → new archive SHA-256 |
+|---|---|---|---|---:|---|---|
+| c | `tree-sitter/tree-sitter-c` → `tree-sitter-grammars/tree-sitter-c` | `b780e47fc780ddc8da13afa35a3f4ed5c157823d` → `f3202ac4f1041e0b0a2b908147d5dd0e951da7b1` | `src` | 83057 | `23e819ef1eefd357bb6eba844f47f8492f6a88da3e5046b06ec4acd4da8a9fd6` | `dc3979e40fce678c27273ba8ab93b48b5acd6b91d1dfde6a4451222d366d689f` → `c7a0d2fa561da7c9ae7a4d8b705a059ed0c855eccddef3badcabb9004b094380` |

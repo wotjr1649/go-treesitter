@@ -5,14 +5,14 @@
   "module": "github.com/wotjr1649/go-treesitter/grammars/c",
   "identity": {
     "Runtime": "v0.27.2",
-    "GrammarRepo": "https://github.com/tree-sitter/tree-sitter-c",
-    "GrammarRev": "b780e47fc780ddc8da13afa35a3f4ed5c157823d",
+    "GrammarRepo": "https://github.com/tree-sitter-grammars/tree-sitter-c",
+    "GrammarRev": "f3202ac4f1041e0b0a2b908147d5dd0e951da7b1",
     "SourceSHA256": {
       "grammar.LICENSE": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
-      "grammar.parser.c": "f2883ff9b21f4a5bd5553c1b10366c418947d17a7bc6bf256124a7542f079dd2",
-      "grammar.tree": "69eea1eb0f42b4d38abcf2c4d8d916a247ffa12faebcc781b421f61fd7cc9b53",
+      "grammar.parser.c": "55becfe6fdf0d6b6b1bfc579c5503fe2717c9508be54b95bcbff62997bc20e80",
+      "grammar.tree": "cb0faf756bfeb9ca141d238607127b6c2a74efde497acc56614f596ea8d056f1",
       "grammar.tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
-      "grammar.tree_sitter/array.h": "31e60a1bff6f715afacce03b5b70efe42b58371b4f9595dd4af52a577ff9608c",
+      "grammar.tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
       "grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
       "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
@@ -37,9 +37,9 @@
     "LICENSES/wasi-libc/cloudlibc-LICENSE": "c8b789cf5a746611e6300a0cc7750dbf92b61912a709d04e639245f7290656d0",
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
-    "engine_gen.dat": "df40130de3aedfc785f77f8d66d976f083a5766245fc9c9049bf8f25a79ef5db",
+    "engine_gen.dat": "8286ae5efc96630afd38c1e9ea42ac3e9c3632dabd19d5efe694c9f922bf03b4",
     "engine_gen.go": "fa65c392c3de164d11050dc2d378c08a40275f434ff7fdadcb3eeb1b45c8da14",
-    "wasm": "91fdbd3b08e0cc87064b5a3d4b857dd66f886015d3247110eb063d56cb730a10",
-    "wasm.clang": "a5351edaf41f35edebf59fae12b9b5fe3798378ac94a443103df4e6b028236a2"
+    "wasm": "f704926ec28a988428c29b4e3dba8a0f82d626ec971852bca45edb60f60d867e",
+    "wasm.clang": "98c61a9a6157cc8d36d6420188a31531b5f8026623238cef87be28f0b46c0e44"
   }
 }

@@ -24,7 +24,7 @@ Each language has exactly one upstream repository, chosen by the tiers of
 
 | Tier | Modules | Upstream |
 |---|---|---|
-| 1 | `bash`, `c`, `cpp`, `csharp`, `css`, `golang`, `html`, `java`, `javascript`, `json`, `php`, `python`, `ruby`, `rust`, `tsx`, `typescript` | `tree-sitter` organisation (`golang` uses `tree-sitter-go`; TSX and TypeScript share `tree-sitter-typescript`) |
+| 1 | `bash`, `c`, `cpp`, `csharp`, `css`, `golang`, `html`, `java`, `javascript`, `json`, `php`, `python`, `ruby`, `rust`, `tsx`, `typescript` | `tree-sitter` organisation (`golang` uses `tree-sitter-go`; TSX and TypeScript share `tree-sitter-typescript`); `c` follows the maintained fork `tree-sitter-grammars/tree-sitter-c` that nvim-treesitter adopted (ADR-0024 rule 6) |
 | 2 | `xml`, `yaml` | `tree-sitter-grammars/tree-sitter-xml`, `tree-sitter-grammars/tree-sitter-yaml` |
 | 3 | `dart`, `kotlin`, `powershell`, `r` | `UserNobody14/tree-sitter-dart`, `fwcd/tree-sitter-kotlin`, `airbus-cert/tree-sitter-powershell`, `r-lib/tree-sitter-r` |
 | Owner-designated | `tsql` | `alfpricot/tree-sitter-mssql` |

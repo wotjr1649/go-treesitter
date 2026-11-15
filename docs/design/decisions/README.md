@@ -57,6 +57,6 @@ understand whether the contract is still right.
 | 0021 | Public API v2: owned immutable snapshots on a confined parser | Accepted |
 | 0022 | Wave-1 preview, multi-module versioning, release-memory criterion, carrier removal | Accepted |
 | 0023 | Temporary, retirable patches to upstream grammar C | Accepted; amends ADR-0020 §1, §4 for grammars |
-| 0024 | Grammar source tiers: one upstream per language | Accepted; Consequences amended by ADR-0025 |
+| 0024 | Grammar source tiers: one upstream per language | Accepted; Consequences amended by ADR-0025; rule 6 (follow a maintained fork) added 2026-11-16 |
 | 0025 | Absorbing tree-sitter-grammar-kit | Accepted; amends ADR-0020 (decision 6), ADR-0024 |
 | 0026 | Never block on upstream: mirrors, grammar patches, health watch | Accepted; extends ADR-0023, ADR-0024; S1 amended 2026-11-15: sources mirrored, toolchains deferred until complete bundled notices |
