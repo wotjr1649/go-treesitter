@@ -15,6 +15,25 @@ digests they describe. The current lanes use:
 | Native C reference dumps, edit dumps and changed ranges for those inputs | built and recorded with `tools/native-ref` from `tools/gen/pins.json` | the same |
 | Built-in fuzz seeds (one small sample per grammar) | `tools/conformance/fuzz_test.go` (`FuzzParse<Lang>`); crashers go to `tools/conformance/testdata/fuzz/` | `go test -fuzz` |
 | Embedded samples | each `grammars/<lang>` module | its own tests |
+| Known upstream grammar defects (5 minimal inputs, Python and C#) | [`register.json`](../../tools/conformance/testdata/known-gaps/register.json): exact JSON input strings, input/dump SHA-256, spec citations and source/module identities; adjacent `.dump` files | `TestKnownGaps` (engine and live native reference), `TestKnownGapRatchet`, `TestKnownGapDocs` |
+
+The known-gap inputs are original minimal reproductions written for this repository (repository MIT license),
+motivated by [grammar-kit handoff B](https://github.com/wotjr1649/tree-sitter-grammar-kit/blob/0a12156/docs/reports/repository-closure-handoff-b.md).
+No kit code or expectations are copied. Input bytes come from decoded JSON strings; only the Python await case has
+a final LF, and the C# EOF directive deliberately has none. Dumps are LF. Per-grammar consumer documents are generated
+from that register with `go generate ./...` in `tools/conformance`; `TestKnownGapDocs` regenerates in memory and
+compares all committed bytes, including detecting obsolete documents. CI runs all three tests in every grammar shard;
+the entries execute only in the shards of the grammars that have them (Python, C#), so a shard of any other grammar
+finishes `TestKnownGaps` with a skip.
+The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from `pins.json`, including patch records;
+an unrelated grammar pin move does not invalidate these entries. A changed identity of one grammar fails that
+grammar's shard and `TestKnownGapDocs` (not the other shards); the failure prints the recomputed hashes, and the
+register identity is updated only after a fresh engine/native reproduction of every entry. `TestKnownGaps` needs no
+corpus directory; without `TSG_NATIVE_EXE_DIR` only its native subtests skip (E3). With `TSG_NATIVE_EXE_DIR` set, a
+missing executable fails; with `TSG_REQUIRE_FIELD_LOOKUP=1` (CI), an unset variable or a selected but unlinked
+grammar fails too, and a shard whose grammar has entries must run at least one. CI builds the reference from the current
+pins and sets the variable, so publication evidence is a retained E5 differential, scoped to these exact inputs.
+The E5 summary logs input/dump/executable hashes, source/module identities and the executing OS/architecture.
 
 The remaining fixed-oracle catalogs were removed after `be31f49f3e4d645a929a9aebc961be150de16e37`, the last
 commit containing them. They remain available in Git history; catalog filenames below refer to that retired

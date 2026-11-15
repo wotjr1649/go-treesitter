@@ -1,0 +1,16 @@
+#tsg-dump/1 root_has_error=1 nodes=15
+0	-	compilation_unit	1	0	0	0	1	0	12	0:0	0:12
+1	-	global_statement	1	0	0	0	1	0	12	0:0	0:12
+2	-	local_declaration_statement	1	0	0	0	1	0	12	0:0	0:12
+3	-	variable_declaration	1	0	0	0	1	0	11	0:0	0:11
+4	type	implicit_type	1	0	0	0	0	0	3	0:0	0:3
+5	-	var	0	0	0	0	0	0	3	0:0	0:3
+4	-	variable_declarator	1	0	0	0	1	4	11	0:4	0:11
+5	name	identifier	1	0	0	0	0	4	5	0:4	0:5
+5	-	=	0	0	0	0	0	6	7	0:6	0:7
+5	-	ERROR	1	1	0	1	1	8	9	0:8	0:9
+6	-	interpolation_start	1	0	0	0	0	8	9	0:8	0:9
+5	-	string_literal	1	0	0	0	0	9	11	0:9	0:11
+6	-	"	0	0	0	0	0	9	10	0:9	0:10
+6	-	"	0	0	0	0	0	10	11	0:10	0:11
+3	-	;	0	0	0	0	0	11	12	0:11	0:12
