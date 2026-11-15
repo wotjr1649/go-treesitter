@@ -328,21 +328,21 @@
       "cSymbol": "tree_sitter_java"
     },
     "c": {
-      "repo": "https://github.com/tree-sitter/tree-sitter-c",
-      "commit": "b780e47fc780ddc8da13afa35a3f4ed5c157823d",
+      "repo": "https://github.com/tree-sitter-grammars/tree-sitter-c",
+      "commit": "f3202ac4f1041e0b0a2b908147d5dd0e951da7b1",
       "extractDir": "c",
-      "archive": "c-b780e47fc780.tar.gz",
-      "archiveSHA256": "dc3979e40fce678c27273ba8ab93b48b5acd6b91d1dfde6a4451222d366d689f",
-      "archiveURL": "https://codeload.github.com/tree-sitter/tree-sitter-c/tar.gz/b780e47fc780ddc8da13afa35a3f4ed5c157823d",
+      "archive": "c-f3202ac4f104.tar.gz",
+      "archiveSHA256": "c7a0d2fa561da7c9ae7a4d8b705a059ed0c855eccddef3badcabb9004b094380",
+      "archiveURL": "https://codeload.github.com/tree-sitter-grammars/tree-sitter-c/tar.gz/f3202ac4f1041e0b0a2b908147d5dd0e951da7b1",
       "grammarDir": "src",
       "dirs": [
         "src"
       ],
-      "treeSHA256": "69eea1eb0f42b4d38abcf2c4d8d916a247ffa12faebcc781b421f61fd7cc9b53",
+      "treeSHA256": "cb0faf756bfeb9ca141d238607127b6c2a74efde497acc56614f596ea8d056f1",
       "files": {
-        "parser.c": "f2883ff9b21f4a5bd5553c1b10366c418947d17a7bc6bf256124a7542f079dd2",
+        "parser.c": "55becfe6fdf0d6b6b1bfc579c5503fe2717c9508be54b95bcbff62997bc20e80",
         "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
-        "tree_sitter/array.h": "31e60a1bff6f715afacce03b5b70efe42b58371b4f9595dd4af52a577ff9608c",
+        "tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
         "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
       },
       "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",

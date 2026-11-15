@@ -1,6 +1,6 @@
 # ADR-0024 — Grammar source tiers: one upstream per language
 
-**Status:** Accepted by the owner · 2026-11-15 · refines ADR-0020 §4 (which grammars) and ADR-0023 (how defects
+**Status:** Accepted by the owner · 2026-11-15; rule 6 added 2026-11-16 · refines ADR-0020 §4 (which grammars) and ADR-0023 (how defects
 are carried). The runtime upstream is `tree-sitter/tree-sitter` only, unmodified.
 
 ## Context
@@ -31,7 +31,7 @@ distributions such as nvim-treesitter pick one per language.
 
 | Tier | Language → repository |
 |---|---|
-| 1 | bash, c, cpp, c-sharp, css, go, html, java, javascript (+jsx), json, php, python, ruby, rust, typescript/tsx → `tree-sitter/tree-sitter-<lang>` |
+| 1 | bash, cpp, c-sharp, css, go, html, java, javascript (+jsx), json, php, python, ruby, rust, typescript/tsx → `tree-sitter/tree-sitter-<lang>`; c → `tree-sitter-grammars/tree-sitter-c` (maintained fork, rule 6, since 2026-11-16) |
 | 2 | yaml → `tree-sitter-grammars/tree-sitter-yaml`; xml → `tree-sitter-grammars/tree-sitter-xml` |
 | 3 | kotlin → `fwcd/tree-sitter-kotlin` (replaces the kit's `tree-sitter-grammars/tree-sitter-kotlin`); powershell → `airbus-cert/tree-sitter-powershell`; r → `r-lib/tree-sitter-r`; dart → `UserNobody14/tree-sitter-dart`; swift → `alex-pinkus/tree-sitter-swift` |
 | owner-designated | T-SQL → `alfpricot/tree-sitter-mssql` (formerly `meloncholera/tree-sitter-mssql`; released since v0.1.0; nvim-treesitter has no T-SQL grammar); PostgreSQL → `gmr/tree-sitter-postgres` (nvim-treesitter has none; generated from PostgreSQL's own grammar) |
@@ -44,3 +44,26 @@ distributions such as nvim-treesitter pick one per language.
   CLI), per earlier decisions.
 - tree-sitter-grammar-kit is being absorbed into this repository; its grammar choices do not carry over unless they
   match this ADR.
+
+## Amendment (2026-11-16): rule 6, following a maintained fork
+
+6. **Follow a maintained fork.** When nvim-treesitter's `parsers.lua` (main) moves a tier-1 language to a maintained
+   fork, we follow it after measuring the move. A maintained fork is (a) in `tree-sitter-grammars` or another
+   repository nvim-treesitter pins, (b) not archived, (c) committed to within 12 months, (d) under the same licence
+   text. The language keeps tier 1 by origin and is shown as "tier 1 (maintained fork)". Rule 5 still holds.
+
+   Tie-breakers: the repository with better measured behaviour on our gates wins; if behaviour is equal, prefer the
+   one nvim-treesitter pins; if the fork lacks commits the original has (GitHub compare `behind_by > 0`), stay and
+   re-check at the next pin move; fixes we find are reported where issues are enabled (the original if the fork has
+   none). The weekly upstream watch reports a different repository as a warning, never a failure or automatic move.
+
+   A move is one pull request with: new identity and hashes in `tools/gen/pins.json` (licence bytes compared);
+   `schema check`/`schema diff` old→new; native tree diff old→new over the pinned corpus and large input (any
+   ok→error blocks); regenerated module and the usual gates (conformance including the new repository's queries,
+   bench); updated README, module README, schema register and `limitations.md`; owner approval per pin.
+
+   First application, C (P43, 2026-11-16): `tree-sitter/tree-sitter-c@b780e47` → `tree-sitter-grammars/tree-sitter-c@f3202ac`
+   (fork of the original, 2 commits ahead, 0 behind). `grammar.js`, `node-types.json`, licence and test corpus are
+   identical; `parser.c` differs only in a gcc pragma and the patch version because the fork regenerated it with
+   CLI 0.27.2 (byte-identical to our regeneration); native trees over the corpus are identical; the product wasm
+   differs by one byte. nvim-treesitter moved for its own queries and bindings, not for grammar defects.
