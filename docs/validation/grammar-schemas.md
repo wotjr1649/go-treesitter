@@ -47,3 +47,40 @@ YAML's ADR-0023 patch changes `src/parser.c` only; the schema below is the unmod
 | ruby | tree-sitter/tree-sitter-ruby | `ad907a69da0c` | `src` | 70025 | `9683f80e7be3dd93f1d6f575800de3f3445cda8af1f313f1f80003229c328e8b` | baseline (Q14 v0.4.0 candidate) |
 | xml | tree-sitter-grammars/tree-sitter-xml | `5000ae8f22d1` | `xml/src` | 17444 | `3b63e111187a0f9b2282e1748db2dd6b10e968f0cdb3676772def93bf89f2a7b` | baseline (Q14 v0.4.0 candidate) |
 | yaml | tree-sitter-grammars/tree-sitter-yaml | `a1c4812a73ec` | `src` | 9026 | `1238b6c89fc6afb9723b6463a365843aa87e478025490660e5acfc9adaaf809b` | baseline (Q14 v0.4.0 candidate) |
+
+## v0.4.0 candidate (Q17 nvim-treesitter pin refresh)
+
+Based on main `dc3b23dc8813b8311e61a97051a6db77c1a287de`. The current nvim-treesitter
+`main/lua/nvim-treesitter/parsers.lua` was read twice on 2026-11-15, including immediately before updating pins;
+both reads selected the same revisions in the same repositories. Archives are codeload tarballs with SHA-256
+recorded in `tools/gen/pins.json`; the previous baselines above are retained.
+
+The Q15 schema tool is absent at this base, so these static node-type diffs use the existing manual review method:
+records are keyed by `(type, named)` and their fields, child alternatives, subtypes and flags are compared.
+The reviewed changes are:
+
+- PHP: 305 records remain; `clone_expression.children.required` becomes false and an optional, single
+  `arguments` field of type `arguments` is added.
+- PowerShell: 322 → 323 records. The new named `background_operator` is allowed in the assignment `value`
+  field and the children of `hash_entry` and `statement_list`. `command_elements` and
+  `redirected_file_name` gain `unary_expression` child alternatives. `command_parameter` gains an empty
+  `fields` object (a schema serialization change). No records are removed; six existing records change.
+- Dart: 353 → 355 records, adding named `primary_constructor` and `primary_constructor_body_signature`.
+  `class_definition` and `enum_declaration` gain optional `primary_constructor` fields and `const_builtin`
+  children. The primary constructor body signature becomes a child alternative in `declaration` and
+  `method_signature`. `constant_constructor_signature` replaces its `identifier` child alternative with an
+  optional, multiple `name` field accepting `.`, `identifier`, and `new`; `constructor_signature.name`
+  becomes optional. `enum_body.children`, `enum_declaration.body`, `extension_declaration.body`, and
+  `extension_type_declaration.body` become optional. `enum_declaration` moves `type_parameters` from child
+  alternatives to an optional single field. `representation_declaration` gains `final_builtin` children
+  and optional single `parameters` of type `formal_parameter_list`, while its `name` and `type` fields
+  become optional. No records are removed; ten existing records change.
+
+These are static schema changes and do not establish parse behaviour. No license/notice bytes changed; large benchmark input
+identities are independently pinned and unchanged.
+
+| Grammar | Repository | Old commit → new commit | Directory | Old → new bytes | Old → new `node-types.json` SHA-256 | Added / removed / changed records |
+|---|---|---|---|---:|---|---|
+| php | tree-sitter/tree-sitter-php | `92b5271b60bec77fb65b5e5bc41561e8dac81299` → `58d5643086ae60e93a3746cca648363ee97c8761` | `php/src` | 115690 → 115891 | `c487d95cf9ddce3b7fe2120a257e5e43f7e9e4842cb5988707a984887143b788` → `45fddbaad542a86cf413ca204bb232ea4478f8d634dc3beac4b2c8d837ce49ff` | +0 / -0 / ~1 |
+| powershell | airbus-cert/tree-sitter-powershell | `e7bd348c49fdfd5c853a146a670965ba516a6239` → `65ea6919e816a7ac142acec7ee72757f89db8439` | `src` | 72248 → 72778 | `dc314fa2746de2c2048ad5c95e0c6488d1b2873e524a95473356c685f18a9707` → `db02c7bdba010b518e4fa12b3ba045d0156d475f414b3ff4622eb30f51281c4e` | +1 / -0 / ~6 |
+| dart | UserNobody14/tree-sitter-dart | `be07cf7118d3dba06236a3f19541685a68209934` → `0038280b774b65c1b89ba7fec50624d8baed9fe1` | `src` | 314023 → 316418 | `ea858f11158d4b176b32e7fdbdff6b49c587b2e7ee70e5fbe90751865a1912fe` → `9e351626d3a185b95ccdf58fb9e94967e8e97075ff62295269ba4208f51c7600` | +2 / -0 / ~10 |

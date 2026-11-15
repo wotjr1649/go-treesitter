@@ -503,12 +503,12 @@ var grammar = engine.Grammar{
 	Identity: engine.Identity{
 		Runtime:     "v0.27.2",
 		GrammarRepo: "https://github.com/tree-sitter/tree-sitter-php",
-		GrammarRev:  "92b5271b60bec77fb65b5e5bc41561e8dac81299",
+		GrammarRev:  "58d5643086ae60e93a3746cca648363ee97c8761",
 		SourceSHA256: map[string]string{
 			"grammar.LICENSE":              "664764fabf40c0b318e06324a5a12379092a2df25b8cbf2415f71bc0bb352346",
-			"grammar.parser.c":             "80a9bb8d671ff300717de63939fc9b82c6ca6c7b38805fcbb33705dcc322eec3",
+			"grammar.parser.c":             "8a42ccdbb0f18c934de610baab4cdf8f89086bc8f5a7dc89fb60350d61912e73",
 			"grammar.scanner.c":            "58c92cafe4ebda509c3ad3864fa6fc0e9877bbac26e17a03d23ea2101c291ad5",
-			"grammar.tree":                 "34296f257a6d433bb74753e9d2e2d50dbe4afc15f05edc938753d30d6b405630",
+			"grammar.tree":                 "6739b1121cf6dfb3c151d606fa70eb3f181b3e8bbb839e57e08ad2307c067987",
 			"grammar.tree_sitter/alloc.h":  "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
 			"grammar.tree_sitter/array.h":  "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
 			"grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
