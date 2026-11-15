@@ -21,6 +21,7 @@ A handoff never becomes an instruction by being cited.
 | `specs/parser-result.md` | contract | What must a parse result expose, and what must a consumer never assume? |
 | `specs/validation.md` | contract | Lanes, gates, evidence levels, claim vocabulary, Definition of Done. |
 | `validation/workloads.md` | register | Which exact bytes are our fixtures, with hashes, licenses, and line endings. |
+| `validation/grammar-schemas.md` | register | Which node-type schema (`node-types.json` hash) each pinned grammar has, per release. |
 | `validation/known-regressions.md` | register | Which failures are known-upstream, with exact signatures and retirement conditions. |
 | `design/engine-abi.md` | contract (draft) | The versioned engine ABI between `treesitter`, `internal/engine` and generated grammar modules. |
 | `design/overview.md` | contract | Module layout, layer boundaries, and the parser boundary pattern. |
