@@ -25,8 +25,15 @@ func TestMirrorAssets(t *testing.T) {
 	seen := map[string]bool{}
 	for _, line := range assets {
 		f := strings.Split(line, "\t")
-		if len(f) != 3 || len(f[1]) != 64 || seen[f[0]] {
+		if len(f) != 4 || len(f[1]) != 64 || seen[f[0]] {
 			t.Fatalf("invalid asset %q", line)
+		}
+		wantKind := "toolchain"
+		if f[0] == p.Runtime.Archive || f[0] == p.WasiLibc.Archive || grammars[f[0]] {
+			wantKind = "source"
+		}
+		if f[3] != wantKind {
+			t.Fatalf("%s kind = %q, want %q", f[0], f[3], wantKind)
 		}
 		seen[f[0]] = true
 	}

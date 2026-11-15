@@ -78,7 +78,7 @@ func main() {
 	flag.BoolVar(&o.hash, "hash", false, "print the computed values of every pin and exit")
 	flag.BoolVar(&o.noAPI, "no-api", false, "do not emit language_api.go (Language() needs the root treesitter package)")
 	flag.BoolVar(&o.balanceProbe, "balance-probe", false, "TEST ONLY: add balancing/reset observations and a deterministic conformance test; output must be a new directory outside grammars/")
-	flag.BoolVar(&o.mirrorAssets, "mirror-assets", false, "list release assets for every pinned platform: file, sha256, upstream URL")
+	flag.BoolVar(&o.mirrorAssets, "mirror-assets", false, "list pinned archives for every platform: file, sha256, upstream URL, kind (source/toolchain)")
 	flag.StringVar(&o.treeSitter, "tree-sitter", "", "pinned tree-sitter CLI (needed only for grammar-source patches)")
 	flag.IntVar(&o.patchAlert, "patch-alert", 3, "warn when a grammar has more than this many patches")
 	flag.BoolVar(&o.patchStatus, "patch-status", false, "list every grammar's patch count and threshold warnings")

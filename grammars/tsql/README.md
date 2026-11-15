@@ -3,7 +3,7 @@
 Generated tree-sitter grammar module for go-treesitter. **Do not edit**: `engine_gen.go` and `language.go` are output of
 `tools/gen` (docs/design/engine-abi.md, ADR-0020).
 
-- upstream grammar: https://github.com/meloncholera/tree-sitter-mssql at `8620fbcfca9438e1ff7104835bcb8305aba3bdfa`
+- upstream grammar: https://github.com/alfpricot/tree-sitter-mssql at `2e34d86ec58f3d1a771efc0ca1e71c536690a0b7`
 - tree-sitter runtime: v0.27.2 (unmodified)
 - engine ABI: 3
 - recipe sha256: `00002fc28f845d1121357c3690210d2ad59133b67078a9936c0ed376fd53f6fa`

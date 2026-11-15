@@ -36,7 +36,7 @@ func TestWasiCtype(t *testing.T) {
 		t.Fatal(err)
 	}
 	exe := filepath.Join(work, "ctype-probe")
-	args := []string{"-std=c11", "-I" + filepath.Join(here, "shim"), filepath.Join(here, "ctype_probe.c")}
+	args := []string{"-std=c11", "-fsigned-char", "-fno-builtin", "-Werror=implicit-function-declaration", "-I" + filepath.Join(here, "shim"), filepath.Join(here, "ctype_probe.c")}
 	if runtime.GOOS == "windows" {
 		exe += ".exe"
 		args = append(args, "-static")

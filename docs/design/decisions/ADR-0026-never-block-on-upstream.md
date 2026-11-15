@@ -1,14 +1,25 @@
 # ADR-0026 — Never block on upstream: mirrors, grammar patches, health watch
 
 **Status:** Accepted by the owner · 2026-11-15 · extends ADR-0023 (patch scope) and ADR-0024 (tier re-check).
+S1 amended by the owner on 2026-11-15 as follows; the original reasoning below is retained.
+
+## Amendment (2026-11-15)
+
+Mirror source archives (grammars, tree-sitter runtime and wasi-libc) with the release. Toolchain binaries
+(wasi-sdk, binaryen and tree-sitter CLI, on all pinned host platforms) are not mirrored until their complete
+bundled notices are established, for example from an SBOM of the exact archives. Fetch those tools from their
+official releases with the pinned SHA-256 checks; the release supplies no fallback assets for them. For v0.4.0,
+release assets are the 24 source archives plus `SHA256SUMS`. This amendment narrows decision S1 below; the
+[publication procedure](../../specs/publication.md#pinned-archive-release-assets) defines the source-row selection.
 
 ## Context
 
 Library users do not depend on upstream repositories: generated Go code is committed and released versions are kept by
 the Go module proxy. Our development pipeline does: regeneration, the native reference, nightly and bench lanes fetch
 pinned archives from upstream, and most grammar defects need a `grammar.js` change that only upstream can release.
-Both risks have occurred: the T-SQL repository moved (`meloncholera` → `alfpricot`) and its pinned commit is no longer
-reachable from any branch; the kit's Kotlin repository stopped merging changes.
+Both risks have occurred: the T-SQL repository moved (`meloncholera` → `alfpricot`) and its former pinned commit became
+unreachable from any branch (the owner-approved 2026-11-15 pin move selects a tree-identical reachable commit);
+the kit's Kotlin repository stopped merging changes.
 
 ## Decision
 

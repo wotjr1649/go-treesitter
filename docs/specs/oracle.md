@@ -9,7 +9,13 @@ tree-sitter runtime release and the same grammar `parser.c`/`scanner.c` bytes (`
 compiled by this repository's own tooling (`tools/native-ref`: our own dump/edit/changed-ranges driver,
 sources verified against `tools/gen/pins.json`). Scanner character classification and case conversion use the
 engine's same pinned wasi-libc sources through `wctype.h`/`ctype.h` shims, rather than the host libc's semantics;
-the wasi-libc archive is SHA-256-checked against the pin before its sources are compiled. The upstream runtime stays
+the wasi-libc archive is SHA-256-checked against the pin before its sources are compiled. The reference is also built
+with `-fsigned-char`: plain `char` is signed for the engine's wasm32 clang target but unsigned by default on AArch64
+Linux, and scanners that keep lookahead in `char` (bash and ruby heredoc delimiters) compare differently for bytes
+above 0x7F. The reference uses the engine recipe's `-DNDEBUG` for the driver, grammar and runtime, so assertions
+are disabled in both builds. Windows native references retain 16-bit `wchar_t`: C++ raw string delimiters and XML
+names containing supplementary-plane characters can differ from the engine there; CI native references run on Linux.
+The upstream runtime stays
 unmodified; grammar sources follow ADR-0023 when owner-approved temporary patches are present, with the same patched
 or regenerated C used by both builds. There is no long-lived pinned oracle epoch: the reference moves with the runtime
 release and is rebuilt for it.

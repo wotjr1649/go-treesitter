@@ -34,7 +34,7 @@ distributions such as nvim-treesitter pick one per language.
 | 1 | bash, c, cpp, c-sharp, css, go, html, java, javascript (+jsx), json, php, python, ruby, rust, typescript/tsx → `tree-sitter/tree-sitter-<lang>` |
 | 2 | yaml → `tree-sitter-grammars/tree-sitter-yaml`; xml → `tree-sitter-grammars/tree-sitter-xml` |
 | 3 | kotlin → `fwcd/tree-sitter-kotlin` (replaces the kit's `tree-sitter-grammars/tree-sitter-kotlin`); powershell → `airbus-cert/tree-sitter-powershell`; r → `r-lib/tree-sitter-r`; dart → `UserNobody14/tree-sitter-dart`; swift → `alex-pinkus/tree-sitter-swift` |
-| owner-designated | T-SQL → `meloncholera/tree-sitter-mssql` (released since v0.1.0; nvim-treesitter has no T-SQL grammar); PostgreSQL → `gmr/tree-sitter-postgres` (nvim-treesitter has none; generated from PostgreSQL's own grammar) |
+| owner-designated | T-SQL → `alfpricot/tree-sitter-mssql` (formerly `meloncholera/tree-sitter-mssql`; released since v0.1.0; nvim-treesitter has no T-SQL grammar); PostgreSQL → `gmr/tree-sitter-postgres` (nvim-treesitter has none; generated from PostgreSQL's own grammar) |
 
 ## Consequences
 

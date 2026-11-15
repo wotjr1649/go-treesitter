@@ -14,9 +14,9 @@ func buildCtype(s source, dl, work, here, cc, opt string, fetch bool) ([]string,
 		return nil, err
 	}
 	var objects []string
-	for _, name := range []string{"iswalnum", "iswalpha", "iswdigit", "iswspace", "towctrans", "isdigit"} {
+	for _, name := range []string{"iswalnum", "iswalpha", "iswblank", "iswcntrl", "iswdigit", "iswgraph", "iswlower", "iswprint", "iswpunct", "iswspace", "iswupper", "iswxdigit", "towctrans", "isblank", "isdigit"} {
 		obj := filepath.Join(work, "tsg_"+name+".o")
-		args := []string{"-std=c11", opt, "-fno-builtin", "-I" + filepath.Join(here, "ctype"), "-c",
+		args := []string{"-std=c11", "-fsigned-char", opt, "-fno-builtin", "-I" + filepath.Join(here, "ctype"), "-c",
 			filepath.Join(work, s.ExtractDir, "libc-top-half", "musl", "src", "ctype", name+".c"), "-o", obj}
 		cmd := exec.Command(cc, args...)
 		cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr

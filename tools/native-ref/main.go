@@ -189,7 +189,7 @@ func run(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuil
 		if runtime.GOOS == "windows" {
 			exe += ".exe"
 		}
-		args := []string{"-std=c11", opt, "-I" + filepath.Join(here, "shim"), "-I" + filepath.Join(lib, "include"), "-I" + filepath.Join(lib, "src"),
+		args := []string{"-std=c11", "-fsigned-char", "-DNDEBUG", opt, "-I" + filepath.Join(here, "shim"), "-I" + filepath.Join(lib, "include"), "-I" + filepath.Join(lib, "src"),
 			"-I" + gdir, "-DTSG_LANG_FN=" + g.CSymbol}
 		if runtime.GOOS == "windows" {
 			args = append(args, "-static") // runs without the MinGW runtime DLLs next to it

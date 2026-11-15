@@ -196,8 +196,7 @@ to `EngineFault`; both discard the instance (`Release`) and create a new one.
 ## 5. Grammar module layout
 
 `grammars/<dir>/go.mod`: `module github.com/wotjr1649/go-treesitter/grammars/<dir>`, requires the root module (local
-development: `replace github.com/wotjr1649/go-treesitter => ../..`). Wave 1 directories / packages: `csharp`, `tsql`,
-`typescript`, `tsx`, `python`, `golang` (package `golang`), `json`. Files: generated `engine_gen.go` (wasm2go output,
+development: `replace github.com/wotjr1649/go-treesitter => ../..`). The layout applies to every entry in `tools/gen/pins.json`. Files: generated `engine_gen.go` (wasm2go output,
 patched), `language.go` (static `engine.Grammar` + `func Language() *treesitter.Language`), `LICENSE` of the grammar,
 `provenance.json` (identity + hashes), `README.md`. Regenerating twice must give identical bytes.
 

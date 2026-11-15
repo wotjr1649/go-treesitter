@@ -1,6 +1,6 @@
 # go-treesitter
 
-**Preview (v0.3.0).** A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
+**Preview (v0.4.0).** A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
 module is generated from the unmodified upstream tree-sitter runtime and pinned grammar C (wasm translated to Go by
 `tools/gen`). Grammar C may carry recorded temporary
 [ADR-0023 patches](docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md); each patched module discloses them.
@@ -14,17 +14,23 @@ Start with [AGENTS.md](AGENTS.md) and the [documentation map](docs/README.md). T
 
 ## Use
 
-The root module has no grammar. Add the grammar modules you need under `grammars/`: `bash`, `c`, `cpp`, `csharp`,
-`css`, `golang`, `html`, `java`, `javascript` (including JSX), `json`, `python`, `rust`, `tsql`, `tsx`,
-`typescript`. Each language has exactly one upstream grammar repository, chosen by the tiers of
-[ADR-0024](docs/design/decisions/ADR-0024-grammar-source-tiers.md): all of these come from the `tree-sitter`
-organisation except `tsql` (`meloncholera/tree-sitter-mssql`, owner-designated).
+The root module has no grammar. v0.4.0 provides 23 grammar modules using engine ABI 3. Add the modules you need
+under `grammars/`: `bash`, `c`, `cpp`, `csharp`, `css`, `dart`, `golang`, `html`, `java`, `javascript` (including JSX),
+`json`, `kotlin`, `php` (PHP parser only), `powershell`, `python`, `r`, `ruby`, `rust`, `tsql`, `tsx`, `typescript`,
+`xml` (XML parser only), and `yaml`.
 
-Wave-2 batch 2 adds development candidates `yaml` (tier 2), `php` (tier 1, PHP parser only), `powershell` (tier 3),
-`r` (tier 3), `dart` (tier 3), `xml` (tier 2, XML parser only), `ruby` (tier 1), and `kotlin` (tier 3,
-`fwcd/tree-sitter-kotlin`). YAML carries temporary patch `0001-no-early-eof`. Local Q9/Q10 results describe earlier
-product bytes; Q14 passed the current ABI 3 local Windows integration, native comparison and resource gates. Hosted gates for these eight have not run.
-See the [status board](docs/reports/release-critical-status.md#q14-wave-2-batch-2-abi-3-integration) and
+Each language has exactly one upstream repository, chosen by the tiers of
+[ADR-0024](docs/design/decisions/ADR-0024-grammar-source-tiers.md):
+
+| Tier | Modules | Upstream |
+|---|---|---|
+| 1 | `bash`, `c`, `cpp`, `csharp`, `css`, `golang`, `html`, `java`, `javascript`, `json`, `php`, `python`, `ruby`, `rust`, `tsx`, `typescript` | `tree-sitter` organisation (`golang` uses `tree-sitter-go`; TSX and TypeScript share `tree-sitter-typescript`) |
+| 2 | `xml`, `yaml` | `tree-sitter-grammars/tree-sitter-xml`, `tree-sitter-grammars/tree-sitter-yaml` |
+| 3 | `dart`, `kotlin`, `powershell`, `r` | `UserNobody14/tree-sitter-dart`, `fwcd/tree-sitter-kotlin`, `airbus-cert/tree-sitter-powershell`, `r-lib/tree-sitter-r` |
+| Owner-designated | `tsql` | `alfpricot/tree-sitter-mssql` |
+
+Exact revisions are in [pins.json](tools/gen/pins.json). YAML carries temporary patch `0001-no-early-eof`.
+See the [status board](docs/reports/release-critical-status.md) for measured scopes and pending release gates, and
 [limitations](docs/reports/limitations.md).
 
 ```go

@@ -7,8 +7,9 @@ behaviour: equal schemas can still parse differently (for example after a preced
 
 ## Offline strict-check inputs
 
-The current pin set contains 23 grammars, including the Q17 PHP, PowerShell and Dart revisions below;
-`tools/gen/pins.json` SHA-256 is `18a8497b6e0fa028b4d7d1607ff2505a51fc3a182a4989f61dd55b114255c3a1`. All 23 schemas pass the
+The current pin set contains 23 grammars, including the Q17 PHP, PowerShell and Dart revisions and the Q20
+tree-identical T-SQL pin move below; `tools/gen/pins.json` SHA-256 is
+`05f4b60acb1f193875529ff0a1785cd6bd1d6c3ce921cd91793a4c04797996ab`. All 23 schemas pass the
 strict check at this pin set (Windows amd64, Go 1.27.4).
 The tables below record each schema once, grouped by the release that first recorded it; archive SHA-256
 values identify the pinned upstream inputs. `tsx` and `typescript` share one archive. Schema bytes come from
@@ -104,3 +105,14 @@ identities are independently pinned and unchanged.
 | php | tree-sitter/tree-sitter-php | `92b5271b60bec77fb65b5e5bc41561e8dac81299` → `58d5643086ae60e93a3746cca648363ee97c8761` | `php/src` | 115690 → 115891 | `c487d95cf9ddce3b7fe2120a257e5e43f7e9e4842cb5988707a984887143b788` → `45fddbaad542a86cf413ca204bb232ea4478f8d634dc3beac4b2c8d837ce49ff` | +0 / -0 / ~1 |
 | powershell | airbus-cert/tree-sitter-powershell | `e7bd348c49fdfd5c853a146a670965ba516a6239` → `65ea6919e816a7ac142acec7ee72757f89db8439` | `src` | 72248 → 72778 | `dc314fa2746de2c2048ad5c95e0c6488d1b2873e524a95473356c685f18a9707` → `db02c7bdba010b518e4fa12b3ba045d0156d475f414b3ff4622eb30f51281c4e` | +1 / -0 / ~6 |
 | dart | UserNobody14/tree-sitter-dart | `be07cf7118d3dba06236a3f19541685a68209934` → `0038280b774b65c1b89ba7fec50624d8baed9fe1` | `src` | 314023 → 316418 | `ea858f11158d4b176b32e7fdbdff6b49c587b2e7ee70e5fbe90751865a1912fe` → `9e351626d3a185b95ccdf58fb9e94967e8e97075ff62295269ba4208f51c7600` | +2 / -0 / ~10 |
+
+## v0.4.0 candidate T-SQL source identity (Q20, 2026-11-15)
+
+Owner-approved move from the unreachable historical commit in `meloncholera/tree-sitter-mssql` to
+`alfpricot/tree-sitter-mssql` at a commit reachable from its default branch `dev`. Both commits name git tree
+`4db801d44125085dd823d446b0cbf0cfdce7b50b`; all extracted regular-file bytes, including C, license and notice,
+are identical. The static `schema diff` is `PASS` with zero changes; the v0.3.0 record above remains historical.
+
+| Grammar | Current repository | Old commit → new commit | Directory | Old → new bytes | Unchanged `node-types.json` SHA-256 | Old → new archive SHA-256 |
+|---|---|---|---|---:|---|---|
+| tsql | alfpricot/tree-sitter-mssql | `8620fbcfca9438e1ff7104835bcb8305aba3bdfa` → `2e34d86ec58f3d1a771efc0ca1e71c536690a0b7` | `src` | 404735 → 404735 | `d49356aed210b6522a6e130fdfb3081ff004b74c1cc3a8aee8c5f76eb73d30b9` | `66c05cc00ad2b0a9e91c4814a39c2c066015fb912828ec3bf360d164fe8a9149` → `82476f5880f6b46c83198ae24b4a4eca30941893dbee4d05ec9748fb55ee3b7b` |

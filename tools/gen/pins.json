@@ -220,11 +220,11 @@
       "cSymbol": "tree_sitter_c_sharp"
     },
     "tsql": {
-      "repo": "https://github.com/meloncholera/tree-sitter-mssql",
-      "commit": "8620fbcfca9438e1ff7104835bcb8305aba3bdfa",
-      "extractDir": "tree-sitter-mssql-8620fbcfca94",
-      "archive": "tree-sitter-mssql-8620fbcfca94.tar.gz",
-      "archiveSHA256": "66c05cc00ad2b0a9e91c4814a39c2c066015fb912828ec3bf360d164fe8a9149",
+      "repo": "https://github.com/alfpricot/tree-sitter-mssql",
+      "commit": "2e34d86ec58f3d1a771efc0ca1e71c536690a0b7",
+      "extractDir": "tree-sitter-mssql-2e34d86ec58f",
+      "archive": "tree-sitter-mssql-2e34d86ec58f.tar.gz",
+      "archiveSHA256": "82476f5880f6b46c83198ae24b4a4eca30941893dbee4d05ec9748fb55ee3b7b",
       "grammarDir": "src",
       "dirs": [
         "src"

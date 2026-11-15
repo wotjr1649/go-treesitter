@@ -71,7 +71,7 @@ func TestQueryIndexInvalidation(t *testing.T) {
 				t.Fatal(err)
 			}
 			exe := filepath.Join(work, name)
-			args := []string{"-std=c11", "-O2", "-Wno-attributes", "-I" + filepath.Join(lib, "include"), "-I" + filepath.Join(lib, "src"), "-I" + gdir,
+			args := []string{"-std=c11", "-fsigned-char", "-O2", "-Wno-attributes", "-I" + filepath.Join(lib, "include"), "-I" + filepath.Join(lib, "src"), "-I" + gdir,
 				"-DTSG_LANG_FN=" + g.CSymbol, `-DTSG_INDEX_SHIM="` + filepath.ToSlash(copyPath) + `"`}
 			if runtime.GOOS == "windows" {
 				exe += ".exe"
