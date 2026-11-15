@@ -43,6 +43,7 @@ Executable CLI (stdout is binary, `\n` line ends on every platform):
 | `<exe> changed-ranges <old> <new> <start> <old_end> <new_end>` | `ts_tree_get_changed_ranges(old, new)`, one `start_byte end_byte start_row start_col end_row end_col` line per range |
 | `<exe> query <query-file> <source>` | raw matches of a fresh parse, text predicates not evaluated (the C engine never does): `#tsg-query/1 patterns=<n> captures=<n>`, then per match `m<TAB><pattern><TAB><n>` and per capture `c<TAB><capture><TAB><node preorder index><TAB><symbol><TAB><start byte><TAB><end byte>` (the index comes from a full cursor walk by node id, independent of the engine's descendant index; symbol is `ts_node_symbol`). A rejected query prints `#tsg-query/1 error offset=<o> type=<t>` and exits 0. |
 | `<exe> fields <file>` | `ts_node_child_by_field_name` of a fresh parse for every node (cursor preorder) and every field name: `#tsg-fields/1 nodes=<n> fields=<f>`, then `<node index><TAB><field><TAB><result preorder index>` per non-null result (`?<symbol>:<start>:<end>` when the result is not a visible node). The runtime has no `ts_node_children_by_field_name` (v0.27.2). `tools/conformance` `TestFieldLookup` compares it with `Node.ChildByFieldName`. |
+| `<exe> edit-fields <old> <new> <start> <old_end> <new_end>` | the same `#tsg-fields/1` lookup output for `<new>` reparsed incrementally from the edited `<old>` tree, using the same tree construction as `edit`. `TestFieldLookupEdits` compares this with the Go incremental tree. |
 
 Points are byte columns with `\n` rows (the same as `treesitter.EditFor`). Exit codes: 0 ok, 2 usage / edit out of
 range, 3 unreadable input, 4 parse failure, 5 write failure.
@@ -81,7 +82,8 @@ format (`===` header with name and `:attribute` lines, input, `---`, expected tr
   same pins and seed give the same data on every host; the per-edit seed is in `edits/manifest.csv`.
 - Native results: `native/dumps/<lang>/<name>.dump` (fresh dump), `edits/results-native.csv` (sha256 of the native
   incremental dump and of the native fresh dump of the new text), `edits/<lang>/<name>.ranges` (native
-  `changed-ranges`). A native run that fails is listed in `native-failures.csv` and `ciconf` exits 1.
+  `changed-ranges`), and `edits/<lang>/<name>.fields` (native incremental field lookups). `edits/results-native.csv`
+  also records `edit_fields_exit` and `edit_fields_sha256` for each edit. A native run that fails is listed in `native-failures.csv` and `ciconf` exits 1.
 
 ## Timing modes (`tools/bench/ci`)
 
