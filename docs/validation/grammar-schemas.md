@@ -26,8 +26,8 @@ an archived upstream schema alone is not the generated result. YAML's ADR-0023 C
 the upstream schema does not describe that patch's behavioural effect.
 
 A new grammar's first entry is its baseline. When a pin moves, the entry records the old and new hashes and the
-reviewed node-type diff (tooling: `docs/design/decisions/ADR-0025` once accepted; until then the diff is written by
-hand in the pin-change pull request).
+reviewed node-type diff from `go run . schema diff` in `tools/gen`
+([ADR-0025](../design/decisions/ADR-0025-absorbing-tree-sitter-grammar-kit.md)), reviewed in the pin-change pull request.
 
 ## v0.3.0 (root tag on the merge commit of this change)
 
