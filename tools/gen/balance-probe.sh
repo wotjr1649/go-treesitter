@@ -26,16 +26,20 @@ mkdir -p "$W/bin" "$W/dl" "$W/src" "$W/work"
 GEN="$W/bin/gen$EXE"
 
 "$GEN" -root "$REPO/tools/gen" -plan host >"$W/plan.tsv"
-while IFS=$'\t' read -r kind file url sum dest; do
+while IFS=$'\t' read -r kind file url sum dest mirrors; do
   case "$kind" in
     goinstall)
       (cd "$W" && GOBIN="$W/bin" go install -trimpath "$file")
       ;;
     tool | source)
-      fetch_archive "$W/dl/$file" "$url"
-      echo "$sum  $W/dl/$file" | sha256sum -c -
+      fetch_verified_archive "$W/dl/$file" "$sum" "$url" "$mirrors"
       mkdir -p "$W/$dest"
       (cd "$W" && tar -xzf "dl/$file" --strip-components=1 -C "$dest")
+      ;;
+    cli)
+      fetch_verified_archive "$W/dl/$file" "$sum" "$url" "$mirrors"
+      gzip -dc "$W/dl/$file" >"$W/$dest"
+      chmod +x "$W/$dest"
       ;;
     *) echo "balance-probe: unknown plan line kind $kind" >&2; exit 1 ;;
   esac
@@ -47,6 +51,7 @@ for lang in "${LANGS[@]}"; do
   echo "== test-only $lang"
   "$GEN" -balance-probe -lang "$lang" -root tools/gen -src "$W/src" -dl "$W/dl" -sdk "$W/sdk" \
     -wasm2go "$W/bin/wasm2go$EXE" -wasm-opt "$W/binaryen/bin/wasm-opt$EXE" \
+    -tree-sitter "$W/bin/tree-sitter$EXE" -patch-alert "${PATCH_ALERT_THRESHOLD:-3}" \
     -out "$W/probes/$lang" -work "$W/work" -repo .
 done
 sha256sum -c "$W/shim-before.sha256"

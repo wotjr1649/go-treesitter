@@ -1,14 +1,14 @@
 # tools/native-ref — native C reference
 
 Builds one native executable per grammar from the sources pinned in `tools/gen/pins.json` (the unmodified tree-sitter
-runtime `lib/` plus one unmodified grammar, `parser.c` and `scanner.c`), linked with this repository's own driver
+runtime `lib/` plus one grammar's `parser.c` and `scanner.c`, including any approved ADR-0023 patches), linked with this repository's own driver
 `c/native_ref.c`. The executables produce the reference results the CGO-free conformance lane compares against
 (`docs/specs/oracle.md`). CGO is used only by the C compiler here, never by the Go product lanes.
 
 Scanner calls to `iswalnum`, `iswalpha`, `iswdigit`, `iswspace`, `towupper`, `towlower` and narrow `isdigit`
 use the engine's character semantics: `wctype.h`/`ctype.h` shims route them to namespaced functions compiled from
 the wasi-libc sources pinned in `tools/gen/pins.json`. The wasi-libc archive is SHA-256-checked before extraction,
-as are the runtime and grammar archives; upstream C stays unmodified. Private headers compile those sources with
+as are the runtime and grammar archives; runtime and wasi-libc C stay unmodified. Private headers compile those sources with
 32-bit character types and a 32-bit `wcschr` for musl's whitespace table; `-fno-builtin` prevents host-width compiler
 builtins from replacing that lookup. This keeps classification and case conversion independent of the host locale,
 glibc or UCRT, including full code points on Windows, whose host `wint_t` is narrower.
@@ -24,7 +24,8 @@ go run . -pins ../gen/pins.json -dl <archive dir> -work <empty dir> -out <exe di
   the pinned `files` hash. Transient network failures get at most three attempts, with 1/2-second backoff and a two-minute
   timeout per attempt; HTTP errors and hash mismatches are not retried. Failed transfers leave no partial archive. Only
   the required source directories are extracted into `-work` (the pinned grammar/runtime `dirs` and wasi-libc's
-  `libc-top-half/musl/src/ctype`); nothing in them is run.
+  `libc-top-half/musl/src/ctype`). Approved grammar-input patches additionally extract the full grammar archive
+  into a private directory and execute its grammar JS with the pinned CLI's native JS runtime (ADR-0023).
 - `-static` on Windows (no MinGW DLLs needed); upstream's `_POSIX_C_SOURCE`/`_DEFAULT_SOURCE` flags elsewhere.
 - Needs a C11 compiler (gcc or clang) on `PATH`; large grammars (csharp, tsql, typescript, tsx) take a few GB of RAM to
   compile at `-O2`.
@@ -89,7 +90,28 @@ Timer: `QueryPerformanceCounter` on Windows, `mach_absolute_time` on macOS, `CLO
 ## Upstream watch (`upstreamwatch`)
 
 `cd tools/native-ref && go run ./upstreamwatch -pins ../gen/pins.json` compares the pins with the newest stable
-tree-sitter, wasi-sdk, binaryen and wasm2go releases (exit 1 when one is newer) and lists how far the grammar repositories'
-and wasi-libc's default-branch heads are ahead of the pinned commits (reported only). Exit 2 means the GitHub API could not
-be read (for example the anonymous rate limit: set `GITHUB_TOKEN`). It reads only `pins.json` and public API answers and
-changes nothing. Run by `.github/workflows/upstream-watch.yml`.
+runtime/tool releases (exit 1 when one is newer). For every grammar, runtime, wasi-libc and tool pin it reports:
+
+- API redirects / changed `full_name` (rename or transfer), archive status, and missing/deleted repositories;
+- which default branch, published release tag, or other branch/tag contains the pin (`identical` or `ahead` from
+  pin to ref); only a pin unreachable from every branch and tag fails, including an orphan still downloadable as an archive;
+- last default-branch commit older than 12 calendar months (tier-review warning), and latest stable release vs pin.
+
+Rename, archive and age are warnings. Exit 2 means an unreachable pin, missing repository or API failure; GitHub's
+404 cannot distinguish deletion from an inaccessible repository. Requests are cached by path (shared grammar repos
+are fetched once); comparisons request one commit per page. The default head and latest published release are tried
+first; fallback enumerates all branches and public repository tags in pages of 100, stopping at the first containing ref.
+Public tags count as published release refs even without a GitHub Release entry. API/listing errors or quota exhaustion
+fail as incomplete checks, rather than being reported as an orphan. `GITHUB_TOKEN` is recommended: the complete inventory
+can exceed the anonymous 60-request quota. The report records request count and remaining quota, and stops requests
+when it reaches zero. It reads only `pins.json` and public API answers and changes nothing.
+Run by `.github/workflows/upstream-watch.yml` with its read-only token.
+
+## Recorded grammar patches
+
+Both builders use the ADR-0023 patch records in `pins.json`; grammar-input patches with `regenerate: true` use
+`tools/gen/grammarpatch` to compare two independent generated source trees with the pinned CLI. `-fetch` also
+retrieves the required CLI gzip upstream-first, with the release mirror as fallback and the original SHA-256
+still mandatory. A generation record is kept at `<work>/patches-<lang>/provenance.json`.
+`-unpatched` builds the original C for the required before/after comparison; it never changes the pin set.
+`-patch-alert N` sets the patch-count warning threshold (default 3). See `tools/gen/README.md` for the record schema.

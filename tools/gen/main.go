@@ -22,6 +22,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/wotjr1649/go-treesitter/tools/gen/patches"
 )
 
 var rootVersionRx = regexp.MustCompile(`^v[0-9]+[.][0-9]+[.][0-9]+(-[0-9A-Za-z.-]+)?$`)
@@ -41,9 +43,13 @@ var (
 )
 
 type opts struct {
+	treeSitter, grammarSrc                                                                 string
+	patchStatus                                                                            bool
+	patchAlert                                                                             int
 	lang, root, src, dl, sdk, wasm2go, wasmOpt, recipe, out, work, repo, rootVersion, plan string
 	hash, noAPI, verifyBinaries                                                            bool
 	balanceProbe                                                                           bool
+	mirrorAssets                                                                           bool
 }
 
 func main() {
@@ -65,6 +71,10 @@ func main() {
 	flag.BoolVar(&o.hash, "hash", false, "print the computed values of every pin and exit")
 	flag.BoolVar(&o.noAPI, "no-api", false, "do not emit language_api.go (Language() needs the root treesitter package)")
 	flag.BoolVar(&o.balanceProbe, "balance-probe", false, "TEST ONLY: add balancing/reset observations and a deterministic conformance test; output must be a new directory outside grammars/")
+	flag.BoolVar(&o.mirrorAssets, "mirror-assets", false, "list release assets for every pinned platform: file, sha256, upstream URL")
+	flag.StringVar(&o.treeSitter, "tree-sitter", "", "pinned tree-sitter CLI (needed only for grammar-source patches)")
+	flag.IntVar(&o.patchAlert, "patch-alert", 3, "warn when a grammar has more than this many patches")
+	flag.BoolVar(&o.patchStatus, "patch-status", false, "list every grammar's patch count and threshold warnings")
 	flag.Parse()
 	if err := run(o); err != nil {
 		fmt.Fprintln(os.Stderr, "gen:", err)
@@ -76,6 +86,20 @@ func run(o opts) error {
 	pins, err := loadPins(filepath.Join(o.root, "pins.json"))
 	if err != nil {
 		return err
+	}
+	if o.patchAlert < 0 {
+		return fmt.Errorf("-patch-alert must not be negative")
+	}
+	if o.patchStatus {
+		return printPatchStatus(pins, o.patchAlert)
+	}
+	if o.mirrorAssets {
+		lines, err := pins.mirrorAssets()
+		if err != nil {
+			return err
+		}
+		fmt.Println(strings.Join(lines, "\n"))
+		return nil
 	}
 	if o.plan != "" {
 		if o.plan == "host" {
@@ -132,6 +156,11 @@ func run(o opts) error {
 
 	work := filepath.Join(o.work, o.lang)
 	if err := os.MkdirAll(work, 0o755); err != nil {
+		return err
+	}
+	fmt.Fprintln(os.Stderr, patchStatus(o.lang, len(g.Patches), o.patchAlert))
+	patchProvenance, err := preparePatches(&o, pins, g, work, &id)
+	if err != nil {
 		return err
 	}
 	wasm := filepath.Join(work, o.lang+".wasm")
@@ -217,6 +246,9 @@ func run(o opts) error {
 
 	id.RecipeSHA256 = recipeSHA256(pins, g, rname, rc)
 	id.Tools = map[string]string{"wasi-sdk": pins.Tools.WasiSDK, "clang": pins.Tools.Clang, "llvm": pins.Tools.LLVMCommit, "wasm2go": pins.Tools.Wasm2go, "wasm2go-sum": pins.Tools.Wasm2goSum, "recipe": rname}
+	if patchProvenance != nil {
+		bindPatches(&id, patchProvenance)
+	}
 	if o.balanceProbe {
 		probeHash, err := sumFile(filepath.Join(o.root, "probe", "balance.c"))
 		if err != nil {
@@ -255,6 +287,7 @@ func run(o opts) error {
 		outputs[name] = sumBytes(b)
 	}
 	prov := provenance{Schema: 1, ABI: uint32(pins.ABI), Name: o.lang, Module: modulePrefix + o.lang, Identity: id, Outputs: outputs}
+	prov.Patches, prov.GrammarGeneration = g.Patches, patchProvenance
 	if o.balanceProbe {
 		prov.TestOnly = "balancing-cancel"
 	}
@@ -466,6 +499,9 @@ func clangPath(sdk string) string {
 func compile(o opts, pins *Pins, g GrammarPin, wasm string, extra ...string) (string, error) {
 	rt := filepath.Join(o.src, pins.Runtime.ExtractDir, "lib")
 	gd := filepath.Join(o.src, g.ExtractDir, filepath.FromSlash(g.GrammarDir))
+	if o.grammarSrc != "" {
+		gd = filepath.Join(o.grammarSrc, filepath.FromSlash(g.GrammarDir))
+	}
 	args := append([]string{}, clangFlags...)
 	args = append(args, extra...)
 	args = append(args, "--sysroot="+filepath.Join(o.sdk, "share", "wasi-sysroot"), "-DTSG_LANG_FN="+g.CSymbol,
@@ -594,4 +630,28 @@ func printHashes(o opts, pins *Pins) error {
 		res["shimSHA256"] = s
 	}
 	return json.NewEncoder(os.Stdout).Encode(res)
+}
+
+// patchedGrammar keeps the verified upstream tree intact, including for repeated generation.
+func patchedGrammar(o opts, g GrammarPin, work string, id *Identity) (string, error) {
+	dst, err := os.MkdirTemp(work, "patched-source-")
+	if err != nil {
+		return "", err
+	}
+	for _, dir := range g.Dirs {
+		if !filepath.IsLocal(dir) {
+			return "", fmt.Errorf("invalid grammar directory %q", dir)
+		}
+		if err := os.CopyFS(filepath.Join(dst, filepath.FromSlash(dir)), os.DirFS(filepath.Join(o.src, g.ExtractDir, filepath.FromSlash(dir)))); err != nil {
+			return "", err
+		}
+	}
+	if err := patches.Apply(o.root, dst, g.Patches); err != nil {
+		return "", err
+	}
+	for _, p := range g.Patches {
+		id.SourceSHA256["patch."+p.File] = p.SHA256
+		id.SourceSHA256["patched."+p.Source] = p.AfterSHA256
+	}
+	return dst, nil
 }
