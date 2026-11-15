@@ -27,7 +27,7 @@ const (
 	flagHasError = 16
 )
 
-// Snapshot is an immutable, goroutine-safe copy of one parse tree in struct-of-arrays form (about 41 bytes per node plus sparse field exceptions).
+// Snapshot is an immutable, goroutine-safe copy of one parse tree in struct-of-arrays form (25 bytes per node plus sparse field exceptions and a lazy line index).
 // It owns its source text (Parse: one copy; ParseOwned: the caller's slice). Node i is the i-th node in preorder, which
 // equals C's descendant index.
 type Snapshot struct {
@@ -35,13 +35,12 @@ type Snapshot struct {
 	src  string
 	n    int
 
-	symbol, field                      []uint16
-	flags                              []uint8
-	startByte, endByte                 []uint32
-	startRow, startCol, endRow, endCol []uint32
-	parent                             []int32  // -1 for the root
-	descEnd                            []int32  // exclusive end of the subtree in preorder (i+1 for a leaf)
-	childCount                         []uint32 // number of children (visible nodes only)
+	symbol, field      []uint16
+	flags              []uint8
+	startByte, endByte []uint32
+	parent             []int32  // -1 for the root
+	descEnd            []int32  // exclusive end of the subtree in preorder (i+1 for a leaf)
+	childCount         []uint32 // number of children (visible nodes only)
 
 	fieldLookups []fieldLookup // sorted by node, then field; target -1 is an explicit null
 
@@ -138,14 +137,14 @@ func (s *Snapshot) DescendantForPointRange(start, end Point, named bool) Node {
 
 func (s *Snapshot) startKey(i int32, points bool) uint64 {
 	if points {
-		return uint64(s.startRow[i])<<32 | uint64(s.startCol[i])
+		return s.Lines().point(s.startByte[i]).key()
 	}
 	return uint64(s.startByte[i])
 }
 
 func (s *Snapshot) endKey(i int32, points bool) uint64 {
 	if points {
-		return uint64(s.endRow[i])<<32 | uint64(s.endCol[i])
+		return s.Lines().point(s.endByte[i]).key()
 	}
 	return uint64(s.endByte[i])
 }
@@ -216,7 +215,6 @@ func newSnapshotBuilder(n int, lang *Language, src string, invalidUTF8 bool) *sn
 		lang: lang, src: src, n: n, invalidUTF8: invalidUTF8,
 		symbol: make([]uint16, n), field: make([]uint16, n), flags: make([]uint8, n),
 		startByte: make([]uint32, n), endByte: make([]uint32, n),
-		startRow: make([]uint32, n), startCol: make([]uint32, n), endRow: make([]uint32, n), endCol: make([]uint32, n),
 		parent: make([]int32, n), descEnd: make([]int32, n), childCount: make([]uint32, n),
 	}}
 }
@@ -245,10 +243,7 @@ func (b *snapshotBuilder) add(cnt, kc int, chunk []byte) error {
 	}
 	u32(5, s.startByte)
 	u32(9, s.endByte)
-	u32(13, s.startRow)
-	u32(17, s.startCol)
-	u32(21, s.endRow)
-	u32(25, s.endCol)
+	// Formats 1/2 still export point columns at 13/17/21/25; derive them from the owned source instead.
 	for i := 0; i < cnt; i++ {
 		s.parent[o+i] = int32(le.Uint32(chunk[29*kc+4*i:]))
 		if s.startByte[o+i] > s.endByte[o+i] || s.endByte[o+i] > srcLen {

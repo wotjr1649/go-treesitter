@@ -3,6 +3,7 @@ package treesitter
 import (
 	"sort"
 	"strings"
+	"sync"
 	"unicode/utf8"
 )
 
@@ -10,9 +11,10 @@ import (
 // only (like tree-sitter rows). A byte that is not valid UTF-8 counts as one rune and one UTF-16 unit. It is immutable
 // and safe for concurrent use.
 type LineIndex struct {
-	src      string
-	starts   []uint32 // starts[k] = byte offset of line k; starts[0] = 0
-	nonASCII []uint64 // bit k set: line k contains a byte >= 0x80
+	src          string
+	starts       []uint32 // starts[k] = byte offset of line k; starts[0] = 0
+	nonASCIIOnce sync.Once
+	nonASCII     []uint64 // bit k set: line k contains a byte >= 0x80; only Pos needs this
 }
 
 // Position is a 0-based line and the columns of one offset.
@@ -23,7 +25,7 @@ type Position struct {
 
 // NewLineIndex indexes src (at most 4 GiB; offsets are uint32).
 func NewLineIndex(src string) *LineIndex {
-	x := &LineIndex{src: src, starts: make([]uint32, 1, len(src)/32+2)}
+	x := &LineIndex{src: src, starts: make([]uint32, 1, strings.Count(src, "\n")+1)}
 	for off := 0; ; {
 		j := strings.IndexByte(src[off:], '\n')
 		if j < 0 {
@@ -31,19 +33,6 @@ func NewLineIndex(src string) *LineIndex {
 		}
 		off += j + 1
 		x.starts = append(x.starts, uint32(off))
-	}
-	x.nonASCII = make([]uint64, (len(x.starts)+63)/64)
-	for k := range x.starts {
-		a, e := int(x.starts[k]), len(src)
-		if k+1 < len(x.starts) {
-			e = int(x.starts[k+1])
-		}
-		for i := a; i < e; i++ {
-			if src[i] >= 0x80 {
-				x.nonASCII[k>>6] |= 1 << (k & 63)
-				break
-			}
-		}
 	}
 	return x
 }
@@ -65,8 +54,30 @@ func (x *LineIndex) Line(off uint32) int {
 	return sort.Search(len(x.starts), func(i int) bool { return x.starts[i] > off }) - 1
 }
 
+// point needs only byte columns; Pos would also decode a non-ASCII line for UTF-16/rune columns.
+func (x *LineIndex) point(off uint32) Point {
+	off = min(off, uint32(len(x.src)))
+	line := x.Line(off)
+	return Point{uint32(line), off - x.starts[line]}
+}
+
 // Pos maps a byte offset to its line and columns. Offsets past the end are clamped to the end of the source.
 func (x *LineIndex) Pos(off uint32) Position {
+	x.nonASCIIOnce.Do(func() {
+		x.nonASCII = make([]uint64, (len(x.starts)+63)/64)
+		for k, start := range x.starts {
+			end := len(x.src)
+			if k+1 < len(x.starts) {
+				end = int(x.starts[k+1])
+			}
+			for i := int(start); i < end; i++ {
+				if x.src[i] >= 0x80 {
+					x.nonASCII[k>>6] |= 1 << (k & 63)
+					break
+				}
+			}
+		}
+	})
 	if int64(off) > int64(len(x.src)) {
 		off = uint32(len(x.src))
 	}

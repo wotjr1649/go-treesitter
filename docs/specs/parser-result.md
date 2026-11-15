@@ -57,6 +57,18 @@ to UTF-8 and map offsets back to the original bytes.
 - `Snapshot`, `Node`, `Index`, `LineIndex` are immutable and safe for any number of goroutines. A snapshot owns its
   source (one copy; none with `ParseOwned`, whose caller must never modify the bytes again) and stays valid after the
   parser is closed. `Node.Text` is a zero-allocation substring of that source.
+- Snapshot arrays retain 25 B/node (previously 41), plus sparse field exceptions and source. Node points derive
+  LF-counted rows and byte columns from source offsets using a shared, lazy `sync.Once` line index:
+  `[]uint32` line starts cost `4 * (LF count + 1)` bytes plus fixed object/allocator overhead, with at most
+  `len(source) + 1` entries and no extra source copy. Only `LineIndex.Pos` adds its lazy non-ASCII bitset
+  (`8 * ceil(lines / 64)` bytes). Snapshot/source/cache Go memory is outside `WithMaxMemoryBytes`, whose
+  instance wasm linear-memory semantics are unchanged.
+- `Tree.Edit` validates byte bounds and point ordering only. Points inconsistent with bytes are passed to C
+  unchanged. Snapshot node points and `ChangedRanges` points derive from the result
+  source instead; changed-range offsets beyond its end use the EOF point. `EditFor` computes consistent points
+  from bytes. For example, inserting LF at byte 3 into `[1,2,3]\n` with all edit points zero can leave C
+  changed range `[3,4)` ending at `0:4`; this API derives `1:0`. Query captures store byte offsets and node
+  indices, with no point columns.
 - The zero `Node` is C's null node (`IsZero`). Every method on it returns its zero value (false, 0, `""`, the zero `Node`, an
   empty iterator, `(Node{}, false)` for the `(Node, bool)` methods) and none panics.
 

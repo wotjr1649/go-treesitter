@@ -81,18 +81,23 @@ func (n Node) EndByte() uint32 {
 	return n.s.endByte[n.i]
 }
 
+// StartPoint returns the node's start as a \n-counted row and a byte column.
+// The point is derived from the snapshot's source: the first point lookup on a snapshot builds its
+// line index (one pass over the source, 4 bytes per line, so up to 4x the source size for input made
+// only of line feeds); later lookups are O(log lines).
 func (n Node) StartPoint() Point {
 	if n.s == nil {
 		return Point{}
 	}
-	return Point{n.s.startRow[n.i], n.s.startCol[n.i]}
+	return n.s.Lines().point(n.s.startByte[n.i])
 }
 
+// EndPoint returns the node's end as a \n-counted row and a byte column; see StartPoint for the cost.
 func (n Node) EndPoint() Point {
 	if n.s == nil {
 		return Point{}
 	}
-	return Point{n.s.endRow[n.i], n.s.endCol[n.i]}
+	return n.s.Lines().point(n.s.endByte[n.i])
 }
 
 // Text is the node's source text: a substring of the snapshot's owned source, no allocation.
