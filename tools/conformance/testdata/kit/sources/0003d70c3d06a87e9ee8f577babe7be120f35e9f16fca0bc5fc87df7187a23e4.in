@@ -1,0 +1,12 @@
+type Pair[T] = tuple[T, T]
+
+
+class Box[T: (int, str), *Ts, **P:
+    pass
+
+
+def first[T](items: list[T]) -> T:
+    return items[0]
+
+
+done = True

@@ -1,0 +1,24 @@
+package lex
+
+const (
+	hex    = 0x1F
+	bin    = 0b1010
+	octal  = 0o17
+	under  = 1_000_000
+	flt    = 1.5e3
+	imag   = 2i
+	r      = 'xy'
+	esc    = '\n'
+	raw    = `C:\path`
+	interp = "tab\tquote\""
+)
+
+// sum adds.
+func sum(a, b int) int {
+	return a + b
+}
+
+/* block comment */
+func diff(a, b int) int {
+	return a - b
+}

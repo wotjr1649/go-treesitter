@@ -1,0 +1,18 @@
+import data from "./data.json" with { type: "json" };
+
+function pick<const T extends readonly unknown[]>(items: T): T {
+  return items;
+}
+
+@sealed
+class Service {
+  @logged
+  run(): void {}
+}
+
+export type * from "./types";
+
+async function main() {
+  using res = open();
+  await using conn = connect();
+}

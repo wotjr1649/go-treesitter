@@ -1,0 +1,11 @@
+def first():
+    return 1
+
+
+def second():
+    x = 1
+    return x
+
+
+def third():
+    return 3

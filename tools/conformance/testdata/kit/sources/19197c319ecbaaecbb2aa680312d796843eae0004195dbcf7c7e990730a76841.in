@@ -1,0 +1,8 @@
+class Keep { int A; int B; }
+class C { void M() {
+F(
+#if true
+1 2,
+#endif
+3);
+} }

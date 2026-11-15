@@ -1,0 +1,10 @@
+DECLARE @v int = 1;
+SELECT 1 /* block comment
+   second line */ AS k, ABS(-1) AS f, t.c1, @v AS v, (c1 + 1) AS p, (SELECT MAX(c1) FROM dbo.t2) AS q, -c1 AS n, c1 * 2 AS m,
+  ROW_NUMBER() OVER (ORDER BY c1) AS rn, SUM(c1) OVER (PARTITION BY c2) AS s
+FROM dbo.t1 AS t;
+
+GO
+-- c
+SELECT 1;
+-- trailing

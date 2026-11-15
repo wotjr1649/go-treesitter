@@ -1,0 +1,11 @@
+{
+  "service": "api",
+  "port": 8080,
+  "features": ["auth", "metrics"],
+  "limits": {
+    "rps": 100,
+    "burst": 20
+  },
+  "owners": ["ops", "dev"],
+  "enabled": true
+}

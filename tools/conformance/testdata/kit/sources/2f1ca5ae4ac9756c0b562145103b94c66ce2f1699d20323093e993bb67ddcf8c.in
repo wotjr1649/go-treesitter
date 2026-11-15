@@ -1,0 +1,8 @@
+@sealed
+class BugReport {
+  @format("Hello, %s") greeting: string;
+  @enumerable(false) greet() {}
+  @configurable(false) get x() { return 1; }
+  print(@required verbose: boolean) {}
+}
+@f @g class C {}

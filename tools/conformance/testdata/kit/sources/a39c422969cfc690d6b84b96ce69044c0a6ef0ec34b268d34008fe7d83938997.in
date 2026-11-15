@@ -1,0 +1,43 @@
+# -*- coding: utf-8 -*-
+"""Inventory helpers."""
+from __future__ import annotations
+
+import asyncio
+from dataclasses import dataclass, field
+
+
+@dataclass
+class Item:
+    name: str
+    count: int = 0
+    tags: list[str] = field(default_factory=list)
+
+    def label(self, /, upper: bool = False) -> str:
+        text = f"{self.name}: {self.count!r}"
+        return text.upper() if upper else text
+
+
+type Pair[T] = tuple[T, T]
+
+
+def classify(item: Item) -> str:
+    match item:
+        case Item(count=0):
+            return "empty"
+        case Item(name=str(n), count=c) if c > 100:
+            return f"bulk {n}"
+        case _:
+            return "normal"
+
+
+async def total(items: list[Item]) -> int:
+    await asyncio.sleep(0)
+    if (n := len(items)) == 0:
+        return 0
+    squares = [i.count ** 2 for i in items if i.count > 0]
+    try:
+        return sum(squares) // n
+    except (ZeroDivisionError, ValueError) as exc:
+        raise RuntimeError("bad") from exc
+    finally:
+        pass

@@ -1,0 +1,10 @@
+@register class A {
+  @loggedMethod greet() {}
+  @bound @(decorators[0]) get g() { return 1; }
+  @observable.deep() name = "x";
+  @tracked accessor count = 0;
+}
+export @register class B {}
+@register export class C {}
+export default @register class D {}
+const E = @register class {};

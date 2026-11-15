@@ -1,0 +1,6 @@
+#if false
+opaque % text
+#undef true
+more inactive @ text
+#endif
+class C { int M() { return 1; } }

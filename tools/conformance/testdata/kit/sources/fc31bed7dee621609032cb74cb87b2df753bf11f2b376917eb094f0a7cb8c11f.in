@@ -1,0 +1,3 @@
+const before: number = 1;
+const list = <><li key="a">a</li><li key="b">b</li></>;
+const nested = <div><>{list}</></div>;

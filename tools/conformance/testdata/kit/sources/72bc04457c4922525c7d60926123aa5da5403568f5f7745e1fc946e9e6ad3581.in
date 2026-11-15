@@ -1,0 +1,6 @@
+{
+  "name": "kit",
+  "tags": ["a", "b"]
+  "count": 2,
+  "nested": {"ok": true}
+}

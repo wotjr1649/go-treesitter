@@ -1,0 +1,3 @@
+const before: number = 1;
+declare const rest: Record<string, string>;
+const svg = <svg xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:="#a" {...rest} data-x="1" /></svg>;

@@ -1,0 +1,6 @@
+#if false
+opaque % text
+#line 123 "x\y"
+more inactive @ text
+#endif
+class C { int M() { return 1; } }

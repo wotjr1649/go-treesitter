@@ -1,0 +1,31 @@
+public struct Num
+{
+    public static Num operator +(Num a) => a;
+    public static Num operator -(Num a) => a;
+    public static bool operator !(Num a) => false;
+    public static Num operator ~(Num a) => a;
+    public static Num operator ++(Num a) => a;
+    public static Num operator --(Num a) => a;
+    public static bool operator true(Num a) => true;
+    public static bool operator false(Num a) => false;
+    public static Num operator +(Num a, Num b) => a;
+    public static Num operator -(Num a, Num b) => a;
+    public static Num operator *(Num a, Num b) => a;
+    public static Num operator /(Num a, Num b) => a;
+    public static Num operator %(Num a, Num b) => a;
+    public static Num operator &(Num a, Num b) => a;
+    public static Num operator |(Num a, Num b) => a;
+    public static Num operator ^(Num a, Num b) => a;
+    public static Num operator <<(Num a, int b) => a;
+    public static Num operator >>(Num a, int b) => a;
+    public static bool operator ==(Num a, Num b) => true;
+    public static bool operator !=(Num a, Num b) => false;
+    public static bool operator >(Num a, Num b) => true;
+    public static bool operator <(Num a, Num b) => false;
+    public static bool operator >=(Num a, Num b) { return true; }
+    public static bool operator <=(Num a, Num b) { return true; }
+    public static implicit operator int(Num a) => 0;
+    public static explicit operator Num(int a) => default;
+    public static extern Num operator +(Num a, int b);
+    public static unsafe Num operator -(Num a, int* b) => a;
+}

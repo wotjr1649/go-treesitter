@@ -1,0 +1,17 @@
+import defer * as feature from "./other-feature.js";
+import defer * as extra from "./extra.js";
+import legacy from "./legacy.json" assert { type: "json" };
+
+namespace Legacy {
+  export const version = 1;
+}
+
+namespace Modern {
+  export const version = 2;
+}
+
+declare module "virtual:config" {
+  export const mode: string;
+}
+
+console.log(feature.specialConstant, legacy, Legacy.version, Modern.version);

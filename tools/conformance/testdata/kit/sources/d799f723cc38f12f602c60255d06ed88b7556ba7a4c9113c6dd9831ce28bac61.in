@@ -1,0 +1,8 @@
+with (open(a) as f, open(b) as g,):
+    pass
+with (a, b):
+    pass
+async def k():
+    async with (a as b, c):
+        pass
+match = case = _ = 1

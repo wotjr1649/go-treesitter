@@ -1,0 +1,2 @@
+const palette = { red: [255, 0, 0], green: "#00ff00" } satisfies Record<Colors, string | RGB>;
+class Person { accessor name: string; static accessor count = 0; constructor(name: string) { this.name = name; } }

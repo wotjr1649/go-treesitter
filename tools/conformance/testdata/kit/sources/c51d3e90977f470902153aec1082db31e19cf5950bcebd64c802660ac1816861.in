@@ -1,0 +1,9 @@
+async def g():
+    await x
+    yield
+    yield 1, 2
+    r = await f() ** 2
+def h():
+    yield from it
+    z = (yield)
+    w = yield 1

@@ -1,0 +1,2 @@
+type TwoOrMore<T> = [first: T, second: T, ...rest: T[]];
+type Pair<T> = [first: T, T];

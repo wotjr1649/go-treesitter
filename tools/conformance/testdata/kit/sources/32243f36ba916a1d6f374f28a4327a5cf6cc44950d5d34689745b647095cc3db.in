@@ -1,0 +1,24 @@
+package gm
+
+type Inner struct {
+	X int
+}
+
+type Outer struct {
+	Inner
+	Name string
+}
+
+type Stack struct {
+	items []int
+}
+
+func (s *Stack) Map[U any](f func(int) U) []U {
+	out := make([]U, 0, len(s.items))
+	for _, v := range s.items {
+		out = append(out, f(v))
+	}
+	return out
+}
+
+var o = Outer{.X: 1, Name: "b"}

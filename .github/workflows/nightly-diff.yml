@@ -92,7 +92,7 @@ jobs:
         env:
           CGO_ENABLED: "0"
         run: |
-          "$RUNNER_TEMP/ciconf" -inputs-only -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "$TSG_S15_LANGS"
+          "$RUNNER_TEMP/ciconf" -inputs-only -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "$TSG_S15_LANGS" -kit tools/conformance/testdata/kit
       - name: Differential fuzzing against the native reference
         working-directory: tools/conformance
         env:
@@ -121,10 +121,10 @@ jobs:
           {
             echo "### Nightly differential fuzzing (${{ matrix.runner }}, seed $TSG_NIGHTLY_SEED)"
             echo
-            echo "| grammar | cases | seconds | mismatch |"
-            echo "|---|---|---|---|"
+            echo "| grammar | cases | seconds | mismatch | input set (sha256) | kit manifest (sha256) |"
+            echo "|---|---|---|---|---|---|"
             if [ -f "$TSG_CONF_OUT/summary.jsonl" ]; then
-              jq -r 'select(.test | startswith("TestNightlyDiff/")) | "| \(.lang) | \(.cases) | \(.seconds | floor) | \(.mismatch) |"' "$TSG_CONF_OUT/summary.jsonl"
+              jq -r 'select(.test | startswith("TestNightlyDiff/")) | "| \(.lang) | \(.cases) | \(.seconds | floor) | \(.mismatch) | \(.inputSetSHA256 // "" | .[:12]) | \(.kitManifestSHA256 // "" | .[:12]) |"' "$TSG_CONF_OUT/summary.jsonl"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Upload reproducers

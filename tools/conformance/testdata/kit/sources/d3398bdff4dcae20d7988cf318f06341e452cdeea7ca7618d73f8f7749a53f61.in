@@ -1,0 +1,7 @@
+import type { A } from "./a";
+import { type B, c } from "./b" with { type: "json" };
+type Cond<T> = T extends `x${infer U extends string}` ? U : never;
+type Tup = [head: string, ...tail: readonly number[][]];
+class K<const T, in out U> extends Base { override accessor v = 1; static { } #p = 0; }
+const value = { a: 1 } satisfies Record<string, number>;
+let q = value?.a ?? 0; q ||= 1;

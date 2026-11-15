@@ -1,0 +1,4 @@
+type NameOrId<T extends number | string> = T extends number ? IdLabel : NameLabel;
+type Flatten<T> = T extends any[] ? T[number] : T;
+type GetReturnType<Type> = Type extends (...args: never[]) => infer Return ? Return : never;
+type Unpacked<T> = T extends (infer U)[] ? U : T extends Promise<infer U> ? U : T;

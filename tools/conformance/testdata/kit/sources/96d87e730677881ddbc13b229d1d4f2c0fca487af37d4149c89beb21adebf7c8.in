@@ -1,0 +1,9 @@
+class Keep { int A; int B; }
+class C { void M() {
+#if false
+invalid ! text
+#else
+if(G())
+#endif
+{ H(); }
+} }

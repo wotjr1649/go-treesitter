@@ -1,0 +1,17 @@
+match config:
+    case {}:
+        pass
+    case {**rest}:
+        pass
+    case {"a": 1, -1: x, 1+2j: y, None: z, True: t, False: u, Color.RED: v, **rest,}:
+        pass
+    case {"a": [*_],}:
+        pass
+    case Point():
+        pass
+    case Point(0, y,):
+        pass
+    case mod.Point(x=0, y=1):
+        pass
+    case Point(0, y=1,):
+        pass

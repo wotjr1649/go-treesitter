@@ -72,7 +72,7 @@ jobs:
         env:
           CGO_ENABLED: "0"
         run: |
-          "$RUNNER_TEMP/ciconf" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "$TSG_S15_LANGS"
+          "$RUNNER_TEMP/ciconf" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "$TSG_S15_LANGS" -kit tools/conformance/testdata/kit
       - name: YAML patch comparison against the original upstream grammar
         if: ${{ matrix.lang == 'yaml' }}
         working-directory: tools/native-ref

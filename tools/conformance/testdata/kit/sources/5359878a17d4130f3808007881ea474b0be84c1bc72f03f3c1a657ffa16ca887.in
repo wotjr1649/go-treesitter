@@ -1,0 +1,3 @@
+const before: number = 1;
+function first<const T extends readonly unknown[]>(xs: T): T[0] { return xs[0]; }
+class Box<const V> { constructor(readonly v: V) {} }

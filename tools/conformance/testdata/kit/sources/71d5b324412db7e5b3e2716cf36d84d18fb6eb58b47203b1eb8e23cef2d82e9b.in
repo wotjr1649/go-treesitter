@@ -1,0 +1,11 @@
+package decl
+
+func before() {}
+
+func g() {
+	x := []int
+	{1, 2}
+	_ = x
+}
+
+func after() {}

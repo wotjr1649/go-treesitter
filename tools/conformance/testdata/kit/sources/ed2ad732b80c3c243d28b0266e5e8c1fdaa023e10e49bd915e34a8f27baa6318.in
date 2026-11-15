@@ -1,0 +1,6 @@
+def scale(values, k):
+    return [v * k for v in values if v]
+
+
+total = sum(x ** 2 for x in range(10) if x %)
+squares = {n: n * n for n in range(5)}

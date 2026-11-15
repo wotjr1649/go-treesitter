@@ -1,0 +1,7 @@
+class async { }
+class var { }
+class C
+{
+    System.Collections.Generic.List<async> a;
+    System.Collections.Generic.List<var v;
+}

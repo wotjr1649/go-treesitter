@@ -1,0 +1,25 @@
+package gen
+
+type Number interface {
+	~int | ~int64 | float64
+}
+
+func Sum[T Number](xs []T) T {
+	var s T
+	for _, x := range xs {
+		s += x
+	}
+	return s
+}
+
+type List[T any] struct {
+	items []T
+}
+
+type Vec[T any] = List[T]
+
+func Map[S ~[]E, E, R any](s S, f func(E) R) []R {
+	return nil
+}
+
+var total = Sum[int]([]int{1, 2})

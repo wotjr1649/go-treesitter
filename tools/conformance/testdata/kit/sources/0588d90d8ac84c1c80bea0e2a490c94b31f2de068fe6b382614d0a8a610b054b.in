@@ -1,0 +1,16 @@
+buttons = [make_button()]
+
+
+@buttons[0].clicked.connect
+def on_click():
+    pass
+
+
+@(lambda f: f)
+def ident():
+    pass
+
+
+@registry = make_registry()
+def tracked():
+    pass

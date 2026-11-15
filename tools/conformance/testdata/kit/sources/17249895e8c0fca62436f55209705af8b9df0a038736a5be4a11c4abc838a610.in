@@ -1,0 +1,12 @@
+declare const input: number | undefined;
+
+class Counter {
+  #count = 0;
+  inc(): number {
+    return ++this.#count;
+  }
+}
+
+type Pair = readonly [string, number?];
+
+const size = input ?? ;

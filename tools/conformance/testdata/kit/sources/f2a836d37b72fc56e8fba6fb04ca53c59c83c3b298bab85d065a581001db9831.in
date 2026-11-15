@@ -1,0 +1,22 @@
+import typing
+
+
+class Box[T = ]:
+    pass
+
+
+def make[T: (int, str) = int, *Ts = *tuple[int, str], **P = [int, str]]() -> None:
+    pass
+
+
+type Alias[T = str] = list[T]
+
+
+size = 1
+
+
+def tail(x):
+    return x + size
+
+
+print(typing.Any, tail(size))

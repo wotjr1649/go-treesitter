@@ -58,13 +58,20 @@ func main() {
 	seed := flag.Uint64("seed", 1, "edit seed")
 	jobs := flag.Int("j", runtime.NumCPU(), "parallel native runs")
 	selected := flag.String("lang", "", "comma-separated languages (default: all)")
+	kit := flag.String("kit", "", "optional bounded kit manifest directory (tools/conformance/testdata/kit)")
 	inputsOnly := flag.Bool("inputs-only", false, "extract mutation seeds without running native parsers or generating edits")
 	flag.Parse()
 	if *corpus == "" || (*exeDir == "" && !*inputsOnly) || *out == "" {
 		fmt.Fprintln(os.Stderr, "usage: ciconf -corpus DIR -exe DIR -out DIR [-pins F] [-seed N] [-j N] [-lang LANG,...] [-inputs-only]")
 		os.Exit(2)
 	}
-	if err := run(*pinsFile, *corpus, *exeDir, *out, *seed, max(1, *jobs), *selected, *inputsOnly); err != nil {
+	var kitArgs []string // present only when -kit was given, so an empty value (unset CI variable) reaches run as an error
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == "kit" {
+			kitArgs = []string{*kit}
+		}
+	})
+	if err := run(*pinsFile, *corpus, *exeDir, *out, *seed, max(1, *jobs), *selected, *inputsOnly, kitArgs...); err != nil {
 		fmt.Fprintln(os.Stderr, "ciconf:", err)
 		os.Exit(1)
 	}
@@ -78,7 +85,7 @@ type job struct {
 	seq            int
 }
 
-func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected string, inputsOnly bool) error {
+func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected string, inputsOnly bool, kitDir ...string) error {
 	pinsRaw, err := os.ReadFile(pinsFile)
 	if err != nil {
 		return err
@@ -149,6 +156,21 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected s
 		}
 	}
 
+	var kitEdits []edit
+	var kitSHA string
+	upstreamInputs := len(inputs)
+	if len(kitDir) > 0 {
+		if kitDir[0] == "" {
+			return fmt.Errorf("-kit was given an empty directory")
+		}
+		kitInputs, es, identity, err := loadKit(kitDir[0], names)
+		if err != nil {
+			return err
+		}
+		inputs = append(inputs, kitInputs...)
+		kitEdits, kitSHA = es, identity
+	}
+
 	exe := func(lang string) string {
 		x := filepath.Join(exeDir, langs[lang])
 		if runtime.GOOS == "windows" {
@@ -186,7 +208,7 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected s
 	must(writeCSV(filepath.Join(out, "corpus", "skipped.csv"), []string{"id", "lang", "corpus_file", "test_name", "attrs", "reason"}, skipped))
 
 	if inputsOnly {
-		meta, err := json.MarshalIndent(map[string]any{"kind": "ciconf-inputs/1", "pinsSHA256": sha(pinsRaw), "inputs": len(inputs), "skipped": len(skipped)}, "", "  ")
+		meta, err := json.MarshalIndent(map[string]any{"kitManifestSHA256": kitSHA, "kind": "ciconf-inputs/1", "pinsSHA256": sha(pinsRaw), "inputs": len(inputs), "skipped": len(skipped)}, "", "  ")
 		if err != nil {
 			return err
 		}
@@ -195,14 +217,8 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected s
 	}
 
 	// Edits: three per input (insert, delete, replace), seeded per input id.
-	type edit struct {
-		id, lang, name, base, kind string
-		old, new                   []byte
-		start, oe, ne              int
-		seed                       uint64
-	}
 	var edits []edit
-	for _, j := range inputs {
+	for _, j := range inputs[:upstreamInputs] {
 		for k, kind := range []string{"insert", "delete", "replace"} {
 			eseed := idSeed(j.id+"#"+kind, seed)
 			nw, s, oe, ne, actual := makeEdit(j.src, kind, rand.New(rand.NewPCG(seed, eseed)))
@@ -210,6 +226,7 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected s
 			edits = append(edits, edit{j.lang + "/" + name, j.lang, name, j.id, actual, j.src, nw, s, oe, ne, eseed})
 		}
 	}
+	edits = append(edits, kitEdits...)
 	editRows := make([][]string, len(edits))
 	resRows := make([][]string, len(edits))
 	parallel(jobs, len(edits), func(i int) {
@@ -251,8 +268,12 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected s
 	for _, j := range inputs {
 		c := perLang[j.lang]
 		c[0]++
-		c[1] += 3
 		perLang[j.lang] = c
+	}
+	for _, e := range edits {
+		c := perLang[e.lang]
+		c[1]++
+		perLang[e.lang] = c
 	}
 	for _, s := range skipped {
 		c := perLang[s[1]]
@@ -260,7 +281,7 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected s
 		perLang[s[1]] = c
 	}
 	meta, _ := json.MarshalIndent(map[string]any{
-		"kind": "ciconf/1", "seed": seed, "editsPerInput": 3, "pinsSHA256": sha(pinsRaw),
+		"kind": "ciconf/1", "seed": seed, "seededEditsPerUpstreamInput": 3, "kitManifestSHA256": kitSHA, "kitPairEdits": len(kitEdits), "pinsSHA256": sha(pinsRaw),
 		"inputs": len(inputs), "edits": len(edits), "skipped": len(skipped), "perLang": perLang,
 	}, "", "  ")
 	must(writeFile(filepath.Join(out, "ci.json"), append(meta, '\n')))

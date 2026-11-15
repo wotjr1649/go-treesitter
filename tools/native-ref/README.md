@@ -146,3 +146,10 @@ fail the command. The `-allow-nul-truncation` exception is only for this recorde
 `go test -run '^TestQueryIndexInvalidation$' .` also exercises the retained `query_index` invalidation probe
 against the current shim and pinned JSON/runtime C. It asserts cache invalidation directly and checks a negative
 mutation without the invalidation assignments; grammar regeneration is unnecessary for this test.
+
+The CI and nightly lanes also pass `-kit ../conformance/testdata/kit` (relative
+to this module; from the repository root use `tools/conformance/testdata/kit`).
+This adds the bounded, hash-checked source/edit projection documented in
+[`workloads.md`](../../docs/validation/workloads.md#bounded-grammar-kit-inputs).
+Kit inputs get their explicit pair edits, not three additional seeded edits.
+`-inputs-only` includes their fresh step sources without running native parsers.

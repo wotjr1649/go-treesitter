@@ -1,0 +1,5 @@
+enum Direction { Up = 1, Down, Left, Right }
+enum S { Up = "UP", Down = "DOWN", }
+enum Het { No = 0, Yes = "YES" }
+enum FileAccess { None, Read = 1 << 1, Write = 1 << 2, ReadWrite = Read | Write, G = "123".length }
+const enum E { A = 1, B = A * 2 }

@@ -1,0 +1,10 @@
+package hdr
+
+func f() int { return 1 }
+
+func g() {
+	for i := 0
+	i < 3
+	i++ {
+	}
+}

@@ -1,0 +1,8 @@
+SELECT CASE c1 WHEN 1 THEN N'one' WHEN 2 THEN N'two' ELSE N'other' END AS a,
+  CASE WHEN c1 > 2 THEN 1 ELSE 0 END AS b, COALESCE(c1, c2, 0) AS c, NULLIF(c1, c2) AS d
+FROM dbo.t1;
+
+GO
+-- c
+SELECT 1;
+-- trailing

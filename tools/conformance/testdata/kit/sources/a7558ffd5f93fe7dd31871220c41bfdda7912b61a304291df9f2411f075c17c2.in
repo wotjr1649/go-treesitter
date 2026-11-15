@@ -1,0 +1,19 @@
+import os
+
+
+def f(a, b, *, c, /, d):
+    return a
+
+
+if (n := len("abc")) > 2:
+    print(f"{n=}")
+
+
+limit = 3
+
+
+def tail(x):
+    return x + limit
+
+
+print(os.sep, tail(limit))

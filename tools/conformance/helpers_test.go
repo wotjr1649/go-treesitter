@@ -51,7 +51,7 @@ func dataRoot(t *testing.T) string {
 	return d
 }
 
-// ciData reports whether root was produced by ciconf (it has ci.json). Its inputs are upstream corpora, so the
+// ciData reports whether root was produced by ciconf (it has ci.json). Its inputs are upstream corpora plus optional kit source/edit pairs, so the
 // session-15 ratchet lists (knownIncrementalDiffs) do not apply to it.
 func ciData(root string) bool {
 	_, err := os.Stat(filepath.Join(root, "ci.json"))
@@ -175,4 +175,54 @@ func atou(t *testing.T, s string) uint32 {
 		t.Fatal(err)
 	}
 	return uint32(n)
+}
+
+// kitLangs are the grammars whose shards load the bounded kit input set (tools/native-ref/ciconf -kit).
+var kitLangs = []string{"csharp", "go", "json", "python", "tsql", "tsx", "typescript"}
+
+// kitInputsMissing reports why a ciconf data dir lacks the kit input set for a kit grammar (nil otherwise, and
+// for non-ciconf data or non-kit grammars). wantEdits additionally requires kit pair edits (inputs-only data has none).
+func kitInputsMissing(root, lang string, wantEdits bool) error {
+	if !slices.Contains(kitLangs, lang) {
+		return nil
+	}
+	var id struct{ KitManifestSHA256 string }
+	b, err := os.ReadFile(filepath.Join(root, "ci.json"))
+	if err != nil {
+		if b, err = os.ReadFile(filepath.Join(root, "inputs.json")); err != nil {
+			return nil
+		}
+	}
+	if err := json.Unmarshal(b, &id); err != nil {
+		return err
+	}
+	if len(id.KitManifestSHA256) != 64 {
+		return fmt.Errorf("%s: kit manifest identity is missing: the kit input set was not loaded (ciconf -kit)", lang)
+	}
+	count := func(file string, match func(r []string) bool) (n int, err error) {
+		f, err := os.Open(filepath.Join(root, file))
+		if err != nil {
+			return 0, err
+		}
+		defer f.Close()
+		rows, err := csv.NewReader(f).ReadAll()
+		for _, r := range rows[min(1, len(rows)):] {
+			if match(r) {
+				n++
+			}
+		}
+		return n, err
+	}
+	fresh, err := count("corpus/manifest.csv", func(r []string) bool { return r[1] == lang && strings.HasPrefix(r[0], lang+"/kit-") })
+	if err != nil || fresh == 0 {
+		return fmt.Errorf("%s: no kit fresh inputs in corpus/manifest.csv (%v)", lang, err)
+	}
+	if !wantEdits {
+		return nil
+	}
+	pairs, err := count("edits/manifest.csv", func(r []string) bool { return r[1] == lang && r[8] == "kit-pair" })
+	if err != nil || pairs == 0 {
+		return fmt.Errorf("%s: no kit-pair edits in edits/manifest.csv (%v)", lang, err)
+	}
+	return nil
 }

@@ -1,0 +1,7 @@
+function assert(condition: any, msg?: string): asserts condition {}
+function assertIsString(val: any): asserts val is string {}
+class Animal {
+  declare resident: Dog;
+  assertValid(): asserts this {}
+  isDog(): asserts this is Dog {}
+}

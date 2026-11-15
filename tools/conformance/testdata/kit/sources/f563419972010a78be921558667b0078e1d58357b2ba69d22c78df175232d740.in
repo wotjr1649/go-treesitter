@@ -1,0 +1,19 @@
+{
+  "name": "inventory",
+  "version": 3,
+  "active": true,
+  "owner": null,
+  "archived": false,
+  "ratio": -1.25e-3,
+  "tags": ["tools", "hardware", "caf\u00e9"],
+  "items": [
+    {"id": 1, "name": "bolt", "count": 120, "price": 0.25},
+    {"id": 2, "name": "nut", "count": 4, "price": 0.1},
+    {"id": 3, "name": "washer", "count": 0, "price": 0.05}
+  ],
+  "limits": {
+    "max": 1000,
+    "min": 0,
+    "notes": "line1\nline2 \"quoted\""
+  }
+}

@@ -1,0 +1,2 @@
+const before: number = 1;
+const p = <p title="x">A &lt; B &#169; {1 + 1}</p;

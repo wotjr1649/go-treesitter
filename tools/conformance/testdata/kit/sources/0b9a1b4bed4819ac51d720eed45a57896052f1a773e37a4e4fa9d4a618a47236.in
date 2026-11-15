@@ -1,0 +1,11 @@
+SELECT @@ROWCOUNT AS unchanged_probe;
+GO
+-- issue149-delete-target-arg-5
+-- issue149-delete-target-arg-5
+SELECT 1 AS recovery_value;
+GO
+-- issue149-delete-target-arg-6
+-- issue149-delete-target-arg-6
+DECLARE @a int=1; DELETE FROM dbo.f((1));
+
+GO

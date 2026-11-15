@@ -78,6 +78,7 @@ func TestEdits(t *testing.T) {
 			}
 			p := newParser(t, lang)
 			var cases, nodes, mism, incMatch, freshMatch, incEqFresh, incDiffFresh, treeChanged, rangesEmptyOnReplace, rangesEmptyOnPureDeletion, rangesTotal, knownSeen, crCompared int
+			var kitPairs, kitNativeDiff int
 			start := time.Now()
 			for _, r := range rows {
 				id := r[0]
@@ -164,6 +165,12 @@ func TestEdits(t *testing.T) {
 					preserve("edits/"+id+".go-fresh.dump", freshDump)
 				}
 				eq, nativeEq := incSHA == freshSHA, nr.editSHA == nr.freshSHA
+				if r[8] == "kit-pair" {
+					kitPairs++
+					if !nativeEq {
+						kitNativeDiff++
+					}
+				}
 				if eq {
 					incEqFresh++
 				} else {
@@ -218,6 +225,7 @@ func TestEdits(t *testing.T) {
 			summary(t, map[string]any{"lang": lang, "cases": cases, "nodes": nodes, "mismatches": mism,
 				"incrementalMatchesNative": incMatch, "freshMatchesNative": freshMatch,
 				"incrementalEqualsFresh": incEqFresh, "incrementalDiffersFromFresh": incDiffFresh,
+				"kitPairCases": kitPairs, "kitNativeIncrementalDiffersFromFresh": kitNativeDiff,
 				"knownRatchetCasesRun": knownSeen, "treeChanged": treeChanged,
 				"changedRangesEmptyOnReplaceOrInsert": rangesEmptyOnReplace, "changedRangesEmptyOnPureDeletion": rangesEmptyOnPureDeletion, "changedRangesComparedToNative": crCompared, "changedRangesTotal": rangesTotal,
 				"sample": sample, "seconds": time.Since(start).Seconds()})

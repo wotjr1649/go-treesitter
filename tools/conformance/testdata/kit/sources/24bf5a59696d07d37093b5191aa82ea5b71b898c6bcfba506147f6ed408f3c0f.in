@@ -1,0 +1,7 @@
+static class P9
+{
+    static bool A(int x) => x is > 0 and < 10 or >= 100 and <= 200;
+    static bool B(object o) => o is not null and (int or long);
+    static string D(object o) => o switch { int => "int", string or null => "s", not (> 0 or < -5) => "neg", _ => "" };
+    static bool E(object o) => o is System.String or System.Int32;
+}

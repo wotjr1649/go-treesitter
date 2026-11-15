@@ -1,0 +1,51 @@
+import type { Readable } from 'node:stream';
+import { EventEmitter } from 'node:events';
+
+export interface Item {
+  readonly id: number;
+  name: string;
+  tags?: string[];
+}
+
+type Status = 'active' | 'retired';
+type Handler<T> = (item: T) => void;
+type Keys<T> = { [K in keyof T]-?: T[K] extends Function ? never : K }[keyof T];
+
+enum Level {
+  Low = 0,
+  High,
+}
+
+declare module 'node:events' {
+  interface EventEmitter {
+    tagged?: boolean;
+  }
+}
+
+export abstract class Repository<T extends Item> extends EventEmitter {
+  protected items = new Map<number, T>();
+
+  constructor(private readonly label: string) {
+    super();
+  }
+
+  abstract validate(item: T): item is T;
+
+  add(item: T): this {
+    if (!this.validate(item)) {
+      throw new Error(`invalid ${this.label}`);
+    }
+    this.items.set(item.id, item);
+    return this;
+  }
+
+  find(id: number): T | undefined {
+    return this.items.get(id) as T | undefined;
+  }
+}
+
+export function level(n: number): Level {
+  return n > 10 ? Level.High : Level.Low;
+}
+
+const config = { retries: 3 } as const satisfies Record<string, number>;

@@ -1,0 +1,11 @@
+
+function App() { return <div />; }
+const f = () => <span />;
+const g = cond ? <a /> : <b />;
+const h = cond && <i />;
+const arr = [<li key="1" />, <></>];
+render(<App />, root);
+const t = `${<x />}`;
+function d(el = <em />) {}
+const r1 = a < b > c;
+if (a < b && c > d) {}

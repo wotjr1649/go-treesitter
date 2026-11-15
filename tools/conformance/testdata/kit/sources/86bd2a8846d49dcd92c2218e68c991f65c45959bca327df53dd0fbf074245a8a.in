@@ -1,0 +1,20 @@
+from __future__ import annotations
+import os, os.path as osp
+from . import a
+from .. import (b, c as d,)
+from ...pkg.mod import *
+from .mod import e as f, g
+x: int
+y: int = 1
+(z): int = 2
+o.attr: str
+o[0]: str = "a"
+a = b = 1
+x += 1; x -= 1; x *= 1; x @= m; x /= 1; x %= 1; x &= 1
+x |= 1; x ^= 1; x <<= 1; x >>= 1; x **= 1; x //= 1;
+o.attr += 1; (x) += 1; o[0] += 1
+assert x
+assert x, "msg"
+del x, o.attr, o[0]
+del (x), (a, b), [a, b], ()
+pass
