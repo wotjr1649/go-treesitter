@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp]
+        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin]
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
@@ -45,7 +45,7 @@ jobs:
           [ "$lang" != golang ] || lang=go
           echo "TSG_S15_LANGS=$lang" >> "$GITHUB_ENV"
           tags=""
-          for other in csharp go json python tsql tsx typescript javascript html css java c rust bash cpp; do
+          for other in csharp go json python tsql tsx typescript javascript html css java c rust bash cpp yaml php powershell r dart xml ruby kotlin; do
             [ "$other" = "$lang" ] || tags="${tags:+$tags,}no_$other"
           done
           echo "GOFLAGS=-tags=$tags" >> "$GITHUB_ENV"

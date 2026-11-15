@@ -89,5 +89,61 @@
     "license": "MIT",
     "source": "https://github.com/tree-sitter/tree-sitter-css/blob/dda5cfc5722c429eaba1c910ca32c2c0c5bb1a3f/LICENSE",
     "sha256": "c5cfb43042b6b72045f4ba997834d0a7786d2793d91680868b5815b39f14fc78"
+  },
+  {
+    "component": "tree-sitter-yaml",
+    "path": "LICENSES/tree-sitter-yaml.txt",
+    "license": "MIT",
+    "source": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/blob/a1c4812a73ec5e089de8e441fdea3a921e8d5079/LICENSE",
+    "sha256": "2d181298822a124f6d106118dcc69c8d4d26ac668559be29682c452e712b0947"
+  },
+  {
+    "component": "tree-sitter-php",
+    "path": "LICENSES/tree-sitter-php.txt",
+    "license": "MIT",
+    "source": "https://github.com/tree-sitter/tree-sitter-php/blob/92b5271b60bec77fb65b5e5bc41561e8dac81299/LICENSE",
+    "sha256": "664764fabf40c0b318e06324a5a12379092a2df25b8cbf2415f71bc0bb352346"
+  },
+  {
+    "component": "tree-sitter-powershell",
+    "path": "LICENSES/tree-sitter-powershell.txt",
+    "license": "MIT",
+    "source": "https://github.com/airbus-cert/tree-sitter-powershell/blob/e7bd348c49fdfd5c853a146a670965ba516a6239/LICENSE",
+    "sha256": "1fca8454c0d77a73f9922a52d39e1f7c339f5da5d03f2766eff66b859fa19477"
+  },
+  {
+    "component": "tree-sitter-r",
+    "path": "LICENSES/tree-sitter-r.txt",
+    "license": "MIT",
+    "source": "https://github.com/r-lib/tree-sitter-r/blob/58a22794466c0fc15b0d3b40531db751593721e8/LICENSE",
+    "sha256": "de2e49529f03d573bc3fa229dc83acfe22c63a5ad1766b289563edfd45b72dea"
+  },
+  {
+    "component": "tree-sitter-dart",
+    "path": "LICENSES/tree-sitter-dart.txt",
+    "license": "MIT",
+    "source": "https://github.com/UserNobody14/tree-sitter-dart/blob/be07cf7118d3dba06236a3f19541685a68209934/LICENSE",
+    "sha256": "d270cb3a4985d75033bd77d875ccebff1d66e32788a3f727891e28d76132dd46"
+  },
+  {
+    "component": "tree-sitter-xml",
+    "path": "LICENSES/tree-sitter-xml.txt",
+    "license": "MIT",
+    "source": "https://github.com/tree-sitter-grammars/tree-sitter-xml/blob/5000ae8f22d11fbe93939b05c1e37cf21117162d/LICENSE",
+    "sha256": "3297073719030b7261afd78b7267931ccc03a27f7a65ca6fc644316180f71bf6"
+  },
+  {
+    "component": "tree-sitter-ruby",
+    "path": "LICENSES/tree-sitter-ruby.txt",
+    "license": "MIT",
+    "source": "https://github.com/tree-sitter/tree-sitter-ruby/blob/ad907a69da0c8a4f7a943a7fe012712208da6dee/LICENSE",
+    "sha256": "ee006f02a3d856df282e409be2a86e24a65bb573a98b9c28343771141351bb6b"
+  },
+  {
+    "component": "tree-sitter-kotlin",
+    "path": "LICENSES/tree-sitter-kotlin.txt",
+    "license": "MIT",
+    "source": "https://github.com/fwcd/tree-sitter-kotlin/blob/d6af96d2e23ef0a8ff5ab512864378cf08fba311/LICENSE",
+    "sha256": "948495f61768f7de26bcc61113d8cd95f50bbc15adb678c28c941c6c8fcd5903"
   }
 ]

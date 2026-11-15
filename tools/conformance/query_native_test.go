@@ -138,6 +138,15 @@ func queryDirFor(root string) string {
 	return filepath.Join(root, "src")
 }
 
+// XML stores XML and DTD queries separately; only the XML parser is linked.
+func upstreamQueryGlob(root, extractDir, lang string) string {
+	dir := filepath.Join(queryDirFor(root), extractDir, "queries")
+	if lang == "xml" {
+		dir = filepath.Join(dir, "xml")
+	}
+	return filepath.Join(dir, "*.scm")
+}
+
 // queryFilesFor returns the pinned grammar repository's own queries/*.scm for a corpus language (sorted) and the
 // structural probes.
 func queryFilesFor(t *testing.T, root, lang string) []queryFile {
@@ -154,7 +163,7 @@ func queryFilesFor(t *testing.T, root, lang string) []queryFile {
 	if pin == "go" {
 		pin = "golang"
 	}
-	files, err := filepath.Glob(filepath.Join(queryDirFor(root), pins.Grammars[pin].ExtractDir, "queries", "*.scm"))
+	files, err := filepath.Glob(upstreamQueryGlob(root, pins.Grammars[pin].ExtractDir, lang))
 	if err != nil {
 		t.Fatal(err)
 	}

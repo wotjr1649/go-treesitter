@@ -85,6 +85,34 @@ func FuzzParseCPP(f *testing.F) {
 	fuzzParse(f, "cpp", "int f() { return 1; }\n", "template <typename T> struct A {};\n", "class A {", "")
 }
 
+func FuzzParseYAML(f *testing.F) {
+	fuzzParse(f, "yaml", "a: [1, 2]\n", "---\na: true\n", "a: [", "", "a: 1\n\x00b: 2\n", "\x00", "---\n\x00\n")
+}
+
+func FuzzParsePHP(f *testing.F) {
+	fuzzParse(f, "php", "<?php function f($x) { return $x + 1; }\n", "<?php echo 'a';\n", "<?php function (", "")
+}
+
+func FuzzParsePowerShell(f *testing.F) {
+	fuzzParse(f, "powershell", "function f { param($x) return $x + 1 }\n", "$x = 1\n", "function f {", "")
+}
+
+func FuzzParseR(f *testing.F) {
+	fuzzParse(f, "r", "f <- function(x) { x + 1 }\n", "x <- c(1, 2)\n", "f <- function(", "")
+}
+
+func FuzzParseDart(f *testing.F) {
+	fuzzParse(f, "dart", "int f(int x) { return x + 1; }\n", "class A {}\n", "void f(", "")
+}
+
+func FuzzParseXML(f *testing.F) {
+	fuzzParse(f, "xml", "<root><a id=\"1\">value</a></root>\n", "<?xml version=\"1.0\"?><root/>\n", "<root", "")
+}
+
+func FuzzParseRuby(f *testing.F) {
+	fuzzParse(f, "ruby", "def f(x)\n  x + 1\nend\n", "x = [1, 2]\n", "def f(", "")
+}
+
 func fuzzParse(f *testing.F, lang string, seeds ...string) {
 	mk, ok := languages[lang]
 	if !ok {
@@ -205,4 +233,8 @@ func checkTree(t *testing.T, what string, tree *treesitter.Tree, snap *treesitte
 	if count != snap.Len() {
 		t.Fatalf("%s: %d nodes reachable from the root, Snapshot.Len() = %d", what, count, snap.Len())
 	}
+}
+
+func FuzzParseKotlin(f *testing.F) {
+	fuzzParse(f, "kotlin", "fun f(x: Int): Int { return x + 1 }\n", "class A\n", "fun f(", "", "val a = 1 2\nval b = 3\n")
 }

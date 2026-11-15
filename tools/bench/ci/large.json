@@ -1,22 +1,348 @@
 [
-  {"lang": "json", "file": "generated_5mb.json", "kind": "json", "seed": 12345, "sha256": "9dc93c936707af87e87b56a85e4496ff9d357b0e07a98cf9010a42cfbd0a8fe1"},
-  {"lang": "golang", "file": "opGen.go", "kind": "url", "url": "https://raw.githubusercontent.com/golang/go/go1.26.0/src/cmd/compile/internal/ssa/opGen.go", "sha256": "fd9bb20543045745f38417ac47439685c3b35bf71af65858ce8392f9eb2c5dc8"},
-  {"lang": "golang", "file": "rewriteAMD64.go", "kind": "url", "url": "https://raw.githubusercontent.com/golang/go/go1.26.0/src/cmd/compile/internal/ssa/rewriteAMD64.go", "sha256": "045fc7a8d20edabd72411ce735675f4c07b69470fe68e50a999730004a226cee"},
-  {"lang": "golang", "file": "rewriteARM64.go", "kind": "url", "url": "https://raw.githubusercontent.com/golang/go/go1.26.0/src/cmd/compile/internal/ssa/rewriteARM64.go", "sha256": "ef456764c90d82399931fc2794dd05d4878aee17eec9d534a2da0759511673ab"},
-  {"lang": "python", "file": "topics.py", "kind": "url", "url": "https://raw.githubusercontent.com/python/cpython/v3.14.0/Lib/pydoc_data/topics.py", "sha256": "3247a7690ac0439ac98f0e9be0a9595896c73ad426143ade7e44e4a56d53654a"},
-  {"lang": "python", "file": "_pydecimal.py", "kind": "url", "url": "https://raw.githubusercontent.com/python/cpython/v3.14.0/Lib/_pydecimal.py", "sha256": "40df667a04926a73cb8b02001def578369a52d4f595068076d9b7e2dba382f7c"},
-  {"lang": "python", "file": "typing.py", "kind": "url", "url": "https://raw.githubusercontent.com/python/cpython/v3.14.0/Lib/typing.py", "sha256": "b7b20c5180b6be1dd5f17f3f5be5f1a77540802f360ccea8ebf4ecc35ce8a0b5"},
-  {"lang": "typescript", "file": "lib.dom.d.ts", "kind": "npm", "url": "https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz", "member": "package/lib/lib.dom.d.ts", "sha256": "d6b1eba8496bdd0eed6fc8a685768fe01b2da4a0388b5fe7df558290bffcf32f"},
-  {"lang": "typescript", "file": "typescript.js", "kind": "npm", "url": "https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz", "member": "package/lib/typescript.js", "sha256": "569177652966bd528c319171c7dd22860dbf72bde116cbc4f644f1d02bb12e39"},
-  {"lang": "csharp", "file": "Binder_Expressions.cs", "kind": "url", "url": "https://raw.githubusercontent.com/dotnet/roslyn/380343d9b1289048f0f28c052b15018ac6031397/src/Compilers/CSharp/Portable/Binder/Binder_Expressions.cs", "sha256": "38c8c5abf11f4e4ac56592a717840ed1b61baa5b714bee9cb7a9ef45206a9b36"},
-  {"lang": "csharp", "file": "LanguageParser.cs", "kind": "url", "url": "https://raw.githubusercontent.com/dotnet/roslyn/6f4fb6dbba6652102f048e0f421c4999d8f12cb0/src/Compilers/CSharp/Portable/Parser/LanguageParser.cs", "sha256": "733d12c22f9c043d6fa331b5d528ab6cc3e3728ab838d00177ee8be2e6f39b16"},
-  {"lang": "tsql", "file": "corpus_go_concat_1mb.sql", "kind": "concat", "sha256": "388688f2c7ec8152ab7680d25eee7735adf9cec348d90bc63747006d7fd343b2"},
-  {"lang": "javascript", "file": "typescript.js", "kind": "npm", "url": "https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz", "sha256": "569177652966bd528c319171c7dd22860dbf72bde116cbc4f644f1d02bb12e39", "license_spdx": "Apache-2.0", "license_url": "https://raw.githubusercontent.com/microsoft/TypeScript/050880ce59e30b356b686bd3144efe24f875ebc8/LICENSE.txt", "license_sha256": "a7d00bfd54525bc694b6e32f64c7ebcf5e6b7ae3657be5cc12767bce74654a47", "member": "package/lib/typescript.js"},
-  {"lang": "html", "file": "dom_sort.html", "kind": "url", "url": "https://raw.githubusercontent.com/DataTables/DataTables/f60c41290255c3fcab38999161f9529226b655c9/examples/plug-ins/dom_sort.html", "sha256": "8eed4937dc497a478d12199dfbe0fa2aa070ae5104ccc5f18e92c4d5235c9c53", "license_spdx": "MIT", "license_url": "https://raw.githubusercontent.com/DataTables/DataTables/f60c41290255c3fcab38999161f9529226b655c9/license.txt", "license_sha256": "5cd1e7bc146fbb6189184cbd0dced6853dc6b5a049c5ea3d8052d235e549a644"},
-  {"lang": "css", "file": "bootstrap.css", "kind": "url", "url": "https://raw.githubusercontent.com/twbs/bootstrap/f9a7a8941e7c1c91b0cae8a0c906537c26086ae2/dist/css/bootstrap.css", "sha256": "ad0d5123040e043dad1451a6d4483dad4df4e2835e6687d6cf5af8a757283371", "license_spdx": "MIT", "license_url": "https://raw.githubusercontent.com/twbs/bootstrap/f9a7a8941e7c1c91b0cae8a0c906537c26086ae2/LICENSE", "license_sha256": "bc0cd18d94c028f1c0b62ec9fdaddcb9921c1e07c29cf52dc7df8cca9daf2488"},
-  {"lang": "java", "file": "Proto3GencodeTestProto.java", "kind": "url", "url": "https://raw.githubusercontent.com/protocolbuffers/protobuf/1633873a4e9a6cf3df2e0f0d69cb2693b8f006b5/compatibility/smoke/v25.8/legacy_gencode_test/proto3/Proto3GencodeTestProto.java", "sha256": "80413d76f6b02e978a4d5a569008371b192f1e219a2802c53bdb1083f4d8dfbe", "license_spdx": "BSD-3-Clause", "license_url": "https://raw.githubusercontent.com/protocolbuffers/protobuf/1633873a4e9a6cf3df2e0f0d69cb2693b8f006b5/LICENSE", "license_sha256": "6e5e117324afd944dcf67f36cf329843bc1a92229a8cd9bb573d7a83130fea7d"},
-  {"lang": "c", "file": "openssl.c", "kind": "url", "url": "https://raw.githubusercontent.com/curl/curl/4f2b5fba5212a32c4e4a889492cc153e1220e619/lib/vtls/openssl.c", "sha256": "c542b52edee1dbd827ede82f10fb21519674ebe93ec335c56d2cec20f39d81aa", "license_spdx": "curl", "license_url": "https://raw.githubusercontent.com/curl/curl/4f2b5fba5212a32c4e4a889492cc153e1220e619/COPYING", "license_sha256": "82f2f4427d6545ee5aaac4f0b80428da6cc8ba41c2cf5da3a03680ec327b9681"},
-  {"lang": "rust", "file": "ast.rs", "kind": "url", "url": "https://raw.githubusercontent.com/rust-lang/rust/5f4effd579500175af844241eb179e756190f1e7/compiler/rustc_ast/src/ast.rs", "sha256": "09609e4e241bc21662722f6423437b53fc2fabe9f711621806b94c9cde0f84f5", "license_spdx": "MIT", "license_url": "https://raw.githubusercontent.com/rust-lang/rust/5f4effd579500175af844241eb179e756190f1e7/LICENSE-MIT", "license_sha256": "b71bd43a069ca0641a9ecfe585ca7b3c53b5cc1608f8b68321168698e28b5ea1"},
-  {"lang": "bash", "file": "nvm.sh", "kind": "url", "url": "https://raw.githubusercontent.com/nvm-sh/nvm/09e620c401382f4b3d3147333dd64c1e09188fdb/nvm.sh", "sha256": "caca749b75b598322d6f03674f3440e99a7efb8c4f60265750b6d867b3a1d65b", "license_spdx": "MIT", "license_url": "https://raw.githubusercontent.com/nvm-sh/nvm/09e620c401382f4b3d3147333dd64c1e09188fdb/LICENSE.md", "license_sha256": "681a12d1a1367b5890be9bc71a70466633d28fd32397be9b72d69d9bfb243492"},
-  {"lang": "cpp", "file": "json.hpp", "kind": "url", "url": "https://raw.githubusercontent.com/nlohmann/json/81888ff9f005c022e60f2de572327b2e50222222/single_include/nlohmann/json.hpp", "sha256": "686e19239b9135b5822f96876fd59de90bde335d598c2e71ded84201d6f5e584", "license_spdx": "MIT", "license_url": "https://raw.githubusercontent.com/nlohmann/json/81888ff9f005c022e60f2de572327b2e50222222/LICENSE.MIT", "license_sha256": "d64d1b4d948aa7751cfb613c02dc246aab7b358d760053e6580f01affe946906"}
+  {
+    "lang": "json",
+    "file": "generated_5mb.json",
+    "kind": "json",
+    "seed": 12345,
+    "sha256": "9dc93c936707af87e87b56a85e4496ff9d357b0e07a98cf9010a42cfbd0a8fe1"
+  },
+  {
+    "lang": "golang",
+    "file": "opGen.go",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/golang/go/go1.26.0/src/cmd/compile/internal/ssa/opGen.go",
+    "sha256": "fd9bb20543045745f38417ac47439685c3b35bf71af65858ce8392f9eb2c5dc8"
+  },
+  {
+    "lang": "golang",
+    "file": "rewriteAMD64.go",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/golang/go/go1.26.0/src/cmd/compile/internal/ssa/rewriteAMD64.go",
+    "sha256": "045fc7a8d20edabd72411ce735675f4c07b69470fe68e50a999730004a226cee"
+  },
+  {
+    "lang": "golang",
+    "file": "rewriteARM64.go",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/golang/go/go1.26.0/src/cmd/compile/internal/ssa/rewriteARM64.go",
+    "sha256": "ef456764c90d82399931fc2794dd05d4878aee17eec9d534a2da0759511673ab"
+  },
+  {
+    "lang": "python",
+    "file": "topics.py",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/python/cpython/v3.14.0/Lib/pydoc_data/topics.py",
+    "sha256": "3247a7690ac0439ac98f0e9be0a9595896c73ad426143ade7e44e4a56d53654a"
+  },
+  {
+    "lang": "python",
+    "file": "_pydecimal.py",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/python/cpython/v3.14.0/Lib/_pydecimal.py",
+    "sha256": "40df667a04926a73cb8b02001def578369a52d4f595068076d9b7e2dba382f7c"
+  },
+  {
+    "lang": "python",
+    "file": "typing.py",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/python/cpython/v3.14.0/Lib/typing.py",
+    "sha256": "b7b20c5180b6be1dd5f17f3f5be5f1a77540802f360ccea8ebf4ecc35ce8a0b5"
+  },
+  {
+    "lang": "typescript",
+    "file": "lib.dom.d.ts",
+    "kind": "npm",
+    "url": "https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz",
+    "member": "package/lib/lib.dom.d.ts",
+    "sha256": "d6b1eba8496bdd0eed6fc8a685768fe01b2da4a0388b5fe7df558290bffcf32f"
+  },
+  {
+    "lang": "typescript",
+    "file": "typescript.js",
+    "kind": "npm",
+    "url": "https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz",
+    "member": "package/lib/typescript.js",
+    "sha256": "569177652966bd528c319171c7dd22860dbf72bde116cbc4f644f1d02bb12e39"
+  },
+  {
+    "lang": "csharp",
+    "file": "Binder_Expressions.cs",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/dotnet/roslyn/380343d9b1289048f0f28c052b15018ac6031397/src/Compilers/CSharp/Portable/Binder/Binder_Expressions.cs",
+    "sha256": "38c8c5abf11f4e4ac56592a717840ed1b61baa5b714bee9cb7a9ef45206a9b36"
+  },
+  {
+    "lang": "csharp",
+    "file": "LanguageParser.cs",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/dotnet/roslyn/6f4fb6dbba6652102f048e0f421c4999d8f12cb0/src/Compilers/CSharp/Portable/Parser/LanguageParser.cs",
+    "sha256": "733d12c22f9c043d6fa331b5d528ab6cc3e3728ab838d00177ee8be2e6f39b16"
+  },
+  {
+    "lang": "tsql",
+    "file": "corpus_go_concat_1mb.sql",
+    "kind": "concat",
+    "sha256": "388688f2c7ec8152ab7680d25eee7735adf9cec348d90bc63747006d7fd343b2"
+  },
+  {
+    "lang": "javascript",
+    "file": "typescript.js",
+    "kind": "npm",
+    "url": "https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz",
+    "sha256": "569177652966bd528c319171c7dd22860dbf72bde116cbc4f644f1d02bb12e39",
+    "license_spdx": "Apache-2.0",
+    "license_url": "https://raw.githubusercontent.com/microsoft/TypeScript/050880ce59e30b356b686bd3144efe24f875ebc8/LICENSE.txt",
+    "license_sha256": "a7d00bfd54525bc694b6e32f64c7ebcf5e6b7ae3657be5cc12767bce74654a47",
+    "member": "package/lib/typescript.js"
+  },
+  {
+    "lang": "html",
+    "file": "dom_sort.html",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/DataTables/DataTables/f60c41290255c3fcab38999161f9529226b655c9/examples/plug-ins/dom_sort.html",
+    "sha256": "8eed4937dc497a478d12199dfbe0fa2aa070ae5104ccc5f18e92c4d5235c9c53",
+    "license_spdx": "MIT",
+    "license_url": "https://raw.githubusercontent.com/DataTables/DataTables/f60c41290255c3fcab38999161f9529226b655c9/license.txt",
+    "license_sha256": "5cd1e7bc146fbb6189184cbd0dced6853dc6b5a049c5ea3d8052d235e549a644"
+  },
+  {
+    "lang": "css",
+    "file": "bootstrap.css",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/twbs/bootstrap/f9a7a8941e7c1c91b0cae8a0c906537c26086ae2/dist/css/bootstrap.css",
+    "sha256": "ad0d5123040e043dad1451a6d4483dad4df4e2835e6687d6cf5af8a757283371",
+    "license_spdx": "MIT",
+    "license_url": "https://raw.githubusercontent.com/twbs/bootstrap/f9a7a8941e7c1c91b0cae8a0c906537c26086ae2/LICENSE",
+    "license_sha256": "bc0cd18d94c028f1c0b62ec9fdaddcb9921c1e07c29cf52dc7df8cca9daf2488"
+  },
+  {
+    "lang": "java",
+    "file": "Proto3GencodeTestProto.java",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/protocolbuffers/protobuf/1633873a4e9a6cf3df2e0f0d69cb2693b8f006b5/compatibility/smoke/v25.8/legacy_gencode_test/proto3/Proto3GencodeTestProto.java",
+    "sha256": "80413d76f6b02e978a4d5a569008371b192f1e219a2802c53bdb1083f4d8dfbe",
+    "license_spdx": "BSD-3-Clause",
+    "license_url": "https://raw.githubusercontent.com/protocolbuffers/protobuf/1633873a4e9a6cf3df2e0f0d69cb2693b8f006b5/LICENSE",
+    "license_sha256": "6e5e117324afd944dcf67f36cf329843bc1a92229a8cd9bb573d7a83130fea7d"
+  },
+  {
+    "lang": "c",
+    "file": "openssl.c",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/curl/curl/4f2b5fba5212a32c4e4a889492cc153e1220e619/lib/vtls/openssl.c",
+    "sha256": "c542b52edee1dbd827ede82f10fb21519674ebe93ec335c56d2cec20f39d81aa",
+    "license_spdx": "curl",
+    "license_url": "https://raw.githubusercontent.com/curl/curl/4f2b5fba5212a32c4e4a889492cc153e1220e619/COPYING",
+    "license_sha256": "82f2f4427d6545ee5aaac4f0b80428da6cc8ba41c2cf5da3a03680ec327b9681"
+  },
+  {
+    "lang": "rust",
+    "file": "ast.rs",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/rust-lang/rust/5f4effd579500175af844241eb179e756190f1e7/compiler/rustc_ast/src/ast.rs",
+    "sha256": "09609e4e241bc21662722f6423437b53fc2fabe9f711621806b94c9cde0f84f5",
+    "license_spdx": "MIT",
+    "license_url": "https://raw.githubusercontent.com/rust-lang/rust/5f4effd579500175af844241eb179e756190f1e7/LICENSE-MIT",
+    "license_sha256": "b71bd43a069ca0641a9ecfe585ca7b3c53b5cc1608f8b68321168698e28b5ea1"
+  },
+  {
+    "lang": "bash",
+    "file": "nvm.sh",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/nvm-sh/nvm/09e620c401382f4b3d3147333dd64c1e09188fdb/nvm.sh",
+    "sha256": "caca749b75b598322d6f03674f3440e99a7efb8c4f60265750b6d867b3a1d65b",
+    "license_spdx": "MIT",
+    "license_url": "https://raw.githubusercontent.com/nvm-sh/nvm/09e620c401382f4b3d3147333dd64c1e09188fdb/LICENSE.md",
+    "license_sha256": "681a12d1a1367b5890be9bc71a70466633d28fd32397be9b72d69d9bfb243492"
+  },
+  {
+    "lang": "cpp",
+    "file": "json.hpp",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/nlohmann/json/81888ff9f005c022e60f2de572327b2e50222222/single_include/nlohmann/json.hpp",
+    "sha256": "686e19239b9135b5822f96876fd59de90bde335d598c2e71ded84201d6f5e584",
+    "license_spdx": "MIT",
+    "license_url": "https://raw.githubusercontent.com/nlohmann/json/81888ff9f005c022e60f2de572327b2e50222222/LICENSE.MIT",
+    "license_sha256": "d64d1b4d948aa7751cfb613c02dc246aab7b358d760053e6580f01affe946906"
+  },
+  {
+    "lang": "yaml",
+    "file": "compute_gapic.yaml",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/googleapis/googleapis/97f6460c3558c1435d7fd001a9251f8df058ae2f/google/cloud/compute/v1beta/compute_gapic.yaml",
+    "sha256": "c7d306beaad2221df3676aa6d1933dbb6c8f05f595592aa676929d92b34fdffc",
+    "license_spdx": "Apache-2.0",
+    "license_url": "https://raw.githubusercontent.com/googleapis/googleapis/97f6460c3558c1435d7fd001a9251f8df058ae2f/LICENSE",
+    "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+  },
+  {
+    "lang": "php",
+    "file": "ContainerBuilder.php",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/symfony/symfony/979969dc83ebb43a7b6cd6447c0945b764af82b2/src/Symfony/Component/DependencyInjection/ContainerBuilder.php",
+    "sha256": "d37e4c0a7410237e501f77e787b9c94314cd68989bd7aafa0a6ae468cd50872a",
+    "license_spdx": "MIT",
+    "license_url": "https://raw.githubusercontent.com/symfony/symfony/979969dc83ebb43a7b6cd6447c0945b764af82b2/LICENSE",
+    "license_sha256": "18da7e490d2aa77197a0619b25bcc771a0110132a9d76071665718d3295e73cb"
+  },
+  {
+    "lang": "powershell",
+    "file": "build.psm1",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/PowerShell/PowerShell/cb9cf48b76cf2fdafb2f2a5e4c64dad4da526486/build.psm1",
+    "sha256": "9c87bbaceee0f4724983452b5d1c1ace09fa898f955c970b620d89ec0886a6bf",
+    "license_spdx": "MIT",
+    "license_url": "https://raw.githubusercontent.com/PowerShell/PowerShell/cb9cf48b76cf2fdafb2f2a5e4c64dad4da526486/LICENSE.txt",
+    "license_sha256": "7c77a44a8acd9b41fdc209864a8016b3d430b5d0e09309818d5b7444336df744"
+  },
+  {
+    "lang": "r",
+    "file": "arrowExports.R",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/apache/arrow/ab5b42237dfe14d683bc74ecbddf71109a0c6633/r/R/arrowExports.R",
+    "sha256": "1bbbfea18cfb9e64f7f8c1362ddfd264e2057858375eae225fdc415b7ba364dd",
+    "license_spdx": "Apache-2.0",
+    "license_url": "https://raw.githubusercontent.com/apache/arrow/ab5b42237dfe14d683bc74ecbddf71109a0c6633/LICENSE.txt",
+    "license_sha256": "4400b507b722b880ae4c66ea45984f9f4f068b170b83a3c54590154aeb81e021"
+  },
+  {
+    "lang": "dart",
+    "file": "ast.dart",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/dart-lang/sdk/f3f72dd63911938effc75feacc86f52022216c67/pkg/analyzer/lib/src/dart/ast/ast.dart",
+    "sha256": "69c8d401594c049800129b533fd7764d329c3e8df5fd837137915d6b27ea6d8a",
+    "license_spdx": "BSD-3-Clause",
+    "license_url": "https://raw.githubusercontent.com/dart-lang/sdk/f3f72dd63911938effc75feacc86f52022216c67/LICENSE",
+    "license_sha256": "2cfa3ee8e7512e6d44c854b986510810fadc815f93f890373b3a81c1b6ccd256"
+  },
+  {
+    "lang": "xml",
+    "file": "wayland.xml",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/wayland-mirror/wayland/f2ecaa61a3a82944ae069de5413104ab7ba2109f/protocol/wayland.xml",
+    "sha256": "4831fd1cdbca6319037660bec5da0f3c5636fd81573cb61e01e4709570dac294",
+    "license_spdx": "MIT",
+    "license_url": "https://raw.githubusercontent.com/wayland-mirror/wayland/f2ecaa61a3a82944ae069de5413104ab7ba2109f/COPYING",
+    "license_sha256": "6eefcb023622a463168a5c20add95fd24a38c7482622a9254a23b99b7c153061"
+  },
+  {
+    "lang": "ruby",
+    "file": "gb18030-tbl.rb",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/ruby/ruby/b7e8fad02273da0947e45fee172b26c6f49e694e/enc/trans/gb18030-tbl.rb",
+    "sha256": "2755eb2a433e528b1f51213c4b5905a139ceff3d1d2ef5349dbb1f15bc77201f",
+    "license_spdx": "BSD-2-Clause",
+    "license_url": "https://raw.githubusercontent.com/ruby/ruby/b7e8fad02273da0947e45fee172b26c6f49e694e/BSDL",
+    "license_sha256": "36a9a6e7347214bbba599a412617204e65bff065dcbe5c46f5cb454c80de9eb0"
+  },
+  {
+    "lang": "kotlin",
+    "file": "_Arrays.kt",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/libraries/stdlib/common/src/generated/_Arrays.kt",
+    "sha256": "85d0cf599441b69ed6f836ba588e0f54617a807f63f0e6b57195124ee6bc0849",
+    "license_spdx": "Apache-2.0",
+    "license_url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/license/LICENSE.txt",
+    "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "lang": "kotlin",
+    "file": "_UArrays.kt",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/libraries/stdlib/common/src/generated/_UArrays.kt",
+    "sha256": "cb2dc50d5296585e863da1a8efbce997c0db3f14e7e0d434809b0f12675da741",
+    "license_spdx": "Apache-2.0",
+    "license_url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/license/LICENSE.txt",
+    "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "lang": "kotlin",
+    "file": "_Collections.kt",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/libraries/stdlib/common/src/generated/_Collections.kt",
+    "sha256": "ceef966fca1973a351e85c6bedc4a14d43386b26b25682fb6efaa2c9e79cc842",
+    "license_spdx": "Apache-2.0",
+    "license_url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/license/LICENSE.txt",
+    "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "lang": "kotlin",
+    "file": "_Sequences.kt",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/libraries/stdlib/common/src/generated/_Sequences.kt",
+    "sha256": "66906380cffa34e53b7c65d780879c5d49930d46ed3c8788f59656a93102a0f0",
+    "license_spdx": "Apache-2.0",
+    "license_url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/license/LICENSE.txt",
+    "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "lang": "kotlin",
+    "file": "_Strings.kt",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/libraries/stdlib/common/src/generated/_Strings.kt",
+    "sha256": "5b6fe03540506b6191bd097c0166ba85b83da38bb0689f213eeada3621259a44",
+    "license_spdx": "Apache-2.0",
+    "license_url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/license/LICENSE.txt",
+    "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "lang": "kotlin",
+    "file": "_Maps.kt",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/libraries/stdlib/common/src/generated/_Maps.kt",
+    "sha256": "ff9e7a624131f00164563bd126404d61a8487998441e42aaf41262d71b9b7e0e",
+    "license_spdx": "Apache-2.0",
+    "license_url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/license/LICENSE.txt",
+    "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "lang": "kotlin",
+    "file": "Collections.kt",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/libraries/stdlib/src/kotlin/collections/Collections.kt",
+    "sha256": "6534b218d083d0a59b12d4f1c2276a92ee23cf3c1ec8d9a1e9157ae744dcf06d",
+    "license_spdx": "Apache-2.0",
+    "license_url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/license/LICENSE.txt",
+    "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "lang": "kotlin",
+    "file": "Strings.kt",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/libraries/stdlib/src/kotlin/text/Strings.kt",
+    "sha256": "12be6c955d7ab31a705abe296b4733f3883468c8566ca823537a2642932e6b82",
+    "license_spdx": "Apache-2.0",
+    "license_url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/license/LICENSE.txt",
+    "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "lang": "kotlin",
+    "file": "StringTest.kt",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/libraries/stdlib/test/text/StringTest.kt",
+    "sha256": "dfae8bb84a5eb8aa80d12e76395f2d80a5ea1b943aae2313728031d482fa8d4d",
+    "license_spdx": "Apache-2.0",
+    "license_url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/license/LICENSE.txt",
+    "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "lang": "kotlin",
+    "file": "CollectionTest.kt",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/libraries/stdlib/test/collections/CollectionTest.kt",
+    "sha256": "6ef51d3628a53e461d75c29c2d99786e697c209c3b37aa7a2afbe47c2649cfa9",
+    "license_spdx": "Apache-2.0",
+    "license_url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/license/LICENSE.txt",
+    "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "lang": "kotlin",
+    "file": "ArraysTest.kt",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/libraries/stdlib/test/collections/ArraysTest.kt",
+    "sha256": "bfc65c890312121479e786d5dd05d25f85bbc42e8ac5b10ca95947caa2e8bb03",
+    "license_spdx": "Apache-2.0",
+    "license_url": "https://raw.githubusercontent.com/JetBrains/kotlin/e12dc36e784c4c65886009eb622504b3db65b699/license/LICENSE.txt",
+    "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  }
 ]

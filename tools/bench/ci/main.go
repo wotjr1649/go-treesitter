@@ -43,7 +43,7 @@ const (
 	smallLimit = 25 * 1024
 )
 
-var allLangs = []string{"json", "golang", "python", "typescript", "tsx", "csharp", "tsql", "javascript", "html", "css", "java", "c", "rust", "bash", "cpp"}
+var allLangs = []string{"json", "golang", "python", "typescript", "tsx", "csharp", "tsql", "javascript", "html", "css", "java", "c", "rust", "bash", "cpp", "yaml", "php", "powershell", "r", "dart", "xml", "ruby", "kotlin"}
 
 // dataLang is the directory name of a language in the ciconf data tree (it calls golang "go").
 func dataLang(l string) string {

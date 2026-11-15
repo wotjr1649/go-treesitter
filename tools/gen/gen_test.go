@@ -169,8 +169,8 @@ func TestPinsPlan(t *testing.T) {
 				t.Fatalf("%s: unpinned download %q", plat, l)
 			}
 		}
-		// Runtime + wasi-libc + 14 grammar repositories (typescript and tsx share one archive).
-		if kinds["tool"] != 2 || kinds["goinstall"] != 1 || kinds["source"] != 16 {
+		// Runtime + wasi-libc + 22 grammar repositories (typescript and tsx share one archive).
+		if kinds["tool"] != 2 || kinds["goinstall"] != 1 || kinds["source"] != 24 {
 			t.Fatalf("%s: plan kinds %v", plat, kinds)
 		}
 	}
@@ -336,5 +336,22 @@ func TestRuntimeNotice(t *testing.T) {
 	}
 	if _, err := runtimeNotice(opts{src: dir}, pins); err == nil {
 		t.Fatal("a changed runtime LICENSE must fail")
+	}
+}
+
+func TestReadmeSourceTiers(t *testing.T) {
+	for lang, tier := range map[string]string{
+		"php": "1 (core)", "ruby": "1 (core)",
+		"yaml": "2 (tree-sitter-grammars)", "xml": "2 (tree-sitter-grammars)",
+		"kotlin": "3 (third party)", "powershell": "3 (third party)", "r": "3 (third party)", "dart": "3 (third party)",
+	} {
+		if got := readme(lang, &Pins{}, GrammarPin{}, Identity{}); !strings.Contains(got, "Source tier: "+tier+", per ADR-0024.") {
+			t.Errorf("%s: missing source tier %s", lang, tier)
+		}
+	}
+	for _, lang := range []string{"csharp", "golang", "json", "python", "tsql", "tsx", "typescript", "javascript", "html", "css", "java", "c", "rust", "bash", "cpp"} {
+		if strings.Contains(readme(lang, &Pins{}, GrammarPin{}, Identity{}), "Source tier:") {
+			t.Errorf("%s: legacy module output must stay unchanged in this batch", lang)
+		}
 	}
 }

@@ -7,7 +7,7 @@ W=${1:?usage: balance-probe.sh <new-empty-work-dir> [lang ...]}
 shift
 LANGS=("$@")
 if [ ${#LANGS[@]} -eq 0 ]; then
-  LANGS=(bash c cpp csharp css golang html java javascript json python rust tsql tsx typescript)
+  LANGS=(bash c cpp csharp css dart golang html java javascript json php powershell python r ruby rust tsql tsx typescript xml yaml kotlin)
 fi
 REPO=$(cd "$(dirname "$0")/../.." && pwd)
 source "$REPO/tools/gen/fetch.sh"

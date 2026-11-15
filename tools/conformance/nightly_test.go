@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"hash/fnv"
 	"math/rand/v2"
@@ -26,6 +27,7 @@ import (
 // random byte mutations, plus one random edit (insert, delete or replace; not always on a UTF-8 boundary).
 //
 //	TSG_NIGHTLY_BUDGET   time per grammar, e.g. 4m (unset: the test skips)
+//	TSG_NIGHTLY_INPUT_TIMEOUT wall-clock bound per Go case/native operation (default 30s)
 //	TSG_NIGHTLY_SEED     base seed (the workflow uses the UTC date, YYYYMMDD); every case is derived from
 //	                     (seed, language, iteration), so TSG_NIGHTLY_REPLAY=<lang>:<iteration> reruns exactly one case
 //	TSG_NATIVE_EXE_DIR   native-ref output directory
@@ -47,6 +49,13 @@ func TestNightlyDiff(t *testing.T) {
 	if err != nil {
 		t.Fatalf("TSG_NIGHTLY_SEED: %v", err)
 	}
+	limit := 30 * time.Second
+	if v := os.Getenv("TSG_NIGHTLY_INPUT_TIMEOUT"); v != "" {
+		limit, err = time.ParseDuration(v)
+		if err != nil || limit <= 0 {
+			t.Fatalf("TSG_NIGHTLY_INPUT_TIMEOUT must be a positive duration: %q", v)
+		}
+	}
 	root := dataRoot(t)
 	replayLang, replayIt, replay := strings.Cut(os.Getenv("TSG_NIGHTLY_REPLAY"), ":")
 	for _, lang := range langs(t) {
@@ -66,7 +75,7 @@ func TestNightlyDiff(t *testing.T) {
 			for _, f := range files {
 				seeds = append(seeds, readFile(t, f))
 			}
-			nd := &nightly{t: t, lang: lang, exe: exe, p: newParser(t, lang), tmp: t.TempDir()}
+			nd := &nightly{t: t, lang: lang, exe: exe, tmp: t.TempDir(), limit: limit}
 			h := fnv.New64a()
 			h.Write([]byte(lang))
 			stream := h.Sum64()
@@ -88,7 +97,7 @@ func TestNightlyDiff(t *testing.T) {
 				}
 			}
 			summary(t, map[string]any{"lang": lang, "seed": seed, "cases": cases, "budget": budgetS, "goos": runtime.GOOS, "goarch": runtime.GOARCH,
-				"seconds": time.Since(start).Seconds(), "mismatch": t.Failed()})
+				"seconds": time.Since(start).Seconds(), "input_timeout": limit.String(), "mismatch": t.Failed()})
 		})
 	}
 }
@@ -181,24 +190,122 @@ func splice(src []byte, at, del int, ins []byte) []byte {
 }
 
 type nightly struct {
-	t    *testing.T
-	lang string
-	exe  string
-	p    *treesitter.Parser
-	tmp  string
+	t          *testing.T
+	lang       string
+	exe        string
+	p          *treesitter.Parser
+	tmp        string
+	limit      time.Duration
+	workerTest string   // test-only non-terminating worker substitute
+	exeArgs    []string // test-only native substitute arguments
 }
 
-func (n *nightly) native(args ...string) ([]byte, error) {
-	ctx, cancel := context.WithTimeout(bg, 2*time.Minute)
+// A process boundary is required: an external scanner can loop without polling the context.
+func nightlyCommand(limit time.Duration, exe string, env []string, args ...string) ([]byte, error) {
+	ctx, cancel := context.WithTimeout(bg, limit)
 	defer cancel()
 	var stderr bytes.Buffer
-	cmd := exec.CommandContext(ctx, n.exe, args...)
+	cmd := exec.CommandContext(ctx, exe, args...)
+	cmd.Env = env
 	cmd.Stderr = &stderr
-	out, err := cmd.Output()
+	out, err := cmd.Output() // Wait reaps the process before the next input/grammar.
+	if ctx.Err() != nil {
+		return out, fmt.Errorf("wall-clock limit %s exceeded: %w", limit, ctx.Err())
+	}
 	if err != nil {
-		return nil, fmt.Errorf("%v: %s", err, strings.TrimSpace(stderr.String()))
+		return out, fmt.Errorf("%v: %s", err, strings.TrimSpace(stderr.String()))
 	}
 	return out, nil
+}
+
+type nightlyRequest struct {
+	Lang, Old, New, Result string
+	Start, OldEnd, NewEnd  int
+	NoEdit                 bool
+}
+
+type nightlyResult struct {
+	Old, New, Incremental, Ranges        []byte
+	OldError, NewError, IncrementalError string
+}
+
+func errorText(err error) string {
+	if err != nil {
+		return err.Error()
+	}
+	return ""
+}
+
+func (n *nightly) engine(c kase, old, next string) (nightlyResult, error) {
+	var result nightlyResult
+	req := nightlyRequest{n.lang, old, next, filepath.Join(n.tmp, "result.json"), c.start, c.oe, c.start + len(c.ins), c.noEdit}
+	path := filepath.Join(n.tmp, "request.json")
+	raw, err := json.Marshal(req)
+	if err != nil {
+		return result, err
+	}
+	if err = os.WriteFile(path, raw, 0o600); err != nil {
+		return result, err
+	}
+	exe, err := os.Executable()
+	if err != nil {
+		return result, err
+	}
+	worker := n.workerTest
+	if worker == "" {
+		worker = "TestNightlyEngineWorker"
+	}
+	_, err = nightlyCommand(n.limit, exe, append(os.Environ(), "TSG_NIGHTLY_WORKER_REQUEST="+path), "-test.run=^"+worker+"$", "-test.timeout=0")
+	if err != nil {
+		return result, err
+	}
+	raw, err = os.ReadFile(req.Result)
+	if err != nil {
+		return result, err
+	}
+	err = json.Unmarshal(raw, &result)
+	return result, err
+}
+
+// TestNightlyEngineWorker runs only in a disposable child of the nightly supervisor.
+func TestNightlyEngineWorker(t *testing.T) {
+	path := os.Getenv("TSG_NIGHTLY_WORKER_REQUEST")
+	if path == "" {
+		t.Skip("nightly subprocess only")
+	}
+	var req nightlyRequest
+	if err := json.Unmarshal(readFile(t, path), &req); err != nil {
+		t.Fatal(err)
+	}
+	n := &nightly{t: t, lang: req.Lang, p: newParser(t, req.Lang)}
+	old, next := readFile(t, req.Old), readFile(t, req.New)
+	var result nightlyResult
+	dump := func(src []byte) ([]byte, string) {
+		s, err := n.p.ParseSnapshot(bg, src)
+		if err != nil {
+			return nil, err.Error()
+		}
+		return Dump(s), ""
+	}
+	result.Old, result.OldError = dump(old)
+	if !req.NoEdit {
+		result.New, result.NewError = dump(next)
+		c := kase{old: old, start: req.Start, oe: req.OldEnd, ins: next[req.Start:req.NewEnd]}
+		d, ranges, err := n.incremental(bg, c, next)
+		result.Incremental, result.IncrementalError = d, errorText(err)
+		var rs bytes.Buffer
+		for _, rg := range ranges {
+			fmt.Fprintf(&rs, "%d %d %d %d %d %d\n", rg.StartByte, rg.EndByte, rg.StartPoint.Row, rg.StartPoint.Column, rg.EndPoint.Row, rg.EndPoint.Column)
+		}
+		result.Ranges = rs.Bytes()
+	}
+	raw, err := json.Marshal(result)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(req.Result, raw, 0o600); err != nil {
+		t.Fatal(err)
+	}
 }
 
 // check runs every comparison for c and returns the findings, in a fixed order.
@@ -211,43 +318,41 @@ func (n *nightly) check(c kase) (out []finding) {
 	if err := os.WriteFile(newP, next, 0o644); err != nil {
 		n.t.Fatal(err)
 	}
-	ctx, cancel := context.WithTimeout(bg, 60*time.Second)
-	defer cancel()
-	cmp := func(kind string, goOut []byte, goErr error, nativeArgs ...string) {
-		nat, nerr := n.native(nativeArgs...)
+	result, err := n.engine(c, oldP, newP)
+	if err != nil {
+		kind := "engine-error"
+		if errors.Is(err, context.DeadlineExceeded) {
+			kind = "engine-timeout"
+		}
+		return []finding{{kind, "Go case failed: " + err.Error(), nil, nil}}
+	}
+	cmp := func(kind string, goOut []byte, goErr string, nativeArgs ...string) bool {
+		nat, nerr := nightlyCommand(n.limit, n.exe, nil, append(n.exeArgs, nativeArgs...)...)
 		switch {
+		case errors.Is(nerr, context.DeadlineExceeded):
+			out = append([]finding{{kind + "-native-timeout", "native " + nativeArgs[0] + ": " + nerr.Error(), goOut, nat}}, out...)
+			return false
 		case nerr != nil:
-			out = append(out, finding{kind + "-native-error", "native " + strings.Join(nativeArgs[:1], " ") + " failed: " + nerr.Error(), goOut, nil})
-		case goErr != nil:
-			out = append(out, finding{kind + "-go-error", "Go failed where native succeeded: " + goErr.Error(), nil, nat})
+			out = append(out, finding{kind + "-native-error", "native " + nativeArgs[0] + " failed: " + nerr.Error(), goOut, nat})
+		case goErr != "":
+			out = append(out, finding{kind + "-go-error", "Go failed where native succeeded: " + goErr, nil, nat})
 		case !bytes.Equal(goOut, nat):
 			out = append(out, finding{kind, kind + " differs: " + firstDiff(goOut, nat), goOut, nat})
 		}
+		return true
 	}
-	dump := func(src []byte) ([]byte, error) {
-		s, err := n.p.ParseSnapshot(ctx, src)
-		if err != nil {
-			return nil, err
-		}
-		return Dump(s), nil
-	}
-	d, err := dump(c.old)
-	cmp("fresh-old", d, err, "dump", oldP)
-	if c.noEdit {
+	if !cmp("fresh-old", result.Old, result.OldError, "dump", oldP) || c.noEdit {
 		return out
 	}
-	d, err = dump(next)
-	cmp("fresh-new", d, err, "dump", newP)
-
-	args := []string{oldP, newP, strconv.Itoa(c.start), strconv.Itoa(c.oe), strconv.Itoa(c.start + len(c.ins))}
-	incDump, ranges, err := n.incremental(ctx, c, next)
-	cmp("incremental", incDump, err, append([]string{"edit"}, args...)...)
-	var rs bytes.Buffer
-	for _, rg := range ranges {
-		fmt.Fprintf(&rs, "%d %d %d %d %d %d\n", rg.StartByte, rg.EndByte, rg.StartPoint.Row, rg.StartPoint.Column, rg.EndPoint.Row, rg.EndPoint.Column)
+	if !cmp("fresh-new", result.New, result.NewError, "dump", newP) {
+		return out
 	}
-	if err == nil { // a ranges comparison after an incremental failure would only repeat it
-		cmp("ranges", rs.Bytes(), nil, append([]string{"changed-ranges"}, args...)...)
+	args := []string{oldP, newP, strconv.Itoa(c.start), strconv.Itoa(c.oe), strconv.Itoa(c.start + len(c.ins))}
+	if !cmp("incremental", result.Incremental, result.IncrementalError, append([]string{"edit"}, args...)...) {
+		return out
+	}
+	if result.IncrementalError == "" {
+		cmp("ranges", result.Ranges, "", append([]string{"changed-ranges"}, args...)...)
 	}
 	return out
 }
@@ -332,6 +437,7 @@ func (n *nightly) report(seed uint64, it int, c kase, f finding, doShrink bool) 
 		return
 	}
 	orig := c
+	doShrink = doShrink && !strings.HasSuffix(f.kind, "-timeout")
 	if doShrink {
 		c = n.shrink(c, f.kind)
 		for _, g := range n.check(c) { // outputs of the shrunk case
@@ -341,19 +447,26 @@ func (n *nightly) report(seed uint64, it int, c kase, f finding, doShrink bool) 
 		}
 	}
 	dir := filepath.Join(out, "nightly", fmt.Sprintf("%s-%d", n.lang, it))
-	os.MkdirAll(dir, 0o755)
-	w := func(name string, b []byte) { os.WriteFile(filepath.Join(dir, name), b, 0o644) }
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		n.t.Fatal(err)
+	}
+	w := func(name string, b []byte) {
+		if err := os.WriteFile(filepath.Join(dir, name), b, 0o644); err != nil {
+			n.t.Fatal(err)
+		}
+	}
 	next := c.next()
 	w("old.bin", c.old)
 	w("new.bin", next)
 	w("go.out", f.goOut)
 	w("native.out", f.native)
 	w("original-old.bin", orig.old)
+	w("original-new.bin", orig.next())
 	nativeCmd := "dump old.bin"
 	switch {
 	case strings.HasPrefix(f.kind, "fresh-new"):
 		nativeCmd = "dump new.bin"
-	case strings.HasPrefix(f.kind, "incremental"):
+	case strings.HasPrefix(f.kind, "incremental"), strings.HasPrefix(f.kind, "engine"):
 		nativeCmd = "edit old.bin new.bin"
 	case strings.HasPrefix(f.kind, "ranges"):
 		nativeCmd = "changed-ranges old.bin new.bin"
@@ -365,10 +478,10 @@ func (n *nightly) report(seed uint64, it int, c kase, f finding, doShrink bool) 
 	repro := fmt.Sprintf("language:   %s\nfinding:    %s\ndetail:     %s\nseed:       %d (TSG_NIGHTLY_SEED)\niteration:  %d\nplatform:   %s/%s\n"+
 		"edit:       start=%d old_end=%d new_end=%d (shrunk=%v; original input %d bytes, shrunk %d bytes)\n\n"+
 		"native:     %s %s%s      # go.out and native.out are the two outputs compared\n"+
-		"replay:     TSG_NIGHTLY_BUDGET=1m TSG_NIGHTLY_SEED=%d TSG_NIGHTLY_REPLAY=%s:%d TSG_DATA_DIR=<ciconf data> TSG_NATIVE_EXE_DIR=<native exe dir> go test -run TestNightlyDiff -v . (in tools/conformance, CGO_ENABLED=0)\n",
+		"replay:     TSG_NIGHTLY_BUDGET=1m TSG_NIGHTLY_INPUT_TIMEOUT=%s TSG_NIGHTLY_SEED=%d TSG_NIGHTLY_REPLAY=%s:%d TSG_DATA_DIR=<ciconf data> TSG_NATIVE_EXE_DIR=<native exe dir> go test -run TestNightlyDiff -v . (in tools/conformance, CGO_ENABLED=0)\n",
 		n.lang, f.kind, f.detail, seed, it, runtime.GOOS, runtime.GOARCH, c.start, c.oe, c.start+len(c.ins), doShrink, len(orig.old), len(c.old),
-		filepath.Base(n.exe), nativeCmd, edit, seed, n.lang, it)
+		filepath.Base(n.exe), nativeCmd, edit, n.limit.String(), seed, n.lang, it)
 	w("repro.txt", []byte(repro))
-	meta, _ := json.Marshal(map[string]any{"lang": n.lang, "seed": seed, "iteration": it, "kind": f.kind, "start": c.start, "oldEnd": c.oe, "newEnd": c.start + len(c.ins)})
+	meta, _ := json.Marshal(map[string]any{"lang": n.lang, "seed": seed, "iteration": it, "kind": f.kind, "start": c.start, "oldEnd": c.oe, "newEnd": c.start + len(c.ins), "inputTimeout": n.limit.String()})
 	w("repro.json", meta)
 }

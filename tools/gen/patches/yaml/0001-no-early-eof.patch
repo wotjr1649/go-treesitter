@@ -1,0 +1,10 @@
+--- a/src/parser.c
++++ b/src/parser.c
+@@ -3824,7 +3824,6 @@
+   eof = lexer->eof(lexer);
+   switch (state) {
+     case 0:
+-      ACCEPT_TOKEN(ts_builtin_sym_end);
+       if (eof) ADVANCE(1);
+       END_STATE();
+     case 1:

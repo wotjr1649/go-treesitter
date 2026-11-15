@@ -1,8 +1,10 @@
 # go-treesitter
 
 **Preview (v0.3.0).** A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
-module is generated from the unmodified upstream tree-sitter runtime and grammar C (wasm translated to Go by
-`tools/gen`), and is checked against a native C build of the same sources.
+module is generated from the unmodified upstream tree-sitter runtime and pinned grammar C (wasm translated to Go by
+`tools/gen`). Grammar C may carry recorded temporary
+[ADR-0023 patches](docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md); each patched module discloses them.
+Native C comparisons and their measured scope are recorded on the status board.
 
 This repository owns the `treesitter` API, its result contract, the engine ABI and the generator. Language semantics,
 code graphs and application policy belong to consumers.
@@ -17,6 +19,13 @@ The root module has no grammar. Add the grammar modules you need under `grammars
 `typescript`. Each language has exactly one upstream grammar repository, chosen by the tiers of
 [ADR-0024](docs/design/decisions/ADR-0024-grammar-source-tiers.md): all of these come from the `tree-sitter`
 organisation except `tsql` (`meloncholera/tree-sitter-mssql`, owner-designated).
+
+Wave-2 batch 2 adds development candidates `yaml` (tier 2), `php` (tier 1, PHP parser only), `powershell` (tier 3),
+`r` (tier 3), `dart` (tier 3), `xml` (tier 2, XML parser only), `ruby` (tier 1), and `kotlin` (tier 3,
+`fwcd/tree-sitter-kotlin`). YAML carries temporary patch `0001-no-early-eof`. Local Q9/Q10 results describe earlier
+product bytes; Q14 passed the current ABI 3 local Windows integration, native comparison and resource gates. Hosted gates for these eight have not run.
+See the [status board](docs/reports/release-critical-status.md#q14-wave-2-batch-2-abi-3-integration) and
+[limitations](docs/reports/limitations.md).
 
 ```go
 import (

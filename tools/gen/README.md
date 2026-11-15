@@ -21,17 +21,17 @@ Everything a generation consumes is pinned, and the identity of a generated modu
 ## Regenerate
 
 ```
-bash tools/gen/regen.sh <new-empty-work-dir> [lang ...]      # all 15 modules by default
+bash tools/gen/regen.sh <new-empty-work-dir> [lang ...]      # all 23 modules by default
 ROOT_VERSION=v0.1.0 bash tools/gen/regen.sh <work-dir>       # switch a development tree to the release go.mod form
 ```
 
 `regen.sh` builds `gen`, prints the fetch plan (`gen -plan host`), downloads every archive into the new directory,
 verifies its sha256 **before** extracting, builds wasm2go from the pinned version, then runs `gen` per module into
 `grammars/<lang>`. `.github/workflows/regen.yml` runs it on Linux and requires `git diff --exit-code -- grammars/`.
-Without `ROOT_VERSION`, `regen.sh` derives the go.mod form from the committed `grammars/*/go.mod` (all 15 must be in the same form: development with `replace`, or release `require vX.Y.Z` without `replace`; otherwise it fails), so the drift check regenerates the committed form unchanged.
+Without `ROOT_VERSION`, `regen.sh` derives the go.mod form from the committed `grammars/*/go.mod` (all 23 must be in the same form: development with `replace`, or release `require vX.Y.Z` without `replace`; otherwise it fails), so the drift check regenerates the committed form unchanged.
 
-The modules are `bash`, `c`, `cpp`, `csharp`, `css`, `golang`, `html`, `java`, `javascript` (including JSX), `json`,
-`python`, `rust`, `tsql`, `tsx`, and `typescript`. Each has a grammar-specific generated smoke-test sample.
+The modules are `bash`, `c`, `cpp`, `csharp`, `css`, `dart`, `golang`, `html`, `java`, `javascript` (including JSX), `json`,
+`kotlin`, `php`, `powershell`, `python`, `r`, `ruby`, `rust`, `tsql`, `tsx`, `typescript`, `xml`, and `yaml`. Each has a grammar-specific generated smoke-test sample.
 Downloads allow three attempts with 1s/2s backoff only for transient transport failures. HTTP, certificate and local
 write errors end that URL attempt; transient HTTP 408/429/5xx responses also receive bounded retries. A failed upstream download or hash check then tries each configured mirror; sha256 verification remains mandatory before extraction. The retry self-check is
 `bash tools/gen/fetch_test.sh`.
@@ -55,7 +55,7 @@ and product shim in `probe/balance.c`. It uses the normal recipe and memory prov
 output outside `grammars/`, rejects `-root-version`, and marks its provenance `testOnly: "balancing-cancel"`; its wrapper
 hash and extra exports are bound into its identity. These modules are test artifacts, never product grammar modules.
 
-`bash tools/gen/balance-probe.sh <new-empty-work-dir> [lang ...]` fetches SHA-verified pinned inputs and builds all 15 probes
+`bash tools/gen/balance-probe.sh <new-empty-work-dir> [lang ...]` fetches SHA-verified pinned inputs and builds all 23 probes
 under `<work-dir>/probes/` and native references under `<work-dir>/native/`, without regenerating product modules.
 With language arguments it builds only those probes and native executables, for example `... <work-dir> javascript`.
 Then, from `tools/conformance`:
@@ -74,6 +74,9 @@ Each grammar's optional `patches` list keeps the existing single-file records: `
 `source` (archive-root-relative), `sha256` (patch bytes), `beforeSHA256`, `afterSHA256`, and `upstreamReport` (HTTPS).
 Only owner-approved patches may be added. C-only patches keep their existing identities and disclosure format.
 No real grammar patch is introduced by the regeneration mechanism itself.
+YAML carries recorded C-only patch `0001-no-early-eof`, preventing premature end-of-input acceptance and truncated
+roots. Retire it with an approved pin move when upstream fixes it; `native-ref -unpatched` supplies the required
+corpus/fuzz baseline.
 
 For `grammar.js` or related grammar inputs, also set the grammar's `regenerate: true`. `gen` and `native-ref` use
 the same implementation: verify the full archive, extract a private copy, apply the recorded patches, then run
@@ -110,6 +113,6 @@ The list includes the runtime, every grammar archive, wasi-libc, both host SDK/b
 CLI executables' gzip archives, including when no real grammar patch uses the CLI yet. Download each listed upstream
 URL into a file named by column one, check column two, and attach these unchanged files to each immutable `vX.Y.Z`
 release. Before releasing a new pin set, update `mirrors` to that release and retain older bases only when useful.
-The configured `v0.3.0` mirror becomes available when its assets are published; this command does not upload anything.
+Published releases are immutable: archives added by a later pin set (for example the eight wave-2 batch-2 grammars) have no mirror until the next release carries them. This command does not upload anything.
 `wasm2go` remains a Go module installed through Go's checksum-verified module mechanism (`wasm2goSum`), not an archive
 in this list. The Go toolchain and system C compiler are host prerequisites, not downloads managed by this pin file.

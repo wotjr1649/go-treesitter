@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "abi": 3,
+  "name": "dart",
+  "module": "github.com/wotjr1649/go-treesitter/grammars/dart",
+  "identity": {
+    "Runtime": "v0.27.2",
+    "GrammarRepo": "https://github.com/UserNobody14/tree-sitter-dart",
+    "GrammarRev": "be07cf7118d3dba06236a3f19541685a68209934",
+    "SourceSHA256": {
+      "grammar.LICENSE": "d270cb3a4985d75033bd77d875ccebff1d66e32788a3f727891e28d76132dd46",
+      "grammar.parser.c": "af2c6d473ddd54f56603db77fa35e0bdbc8e4fb92d41c4bac69dc7e510eb9ca4",
+      "grammar.scanner.c": "07a7b7818b175e9460523e705dd88d20f7b5141bac95c593d4426e6d52284996",
+      "grammar.tree": "02daac8faaf4b54a43d3fda17abaee1008dc173450d06c308ee1b72c8c4dffc8",
+      "grammar.tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+      "grammar.tree_sitter/array.h": "31e60a1bff6f715afacce03b5b70efe42b58371b4f9595dd4af52a577ff9608c",
+      "grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
+      "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
+      "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
+    },
+    "RecipeSHA256": "ecd722b03a5691afef0f1d0ef356b42d6b8c8c0af284b9727a7331b8c50a4100",
+    "Tools": {
+      "binaryen": "133",
+      "clang": "23.1.0",
+      "llvm": "895aa2c896ada719451be2e3673c83da8ddf1141",
+      "recipe": "v2-O3",
+      "wasi-sdk": "34.0",
+      "wasm2go": "v0.4.21",
+      "wasm2go-sum": "h1:F9xQyNnXIjWesQgt7tLxqVUg2pmxwBOrRCLpEFv3QUc="
+    }
+  },
+  "outputs": {
+    "LICENSES/tree-sitter.txt": "c5cfb43042b6b72045f4ba997834d0a7786d2793d91680868b5815b39f14fc78",
+    "LICENSES/wasi-libc/LICENSE": "2711a8b5a5cdfef0e639f96c1aca12ae23d7d64a02d0507f1bdf14d2b27bbc3a",
+    "LICENSES/wasi-libc/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+    "LICENSES/wasi-libc/LICENSE-APACHE-LLVM": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+    "LICENSES/wasi-libc/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+    "LICENSES/wasi-libc/cloudlibc-LICENSE": "c8b789cf5a746611e6300a0cc7750dbf92b61912a709d04e639245f7290656d0",
+    "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
+    "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
+    "engine_gen.dat": "8d2a37e32092a16eb1943045e35d126f776d1f33d81c6e4cdd60880f18381b86",
+    "engine_gen.go": "1a341df5d43c8b9a844d8181dd73d7b1a38fed0b91385701e83c57d2ff02c94b",
+    "wasm": "e801b0c067a8ee7d443b94a9e06c6a375e79e84510ddb97223d6835f1f268950",
+    "wasm.clang": "6b844534fc8f73320abf4cab2624c2dcba744c2e686ad4c123b0b147d2c2a7ca"
+  }
+}

@@ -4,7 +4,8 @@ name: Nightly differential fuzzing
 # cases (mutations of the pinned grammars' own test/corpus inputs plus random edits, seeded from the UTC date) and
 # compares the CGO-free engine with the native executables byte for byte (dumps, incremental edits, changed ranges)
 # for a fixed time budget per grammar (tools/conformance TestNightlyDiff). The Go fuzz targets run for a short budget
-# afterwards. A mismatch uploads the shrunk reproducer (input, both outputs, seed, commands) and fails the job.
+# afterwards. Each Go case/native operation has a hard process watchdog; a hang uploads its original input and fails
+# only that grammar (matrix fail-fast is false). A mismatch uploads the shrunk reproducer (input, both outputs, seed, commands) and fails the job.
 # Not a release gate: it finds regressions, the conformance lane stays the gate.
 
 on:
@@ -31,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp]
+        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin]
         runner: [ubuntu-24.04, ubuntu-24.04-arm]
         include:
           - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
@@ -45,6 +46,8 @@ jobs:
       MINUTES: ${{ inputs.minutes || '4' }}
       FUZZ_SECONDS: ${{ inputs.fuzz_seconds || '30' }}
       SEED_INPUT: ${{ inputs.seed }}
+      # 30s per Go case/native operation; see validation.md, Nightly input watchdog.
+      TSG_NIGHTLY_INPUT_TIMEOUT: 30s
     defaults:
       run:
         shell: bash
@@ -61,7 +64,7 @@ jobs:
           [ "$lang" != golang ] || lang=go
           echo "TSG_S15_LANGS=$lang" >> "$GITHUB_ENV"
           tags=""
-          for other in csharp go json python tsql tsx typescript javascript html css java c rust bash cpp; do
+          for other in csharp go json python tsql tsx typescript javascript html css java c rust bash cpp yaml php powershell r dart xml ruby kotlin; do
             [ "$other" = "$lang" ] || tags="${tags:+$tags,}no_$other"
           done
           echo "GOFLAGS=-tags=$tags" >> "$GITHUB_ENV"
@@ -84,12 +87,12 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -fetch -cc gcc \
             -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" "${{ matrix.lang }}"
-      # The corpus inputs are the mutation seeds; the edits and results it also writes are not used here.
+      # Extract only mutation seeds: every parse belongs inside the differential watchdog below.
       - name: Extract the corpus inputs
         env:
           CGO_ENABLED: "0"
         run: |
-          "$RUNNER_TEMP/ciconf" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "$TSG_S15_LANGS"
+          "$RUNNER_TEMP/ciconf" -inputs-only -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "$TSG_S15_LANGS"
       - name: Differential fuzzing against the native reference
         working-directory: tools/conformance
         env:

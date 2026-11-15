@@ -5,6 +5,7 @@ the project owner. Third-party works retain their original copyright notices.
 
 Each generated grammar module under `grammars/` contains, in generated Go and data
 files, the unmodified tree-sitter runtime C and its grammar's `parser.c`/`scanner.c`
+(with any recorded [ADR-0023](docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md) patches)
 (translated from wasm by `tools/gen`). Each module ships its grammar's license as its
 own `LICENSE`.
 
@@ -25,6 +26,14 @@ own `LICENSE`.
 | tree-sitter-bash | `grammars/bash` | [MIT](LICENSES/tree-sitter-bash.txt) |
 | tree-sitter-html | `grammars/html` | [MIT](LICENSES/tree-sitter-html.txt) |
 | tree-sitter-css | `grammars/css` | [MIT](LICENSES/tree-sitter-css.txt) |
+| tree-sitter-yaml | `grammars/yaml` | [MIT](LICENSES/tree-sitter-yaml.txt) |
+| tree-sitter-php | `grammars/php` | [MIT](LICENSES/tree-sitter-php.txt) |
+| tree-sitter-powershell | `grammars/powershell` | [MIT](LICENSES/tree-sitter-powershell.txt) |
+| tree-sitter-r | `grammars/r` | [MIT](LICENSES/tree-sitter-r.txt) |
+| tree-sitter-dart | `grammars/dart` | [MIT](LICENSES/tree-sitter-dart.txt) |
+| tree-sitter-xml | `grammars/xml` | [MIT](LICENSES/tree-sitter-xml.txt) |
+| tree-sitter-ruby | `grammars/ruby` | [MIT](LICENSES/tree-sitter-ruby.txt) |
+| tree-sitter-kotlin | `grammars/kotlin` | [MIT](LICENSES/tree-sitter-kotlin.txt) |
 | Newtonsoft.Json | Copied C# test fixtures | [MIT](testdata/newtonsoft/LICENSE.md) |
 
 [The license manifest](LICENSES/manifest.json) records the exact public source

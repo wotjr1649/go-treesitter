@@ -63,6 +63,24 @@ must remain visible in the evidence.
 - `.gitattributes` must pin `*.cs`, `*.ts`, `*.tsx`, `*.js`, `*.jsx`, `*.py`, `*.go` fixtures to LF
   and mark `*.bin` as `-text`, before the first external fixture lands.
 
+## Wave-2 batch 2 large inputs (Q9)
+
+The following unmodified real inputs and their licenses are SHA-256-pinned in `tools/bench/ci/large.json`.
+The YAML and Ruby inputs reuse the previously recorded bytes; no input is concatenated or enlarged.
+
+| Grammar | Source | Bytes | SHA-256 | License |
+|---|---|---:|---|---|
+| yaml | [compute_gapic.yaml](https://raw.githubusercontent.com/googleapis/googleapis/97f6460c3558c1435d7fd001a9251f8df058ae2f/google/cloud/compute/v1beta/compute_gapic.yaml) | 109,374 | `c7d306beaad2221df3676aa6d1933dbb6c8f05f595592aa676929d92b34fdffc` | [Apache-2.0](https://raw.githubusercontent.com/googleapis/googleapis/97f6460c3558c1435d7fd001a9251f8df058ae2f/LICENSE) |
+| php | [ContainerBuilder.php](https://raw.githubusercontent.com/symfony/symfony/979969dc83ebb43a7b6cd6447c0945b764af82b2/src/Symfony/Component/DependencyInjection/ContainerBuilder.php) | 72,565 | `d37e4c0a7410237e501f77e787b9c94314cd68989bd7aafa0a6ae468cd50872a` | [MIT](https://raw.githubusercontent.com/symfony/symfony/979969dc83ebb43a7b6cd6447c0945b764af82b2/LICENSE) |
+| powershell | [build.psm1](https://raw.githubusercontent.com/PowerShell/PowerShell/cb9cf48b76cf2fdafb2f2a5e4c64dad4da526486/build.psm1) | 187,716 | `9c87bbaceee0f4724983452b5d1c1ace09fa898f955c970b620d89ec0886a6bf` | [MIT](https://raw.githubusercontent.com/PowerShell/PowerShell/cb9cf48b76cf2fdafb2f2a5e4c64dad4da526486/LICENSE.txt) |
+| r | [arrowExports.R](https://raw.githubusercontent.com/apache/arrow/ab5b42237dfe14d683bc74ecbddf71109a0c6633/r/R/arrowExports.R) | 64,659 | `1bbbfea18cfb9e64f7f8c1362ddfd264e2057858375eae225fdc415b7ba364dd` | [Apache-2.0](https://raw.githubusercontent.com/apache/arrow/ab5b42237dfe14d683bc74ecbddf71109a0c6633/LICENSE.txt) |
+| dart | [ast.dart](https://raw.githubusercontent.com/dart-lang/sdk/f3f72dd63911938effc75feacc86f52022216c67/pkg/analyzer/lib/src/dart/ast/ast.dart) | 1,763,805 | `69c8d401594c049800129b533fd7764d329c3e8df5fd837137915d6b27ea6d8a` | [BSD-3-Clause](https://raw.githubusercontent.com/dart-lang/sdk/f3f72dd63911938effc75feacc86f52022216c67/LICENSE) |
+| xml | [wayland.xml](https://raw.githubusercontent.com/wayland-mirror/wayland/f2ecaa61a3a82944ae069de5413104ab7ba2109f/protocol/wayland.xml) | 168,986 | `4831fd1cdbca6319037660bec5da0f3c5636fd81573cb61e01e4709570dac294` | [MIT](https://raw.githubusercontent.com/wayland-mirror/wayland/f2ecaa61a3a82944ae069de5413104ab7ba2109f/COPYING) |
+| ruby | [gb18030-tbl.rb](https://raw.githubusercontent.com/ruby/ruby/b7e8fad02273da0947e45fee172b26c6f49e694e/enc/trans/gb18030-tbl.rb) | 1,357,449 | `2755eb2a433e528b1f51213c4b5905a139ceff3d1d2ef5349dbb1f15bc77201f` | [BSD-2-Clause](https://raw.githubusercontent.com/ruby/ruby/b7e8fad02273da0947e45fee172b26c6f49e694e/BSDL) |
+
+Apache Arrow's NOTICE and Ruby's LEGAL are retained with the local Q9 input evidence; their source identities
+and SHA-256 values are in the Q9 input manifest. Gate results are reported independently of this input register.
+
 ## Tier 1 — smoke (inline, present from the foundation session)
 
 Purpose: prove the grammar loads, the adapter maps outcomes correctly, and the product lane builds.
@@ -275,3 +293,27 @@ separately from parser arena/scratch receipts.
 - No fixture is copied from `code-map-memo`'s `.work/` run directories at runtime. If bytes are
   needed, they are copied in once, hashed, and licensed here.
 - No repository-wide corpus. Every workload is named, bounded, and justified by a claim it supports.
+
+## Q10 Kotlin inputs (JetBrains stdlib and tests)
+
+Eleven P23/P27 inputs, reused without byte changes from `JetBrains/kotlin` commit
+`e12dc36e784c4c65886009eb622504b3db65b699`. Sources and Apache-2.0 license hashes are pinned in
+[`tools/bench/ci/large.json`](../../tools/bench/ci/large.json); each input is checked before measurement.
+The grammar source is the unmodified tier-3 `fwcd/tree-sitter-kotlin` pin (ADR-0024).
+
+| File | Bytes | SHA-256 |
+|---|---:|---|
+| _Arrays.kt | 985805 | `85d0cf599441b69ed6f836ba588e0f54617a807f63f0e6b57195124ee6bc0849` |
+| _UArrays.kt | 413285 | `cb2dc50d5296585e863da1a8efbce997c0db3f14e7e0d434809b0f12675da741` |
+| _Collections.kt | 143165 | `ceef966fca1973a351e85c6bedc4a14d43386b26b25682fb6efaa2c9e79cc842` |
+| _Sequences.kt | 120825 | `66906380cffa34e53b7c65d780879c5d49930d46ed3c8788f59656a93102a0f0` |
+| _Strings.kt | 93867 | `5b6fe03540506b6191bd097c0166ba85b83da38bb0689f213eeada3621259a44` |
+| _Maps.kt | 25235 | `ff9e7a624131f00164563bd126404d61a8487998441e42aaf41262d71b9b7e0e` |
+| Collections.kt | 22139 | `6534b218d083d0a59b12d4f1c2276a92ee23cf3c1ec8d9a1e9157ae744dcf06d` |
+| Strings.kt | 70480 | `12be6c955d7ab31a705abe296b4733f3883468c8566ca823537a2642932e6b82` |
+| StringTest.kt | 80759 | `dfae8bb84a5eb8aa80d12e76395f2d80a5ea1b943aae2313728031d482fa8d4d` |
+| CollectionTest.kt | 49180 | `6ef51d3628a53e461d75c29c2d99786e697c209c3b37aa7a2afbe47c2649cfa9` |
+| ArraysTest.kt | 128682 | `bfc65c890312121479e786d5dd05d25f85bbc42e8ac5b10ca95947caa2e8bb03` |
+
+The license is `JetBrains/kotlin` `license/LICENSE.txt`, SHA-256
+`cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30`.

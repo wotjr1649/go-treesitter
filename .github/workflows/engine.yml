@@ -100,7 +100,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp]
+        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin]
         target: [linux-amd64, linux-arm64, macos-arm64, windows-amd64, windows-arm64, go126]
         include:
           - {target: linux-amd64, runner: ubuntu-24.04, goos: linux, goarch: amd64, go: 1.27.x}

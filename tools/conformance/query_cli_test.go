@@ -26,7 +26,8 @@ import (
 // Without TSG_TS_CLI the test skips.
 
 // cliLib maps a corpus language to the shared library file stem and the CLI --lang-name.
-var cliLib = map[string][2]string{"json": {"json", "json"}, "go": {"go", "go"}, "python": {"python", "python"},
+var cliLib = map[string][2]string{
+	"kotlin": {"kotlin", "kotlin"}, "json": {"json", "json"}, "go": {"go", "go"}, "python": {"python", "python"},
 	"typescript": {"typescript", "typescript"}, "tsx": {"tsx", "tsx"}, "csharp": {"c_sharp", "c_sharp"}, "tsql": {"mssql", "mssql"},
 	"javascript": {"javascript", "javascript"},
 	"html":       {"html", "html"},
@@ -36,6 +37,13 @@ var cliLib = map[string][2]string{"json": {"json", "json"}, "go": {"go", "go"}, 
 	"rust":       {"rust", "rust"},
 	"bash":       {"bash", "bash"},
 	"cpp":        {"cpp", "cpp"},
+	"yaml":       {"yaml", "yaml"},
+	"php":        {"php", "php"},
+	"powershell": {"powershell", "powershell"},
+	"r":          {"r", "r"},
+	"dart":       {"dart", "dart"},
+	"xml":        {"xml", "xml"},
+	"ruby":       {"ruby", "ruby"},
 }
 
 // predicateSuite runs over the json corpus (the grammar with the simplest tree). Each entry states what it probes.

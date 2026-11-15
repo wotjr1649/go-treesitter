@@ -60,7 +60,12 @@ cd tools/native-ref && go run ./ciconf -pins ../gen/pins.json -corpus <corpus di
 cd tools/conformance && TSG_DATA_DIR=<data dir> TSG_NATIVE_EXE_DIR=<exe dir> go test -run 'TestCorpus|TestEdits|TestParserPoolRealEngine' .
 ```
 
-`-lang` limits corpus preparation to the comma-separated conformance language names (default: all). JSX inputs use the JavaScript corpus and parser.
+`-lang` limits corpus preparation to the comma-separated conformance language names (default: all 23). JSX inputs use the JavaScript corpus and parser. PHP selects the PHP parser; XML selects XML, not DTD.
+Nested corpus directories follow each pin's `grammarDir`; XML upstream queries are under `queries/xml`.
+
+`-inputs-only` writes only corpus inputs, manifests and `inputs.json`; it needs no `-exe` and executes no parser.
+Nightly uses it so all parsing happens under its per-input watchdog. It writes no reference dumps, edits or `ci.json`
+and cannot substitute for conformance preparation.
 
 `ciconf` is its own `main` (stdlib only) because `native-ref` itself only fetches and compiles; it parses the corpus
 format (`===` header with name and `:attribute` lines, input, `---`, expected tree), writes each input once as
@@ -116,3 +121,23 @@ retrieves the required CLI gzip upstream-first, with the release mirror as fallb
 still mandatory. A generation record is kept at `<work>/patches-<lang>/provenance.json`.
 `-unpatched` builds the original C for the required before/after comparison; it never changes the pin set.
 `-patch-alert N` sets the patch-count warning threshold (default 3). See `tools/gen/README.md` for the record schema.
+
+## Unpatched comparison (ADR-0023)
+
+For a patched grammar, build separate executables into separate work/output directories, once normally and once
+with `-unpatched`. For YAML, compare the corpus and the retained fuzz seed literals with:
+
+```sh
+cd tools/native-ref
+go run ./patchcompare -before <unpatched-yaml-exe> -after <patched-yaml-exe> \
+  -corpus <data>/corpus/yaml -fuzz-source ../conformance/fuzz_test.go -fuzz-target FuzzParseYAML \
+  -allow-nul-truncation -out <new-comparison-dir>
+```
+
+The report lists changed inputs and binds input/executable hashes. Error-free unpatched trees must remain identical;
+YAML's documented NUL-truncation exception must become a full-length error tree. Mismatches retain both dumps and
+fail the command. The `-allow-nul-truncation` exception is only for this recorded YAML fix.
+
+`go test -run '^TestQueryIndexInvalidation$' .` also exercises the retained `query_index` invalidation probe
+against the current shim and pinned JSON/runtime C. It asserts cache invalidation directly and checks a negative
+mutation without the invalidation assignments; grammar regeneration is unnecessary for this test.

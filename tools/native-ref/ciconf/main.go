@@ -40,6 +40,7 @@ import (
 var langs = map[string]string{
 	"bash": "bash", "c": "c", "cpp": "cpp", "csharp": "csharp", "css": "css", "go": "golang",
 	"html": "html", "java": "java", "javascript": "javascript", "json": "json", "python": "python",
+	"php": "php", "powershell": "powershell", "r": "r", "dart": "dart", "xml": "xml", "ruby": "ruby", "yaml": "yaml", "kotlin": "kotlin",
 	"rust": "rust", "tsql": "tsql", "tsx": "tsx", "typescript": "typescript",
 }
 
@@ -57,12 +58,13 @@ func main() {
 	seed := flag.Uint64("seed", 1, "edit seed")
 	jobs := flag.Int("j", runtime.NumCPU(), "parallel native runs")
 	selected := flag.String("lang", "", "comma-separated languages (default: all)")
+	inputsOnly := flag.Bool("inputs-only", false, "extract mutation seeds without running native parsers or generating edits")
 	flag.Parse()
-	if *corpus == "" || *exeDir == "" || *out == "" {
-		fmt.Fprintln(os.Stderr, "usage: ciconf -corpus DIR -exe DIR -out DIR [-pins F] [-seed N] [-j N] [-lang LANG,...]")
+	if *corpus == "" || (*exeDir == "" && !*inputsOnly) || *out == "" {
+		fmt.Fprintln(os.Stderr, "usage: ciconf -corpus DIR -exe DIR -out DIR [-pins F] [-seed N] [-j N] [-lang LANG,...] [-inputs-only]")
 		os.Exit(2)
 	}
-	if err := run(*pinsFile, *corpus, *exeDir, *out, *seed, max(1, *jobs), *selected); err != nil {
+	if err := run(*pinsFile, *corpus, *exeDir, *out, *seed, max(1, *jobs), *selected, *inputsOnly); err != nil {
 		fmt.Fprintln(os.Stderr, "ciconf:", err)
 		os.Exit(1)
 	}
@@ -76,7 +78,7 @@ type job struct {
 	seq            int
 }
 
-func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected string) error {
+func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected string, inputsOnly bool) error {
 	pinsRaw, err := os.ReadFile(pinsFile)
 	if err != nil {
 		return err
@@ -84,6 +86,7 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected s
 	var p struct {
 		Grammars map[string]struct {
 			ExtractDir string `json:"extractDir"`
+			GrammarDir string `json:"grammarDir"`
 		} `json:"grammars"`
 	}
 	if err := json.Unmarshal(pinsRaw, &p); err != nil {
@@ -105,6 +108,9 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected s
 			return fmt.Errorf("no grammar %q in %s", langs[lang], pinsFile)
 		}
 		root := filepath.Join(corpus, g.ExtractDir, "test", "corpus")
+		if _, err := os.Stat(root); os.IsNotExist(err) {
+			root = filepath.Join(corpus, g.ExtractDir, filepath.FromSlash(g.GrammarDir), "..", "test", "corpus")
+		}
 		var files []string
 		err := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
 			if err == nil && d.Type().IsRegular() && strings.HasSuffix(d.Name(), ".txt") {
@@ -150,9 +156,11 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected s
 		}
 		return x
 	}
-	for _, l := range names {
-		if _, err := os.Stat(exe(l)); err != nil {
-			return err
+	if !inputsOnly {
+		for _, l := range names {
+			if _, err := os.Stat(exe(l)); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -164,6 +172,9 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected s
 		path := filepath.Join(out, "corpus", j.lang, j.name+".in")
 		must(writeFile(path, j.src))
 		corpusRows[i] = []string{j.id, j.lang, j.file + "#" + strconv.Itoa(j.seq), strconv.Itoa(len(j.src)), sha(j.src), j.file, j.test, j.attrs}
+		if inputsOnly {
+			return
+		}
 		dump, code, err := runExe(exe(j.lang), "dump", path)
 		if err != nil || code != 0 {
 			fails.add(j.id, "dump", code, err)
@@ -173,6 +184,15 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected s
 	})
 	must(writeCSV(filepath.Join(out, "corpus", "manifest.csv"), []string{"id", "lang", "source_ref", "bytes", "sha256", "corpus_file", "test_name", "attrs"}, corpusRows))
 	must(writeCSV(filepath.Join(out, "corpus", "skipped.csv"), []string{"id", "lang", "corpus_file", "test_name", "attrs", "reason"}, skipped))
+
+	if inputsOnly {
+		meta, err := json.MarshalIndent(map[string]any{"kind": "ciconf-inputs/1", "pinsSHA256": sha(pinsRaw), "inputs": len(inputs), "skipped": len(skipped)}, "", "  ")
+		if err != nil {
+			return err
+		}
+		fmt.Printf("total inputs=%d skipped=%d (no native execution)\n", len(inputs), len(skipped))
+		return writeFile(filepath.Join(out, "inputs.json"), append(meta, '\n'))
+	}
 
 	// Edits: three per input (insert, delete, replace), seeded per input id.
 	type edit struct {

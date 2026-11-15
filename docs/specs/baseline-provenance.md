@@ -17,11 +17,13 @@ Every grammar module is generated, never hand-edited, from:
 
 The runtime stays unmodified. Grammar changes require the recorded, hash-checked patch and retirement mechanism
 of ADR-0023; grammar-input changes regenerate C with the pinned CLI, identically for the engine and native reference.
+YAML patch `0001-no-early-eof` is a C-only patch; original/result source hashes and the patch identity are recorded
+in its pin and generated provenance. The unpatched native comparison is separate from the product comparison.
 
 ## Machine-readable source of truth
 
 ```
-tools/gen/pins.json                 runtime release + archive/tree sha256, grammar repos + full commits, tool versions
+tools/gen/pins.json                 runtime release + archive/tree sha256, grammar repos + full commits, temporary patch records, tool versions
 grammars/<lang>/provenance.json     identity of one generated module: inputs and their sha256, recipe sha256, outputs
 grammars/<lang>/language.go         the same identity compiled in (engine.Identity)
 ```
