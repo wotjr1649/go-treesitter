@@ -6,16 +6,16 @@ These upstream grammar defects are reproduced by the engine. The retained strict
 passes only while the entire recorded wrong tree remains unchanged; a fix or any other shape change fails it.
 Remove fixed entries or turn them into regression tests. This is a bounded defect list, not a language validator.
 
-Initial E5 evidence: Windows native reference differential (windows/amd64), base commit `45f9071328d66cd665fd20fb89991b589cf0fa23`, with this register applied on top of it.
+Initial E5 evidence: Windows native reference differential (windows/amd64), base commit `a2fec5f2ba66547602a24012517460f771e2bb37`, with this register applied on top of it.
 Only the exact inputs below are covered. `TestKnownGaps` rechecks engine dumps (E3) and, with a freshly built
 `TSG_NATIVE_EXE_DIR`, compares them byte-for-byte with native C (E5). CI requires that comparison.
 
-Identity: grammar `26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64`; runtime `v0.27.2`; grammar patches: 0.
+Identity: grammar `26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64`; runtime `v0.27.2`; grammar patches: 1.
 The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`pins.json`](../../tools/gen/pins.json),
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/python/provenance.json).
 
-- Source identity SHA-256: `4836df5295908caf82d47b8f5244ff1f44636651425ef2fd2b0d6a6475c4d498`
-- Module provenance SHA-256: `1bc6b74fe03a044524e89d6a4a842ea29b620775de84befe491a12870e39d8c1`
+- Source identity SHA-256: `541729622eee59fa4885980a139ec10badbc43394468e0aa6d327149f6925932`
+- Module provenance SHA-256: `99acbb437ac979fa8f0d30b074d11396b03357f9febe25ce275bb5c8eef80756`
 
 ## python-bitwise-precedence
 
