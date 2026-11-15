@@ -1,6 +1,7 @@
 // Package conformance holds the real-grammar conformance lane of go-treesitter: it compares the public treesitter API,
 // running the generated grammar modules, with recorded native C tree-sitter results. The data comes from the local
-// directory named by TSG_DATA_DIR (tools/native-ref/ciconf output) or TSG_S15_DIR (local session-15 tree); without one every test skips.
+// directory named by TSG_DATA_DIR (tools/native-ref/ciconf output) or TSG_S15_DIR (local session-15 tree).
+// Local tests skip missing prerequisites; TSG_REQUIRE_FIELD_LOOKUP=1 makes the CI field gate fail instead.
 package conformance
 
 import (

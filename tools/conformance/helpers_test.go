@@ -22,6 +22,19 @@ import (
 
 var bg = context.Background()
 
+func requireFieldLookup(t *testing.T) bool {
+	return os.Getenv("TSG_REQUIRE_FIELD_LOOKUP") == "1" &&
+		(t.Name() == "TestFieldLookup" || strings.HasPrefix(t.Name(), "TestFieldLookup/"))
+}
+
+func skipConformance(t *testing.T, reason string) {
+	t.Helper()
+	if requireFieldLookup(t) {
+		t.Fatal(reason)
+	}
+	t.Skip(reason)
+}
+
 // dataRoot returns the data directory or skips the test: TSG_DATA_DIR (the CI directory produced by
 // tools/native-ref/ciconf from the pinned grammars' own corpora) or else TSG_S15_DIR (the local session-15 tree).
 func dataRoot(t *testing.T) string {
@@ -31,7 +44,7 @@ func dataRoot(t *testing.T) string {
 		d = os.Getenv("TSG_S15_DIR")
 	}
 	if d == "" {
-		t.Skip("neither TSG_DATA_DIR (tools/native-ref/ciconf output) nor TSG_S15_DIR (local session-15 tree) is set: " +
+		skipConformance(t, "neither TSG_DATA_DIR (tools/native-ref/ciconf output) nor TSG_S15_DIR (local session-15 tree) is set: "+
 			"the conformance lane has no data; skipping")
 	}
 	return d
@@ -54,13 +67,16 @@ func langs(t *testing.T) []string {
 			if slices.Contains(all, l) {
 				sel = append(sel, l)
 			} else {
+				if requireFieldLookup(t) {
+					t.Fatalf("selected language %q is not linked into this binary", l)
+				}
 				t.Logf("language %q is not linked into this binary (build tag no_%s?): not tested", l, l)
 			}
 		}
 		all = sel
 	}
 	if len(all) == 0 {
-		t.Skip("no grammar module linked for the selected languages")
+		skipConformance(t, "no grammar module linked for the selected languages")
 	}
 	return all
 }

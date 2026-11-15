@@ -79,7 +79,8 @@ jobs:
           CGO_ENABLED: "0"
           TSG_DATA_DIR: ${{ runner.temp }}/data
           TSG_NATIVE_EXE_DIR: ${{ runner.temp }}/exe
-        run: go test -count=1 -timeout 20m -v -run 'TestCorpus|TestEdits|TestParserPoolRealEngine' .
+          TSG_REQUIRE_FIELD_LOOKUP: "1"
+        run: go test -count=1 -timeout 20m -v -run 'TestCorpus|TestEdits|TestFieldLookup|TestParserPoolRealEngine' .
       # Query raw matches: every grammar's own queries/*.scm (pinned archive, sha256-verified) plus structural probes,
       # over the corpus inputs, byte-identical to `<native exe> query` (docs/design/query-abi.md, "Verification").
       # The comparison with the tree-sitter CLI (predicates) is local only: TestQueryCLI skips without TSG_TS_CLI.

@@ -119,6 +119,10 @@ func (e *env) readMeta() {
 // dump reads the unchanged product shim's columnar export, retaining the native dump format.
 func (e *env) dump(tree int32) []byte {
 	e.t.Helper()
+	// The sweep counts parse callbacks; snapshot export has its own cancellation polls.
+	callbacks, stopAt := e.h.n, e.h.stopAt
+	e.h.stopAt = 0
+	defer func() { e.h.n, e.h.stopAt = callbacks, stopAt }()
 	n := int(e.m.Xtsg_export_begin(tree))
 	defer e.m.Xtsg_export_end()
 	if n <= 0 {
@@ -135,7 +139,7 @@ func (e *env) dump(tree int32) []byte {
 		p := e.m.Xtsg_export_buf()
 		h := e.block(p, 16)
 		kc := int(binary.LittleEndian.Uint32(h[8:]))
-		if string(h[:4]) != "TSGX" || binary.LittleEndian.Uint32(h[4:]) != 1 || kc < k || kc > 1<<20 || k > n-len(depth) {
+		if string(h[:4]) != "TSGX" || binary.LittleEndian.Uint32(h[4:]) != 2 || kc < k || kc > 1<<20 || k > n-len(depth) {
 			e.t.Fatal("invalid chunk export header/count")
 		}
 		b := e.block(p, 16+33*kc)[16:]
@@ -321,7 +325,7 @@ func Run(t *testing.T, m Module, h *Host, lang string) {
 	}
 	write("identities.json", mustJSON(t, hashes))
 	m.X_initialize()
-	if m.Xtsg_abi_version() != 2 || m.Xtsg_init() != 0 {
+	if m.Xtsg_abi_version() != 3 || m.Xtsg_init() != 0 {
 		t.Fatal("probe initialization/ABI")
 	}
 	e := &env{t: t, m: m, h: h}

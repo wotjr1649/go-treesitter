@@ -42,6 +42,7 @@ Executable CLI (stdout is binary, `\n` line ends on every platform):
 | `<exe> edit <old> <new> <start> <old_end> <new_end>` | the same dump of `<new>` reparsed incrementally from the edited `<old>` tree |
 | `<exe> changed-ranges <old> <new> <start> <old_end> <new_end>` | `ts_tree_get_changed_ranges(old, new)`, one `start_byte end_byte start_row start_col end_row end_col` line per range |
 | `<exe> query <query-file> <source>` | raw matches of a fresh parse, text predicates not evaluated (the C engine never does): `#tsg-query/1 patterns=<n> captures=<n>`, then per match `m<TAB><pattern><TAB><n>` and per capture `c<TAB><capture><TAB><node preorder index><TAB><symbol><TAB><start byte><TAB><end byte>` (the index comes from a full cursor walk by node id, independent of the engine's descendant index; symbol is `ts_node_symbol`). A rejected query prints `#tsg-query/1 error offset=<o> type=<t>` and exits 0. |
+| `<exe> fields <file>` | `ts_node_child_by_field_name` of a fresh parse for every node (cursor preorder) and every field name: `#tsg-fields/1 nodes=<n> fields=<f>`, then `<node index><TAB><field><TAB><result preorder index>` per non-null result (`?<symbol>:<start>:<end>` when the result is not a visible node). The runtime has no `ts_node_children_by_field_name` (v0.27.2). `tools/conformance` `TestFieldLookup` compares it with `Node.ChildByFieldName`. |
 
 Points are byte columns with `\n` rows (the same as `treesitter.EditFor`). Exit codes: 0 ok, 2 usage / edit out of
 range, 3 unreadable input, 4 parse failure, 5 write failure.

@@ -60,6 +60,32 @@ to UTF-8 and map offsets back to the original bytes.
 - The zero `Node` is C's null node (`IsZero`). Every method on it returns its zero value (false, 0, `""`, the zero `Node`, an
   empty iterator, `(Node{}, false)` for the `(Node, bool)` methods) and none panics.
 
+## Field lookup and grammar compatibility
+
+The root accepts engine ABI 1, 2 and 3 grammar modules. ABI 1 supports parsing, ABI 2 adds queries and ABI 3 adds
+snapshot field-lookup exceptions. With ABI 3, `Node.ChildByFieldName` follows C's `ts_node_child_by_field_id`,
+including inherited fields whose result is inside a visible alias rather than a direct child. The snapshot owns
+the exception table; lookup remains valid after parser closure and never calls into the engine.
+
+ABI 1/2 snapshots have no exception table: `ChildByFieldName` keeps the first direct child with the requested
+cursor field, which can differ from C on alias-inherited fields. Regenerate or upgrade the grammar module to get
+ABI 3 semantics. `ChildByFieldName` and `ChildrenByFieldName` return nothing on ERROR nodes, unknown field names
+and the zero `Node` for every supported ABI. `Node.Field()` still reports cursor fields, including those attached
+to ordinary visible children; it makes no promise of a nonempty field on children of ERROR nodes. The lookup rule
+does not change the exported tree or cursor metadata.
+
+`ChildrenByFieldName` yields a recorded C target first, then matching direct children in order without duplicating
+that target. A recorded C no-node result yields nothing; without an exception it retains the direct-child
+iteration. Its first result is `ChildByFieldName`, even when that result is inside a visible alias.
+This iterator is not a C-verified API: v0.27.2 has no children-by-field API. Its ordering and explicit-null behavior
+are Go API semantics covered by retained tests (E3).
+
+Historical Q13 E5 native C agreement for `ChildByFieldName` covers fresh parses of the reproducible pinned
+1,761-input corpus on Windows amd64. Q13 also checked 2,779 additional local inputs, recorded separately in the
+[archived evidence and identities](../design/engine-abi.md#field-lookup-evidence). Q14 reran the P31 guard on the same reproducible corpus with E5 agreement; its input and source identities are archived with that evidence.
+Edited trees' field lookups have not been re-compared with C; the edit lane compares dumps and changed ranges.
+This evidence does not cover `ChildrenByFieldName` or arbitrary inputs.
+
 ## Comparison discipline
 
 - C agreement means byte-identical canonical dumps against a native C build of the same runtime release and grammar

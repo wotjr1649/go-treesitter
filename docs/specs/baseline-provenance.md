@@ -39,7 +39,8 @@ committed bytes.
   new results side by side in a handoff.
 - **Grammars:** the grammar set and commits are fixed per library release. A grammar change ships with a static
   node-type (schema) diff.
-- **Engine ABI:** `internal/engine.ABIVersion`; a grammar module built for another ABI is rejected at `NewParser`.
+- **Engine ABI:** `internal/engine.ABIVersion` is the newest version; supported older ABIs are listed in
+  `docs/design/engine-abi.md`. Unsupported versions are rejected at `NewParser`.
 
 ## Previous runtime (history)
 

@@ -1,6 +1,7 @@
-# Engine ABI v2 (session 15 queries)
+# Engine ABI v3 (session 15 field lookup)
 
-Status: ABI 1 parsing contract plus the additive ABI 2 query implementation (Q1, 2026-11-14).
+Status: ABI 1 parsing contract, ABI 2 queries (Q1, 2026-11-14), and ABI 3 snapshot field-lookup exceptions
+(Q12, owner decision 2026-11-15).
 Inputs: ADR-0020, ADR-0021, `docs/design/api-v2.md`, `docs/design/query-abi.md`, the session-15 spike
 (`.scratch/s15/w2/mem/combo`, shims `tsg_ext.c` and `tsg_export_s2.c`).
 
@@ -12,7 +13,9 @@ The ABI is the contract between three parts that are versioned separately:
 | Go side of the ABI, memory provider, trap capture | `internal/engine` (root module) | engine |
 | Per-grammar generated module | `grammars/<lang>/` (one Go module each) | generator output |
 
-`ABIVersion = 2`. The root accepts ABI 1 for parsing and ABI 2 for parsing and queries. Any change to an export signature or semantics, the chunk layout or the meta block bumps it.
+`ABIVersion = 3`. The root accepts ABI 1 for parsing and ABI 2/3 for parsing and queries. ABI 3 adds single-child
+field-lookup exceptions through snapshot format 2; ABI 1/2 retain snapshot format 1 and their direct-child lookup for
+alias-inherited fields. Any change to an export signature or semantics, the chunk layout or the meta block bumps it.
 
 ## 1. C exports (wasm reactor, one instance = one `TSParser`)
 
@@ -21,7 +24,7 @@ All pointers are wasm32 offsets (`int32` in Go). `TSTree*` handles are opaque. O
 
 | Export | Semantics |
 |---|---|
-| `uint32_t tsg_abi_version(void)` | returns `2` |
+| `uint32_t tsg_abi_version(void)` | returns `3` (legacy modules return `1` or `2`) |
 | `int32_t tsg_init(void)` | create the parser, set the language, allocate the export chunk buffer and write its header (section 2); `0` ok, `-1` the runtime rejected the language (language ABI) or allocation failed |
 | `TSTree *tsg_parse(const char *src, uint32_t len, TSTree *old)` | `ts_parser_parse_with_options`, UTF-8 input, progress callback = host `should_stop`; `old` may be `0`. **If the result is `NULL` the shim calls `ts_parser_reset` before returning.** |
 | `void tsg_parser_reset(void)` | `ts_parser_reset` (host calls it on any no-tree path it creates itself) |
@@ -33,7 +36,7 @@ All pointers are wasm32 offsets (`int32` in Go). `TSTree*` handles are opaque. O
 | `uint8_t *tsg_changed_ranges(TSTree *old, TSTree *neu)` | malloc'ed block, never `NULL` (`count = 0` when nothing changed): `u32 count`, then `count` x `{u32 start_byte, end_byte, start_row, start_col, end_row, end_col}`; free with `free` |
 | `uint32_t tsg_export_begin(TSTree *t)` | start a chunked preorder export; returns node count `n` (`0` = error) |
 | `uint32_t tsg_export_next(void)` | fill the chunk buffer; returns nodes written (`0` = finished) |
-| `uint32_t tsg_export_err(void)` | `1` if the traversal disagreed with the descendant count |
+| `uint32_t tsg_export_err(void)` | `1` on an interrupted or inconsistent traversal; the host checks context cancellation before interpreting it |
 | `uint8_t *tsg_export_buf(void)` | chunk buffer; valid from `tsg_init` on, header already written |
 | `void tsg_export_end(void)` | abandon an export in progress (cancellation); idempotent |
 | `uint8_t *tsg_lang_meta(void)` | malloc'ed language meta block (section 3); used by the generator, not on the parse path |
@@ -47,14 +50,83 @@ Build flags (from the spike, fixed): `clang --target=wasm32-wasip1 -mexec-model=
 (data sections in `engine_gen.dat`, loaded with `go:embed`). Recipe name `v2-O3` in `tools/gen/pins.json`; chosen by the
 pre-declared size round of 2026-11-14 (76.0 -> 25.6 MB raw, same conformance, speed within 1 %).
 
-## 2. Export chunk buffer (snapshot block format 1)
+## 2. Export chunk buffer (snapshot block formats 1 and 2)
 
-Header, 16 bytes: `magic = "TSGX"` (4 bytes), `u16 format = 1`, `u16 reserved = 0`, `u32 KC` (chunk capacity, a
-multiple of 4), `u32 reserved`. Columns follow the header (offsets relative to `buf+16`), as validated in the spike:
+Header, 16 bytes: `magic = "TSGX"` (4 bytes), `u16 format` (`1` for ABI 1/2, `2` for ABI 3), `u16 reserved = 0`,
+`u32 KC` (chunk capacity, a multiple of 4), `u32 fieldExceptions` (reserved in format 1; see below for format 2).
+Columns follow the header (offsets relative to `buf+16`), as validated in the spike:
 `symbol u16[KC] @0`, `field u16[KC] @2KC`, `flags u8[KC] @4KC`, `startByte @5KC`, `endByte @9KC`, `startRow @13KC`,
 `startCol @17KC`, `endRow @21KC`, `endCol @25KC` (`u32[KC]` each), `parent i32[KC] @29KC` (global preorder index,
 `-1` = root). Flags: `1` named, `2` extra, `4` missing, `8` error, `16` has_error. `symbol 65535` = ERROR.
-The header is written by `tsg_init`; `NewParser` checks magic and format once (mismatch = `ErrIncompatibleLanguage`) and the Go side checks them again after every `tsg_export_begin`, and derives `descendantEnd`/`childCount`/siblings.
+The header is written by `tsg_init`; `NewParser` checks magic and format once (mismatch = `ErrIncompatibleLanguage`) and the Go side checks them again after every `tsg_export_begin` and nonempty chunk, and derives `descendantEnd`/`childCount`/siblings.
+
+In format 2, header offset 12 is a wasm32 pointer to the current chunk's field-lookup exception block; `0` means
+there are no exceptions in that chunk. The block is little endian: `u32 count`, then `count` records of
+`{u32 nodeIndex, u32 fieldID, u32 targetIndex}`. Node and target indices are global visible preorder indices,
+not chunk-relative. `targetIndex = UINT32_MAX` means C returned no node. The records are sorted by `(nodeIndex,
+fieldID)` and contain only results that differ from the first direct child with that cursor field. The host copies
+them into the immutable snapshot before requesting the next chunk and looks them up by binary search; no engine
+pointer escapes. Format 1 supplies no exceptions and remains accepted for ABI 1/2 modules. No export or Go module
+interface is added for ABI 3.
+
+The shim uses the node's production field map to select field IDs, calls `ts_node_child_by_field_id` and maps its
+result through the same preorder index machinery used for query captures. It reads the pinned runtime's private
+language/subtree headers inside our shim; upstream C is unchanged. The extra table is sparse, but building it has
+an export-time and engine-memory cost in addition to the copied snapshot records.
+
+The export filter precomputes a per-production plan once per instance. It skips empty maps (`plan == 0`),
+relying on the generator invariant below. For a nonempty map (`plan > 0`), only when it has no inherited entries,
+no different field IDs at the same structural child index, and no decreasing child indices within a field,
+it checks that every actual child is visible (a non-extra alias also makes a child visible) and that all mapped
+structural indices exist.
+For this case, pinned v0.27.2 `node.c:ts_node_child_by_field_id` returns the first non-extra child at a mapped
+index; `tree_cursor.c:ts_tree_cursor_current_field_id` returns that child's unique non-inherited field. Extras
+have no cursor field and are ignored by field lookup. With no hidden child, no inner field can precede or mask
+that mapping. Thus no exception is needed for a field in that nonempty map. All other `plan > 0` nodes use the
+unfiltered comparison, including every hidden child, even for a non-inherited map: `ts_node_child(child, 0)`
+could return an extra or a descendant with a different innermost cursor field. Missing structural positions,
+field collisions and decreasing per-field child indices also keep the comparison. This `plan > 0` compare/skip
+decision is a sufficient condition independent of corpus observations. Empty-map skips and fields absent from
+the production map instead rely on the generator invariant below. Neither ABI 3 nor format 2 changes.
+The plan occupies two bytes per production and lives until the instance is released. Nodes that require a
+comparison use one children cursor pass to collect each field's first direct child, reusing a per-instance
+`TSNode[field_count + 1]` scratch array; fields in the current map are cleared before each pass. The C lookup,
+exception ordering, lazy target index and output records are unchanged.
+
+The generator assumptions behind the field map were inspected in the SHA-256-pinned v0.27.2 runtime archive
+(the same release as the CLI pin). `crates/generate/src/build_tables/build_parse_table.rs:get_production_id`
+enumerates steps in order, adds at most one direct `step.field()`, and propagates every hidden nonterminal's
+field as inherited, including aliased steps. `node_types.rs:inherit_hidden_child_info` computes the transitive
+hidden-field summary to a fixed point. A step's field is a single `Option<StrId>` (`grammars.rs` and
+`prepare_grammar/flatten_grammar.rs`); `render.rs:add_field_sequences` stably sorts by field name, preserving
+each field's increasing step indices and matching field-ID order. The runtime binds the reduce production ID
+to the subtree (`parser.c`/`subtree.c`). The invariant needed for empty-map skips and fields absent from a map is
+that every hidden child's field is propagated into its parent's production map as inherited; the source inspection
+supports this for the pinned generator, not every possible upstream-generated `parser.c`. For `plan > 0`, the
+filter additionally rejects field collisions, decreasing per-field child indices and absent positions at runtime,
+and every hidden child remains in the comparison, including P30's non-inherited hidden-child case whose first
+visible descendant is an extra.
+
+`ChildByFieldName` consults this table first, then falls back to the direct-child rule. A C result can lie inside
+a visible alias instead of being a direct child. `ChildrenByFieldName` yields an exception target first, followed
+by matching direct children in their original order, omitting a duplicate target; an explicit no-node exception
+yields nothing. Without an exception it yields the matching direct children as before. Both methods return
+nothing on ERROR nodes, unknown field names and the zero `Node`, for all supported ABIs. Cursor fields exported
+in the columns above are unchanged, so `Node.Field()` and field lookup can describe different relationships.
+The iterator's first element equals `ChildByFieldName`; `ChildrenByFieldName` is not a C-verified API because
+v0.27.2 has no children-by-field API. Its ordering and explicit-null behavior have E3 retained tests.
+
+### Field-lookup evidence
+
+Historical Q13 E5 native agreement for single-child lookup covers fresh parses of the reproducible pinned
+1,761-input corpus on Windows amd64 (`tools/native-ref/ciconf`, seed 1). Q13 also checked 2,779 additional local
+inputs; they are recorded separately and are not part of this reproducible-corpus E5 claim.
+The [Q13 handoff](../../artifacts/handoff/2026-11-15-q13-field-export-cost/README.md) binds the result to base
+`35233d365418147ee8cac8bd7c54f5f617bfe753`, T13 `9531f2e5aa7b1cef78fc140a86230a17ab7c6e20`,
+pins SHA-256 `f67b89640c3880226aeec44bbe44f135b9017ba193241168cd88ec71f25d7571` and the Windows platform.
+Its `q13/generation-identity.json` records module/native identities, `q13/differential-jobs.json` lists input hashes,
+and `q12-prerequisite/` preserves the input archives. Q14 reran the P31 guard on the same reproducible corpus with E5 agreement. The [Q14 ABI-v3 handoff](../../artifacts/handoff/2026-11-15-q14-batch2/abi-v3/README.md) records the new shim/pins hashes, generation and test commands, exact differential arguments and input hashes.
+Edited trees' field lookups have not been re-compared with C; edit gates compare dumps and changed ranges.
 
 ## 3. Language meta block (format 1)
 
@@ -66,7 +138,7 @@ Go data; nothing at run time needs an instance to read names.
 ## 4. Go side (`internal/engine`)
 
 ```go
-const ABIVersion = 2
+const ABIVersion = 3
 
 type Memory = interface{ Slice() *[]byte; Grow(delta, max int64) int64 } // alias: identical to wasm2go's type
 
@@ -106,7 +178,7 @@ Memory provider: reserve-then-commit, `VirtualAlloc` on Windows, `mmap` on Unix 
 recorded in the generator; mismatch = generation failure).
 
 Instance sequence (the `treesitter` package): `m := g.New(h)` → `SetLimit(m.Xmemory().Slice(), limit)` →
-`engine.Call(m.X_initialize)` → `Xtsg_abi_version() == g.ABI` (accepted: 1 or 2) → `Xtsg_init() == 0` → export header magic/format; any failure =
+`engine.Call(m.X_initialize)` → `Xtsg_abi_version() == g.ABI` (accepted: 1, 2 or 3) → `Xtsg_init() == 0` → export header magic/format (format 1 for ABI 1/2, format 2 for ABI 3); any failure =
 `ErrIncompatibleLanguage` (version) or `EngineFault`. A trap with `Refused` set maps to `ResourceLimit`; any other trap
 to `EngineFault`; both discard the instance (`Release`) and create a new one.
 
@@ -123,8 +195,9 @@ internal, so other modules cannot construct one).
 
 ## 6. Query additions (ABI 2)
 
-ABI 1's `Module` interface and all export/snapshot layouts above stay unchanged. ABI 2 additionally implements
-`engine.QueryModule`, an interface embedding `Module`; instance creation rejects ABI 2 without these exports.
+ABI 1's `Module` interface stays unchanged. ABI 2 additionally implements `engine.QueryModule`, an interface
+embedding `Module`; ABI 3 uses the same query extension. Instance creation rejects ABI 2/3 without these exports.
+Query block formats remain unchanged in ABI 3; its snapshot format change is described in section 2.
 This separate extension is required so old grammar modules still compile against the new root.
 
 | C export (wasm32 opaque handles) | Go method | Meaning |

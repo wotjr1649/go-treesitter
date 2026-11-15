@@ -95,7 +95,7 @@ func (c *core) recreate() (err error) {
 
 func (c *core) newInstance() (*instance, *ParseError) {
 	g := c.lang.g
-	if g.ABI != 1 && g.ABI != engine.ABIVersion {
+	if g.ABI < 1 || g.ABI > engine.ABIVersion {
 		return nil, perr(IncompatibleLanguage, fmt.Sprintf("grammar module %q has engine ABI %d, this root module speaks %d", g.Name, g.ABI, engine.ABIVersion), nil)
 	}
 	in := &instance{h: &engine.Host{}}
@@ -129,9 +129,9 @@ func (c *core) newInstance() (*instance, *ParseError) {
 	if uint32(ver) != g.ABI {
 		return fail(IncompatibleLanguage, fmt.Sprintf("module reports engine ABI %d, expected %d", ver, g.ABI), nil)
 	}
-	if ver == 2 {
+	if ver >= 2 {
 		if _, ok := in.m.(engine.QueryModule); !ok {
-			return fail(IncompatibleLanguage, "ABI 2 module lacks query exports", nil)
+			return fail(IncompatibleLanguage, "query-capable module lacks query exports", nil)
 		}
 	}
 	if err := ops.call(func() { rc = in.m.Xtsg_init() }); err != nil {
@@ -144,7 +144,7 @@ func (c *core) newInstance() (*instance, *ParseError) {
 	if err := ops.call(func() { buf = in.m.Xtsg_export_buf() }); err != nil {
 		return trap("tsg_export_buf", err)
 	}
-	if _, e := parseExportHeader(*in.mem, buf); e != nil {
+	if _, e := parseExportHeader(*in.mem, buf, c.lang.g.ABI); e != nil {
 		return fail(e.Outcome, e.Reason, nil)
 	}
 	return in, nil
@@ -526,17 +526,21 @@ func (c *core) dropTrees() *ParseError {
 }
 
 // parseExportHeader validates the 16-byte header of the export chunk buffer and returns the chunk capacity.
-func parseExportHeader(mem []byte, buf int32) (int, *ParseError) {
+func parseExportHeader(mem []byte, buf int32, abi uint32) (int, *ParseError) {
 	if buf <= 0 || int(buf)+16 > len(mem) {
 		return 0, perr(EngineFault, "export buffer pointer is out of range", nil)
 	}
 	h := mem[buf : buf+16]
-	if string(h[:4]) != engine.ExportMagic || binary.LittleEndian.Uint16(h[4:]) != engine.ExportFormat {
+	format := uint16(1)
+	if abi >= 3 {
+		format = engine.ExportFormat
+	}
+	if string(h[:4]) != engine.ExportMagic || binary.LittleEndian.Uint16(h[4:]) != format {
 		return 0, perr(IncompatibleLanguage, fmt.Sprintf("snapshot block magic %q format %d, expected %q format %d",
-			h[:4], binary.LittleEndian.Uint16(h[4:]), engine.ExportMagic, engine.ExportFormat), nil)
+			h[:4], binary.LittleEndian.Uint16(h[4:]), engine.ExportMagic, format), nil)
 	}
 	kc := int(binary.LittleEndian.Uint32(h[8:]))
-	if kc <= 0 || kc%4 != 0 || int(buf)+16+33*kc > len(mem) {
+	if kc <= 0 || kc%4 != 0 || uint64(uint32(buf))+16+33*uint64(kc) > uint64(len(mem)) {
 		return 0, perr(EngineFault, fmt.Sprintf("snapshot chunk capacity %d is invalid", kc), nil)
 	}
 	return kc, nil
@@ -545,9 +549,19 @@ func parseExportHeader(mem []byte, buf int32) (int, *ParseError) {
 // export runs the chunked export of tree t into a Snapshot. Cancellation abandons the export and keeps the tree.
 func (c *core) export(ctx context.Context, t int32, text string, invalid bool) (*Snapshot, *ParseError) {
 	in := c.inst
+	ops.clearRefused(in.mem)
+	call := func(what string, fn func()) *ParseError {
+		if err := ops.call(fn); err != nil {
+			return c.trapped(err, what)
+		}
+		if ops.refused(in.mem) {
+			return c.fault(ResourceLimit, what+": memory.grow refused", nil)
+		}
+		return nil
+	}
 	var cnt int32
-	if err := ops.call(func() { cnt = in.m.Xtsg_descendant_count(t) }); err != nil {
-		return nil, c.trapped(err, "tsg_descendant_count")
+	if e := call("tsg_descendant_count", func() { cnt = in.m.Xtsg_descendant_count(t) }); e != nil {
+		return nil, e
 	}
 	if lim := c.cfg.maxSnapshotNodes; lim > 0 && int64(cnt) > lim {
 		return nil, perr(ResourceLimit, fmt.Sprintf("tree has %d nodes, WithMaxSnapshotNodes is %d", cnt, lim), nil)
@@ -555,24 +569,23 @@ func (c *core) export(ctx context.Context, t int32, text string, invalid bool) (
 	if cnt <= 0 || int64(cnt)*8 > int64(len(*in.mem)) { // a node needs at least 8 bytes of tree memory
 		return nil, c.engineFault(fmt.Sprintf("descendant count %d is not plausible", cnt))
 	}
+	stop := watchCtx(ctx, in.h)
+	defer stop()
 	endExport := func() *ParseError {
-		if err := ops.call(in.m.Xtsg_export_end); err != nil {
-			return c.trapped(err, "tsg_export_end")
-		}
-		return nil
+		return call("tsg_export_end", in.m.Xtsg_export_end)
 	}
 	var n, buf int32
-	if err := ops.call(func() {
+	if e := call("tsg_export_begin", func() {
 		if n = in.m.Xtsg_export_begin(t); n != 0 {
 			buf = in.m.Xtsg_export_buf()
 		}
-	}); err != nil {
-		return nil, c.trapped(err, "tsg_export_begin")
+	}); e != nil {
+		return nil, e
 	}
 	if n != cnt {
 		return nil, c.engineFault(fmt.Sprintf("export_begin returned %d nodes, descendant count is %d", n, cnt))
 	}
-	kc, e := parseExportHeader(*in.mem, buf)
+	kc, e := parseExportHeader(*in.mem, buf, c.lang.g.ABI)
 	if e != nil {
 		if e.Outcome == IncompatibleLanguage { // the instance is healthy but cannot be read by this root module
 			if e2 := endExport(); e2 != nil {
@@ -591,8 +604,14 @@ func (c *core) export(ctx context.Context, t int32, text string, invalid bool) (
 			return nil, ctxError(ctx, "snapshot export stopped by the context")
 		}
 		var k int32
-		if err := ops.call(func() { k = in.m.Xtsg_export_next() }); err != nil {
-			return nil, c.trapped(err, "tsg_export_next")
+		if e := call("tsg_export_next", func() { k = in.m.Xtsg_export_next() }); e != nil {
+			return nil, e
+		}
+		if ctx.Err() != nil {
+			if e := endExport(); e != nil {
+				return nil, e
+			}
+			return nil, ctxError(ctx, "snapshot export stopped by the context")
 		}
 		if k == 0 {
 			break
@@ -601,13 +620,24 @@ func (c *core) export(ctx context.Context, t int32, text string, invalid bool) (
 			return nil, c.engineFault(fmt.Sprintf("export_next returned %d nodes (capacity %d, %d of %d filled)", k, kc, b.filled, n))
 		}
 		mem := *in.mem
+		capacity, e := parseExportHeader(mem, buf, c.lang.g.ABI)
+		if e != nil || capacity != kc {
+			return nil, c.engineFault("snapshot chunk header changed during export")
+		}
+		start := b.filled
 		if err := b.add(int(k), kc, mem[int(buf)+16:int(buf)+16+33*kc]); err != nil {
 			return nil, c.engineFault("snapshot chunk: " + err.Error())
 		}
+		if c.lang.g.ABI >= 3 {
+			ptr := binary.LittleEndian.Uint32(mem[int(buf)+12:])
+			if err := b.addFieldLookups(mem, ptr, start); err != nil {
+				return nil, c.engineFault("snapshot field lookups: " + err.Error())
+			}
+		}
 	}
 	var xerr int32
-	if err := ops.call(func() { xerr = in.m.Xtsg_export_err() }); err != nil {
-		return nil, c.trapped(err, "tsg_export_err")
+	if e := call("tsg_export_err", func() { xerr = in.m.Xtsg_export_err() }); e != nil {
+		return nil, e
 	}
 	if xerr != 0 {
 		return nil, c.engineFault("the export traversal disagreed with the descendant count")

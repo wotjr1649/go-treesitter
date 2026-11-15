@@ -1,4 +1,4 @@
-// tsg_abi.c - the C side of engine ABI v2 (docs/design/engine-abi.md). This repository's own code; upstream files are
+// tsg_abi.c - the C side of engine ABI v3 (docs/design/engine-abi.md). This repository's own code; upstream files are
 // compiled unmodified next to it. One wasm instance = one TSParser; trees are opaque TSTree* handles (wasm32 offsets).
 // Build: clang --target=wasm32-wasip1 -mexec-model=reactor -DTSG_LANG_FN=<tree_sitter_xxx> (see tools/gen).
 // Any change to an export signature or semantics, the chunk layout or the meta block bumps TSG_ABI_VERSION and
@@ -8,8 +8,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "tree_sitter/api.h"
+#include "language.h"
+#include "subtree.h"
 
-#define TSG_ABI_VERSION 2u
+#define TSG_ABI_VERSION 3u
 
 #ifndef TSG_LANG_FN
 #error "define TSG_LANG_FN"
@@ -19,6 +21,34 @@ const TSLanguage *TSG_LANG_FN(void);
 __attribute__((import_module("tsg"), import_name("should_stop"))) int32_t tsg_host_should_stop(void);
 
 static TSParser *g_p;
+// 0 = no fields, UINT16_MAX = compare, otherwise minimum structural child count for direct fields.
+static uint16_t *x_field_plans;
+static TSNode *x_direct_fields;
+
+static void xfields_init(void) {
+  if (x_field_plans) return;
+  const TSLanguage *lang = TSG_LANG_FN();
+  x_field_plans = calloc(lang->production_id_count, sizeof(uint16_t));
+  x_direct_fields = calloc(lang->field_count + 1, sizeof(TSNode));
+  if (!x_field_plans || !x_direct_fields) abort();
+  for (uint32_t i = 0; i < lang->production_id_count; i++) {
+    const TSFieldMapEntry *field, *end;
+    ts_language_field_map(lang, i, &field, &end);
+    uint16_t plan = 0;
+    for (const TSFieldMapEntry *f = field; f != end; f++) {
+      if (f->inherited) { plan = UINT16_MAX; break; }
+      for (const TSFieldMapEntry *other = field; other != f; other++) {
+        if ((other->child_index == f->child_index && other->field_id != f->field_id) ||
+            (other->field_id == f->field_id && other->child_index > f->child_index)) {
+          plan = UINT16_MAX; break;
+        }
+      }
+      if (plan == UINT16_MAX) break;
+      if (plan <= f->child_index) plan = (uint16_t)f->child_index + 1;
+    }
+    x_field_plans[i] = plan;
+  }
+}
 
 // export chunk buffer (section "chunked preorder export"); allocated and its header written by tsg_init
 #define KC 16384u
@@ -31,7 +61,7 @@ static int xbuf_alloc(void) {
   if (!x_buf) return 0;
   memcpy(x_buf, "TSGX", 4);
   uint16_t *h16 = (uint16_t *)(x_buf + 4);
-  h16[0] = 1; h16[1] = 0;
+  h16[0] = 2; h16[1] = 0;
   uint32_t *h32 = (uint32_t *)(x_buf + 8);
   h32[0] = KC; h32[1] = 0;
   return 1;
@@ -49,6 +79,7 @@ int32_t tsg_init(void) {
     g_p = NULL;
     return -1;
   }
+  xfields_init();
   return 0;
 }
 
@@ -111,8 +142,56 @@ uint8_t *tsg_changed_ranges(TSTree *old, TSTree *neu) {
   return (uint8_t *)blk;
 }
 
-// ---- chunked preorder export (snapshot block format 1) ----
-// Header 16 bytes: "TSGX", u16 format=1, u16 0, u32 KC, u32 0. Columns follow at buf+16 (KC = chunk capacity, multiple of 4):
+// Shared by snapshot field exceptions and query captures; build lazily on the first result needing an index.
+typedef struct { const void *id; uint32_t index; } NodeIndexEntry;
+typedef struct { NodeIndexEntry *entries; uint32_t capacity; } NodeIndex;
+
+static void node_index_drop(NodeIndex *map) {
+  free(map->entries); map->entries = NULL; map->capacity = 0;
+}
+static NodeIndexEntry *node_index_slot(NodeIndex *map, const void *id) {
+  uint32_t hash = (uint32_t)(uintptr_t)id;
+  hash ^= hash >> 16; hash *= 0x7feb352du; hash ^= hash >> 15;
+  uint32_t slot = hash & (map->capacity - 1);
+  while (map->entries[slot].id && map->entries[slot].id != id) slot = (slot + 1) & (map->capacity - 1);
+  return &map->entries[slot];
+}
+static bool node_index_build(NodeIndex *map, TSNode root) {
+  uint32_t count = ts_node_descendant_count(root);
+  uint64_t capacity = 1;
+  while (capacity < 2ull * count) capacity *= 2;
+  if (capacity > UINT32_MAX / sizeof(NodeIndexEntry)) abort();
+  map->capacity = (uint32_t)capacity;
+  map->entries = calloc(map->capacity, sizeof(NodeIndexEntry));
+  if (!map->entries) abort();
+  TSTreeCursor cur = ts_tree_cursor_new(root);
+  uint32_t visited = 0;
+  do {
+    if ((visited & 255u) == 0 && tsg_host_should_stop()) {
+      ts_tree_cursor_delete(&cur); node_index_drop(map); return false;
+    }
+    TSNode node = ts_tree_cursor_current_node(&cur);
+    NodeIndexEntry *entry = node_index_slot(map, node.id);
+    if (entry->id) abort();
+    *entry = (NodeIndexEntry){node.id, ts_tree_cursor_current_descendant_index(&cur)};
+    visited++;
+    if (ts_tree_cursor_goto_first_child(&cur)) continue;
+    while (!ts_tree_cursor_goto_next_sibling(&cur)) {
+      if (!ts_tree_cursor_goto_parent(&cur)) goto done;
+    }
+  } while (true);
+done:
+  ts_tree_cursor_delete(&cur);
+  if (visited != count) abort();
+  return true;
+}
+static uint32_t node_index_get(NodeIndex *map, TSNode node) {
+  NodeIndexEntry *entry = node_index_slot(map, node.id);
+  return entry->id ? entry->index : UINT32_MAX;
+}
+
+// ---- chunked preorder export (snapshot block format 2) ----
+// Header 16 bytes: "TSGX", u16 format=2, u16 0, u32 KC, u32 field-exception block pointer (0 = none). Columns follow at buf+16 (KC = chunk capacity, multiple of 4):
 // symbol u16 @0, field u16 @2KC, flags u8 @4KC, startByte @5KC, endByte @9KC, startRow @13KC, startCol @17KC, endRow @21KC,
 // endCol @25KC (u32 each), parent i32 @29KC (global preorder index, -1 = root). flags: 1 named, 2 extra, 4 missing, 8 error,
 // 16 has_error. symbol 65535 = ERROR. firstChild/nextSibling are not exported; the host derives them from parent.
@@ -120,30 +199,109 @@ static TSTreeCursor x_cur;
 static int x_live, x_done, x_err;
 static int32_t *x_prev;
 static uint32_t x_cap, x_i, x_d, x_n;
+static TSTree *x_tree;
+static NodeIndex x_index;
+// u32 count followed by {node index, field id, target index}; UINT32_MAX means an explicit null result.
+static uint32_t *x_fields;
+static uint32_t x_field_count, x_field_capacity;
+static void xfields_end(void) {
+  free(x_fields); x_fields = NULL; x_field_count = x_field_capacity = 0;
+  if (x_buf) ((uint32_t *)(x_buf + 12))[0] = 0;
+}
 static void xend(void) {
   if (x_live) { ts_tree_cursor_delete(&x_cur); x_live = 0; }
   free(x_prev); x_prev = NULL;
+  node_index_drop(&x_index); x_tree = NULL;
 }
 
-void tsg_export_end(void) { xend(); x_done = 1; }
+void tsg_export_end(void) { xend(); xfields_end(); x_done = 1; }
 uint8_t *tsg_export_buf(void) { return x_buf; }
 uint32_t tsg_export_err(void) { return (uint32_t)x_err; }
 
 uint32_t tsg_export_begin(TSTree *t) {
-  xend();
+  xend(); xfields_end();
   x_done = 0; x_err = 0;
   if (!t) return 0;
   if (!xbuf_alloc()) return 0;
   x_cap = 256;
   x_prev = (int32_t *)malloc(sizeof(int32_t) * x_cap);
-  if (!x_prev) return 0;
+  if (!x_prev) abort();
+  x_tree = t;
   x_n = ts_node_descendant_count(ts_tree_root_node(t));
   x_cur = ts_tree_cursor_new(ts_tree_root_node(t));
   x_live = 1; x_i = 0; x_d = 0;
   return x_n;
 }
 
+static bool xfields_may_differ(Subtree subtree) {
+  uint32_t production = ts_subtree_production_id(subtree);
+  uint16_t plan = x_field_plans[production];
+  if (!plan) return false;
+  if (plan == UINT16_MAX) return true;
+  const TSSymbol *aliases = ts_language_alias_sequence(TSG_LANG_FN(), production);
+  const Subtree *children = ts_subtree_children(subtree);
+  uint32_t structural = 0;
+  // v0.27.2 node.c selects the first mapped non-extra child; tree_cursor.c selects its sole direct field.
+  // Skip only with no inheritance/collisions, all children visible (including aliases), and every mapped index
+  // present. Keep ALL hidden children: even non-inherited fields can meet extras or inner fields there.
+  for (uint32_t i = 0, n = ts_subtree_child_count(subtree); i < n; i++) {
+    bool extra = ts_subtree_extra(children[i]);
+    TSSymbol alias = !extra && aliases ? aliases[structural] : 0;
+    if (!ts_subtree_visible(children[i]) && !alias) return true;
+    if (!extra) structural++;
+  }
+  return structural < plan;
+}
+
+// Cursor fields describe direct visible children; C may instead follow a field through a visible alias.
+static bool xfields_node(TSNode node) {
+  Subtree subtree = *(const Subtree *)node.id;
+  if (ts_subtree_child_count(subtree) == 0 || ts_node_is_error(node)) return true;
+  if (!xfields_may_differ(subtree)) return true;
+  const TSFieldMapEntry *field, *end;
+  ts_language_field_map(TSG_LANG_FN(), ts_subtree_production_id(subtree), &field, &end);
+  for (const TSFieldMapEntry *f = field; f != end; f++) x_direct_fields[f->field_id] = (TSNode){0};
+  TSTreeCursor children = ts_tree_cursor_new(node);
+  if (ts_tree_cursor_goto_first_child(&children)) {
+    uint32_t visited = 0;
+    do {
+      if ((visited++ & 255u) == 0 && tsg_host_should_stop()) {
+        ts_tree_cursor_delete(&children); return false;
+      }
+      TSFieldId id = ts_tree_cursor_current_field_id(&children);
+      if (id && !x_direct_fields[id].id) x_direct_fields[id] = ts_tree_cursor_current_node(&children);
+    } while (ts_tree_cursor_goto_next_sibling(&children));
+  }
+  ts_tree_cursor_delete(&children);
+  for (TSFieldId previous = 0; field != end; field++) {
+    TSFieldId id = field->field_id;
+    if (id == previous) continue;
+    previous = id;
+    TSNode target = ts_node_child_by_field_id(node, id);
+    TSNode direct = x_direct_fields[id];
+    if (ts_node_eq(target, direct)) continue;
+    uint32_t target_index = UINT32_MAX;
+    if (target.id) {
+      if (!x_index.entries && !node_index_build(&x_index, ts_tree_root_node(x_tree))) return false;
+      target_index = node_index_get(&x_index, target);
+      if (target_index == UINT32_MAX) abort();
+    }
+    if (x_field_count == x_field_capacity) {
+      uint64_t capacity = x_field_capacity ? 2ull * x_field_capacity : 16;
+      if (4ull + 12ull * capacity > UINT32_MAX) abort();
+      uint32_t *fields = realloc(x_fields, (uint32_t)(4ull + 12ull * capacity));
+      if (!fields) abort();
+      x_fields = fields; x_field_capacity = (uint32_t)capacity;
+    }
+    uint32_t *entry = x_fields + 1 + 3u * x_field_count++;
+    entry[0] = x_i; entry[1] = id; entry[2] = target_index;
+  }
+  return true;
+}
+
 uint32_t tsg_export_next(void) {
+  x_field_count = 0;
+  ((uint32_t *)(x_buf + 12))[0] = 0;
   if (!x_live || x_done) return 0;
   uint8_t *c = x_buf + XHDR;
   uint16_t *symc = (uint16_t *)c, *fldc = (uint16_t *)(c + 2u * KC);
@@ -154,14 +312,17 @@ uint32_t tsg_export_next(void) {
   int32_t *par = (int32_t *)(c + 29u * KC);
   uint32_t k = 0;
   while (k < KC) {
+    if ((x_i & 255u) == 0 && tsg_host_should_stop()) { x_err = 1; x_done = 1; break; }
     if (x_i >= x_n) { x_err = 1; x_done = 1; break; }  // traversal longer than the descendant count
     if (x_d + 1 >= x_cap) {
+      if (x_cap > UINT32_MAX / (2u * sizeof(int32_t))) abort();
       x_cap *= 2;
       int32_t *np = (int32_t *)realloc(x_prev, sizeof(int32_t) * x_cap);
-      if (!np) { x_err = 1; x_done = 1; break; }
+      if (!np) abort();
       x_prev = np;
     }
     TSNode nd = ts_tree_cursor_current_node(&x_cur);
+    if (!xfields_node(nd)) { x_err = 1; x_done = 1; break; }
     TSPoint a = ts_node_start_point(nd), b = ts_node_end_point(nd);
     symc[k] = ts_node_symbol(nd);
     fldc[k] = ts_tree_cursor_current_field_id(&x_cur);
@@ -180,6 +341,10 @@ uint32_t tsg_export_next(void) {
     }
   }
 out:
+  if (x_field_count) {
+    x_fields[0] = x_field_count;
+    ((uint32_t *)(x_buf + 12))[0] = (uint32_t)(uintptr_t)x_fields;
+  }
   if (x_done) {
     if (x_i != x_n) x_err = 1;
     xend();
@@ -273,23 +438,20 @@ uint8_t *tsg_query_meta(TSQuery *q) {
   return b;
 }
 
-typedef struct { const void *id; uint32_t index; } QNodeIndex;
-
 typedef struct TSGQCursor {
   TSQueryCursor *cursor;
   TSTree *tree;
   TSQueryCursorOptions options;
   uint8_t *buf;
   uint32_t bytes;
-  QNodeIndex *nodes;
-  uint32_t node_capacity;
+  NodeIndex index;
   bool halted;
   struct TSGQCursor *next;
 } TSGQCursor;
 
 static TSGQCursor *q_cursors;
 static void qcursor_drop_index(TSGQCursor *c) {
-  free(c->nodes); c->nodes = NULL; c->node_capacity = 0;
+  node_index_drop(&c->index);
 }
 static void qcursor_drop_tree(TSTree *t) {
   for (TSGQCursor *c = q_cursors; c; c = c->next) {
@@ -309,7 +471,7 @@ void tsg_qcursor_delete(TSGQCursor *c) {
   TSGQCursor **link = &q_cursors;
   while (*link && *link != c) link = &(*link)->next;
   if (*link) *link = c->next;
-  ts_query_cursor_delete(c->cursor); free(c->nodes); free(c->buf); free(c);
+  ts_query_cursor_delete(c->cursor); node_index_drop(&c->index); free(c->buf); free(c);
 }
 static bool qprogress(TSQueryCursorState *state) {
   TSGQCursor *c = state->payload;
@@ -325,52 +487,12 @@ int32_t tsg_qcursor_exec(TSGQCursor *c, TSQuery *q, TSTree *t, uint32_t start, u
   ts_query_cursor_exec_with_options(c->cursor, q, ts_tree_root_node(t), &c->options);
   return 0;
 }
-// One preorder traversal and a half-full ID table avoid rescanning siblings for every capture.
-static QNodeIndex *qnode_slot(TSGQCursor *c, const void *id) {
-  uint32_t hash = (uint32_t)(uintptr_t)id;
-  hash ^= hash >> 16; hash *= 0x7feb352du; hash ^= hash >> 15;
-  uint32_t slot = hash & (c->node_capacity - 1);
-  while (c->nodes[slot].id && c->nodes[slot].id != id) slot = (slot + 1) & (c->node_capacity - 1);
-  return &c->nodes[slot];
-}
-static bool qnode_build(TSGQCursor *c) {
-  TSNode root = ts_tree_root_node(c->tree);
-  uint32_t count = ts_node_descendant_count(root);
-  uint64_t capacity = 1;
-  while (capacity < 2ull * count) capacity *= 2;
-  if (capacity > UINT32_MAX / sizeof(QNodeIndex)) abort();
-  c->node_capacity = (uint32_t)capacity;
-  c->nodes = calloc(c->node_capacity, sizeof(QNodeIndex));
-  if (!c->nodes) abort();
-  TSTreeCursor cur = ts_tree_cursor_new(root);
-  uint32_t visited = 0;
-  do {
-    if ((visited & 255u) == 0 && tsg_host_should_stop()) {
-      c->halted = true; ts_tree_cursor_delete(&cur); qcursor_drop_index(c); return false;
-    }
-    TSNode node = ts_tree_cursor_current_node(&cur);
-    QNodeIndex *entry = qnode_slot(c, node.id);
-    if (entry->id) abort();
-    *entry = (QNodeIndex){node.id, ts_tree_cursor_current_descendant_index(&cur)};
-    visited++;
-    if (ts_tree_cursor_goto_first_child(&cur)) continue;
-    while (!ts_tree_cursor_goto_next_sibling(&cur)) {
-      if (!ts_tree_cursor_goto_parent(&cur)) goto done;
-    }
-  } while (true);
-done:
-  ts_tree_cursor_delete(&cur);
-  if (visited != count) abort();
-  return true;
-}
-static uint32_t qnode_index(TSGQCursor *c, TSNode node) {
-  QNodeIndex *entry = qnode_slot(c, node.id);
-  return entry->id ? entry->index : UINT32_MAX;
-}
 uint32_t tsg_qcursor_next(TSGQCursor *c) {
   TSQueryMatch m;
   if (!ts_query_cursor_next_match(c->cursor, &m)) return 0;
-  if (!c->nodes && !qnode_build(c)) return 0;
+  if (!c->index.entries && !node_index_build(&c->index, ts_tree_root_node(c->tree))) {
+    c->halted = true; return 0;
+  }
   uint32_t bytes = 24u + 20u * m.capture_count;
   if (bytes > c->bytes) {
     uint8_t *b = realloc(c->buf, bytes);
@@ -382,7 +504,7 @@ uint32_t tsg_qcursor_next(TSGQCursor *c) {
   memcpy(c->buf + 4, h, sizeof(h));
   for (uint32_t i = 0; i < m.capture_count; i++) {
     TSNode n = m.captures[i].node;
-    uint32_t cap[] = {m.captures[i].index, qnode_index(c, n), ts_node_symbol(n), ts_node_start_byte(n), ts_node_end_byte(n)};
+    uint32_t cap[] = {m.captures[i].index, node_index_get(&c->index, n), ts_node_symbol(n), ts_node_start_byte(n), ts_node_end_byte(n)};
     memcpy(c->buf + 24 + 20u * i, cap, sizeof(cap));
   }
   return 1;

@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	ErrQueryUnsupported = &sentinel{msg: "treesitter: queries require engine ABI 2"}
+	ErrQueryUnsupported = &sentinel{msg: "treesitter: queries require engine ABI 2 or later"}
 	ErrQueryMatchLimit  = &sentinel{msg: "treesitter: query match limit exceeded"}
 )
 
@@ -142,7 +142,7 @@ func (c *core) queryCall(what string, fn func()) error {
 func (c *core) compileQuery(q *Query) (int32, error) {
 	in := c.inst
 	m, ok := in.m.(engine.QueryModule)
-	if !ok || c.lang.g.ABI != 2 {
+	if !ok || c.lang.g.ABI < 2 {
 		return 0, ErrQueryUnsupported
 	}
 	ops.clearRefused(in.mem)

@@ -83,7 +83,7 @@ func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, yield f
 	if q == nil || q.lang != c.lang {
 		return perr(InvalidInput, "query is nil or belongs to another language", nil)
 	}
-	if c.lang.g.ABI != 2 {
+	if c.lang.g.ABI < 2 {
 		return ErrQueryUnsupported
 	}
 	end := opts.EndByte

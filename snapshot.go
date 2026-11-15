@@ -27,7 +27,7 @@ const (
 	flagHasError = 16
 )
 
-// Snapshot is an immutable, goroutine-safe copy of one parse tree in struct-of-arrays form (about 41 bytes per node).
+// Snapshot is an immutable, goroutine-safe copy of one parse tree in struct-of-arrays form (about 41 bytes per node plus sparse field exceptions).
 // It owns its source text (Parse: one copy; ParseOwned: the caller's slice). Node i is the i-th node in preorder, which
 // equals C's descendant index.
 type Snapshot struct {
@@ -42,6 +42,8 @@ type Snapshot struct {
 	parent                             []int32  // -1 for the root
 	descEnd                            []int32  // exclusive end of the subtree in preorder (i+1 for a leaf)
 	childCount                         []uint32 // number of children (visible nodes only)
+
+	fieldLookups []fieldLookup // sorted by node, then field; target -1 is an explicit null
 
 	invalidUTF8 bool
 
@@ -197,6 +199,12 @@ func (s *Snapshot) nextSibling(i int32) (int32, bool) {
 	return e, true
 }
 
+type fieldLookup struct {
+	node   int32
+	field  uint32
+	target int32
+}
+
 // snapshotBuilder fills a Snapshot from the engine's chunks and validates everything later reads rely on.
 type snapshotBuilder struct {
 	s      *Snapshot
@@ -278,5 +286,43 @@ func (b *snapshotBuilder) finish() (*Snapshot, error) {
 	for _, j := range stack {
 		s.descEnd[j] = int32(s.n)
 	}
+	for _, e := range s.fieldLookups {
+		if e.target != -1 && (e.target <= e.node || e.target >= s.descEnd[e.node]) {
+			return nil, fmt.Errorf("field lookup target %d is not a descendant of %d", e.target, e.node)
+		}
+	}
 	return s, nil
+}
+
+// addFieldLookups copies and validates the format-2 sparse table for the just-copied node chunk.
+func (b *snapshotBuilder) addFieldLookups(mem []byte, ptr uint32, start int) error {
+	if ptr == 0 {
+		return nil
+	}
+	if uint64(ptr)+4 > uint64(len(mem)) {
+		return fmt.Errorf("block pointer %d is outside memory", ptr)
+	}
+	le := binary.LittleEndian
+	count := uint64(le.Uint32(mem[ptr:]))
+	end := uint64(ptr) + 4 + 12*count
+	s := b.s
+	if end > uint64(len(mem)) || count > uint64(b.filled-start)*uint64(len(s.lang.g.Meta.Fields)-1) {
+		return fmt.Errorf("invalid exception count %d", count)
+	}
+	data := mem[uint64(ptr)+4 : end]
+	for len(data) > 0 {
+		e := fieldLookup{int32(le.Uint32(data)), le.Uint32(data[4:]), int32(le.Uint32(data[8:]))}
+		if int(e.node) < start || int(e.node) >= b.filled || e.field == 0 || uint64(e.field) >= uint64(len(s.lang.g.Meta.Fields)) || e.target < -1 || int(e.target) >= s.n {
+			return fmt.Errorf("invalid exception %+v", e)
+		}
+		if n := len(s.fieldLookups); n > 0 {
+			prev := s.fieldLookups[n-1]
+			if e.node < prev.node || (e.node == prev.node && e.field <= prev.field) {
+				return fmt.Errorf("exceptions are not strictly ordered")
+			}
+		}
+		s.fieldLookups = append(s.fieldLookups, e)
+		data = data[12:]
+	}
+	return nil
 }

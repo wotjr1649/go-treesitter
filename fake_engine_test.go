@@ -127,6 +127,7 @@ type fakeModule struct {
 	abi              int32
 	initRC           int32
 	badMagic         bool
+	exportFormat     uint16 // zero uses the ABI's default
 	rootEndDelta     int32
 	dcDelta          int32
 	badExportMagic   bool // header is wrong at every export_begin (badMagic: wrong from tsg_init on)
@@ -199,7 +200,14 @@ func (f *fakeModule) writeHeader(bad bool) {
 	if bad {
 		copy(h, "XXXX")
 	}
-	binary.LittleEndian.PutUint16(h[4:], engine.ExportFormat)
+	format := uint16(1)
+	if f.abi >= 3 {
+		format = engine.ExportFormat
+	}
+	if f.exportFormat != 0 {
+		format = f.exportFormat
+	}
+	binary.LittleEndian.PutUint16(h[4:], format)
 	binary.LittleEndian.PutUint32(h[8:], uint32(f.kc))
 }
 

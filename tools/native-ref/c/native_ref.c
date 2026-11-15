@@ -13,6 +13,11 @@
  *                                                      never does): "#tsg-query/1 patterns=<n> captures=<n>", then per match "m\t<pattern>\t<n>"
  *                                                      and per capture "c\t<capture>\t<node preorder index>\t<symbol>\t<start>\t<end>";
  *                                                      a rejected query prints "#tsg-query/1 error offset=<o> type=<t>" (exit 0)
+ *   <exe> fields <file>                                ts_node_child_by_field_name for every visible node (cursor preorder) and every
+ *                                                      field name of the language: "#tsg-fields/1 nodes=<n> fields=<f>", then one line per
+ *                                                      non-null result "<node index>\t<field>\t<result>" in node, then field-id order; result is
+ *                                                      the result's preorder index (found by node id), or "?<symbol>:<start>:<end>" when it is
+ *                                                      not a visible node of the tree. v0.27.2 has no ts_node_children_by_field_name.
  * Points are byte columns with '\n' rows, the same as treesitter.EditFor. Exit: 0 ok, 2 usage, 3 cannot read input,
  * 4 parse failed.
  *
@@ -284,6 +289,54 @@ static int query_cmd(const char *qpath, const char *spath) {
   return emit(out);
 }
 
+static int fields_cmd(const char *spath) {
+  uint32_t sn;
+  char *src = slurp(spath, &sn);
+  if (!src) { fputs("open failed\n", stderr); return 3; }
+  TSParser *p = new_parser();
+  if (!p) { fputs("set language failed\n", stderr); return 4; }
+  TSTree *tree = ts_parser_parse_string(p, NULL, src, sn);
+  if (!tree) { fputs("parse failed\n", stderr); return 4; }
+  const TSLanguage *lang = TSG_LANG_FN();
+  uint32_t nrefs, nf = ts_language_field_count(lang);
+  NodeRef *refs = index_nodes(tree, &nrefs);
+  Buf body = {0}, out = {0};
+  uint32_t idx = 0;
+  TSTreeCursor cur = ts_tree_cursor_new(ts_tree_root_node(tree));
+  for (;;) {
+    TSNode n = ts_tree_cursor_current_node(&cur);
+    for (uint32_t f = 1; f <= nf; f++) {
+      const char *name = ts_language_field_name_for_id(lang, (TSFieldId)f);
+      TSNode r = ts_node_child_by_field_name(n, name, (uint32_t)strlen(name));
+      if (ts_node_is_null(r)) continue;
+      NodeRef key = {r.id, 0}, *hit = bsearch(&key, refs, nrefs, sizeof *refs, cmp_ref);
+      u32(&body, idx); str(&body, "\t"); str(&body, name); str(&body, "\t");
+      if (hit) {
+        u32(&body, hit->index);
+      } else {
+        str(&body, "?"); u32(&body, ts_node_symbol(r)); str(&body, ":"); u32(&body, ts_node_start_byte(r));
+        str(&body, ":"); u32(&body, ts_node_end_byte(r));
+      }
+      str(&body, "\n");
+    }
+    idx++;
+    if (ts_tree_cursor_goto_first_child(&cur)) continue;
+    for (;;) {
+      if (ts_tree_cursor_goto_next_sibling(&cur)) break;
+      if (!ts_tree_cursor_goto_parent(&cur)) goto done;
+    }
+  }
+done:
+  ts_tree_cursor_delete(&cur);
+  str(&out, "#tsg-fields/1 nodes="); u32(&out, idx); str(&out, " fields="); u32(&out, nf); str(&out, "\n");
+  if (body.len) put(&out, body.p, body.len);
+  free(body.p);
+  free(refs);
+  ts_tree_delete(tree);
+  ts_parser_delete(p);
+  return emit(out);
+}
+
 int main(int argc, char **argv) {
 #ifdef _WIN32
   _setmode(_fileno(stdout), _O_BINARY);
@@ -295,9 +348,10 @@ int main(int argc, char **argv) {
     return speed(argv[2], reps, cmd[0] == 'c');
   }
   if (argc == 4 && !strcmp(cmd, "query")) return query_cmd(argv[2], argv[3]);
+  if (argc == 3 && !strcmp(cmd, "fields")) return fields_cmd(argv[2]);
   int edit = !strcmp(cmd, "edit"), cr = !strcmp(cmd, "changed-ranges");
   if (!((argc == 3 && !strcmp(cmd, "dump")) || (argc == 7 && (edit || cr)))) {
-    fputs("usage: <exe> dump <file> | edit|changed-ranges <old> <new> <start> <old_end> <new_end> | speed <file> <reps> | corpus <list> <reps> | query <query-file> <source>\n", stderr);
+    fputs("usage: <exe> dump <file> | edit|changed-ranges <old> <new> <start> <old_end> <new_end> | speed <file> <reps> | corpus <list> <reps> | query <query-file> <source> | fields <file>\n", stderr);
     return 2;
   }
   uint32_t n1, n2 = 0;

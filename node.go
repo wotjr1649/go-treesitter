@@ -2,6 +2,7 @@ package treesitter
 
 import (
 	"iter"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -247,7 +248,8 @@ func (n Node) NamedChildren() iter.Seq[Node] {
 	}
 }
 
-// ChildByFieldName returns the first child filling the named field.
+// ChildByFieldName returns C's first node filling the named field (possibly an alias's descendant).
+// ERROR nodes and unknown fields return nothing. ABI 1/2 grammars retain direct-child lookup.
 func (n Node) ChildByFieldName(name string) (Node, bool) {
 	for c := range n.ChildrenByFieldName(name) {
 		return c, true
@@ -255,18 +257,31 @@ func (n Node) ChildByFieldName(name string) (Node, bool) {
 	return Node{}, false
 }
 
-// ChildrenByFieldName iterates the children filling the named field (none for an unknown name).
+// ChildrenByFieldName yields ChildByFieldName first, then the other direct children with that field.
+// An ERROR node, unknown field or explicit C null exception yields nothing.
+// This iterator has no C oracle; tree-sitter v0.27.2 exposes only single-child field lookup.
 func (n Node) ChildrenByFieldName(name string) iter.Seq[Node] {
 	return func(yield func(Node) bool) {
-		if n.s == nil {
+		if n.s == nil || n.IsError() {
 			return
 		}
 		id, ok := n.s.lang.FieldForName(name)
 		if !ok {
 			return
 		}
+		first := int32(-1)
+		es := n.s.fieldLookups
+		i := sort.Search(len(es), func(i int) bool {
+			return es[i].node > n.i || (es[i].node == n.i && es[i].field >= uint32(id))
+		})
+		if i < len(es) && es[i].node == n.i && es[i].field == uint32(id) {
+			first = es[i].target
+			if first == -1 || !yield(n.at(first)) {
+				return
+			}
+		}
 		for c := range n.Children() {
-			if c.FieldID() == id && !yield(c) {
+			if c.i != first && c.FieldID() == id && !yield(c) {
 				return
 			}
 		}
