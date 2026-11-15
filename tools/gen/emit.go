@@ -14,6 +14,9 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/wotjr1649/go-treesitter/tools/gen/grammarpatch"
+	"github.com/wotjr1649/go-treesitter/tools/gen/patches"
 )
 
 // Identity mirrors engine.Identity (field names and JSON keys must stay identical: the module test unmarshals
@@ -28,13 +31,15 @@ type Identity struct {
 }
 
 type provenance struct {
-	Schema   int               `json:"schema"`
-	ABI      uint32            `json:"abi"`
-	Name     string            `json:"name"`
-	Module   string            `json:"module"`
-	Identity Identity          `json:"identity"`
-	Outputs  map[string]string `json:"outputs"` // sha256 of generated artifacts
-	TestOnly string            `json:"testOnly,omitempty"`
+	Patches           []patches.Pin            `json:"patches,omitempty"`
+	GrammarGeneration *grammarpatch.Provenance `json:"grammarGeneration,omitempty"`
+	Schema            int                      `json:"schema"`
+	ABI               uint32                   `json:"abi"`
+	Name              string                   `json:"name"`
+	Module            string                   `json:"module"`
+	Identity          Identity                 `json:"identity"`
+	Outputs           map[string]string        `json:"outputs"` // sha256 of generated artifacts
+	TestOnly          string                   `json:"testOnly,omitempty"`
 }
 
 func marshal(v any) ([]byte, error) {
@@ -317,7 +322,7 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 	if g.NoticeSHA256 != "" {
 		files = "`LICENSE` and `NOTICE` are the upstream grammar's license files."
 	}
-	return fmt.Sprintf("# %s%s\n\nGenerated tree-sitter grammar module for go-treesitter. **Do not edit**: `engine_gen.go` and `language.go` are output of\n"+
+	result := fmt.Sprintf("# %s%s\n\nGenerated tree-sitter grammar module for go-treesitter. **Do not edit**: `engine_gen.go` and `language.go` are output of\n"+
 		"`tools/gen` (docs/design/engine-abi.md, ADR-0020).\n\n"+
 		"- upstream grammar: %s at `%s`\n- tree-sitter runtime: %s (unmodified)\n- engine ABI: %d\n"+
 		"- recipe sha256: `%s`\n- identity and output hashes: `provenance.json` (equals the compiled `engine.Identity`; `go test` checks it)\n\n"+
@@ -325,6 +330,16 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 		"its `LICENSE` is the index: musl MIT, cloudlibc BSD-2-Clause, dlmalloc CC0, the rest Apache-2.0 WITH LLVM-exception, Apache-2.0 or MIT;\n"+
 		"every file's hash is in `provenance.json`). Regenerate with `tools/gen` (see its README); regenerating gives identical bytes.\n",
 		modulePrefix, lang, g.Repo, g.Commit, pins.Runtime.Release, pins.ABI, id.RecipeSHA256, files, pins.WasiLibc.Commit)
+	if len(g.Patches) > 0 {
+		result += "\nThis grammar differs temporarily from upstream under ADR-0023. Applied patches (full hashes in `provenance.json`):\n"
+		if lang == "yaml" {
+			result += "\nYAML patch 0001 prevents premature end-of-input acceptance and silent source truncation.\n"
+		}
+		for _, p := range g.Patches {
+			result += fmt.Sprintf("\n- `%s` changes `%s`; upstream defect report: %s.\n", p.File, p.Source, p.UpstreamReport)
+		}
+	}
+	return result
 }
 
 var samples = map[string]string{

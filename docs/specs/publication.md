@@ -82,3 +82,12 @@ Notes:
   release before step 2 is fixed by a new commit, nothing to roll back.
 - A grammar `require`s one exact root version. If the root needs a fix, release root `vX.Y.(Z+1)`, then regenerate
   every grammar `go.mod` against it (steps 4-6); a grammar is not re-tagged at the old number.
+
+## Pinned archive release assets
+
+Every immutable root `vX.Y.Z` release carries the unchanged archives listed by
+`(cd tools/gen && CGO_ENABLED=0 go run . -mirror-assets)` for its `pins.json`, including all pinned host platforms.
+The command emits filenames, SHA-256 pins and upstream download URLs; it does not publish. Verify every file against
+that list before attaching it. The ordered `pins.json` `mirrors` bases name releases carrying these exact archives.
+Generation and the native reference try upstream first, then these mirrors, with the same mandatory SHA-256 check.
+Go modules (including wasm2go) continue to use Go's module checksum mechanism; host toolchains remain prerequisites.

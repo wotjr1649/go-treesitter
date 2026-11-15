@@ -14,10 +14,13 @@ import (
 	"runtime"
 	"sort"
 	"strings"
+
+	"github.com/wotjr1649/go-treesitter/tools/gen/patches"
 )
 
 // Pins is tools/gen/pins.json: the machine-readable source of truth for everything a generation consumes.
 type Pins struct {
+	Mirrors          []string              `json:"mirrors,omitempty"` // immutable release-asset base URLs; archive name appended
 	Schema           int                   `json:"schema"`
 	ABI              int                   `json:"abi"`
 	Recipe           string                `json:"recipe"` // build variant, a key of recipes in recipe.go (-recipe overrides it for comparisons)
@@ -69,13 +72,15 @@ type Archive struct {
 // ToolPins identify tools by upstream source and version, never by a host binary hash: a generated module's
 // identity must not depend on the host that generated it. Archives are keyed per host platform "<GOOS>-<GOARCH>".
 type ToolPins struct {
-	WasiSDK         string             `json:"wasi-sdk"`
-	Clang           string             `json:"clang"`      // clang release number (host strings differ in the suffix)
-	LLVMCommit      string             `json:"llvmCommit"` // llvm-project commit clang was built from
-	WasiSDKArchives map[string]Archive `json:"wasiSDKArchives"`
-	Wasm2go         string             `json:"wasm2go"`       // module version
-	Wasm2goModule   string             `json:"wasm2goModule"` // built with: go install -trimpath <module>@<version>
-	Wasm2goSum      string             `json:"wasm2goSum"`    // go.sum h1: hash of that module version (read back from the binary's build info)
+	TreeSitterCLI         string             `json:"treeSitterCLI,omitempty"`
+	TreeSitterCLIArchives map[string]Archive `json:"treeSitterCLIArchives,omitempty"`
+	WasiSDK               string             `json:"wasi-sdk"`
+	Clang                 string             `json:"clang"`      // clang release number (host strings differ in the suffix)
+	LLVMCommit            string             `json:"llvmCommit"` // llvm-project commit clang was built from
+	WasiSDKArchives       map[string]Archive `json:"wasiSDKArchives"`
+	Wasm2go               string             `json:"wasm2go"`       // module version
+	Wasm2goModule         string             `json:"wasm2goModule"` // built with: go install -trimpath <module>@<version>
+	Wasm2goSum            string             `json:"wasm2goSum"`    // go.sum h1: hash of that module version (read back from the binary's build info)
 	// Binaryen is needed only by the recipes that run wasm-opt.
 	Binaryen         string             `json:"binaryen,omitempty"` // binaryen release number (version_N)
 	BinaryenArchives map[string]Archive `json:"binaryenArchives,omitempty"`
@@ -85,6 +90,8 @@ type ToolPins struct {
 }
 
 type GrammarPin struct {
+	Regenerate    bool              `json:"regenerate,omitempty"`
+	Patches       []patches.Pin     `json:"patches,omitempty"`
 	Repo          string            `json:"repo"`
 	Commit        string            `json:"commit"` // full commit
 	ExtractDir    string            `json:"extractDir"`
@@ -110,6 +117,9 @@ func loadPins(path string) (*Pins, error) {
 	dec.DisallowUnknownFields()
 	if err := dec.Decode(&p); err != nil {
 		return nil, fmt.Errorf("%s: %w", path, err)
+	}
+	if err := validateMirrors(p.Mirrors); err != nil {
+		return nil, err
 	}
 	return &p, nil
 }
@@ -177,19 +187,42 @@ func tarballURL(repo, commit string) (string, error) {
 	return "https://api.github.com/repos/" + strings.TrimPrefix(repo, p) + "/tarball/" + commit, nil
 }
 
-// plan lists everything a host must fetch, one tab-separated line each: kind, file, url, sha256, destination.
+// plan lists everything a host must fetch: kind, file, upstream URL, sha256, destination, comma-separated mirrors.
 // Archives are extracted with their top directory stripped into <work>/<destination>; a "goinstall" line names a
 // module version to build with go install -trimpath. tools/gen/regen.sh executes it.
 func (p *Pins) plan(platform string) ([]string, error) {
 	var out []string
 	add := func(kind, file, url, sum, dest string) {
-		out = append(out, strings.Join([]string{kind, file, url, sum, dest}, "\t"))
+		mirrors := "-"
+		if kind != "goinstall" && len(p.Mirrors) > 0 {
+			var urls []string
+			for _, base := range p.Mirrors {
+				urls = append(urls, strings.TrimRight(base, "/")+"/"+file)
+			}
+			mirrors = strings.Join(urls, ",")
+		}
+		out = append(out, strings.Join([]string{kind, file, url, sum, dest, mirrors}, "\t"))
 	}
 	sdk, ok := p.Tools.WasiSDKArchives[platform]
 	if !ok {
 		return nil, fmt.Errorf("no wasi-sdk archive pinned for platform %q", platform)
 	}
 	add("tool", path.Base(sdk.URL), sdk.URL, sdk.SHA256, "sdk")
+	needsCLI := false
+	for _, g := range p.Grammars {
+		needsCLI = needsCLI || g.Regenerate
+	}
+	if needsCLI {
+		cli, ok := p.Tools.TreeSitterCLIArchives[platform]
+		if !ok || p.Tools.TreeSitterCLI == "" {
+			return nil, fmt.Errorf("no tree-sitter CLI pinned for platform %q", platform)
+		}
+		dest := "bin/tree-sitter"
+		if strings.HasPrefix(platform, "windows-") {
+			dest += ".exe"
+		}
+		add("cli", path.Base(cli.URL), cli.URL, cli.SHA256, dest)
+	}
 	if p.Tools.BinaryenArchives != nil {
 		bin, ok := p.Tools.BinaryenArchives[platform]
 		if !ok {

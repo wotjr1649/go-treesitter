@@ -1,11 +1,11 @@
 // Command native-ref builds the native C reference executables (one per grammar) from the sources pinned in
-// tools/gen/pins.json: the unmodified tree-sitter runtime plus one unmodified grammar, linked with native_ref.c.
+// tools/gen/pins.json: the unmodified tree-sitter runtime plus one grammar with any recorded ADR-0023 patches, linked with native_ref.c.
 // They produce the dumps and changed ranges the CGO-free conformance lane compares against (docs/specs/oracle.md).
 //
 //	go run ./tools/native-ref -dl <archive dir> -work <empty extract dir> -out <exe dir> [-fetch] [lang ...]
 //
 // Every archive's sha256 is verified against the pin before it is extracted, and every grammar source file against
-// its pinned "files" hash. Nothing inside an archive is executed; only the C compiler reads it.
+// its pinned "files" hash. Approved grammar-input patches regenerate C with the pinned CLI (ADR-0023).
 package main
 
 import (
@@ -25,9 +25,14 @@ import (
 	"runtime"
 	"sort"
 	"strings"
+
+	"github.com/wotjr1649/go-treesitter/tools/gen/patches"
 )
 
 type source struct {
+	Regenerate    bool              `json:"regenerate,omitempty"`
+	Patches       []patches.Pin     `json:"patches,omitempty"`
+	Mirrors       []string          `json:"-"`
 	Repo          string            `json:"repo"`
 	Commit        string            `json:"commit"`
 	ExtractDir    string            `json:"extractDir"`
@@ -41,6 +46,14 @@ type source struct {
 }
 
 type pins struct {
+	Tools struct {
+		TreeSitterCLI         string `json:"treeSitterCLI"`
+		TreeSitterCLIArchives map[string]struct {
+			URL    string `json:"url"`
+			SHA256 string `json:"sha256"`
+		} `json:"treeSitterCLIArchives"`
+	} `json:"tools"`
+	Mirrors  []string          `json:"mirrors"`
 	Runtime  source            `json:"runtime"`
 	WasiLibc source            `json:"wasiLibc"`
 	Grammars map[string]source `json:"grammars"`
@@ -56,19 +69,28 @@ func main() {
 	fetch := flag.Bool("fetch", false, "download a missing archive from GitHub (sha256 still verified)")
 	corpus := flag.String("corpus", "", "also extract each grammar archive's test/corpus into DIR/<extractDir>/test/corpus (the archive is sha256-verified first)")
 	queries := flag.String("queries", "", "also extract each grammar archive's queries/ into DIR/<extractDir>/queries (the archive is sha256-verified first)")
+	unpatched := flag.Bool("unpatched", false, "comparison only: compile the original pinned grammar without its ADR-0023 patches")
 	nobuild := flag.Bool("nobuild", false, "verify and extract only; do not compile (-out is then optional)")
+	patchAlert := flag.Int("patch-alert", 3, "warn when a grammar has more than this many patches")
 	flag.Parse()
 	if *dl == "" || *work == "" || (*out == "" && !*nobuild) {
 		fmt.Fprintln(os.Stderr, "usage: native-ref -dl DIR -work DIR -out DIR [-pins F] [-cc gcc] [-fetch] [-corpus DIR] [-queries DIR] [-nobuild] [lang ...]")
 		os.Exit(2)
 	}
-	if err := run(*log, *dl, *work, *out, *cc, *opt, *corpus, *queries, *fetch, *nobuild, flag.Args()); err != nil {
+	if err := run(*log, *dl, *work, *out, *cc, *opt, *corpus, *queries, *fetch, *nobuild, *unpatched, flag.Args(), *patchAlert); err != nil {
 		fmt.Fprintln(os.Stderr, "native-ref:", err)
 		os.Exit(1)
 	}
 }
 
-func run(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuild bool, langs []string) error {
+func run(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuild, unpatched bool, langs []string, patchAlert ...int) error {
+	threshold := 3
+	if len(patchAlert) > 0 {
+		threshold = patchAlert[0]
+	}
+	if threshold < 0 {
+		return fmt.Errorf("-patch-alert must not be negative")
+	}
 	raw, err := os.ReadFile(pinsFile)
 	if err != nil {
 		return err
@@ -76,6 +98,11 @@ func run(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuil
 	var p pins
 	if err := json.Unmarshal(raw, &p); err != nil {
 		return err
+	}
+	p.Runtime.Mirrors, p.WasiLibc.Mirrors = p.Mirrors, p.Mirrors
+	for name, g := range p.Grammars {
+		g.Mirrors = p.Mirrors
+		p.Grammars[name] = g
 	}
 	if len(langs) == 0 {
 		for l := range p.Grammars {
@@ -129,6 +156,18 @@ func run(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuil
 			if got, err := fileSHA(filepath.Join(gdir, name)); err != nil || got != want {
 				return fmt.Errorf("%s: %s sha256 %s, pinned %s (%v)", l, name, got, want, err)
 			}
+		}
+		fmt.Fprintf(os.Stderr, "%s patches=%d alert-threshold=%d", l, len(g.Patches), threshold)
+		if len(g.Patches) > threshold {
+			fmt.Fprint(os.Stderr, " WARNING: review temporary patch burden")
+		}
+		fmt.Fprintln(os.Stderr)
+		if !unpatched && len(g.Patches) > 0 {
+			patched, err := prepareGrammarPatches(pinsFile, p, g, dl, work, l, fetch)
+			if err != nil {
+				return fmt.Errorf("%s: patches: %w", l, err)
+			}
+			gdir = filepath.Join(patched, filepath.FromSlash(g.GrammarDir))
 		}
 		if corpus != "" && !corpusDone[g.Archive] { // prepare has verified the archive's sha256
 			if err := extract(filepath.Join(dl, g.Archive), filepath.Join(corpus, g.ExtractDir), []string{"test/corpus"}); err != nil {
@@ -215,7 +254,7 @@ func prepare(s source, dl, work string, fetch bool, done map[string]bool) error 
 		if url == "" {
 			url = "https://api.github.com/repos/" + strings.TrimPrefix(s.Repo, gh) + "/tarball/" + s.Commit
 		}
-		if err := download(url, arc); err != nil {
+		if err := downloadVerified(url, arc, s.ArchiveSHA256, s.Mirrors); err != nil {
 			return err
 		}
 	}

@@ -33,7 +33,7 @@ Without `ROOT_VERSION`, `regen.sh` derives the go.mod form from the committed `g
 The modules are `bash`, `c`, `cpp`, `csharp`, `css`, `golang`, `html`, `java`, `javascript` (including JSX), `json`,
 `python`, `rust`, `tsql`, `tsx`, and `typescript`. Each has a grammar-specific generated smoke-test sample.
 Downloads allow three attempts with 1s/2s backoff only for transient transport failures. HTTP, certificate and local
-write errors fail immediately; sha256 verification remains mandatory before extraction. The retry self-check is
+write errors end that URL attempt; transient HTTP 408/429/5xx responses also receive bounded retries. A failed upstream download or hash check then tries each configured mirror; sha256 verification remains mandatory before extraction. The retry self-check is
 `bash tools/gen/fetch_test.sh`.
 
 ## go.mod forms
@@ -65,3 +65,49 @@ CGO_ENABLED=0 GOWORK=off TSG_BALANCE_PROBE_DIR=<absolute-work-dir>/probes \
 ```
 
 The nightly/manual Linux job `.github/workflows/balancing-cancel.yml` runs this lane. It is not a PR-required check.
+
+## Recorded grammar patches (ADR-0023)
+
+Each grammar's optional `patches` list keeps the existing single-file records: `file` (under `patches/<grammar>/`),
+`source` (archive-root-relative), `sha256` (patch bytes), `beforeSHA256`, `afterSHA256`, and `upstreamReport` (HTTPS).
+Only owner-approved patches may be added. C-only patches keep their existing identities and disclosure format.
+No real grammar patch is introduced by the regeneration mechanism itself.
+
+For `grammar.js` or related grammar inputs, also set the grammar's `regenerate: true`. `gen` and `native-ref` use
+the same implementation: verify the full archive, extract a private copy, apply the recorded patches, then run
+the pinned CLI twice on independent trees using `generate --js-runtime native`. Every resulting file must match.
+The CLI gzip and its decompressed executable are checked against the per-platform pin before execution. The
+generated module's optional `grammarGeneration` provenance records CLI version/runtime, patched input-tree hash
+and generated source hashes; `native-ref` writes the same record under its `work/patches-<lang>/provenance.json`.
+Both compilers read C from this private result. The original extracted source and archive stay intact.
+
+`regen.sh` fetches the CLI only when a grammar requires regeneration; direct `gen` invocations supply `-tree-sitter`
+and keep the corresponding pinned gzip in `-dl`. `native-ref -fetch` downloads it on demand. Existing unpatched
+modules are unchanged. Patches modifying multiple files are represented by ordered single-file records.
+
+`gen -patch-status [-patch-alert N]` lists all grammar patch counts, including zero; counts greater than `N` warn
+(default 3). Both builders print the selected grammar's count. `PATCH_ALERT_THRESHOLD=N` configures the shell
+entry points; `native-ref` accepts `-patch-alert N`. The synthetic integration test is enabled with
+`TREE_SITTER_CLI_ARCHIVE=<pinned-host-gzip> CGO_ENABLED=0 go test ./...` from this module.
+
+## Immutable release source mirror
+
+`pins.json` has an ordered `mirrors` array of release-asset base URLs. The fetch plan's sixth TSV column contains
+those bases with the exact archive filename appended (comma-separated; `-` means none). Upstream always runs first;
+transport/HTTP failure or a wrong SHA-256 tries the next mirror. Both `regen.sh` and `balance-probe.sh` check the original
+archive hash before extraction. `native-ref -fetch` follows the same rule. Existing cached native archives are still
+checked and a corrupt cache fails, rather than being silently replaced.
+
+List the exact release attachments from all pinned platforms (deduplicated filename, SHA-256, upstream URL):
+
+```sh
+(cd tools/gen && CGO_ENABLED=0 go run . -mirror-assets) > release-assets.tsv
+```
+
+The list includes the runtime, every grammar archive, wasi-libc, both host SDK/binaryen archives, and the pinned
+CLI executables' gzip archives, including when no real grammar patch uses the CLI yet. Download each listed upstream
+URL into a file named by column one, check column two, and attach these unchanged files to each immutable `vX.Y.Z`
+release. Before releasing a new pin set, update `mirrors` to that release and retain older bases only when useful.
+The configured `v0.3.0` mirror becomes available when its assets are published; this command does not upload anything.
+`wasm2go` remains a Go module installed through Go's checksum-verified module mechanism (`wasm2goSum`), not an archive
+in this list. The Go toolchain and system C compiler are host prerequisites, not downloads managed by this pin file.

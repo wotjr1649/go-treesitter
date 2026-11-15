@@ -1,5 +1,8 @@
 {
   "schema": 2,
+  "mirrors": [
+    "https://github.com/wotjr1649/go-treesitter/releases/download/v0.3.0"
+  ],
   "abi": 2,
   "recipe": "v2-O3",
   "runtime": {
@@ -16,6 +19,17 @@
     "licenseSHA256": "c5cfb43042b6b72045f4ba997834d0a7786d2793d91680868b5815b39f14fc78"
   },
   "tools": {
+    "treeSitterCLI": "0.27.2",
+    "treeSitterCLIArchives": {
+      "windows-amd64": {
+        "url": "https://github.com/tree-sitter/tree-sitter/releases/download/v0.27.2/tree-sitter-windows-x64.gz",
+        "sha256": "230779ee4a729e3044d4a8ed57490b776ea1bac0671d12afbd6f5b4d1878f1d0"
+      },
+      "linux-amd64": {
+        "url": "https://github.com/tree-sitter/tree-sitter/releases/download/v0.27.2/tree-sitter-linux-x64.gz",
+        "sha256": "7ed56d152c52437397b9fcaa43cf341f49933cecc1ca291843f0d347c6e2cb3a"
+      }
+    },
     "wasi-sdk": "34.0",
     "clang": "23.1.0",
     "wasiSDKArchives": {

@@ -37,3 +37,29 @@ done
 for http in 400 401 403 404 409 499; do check 22 1 "" "22:$http"; done
 for code in 22 23 60; do check "$code" 1 "" "$code:000"; done
 echo "fetch retry checks passed"
+
+# Simulate blocked upstream and corrupt mirrors without depending on a real outage.
+curl() {
+  local url="${@: -1}"
+  echo "$url" >>"$work/calls"
+  case "$url" in
+    https://upstream.invalid/blocked) printf 404; return 22 ;;
+    https://mirror.invalid/corrupt) printf corrupt >"$work/archive" ;;
+    *) printf 'pinned archive' >"$work/archive" ;;
+  esac
+  printf 200
+}
+sum=$(printf 'pinned archive' | sha256sum | cut -d' ' -f1)
+: >"$work/calls"
+fetch_verified_archive "$work/archive" "$sum" https://upstream.invalid/blocked \
+  https://mirror.invalid/corrupt,https://mirror.invalid/good
+[ "$(wc -l <"$work/calls")" = 3 ]
+[ "$(cat "$work/archive")" = 'pinned archive' ]
+: >"$work/calls"
+fetch_verified_archive "$work/archive" "$sum" https://upstream.invalid/good https://mirror.invalid/good
+[ "$(wc -l <"$work/calls")" = 1 ]
+if fetch_verified_archive "$work/archive" "$sum" https://upstream.invalid/blocked https://mirror.invalid/corrupt; then
+  echo "accepted corrupt mirror" >&2; exit 1
+fi
+[ ! -e "$work/archive" ]
+echo "fetch mirror checks passed"

@@ -10,13 +10,13 @@ Every grammar module is generated, never hand-edited, from:
 | Input | Rule |
 |---|---|
 | tree-sitter runtime C (`lib/src/lib.c` tree) | an upstream **release**, unmodified |
-| grammar `parser.c`, `scanner.c`, headers | upstream grammar repository at a full commit, unmodified (wave 1: the six repositories of ADR-0020) |
+| grammar `parser.c`, `scanner.c`, headers | upstream grammar repository at a full commit; owner-approved temporary source patches follow ADR-0023 |
 | `tools/gen/shim/tsg_abi.c` | this repository's own C, versioned by the engine ABI |
 | toolchain | wasi-sdk (clang) and binaryen `wasm-opt` pinned by upstream release archive sha256 per platform; wasm2go pinned by module version + `go.sum` hash and built with `go install -trimpath`; versions and the recipe name recorded per generation (host binary hashes are not identity) |
 | post-processing | the hash-checked `memory_grow` replacement of `tools/gen` (ADR-0020 §8) |
 
-Upstream files are never edited. A fix to an upstream file goes upstream as a contribution; until it lands, the
-difference is a published known gap.
+The runtime stays unmodified. Grammar changes require the recorded, hash-checked patch and retirement mechanism
+of ADR-0023; grammar-input changes regenerate C with the pinned CLI, identically for the engine and native reference.
 
 ## Machine-readable source of truth
 

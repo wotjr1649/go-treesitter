@@ -20,3 +20,22 @@ fetch_archive() {
   rm -f -- "$1"
   return "$code"
 }
+
+# Both upstream and mirrors must satisfy the same archive pin before extraction.
+fetch_verified_archive() {
+  local dst=$1 sum=$2 upstream=$3 mirrors=${4:--} url
+  local -a urls=("$upstream") fallback=()
+  if [ "$mirrors" != - ]; then
+    IFS=',' read -r -a fallback <<<"$mirrors"
+    urls+=("${fallback[@]}")
+  fi
+  for url in "${urls[@]}"; do
+    if fetch_archive "$dst" "$url"; then
+      if echo "$sum  $dst" | sha256sum -c -; then return 0; fi
+      echo "fetch: sha256 mismatch from $url" >&2
+    fi
+    rm -f -- "$dst"
+    echo "fetch: $url failed; trying next pinned mirror if available" >&2
+  done
+  return 1
+}

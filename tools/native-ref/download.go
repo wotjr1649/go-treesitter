@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -44,7 +45,7 @@ func downloadOnce(url, dst string, client *http.Client) error {
 	if err != nil {
 		return err
 	}
-	if tok := os.Getenv("GITHUB_TOKEN"); tok != "" { // net/http drops it on the cross-host redirect
+	if tok := os.Getenv("GITHUB_TOKEN"); tok != "" && (req.URL.Hostname() == "api.github.com" || req.URL.Hostname() == "github.com") { // net/http drops it on the cross-host redirect
 		req.Header.Set("Authorization", "Bearer "+tok)
 	}
 	resp, err := client.Do(req)
@@ -68,4 +69,32 @@ func downloadOnce(url, dst string, client *http.Client) error {
 		return err
 	}
 	return os.Rename(f.Name(), dst)
+}
+
+// downloadVerified never accepts a mirror response without the original archive pin.
+func downloadVerified(upstream, dst, sum string, mirrors []string) error {
+	urls := []string{upstream}
+	for _, base := range mirrors {
+		urls = append(urls, strings.TrimRight(base, "/")+"/"+filepath.Base(dst))
+	}
+	var failures []error
+	for _, url := range urls {
+		err := download(url, dst)
+		if err == nil {
+			got, hashErr := fileSHA(dst)
+			err = hashErr
+			if err == nil && got != sum {
+				err = fmt.Errorf("GET %s: sha256 %s, pinned %s", url, got, sum)
+			}
+			if err == nil {
+				return nil
+			}
+			if removeErr := os.Remove(dst); removeErr != nil {
+				return errors.Join(err, removeErr)
+			}
+		}
+		failures = append(failures, err)
+		fmt.Fprintf(os.Stderr, "fetch: %s failed; trying next pinned mirror if available\n", url)
+	}
+	return errors.Join(failures...)
 }

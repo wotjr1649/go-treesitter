@@ -161,7 +161,7 @@ func TestPinsPlan(t *testing.T) {
 		kinds := map[string]int{}
 		for _, l := range lines {
 			f := strings.Split(l, "\t")
-			if len(f) != 5 {
+			if len(f) != 6 {
 				t.Fatalf("%s: malformed plan line %q", plat, l)
 			}
 			kinds[f[0]]++
