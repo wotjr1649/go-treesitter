@@ -19,4 +19,8 @@ This grammar differs temporarily from upstream under ADR-0023. Applied patches (
 
 YAML patch 0001 prevents premature end-of-input acceptance and silent source truncation.
 
+YAML patch 0002 bounds serialized indentation by bytes written, preventing deep-nesting buffer overruns (upstream PR #47).
+
 - `patches/yaml/0001-no-early-eof.patch` changes `src/parser.c`; upstream defect report: https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/14.
+
+- `patches/yaml/0002-bound-serialized-indent-bytes.patch` changes `src/scanner.c`; upstream defect report: https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/48.

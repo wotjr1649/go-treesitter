@@ -317,3 +317,15 @@ The grammar source is the unmodified tier-3 `fwcd/tree-sitter-kotlin` pin (ADR-0
 
 The license is `JetBrains/kotlin` `license/LICENSE.txt`, SHA-256
 `cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30`.
+
+## TSX large input (Q22)
+
+`tools/bench/ci/large.json` pins Excalidraw's unmodified `App.tsx` at v0.18.0 commit
+`817d8c553c3389650f8b4503984a6d4a5d2f0c11`. It is one real application source file,
+not a concatenated or enlarged fixture; results describe this input's shape.
+
+| Grammar | Source | Bytes | SHA-256 | License | License SHA-256 |
+|---|---|---:|---|---|---|
+| tsx | [App.tsx](https://raw.githubusercontent.com/excalidraw/excalidraw/817d8c553c3389650f8b4503984a6d4a5d2f0c11/packages/excalidraw/components/App.tsx) | 353,813 | `7b3e614cf314d29d0285b69079cc3e67986b75c56f57088c17f9bc01b3b96dbe` | [MIT](https://raw.githubusercontent.com/excalidraw/excalidraw/817d8c553c3389650f8b4503984a6d4a5d2f0c11/LICENSE) | `1352d204fdb90d5e482c13139d848bc2c9300a9a7de358a0a558a23e72d0d8be` |
+
+The fetch lane checks both hashes and writes `App.tsx.LICENSE` beside the input.

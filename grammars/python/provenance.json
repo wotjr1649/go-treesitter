@@ -1,4 +1,14 @@
 {
+  "patches": [
+    {
+      "file": "patches/python/0001-bound-serialized-indent-bytes.patch",
+      "sha256": "00163049bb971eb8a24d1f6a3bb9445259dffb68202992676a84b792d379c598",
+      "source": "src/scanner.c",
+      "beforeSHA256": "6db82134ac2d4c90a1a1475487a625cface02662ebda9b7478cad9c7147e9afe",
+      "afterSHA256": "7a0c6bb9e0c121ff3e25f9180dd6625526725c2ddb62321ccc2cf35adaf488eb",
+      "upstreamReport": "https://github.com/tree-sitter/tree-sitter-python/issues/350"
+    }
+  ],
   "schema": 1,
   "abi": 3,
   "name": "python",
@@ -12,6 +22,8 @@
       "grammar.parser.c": "53a7bd87ba22c4fdbb8566a2caf848a1478f3ac9d47a1b32677a71de75d75db6",
       "grammar.scanner.c": "6db82134ac2d4c90a1a1475487a625cface02662ebda9b7478cad9c7147e9afe",
       "grammar.tree": "2102a9fe2ccb7e008975e8b0acb906d8340fe14c399c6bc5c28d1be60417d39d",
+      "patch.patches/python/0001-bound-serialized-indent-bytes.patch": "00163049bb971eb8a24d1f6a3bb9445259dffb68202992676a84b792d379c598",
+      "patched.src/scanner.c": "7a0c6bb9e0c121ff3e25f9180dd6625526725c2ddb62321ccc2cf35adaf488eb",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
       "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
     },
@@ -36,8 +48,8 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "38e3846f5ca08b8e51baba61f6980d1fe6655c7369b947f126c6cbff80efaaab",
-    "engine_gen.go": "effad6ba6ef170671c244ec3d59cb0f3f8b4d76385cf06b45ec196c605121e59",
-    "wasm": "467684d2536e476c5681a5efe979889435aa6cb49c3d1d51220368197d795dc2",
-    "wasm.clang": "b0e8f545c2dd14cfdb4d85cbecbca3c306576d7ec0d501567ac6fea606a88a1e"
+    "engine_gen.go": "0fe5c67dcc050dace60089d3bef23fc6ce52f43b2d6aa03a14848f883946d2bb",
+    "wasm": "dbdc21601f71df6a88fe51329b8c060656918d67574548dd1e4e9cde7d9dc874",
+    "wasm.clang": "5e555beab9654e1eb7326264dd38707fcb4929252a47c09a4bfa5f8662beb4ee"
   }
 }

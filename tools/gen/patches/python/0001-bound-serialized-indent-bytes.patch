@@ -1,0 +1,9 @@
+--- a/src/scanner.c
++++ b/src/scanner.c
+@@ -382,5 +382,5 @@
+     uint32_t iter = 1;
+-    for (; iter < scanner->indents.size && size < TREE_SITTER_SERIALIZATION_BUFFER_SIZE; ++iter) {
++    for (; iter < scanner->indents.size && size + 2 <= TREE_SITTER_SERIALIZATION_BUFFER_SIZE; ++iter) {
+         uint16_t indent_value = *array_get(&scanner->indents, iter);
+         buffer[size++] = (char)(indent_value & 0xFF);
+         buffer[size++] = (char)((indent_value >> 8) & 0xFF);

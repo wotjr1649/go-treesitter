@@ -23799,7 +23799,7 @@ l0:
 			t10 := v1 + v3
 			v4 = v4 + i32(1)
 			v1 = v2
-			if uint32(t10) < uint32(i32(1022)) {
+			if uint32(t10) < uint32(i32(1021)) {
 				goto l2
 			}
 		}

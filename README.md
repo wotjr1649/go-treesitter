@@ -19,6 +19,9 @@ under `grammars/`: `bash`, `c`, `cpp`, `csharp`, `css`, `dart`, `golang`, `html`
 `json`, `kotlin`, `php` (PHP parser only), `powershell`, `python`, `r`, `ruby`, `rust`, `tsql`, `tsx`, `typescript`,
 `xml` (XML parser only), and `yaml`.
 
+Use `typescript` for `.ts` and `tsx` for `.tsx`: the same upstream repository provides two grammars.
+`<T>expr` type assertions are TypeScript-only; JSX is TSX-only.
+
 Each language has exactly one upstream repository, chosen by the tiers of
 [ADR-0024](docs/design/decisions/ADR-0024-grammar-source-tiers.md):
 
@@ -29,7 +32,8 @@ Each language has exactly one upstream repository, chosen by the tiers of
 | 3 | `dart`, `kotlin`, `powershell`, `r` | `UserNobody14/tree-sitter-dart`, `fwcd/tree-sitter-kotlin`, `airbus-cert/tree-sitter-powershell`, `r-lib/tree-sitter-r` |
 | Owner-designated | `tsql` | `alfpricot/tree-sitter-mssql` |
 
-Exact revisions are in [pins.json](tools/gen/pins.json). YAML carries temporary patch `0001-no-early-eof`.
+Exact revisions are in [pins.json](tools/gen/pins.json). Bash, Ruby, YAML and Python carry recorded temporary C-only patches
+([ADR-0023](docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md); each module's README lists them).
 See the [status board](docs/reports/release-critical-status.md) for measured scopes and pending release gates, and
 [limitations](docs/reports/limitations.md).
 

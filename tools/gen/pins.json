@@ -162,7 +162,17 @@
         "scanner.c": "6db82134ac2d4c90a1a1475487a625cface02662ebda9b7478cad9c7147e9afe"
       },
       "licenseSHA256": "d724405ce238a22c0d35769c5a36b386ad5958192efe8bbb304fb2896254575f",
-      "cSymbol": "tree_sitter_python"
+      "cSymbol": "tree_sitter_python",
+      "patches": [
+        {
+          "file": "patches/python/0001-bound-serialized-indent-bytes.patch",
+          "sha256": "00163049bb971eb8a24d1f6a3bb9445259dffb68202992676a84b792d379c598",
+          "source": "src/scanner.c",
+          "beforeSHA256": "6db82134ac2d4c90a1a1475487a625cface02662ebda9b7478cad9c7147e9afe",
+          "afterSHA256": "7a0c6bb9e0c121ff3e25f9180dd6625526725c2ddb62321ccc2cf35adaf488eb",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-python/issues/350"
+        }
+      ]
     },
     "typescript": {
       "repo": "https://github.com/tree-sitter/tree-sitter-typescript",
@@ -390,7 +400,17 @@
         "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
       },
       "licenseSHA256": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
-      "cSymbol": "tree_sitter_bash"
+      "cSymbol": "tree_sitter_bash",
+      "patches": [
+        {
+          "file": "patches/bash/0001-heredoc-lookahead-char.patch",
+          "sha256": "5c2a16ea0121047b87902ce025930b104be1107c704fc91e8d07a6e7735e5406",
+          "source": "src/scanner.c",
+          "beforeSHA256": "7cc25d70626f8939b35ecd504bf724e2001b817412aa29bceb4c4955a91558a9",
+          "afterSHA256": "2578185990c634a3e1b546c23615e3339ea55bb77a2117799b2e6a960cdf472e",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-bash/issues/370"
+        }
+      ]
     },
     "cpp": {
       "repo": "https://github.com/tree-sitter/tree-sitter-cpp",
@@ -546,7 +566,17 @@
         "tree_sitter/parser.h": "a1f6ef161fbaf48a0e10fca90ef5290a062462b307b3898aa562993853b9f80a"
       },
       "licenseSHA256": "ee006f02a3d856df282e409be2a86e24a65bb573a98b9c28343771141351bb6b",
-      "cSymbol": "tree_sitter_ruby"
+      "cSymbol": "tree_sitter_ruby",
+      "patches": [
+        {
+          "file": "patches/ruby/0001-heredoc-lookahead-char.patch",
+          "sha256": "f98de0690410d24128412eca402b8f1d0c8182972b84c26794dd7441970130e7",
+          "source": "src/scanner.c",
+          "beforeSHA256": "88c1c036d5af7c22a1bc9cc5e50411d414ac9624afed676d42957c566ac4083d",
+          "afterSHA256": "d40efa691677b020f805dae9ed59cb49cd45a17c234c22a06b837dba42389f98",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/305"
+        }
+      ]
     },
     "yaml": {
       "repo": "https://github.com/tree-sitter-grammars/tree-sitter-yaml",
@@ -580,6 +610,14 @@
           "beforeSHA256": "02c5d32e95fa018a3c3ba7d7134d84bb7d5595c8874aa7ae6582745d9b40dede",
           "afterSHA256": "91564e108b65d2dd9487cf5b419d4d161e339b41c3e7ad462da91971ee52383f",
           "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/14"
+        },
+        {
+          "file": "patches/yaml/0002-bound-serialized-indent-bytes.patch",
+          "sha256": "b36738e2cc1d30273d02f0e55daba26e77459eea3c210138ba4d84085dd39535",
+          "source": "src/scanner.c",
+          "beforeSHA256": "a510c0ca699cf3853bd2192bf103e11132414bc002fe952a88a7106ffb5d44e9",
+          "afterSHA256": "c1177bf7a0ecf12160807a86a61c874101f81d764512f6bca3b8e4a03fccde32",
+          "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/48"
         }
       ]
     },

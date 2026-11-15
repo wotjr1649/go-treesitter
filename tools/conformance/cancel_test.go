@@ -16,8 +16,8 @@ import (
 	treesitter "github.com/wotjr1649/go-treesitter"
 )
 
-// largeFiles lists the $TSG_S15_DIR/large inputs per language (tsx has none of its own: it reuses typescript's
-// lib.dom.d.ts, which tsx parses, with errors).
+// largeFiles lists the $TSG_S15_DIR/large inputs per language (tsx has its own App.tsx, but this cancellation
+// probe deliberately reuses typescript's lib.dom.d.ts, which tsx parses with errors).
 func largeFiles(t *testing.T, root, lang string) []string {
 	t.Helper()
 	dir := lang

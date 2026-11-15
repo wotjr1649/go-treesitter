@@ -346,8 +346,10 @@ var grammar = engine.Grammar{
 			"grammar.parser.c":  "53a7bd87ba22c4fdbb8566a2caf848a1478f3ac9d47a1b32677a71de75d75db6",
 			"grammar.scanner.c": "6db82134ac2d4c90a1a1475487a625cface02662ebda9b7478cad9c7147e9afe",
 			"grammar.tree":      "2102a9fe2ccb7e008975e8b0acb906d8340fe14c399c6bc5c28d1be60417d39d",
-			"runtime.tree":      "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-			"shim.tsg_abi.c":    "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05",
+			"patch.patches/python/0001-bound-serialized-indent-bytes.patch": "00163049bb971eb8a24d1f6a3bb9445259dffb68202992676a84b792d379c598",
+			"patched.src/scanner.c": "7a0c6bb9e0c121ff3e25f9180dd6625526725c2ddb62321ccc2cf35adaf488eb",
+			"runtime.tree":          "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
+			"shim.tsg_abi.c":        "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05",
 		},
 		RecipeSHA256: "d2341736ec71ba006862bb8199bc0b9349161279cb44de13faacdf270906f9ac",
 		Tools: map[string]string{
