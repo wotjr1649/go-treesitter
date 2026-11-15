@@ -68,8 +68,56 @@ TSG_SCHEMA_ARCHIVES=/absolute/regen-work/dl TSG_SCHEMA_PINS=/absolute/review/too
 
 Without `TSG_SCHEMA_ARCHIVES`, this archive integration test is explicitly skipped; ordinary unit tests stay
 offline. Archive hash mismatches and strict schema failures fail the test, with no allowlist. Schema provenance
-is recorded in [the schema register](../../docs/validation/grammar-schemas.md#offline-strict-check-inputs). No CI wiring is added;
-the first pin move also needs explicit base/head selection and an old/new native tree comparison.
+is recorded in [the schema register](../../docs/validation/grammar-schemas.md#offline-strict-check-inputs).
+
+## Pin-move CI evidence
+
+`.github/workflows/pin-move.yml` fetches and verifies the PR `base.sha`, then compares the **merge base** of base and
+head with the head commit (`--merge-base`), so a branch that is behind the base is never judged against pins it does
+not contain. Full history is checked out; a missing merge base fails the step. The cache, Go setup and native work
+are skipped when no grammar entry differs (`--detect`). It runs again when the PR body changes. Dispatch requires explicit `base` and `head`
+refs; a push or dispatch without refs reports **diff skipped**, never an inferred baseline. Local replay uses
+the same driver from the repository root (the named commits must already be available locally):
+
+```sh
+python3 tools/gen/pin-move.py --base OLD_COMMIT --head NEW_COMMIT \
+  --out /new/empty/pin-move-out --cache /reusable/pin-move-cache \
+  --pr-body-file /path/to/pr-body.txt
+python3 -m unittest discover -s tools/gen -p pin_move_test.py
+```
+
+Only changed `grammars` entries in `tools/gen/pins.json` run. `ADDED` entries receive a strict new-schema check;
+`REMOVED` entries are listed. Changed entries receive strict old and new schema checks and a diff with its
+codes/risks, then fresh `tools/native-ref` builds for both pins using the current wasi-libc ctype shims,
+`-fsigned-char` and `-DNDEBUG`. Downloads are cached by SHA-256 and checked before archive/schema use.
+The current native driver is used on both sides; this compares grammar sources, not historical host binaries.
+
+Each native executable dumps every extracted old corpus input, every new corpus input and each selected grammar's
+SHA-256-pinned large benchmark input from `tools/bench/ci/large.json`. The driver retains input hashes, both
+dumps and per-input classifications: identical, changed, ok→error and error→ok. Existing error trees are retained
+and reported; they are not successful clean parses. Corpus extraction uses `ciconf -inputs-only`; upstream `:skip`
+and other-language exclusions are listed with reasons in the report and counted in the summary. A changed grammar
+without a large manifest entry fails (currently TSX needs a baseline added before a move). A grammar whose large input is a corpus concatenation (T-SQL)
+also needs that input's `sha256` in `tools/bench/ci/large.json` updated by the same PR whenever the move changes the
+corpus, otherwise the hash check fails and cannot be overridden. A missing baseline/input, extraction/schema failure, process
+failure, timeout or malformed dump fails the job. Schema `REMOVAL`/narrowing risks and changed trees alone do not.
+Native runs have a 30-second per-input limit, build commands a 15-minute limit, and the CI job a 60-minute limit.
+
+An ok→error regression fails unless the PR body contains a separate exact override line naming that input:
+
+```text
+PIN-MOVE-ALLOW-OK-TO-ERROR c/new/declarations-001.in
+```
+
+Corpus IDs are `<grammar>/<old|new>/<name>.in`; large IDs are `<grammar>/large/<file>`. Copy the exact ID from
+the failed report; there is no wildcard or blanket override. The report shows the override beside the regression
+so it remains visible in review. An override applies only to that ok→error result, not missing/invalid evidence,
+schema failures or a native process failure. A reviewer still decides whether the regression is acceptable;
+the override does not grant pin-change or release authority.
+
+`summary.md` is appended to the job summary even after a comparison failure. The artifact retains `report.json`,
+per-grammar schemas/results, inputs, dumps and logs; extracted sources, executable binaries and download caches
+are excluded. This is native-before/native-after evidence, not Go/native C agreement or release readiness.
 
 ## Pins (`pins.json`)
 
