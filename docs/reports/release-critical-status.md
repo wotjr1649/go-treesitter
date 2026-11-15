@@ -31,8 +31,15 @@ to the new engine.
 
 ## Released
 
-- **v0.4.0 preview** — release candidate at the tagged root commit; this entry (publication date, tags, ZIP h1,
-  assets and verification) is completed by the post-publication pull request.
+- **v0.4.0 preview** (2026-11-15, immutable GitHub pre-release, attestation verified): twenty-three grammars, engine
+  ABI 3. Root tag `v0.4.0` on `09f4c2f` (root ZIP `h1:swsqEf42qDrpBltRaE1rQ7cTxuQqrWDJcpLJAAZABs0=`, precomputed),
+  grammar tags `grammars/<lang>/v0.4.0` on `eb1fbd5`. Verified after tagging: `GOPROXY=direct` and proxy.golang.org,
+  with the checksum database, resolve all twenty-four modules with the precomputed root checksum; an empty-cache
+  external module installs root + all twenty-three grammars, parses with each, runs six queries and cross-builds
+  linux/arm64 without `replace`. The release carries its twenty-four pinned source archives (grammars, runtime,
+  wasi-libc) with `SHA256SUMS`; uploaded digests matched before publication and all twenty-four downloaded from the
+  published release match their pins. Toolchain archives are not mirrored (ADR-0026 amendment). `tools/gen/pins.json`
+  now lists the mirror bases `v0.4.0`, `v0.3.0`.
 
 - **v0.3.0 preview** (2026-11-15, immutable GitHub pre-release, attestation verified): fifteen grammars. Root tag
   `v0.3.0` on `60f1d33`, grammar tags `grammars/<lang>/v0.3.0` on `ee25291`. Verified after tagging: `GOPROXY=direct`
