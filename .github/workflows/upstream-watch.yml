@@ -2,8 +2,11 @@ name: Upstream release watch
 
 # Weekly: compares tools/gen/pins.json with upstream. A pinned tool or runtime (tree-sitter, wasi-sdk, binaryen, wasm2go)
 # with a newer stable release fails the job. Every pinned repository is checked for rename/transfer, archive, deletion,
-# reachability from default/release/other branch or tag, last-commit age and latest release. Missing repos/orphan pins fail; rename/archive/age
-# warn. It changes nothing: pins move only with explicit authority (AGENTS.md).
+# reachability from default/release/other branch or tag, last-commit age and latest release; every grammar pin is also
+# compared with nvim-treesitter's registry (information). Missing repos/orphan pins/API failures fail the job; rename,
+# archive, age, newer stable release and nvim-treesitter differences are warnings: the job stays green and the
+# "issue" job creates/updates ONE tracking issue (label upstream-watch), closing it when no warning remains.
+# It changes nothing else: pins move only with explicit authority (AGENTS.md).
 
 on:
   schedule:
@@ -12,6 +15,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: upstream-watch
+  cancel-in-progress: false
 
 jobs:
   watch:
@@ -37,8 +44,65 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
+          out="$RUNNER_TEMP/watch-out"
+          mkdir -p "$out"
+          go build -o "$RUNNER_TEMP/upstreamwatch" ./upstreamwatch # `go run` would flatten the exit code to 1
           rc=0
-          go run ./upstreamwatch -pins ../gen/pins.json > "$RUNNER_TEMP/watch.md" || rc=$?
+          "$RUNNER_TEMP/upstreamwatch" -pins ../gen/pins.json -issue "$out/body.md" > "$RUNNER_TEMP/watch.md" || rc=$?
           grep '^::' "$RUNNER_TEMP/watch.md" || true # error and warning annotations
           grep -v '^::' "$RUNNER_TEMP/watch.md" | tee -a "$GITHUB_STEP_SUMMARY"
+          # body.md exists only when warnings exist and no hard error occurred (exit 2 = hard error, 1 = newer tool release)
+          if [ "$rc" -ge 2 ]; then echo error > "$out/state"; elif [ -f "$out/body.md" ]; then echo warn > "$out/state"; else echo clean > "$out/state"; fi
           exit $rc
+      - name: Upload the tracking-issue state
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: upstream-watch-issue
+          path: ${{ runner.temp }}/watch-out
+          if-no-files-found: warn
+          retention-days: 1
+
+  # Separate job so that only it holds issues: write; it runs no repository code, only the gh CLI.
+  issue:
+    needs: watch
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/download-artifact@v8
+        continue-on-error: true # missing when the watch job died before writing it
+        with:
+          name: upstream-watch-issue
+          path: ${{ runner.temp }}/watch-out
+      - name: Create, update or close the tracking issue
+        run: |
+          out="$RUNNER_TEMP/watch-out"
+          title="Upstream watch: grammar source health"
+          label="upstream-watch"
+          run="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          state=$(cat "$out/state" 2>/dev/null || echo missing)
+          if [ "$state" != warn ] && [ "$state" != clean ]; then
+            echo "watch state '$state': the tracking issue is left unchanged"
+            exit 0
+          fi
+          gh label create "$label" --force --color D93F0B --description "Automatic upstream grammar source health report" > /dev/null
+          read -r num istate < <(gh issue list --label "$label" --state all --limit 1 --json number,state --jq '.[] | "\(.number) \(.state)"') || true
+          if [ "$state" = warn ]; then
+            { cat "$out/body.md"; printf '\n[Workflow run](%s)\n' "$run"; } > "$out/final.md"
+            if [ -z "${num:-}" ]; then
+              gh issue create --title "$title" --label "$label" --body-file "$out/final.md"
+            else
+              gh issue edit "$num" --title "$title" --body-file "$out/final.md"
+              if [ "$istate" = CLOSED ]; then gh issue reopen "$num"; fi
+            fi
+          elif [ -n "${num:-}" ] && [ "$istate" = OPEN ]; then
+            printf 'No warnings remain as of %s ([workflow run](%s)).\n' "$(date -u '+%Y-%m-%d %H:%M UTC')" "$run" > "$out/final.md"
+            gh issue edit "$num" --body-file "$out/final.md"
+            gh issue close "$num" --comment "No upstream-watch warnings remain; closing ([workflow run]($run))."
+          fi

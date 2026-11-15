@@ -108,7 +108,7 @@ func TestRepositoryHealth(t *testing.T) {
 			api := newAPI()
 			api.base, api.token, api.now = server.URL+"/", "", time.Date(2026, 11, 15, 0, 0, 0, 0, time.UTC)
 			var out bytes.Buffer
-			if failed := health(api, &out, source{"tsql", "old/repo", "pin"}); failed != tc.failed {
+			if failed := health(api, &out, source{"tsql", "old/repo", "pin", false}); failed != tc.failed {
 				t.Fatalf("failed = %v, want %v: %s", failed, tc.failed, out.String())
 			}
 			if !strings.Contains(out.String(), tc.want) {
@@ -122,7 +122,7 @@ func TestRepositoryHealth(t *testing.T) {
 				t.Error("latest release comparison missing")
 			}
 			before := requests
-			health(api, &out, source{"shared pin", "old/repo", "pin"})
+			health(api, &out, source{"shared pin", "old/repo", "pin", false})
 			if requests != before {
 				t.Errorf("shared pin made %d extra requests", requests-before)
 			}
