@@ -10,7 +10,9 @@ measurements) in the local session-15 handoff.
 ## 1. Engine facts the API is built on
 
 - One translated wasm instance per `Parser`; it is single-threaded and its C trees live in its linear memory.
-  Per-node calls into the instance cost 240–840 ns; reads of an exported Go snapshot cost 4–10 ns.
+  Historical per-node calls into the instance cost 240–840 ns; fixed-size byte/symbol/flag reads of an exported
+  Go snapshot cost 4–10 ns. Point lookups derive rows and byte columns from the source: the first builds the snapshot's line index (one
+  pass, 4 B per line, up to 4x the source size for input made of line feeds), later ones cost O(log lines).
 - The C runtime returns a complete tree or `NULL`. A halted parse keeps its state and **resumes on the next call**
   unless `ts_parser_reset` is called (parser.c:2146-2148, 2195, 2234-2235; reproduced in E1).
 - Allocation failure aborts (wasm `unreachable`). Grammar scanners may also write through unchecked `NULL`s.
@@ -96,12 +98,25 @@ func EditFor(old, new []byte, start, oldEnd, newEnd uint32) InputEdit  // O(n); 
 - `ParserPool` (`Get(ctx)`, `Put`): `Put` invalidates all live trees of that parser before it can be lent again.
 - Incremental parsing is not guaranteed to equal a fresh parse (upstream behavior; 5 of 5,919 edit cases differed in
   both native and W2). This is documented, not hidden.
+- `Edit` checks byte bounds and point ordering, not whether points match bytes. Use `EditFor` for consistent
+  points. C trusts supplied edit points; snapshot points instead derive from the new source bytes.
+  `ChangedRanges` also derives points from the result source (offsets past EOF are clamped), reusing its snapshot
+  index if present or otherwise building a temporary line index on every call (O(source) each time). For example, inserting LF at byte 3 into `[1,2,3]\n`
+  with all edit points zero can make C report range
+  `[3,4)` as `0:3`–`0:4`; this API reports `0:3`–`1:0`. Query captures contain byte offsets and node indices,
+  not stored points.
 
 ## 6. Snapshot and Node
 
 The snapshot owns the source: by default one copy (about 0.07 ms per MB; +5–22 % of the snapshot's own memory, no
-disk use); with `ParseOwned` no copy. Struct-of-arrays, about 41 B/node including `descendantEnd` and `childCount`
+disk use); with `ParseOwned` no copy. Struct-of-arrays, 25 B/node (previously 41) including `descendantEnd` and `childCount`
 for O(1) subtree skips and child counts, plus sparse field-lookup exceptions in ABI 3 snapshots.
+`StartPoint`, `EndPoint` and point-range lookups derive LF rows and byte columns from the byte offsets using the
+snapshot's shared `Lines()` index: O(source bytes) on first use, O(log lines) per point. Its lazy `[]uint32` line
+starts cost `4 * (LF count + 1)` bytes (at most `len(source) + 1` entries), plus fixed object/allocator overhead;
+the owned source is shared. `LineIndex.Pos` alone needs the additional lazy non-ASCII bitset
+(`8 * ceil(lines / 64)` bytes). `WithMaxMemoryBytes` still limits only instance wasm linear memory; source,
+snapshot arrays, line starts and other Go-heap caches are excluded.
 
 ```go
 func (*Snapshot) Root() Node; Len() int; Node(i int) Node; Language() *Language; Source() string
@@ -150,7 +165,8 @@ All are lazy (computed on first use, once, safe for concurrent readers) and meas
 
 - **Positions and encodings.** `NewSourceUTF16`/BOM detection convert UTF-16 or BOM-prefixed input to UTF-8 and keep
   an offset map to the original bytes; `(*Snapshot).Lines()` returns a `LineIndex` with byte → line and UTF-8,
-  UTF-16 and rune columns (build 0.2–1 ns/byte, lookup 10–27 ns; 15 M positions verified). Standard library only.
+  UTF-16 and rune columns. Line starts build lazily in O(source bytes); byte points use binary search, while
+  UTF-16/rune columns can additionally scan the non-ASCII line prefix. Standard library only.
 - **Merkle subtree hashes.** `Node.Hash()` (kind, field, leaf text, children) and `Node.ShapeHash()` (ignores extras
   such as comments). 7–11 ns/node, 8 B/node; equal-hash groups verified by full canonical serialization. Use cases:
   subtree-level caching (instead of per-file), duplicate and clone detection, change detection.

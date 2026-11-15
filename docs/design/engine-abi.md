@@ -60,6 +60,15 @@ Columns follow the header (offsets relative to `buf+16`), as validated in the sp
 `-1` = root). Flags: `1` named, `2` extra, `4` missing, `8` error, `16` has_error. `symbol 65535` = ERROR.
 The header is written by `tsg_init`; `NewParser` checks magic and format once (mismatch = `ErrIncompatibleLanguage`) and the Go side checks them again after every `tsg_export_begin` and nonempty chunk, and derives `descendantEnd`/`childCount`/siblings.
 
+The Go snapshot retains 25 B/node (previously 41 B/node), plus its owned source and sparse field exceptions.
+It skips the four exported point columns without changing either block format or engine ABI 1/2/3.
+Node points and point-range lookups derive LF-counted rows and byte columns from byte offsets. The snapshot's
+existing `Lines()` index builds once with `sync.Once`, on first use: `[]uint32` line starts occupy exactly
+`4 * (LF count + 1)` bytes, excluding slice/object/allocator overhead; there are at most `len(source) + 1` entries.
+The source is shared, not copied again. `LineIndex.Pos` additionally builds its existing non-ASCII bitset lazily
+(`8 * ceil(lines / 64)` bytes); byte-point lookups do not need it. These Go-heap allocations, like source/node
+arrays and other snapshot caches, do not count against `WithMaxMemoryBytes`, which limits instance linear memory.
+
 In format 2, header offset 12 is a wasm32 pointer to the current chunk's field-lookup exception block; `0` means
 there are no exceptions in that chunk. The block is little endian: `u32 count`, then `count` records of
 `{u32 nodeIndex, u32 fieldID, u32 targetIndex}`. Node and target indices are global visible preorder indices,

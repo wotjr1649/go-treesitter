@@ -74,6 +74,7 @@ type InputEdit struct {
 
 // Edit applies e to the tree in place (C semantics). Afterwards the tree is old-only: pass it as the old tree of the
 // next Parse; Snapshot returns ErrTreeEdited. An edit that does not fit the tree is rejected with ErrInvalidInput.
+// Only byte bounds and point ordering are checked, not their correspondence; use EditFor for consistent points.
 func (t *Tree) Edit(e InputEdit) error {
 	c := t.p.c
 	defer runtime.KeepAlive(t)
@@ -138,13 +139,22 @@ func (t *Tree) ChangedRanges(old *Tree) ([]Range, error) {
 	if count < 0 || int64(blk)+4+24*int64(count) > int64(len(mem)) {
 		return nil, c.engineFault(fmt.Sprintf("changed-ranges count %d does not fit the block", count))
 	}
+	var lines *LineIndex
+	if count > 0 {
+		if t.snap != nil {
+			lines = t.snap.Lines()
+		} else {
+			lines = NewLineIndex(t.src)
+		}
+	}
 	out := make([]Range, count)
 	for i := range out {
 		r := mem[int(blk)+4+24*i:]
 		out[i] = Range{
 			StartByte: le.Uint32(r), EndByte: le.Uint32(r[4:]),
-			StartPoint: Point{le.Uint32(r[8:]), le.Uint32(r[12:])}, EndPoint: Point{le.Uint32(r[16:]), le.Uint32(r[20:])},
 		}
+		out[i].StartPoint = lines.point(out[i].StartByte)
+		out[i].EndPoint = lines.point(out[i].EndByte)
 	}
 	if err := ops.call(func() { in.m.Xfree(blk) }); err != nil {
 		return nil, c.trapped(err, "free")
