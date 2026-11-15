@@ -3,10 +3,15 @@
 // a missing repository, unreachable pin or API failure exits 2. Renames, archives and age are warnings. Stdlib only;
 // GITHUB_TOKEN lifts the API rate limit. Requests are cached for shared repositories and pins are never changed.
 //
-//	upstreamwatch [-pins tools/gen/pins.json]
+// Every grammar pin is also compared with nvim-treesitter's parsers.lua (information, never a failure; see nvim.go).
+// -issue FILE writes the body of the tracking issue when warnings exist and no hard error occurred; the file is
+// removed otherwise, so its absence means "nothing to report" (the workflow reads the exit code for errors).
+//
+//	upstreamwatch [-pins tools/gen/pins.json] [-nvim URL|""] [-issue FILE]
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -42,6 +47,8 @@ type pins struct {
 
 func main() {
 	file := flag.String("pins", filepath.Join("tools", "gen", "pins.json"), "pins file")
+	nvimURL := flag.String("nvim", nvimParsersURL, "nvim-treesitter parsers.lua URL (empty: skip the comparison)")
+	issue := flag.String("issue", "", "write the tracking-issue body here when warnings exist")
 	flag.Parse()
 	raw, err := os.ReadFile(*file)
 	if err != nil {
@@ -53,7 +60,20 @@ func main() {
 		fmt.Fprintln(os.Stderr, "upstreamwatch:", err)
 		os.Exit(2)
 	}
-	stale, failed := report(&p, os.Stdout, newAPI())
+	var out bytes.Buffer
+	api := newAPI()
+	both := io.MultiWriter(os.Stdout, &out)
+	stale, failed := report(&p, both, api)
+	if *nvimURL != "" {
+		entries, err := fetchNvim(api.client, *nvimURL)
+		nvimSection(&p, both, api, entries, err)
+	}
+	if *issue != "" {
+		if err := writeIssue(*issue, &out, api, failed); err != nil {
+			fmt.Fprintln(os.Stderr, "upstreamwatch:", err)
+			os.Exit(2)
+		}
+	}
 	if failed {
 		os.Exit(2)
 	}
@@ -64,7 +84,18 @@ func main() {
 
 func repoOf(url string) string { return strings.TrimPrefix(url, "https://github.com/") }
 
-type source struct{ name, repo, pin string }
+type source struct {
+	name, repo, pin string
+	grammar         bool // a grammar pin: a newer stable release than the pin is a warning
+}
+
+type finding struct{ component, text string }
+
+// warn records a warning for the tracking issue and prints its annotation.
+func (a *githubAPI) warn(w io.Writer, name, text string) {
+	a.findings = append(a.findings, finding{name, text})
+	fmt.Fprintf(w, "::warning::%s: %s\n", name, text)
+}
 
 func report(p *pins, w io.Writer, api *githubAPI) (stale, failed bool) {
 	fmt.Fprintln(w, "## Pinned tools and runtime vs newest stable release")
@@ -80,16 +111,16 @@ func report(p *pins, w io.Writer, api *githubAPI) (stale, failed bool) {
 	if p.Tools.CLI != "" {
 		tools = append(tools, struct{ name, pinned, repo, ref string }{"tree-sitter CLI", p.Tools.CLI, repoOf(p.Runtime.Repo), "v" + strings.TrimPrefix(p.Tools.CLI, "v")})
 	}
-	srcs := []source{{"wasi-libc", repoOf(p.WasiLibc.Repo), p.WasiLibc.Commit}}
+	srcs := []source{{"wasi-libc", repoOf(p.WasiLibc.Repo), p.WasiLibc.Commit, false}}
 	if p.Tools.LLVM != "" {
-		srcs = append(srcs, source{"LLVM (wasi-sdk clang)", "llvm/llvm-project", p.Tools.LLVM})
+		srcs = append(srcs, source{"LLVM (wasi-sdk clang)", "llvm/llvm-project", p.Tools.LLVM, false})
 	}
 	for _, t := range tools {
 		ref := t.ref
 		if ref == "" {
 			ref = t.pinned
 		}
-		srcs = append(srcs, source{t.name, t.repo, ref})
+		srcs = append(srcs, source{t.name, t.repo, ref, false})
 		var rel struct {
 			Tag string `json:"tag_name"`
 		}
@@ -102,6 +133,7 @@ func report(p *pins, w io.Writer, api *githubAPI) (stale, failed bool) {
 		if newer(t.pinned, rel.Tag) {
 			status, stale = "**NEWER STABLE RELEASE**", true
 			fmt.Fprintf(w, "::error::%s: pinned %s, newest stable release %s\n", t.name, t.pinned, rel.Tag)
+			api.findings = append(api.findings, finding{t.name, "newer stable release " + rel.Tag + " than pinned " + t.pinned})
 		}
 		fmt.Fprintf(w, "| %s | %s | %s | %s |\n", t.name, t.pinned, rel.Tag, status)
 	}
@@ -112,7 +144,7 @@ func report(p *pins, w io.Writer, api *githubAPI) (stale, failed bool) {
 	sort.Strings(names)
 	for _, n := range names {
 		g := p.Grammars[n]
-		srcs = append(srcs, source{n, repoOf(g.Repo), g.Commit})
+		srcs = append(srcs, source{n, repoOf(g.Repo), g.Commit, true})
 	}
 
 	fmt.Fprintln(w, "\n## Repository health (all pins)")
@@ -149,11 +181,11 @@ func health(api *githubAPI, w io.Writer, s source) (failed bool) {
 	if !strings.EqualFold(repo.Name, s.repo) || api.redirected[repoPath] {
 		identity += " → " + repo.Name
 		health = append(health, "WARNING renamed/transferred (API redirect or full_name differs)")
-		fmt.Fprintf(w, "::warning::%s: repository %s → %s\n", s.name, s.repo, repo.Name)
+		api.warn(w, s.name, fmt.Sprintf("repository %s → %s", s.repo, repo.Name))
 	}
 	if repo.Archived {
 		health = append(health, "WARNING archived")
-		fmt.Fprintf(w, "::warning::%s: repository archived\n", s.name)
+		api.warn(w, s.name, "repository archived")
 	}
 	// Use the canonical name after a transfer, avoiding a redirect on every following request.
 	base := "repos/" + repo.Name
@@ -179,7 +211,7 @@ func health(api *githubAPI, w io.Writer, s source) (failed bool) {
 			failed = true
 		} else if date.Before(api.now.AddDate(-1, 0, 0)) {
 			health = append(health, "WARNING last commit >12 months; tier review")
-			fmt.Fprintf(w, "::warning::%s: last commit %s; tier review (>12 months)\n", s.name, date.Format("2006-01-02"))
+			api.warn(w, s.name, fmt.Sprintf("last commit %s; tier review (>12 months)", date.Format("2006-01-02")))
 		}
 
 	}
@@ -205,6 +237,10 @@ func health(api *githubAPI, w io.Writer, s source) (failed bool) {
 			failed = true
 		} else {
 			releaseText += " (" + cmp.Status + ")"
+			if s.grammar && cmp.Status == "ahead" { // the release contains the pin and is newer
+				health = append(health, "WARNING newer stable release "+release.Tag)
+				api.warn(w, s.name, fmt.Sprintf("newer stable release %s than pin %.12s", release.Tag, s.pin))
+			}
 		}
 	}
 	if headOK {
@@ -246,6 +282,7 @@ type githubAPI struct {
 	now        time.Time
 	cache      map[string]apiReply
 	redirected map[string]bool
+	findings   []finding
 	requests   int
 	remaining  string
 }
