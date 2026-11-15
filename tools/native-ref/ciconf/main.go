@@ -8,7 +8,7 @@
 // Layout (the same as the local session-15 tree, so TestCorpus and TestEdits read both):
 //
 //	corpus/manifest.csv, corpus/<lang>/<name>.in, corpus/skipped.csv, native/dumps/<lang>/<name>.dump
-//	edits/manifest.csv, edits/results-native.csv, edits/<lang>/<name>.{old,new,ranges}, ci.json
+//	edits/manifest.csv, edits/results-native.csv, edits/<lang>/<name>.{old,new,ranges,fields}, ci.json
 //
 // Stdlib only; it never executes anything but the native-ref executables.
 package main
@@ -225,6 +225,7 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected s
 		ms := float64(time.Since(t0).Microseconds()) / 1000
 		fresh, fc, err2 := runExe(exe(e.lang), "dump", newP)
 		cr, cc, err3 := runExe(exe(e.lang), append([]string{"changed-ranges"}, args...)...)
+		fields, fec, err4 := runExe(exe(e.lang), append([]string{"edit-fields"}, args...)...)
 		if err1 != nil || ec != 0 {
 			fails.add(e.id, "edit", ec, err1)
 		}
@@ -236,10 +237,15 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected s
 		} else {
 			must(writeFile(filepath.Join(d, e.name+".ranges"), cr))
 		}
-		resRows[i] = []string{e.id, strconv.Itoa(ec), sha(inc), strconv.Itoa(fc), sha(fresh), strconv.FormatFloat(ms, 'f', 1, 64)}
+		if err4 != nil || fec != 0 {
+			fails.add(e.id, "edit-fields", fec, err4)
+		} else {
+			must(writeFile(filepath.Join(d, e.name+".fields"), fields))
+		}
+		resRows[i] = []string{e.id, strconv.Itoa(ec), sha(inc), strconv.Itoa(fc), sha(fresh), strconv.FormatFloat(ms, 'f', 1, 64), strconv.Itoa(fec), sha(fields)}
 	})
 	must(writeCSV(filepath.Join(out, "edits", "manifest.csv"), []string{"id", "lang", "base_ref", "start", "old_end", "new_end", "old_sha256", "new_sha256", "kind", "seed"}, editRows))
-	must(writeCSV(filepath.Join(out, "edits", "results-native.csv"), []string{"id", "edit_exit", "edit_sha256", "fresh_exit", "fresh_sha256", "edit_ms"}, resRows))
+	must(writeCSV(filepath.Join(out, "edits", "results-native.csv"), []string{"id", "edit_exit", "edit_sha256", "fresh_exit", "fresh_sha256", "edit_ms", "edit_fields_exit", "edit_fields_sha256"}, resRows))
 
 	perLang := map[string][3]int{} // inputs, edits, skipped
 	for _, j := range inputs {

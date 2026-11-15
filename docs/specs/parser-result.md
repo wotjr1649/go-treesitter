@@ -83,8 +83,11 @@ are Go API semantics covered by retained tests (E3).
 Historical Q13 E5 native C agreement for `ChildByFieldName` covers fresh parses of the reproducible pinned
 1,761-input corpus on Windows amd64. Q13 also checked 2,779 additional local inputs, recorded separately in the
 [archived evidence and identities](../design/engine-abi.md#field-lookup-evidence). Q14 reran the P31 guard on the same reproducible corpus with E5 agreement; its input and source identities are archived with that evidence.
-Edited trees' field lookups have not been re-compared with C; the edit lane compares dumps and changed ranges.
-This evidence does not cover `ChildrenByFieldName` or arbitrary inputs.
+Q16 extends E5 agreement on Windows amd64 to all 5,283 reproducible seeded incremental edits of the 15 grammars
+and five retained T-SQL incremental-difference cases. `TestFieldLookupEdits` compares `ChildByFieldName` with C's incremental tree and checks that
+`ChildrenByFieldName`'s first result (including no result) equals it, including cases where C's
+incremental and fresh parses differ. The [scope and identities](../design/engine-abi.md#field-lookup-evidence)
+do not cover the iterator's remaining elements or arbitrary inputs.
 
 ## Comparison discipline
 

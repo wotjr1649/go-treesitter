@@ -289,14 +289,7 @@ static int query_cmd(const char *qpath, const char *spath) {
   return emit(out);
 }
 
-static int fields_cmd(const char *spath) {
-  uint32_t sn;
-  char *src = slurp(spath, &sn);
-  if (!src) { fputs("open failed\n", stderr); return 3; }
-  TSParser *p = new_parser();
-  if (!p) { fputs("set language failed\n", stderr); return 4; }
-  TSTree *tree = ts_parser_parse_string(p, NULL, src, sn);
-  if (!tree) { fputs("parse failed\n", stderr); return 4; }
+static Buf fields_tree(TSTree *tree) {
   const TSLanguage *lang = TSG_LANG_FN();
   uint32_t nrefs, nf = ts_language_field_count(lang);
   NodeRef *refs = index_nodes(tree, &nrefs);
@@ -332,6 +325,19 @@ done:
   if (body.len) put(&out, body.p, body.len);
   free(body.p);
   free(refs);
+  return out;
+}
+
+static int fields_cmd(const char *spath) {
+  uint32_t sn;
+  char *src = slurp(spath, &sn);
+  if (!src) { fputs("open failed\n", stderr); return 3; }
+  TSParser *p = new_parser();
+  if (!p) { fputs("set language failed\n", stderr); return 4; }
+  TSTree *tree = ts_parser_parse_string(p, NULL, src, sn);
+  free(src);
+  if (!tree) { fputs("parse failed\n", stderr); ts_parser_delete(p); return 4; }
+  Buf out = fields_tree(tree);
   ts_tree_delete(tree);
   ts_parser_delete(p);
   return emit(out);
@@ -349,9 +355,9 @@ int main(int argc, char **argv) {
   }
   if (argc == 4 && !strcmp(cmd, "query")) return query_cmd(argv[2], argv[3]);
   if (argc == 3 && !strcmp(cmd, "fields")) return fields_cmd(argv[2]);
-  int edit = !strcmp(cmd, "edit"), cr = !strcmp(cmd, "changed-ranges");
-  if (!((argc == 3 && !strcmp(cmd, "dump")) || (argc == 7 && (edit || cr)))) {
-    fputs("usage: <exe> dump <file> | edit|changed-ranges <old> <new> <start> <old_end> <new_end> | speed <file> <reps> | corpus <list> <reps> | query <query-file> <source> | fields <file>\n", stderr);
+  int edit = !strcmp(cmd, "edit"), cr = !strcmp(cmd, "changed-ranges"), ef = !strcmp(cmd, "edit-fields");
+  if (!((argc == 3 && !strcmp(cmd, "dump")) || (argc == 7 && (edit || cr || ef)))) {
+    fputs("usage: <exe> dump <file> | edit|changed-ranges|edit-fields <old> <new> <start> <old_end> <new_end> | speed <file> <reps> | corpus <list> <reps> | query <query-file> <source> | fields <file>\n", stderr);
     return 2;
   }
   uint32_t n1, n2 = 0;
@@ -379,6 +385,8 @@ int main(int argc, char **argv) {
   Buf out = {0};
   if (edit) {
     out = dump_tree(t1);
+  } else if (ef) {
+    out = fields_tree(t1);
   } else {
     uint32_t count = 0;
     TSRange *r = ts_tree_get_changed_ranges(t0, t1, &count);

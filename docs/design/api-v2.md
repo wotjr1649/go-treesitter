@@ -139,7 +139,10 @@ direct-child iteration. Thus the first result remains `ChildByFieldName`, but it
 Historical Q13 E5 agreement for `ChildByFieldName` is limited to fresh parses of the reproducible pinned
 1,761-input corpus on Windows amd64. Q13 also checked 2,779 additional local inputs, recorded separately in the
 [archived evidence and identities](engine-abi.md#field-lookup-evidence). Q14 reran the P31 guard on the same reproducible corpus with E5 agreement; its input and source identities are archived with that evidence.
-Edited trees' fields have not been re-compared with C; edit gates compare dumps and changed ranges.
+Q16 adds E5 agreement on Windows amd64 for all 5,283 reproducible seeded incremental edits of the 15 grammars
+and five retained T-SQL incremental-difference cases. `ChildByFieldName` is compared with C's incremental tree, and the iterator's
+first result is checked to equal it; the remaining iterator results have no C oracle. See the
+[scope and identities](engine-abi.md#field-lookup-evidence).
 
 ## 7. Primitives that set this library apart (v0.0.1)
 
