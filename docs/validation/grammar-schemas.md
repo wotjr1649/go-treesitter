@@ -141,7 +141,14 @@ go run . schema check <evidence>/postgres-node-types.json
 | postgres | `gmr/tree-sitter-postgres@59d0d8cd7506d68de1229fb4bbce838c83b60c8a` | 508227 | `7f9f350c2730fbddf36f096dbb27405f6ae29ba787b265f2bb494e6a887078d5` | Strict check PASS, no findings; first release baseline, no old schema to diff |
 
 These checks use archived schemas and are static-only evidence. The prior independent PostgreSQL generation
-record below binds the matching generated schema. Release-commit regeneration and conformance: [FILL AT RELEASE].
+record below binds the matching generated schema. Candidate `02d10aa18cf70baea757d17e9cac39070c774fd9` regeneration
+[43835484231](https://github.com/wotjr1649/go-treesitter/actions/runs/43835484231) passed all 24 grammar drift shards plus the aggregate job on Linux amd64 (E3,
+committed modules/provenance unchanged), including PostgreSQL's two independent unpatched C regenerations
+using pinned CLI 0.27.2. Conformance [43835484209](https://github.com/wotjr1649/go-treesitter/actions/runs/43835484209) passed all 24 grammars on Linux amd64/arm64
+(E5, pinned corpus plus bounded kit inputs): per platform 4,616 fresh inputs, 13,188 edits, 46,401 fresh-field and
+103,966 edited-field native result rows, zero differences. PostgreSQL contributes 71 fresh inputs and 213 edits;
+its named-field result rows are zero, so this does not claim nonempty named-field lookup coverage. Pins SHA-256
+`5467afce00a76529acf5dd13243a51d8218fa164c595ce171fc7fe6d78ea9913` binds both runs.
 
 ## C maintained-fork move (ADR-0024 rule 6, 2026-11-16)
 
