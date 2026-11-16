@@ -1,15 +1,48 @@
 # Release-Critical status board
 
-Updated 2026-11-15 for v0.4.0 preview preparation (23 grammars, engine ABI 3). Status, not a promise. Nothing here is release-approved.
-The current candidate adds a 24th grammar, PostgreSQL; its separate local evidence appears below.
+Updated 2026-11-16 for v0.5.0 preview preparation (24 grammars, engine ABI 3). Status, not a promise. Nothing here is release-approved.
+Historical gate tables retain their original commits, pins and scope; their passing results do not transfer to v0.5.0.
 The previous board for the `gotreesitter` carrier is in Git history at main `9ad82eb`; none of its results transfer
 to the new engine.
 
-## v0.4.0 release scope
+## v0.5.0 release scope
 
-- **v0.4.0 Release-Critical scope:** all 23 entries in the released v0.4.0 pins, listed with sources in the [README](../../README.md#use).
-- **Release policy (ADR-0022):** Preview; the scope includes both wave-2 batches. Earlier gate tables keep their original identities.
+- **v0.5.0 Release-Critical scope:** all 24 current pins, including `postgres` (SQL only, no PL/pgSQL). Swift is excluded; the T-SQL pin stays unchanged. Sources and tiers are in the [README](../../README.md#use).
+- **Release policy (ADR-0022):** Preview (GitHub pre-release), following [publication.md](../specs/publication.md) step by step. Tags and publication require separate owner authority.
 - Identity: tree-sitter v0.27.2 and the grammar commits in `tools/gen/pins.json`; Go 1.27.4; `CGO_ENABLED=0`.
+
+## v0.5.0 preparation gates
+
+Preparation base: `a6391abf7746aa216d9f4fdc86151bc6948d1dcf` = main `0372fb53a200272a8ba2eac077f739c41d25e259`
+plus one C# known-gap documentation correction. Pins SHA-256:
+`5467afce00a76529acf5dd13243a51d8218fa164c595ce171fc7fe6d78ea9913`; ABI 3, recipe `v2-O3`.
+C now uses `tree-sitter-grammars/tree-sitter-c@f3202ac`; four new ADR-0023 scanner patches join YAML's retained
+`0001`. Snapshot arrays use 25 rather than 41 bytes per node, plus source, sparse exceptions and a lazy line index.
+The release commit is [FILL AT RELEASE]. All hosted results below must bind that commit and the exact pins/inputs;
+retain and classify failures rather than retrying until green.
+
+| Gate | v0.5.0 state | Scope / required evidence |
+|---|---|---|
+| Conformance | [FILL AT RELEASE] | All 24 grammars, native dumps, seeded edits/ranges, queries, fresh/edited fields and retained known gaps; include bounded grammar-kit inputs; E5 only on the inputs/platforms run |
+| Engine CI | [FILL AT RELEASE] | Hosted Linux/macOS/Windows amd64 and arm64 execution, per-platform identities |
+| Reproducible generation | [FILL AT RELEASE] | All 24 committed grammar modules; PostgreSQL unpatched CLI regeneration and provenance |
+| Windows product lane | [FILL AT RELEASE] | Native Windows amd64/arm64 execution, CGO=0 |
+| Speed / memory bench | [FILL AT RELEASE] | All 24 grammars on configured platforms; TSX large workload; preserve first-pass small-file failures and their single paired confirmation results |
+| Balancing cancellation | [FILL AT RELEASE] | All 24 grammar probe builds; input-specific recovery evidence |
+| Nightly diff | [FILL AT RELEASE] | One release-commit run over every pinned grammar; retain/classify failures, seeds and reproducers |
+| Upstream watch | [FILL AT RELEASE] | Pin reachability/source warnings, accepted warnings with six-month expiry; no automatic pin moves |
+| Local module ZIP rehearsal | PASS, local E3 packaging | Windows amd64 empty-cache file GOPROXY, root + 24 grammars at v0.5.0, CGO=0 run and linux/arm64 build; packaging evidence only |
+| Source-row inventory | PASS, local static check | 33 rows: 25 pin-matching source rows, eight toolchain rows excluded; publication requires those 25 archives plus SHA256SUMS |
+| Tag/proxy resolution and published mirror assets | [FILL AT RELEASE] | Separate later publication steps: root then grammar tags, direct/public proxy consumers, draft/upload digest check, attestation and all source downloads from the published first base |
+
+Local rehearsal on the preparation base above (Windows amd64, Go 1.27.4, CGO=0) used
+`golang.org/x/mod/zip` to create/check 25 v0.5.0 module ZIPs from a tracked snapshot with documentation edits.
+Only the separate packaging copy receives release-form grammar module files; committed generated engine bytes
+are unchanged. Initially empty module/build caches resolve root + 24 grammars from a file GOPROXY without
+replacements; all 24 embedded samples parse cleanly, and linux/arm64 builds. This is packaging/link evidence,
+not native C agreement, hosted platform execution or completion of the release-commit gates. The final release
+commit still needs step 1 repeated under the publication procedure. Source inventory was compared with pin
+filenames and hashes; it does not establish uploaded/downloaded asset digests or a new license audit.
 
 ## Wave 1 gates (session 15, Windows amd64, working-tree grammar modules generated by `tools/gen`)
 
@@ -191,7 +224,7 @@ results, not gates for the later PHP/PowerShell/Dart pin moves or for the releas
 ## v0.4.0 preparation after the pin refresh and schema-tool fixes
 
 Baseline for this preparation is `506e4f7`: the 2026-11-15 nvim-treesitter pin refresh moved PHP to `58d5643086ae`, PowerShell to `65ea6919e816` and
-Dart to `0038280b774b`; the 2026-11-15 schema-tool fixes added offline schema commands and ADR-0025. The current pins SHA-256 is
+Dart to `0038280b774b`; the 2026-11-15 schema-tool fixes added offline schema commands and ADR-0025. The v0.4.0 preparation pins SHA-256 was
 `18a8497b6e0fa028b4d7d1607ff2505a51fc3a182a4989f61dd55b114255c3a1`. The wave-2 batch 2 ABI 3 integration's aggregate counts above keep their
 old pins identity. The pin refresh's maintainer-local evidence archive (`2026-11-15-q17-pins-nvim`) records Windows amd64 / Go 1.27.4 measurements on the
 new three pins (base `dc3b23d`, candidate tree `a0f905db15810e380dac3256317931eaa6c70b80`):
@@ -225,7 +258,7 @@ the native reference. The reference now builds with `-fsigned-char` (PR #36, `32
 
 Mirror coverage follows the configured bases and their immutable contents. After publication and first-base
 asset checks, one PR sets `mirrors` to the v0.4.0 base followed by v0.3.0 and restores the development module form,
-as specified in [publication.md](../specs/publication.md). Packaging and publication remain pending.
+as specified in [publication.md](../specs/publication.md). Those v0.4.0 publication steps were subsequently completed (see Released above).
 The owner's 2026-11-15 ADR-0026 amendment limits v0.4.0 assets to 24 source archives plus `SHA256SUMS`.
 The six wasi-sdk/binaryen/tree-sitter CLI host archives are fetched from official releases with pinned SHA-256
 checks; this release supplies no toolchain fallback assets until complete bundled notices are established.
@@ -235,9 +268,9 @@ maintainer-local evidence archive for later SBOM work.
 
 ## Next
 
-- Complete the release-commit gates and fill the markers above before publication. The owner-approved 2026-11-15 T-SQL pin move selects a tree-identical reachable commit in `alfpricot/tree-sitter-mssql`; the former pin's upstream-watch reachability finding is resolved by that move. Historical results above retain their original identities.
+- Complete the v0.5.0 release-commit gates and fill the markers above before publication. Preserve the current T-SQL pin and all historical failure records.
 - After publication, check all selected source rows from the first mirror base and use one PR for mirror configuration plus development-form restoration.
-- Batch 3: Swift and PostgreSQL, outside v0.4.0 scope.
+- PostgreSQL is included in v0.5.0; Swift remains outside scope.
 
 
 ## PostgreSQL adoption evidence (Windows amd64, local, before the rebase)

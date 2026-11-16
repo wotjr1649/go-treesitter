@@ -64,3 +64,41 @@ The exported Go API signatures are unchanged. Field lookup has these behaviour c
 A v0.4.0 grammar module requires root v0.4.0. PHP, PowerShell and Dart also move to new upstream revisions;
 node-type schema changes are recorded in the [schema register](docs/validation/grammar-schemas.md).
 See the [field contract](docs/specs/parser-result.md#field-lookup-and-grammar-compatibility) for exact semantics.
+
+## Upgrading from v0.4.0 to v0.5.0 (engine ABI 3)
+
+The exported Go API signatures and engine ABI stay unchanged. Upgrade the root and each grammar module you use:
+a v0.5.0 grammar module requires root v0.5.0. Release module versions are prepared in the order specified by the
+[publication procedure](docs/specs/publication.md#multi-module-release); development modules keep their local replacements.
+
+- **PostgreSQL:** add `github.com/wotjr1649/go-treesitter/grammars/postgres` explicitly to use PostgreSQL SQL.
+  PL/pgSQL is excluded. This owner-designated grammar has no named fields; inspect node kinds and children.
+  There are now 24 grammar modules; Swift is outside this release.
+- **Bash/Ruby heredocs:** the recorded scanner patches allow non-ASCII delimiters to close by comparing their
+  stored low byte, with exact ASCII comparisons. Distinct non-ASCII code points with the same low byte still
+  match, and delimiters whose low byte is zero still never close. Consumers may observe different trees for
+  these non-ASCII heredocs; this is not full Unicode delimiter support.
+- **YAML/Python scanner safety:** YAML `0002` and Python `0001` bound serialized indentation by bytes written,
+  preventing scanner state-buffer overruns on deeply nested inputs (for Python, with an odd number of open
+  string delimiters). Beyond the bound, indentation state is dropped and parsing can yield a full-length error
+  tree instead of crashing; this does not add support for unlimited nesting. YAML's separate early-EOF patch
+  from v0.4.0 is retained. All four new patches are disclosed under
+  [ADR-0023](docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md).
+- **C source:** the module path remains `grammars/c`; its source moves from `tree-sitter/tree-sitter-c@b780e47`
+  to the maintained fork `tree-sitter-grammars/tree-sitter-c@f3202ac`. The static node-type schema is unchanged;
+  source and archive identities change. See the [v0.5.0 schema record](docs/validation/grammar-schemas.md#v050-preparation).
+- **Snapshot memory and points:** snapshot arrays now use 25 bytes per node instead of 41, plus the owned source,
+  sparse field exceptions and caches. Point access builds a shared lazy line index costing
+  `4 * (LF count + 1)` bytes plus overhead, then uses O(log lines) lookups. An LF-only input can therefore add
+  about four times its source size as line starts. Points follow source bytes; an `InputEdit` whose supplied
+  points disagree with its byte offsets can now produce different points from native C. Use `EditFor` or
+  supply consistent byte/point coordinates. `WithMaxMemoryBytes` still limits only instance wasm linear memory,
+  not Go-heap snapshot arrays or indexes. See the [snapshot contract](docs/design/api-v2.md#6-snapshot-and-node).
+- **Known grammar gaps remain:** T-SQL's pin stays unchanged; tested non-ASCII identifiers containing Hangul
+  produce errors. C# EOF preprocessor directives need a final newline, and conditionals splitting a construct
+  can produce errors. The [known-gap register](docs/README.md#contract-plane) records other input-specific C#,
+  Python and T-SQL defects; upgrading does not fix them. Input must be UTF-8; transcode legacy encodings first.
+
+[SECURITY.md](SECURITY.md) now describes private vulnerability reporting. The conformance corpus also gains a
+bounded grammar-kit input subset; it is additional test coverage, not a new parsing feature or a language-validity
+claim. See [limitations](docs/reports/limitations.md) for patch bounds and identity-bound evidence.

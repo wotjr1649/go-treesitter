@@ -117,6 +117,32 @@ are identical. The static `schema diff` is `PASS` with zero changes; the v0.3.0 
 |---|---|---|---|---:|---|---|
 | tsql | alfpricot/tree-sitter-mssql | `8620fbcfca9438e1ff7104835bcb8305aba3bdfa` → `2e34d86ec58f3d1a771efc0ca1e71c536690a0b7` | `src` | 404735 → 404735 | `d49356aed210b6522a6e130fdfb3081ff004b74c1cc3a8aee8c5f76eb73d30b9` | `66c05cc00ad2b0a9e91c4814a39c2c066015fb912828ec3bf360d164fe8a9149` → `82476f5880f6b46c83198ae24b4a4eca30941893dbee4d05ec9748fb55ee3b7b` |
 
+## v0.5.0 preparation
+
+Scope: all 24 current pins, engine ABI 3, pins SHA-256
+`5467afce00a76529acf5dd13243a51d8218fa164c595ce171fc7fe6d78ea9913`, preparation base
+`a6391abf7746aa216d9f4fdc86151bc6948d1dcf`. The other 22 grammar schemas retain their v0.4.0 identities.
+The four new ADR-0023 scanner patches do not change `node-types.json`.
+
+Local Windows amd64 / Go 1.27.4 checks on 2026-11-16 used `tools/gen` with `CGO_ENABLED=0`, `GOWORK=off`.
+Each schema was extracted from its upstream archive only after verifying the archive against its release pin.
+From `tools/gen`, the exact command forms (filenames identify those extracted local bytes) were:
+
+```sh
+go run . schema check <evidence>/c-old-node-types.json
+go run . schema check <evidence>/c-new-node-types.json
+go run . schema diff <evidence>/c-old-node-types.json <evidence>/c-new-node-types.json
+go run . schema check <evidence>/postgres-node-types.json
+```
+
+| Grammar | v0.5.0 repository / commit | Bytes | Schema SHA-256 | Local static result |
+|---|---|---:|---|---|
+| c | `tree-sitter-grammars/tree-sitter-c@f3202ac4f1041e0b0a2b908147d5dd0e951da7b1` | 83057 | `23e819ef1eefd357bb6eba844f47f8492f6a88da3e5046b06ec4acd4da8a9fd6` | Old/new strict checks PASS; diff PASS, zero changes from v0.4.0 `tree-sitter/tree-sitter-c@b780e47` |
+| postgres | `gmr/tree-sitter-postgres@59d0d8cd7506d68de1229fb4bbce838c83b60c8a` | 508227 | `7f9f350c2730fbddf36f096dbb27405f6ae29ba787b265f2bb494e6a887078d5` | Strict check PASS, no findings; first release baseline, no old schema to diff |
+
+These checks use archived schemas and are static-only evidence. The prior independent PostgreSQL generation
+record below binds the matching generated schema. Release-commit regeneration and conformance: [FILL AT RELEASE].
+
 ## C maintained-fork move (ADR-0024 rule 6, 2026-11-16)
 
 Owner-approved move to the fork nvim-treesitter pins. The schema is the same file; the static `schema diff` is `PASS`
