@@ -1,7 +1,7 @@
 # Engine ABI v3 (session 15 field lookup)
 
-Status: ABI 1 parsing contract, ABI 2 queries (Q1, 2026-11-14), and ABI 3 snapshot field-lookup exceptions
-(Q12, owner decision 2026-11-15).
+Status: ABI 1 parsing contract, ABI 2 queries (2026-11-14), and ABI 3 snapshot field-lookup exceptions
+(owner decision 2026-11-15).
 Inputs: ADR-0020, ADR-0021, `docs/design/api-v2.md`, `docs/design/query-abi.md`, the session-15 spike
 (`.scratch/s15/w2/mem/combo`, shims `tsg_ext.c` and `tsg_export_s2.c`).
 
@@ -113,7 +113,7 @@ to the subtree (`parser.c`/`subtree.c`). The invariant needed for empty-map skip
 that every hidden child's field is propagated into its parent's production map as inherited; the source inspection
 supports this for the pinned generator, not every possible upstream-generated `parser.c`. For `plan > 0`, the
 filter additionally rejects field collisions, decreasing per-field child indices and absent positions at runtime,
-and every hidden child remains in the comparison, including P30's non-inherited hidden-child case whose first
+and every hidden child remains in the comparison, including the non-inherited hidden-child case found in the 2026-11-15 independent review of the field-lookup ABI, whose first
 visible descendant is an extra.
 
 `ChildByFieldName` consults this table first, then falls back to the direct-child rule. A C result can lie inside
@@ -127,20 +127,20 @@ v0.27.2 has no children-by-field API. Its ordering and explicit-null behavior ha
 
 ### Field-lookup evidence
 
-Historical Q13 E5 native agreement for single-child lookup covers fresh parses of the reproducible pinned
-1,761-input corpus on Windows amd64 (`tools/native-ref/ciconf`, seed 1). Q13 also checked 2,779 additional local
+Historical E5 native agreement for single-child lookup (2026-11-15 field-export-cost run) covers fresh parses of the reproducible pinned
+1,761-input corpus on Windows amd64 (`tools/native-ref/ciconf`, seed 1). That run also checked 2,779 additional local
 inputs; they are recorded separately and are not part of this reproducible-corpus E5 claim.
-The Q13 evidence archive (maintainer-local `2026-11-15-q13-field-export-cost`, not in this repository) binds the result to base
+The evidence archive for that run (maintainer-local `2026-11-15-q13-field-export-cost`, not in this repository) binds the result to base
 `35233d365418147ee8cac8bd7c54f5f617bfe753`, T13 `9531f2e5aa7b1cef78fc140a86230a17ab7c6e20`,
 pins SHA-256 `f67b89640c3880226aeec44bbe44f135b9017ba193241168cd88ec71f25d7571` and the Windows platform.
 Its `q13/generation-identity.json` records module/native identities, `q13/differential-jobs.json` lists input hashes,
-and `q12-prerequisite/` preserves the input archives. Q14 reran the P31 guard on the same reproducible corpus with E5 agreement. The Q14 ABI-v3 evidence archive (maintainer-local) records the new shim/pins hashes, generation and test commands, exact differential arguments and input hashes.
-Q16 E5 native agreement extends ABI 3 `ChildByFieldName` to all 5,283 seeded incremental edits of that
+and `q12-prerequisite/` preserves the input archives. The 2026-11-15 wave-2 batch 2 ABI 3 run reran the field-export cost-filter guard (independently reviewed 2026-11-15) on the same reproducible corpus with E5 agreement. Its ABI-v3 evidence archive (maintainer-local `2026-11-15-q14-batch2`) records the new shim/pins hashes, generation and test commands, exact differential arguments and input hashes.
+E5 native agreement from the 2026-11-15 edited-tree field-lookup run extends ABI 3 `ChildByFieldName` to all 5,283 seeded incremental edits of that
 reproducible 15-grammar corpus (seed 1) on Windows amd64, plus the five separately retained T-SQL
 `knownIncrementalDiffs` cases. `TestFieldLookupEdits` compares with C's **incremental** tree, never a fresh parse,
 and checks that `ChildrenByFieldName` has the same first result (or no result). This is not a C oracle for the
 iterator's remaining elements or arbitrary inputs. CSS and HTML have no field names; their edit headers are
-compared, with zero field-result rows. The Q16 report and identities (maintainer-local evidence archive)
+compared, with zero field-result rows. That run's report and identities (maintainer-local archive `2026-11-15-q16-edited-fields`)
 bind the result to base `2a1d01d19f4e9be7bc49425f467fd464e56f9629`, unchanged pins SHA-256
 `53fca7937e25f52437925aa4a58f5a249171cd0fbaad5fdfc79bffb8c1477ac9`, input manifests,
 the native driver and executable hashes, and the delivered patch/index tree. The existing conformance shard's

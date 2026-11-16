@@ -19,8 +19,8 @@ Every `KR-*` record below describes the removed `gotreesitter` carrier (the Go p
 (`TestKR*`, `tools/runtime-bundle`, `windows-c-v2/`) no longer exist; Git history at `9ad82eb`. No record is open
 against the engine. The existing ratcheted divergence in the engine lane is native-C behaviour, not a Go defect: five T-SQL
 edit cases whose incremental reparse differs from a fresh parse in C v0.27.2 and in the engine alike
-(`knownIncrementalDiffs` in `tools/conformance/edits_test.go`). The [Q9 seed-1 characterization](#q9-seed-1-native-incremental-vs-fresh-characterization)
-adds six same-native observations for PHP, Dart and Ruby; [Q10 Kotlin](#q10-seed-1-kotlin-native-incremental-vs-fresh-characterization)
+(`knownIncrementalDiffs` in `tools/conformance/edits_test.go`). The [wave-2 batch 2 seed-1 characterization](#wave-2-batch-2-seed-1-native-incremental-vs-fresh-characterization)
+adds six same-native observations for PHP, Dart and Ruby; [fwcd Kotlin](#fwcd-kotlin-seed-1-native-incremental-vs-fresh-characterization)
 adds three. Neither is an open product-blocking `KR-*` record. A new failure opens a new record.
 
 The remaining fixed-oracle catalogs were removed after `be31f49f3e4d645a929a9aebc961be150de16e37`, the last
@@ -28,10 +28,10 @@ commit containing them. They remain available in Git history; catalog filenames 
 directory. The older C observations and digests remain in Git history at `9ad82eb`. The current C reference
 is built from the same runtime and grammar pins as the engine.
 
-The Q9/Q10 observations below precede the Q14 ABI 3 integration. Their original input/result signatures remain
+The wave-2 batch 2 and fwcd Kotlin observations below precede the 2026-11-15 ABI 3 integration. Their original input/result signatures remain
 reference material; current engine/native comparisons must pass independently.
 
-## Q9 seed-1 native incremental-vs-fresh characterization
+## Wave-2 batch 2 seed-1 native incremental-vs-fresh characterization
 
 Observed 2026-11-14 on Windows amd64, Go 1.27.4, GCC 16.2.0 (MSYS2 Rev3), product `CGO_ENABLED=0 GOWORK=off`.
 This characterizes the native oracle: the incremental dump differs from the fresh dump in both native C and the
@@ -78,7 +78,7 @@ CGO_ENABLED=0 GOWORK=off TSG_DATA_DIR=<data> TSG_NATIVE_EXE_DIR=<exe> TSG_S15_LA
 **Expected state and retirement.** For this identity and seed, exactly these six pairs differ; every other tested
 edit pair is equal. Each engine result must still equal the corresponding native result, including ranges. The
 existing CI-data rule in `TestEdits` accepts a difference only when native shows that same difference on the same
-input; neither its assertions nor `knownIncrementalDiffs` changed for Q9. This characterization does not waive a
+input; neither its assertions nor `knownIncrementalDiffs` changed for batch 2. This characterization does not waive a
 native mismatch, root-end failure or other product gate, and does not open a release blocker by itself.
 
 A disappearing, additional or changed signature at these pins is a new observation requiring investigation, not
@@ -87,7 +87,7 @@ same-seed corpus/edit comparison, exact old/new input hashes, and review of the 
 identity separately and retire this characterization only when the native behavior changes and engine agreement
 still passes. Preserve this observed signature and its evidence when retiring it.
 
-## Q10 seed-1 Kotlin native incremental-vs-fresh characterization
+## fwcd Kotlin seed-1 native incremental-vs-fresh characterization
 
 Observed 2026-11-15 on Windows amd64, Go 1.27.4, GCC 16.2.0 (MSYS2 Rev3), `CGO_ENABLED=0 GOWORK=off`.
 Kotlin uses the unmodified tier-3 `fwcd/tree-sitter-kotlin` commit
@@ -104,7 +104,7 @@ characterization does not waive a gate or open a product-blocking KR record.
 | `kotlin/jetbrains_annotation_modifiersMigration_newModifiers-001-e2` | `(276, 282, 276)` | `12100d321c9db5820af6447648558f7f4ac790f4df2870546f5b8396bca2fdac` | `c74e1814f81de553b8b30aeb47617ceeed52ab6d294b9dbd6e09991fe4b034e3` | `6da2bb89337fac62fe762f72034892e7eccfad808d4e929250fc5d2c74864d01` | `6a664bf8cbc42c7eefe87907f914b14bff45d4a0e06101764d4b0d1ec2b6c505` | `030199e62255a10d3d156d126a6d677e0f64a1142df931d1f44d040ecbd5742f` |
 | `kotlin/literals-027-e1` | `(45, 45, 47)` | `e36bc58b1d3a8c67a756af24dfc270740ef3d935a3d646008f2aa1c479a8a070` | `b770697ec2c7e2417cc96874d9280f82e595246aec0247d6f1664dc5ef289707` | `d5e10e2427751de8738728ab9e83e2537e29e666194aecd5c3551b74c4cee44e` | `44949ab1dd550e03b39d1b892bd1283145cde69f2556c189eaefd967c6a41f1b` | `3cd092350dec28a2f2181542574035860f33d7e94ed9defe4a93a0bc4d7e269a` |
 
-Replay with the Q9 commands above, selecting `kotlin` and `-seed 1`. The same exact-set and retirement
+Replay with the batch 2 commands above, selecting `kotlin` and `-seed 1`. The same exact-set and retirement
 rules apply: a changed or additional signature requires investigation; every engine result must still match
 its corresponding native output. No upstream issue or scanner patch was created.
 

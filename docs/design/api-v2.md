@@ -151,10 +151,10 @@ duplicating that target; an explicit no-node exception yields nothing. Without a
 direct-child iteration. Thus the first result remains `ChildByFieldName`, but it need not be a direct child.
 `ChildrenByFieldName` is not a C-verified API: v0.27.2 has no children-by-field API. Its first element equals
 `ChildByFieldName`; the iterator order and explicit-null behavior are this Go API's semantics (E3 tests).
-Historical Q13 E5 agreement for `ChildByFieldName` is limited to fresh parses of the reproducible pinned
-1,761-input corpus on Windows amd64. Q13 also checked 2,779 additional local inputs, recorded separately in the
-[archived evidence and identities](engine-abi.md#field-lookup-evidence). Q14 reran the P31 guard on the same reproducible corpus with E5 agreement; its input and source identities are archived with that evidence.
-Q16 adds E5 agreement on Windows amd64 for all 5,283 reproducible seeded incremental edits of the 15 grammars
+Historical E5 agreement for `ChildByFieldName` (2026-11-15 field-export-cost run) is limited to fresh parses of the reproducible pinned
+1,761-input corpus on Windows amd64. That run also checked 2,779 additional local inputs, recorded separately in the
+[archived evidence and identities](engine-abi.md#field-lookup-evidence). The 2026-11-15 wave-2 batch 2 ABI 3 run reran the field-export cost-filter guard (independently reviewed 2026-11-15) on the same reproducible corpus with E5 agreement; its input and source identities are archived with that evidence.
+The 2026-11-15 edited-tree field-lookup run adds E5 agreement on Windows amd64 for all 5,283 reproducible seeded incremental edits of the 15 grammars
 and five retained T-SQL incremental-difference cases. `ChildByFieldName` is compared with C's incremental tree, and the iterator's
 first result is checked to equal it; the remaining iterator results have no C oracle. See the
 [scope and identities](engine-abi.md#field-lookup-evidence).

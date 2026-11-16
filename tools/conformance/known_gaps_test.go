@@ -350,3 +350,43 @@ func TestKnownGapDocs(t *testing.T) {
 		}
 	}
 }
+
+var taskCode = regexp.MustCompile(`\b[PQ][0-9]{1,2}\b`)
+
+// Owner decision D8: user documents cite dates, evidence paths or commits, never internal task codes (ADRs, plans and
+// prompts are exempt). Named TestKnownGap* so the existing conformance.yml -run filter runs it.
+func TestKnownGapDocsNoTaskCodes(t *testing.T) {
+	root := "../.."
+	err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, err := filepath.Rel(root, path)
+		if err != nil {
+			return err
+		}
+		rel = filepath.ToSlash(rel)
+		switch {
+		case d.IsDir():
+			if rel != "." && strings.HasPrefix(rel, ".") || rel == "docs/design/decisions" || rel == "docs/plans" || rel == "docs/prompts" {
+				return filepath.SkipDir
+			}
+			return nil
+		case rel == "README.md" || rel == "MIGRATING.md" || rel == "SECURITY.md",
+			strings.HasPrefix(rel, "docs/") && strings.HasSuffix(rel, ".md"),
+			strings.HasPrefix(rel, "grammars/") && strings.HasSuffix(rel, "/README.md"),
+			strings.HasPrefix(rel, "tools/") && strings.HasSuffix(rel, "/README.md"):
+		default:
+			return nil
+		}
+		for i, line := range strings.Split(string(readFile(t, path)), "\n") {
+			if m := taskCode.FindString(line); m != "" {
+				t.Errorf("%s:%d: internal task code %q; cite a date, evidence path or commit instead", rel, i+1, m)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
