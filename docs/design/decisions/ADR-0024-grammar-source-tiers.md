@@ -74,3 +74,16 @@ distributions such as nvim-treesitter pick one per language.
    identical; `parser.c` differs only in a gcc pragma and the patch version because the fork regenerated it with
    CLI 0.27.2 (byte-identical to our regeneration); native trees over the corpus are identical; the product wasm
    differs by one byte. nvim-treesitter moved for its own queries and bindings, not for grammar defects.
+
+## Amendment (2026-11-16): tier review of tier-1 sources without a commit in 12 months
+
+The weekly upstream watch flagged eight tier-1 pins whose repositories had no commit in 12 months (last commit
+dates as reported on 2026-11-15): css 2025-09-28; go, html, java, javascript, python 2025-09-15; typescript and tsx
+2025-01-30. Review result (owner, 2026-11-16): no maintained fork exists for any of them under rule 6, and
+nvim-treesitter still uses the same repositories, so each language stays on its tier-1 repository. Defects are
+carried as temporary patches under ADR-0023 and reported upstream; we do not wait for upstream to move (ADR-0026).
+
+An accepted watch warning is recorded with an expiry of six months and reported in a separate table, so that only
+new warnings stay at the top of the watch report. When an acceptance expires, the warning returns as new and the
+tier is reviewed again. The accepted warnings and their expiry dates are kept in the upstream-watch tool
+(`tools/native-ref/upstreamwatch`).

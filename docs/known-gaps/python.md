@@ -30,7 +30,7 @@ Observed: The error-free outer binary_operator is & over [0,9), with a left ^ su
 Expected rule: & binds tighter than ^, so the expression must group as a ^ (b & c).
 
 - Specification: [Python reference 6.9: Binary bitwise operations](https://docs.python.org/3/reference/expressions.html#binary-bitwise-operations)
-- Upstream issue: none recorded.
+- [Upstream issue](https://github.com/tree-sitter/tree-sitter-python/issues/358)
 - Input SHA-256: `03545f6a4d6bce1014bb6e30b243104f137f8ee3ad2c3656e7980e5a66a3cb39`
 - [Recorded native dump](../../tools/conformance/testdata/known-gaps/python-bitwise-precedence.dump), SHA-256: `dcf314e5282f04508b5d8e8fd8d1d4e689aee0fc4471e959e04a0acffb4d6b5b`
 

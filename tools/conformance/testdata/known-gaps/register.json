@@ -34,7 +34,7 @@
           "URL": "https://docs.python.org/3/reference/expressions.html#binary-bitwise-operations"
         }
       ],
-      "Upstream": ""
+      "Upstream": "https://github.com/tree-sitter/tree-sitter-python/issues/358"
     },
     {
       "ID": "python-await-power",

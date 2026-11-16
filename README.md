@@ -87,6 +87,10 @@ for m, err := range tree.Matches(ctx, q, nil) {
   `Parse` returns a `*Tree` for incremental work (`Edit`, then `Parse(ctx, src, old)`); close every `Tree`.
 - A `Parser` and its `Tree`s are one confinement unit: use them from one goroutine at a time. `NewParserPool` lends parsers
   to concurrent goroutines.
+- Input is UTF-8. Convert other encodings (for example CP949 or Shift_JIS) to UTF-8 first; the library does not guess
+  legacy code pages. `NewSource` converts UTF-16 that starts with a byte order mark; for UTF-16 without one, call
+  `NewSourceUTF16` with the byte order. A C# file that ends in a preprocessor directive without a final newline gets a
+  root error without an ERROR node ([known gap](docs/known-gaps/csharp.md#csharp-directive-eof)); append a newline.
 - A nil error means a complete tree, which can still contain syntax errors: check `snap.Root().HasError()` (`Tree.Outcome()`
   is `AcceptedClean` or `AcceptedWithErrors`). No result is a `*ParseError` carrying the `Outcome` (`Timeout`, `Cancelled`, …).
 
