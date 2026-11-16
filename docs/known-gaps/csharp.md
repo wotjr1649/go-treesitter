@@ -43,13 +43,13 @@ Input (JSON string; escapes and final newline are significant):
 "#define A"
 ```
 
-Observed: The root and preproc_define over [0,9) have has_error=1; there is no explicit ERROR or missing node.
+Observed: The root and preproc_define over [0,9) have has_error=1 without an ERROR node. The C API string shows an anonymous zero-width MISSING preproc_if_token2 at the end of preproc_define, which the dump does not list.
 
 Expected rule: A nonempty compilation unit receives an implicit final line terminator, so #define A at EOF must parse without errors.
 
 - Specification: [C# specification 6.3.2: Line terminators](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#632-line-terminators)
 - Specification: [C# specification 6.5.4: Definition directives](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#654-definition-directives)
-- Upstream issue: none recorded.
+- [Upstream issue](https://github.com/tree-sitter/tree-sitter-c-sharp/issues/458)
 - Input SHA-256: `e4342cebc1c4b162457213203ce862cac93c73b402f3ac7a004b6c2be418629c`
 - [Recorded native dump](../../tools/conformance/testdata/known-gaps/csharp-directive-eof.dump), SHA-256: `0422ba44c497c2475466bbbecc090af5aa3251adc3ec6e21963b4a02ff9fc33e`
 

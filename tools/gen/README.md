@@ -230,8 +230,8 @@ awk -F '\t' '$4 == "source"' release-assets.tsv > release-source-assets.tsv
 ```
 
 The command lists 33 rows for the current pins: 25 `source` archives and eight `toolchain` archives. The immutable v0.4.0 release
-contains its original 24 source archives plus `SHA256SUMS`; the new PostgreSQL row has no fallback there.
-A future source mirror includes all 25 rows with column 4 equal to `source`, plus `SHA256SUMS`. Check their filenames against `runtime.archive`,
+contains its original 24 source archives plus `SHA256SUMS`; the new C and PostgreSQL archives have no fallback there.
+The v0.5.0 candidate source mirror includes all 25 rows with column 4 equal to `source`, plus `SHA256SUMS`. Check their filenames against `runtime.archive`,
 `wasiLibc.archive`, and each grammar's `archive` in `pins.json`, deduplicating TypeScript/TSX's shared archive;
 the [publication procedure](../../docs/specs/publication.md#pinned-archive-release-assets) specifies the inventory
 and digest checks. The eight SDK/binaryen/CLI host archives are excluded until complete bundled notices can be
@@ -239,7 +239,8 @@ established. Those tools are fetched from their official releases with pinned SH
 in this release to provide mirror fallback, even if the fetch plan lists URLs at the configured bases.
 
 After publishing and checking all selected source rows at the new release base, update `mirrors` in a follow-up PR;
-for v0.4.0 that PR sets the ordered bases to v0.4.0 then v0.3.0 and restores the development module form. A configured
+for v0.5.0 that PR will set the ordered bases to v0.5.0 then v0.4.0 and restore the development module form. Until
+then, pins keep v0.4.0 then v0.3.0. A configured
 base can supply only the exact files already published there; a new source archive gains fallback coverage when a
 carrying release is published and its base is configured. Published releases are immutable. This command does not
 upload anything. `wasm2go` remains a Go module installed through Go's checksum-verified module mechanism
