@@ -78,9 +78,9 @@ Input (JSON string; escapes and final newline are significant):
 "class C { void M() {\n#if A\nif (true)\n#else\nif (false)\n#endif\n{ }\n} }\n"
 ```
 
-Observed: The root has errors: preproc_if contains nested if_statement nodes, an ERROR over #else [37,42), and a missing semicolon at byte 53. The shared block [61,64) is parsed as a separate sibling instead of the selected if statement body.
+Observed: The root has errors: preproc_if contains nested if_statement nodes, an ERROR over #else [37,42), and a missing semicolon at byte 53. The shared block [61,64) is parsed as a separate sibling instead of the body of the if head that either branch selects.
 
-Expected rule: C# conditional compilation operates during lexical analysis: only the selected section supplies ordinary tokens, and unselected sections are skipped source text. Whether A is defined or undefined, this input selects one complete if head followed by the shared block. A conditional section need not contain an entire statement, so this source should not produce syntax errors. The register records this bounded grammar limitation; it does not require a particular tree for inactive text.
+Expected rule: C# conditional compilation operates during lexical analysis: only the selected section supplies ordinary tokens, and unselected sections are skipped source text. Whether A is defined or undefined, this input selects one complete if head followed by the shared block. Either selection is a valid program, and so is the source with the directive lines removed (two nested if statements), so this input is a grammar defect: the grammar models #if/#else/#endif as a node holding whole statements. Inputs whose branches cannot be combined without evaluating symbols (for example a { opened in each branch) are an inherent limit of parsing every branch and are not claimed here. The register records only this input; it does not require a particular tree for inactive text.
 
 - Specification: [C# specification 6.5.5: Conditional compilation directives](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#655-conditional-compilation-directives)
 - Upstream issue: none recorded.

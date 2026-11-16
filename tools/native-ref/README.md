@@ -129,7 +129,6 @@ for review, even when expired; they do not count as current warnings. Tool/runti
 when the workflow closes the issue. `-state FILE` writes `warn`, `clean` or `error`; hard errors remove the body and
 leave the issue unchanged. The issue job uses that state rather than inferring warnings from the body's existence.
 
-
 ## Recorded grammar patches
 
 Both builders support `regenerate: true` without patches (for example PostgreSQL LFS source) and use the ADR-0023 patch records in `pins.json`; grammar-input patches with `regenerate: true` use
