@@ -1,6 +1,6 @@
 # go-treesitter
 
-**Preview (v0.5.0 preparation).** A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
+**Preview (v0.5.0).** A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
 module is generated from the unmodified upstream tree-sitter runtime and pinned grammar C (wasm translated to Go by
 `tools/gen`). Grammar C may carry recorded temporary
 [ADR-0023 patches](docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md); each patched module discloses them.
@@ -14,7 +14,7 @@ Start with [AGENTS.md](AGENTS.md) and the [documentation map](docs/README.md). T
 
 ## Use
 
-The root module has no grammar. The v0.5.0 candidate provides 24 grammar modules using engine ABI 3.
+The root module has no grammar. v0.5.0 provides 24 grammar modules using engine ABI 3.
 Add the modules you need
 under `grammars/`: `bash`, `c`, `cpp`, `csharp`, `css`, `dart`, `golang`, `html`, `java`, `javascript` (including JSX),
 `json`, `kotlin`, `postgres` (PostgreSQL SQL only; PL/pgSQL excluded), `php` (PHP parser only), `powershell`, `python`, `r`, `ruby`, `rust`, `tsql`, `tsx`, `typescript`,
