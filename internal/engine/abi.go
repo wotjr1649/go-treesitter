@@ -77,6 +77,11 @@ func (*Host) Xfd_close(int32) int32                      { return enosys }
 func (*Host) Xfd_seek(int32, int64, int32, int32) int32  { return enosys }
 func (*Host) Xfd_write(int32, int32, int32, int32) int32 { return enosys }
 
+// Xproc_exit is a trap, never a process exit: it unwinds the current call to Call, which returns *Trap
+// (EngineFault, or ResourceLimit after a refused memory.grow). Same meaning as upstream's wasm store, which links
+// proc_exit to a trap.
+func (*Host) Xproc_exit(code int32) { panic(fmt.Sprintf("wasi proc_exit(%d)", code)) }
+
 // Grammar is the static description a generated grammar module hands to treesitter.NewLanguage.
 type Grammar struct {
 	ABI      uint32 // literal ABI version the module was generated for

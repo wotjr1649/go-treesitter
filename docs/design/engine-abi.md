@@ -44,7 +44,19 @@ All pointers are wasm32 offsets (`int32` in Go). `TSTree*` handles are opaque. O
 | `malloc`, `free` | wasi-libc, for source buffers and returned blocks |
 
 Imports: module `tsg`, `should_stop() i32` (non-zero halts the parse). WASI preview1 imports are stubs returning
-`52` (ENOSYS); the generator fails if a grammar needs an import outside `internal/engine`'s stub set.
+`52` (ENOSYS), except `wasi_snapshot_preview1.proc_exit(code)`: it is a trap, never a process exit. `Host.Xproc_exit`
+panics, the panic unwinds through generated code to `engine.Call` (`*Trap`), and the parser maps it as any other trap:
+`EngineFault`, or `ResourceLimit` when a `memory.grow` was refused before it (a scanner's out-of-memory branch that
+calls `exit(1)`), instance discarded and recreated; no code path reaches `os.Exit`. This is the meaning upstream's wasm store
+gives it (`lib/src/wasm_store.c` links `proc_exit`, `abort` and `__assert_fail` to a trap). The generator fails if a
+grammar needs an import outside `internal/engine`'s stub set (`checkImports`; `proc_exit` is in it).
+
+Compatibility: the engine ABI number does not change. It versions the exports, chunk layout and meta block a module
+offers the root; a stub-set addition changes none of them, and the root accepts every ABI 1/2/3 module as before. Existing
+modules do not import `proc_exit`, so their bytes are unchanged. A future module that imports it declares the method in
+its generated import interface and fails to compile against a root without `Host.Xproc_exit`; ADR-0022 already pins
+each module to the exact root version (`require` of that tag), so such a module is released with a root that has it,
+and no run-time mismatch exists to detect with a number.
 
 Build flags (from the spike, fixed): `clang --target=wasm32-wasip1 -mexec-model=reactor -O2 -DNDEBUG
 -Wl,--gc-sections -Wl,--no-entry -Wl,--strip-all` + `--export=` for the table above; then `wasm-opt -O3` (binaryen, explicit feature flags) and `wasm2go -unsafe -embed`
