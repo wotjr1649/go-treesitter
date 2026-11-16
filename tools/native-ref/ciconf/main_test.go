@@ -16,7 +16,7 @@ func TestSelectedLanguages(t *testing.T) {
 		t.Fatal("unknown language accepted")
 	}
 	all, err := selectedLanguages("")
-	if err != nil || len(all) != 23 {
+	if err != nil || len(all) != 24 {
 		t.Fatalf("all languages = %v, %v", all, err)
 	}
 }

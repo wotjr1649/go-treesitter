@@ -145,5 +145,12 @@
     "license": "MIT",
     "source": "https://github.com/fwcd/tree-sitter-kotlin/blob/d6af96d2e23ef0a8ff5ab512864378cf08fba311/LICENSE",
     "sha256": "948495f61768f7de26bcc61113d8cd95f50bbc15adb678c28c941c6c8fcd5903"
+  },
+  {
+    "component": "tree-sitter-postgres",
+    "path": "LICENSES/tree-sitter-postgres.txt",
+    "license": "BSD-3-Clause",
+    "source": "https://github.com/gmr/tree-sitter-postgres/blob/59d0d8cd7506d68de1229fb4bbce838c83b60c8a/LICENSE",
+    "sha256": "b336477d5469bf335e7d173814e1da57d4f13c23968959a71523668ac4a9a6c2"
   }
 ]

@@ -20,6 +20,10 @@ of ADR-0023; grammar-input changes regenerate C with the pinned CLI, identically
 The YAML early-EOF fix, Bash/Ruby heredoc comparisons and YAML/Python serialization bounds are C-only patches;
 original/result source hashes and each patch identity are recorded in the pins and generated provenance.
 The unpatched native comparison is separate from the product comparison.
+A grammar pinned with `regenerate: true` may also regenerate from unmodified upstream inputs without patches
+(for example an archived LFS pointer). Both builders use the shared, pinned CLI path: independent generation
+twice, byte comparison, input-tree hash and generated-file hashes in provenance. The original archive/tree/file
+pins continue to identify the archived bytes; generated C hashes are additional identities.
 
 ## Machine-readable source of truth
 

@@ -29,6 +29,14 @@
       "linux-amd64": {
         "url": "https://github.com/tree-sitter/tree-sitter/releases/download/v0.27.2/tree-sitter-linux-x64.gz",
         "sha256": "7ed56d152c52437397b9fcaa43cf341f49933cecc1ca291843f0d347c6e2cb3a"
+      },
+      "linux-arm64": {
+        "url": "https://github.com/tree-sitter/tree-sitter/releases/download/v0.27.2/tree-sitter-linux-arm64.gz",
+        "sha256": "34fcc5c4fa7bdd2058a2a45a03b6eb9a49b03a93b6d52ec750f99b1516d98d33"
+      },
+      "darwin-arm64": {
+        "url": "https://github.com/tree-sitter/tree-sitter/releases/download/v0.27.2/tree-sitter-macos-arm64.gz",
+        "sha256": "5a08b66e5713b0c69691611250b2191d07139647a3c6e39ba85954284b634d2d"
       }
     },
     "wasi-sdk": "34.0",
@@ -642,6 +650,28 @@
       },
       "licenseSHA256": "948495f61768f7de26bcc61113d8cd95f50bbc15adb678c28c941c6c8fcd5903",
       "cSymbol": "tree_sitter_kotlin"
+    },
+    "postgres": {
+      "regenerate": true,
+      "repo": "https://github.com/gmr/tree-sitter-postgres",
+      "commit": "59d0d8cd7506d68de1229fb4bbce838c83b60c8a",
+      "extractDir": "tree-sitter-postgres-59d0d8cd",
+      "archive": "tree-sitter-postgres-59d0d8cd.tar.gz",
+      "archiveSHA256": "f82ef824c0135805cbe23eb408721b41ff36373c4126052d178d7f5c22690da6",
+      "archiveURL": "https://codeload.github.com/gmr/tree-sitter-postgres/tar.gz/59d0d8cd7506d68de1229fb4bbce838c83b60c8a",
+      "grammarDir": "postgres/src",
+      "dirs": [
+        "postgres/src",
+        "postgres/grammar.js",
+        "tree-sitter.json"
+      ],
+      "treeSHA256": "8818f7575126241416893bbc18134b4873bc3d92298afe7962ce911f580c1e1b",
+      "files": {
+        "parser.c": "9b714c169bc14fb13b23374f344fe1bd20b7db4a07546b2b671d644fe374bcc3",
+        "scanner.c": "4d7872a6bb2126e206a7aa0730b7f272b41d9e75c2d11af274fc4db2cd7c3352"
+      },
+      "licenseSHA256": "b336477d5469bf335e7d173814e1da57d4f13c23968959a71523668ac4a9a6c2",
+      "cSymbol": "tree_sitter_postgres"
     }
   }
 }

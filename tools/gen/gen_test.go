@@ -169,8 +169,8 @@ func TestPinsPlan(t *testing.T) {
 				t.Fatalf("%s: unpinned download %q", plat, l)
 			}
 		}
-		// Runtime + wasi-libc + 22 grammar repositories (typescript and tsx share one archive).
-		if kinds["tool"] != 2 || kinds["goinstall"] != 1 || kinds["source"] != 24 {
+		// Runtime + wasi-libc + 23 grammar repositories (typescript and tsx share one archive).
+		if kinds["tool"] != 2 || kinds["goinstall"] != 1 || kinds["source"] != 25 || kinds["cli"] != 1 {
 			t.Fatalf("%s: plan kinds %v", plat, kinds)
 		}
 	}
@@ -341,7 +341,7 @@ func TestRuntimeNotice(t *testing.T) {
 
 func TestReadmeSourceTiers(t *testing.T) {
 	for lang, tier := range map[string]string{
-		"php": "1 (core)", "ruby": "1 (core)",
+		"postgres": "owner-designated", "php": "1 (core)", "ruby": "1 (core)",
 		"yaml": "2 (tree-sitter-grammars)", "xml": "2 (tree-sitter-grammars)",
 		"kotlin": "3 (third party)", "powershell": "3 (third party)", "r": "3 (third party)", "dart": "3 (third party)",
 	} {

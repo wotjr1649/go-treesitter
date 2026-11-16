@@ -33,19 +33,35 @@ class PinsDiffTest(unittest.TestCase):
             "commit": {"commit": "c"},
             "source": {"repo": "old", "commit": "d"},
             "patch": {"commit": "e", "patches": []},
+            "regenerate": {"commit": "g", "regenerate": False},
         }}
         new = {"grammars": {
             "patch": {"commit": "e", "patches": [{"file": "fix.patch"}]},
             "source": {"repo": "new", "commit": "d"},
             "commit": {"commit": "new"},
             "added": {"commit": "f"},
+            "regenerate": {"commit": "g", "regenerate": True},
             "unchanged": {"files": {"parser.c": "1"}, "commit": "a"},
         }}
         self.assertEqual(pin_move.changed_grammars(old, new), [
             ("added", "ADDED"), ("commit", "CHANGED"),
-            ("patch", "CHANGED"), ("removed", "REMOVED"),
+            ("patch", "CHANGED"), ("regenerate", "CHANGED"), ("removed", "REMOVED"),
             ("source", "CHANGED"),
         ])
+
+    def test_postgres_addition_checks_new_schema_without_old_native(self):
+        pins = json.loads(Path(__file__).with_name("pins.json").read_bytes())
+        old = {"grammars": {k: v for k, v in pins["grammars"].items() if k != "postgres"}}
+        self.assertTrue(pins["grammars"]["postgres"]["regenerate"])
+        self.assertFalse(pins["grammars"]["postgres"].get("patches"))
+        self.assertEqual(pin_move.changed_grammars(old, pins), [("postgres", "ADDED")])
+        with tempfile.TemporaryDirectory() as temp:
+            review = pin_move.Review(Path(temp), Path(temp) / "cache")
+            with patch.object(review, "side") as side:
+                result = review.grammar("base", "head", old, pins, "postgres", "ADDED", set())
+            side.assert_called_once_with("head", pins, "postgres", "new", build=False)
+            self.assertEqual(result["schema"], "PASS (new only)")
+            self.assertTrue(result["pass"])
 
     def test_non_grammar_metadata_is_not_a_pin_move(self):
         self.assertEqual(pin_move.changed_grammars(

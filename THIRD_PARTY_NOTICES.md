@@ -18,6 +18,7 @@ own `LICENSE`.
 | tree-sitter-typescript | `grammars/typescript`, `grammars/tsx` | [MIT](LICENSES/tree-sitter-typescript.txt) |
 | tree-sitter-c-sharp | `grammars/csharp` | [MIT](LICENSES/tree-sitter-c-sharp.txt) |
 | tree-sitter-json | `grammars/json` | MIT, [grammars/json/LICENSE](grammars/json/LICENSE) |
+| tree-sitter-postgres | `grammars/postgres` (SQL only) | [BSD-3-Clause](LICENSES/tree-sitter-postgres.txt) |
 | tree-sitter-tsql | `grammars/tsql` | MIT, [grammars/tsql/LICENSE](grammars/tsql/LICENSE) |
 | tree-sitter-java | `grammars/java` | [MIT](LICENSES/tree-sitter-java.txt) |
 | tree-sitter-c | `grammars/c` | [MIT](LICENSES/tree-sitter-c.txt) |

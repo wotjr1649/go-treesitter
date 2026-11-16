@@ -162,7 +162,10 @@ func run(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuil
 			fmt.Fprint(os.Stderr, " WARNING: review temporary patch burden")
 		}
 		fmt.Fprintln(os.Stderr)
-		if !unpatched && len(g.Patches) > 0 {
+		if g.Regenerate || (!unpatched && len(g.Patches) > 0) {
+			if unpatched {
+				g.Patches = nil
+			}
 			patched, err := prepareGrammarPatches(pinsFile, p, g, dl, work, l, fetch)
 			if err != nil {
 				return fmt.Errorf("%s: patches: %w", l, err)

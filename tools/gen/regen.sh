@@ -4,7 +4,7 @@
 #   tools/gen/regen.sh <work-dir> [lang ...]
 #
 # <work-dir> must not exist or must be empty: every archive is downloaded and extracted only into it, its sha256 is
-# checked before extraction. Only approved grammar-input patches execute grammar JS, with the pinned CLI's native
+# checked before extraction. Only grammars pinned with regenerate: true execute grammar JS, with the pinned CLI's native
 # JS runtime and a twice-generated determinism check (ADR-0023). The fetch plan
 # (URLs, sha256, destinations) comes from tools/gen/pins.json via `gen -plan`; wasm2go is built from its pinned
 # module version with `go install -trimpath`. Output goes to grammars/<lang> in this repository.
@@ -28,7 +28,7 @@ fi
 EXE=""
 [ "$(go env GOOS)" = windows ] && EXE=.exe
 
-ALL=(bash c cpp csharp css dart golang html java javascript json php powershell python r ruby rust tsql tsx typescript xml yaml kotlin)
+ALL=(postgres bash c cpp csharp css dart golang html java javascript json php powershell python r ruby rust tsql tsx typescript xml yaml kotlin)
 if [ -z "${ROOT_VERSION:-}" ]; then
   # one line per module: "dev" (replace present), the release version, or nothing (unknown form -> count below ALL)
   forms=$(for l in "${ALL[@]}"; do

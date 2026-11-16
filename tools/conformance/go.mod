@@ -16,6 +16,7 @@ require (
 	github.com/wotjr1649/go-treesitter/grammars/javascript v0.0.0
 	github.com/wotjr1649/go-treesitter/grammars/json v0.0.0
 	github.com/wotjr1649/go-treesitter/grammars/kotlin v0.0.0
+	github.com/wotjr1649/go-treesitter/grammars/postgres v0.0.0
 	github.com/wotjr1649/go-treesitter/grammars/php v0.0.0
 	github.com/wotjr1649/go-treesitter/grammars/powershell v0.0.0
 	github.com/wotjr1649/go-treesitter/grammars/python v0.0.0
@@ -44,6 +45,7 @@ replace (
 	github.com/wotjr1649/go-treesitter/grammars/javascript => ../../grammars/javascript
 	github.com/wotjr1649/go-treesitter/grammars/json => ../../grammars/json
 	github.com/wotjr1649/go-treesitter/grammars/kotlin => ../../grammars/kotlin
+	github.com/wotjr1649/go-treesitter/grammars/postgres => ../../grammars/postgres
 	github.com/wotjr1649/go-treesitter/grammars/php => ../../grammars/php
 	github.com/wotjr1649/go-treesitter/grammars/powershell => ../../grammars/powershell
 	github.com/wotjr1649/go-treesitter/grammars/python => ../../grammars/python

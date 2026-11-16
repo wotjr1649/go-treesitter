@@ -64,7 +64,7 @@ func local(name string) bool {
 // Prepare verifies the archive, applies exact patches, then generates twice in independent trees.
 // It never modifies the caller's original extracted inputs.
 func Prepare(c Config) (string, *Provenance, error) {
-	if len(c.Patches) == 0 {
+	if len(c.Patches) == 0 && !c.Regenerate {
 		return "", nil, fmt.Errorf("no patches")
 	}
 	if !local(c.GrammarDir) {
@@ -177,7 +177,7 @@ func verifyCLI(c Config) error {
 
 func generate(c Config, root string) error {
 	dir := filepath.Join(root, filepath.Dir(filepath.FromSlash(c.GrammarDir)))
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, c.CLI, "generate", "--js-runtime", "native")
 	cmd.Dir = dir

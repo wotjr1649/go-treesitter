@@ -27,7 +27,7 @@ import (
 
 // cliLib maps a corpus language to the shared library file stem and the CLI --lang-name.
 var cliLib = map[string][2]string{
-	"kotlin": {"kotlin", "kotlin"}, "json": {"json", "json"}, "go": {"go", "go"}, "python": {"python", "python"},
+	"postgres": {"postgres", "postgres"}, "kotlin": {"kotlin", "kotlin"}, "json": {"json", "json"}, "go": {"go", "go"}, "python": {"python", "python"},
 	"typescript": {"typescript", "typescript"}, "tsx": {"tsx", "tsx"}, "csharp": {"c_sharp", "c_sharp"}, "tsql": {"mssql", "mssql"},
 	"javascript": {"javascript", "javascript"},
 	"html":       {"html", "html"},

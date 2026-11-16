@@ -232,7 +232,7 @@ func inputs(lang string) (string, []string) {
 		return "<root>\n" + strings.Repeat("<a>1</a>\n", count) + "</root>\n", []string{"<next>2</next>\n", "<other id=\"2\"/>\n", "<broken\n"}
 	case "ruby":
 		return strings.Repeat("a = 1\n", count), []string{"def next_fn(x)\n  x + 2\nend\n", "class Other\nend\n", "def broken(\n"}
-	case "tsql":
+	case "tsql", "postgres":
 		return strings.Repeat("SELECT 1;\n", count), []string{"SELECT x FROM next_table WHERE x > 2;\n", "CREATE TABLE other_table (id INT);\n", "SELECT (\n"}
 	}
 	return "", nil

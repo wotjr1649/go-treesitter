@@ -248,6 +248,7 @@ func TestCancelDuringSnapshot(t *testing.T) {
 			t0 := time.Now()
 			refSnap, err := ref.Snapshot(bg)
 			export := time.Since(t0)
+			ref.Close()
 			if err != nil {
 				t.Fatal(err)
 			}

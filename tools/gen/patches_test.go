@@ -91,3 +91,11 @@ func TestGrammarRegenerationPlan(t *testing.T) {
 		t.Fatalf("CLI plan entries=%d", found)
 	}
 }
+
+func TestUnpatchedRegenerationIsPrepared(t *testing.T) {
+	o := opts{}
+	_, err := preparePatches(&o, &Pins{}, GrammarPin{Regenerate: true}, t.TempDir(), &Identity{})
+	if err == nil || !strings.Contains(err.Error(), "-dl is required") {
+		t.Fatalf("unpatched regeneration skipped: %v", err)
+	}
+}

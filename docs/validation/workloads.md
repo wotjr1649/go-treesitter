@@ -430,3 +430,16 @@ comparison timings. Existing limits remain 20 minutes per comparison step and
 source budget. Proceed only after measured full shards use less than half each
 existing step/job timeout; do not infer hosted timing from local measurements.
 This change does not widen to that proposal.
+
+## PostgreSQL candidate
+
+`postgres` is SQL only; PL/pgSQL is excluded. The large input is real Pagila INSERT data, not repeated padding.
+It does not represent every PostgreSQL statement or application workload. Both files are used in the local PostgreSQL paired lane;
+the hosted bench fetch manifest includes the Pagila input and the upstream corpus supplies its small-file lane.
+
+| Input | Bytes | SHA-256 | License |
+|---|---:|---|---|
+| [Pagila insert data](https://github.com/devrimgunduz/pagila/blob/6ea53f812254c91a602f61c0ef62beca3fa676b1/pagila-insert-data.sql) | 19,526,610 | `14c39f6e24822177d4cf8b09390fd1bec35c95ded626d7a71c083f429d73182a` | [PostgreSQL](https://github.com/devrimgunduz/pagila/blob/6ea53f812254c91a602f61c0ef62beca3fa676b1/LICENSE.txt), SHA-256 `dcc10ac50b94172e627f7a5ec9c08f9e4568e6dd51a952f96ec09506f70163fb` |
+| [Open-rental report SQL](../../tools/bench/testdata/postgres/rentals.sql) | 351 | `60832cb4371298e2c5cb3026e5bb70e80747da40e56bd6507087a1e2420c937e` | Repository MIT; original PostgreSQL example, LF, UTF-8 |
+
+The grammar corpus and queries are extracted from the SHA-pinned upstream archive by `native-ref`; seeded edits use seed 1.

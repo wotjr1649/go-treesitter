@@ -1,12 +1,13 @@
 # Release-Critical status board
 
 Updated 2026-11-15 for v0.4.0 preview preparation (23 grammars, engine ABI 3). Status, not a promise. Nothing here is release-approved.
+The current candidate adds a 24th grammar, PostgreSQL; its separate local evidence appears below.
 The previous board for the `gotreesitter` carrier is in Git history at main `9ad82eb`; none of its results transfer
 to the new engine.
 
-## Scope
+## v0.4.0 release scope
 
-- **v0.4.0 Release-Critical scope:** all 23 entries in [`tools/gen/pins.json`](../../tools/gen/pins.json), listed with sources in the [README](../../README.md#use).
+- **v0.4.0 Release-Critical scope:** all 23 entries in the released v0.4.0 pins, listed with sources in the [README](../../README.md#use).
 - **Release policy (ADR-0022):** Preview; the scope includes both wave-2 batches. Earlier gate tables keep their original identities.
 - Identity: tree-sitter v0.27.2 and the grammar commits in `tools/gen/pins.json`; Go 1.27.4; `CGO_ENABLED=0`.
 
@@ -237,3 +238,34 @@ maintainer-local evidence archive for later SBOM work.
 - Complete the release-commit gates and fill the markers above before publication. The owner-approved 2026-11-15 T-SQL pin move selects a tree-identical reachable commit in `alfpricot/tree-sitter-mssql`; the former pin's upstream-watch reachability finding is resolved by that move. Historical results above retain their original identities.
 - After publication, check all selected source rows from the first mirror base and use one PR for mirror configuration plus development-form restoration.
 - Batch 3: Swift and PostgreSQL, outside v0.4.0 scope.
+
+
+## PostgreSQL adoption evidence (Windows amd64, local, before the rebase)
+
+This historical adoption run added a 24th grammar candidate, outside the immutable v0.4.0 release. Base `45f9071328d66cd665fd20fb89991b589cf0fa23`,
+Go 1.27.4, `CGO_ENABLED=0`, ABI 3 / recipe v2-O3; pins SHA-256
+`ec6fac800e2821eb50d22f84ee7828fc230906c653232b4ab4973c9c6c73f773`.
+Module `postgres` uses owner-designated `gmr/tree-sitter-postgres@59d0d8cd7506d68de1229fb4bbce838c83b60c8a`,
+BSD-3-Clause, SQL only (PL/pgSQL excluded). Unmodified grammar inputs regenerate with CLI 0.27.2 / native JS;
+the engine and a fresh native build have identical generated-source provenance. No patches are applied.
+
+Local E5: 71 corpus inputs, 213 edits (fresh, incremental and changed ranges), 923 raw-query comparisons
+(stride 1, three upstream files plus ten structural probes), zero differences. Strict field tests cover the
+71 fresh and 213 incremental trees; this grammar has no named fields, so both sides emit zero field-result rows.
+The retained module tests, PostgreSQL fuzz seeds and the hashed realistic small SQL workload pass (E3).
+
+On the [registered Pagila input](../validation/workloads.md#postgresql-candidate), E4 three paired windows
+(warmup 1, timed 3 each) give Go/native 1.127257x (range 1.102759–1.160900); the 351-byte SQL report gives
+1.702076x and 0.052673 ms Go median geomean. The shared Windows host does not establish absolute performance.
+ADR-0022 memory: parse peak WS 905,232,384 bytes, snapshot 1,276,252,160 (limit 2,019,769,864); Close+GC private
+deltas 2,367,488 / 3,993,600 bytes; engine regions and committed bytes after Close are zero in both fresh processes.
+These are local input-specific results, not E6 or hosted platform evidence.
+
+Two independent full PostgreSQL module generations matched all 17 files; regeneration of the other 23 modules
+matched their complete committed file sets and hashes. Archive strict schemas (24), generated PostgreSQL schema,
+patch-status, mirror inventory and actionlint passed.
+
+The first generation attempt stopped at the unchanged 2.5 GiB free-physical-memory guard; its failure and partial
+outputs are retained. One declared recovery after a sustained headroom check completed. The Korean PostgreSQL adoption report,
+patch digest, logs and identity-bound receipts are in the maintainer-local PostgreSQL adoption handoff archive. Hosted drift,
+platform, nightly, balancing, bench and release/packaging gates remain pending; no release approval is inferred.

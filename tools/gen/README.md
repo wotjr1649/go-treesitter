@@ -137,17 +137,17 @@ Everything a generation consumes is pinned, and the identity of a generated modu
 ## Regenerate
 
 ```
-bash tools/gen/regen.sh <new-empty-work-dir> [lang ...]      # all 23 modules by default
+bash tools/gen/regen.sh <new-empty-work-dir> [lang ...]      # all 24 modules by default
 ROOT_VERSION=v0.1.0 bash tools/gen/regen.sh <work-dir>       # switch a development tree to the release go.mod form
 ```
 
 `regen.sh` builds `gen`, prints the fetch plan (`gen -plan host`), downloads every archive into the new directory,
 verifies its sha256 **before** extracting, builds wasm2go from the pinned version, then runs `gen` per module into
 `grammars/<lang>`. `.github/workflows/regen.yml` runs it on Linux and requires `git diff --exit-code -- grammars/`.
-Without `ROOT_VERSION`, `regen.sh` derives the go.mod form from the committed `grammars/*/go.mod` (all 23 must be in the same form: development with `replace`, or release `require vX.Y.Z` without `replace`; otherwise it fails), so the drift check regenerates the committed form unchanged.
+Without `ROOT_VERSION`, `regen.sh` derives the go.mod form from the committed `grammars/*/go.mod` (all 24 must be in the same form: development with `replace`, or release `require vX.Y.Z` without `replace`; otherwise it fails), so the drift check regenerates the committed form unchanged.
 
 The modules are `bash`, `c`, `cpp`, `csharp`, `css`, `dart`, `golang`, `html`, `java`, `javascript` (including JSX), `json`,
-`kotlin`, `php`, `powershell`, `python`, `r`, `ruby`, `rust`, `tsql`, `tsx`, `typescript`, `xml`, and `yaml`. Each has a grammar-specific generated smoke-test sample.
+`kotlin`, `php`, `postgres`, `powershell`, `python`, `r`, `ruby`, `rust`, `tsql`, `tsx`, `typescript`, `xml`, and `yaml`. Each has a grammar-specific generated smoke-test sample.
 Downloads allow three attempts with 1s/2s backoff only for transient transport failures. HTTP, certificate and local
 write errors end that URL attempt; transient HTTP 408/429/5xx responses also receive bounded retries. A failed upstream download or hash check then tries each configured mirror; sha256 verification remains mandatory before extraction. The retry self-check is
 `bash tools/gen/fetch_test.sh`.
@@ -171,7 +171,7 @@ and product shim in `probe/balance.c`. It uses the normal recipe and memory prov
 output outside `grammars/`, rejects `-root-version`, and marks its provenance `testOnly: "balancing-cancel"`; its wrapper
 hash and extra exports are bound into its identity. These modules are test artifacts, never product grammar modules.
 
-`bash tools/gen/balance-probe.sh <new-empty-work-dir> [lang ...]` fetches SHA-verified pinned inputs and builds all 23 probes
+`bash tools/gen/balance-probe.sh <new-empty-work-dir> [lang ...]` fetches SHA-verified pinned inputs and builds all 24 probes
 under `<work-dir>/probes/` and native references under `<work-dir>/native/`, without regenerating product modules.
 With language arguments it builds only those probes and native executables, for example `... <work-dir> javascript`.
 Then, from `tools/conformance`:
@@ -195,11 +195,12 @@ Recorded C-only patches exist for bash and ruby (`0001-heredoc-lookahead-char`),
 counts. Retire each with an approved pin move when upstream fixes it; `native-ref -unpatched` supplies the required
 corpus/fuzz baseline.
 
-For `grammar.js` or related grammar inputs, also set the grammar's `regenerate: true`. `gen` and `native-ref` use
+`regenerate: true` also works without patches, for upstream grammars that omit generated C or store an LFS pointer.
+For `grammar.js` or related grammar-input patches, set the same flag. `gen` and `native-ref` use
 the same implementation: verify the full archive, extract a private copy, apply the recorded patches, then run
 the pinned CLI twice on independent trees using `generate --js-runtime native`. Every resulting file must match.
 The CLI gzip and its decompressed executable are checked against the per-platform pin before execution. The
-generated module's optional `grammarGeneration` provenance records CLI version/runtime, patched input-tree hash
+generated module's optional `grammarGeneration` provenance records CLI version/runtime, input-tree hash (after any patches)
 and generated source hashes; `native-ref` writes the same record under its `work/patches-<lang>/provenance.json`.
 Both compilers read C from this private result. The original extracted source and archive stay intact.
 
@@ -228,11 +229,12 @@ kind `source`/`toolchain`; no header):
 awk -F '\t' '$4 == "source"' release-assets.tsv > release-source-assets.tsv
 ```
 
-The command lists 30 rows for the current pins: 24 `source` archives and six `toolchain` archives. v0.4.0 release
-assets are **only the 24 rows with column 4 equal to `source`, plus `SHA256SUMS`**. Check their filenames against `runtime.archive`,
+The command lists 33 rows for the current pins: 25 `source` archives and eight `toolchain` archives. The immutable v0.4.0 release
+contains its original 24 source archives plus `SHA256SUMS`; the new PostgreSQL row has no fallback there.
+A future source mirror includes all 25 rows with column 4 equal to `source`, plus `SHA256SUMS`. Check their filenames against `runtime.archive`,
 `wasiLibc.archive`, and each grammar's `archive` in `pins.json`, deduplicating TypeScript/TSX's shared archive;
 the [publication procedure](../../docs/specs/publication.md#pinned-archive-release-assets) specifies the inventory
-and digest checks. The six SDK/binaryen/CLI host archives are excluded until complete bundled notices can be
+and digest checks. The eight SDK/binaryen/CLI host archives are excluded until complete bundled notices can be
 established. Those tools are fetched from their official releases with pinned SHA-256 checks and have no assets
 in this release to provide mirror fallback, even if the fetch plan lists URLs at the configured bases.
 
@@ -243,3 +245,27 @@ carrying release is published and its base is configured. Published releases are
 upload anything. `wasm2go` remains a Go module installed through Go's checksum-verified module mechanism
 (`wasm2goSum`), not an archive in this list. The Go toolchain and system C compiler are host prerequisites, not
 downloads managed by this pin file.
+
+## PostgreSQL regeneration cost
+
+`postgres` uses unmodified `gmr/tree-sitter-postgres` grammar inputs. Its archived `postgres/src/parser.c` is an
+LFS pointer; the original pointer and input tree remain pinned, and both builders compile the twice-generated C.
+PL/pgSQL is excluded. The CLI is pinned for Windows x64, Linux x64/arm64 and macOS arm64.
+
+Windows feasibility measurement: one CLI generation took about 180 seconds and 4.52 GiB peak commit. `grammarpatch`
+allows 10 minutes per generation and runs the two independent generations sequentially. Regen and balancing
+jobs have 60 minutes; conformance, nightly and bench native builds also remain one grammar per job with 60 minutes.
+The balancing job generates both a probe and a fresh native reference, so it performs four sequential CLI runs.
+No generated-C cache or skip bypasses the drift check. Other grammar shards fetch the PostgreSQL archive but do not generate it.
+
+[GitHub's hosted-runner specifications](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
+list 16 GB RAM for public Ubuntu x64/arm64 and 7 GB for macOS arm64 (private Ubuntu: 8 GB). Each CLI run precedes
+C compilation and no other language regenerates within the job. macOS has the least headroom; hosted results
+remain pending and an OOM/timeout must fail visibly. Windows measurements do not establish hosted memory or timing.
+
+The PostgreSQL regen shard also runs the small patched and unpatched CLI integration tests using the
+same verified CLI archive. A missing archive fails the step before Go can skip those tests. Pin-move CI
+selects grammars from `pins.json`: adding `postgres` checks its new schema, and later pin changes require
+the old/new native comparison. Its unpatched regeneration flag also prepares the pinned CLI for that job.
+CLI errors (including OOM), compiler errors and timeouts propagate as job failures; no memory-dependent
+skip or `continue-on-error` is used for PostgreSQL generation.
