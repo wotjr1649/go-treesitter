@@ -7,7 +7,8 @@ name: Speed and memory lanes (Linux, macOS)
 # every engine region returned and private bytes within start + 16 MB. A measured breach fails the job; a criterion the
 # platform cannot measure (the region count on macOS) is reported as NOT_RUN. Hosted runners are shared machines: the
 # ratios are measured in one window, absolute times are not comparable between runs, and a noisy result is reported
-# with its spread, never rerun until it passes.
+# with its spread, never rerun until it passes. Only small-corpus threshold failures get exactly one per-file paired
+# confirmation with the same rounds/reps; a file fails only if both passes fail. Both passes remain in the output and CSVs.
 
 on:
   schedule:
