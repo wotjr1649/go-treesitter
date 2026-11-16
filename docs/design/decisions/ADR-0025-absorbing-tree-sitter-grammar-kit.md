@@ -49,3 +49,17 @@ incomplete.
 - T-SQL verdicts from SQL Server (the 726 PARSEONLY cases) are not absorbed here. The owner's grammar repository
   `wotjr1649/tree-sitter-mssql` takes them over as its own oracle. This repository keeps the pinned T-SQL grammar
   (ADR-0024) and its known gaps.
+
+## Amendment (2026-11-16): decision 5, how upstream contributions are made
+
+The tree-sitter [AI policy](https://tree-sitter.github.io/tree-sitter/6-contributing.html) forbids direct coding-agent
+interaction with its repositories and pasted LLM text, and requires disclosure of AI use. Three issues were posted by
+an agent from the owner's account without disclosure; the owner disclosed this on each afterwards.
+
+- Agents prepare only: reproduction, the patch on a branch of the owner's fork, local runs of the upstream CI steps,
+  and a fact sheet. The owner writes and posts every issue, pull request and comment, and discloses AI use. A
+  translation of the owner's own text is allowed.
+- Regenerated files in an upstream pull request use that repository's own pinned CLI (its `package.json`), as its
+  contributors do, and the pull request names the CLI used.
+- When testing several variants locally, give each its own `TREE_SITTER_LIBDIR`; a shared compiled-parser cache
+  makes `tree-sitter test` run an older parser.

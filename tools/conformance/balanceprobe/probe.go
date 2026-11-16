@@ -34,6 +34,10 @@ func (*Host) Xfd_close(int32) int32                      { return 52 }
 func (*Host) Xfd_seek(int32, int64, int32, int32) int32  { return 52 }
 func (*Host) Xfd_write(int32, int32, int32, int32) int32 { return 52 }
 
+// Xproc_exit traps like engine.Host.Xproc_exit, so modules importing it (Swift's scanner OOM branch) still build here.
+// shortcut: this method set mirrors engine.Host by hand; add a generated-fixture compile test when another WASI import is allowed.
+func (*Host) Xproc_exit(code int32) { panic(fmt.Sprintf("wasi proc_exit(%d)", code)) }
+
 type Memory = interface {
 	Slice() *[]byte
 	Grow(delta, max int64) int64

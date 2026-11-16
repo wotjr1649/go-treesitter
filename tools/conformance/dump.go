@@ -12,7 +12,8 @@ import (
 	treesitter "github.com/wotjr1649/go-treesitter"
 )
 
-// WriteDump writes the canonical "#tsg-dump/1" text of s: byte-identical to the C dumper .scratch/s15/shim/tsg_dump.c
+// WriteDump writes the canonical "#tsg-dump/1" text of s: byte-identical to the C dumper tsg_dump.c
+// (maintainer-local; archived in 2026-11-13-session-15 spike/shim/, not in this repository)
 // (a header line, then one line per node in preorder: depth, field or "-", type, named, extra, missing, is_error,
 // has_error, start_byte, end_byte, start_row:start_col, end_row:end_col, tab separated). It uses only the public API.
 func WriteDump(w io.Writer, s *treesitter.Snapshot) error {

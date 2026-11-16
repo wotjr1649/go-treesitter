@@ -53,10 +53,11 @@ understand whether the contract is still right.
 | 0017 | Exclude unclear grammars; assurance by release scope | Superseded in part by ADR-0020 |
 | 0018 | Evaluate the approved runtime baseline transition | Superseded by ADR-0020 |
 | 0019 | Explicit authority for every main merge | Accepted |
-| 0020 | A public CGO-free tree-sitter library built from unmodified upstream C | Accepted; §4 amended by ADR-0022; grammar sources by ADR-0023; decision 6 by ADR-0025 |
+| 0020 | A public CGO-free tree-sitter library built from unmodified upstream C | Accepted; §4 amended by ADR-0022; grammar sources by ADR-0023; decision 6 by ADR-0025; decision 1 (generated grammar C) by ADR-0027 |
 | 0021 | Public API v2: owned immutable snapshots on a confined parser | Accepted |
 | 0022 | Wave-1 preview, multi-module versioning, release-memory criterion, carrier removal | Accepted |
 | 0023 | Temporary, retirable patches to upstream grammar C | Accepted; amends ADR-0020 §1, §4 for grammars |
 | 0024 | Grammar source tiers: one upstream per language | Accepted; Consequences amended by ADR-0025; rule 6 (follow a maintained fork) added 2026-11-16 |
-| 0025 | Absorbing tree-sitter-grammar-kit | Accepted; amends ADR-0020 (decision 6), ADR-0024 |
+| 0025 | Absorbing tree-sitter-grammar-kit | Accepted; amends ADR-0020 (decision 6), ADR-0024; decisions 4 and 5 amended 2026-11-16 |
 | 0026 | Never block on upstream: mirrors, grammar patches, health watch | Accepted; extends ADR-0023, ADR-0024; S1 amended 2026-11-15: sources mirrored, toolchains deferred until complete bundled notices |
+| 0027 | One pinned generator CLI for every grammar | Accepted 2026-11-16, implementation pending; amends ADR-0020 decision 1 |

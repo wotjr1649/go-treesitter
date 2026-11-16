@@ -28,7 +28,7 @@ Transition: the old `syntax` package, `treesitter.New` and `internal/gtsadapter`
 | `ResourceLimit` — input over `WithMaxInputBytes`, snapshot over `WithMaxSnapshotNodes` (checked with the descendant count before export) | no | `ErrResourceLimit` | kept |
 | `ResourceLimit` — a refused `memory.grow` during the call, even if a tree came back | no | `ErrResourceLimit` | recreated (`InstanceReset`) |
 | `InvalidInput` — nil ctx, invalid option value (never clamped), `old` from another parser or invalidated, non-UTF-8 with `WithStrictUTF8` | no | `ErrInvalidInput` | kept |
-| `EngineFault` — any other trap, root-end mismatch, an ABI violation by the module | no | `ErrEngineFault` | recreated (`InstanceReset`) |
+| `EngineFault` — any other trap (including WASI `proc_exit`, which is a trap and never exits the process), root-end mismatch, an ABI violation by the module | no | `ErrEngineFault` | recreated (`InstanceReset`) |
 | `IncompatibleLanguage` — engine ABI version or export-block magic/format mismatch | no parser | `ErrIncompatibleLanguage` | none created |
 
 Adding a member is a contract change and needs an ADR. Lifetime errors are separate sentinels: `ErrTreeInvalidated`,

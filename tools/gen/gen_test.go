@@ -34,7 +34,7 @@ func TestPatchMemoryGrow(t *testing.T) {
 }
 
 func TestCheckImports(t *testing.T) {
-	ok := "type Xtsg = interface {\n\tXshould_stop() int32\n}\ntype Xwasi_snapshot_preview1 = interface {\n\tXfd_close(v0 int32) int32\n}\n" +
+	ok := "type Xtsg = interface {\n\tXshould_stop() int32\n}\ntype Xwasi_snapshot_preview1 = interface {\n\tXfd_close(v0 int32) int32\n\tXproc_exit(v0 int32)\n}\n" +
 		"type Memory = interface {\n\tSlice() *[]byte\n}\n"
 	if err := checkImports(ok); err != nil {
 		t.Fatal(err)

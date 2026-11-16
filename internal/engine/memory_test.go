@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math"
 	"math/bits"
+	"strings"
 	"testing"
 	"unsafe"
 )
@@ -182,5 +183,27 @@ func TestCallCapturesPanic(t *testing.T) {
 	err = Call(func() { _ = s[i] }) // out-of-bounds, like a wasm load past len(mem)
 	if !errors.As(err, &tr) {
 		t.Fatalf("runtime panic not captured: %v", err)
+	}
+}
+
+// proc_exit is a trap: it unwinds through nested frames to Call (the process survives), and the instance's region is
+// still returned by Release afterwards.
+func TestProcExitTrapsAndRegionIsReleased(t *testing.T) {
+	m := newMem(t)
+	SetLimit(m, MinLimit)
+	MemoryGrow(m, 4, 65536)
+	p := base(m)
+	var h Host
+	err := Call(func() { func() { h.Xproc_exit(1) }() })
+	var tr *Trap
+	if !errors.As(err, &tr) || !strings.Contains(tr.Error(), "proc_exit(1)") || len(tr.Stack) == 0 {
+		t.Fatalf("got %v", err)
+	}
+	Release(m)
+	if !regionFreed(p) || *m != nil || Committed(m) != 0 {
+		t.Fatal("region not returned after a proc_exit trap")
+	}
+	if _, ok := live.Load(uintptr(unsafe.Pointer(m))); ok {
+		t.Fatal("state map entry not dropped")
 	}
 }

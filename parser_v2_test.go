@@ -650,3 +650,27 @@ func TestParseCallsLeaveNoTreeBehind(t *testing.T) {
 		t.Fatalf("ParseSnapshot must free the tree and the source buffer: trees %d", len(f.trees))
 	}
 }
+
+// WASI proc_exit from generated code (e.g. Swift's scanner OOM branch) is a trap: EngineFault, instance recreated,
+// and the same parser parses again. A refused memory.grow before it explains it as ResourceLimit (TestTrap).
+func TestProcExitIsEngineFault(t *testing.T) {
+	fl := newFakeLang(func(fl *fakeLang, f *fakeModule) {
+		if len(fl.mods) == 1 {
+			f.parseHook = func(f *fakeModule, _ []byte, _ int32) (int32, bool) {
+				f.h.Xproc_exit(1)
+				return 0, false
+			}
+		}
+	})
+	p := newP(t, fl)
+	tr, err := p.Parse(bg, []byte("a"), nil)
+	pe := wantPE(t, err, EngineFault, true)
+	var trap *engine.Trap
+	if tr != nil || !errors.As(err, &trap) || !strings.Contains(pe.Reason, "proc_exit(1)") {
+		t.Fatalf("tree %v trap %v reason %q", tr, trap, pe.Reason)
+	}
+	if len(fl.mods) != 2 || !fl.mods[0].released.Load() {
+		t.Fatalf("instance must be recreated: %d", len(fl.mods))
+	}
+	mustParse(t, p, "a")
+}

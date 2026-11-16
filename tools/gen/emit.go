@@ -90,7 +90,7 @@ func patchMemoryGrow(src, wantSHA string) (string, error) {
 func checkImports(src string) error {
 	allowed := map[string]map[string]bool{
 		"tsg":                    {"Xshould_stop": true},
-		"wasi_snapshot_preview1": {"Xclock_time_get": true, "Xfd_close": true, "Xfd_seek": true, "Xfd_write": true},
+		"wasi_snapshot_preview1": {"Xclock_time_get": true, "Xfd_close": true, "Xfd_seek": true, "Xfd_write": true, "Xproc_exit": true},
 	}
 	for _, m := range ifaceRx.FindAllStringSubmatch(src, -1) {
 		mod := m[1]
