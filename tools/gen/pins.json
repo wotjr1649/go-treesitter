@@ -1,8 +1,8 @@
 {
   "schema": 2,
   "mirrors": [
-    "https://github.com/wotjr1649/go-treesitter/releases/download/v0.4.0",
-    "https://github.com/wotjr1649/go-treesitter/releases/download/v0.3.0"
+    "https://github.com/wotjr1649/go-treesitter/releases/download/v0.5.0",
+    "https://github.com/wotjr1649/go-treesitter/releases/download/v0.4.0"
   ],
   "abi": 3,
   "recipe": "v2-O3",

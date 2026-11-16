@@ -231,7 +231,7 @@ awk -F '\t' '$4 == "source"' release-assets.tsv > release-source-assets.tsv
 
 The command lists 33 rows for the current pins: 25 `source` archives and eight `toolchain` archives. The immutable v0.4.0 release
 contains its original 24 source archives plus `SHA256SUMS`; the new C and PostgreSQL archives have no fallback there.
-The v0.5.0 candidate source mirror includes all 25 rows with column 4 equal to `source`, plus `SHA256SUMS`. Check their filenames against `runtime.archive`,
+The v0.5.0 release mirrors all 25 rows with column 4 equal to `source`, plus `SHA256SUMS`. Check their filenames against `runtime.archive`,
 `wasiLibc.archive`, and each grammar's `archive` in `pins.json`, deduplicating TypeScript/TSX's shared archive;
 the [publication procedure](../../docs/specs/publication.md#pinned-archive-release-assets) specifies the inventory
 and digest checks. The eight SDK/binaryen/CLI host archives are excluded until complete bundled notices can be

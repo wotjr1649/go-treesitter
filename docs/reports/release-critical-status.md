@@ -1,6 +1,6 @@
 # Release-Critical status board
 
-Updated 2026-11-16 for v0.5.0 preview preparation (24 grammars, engine ABI 3). Status, not a promise. Nothing here is release-approved.
+Updated 2026-11-16 for the v0.5.0 preview release (24 grammars, engine ABI 3). Status, not a promise. Nothing here is release-approved.
 Historical gate tables retain their original commits, pins and scope; their passing results do not transfer to v0.5.0.
 The previous board for the `gotreesitter` carrier is in Git history at main `9ad82eb`; none of its results transfer
 to the new engine.
@@ -35,7 +35,7 @@ inputs/platforms; they do not establish E6 or publication approval. Retain and c
 | Upstream watch | PASS, E1 source-health observation; [43835569820](https://github.com/wotjr1649/go-treesitter/actions/runs/43835569820): zero unaccepted warnings, nine accepted warnings (expiry 2027-05-16 UTC, exclusive); two jobs passed | Pin reachability/source warnings, accepted warnings with six-month expiry; no automatic pin moves |
 | Local module ZIP rehearsal | PASS, local E3 packaging | Windows amd64 empty-cache file GOPROXY, root + 24 grammars at v0.5.0, CGO=0 run and linux/arm64 build; packaging evidence only |
 | Source-row inventory | PASS, local static check | 33 rows: 25 pin-matching source rows, eight toolchain rows excluded; publication requires those 25 archives plus SHA256SUMS |
-| Tag/proxy resolution and published mirror assets | [FILL AT RELEASE] | Separate later publication steps: root then grammar tags, direct/public proxy consumers, draft/upload digest check, attestation and all source downloads from the published first base |
+| Tag/proxy resolution and published mirror assets | PASS, read-only verification | Root tag on `a53a506`, grammar tags on `84c20bd`; `GOPROXY=direct` and proxy.golang.org with the checksum database resolve root + 24 grammars; uploaded digests 26/26 matched; `gh release verify` passed; all 25 source archives downloaded from the published release match their pins |
 
 Hosted scope on `02d10aa18cf70baea757d17e9cac39070c774fd9`:
 
@@ -70,12 +70,10 @@ Hosted scope on `02d10aa18cf70baea757d17e9cac39070c774fd9`:
   TypeScript source-age warnings plus the newer T-SQL stable release warning under the recorded 2026-11-16
   decisions; each expires 2027-05-16 UTC (exclusive). Zero unaccepted warnings does not mean zero warnings.
 
-Post-publication PR: [FILL AT RELEASE]. Keep the tag/proxy row open for publication date and immutable
-pre-release, root/grammar tag commits, root ZIP `h1`, empty-cache direct/public-proxy resolution (checksum database,
-all 25 module consumers and linux/arm64 build), uploaded 25-source-archive inventory plus `SHA256SUMS`, digest
-comparison, attestation/release verification, and download/hash checks from the published first mirror base.
-The final-candidate packaging rehearsal is still a separate publication-procedure check; the preparation-base
-local rehearsal below does not transfer automatically.
+Publication (2026-11-16): the publication-step-1 rehearsal was rerun on the release commit `a53a506`
+(file GOPROXY, empty caches, root + 24 grammar ZIPs, 24/24 clean parses with `CGO_ENABLED=0`, linux/arm64 build);
+the rehearsal below on the preparation base is kept as history. Tags, proxy resolution and mirror assets are in
+the gate table above and under Released.
 
 Local rehearsal on the preparation base above (Windows amd64, Go 1.27.4, CGO=0) used
 `golang.org/x/mod/zip` to create/check 25 v0.5.0 module ZIPs from a tracked snapshot with documentation edits.
@@ -107,6 +105,15 @@ filenames and hashes; it does not establish uploaded/downloaded asset digests or
 
 ## Released
 
+- **v0.5.0 preview** (2026-11-16, immutable GitHub pre-release, attestation verified): twenty-four grammars, engine
+  ABI 3. Root tag `v0.5.0` on `a53a506` (root ZIP `h1:JYGKNCLcI4vGNR9UBjjPfd7J/86hKcnWGy91hcv2348=`, equal to the
+  step-1 rehearsal ZIP), grammar tags `grammars/<lang>/v0.5.0` on `84c20bd`. Verified after tagging: `GOPROXY=direct`
+  and proxy.golang.org, with the checksum database, resolve all twenty-five modules; an empty-cache external module
+  installs root + all twenty-four grammars without `replace`, parses each grammar's sample cleanly with
+  `CGO_ENABLED=0` and cross-builds linux/arm64 (Windows amd64 host, Go 1.27.4). The release carries its twenty-five
+  pinned source archives with `SHA256SUMS`; uploaded digests matched before publication and all twenty-five
+  downloaded from the published release match their pins. `tools/gen/pins.json` now lists the mirror bases
+  `v0.5.0`, `v0.4.0`.
 - **v0.4.0 preview** (2026-11-15, immutable GitHub pre-release, attestation verified): twenty-three grammars, engine
   ABI 3. Root tag `v0.4.0` on `09f4c2f` (root ZIP `h1:swsqEf42qDrpBltRaE1rQ7cTxuQqrWDJcpLJAAZABs0=`, precomputed),
   grammar tags `grammars/<lang>/v0.4.0` on `eb1fbd5`. Verified after tagging: `GOPROXY=direct` and proxy.golang.org,
