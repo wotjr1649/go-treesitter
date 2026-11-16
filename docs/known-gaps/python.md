@@ -6,7 +6,7 @@ These upstream grammar defects are reproduced by the engine. The retained strict
 passes only while the entire recorded wrong tree remains unchanged; a fix or any other shape change fails it.
 Remove fixed entries or turn them into regression tests. This is a bounded defect list, not a language validator.
 
-Initial E5 evidence: Windows native reference differential (windows/amd64), base commit `a2fec5f2ba66547602a24012517460f771e2bb37`, with this register applied on top of it.
+Initial E5 evidence: Windows native reference differential (windows/amd64), base commit `c138aaa1053cf714569428ee598130a904c48c83`, with this register applied on top of it.
 Only the exact inputs below are covered. `TestKnownGaps` rechecks engine dumps (E3) and, with a freshly built
 `TSG_NATIVE_EXE_DIR`, compares them byte-for-byte with native C (E5). CI requires that comparison.
 

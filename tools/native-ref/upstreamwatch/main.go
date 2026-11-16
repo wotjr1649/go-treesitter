@@ -4,10 +4,10 @@
 // GITHUB_TOKEN lifts the API rate limit. Requests are cached for shared repositories and pins are never changed.
 //
 // Every grammar pin is also compared with nvim-treesitter's parsers.lua (information, never a failure; see nvim.go).
-// -issue FILE writes the body of the tracking issue when warnings exist and no hard error occurred; the file is
-// removed otherwise, so its absence means "nothing to report" (the workflow reads the exit code for errors).
+// -issue FILE writes a complete tracking-issue body unless a hard error occurred.
+// -state FILE writes warn, clean or error; accepted warnings do not prevent auto-close.
 //
-//	upstreamwatch [-pins tools/gen/pins.json] [-nvim URL|""] [-issue FILE]
+//	upstreamwatch [-pins tools/gen/pins.json] [-nvim URL|""] [-issue FILE] [-state FILE]
 package main
 
 import (
@@ -48,7 +48,8 @@ type pins struct {
 func main() {
 	file := flag.String("pins", filepath.Join("tools", "gen", "pins.json"), "pins file")
 	nvimURL := flag.String("nvim", nvimParsersURL, "nvim-treesitter parsers.lua URL (empty: skip the comparison)")
-	issue := flag.String("issue", "", "write the tracking-issue body here when warnings exist")
+	issue := flag.String("issue", "", "write the tracking-issue body here when the report is complete")
+	state := flag.String("state", "", "write warn, clean or error for the tracking-issue workflow")
 	flag.Parse()
 	raw, err := os.ReadFile(*file)
 	if err != nil {
@@ -62,14 +63,32 @@ func main() {
 	}
 	var out bytes.Buffer
 	api := newAPI()
+	api.acceptances, err = loadAcceptances(acceptedWarningsJSON)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "upstreamwatch:", err)
+		os.Exit(2)
+	}
 	both := io.MultiWriter(os.Stdout, &out)
 	stale, failed := report(&p, both, api)
 	if *nvimURL != "" {
 		entries, err := fetchNvim(api.client, *nvimURL)
 		nvimSection(&p, both, api, entries, err)
 	}
+	warnings := warningSummary(os.Stdout, api)
 	if *issue != "" {
 		if err := writeIssue(*issue, &out, api, failed); err != nil {
+			fmt.Fprintln(os.Stderr, "upstreamwatch:", err)
+			os.Exit(2)
+		}
+	}
+	if *state != "" {
+		value := "clean"
+		if failed {
+			value = "error"
+		} else if warnings > 0 {
+			value = "warn"
+		}
+		if err := os.WriteFile(*state, []byte(value+"\n"), 0o644); err != nil {
 			fmt.Fprintln(os.Stderr, "upstreamwatch:", err)
 			os.Exit(2)
 		}
@@ -89,12 +108,17 @@ type source struct {
 	grammar         bool // a grammar pin: a newer stable release than the pin is a warning
 }
 
-type finding struct{ component, text string }
+type finding struct{ component, text, kind string }
 
 // warn records a warning for the tracking issue and prints its annotation.
-func (a *githubAPI) warn(w io.Writer, name, text string) {
-	a.findings = append(a.findings, finding{name, text})
-	fmt.Fprintf(w, "::warning::%s: %s\n", name, text)
+func (a *githubAPI) warn(w io.Writer, name, kind, text string) {
+	f := finding{name, text, kind}
+	a.findings = append(a.findings, f)
+	level := "warning"
+	if a.accepted(f) != nil {
+		level = "notice"
+	}
+	fmt.Fprintf(w, "::%s::%s: %s\n", level, name, text)
 }
 
 func report(p *pins, w io.Writer, api *githubAPI) (stale, failed bool) {
@@ -133,7 +157,7 @@ func report(p *pins, w io.Writer, api *githubAPI) (stale, failed bool) {
 		if newer(t.pinned, rel.Tag) {
 			status, stale = "**NEWER STABLE RELEASE**", true
 			fmt.Fprintf(w, "::error::%s: pinned %s, newest stable release %s\n", t.name, t.pinned, rel.Tag)
-			api.findings = append(api.findings, finding{t.name, "newer stable release " + rel.Tag + " than pinned " + t.pinned})
+			api.findings = append(api.findings, finding{component: t.name, text: "newer stable release " + rel.Tag + " than pinned " + t.pinned})
 		}
 		fmt.Fprintf(w, "| %s | %s | %s | %s |\n", t.name, t.pinned, rel.Tag, status)
 	}
@@ -181,11 +205,11 @@ func health(api *githubAPI, w io.Writer, s source) (failed bool) {
 	if !strings.EqualFold(repo.Name, s.repo) || api.redirected[repoPath] {
 		identity += " → " + repo.Name
 		health = append(health, "WARNING renamed/transferred (API redirect or full_name differs)")
-		api.warn(w, s.name, fmt.Sprintf("repository %s → %s", s.repo, repo.Name))
+		api.warn(w, s.name, "repository renamed/transferred", fmt.Sprintf("repository %s → %s", s.repo, repo.Name))
 	}
 	if repo.Archived {
 		health = append(health, "WARNING archived")
-		api.warn(w, s.name, "repository archived")
+		api.warn(w, s.name, "repository archived", "repository archived")
 	}
 	// Use the canonical name after a transfer, avoiding a redirect on every following request.
 	base := "repos/" + repo.Name
@@ -211,7 +235,7 @@ func health(api *githubAPI, w io.Writer, s source) (failed bool) {
 			failed = true
 		} else if date.Before(api.now.AddDate(-1, 0, 0)) {
 			health = append(health, "WARNING last commit >12 months; tier review")
-			api.warn(w, s.name, fmt.Sprintf("last commit %s; tier review (>12 months)", date.Format("2006-01-02")))
+			api.warn(w, s.name, "tier review (>12 months)", fmt.Sprintf("last commit %s; tier review (>12 months)", date.Format("2006-01-02")))
 		}
 
 	}
@@ -239,7 +263,7 @@ func health(api *githubAPI, w io.Writer, s source) (failed bool) {
 			releaseText += " (" + cmp.Status + ")"
 			if s.grammar && cmp.Status == "ahead" { // the release contains the pin and is newer
 				health = append(health, "WARNING newer stable release "+release.Tag)
-				api.warn(w, s.name, fmt.Sprintf("newer stable release %s than pin %.12s", release.Tag, s.pin))
+				api.warn(w, s.name, "newer stable release "+release.Tag+" than pin", fmt.Sprintf("newer stable release %s than pin %.12s", release.Tag, s.pin))
 			}
 		}
 	}
@@ -276,15 +300,16 @@ type apiReply struct {
 	err  error
 }
 type githubAPI struct {
-	base       string
-	client     *http.Client
-	token      string
-	now        time.Time
-	cache      map[string]apiReply
-	redirected map[string]bool
-	findings   []finding
-	requests   int
-	remaining  string
+	base        string
+	client      *http.Client
+	token       string
+	now         time.Time
+	cache       map[string]apiReply
+	redirected  map[string]bool
+	acceptances []acceptance
+	findings    []finding
+	requests    int
+	remaining   string
 }
 
 func newAPI() *githubAPI {

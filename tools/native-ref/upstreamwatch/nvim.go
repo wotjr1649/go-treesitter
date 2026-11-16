@@ -135,7 +135,7 @@ func nvimSection(p *pins, w io.Writer, api *githubAPI, entries map[string]nvimEn
 	fmt.Fprintln(w)
 	if err != nil {
 		fmt.Fprintf(w, "Comparison unavailable: %v\n", err)
-		api.warn(w, "nvim-treesitter", "comparison unavailable: "+err.Error())
+		api.warn(w, "nvim-treesitter", "nvim comparison unavailable", "comparison unavailable: "+err.Error())
 		return
 	}
 	fmt.Fprintln(w, "| grammar | our pin | nvim-treesitter | result |")
@@ -161,7 +161,7 @@ func nvimSection(p *pins, w io.Writer, api *githubAPI, entries map[string]nvimEn
 		result, warn := compareNvim(api, repoOf(g.Repo), g.Commit, e)
 		fmt.Fprintf(w, "| %s | %s | %s | %s |\n", n, ours, theirs, result)
 		if warn {
-			api.warn(w, n, "nvim-treesitter: "+result+" ("+theirs+")")
+			api.warn(w, n, "nvim-treesitter: "+result, "nvim-treesitter: "+result+" ("+theirs+")")
 		}
 	}
 }
@@ -200,24 +200,20 @@ func compareNvim(api *githubAPI, repo, pin string, e nvimEntry) (result string, 
 	return "**unknown** comparison status " + cmp.Status, true
 }
 
-// writeIssue removes path, then writes the tracking-issue body when warnings exist and nothing failed hard (an
+// writeIssue removes path, then writes the tracking-issue body when nothing failed hard (an
 // incomplete report must not close or rewrite the issue).
 func writeIssue(path string, report *bytes.Buffer, api *githubAPI, failed bool) error {
 	if err := os.Remove(path); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return err
 	}
-	if failed || len(api.findings) == 0 {
+	if failed {
 		return nil
 	}
-	cell := func(s string) string { return strings.ReplaceAll(strings.ReplaceAll(s, "|", `\|`), "\n", " ") }
 	var b strings.Builder
 	b.WriteString("<!-- upstream-watch: maintained by .github/workflows/upstream-watch.yml; edits are overwritten -->\n")
-	fmt.Fprintf(&b, "Updated %s by the weekly upstream-watch workflow. Replaced on every run; closed automatically when no warning remains.\n\n",
+	fmt.Fprintf(&b, "Updated %s by the weekly upstream-watch workflow. Replaced on every run; closed automatically when no unaccepted warning remains.\n\n",
 		api.now.Format("2006-01-02 15:04 UTC"))
-	fmt.Fprintf(&b, "**%d warning(s)**\n\n| component | warning |\n|---|---|\n", len(api.findings))
-	for _, f := range api.findings {
-		fmt.Fprintf(&b, "| %s | %s |\n", cell(f.component), cell(f.text))
-	}
+	warningSummary(&b, api)
 	var full []string
 	for _, line := range strings.Split(report.String(), "\n") {
 		if !strings.HasPrefix(line, "::") {
