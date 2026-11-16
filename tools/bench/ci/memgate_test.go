@@ -3,7 +3,8 @@ package main
 import "testing"
 
 // The five snapshot cases that failed the raw gate in bench run 43577876668 (macos-latest), from
-// .scratch/s15/p17/run43577876668/bench-macos-latest/mem-diag/*-snapshot-default.txt: priv_* from the final line,
+// s15/p17/run43577876668/bench-macos-latest/mem-diag/*-snapshot-default.txt (maintainer-local evidence archive
+// 2026-11-16-s17-cleanup; not in this repository): priv_* from the final line,
 // rel_after = d_heap_released at stage=final (after GC + FreeOSMemory), rel_start = d_heap_released at stage=init (the
 // recorded runs have no reading at main, so the first available one stands in). d_snapshot_collected=true in all five.
 var recorded = []struct {

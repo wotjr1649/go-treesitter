@@ -353,6 +353,27 @@ func TestKnownGapDocs(t *testing.T) {
 
 var taskCode = regexp.MustCompile(`\b[PQ][0-9]{1,2}\b`)
 
+// A tracked file may name a scratch path only where it is a rule (the files below), a frozen record, or a line that also
+// says the evidence moved to a "maintainer-local" archive. This file is listed because it holds the needle.
+func TestKnownGapDocsNoDeadScratchRefs(t *testing.T) {
+	out, err := exec.Command("git", "-C", "../..", "ls-files").Output()
+	if err != nil {
+		t.Skipf("git ls-files: %v", err)
+	}
+	for _, rel := range strings.Fields(string(out)) { // no tracked path has a space
+		switch {
+		case rel == ".gitignore", rel == "AGENTS.md", rel == "docs/specs/validation.md",
+			rel == "tools/conformance/known_gaps_test.go", strings.HasPrefix(rel, "artifacts/release-candidate/"):
+			continue
+		}
+		for i, line := range strings.Split(string(readFile(t, filepath.Join("../..", rel))), "\n") {
+			if strings.Contains(line, ".scratch/") && !strings.Contains(line, "maintainer-local") {
+				t.Errorf("%s:%d: .scratch path without a maintainer-local archive name", rel, i+1)
+			}
+		}
+	}
+}
+
 // Owner decision D8: user documents cite dates, evidence paths or commits, never internal task codes (ADRs, plans and
 // prompts are exempt). Named TestKnownGap* so the existing conformance.yml -run filter runs it.
 func TestKnownGapDocsNoTaskCodes(t *testing.T) {

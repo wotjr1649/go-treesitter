@@ -3,7 +3,8 @@
 Status: ABI 1 parsing contract, ABI 2 queries (2026-11-14), and ABI 3 snapshot field-lookup exceptions
 (owner decision 2026-11-15).
 Inputs: ADR-0020, ADR-0021, `docs/design/api-v2.md`, `docs/design/query-abi.md`, the session-15 spike
-(`.scratch/s15/w2/mem/combo`, shims `tsg_ext.c` and `tsg_export_s2.c`).
+(`.scratch/s15/w2/mem/combo`, maintainer-local archive 2026-11-16-s17-cleanup; shims `tsg_ext.c` and
+`tsg_export_s2.c`, archive 2026-11-13-session-15 spike/).
 
 The ABI is the contract between three parts that are versioned separately:
 

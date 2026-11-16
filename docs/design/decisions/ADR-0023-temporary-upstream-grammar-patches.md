@@ -12,9 +12,11 @@ Wave 2 found two upstream grammar defects that block release gates while the eng
   external scanner returns no token mid-input, the parse "ends" there and `recover_eof` drops the rest. Native C and
   CLI 0.27.2 behave the same; 16 of 131 corpus inputs get a root that ends before the input, and inputs with a NUL
   byte can be truncated without any error. Our contract rejects such trees (`EngineFault`). Upstream issues
-  tree-sitter-yaml #12, #14, #16 are open without a root cause. Evidence: `.scratch/s15/p24/P24-report.md`.
+  tree-sitter-yaml #12, #14, #16 are open without a root cause. Evidence: `.scratch/s15/p24/P24-report.md` (maintainer-local evidence archive 2026-11-16-s17-cleanup,
+  s15/p24/P24-report.md; not in this repository).
 - **tree-sitter-kotlin** (pin `3dea6dfa`): the external scanner's string-content branch scans hundreds of thousands
-  of characters per call in error mode; 2.87x native on a large generated file. Evidence: `.scratch/s15/p23/`.
+  of characters per call in error mode; 2.87x native on a large generated file. Evidence: `.scratch/s15/p23/` (maintainer-local evidence archive 2026-11-16-s17-cleanup, s15/p23/; not in
+  this repository).
 
 Waiting for upstream leaves these grammars unavailable indefinitely; relaxing our contract or criteria was rejected.
 
