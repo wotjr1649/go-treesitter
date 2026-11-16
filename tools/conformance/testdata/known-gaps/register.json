@@ -89,7 +89,7 @@
       "Input": "#define A",
       "InputSHA256": "e4342cebc1c4b162457213203ce862cac93c73b402f3ac7a004b6c2be418629c",
       "DumpSHA256": "0422ba44c497c2475466bbbecc090af5aa3251adc3ec6e21963b4a02ff9fc33e",
-      "Observed": "The root and preproc_define over [0,9) have has_error=1; there is no explicit ERROR or missing node.",
+      "Observed": "The root and preproc_define over [0,9) have has_error=1 without an ERROR node. The C API string shows an anonymous zero-width MISSING preproc_if_token2 at the end of preproc_define, which the dump does not list.",
       "Expected": "A nonempty compilation unit receives an implicit final line terminator, so #define A at EOF must parse without errors.",
       "Specs": [
         {
@@ -101,7 +101,7 @@
           "URL": "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#654-definition-directives"
         }
       ],
-      "Upstream": ""
+      "Upstream": "https://github.com/tree-sitter/tree-sitter-c-sharp/issues/458"
     },
     {
       "ID": "csharp-empty-interpolation",
