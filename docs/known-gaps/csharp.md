@@ -6,7 +6,7 @@ These upstream grammar defects are reproduced by the engine. The retained strict
 passes only while the entire recorded wrong tree remains unchanged; a fix or any other shape change fails it.
 Remove fixed entries or turn them into regression tests. This is a bounded defect list, not a language validator.
 
-Initial E5 evidence: Windows native reference differential (windows/amd64), base commit `a2fec5f2ba66547602a24012517460f771e2bb37`, with this register applied on top of it.
+Initial E5 evidence: Windows native reference differential (windows/amd64), base commit `c138aaa1053cf714569428ee598130a904c48c83`, with this register applied on top of it.
 Only the exact inputs below are covered. `TestKnownGaps` rechecks engine dumps (E3) and, with a freshly built
 `TSG_NATIVE_EXE_DIR`, compares them byte-for-byte with native C (E5). CI requires that comparison.
 
@@ -69,3 +69,20 @@ Expected rule: The interpolated regular string production permits zero content a
 - Upstream issue: none recorded.
 - Input SHA-256: `55e49735e3373f85215a805a55fa39d41b3330363c66c8cd842737f26668e7b6`
 - [Recorded native dump](../../tools/conformance/testdata/known-gaps/csharp-empty-interpolation.dump), SHA-256: `44b803dd1798e548026b8f1e848b7768ffb1065838a23f8424f56b79489f7579`
+
+## csharp-conditional-splits-statement
+
+Input (JSON string; escapes and final newline are significant):
+
+```json
+"class C { void M() {\n#if A\nif (true)\n#else\nif (false)\n#endif\n{ }\n} }\n"
+```
+
+Observed: The root has errors: preproc_if contains nested if_statement nodes, an ERROR over #else [37,42), and a missing semicolon at byte 53. The shared block [61,64) is parsed as a separate sibling instead of the body of the if head that either branch selects.
+
+Expected rule: C# conditional compilation operates during lexical analysis: only the selected section supplies ordinary tokens, and unselected sections are skipped source text. Whether A is defined or undefined, this input selects one complete if head followed by the shared block. Either selection is a valid program, and so is the source with the directive lines removed (two nested if statements), so this input is a grammar defect: the grammar models #if/#else/#endif as a node holding whole statements. Inputs whose branches cannot be combined without evaluating symbols (for example a { opened in each branch) are an inherent limit of parsing every branch and are not claimed here. The register records only this input; it does not require a particular tree for inactive text.
+
+- Specification: [C# specification 6.5.5: Conditional compilation directives](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#655-conditional-compilation-directives)
+- Upstream issue: none recorded.
+- Input SHA-256: `b0e13a41549542013633c8b08a00593220c6413d0704e4bfc2d0fc3e4db07b97`
+- [Recorded native dump](../../tools/conformance/testdata/known-gaps/csharp-conditional-splits-statement.dump), SHA-256: `8149d9af64945eb54e95a9594d60b0bd1dc426efff639cd07af41092929bfdb5`

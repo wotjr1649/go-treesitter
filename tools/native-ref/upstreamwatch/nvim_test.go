@@ -276,10 +276,10 @@ func TestWriteIssue(t *testing.T) {
 		_, err := os.Stat(path)
 		return err == nil
 	}
-	if write(false) || write(true, finding{"x", "y"}) {
-		t.Error("no warnings, or a hard error, must leave no body (and remove a stale one)")
+	if !write(false) || write(true, finding{component: "x", text: "y"}) {
+		t.Error("a complete clean report must write a body; a hard error must remove a stale one")
 	}
-	if !write(false, finding{"py|thon", "behind\nnvim"}) {
+	if !write(false, finding{component: "py|thon", text: "behind\nnvim"}) {
 		t.Fatal("warnings must write a body")
 	}
 	body, _ := os.ReadFile(path)
@@ -292,7 +292,7 @@ func TestWriteIssue(t *testing.T) {
 		t.Error("annotations must not reach the issue")
 	}
 	report.WriteString(strings.Repeat("filler line\n", 10000))
-	if write(false, finding{"x", "y"}); func() int { b, _ := os.ReadFile(path); return len(b) }() > 65536 {
+	if write(false, finding{component: "x", text: "y"}); func() int { b, _ := os.ReadFile(path); return len(b) }() > 65536 {
 		t.Error("body exceeds the GitHub limit")
 	}
 }

@@ -7,7 +7,7 @@ behaviour: equal schemas can still parse differently (for example after a preced
 
 ## Offline strict-check inputs
 
-The current candidate pin set contains 24 grammars, including the Q17 PHP, PowerShell and Dart revisions, the Q20
+The current candidate pin set contains 24 grammars, including the 2026-11-15 PHP, PowerShell and Dart revisions, the 2026-11-15
 tree-identical T-SQL pin move and the C maintained-fork move below; `tools/gen/pins.json` SHA-256 is
 `5467afce00a76529acf5dd13243a51d8218fa164c595ce171fc7fe6d78ea9913`. All 24 archived schemas pass the
 strict check at this pin set (Windows amd64, Go 1.27.4).
@@ -60,23 +60,23 @@ YAML's ADR-0023 patch changes `src/parser.c` only; the schema below is the unmod
 
 | Grammar | Repository | Commit | Directory | Bytes | `node-types.json` SHA-256 | Archive SHA-256 | Status |
 |---|---|---|---|---:|---|---|---|
-| dart | UserNobody14/tree-sitter-dart | `be07cf7118d3` | `src` | 314023 | `ea858f11158d4b176b32e7fdbdff6b49c587b2e7ee70e5fbe90751865a1912fe` | `b126efb8dfeeba8b71f0c6ae1f0cd09cf8b205560786b31d44cc16b283e782f2` | baseline (Q14 v0.4.0 candidate) |
-| kotlin | fwcd/tree-sitter-kotlin | `d6af96d2e23e` | `src` | 211132 | `c52aeae846963fe9bc82cc81e2715344e9976fff99469a127c91988ad3787c72` | `8be2036317c39784f3a93a62c79be76f21b9f5222deeb1a498896d2a75702939` | baseline (Q14 v0.4.0 candidate) |
-| php | tree-sitter/tree-sitter-php | `92b5271b60be` | `php/src` | 115690 | `c487d95cf9ddce3b7fe2120a257e5e43f7e9e4842cb5988707a984887143b788` | `2dfa7643857b94a273b6b413b4cb694aef9c9898e17403f97b66a9ba9c163891` | baseline (Q14 v0.4.0 candidate) |
-| powershell | airbus-cert/tree-sitter-powershell | `e7bd348c49fd` | `src` | 72248 | `dc314fa2746de2c2048ad5c95e0c6488d1b2873e524a95473356c685f18a9707` | `0c66318caf62f788b717e8dee74b75552917d1f22ecca0b01b621f79fc0d49f1` | baseline (Q14 v0.4.0 candidate) |
-| r | r-lib/tree-sitter-r | `58a22794466c` | `src` | 69859 | `94d900768d13cfc5daa8eefa829c297c1bc0c09582574f381f9ff8a6c5103062` | `642b13978f724c78f067e6b17edd8ffff223c48e8ea09776324e1f4e8e75ca1c` | baseline (Q14 v0.4.0 candidate) |
-| ruby | tree-sitter/tree-sitter-ruby | `ad907a69da0c` | `src` | 70025 | `9683f80e7be3dd93f1d6f575800de3f3445cda8af1f313f1f80003229c328e8b` | `f7aa2408f1b39922f85add38cacd60b59828a8222c609a240f08779d46d079d9` | baseline (Q14 v0.4.0 candidate) |
-| xml | tree-sitter-grammars/tree-sitter-xml | `5000ae8f22d1` | `xml/src` | 17444 | `3b63e111187a0f9b2282e1748db2dd6b10e968f0cdb3676772def93bf89f2a7b` | `1b7611ba3f2af55768acfbfbaf2fd2eb404ba61b14a85056d4f8d8326fc55146` | baseline (Q14 v0.4.0 candidate) |
-| yaml | tree-sitter-grammars/tree-sitter-yaml | `a1c4812a73ec` | `src` | 9026 | `1238b6c89fc6afb9723b6463a365843aa87e478025490660e5acfc9adaaf809b` | `6548cd059983e8073dfa39f102641f71d045b37f3a05b7ebd799ad17df8471d1` | baseline (Q14 v0.4.0 candidate) |
+| dart | UserNobody14/tree-sitter-dart | `be07cf7118d3` | `src` | 314023 | `ea858f11158d4b176b32e7fdbdff6b49c587b2e7ee70e5fbe90751865a1912fe` | `b126efb8dfeeba8b71f0c6ae1f0cd09cf8b205560786b31d44cc16b283e782f2` | baseline (v0.4.0 candidate, wave-2 batch 2 ABI 3 integration) |
+| kotlin | fwcd/tree-sitter-kotlin | `d6af96d2e23e` | `src` | 211132 | `c52aeae846963fe9bc82cc81e2715344e9976fff99469a127c91988ad3787c72` | `8be2036317c39784f3a93a62c79be76f21b9f5222deeb1a498896d2a75702939` | baseline (v0.4.0 candidate, wave-2 batch 2 ABI 3 integration) |
+| php | tree-sitter/tree-sitter-php | `92b5271b60be` | `php/src` | 115690 | `c487d95cf9ddce3b7fe2120a257e5e43f7e9e4842cb5988707a984887143b788` | `2dfa7643857b94a273b6b413b4cb694aef9c9898e17403f97b66a9ba9c163891` | baseline (v0.4.0 candidate, wave-2 batch 2 ABI 3 integration) |
+| powershell | airbus-cert/tree-sitter-powershell | `e7bd348c49fd` | `src` | 72248 | `dc314fa2746de2c2048ad5c95e0c6488d1b2873e524a95473356c685f18a9707` | `0c66318caf62f788b717e8dee74b75552917d1f22ecca0b01b621f79fc0d49f1` | baseline (v0.4.0 candidate, wave-2 batch 2 ABI 3 integration) |
+| r | r-lib/tree-sitter-r | `58a22794466c` | `src` | 69859 | `94d900768d13cfc5daa8eefa829c297c1bc0c09582574f381f9ff8a6c5103062` | `642b13978f724c78f067e6b17edd8ffff223c48e8ea09776324e1f4e8e75ca1c` | baseline (v0.4.0 candidate, wave-2 batch 2 ABI 3 integration) |
+| ruby | tree-sitter/tree-sitter-ruby | `ad907a69da0c` | `src` | 70025 | `9683f80e7be3dd93f1d6f575800de3f3445cda8af1f313f1f80003229c328e8b` | `f7aa2408f1b39922f85add38cacd60b59828a8222c609a240f08779d46d079d9` | baseline (v0.4.0 candidate, wave-2 batch 2 ABI 3 integration) |
+| xml | tree-sitter-grammars/tree-sitter-xml | `5000ae8f22d1` | `xml/src` | 17444 | `3b63e111187a0f9b2282e1748db2dd6b10e968f0cdb3676772def93bf89f2a7b` | `1b7611ba3f2af55768acfbfbaf2fd2eb404ba61b14a85056d4f8d8326fc55146` | baseline (v0.4.0 candidate, wave-2 batch 2 ABI 3 integration) |
+| yaml | tree-sitter-grammars/tree-sitter-yaml | `a1c4812a73ec` | `src` | 9026 | `1238b6c89fc6afb9723b6463a365843aa87e478025490660e5acfc9adaaf809b` | `6548cd059983e8073dfa39f102641f71d045b37f3a05b7ebd799ad17df8471d1` | baseline (v0.4.0 candidate, wave-2 batch 2 ABI 3 integration) |
 
-## v0.4.0 candidate (Q17 nvim-treesitter pin refresh)
+## v0.4.0 candidate (nvim-treesitter pin refresh)
 
 Based on main `dc3b23dc8813b8311e61a97051a6db77c1a287de`. The current nvim-treesitter
 `main/lua/nvim-treesitter/parsers.lua` was read twice on 2026-11-15, including immediately before updating pins;
 both reads selected the same revisions in the same repositories. Archives are codeload tarballs with SHA-256
 recorded in `tools/gen/pins.json`; the previous baselines above are retained.
 
-The Q15 schema tool is absent at this base, so these static node-type diffs use the existing manual review method:
+The 2026-11-15 schema tool is absent at this base, so these static node-type diffs use the existing manual review method:
 records are keyed by `(type, named)` and their fields, child alternatives, subtypes and flags are compared.
 The reviewed changes are:
 
@@ -106,7 +106,7 @@ identities are independently pinned and unchanged.
 | powershell | airbus-cert/tree-sitter-powershell | `e7bd348c49fdfd5c853a146a670965ba516a6239` → `65ea6919e816a7ac142acec7ee72757f89db8439` | `src` | 72248 → 72778 | `dc314fa2746de2c2048ad5c95e0c6488d1b2873e524a95473356c685f18a9707` → `db02c7bdba010b518e4fa12b3ba045d0156d475f414b3ff4622eb30f51281c4e` | +1 / -0 / ~6 |
 | dart | UserNobody14/tree-sitter-dart | `be07cf7118d3dba06236a3f19541685a68209934` → `0038280b774b65c1b89ba7fec50624d8baed9fe1` | `src` | 314023 → 316418 | `ea858f11158d4b176b32e7fdbdff6b49c587b2e7ee70e5fbe90751865a1912fe` → `9e351626d3a185b95ccdf58fb9e94967e8e97075ff62295269ba4208f51c7600` | +2 / -0 / ~10 |
 
-## v0.4.0 candidate T-SQL source identity (Q20, 2026-11-15)
+## v0.4.0 candidate T-SQL source identity (2026-11-15)
 
 Owner-approved move from the unreachable historical commit in `meloncholera/tree-sitter-mssql` to
 `alfpricot/tree-sitter-mssql` at a commit reachable from its default branch `dev`. Both commits name git tree

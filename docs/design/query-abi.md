@@ -56,7 +56,7 @@ type QueryMatch struct{ Pattern int; Captures []QueryCapture }   // Captures[i].
   differences only where RE2 and Rust regex differ, each listed.
 - Cancellation-then-parse regression and fuzzing of `NewQuery` (no panics, errors carry offsets).
 
-## Implementation refinements (Q1, 2026-11-14)
+## Implementation refinements (2026-11-14)
 
 - ABI 2 query exports live in `engine.QueryModule`, embedding the unchanged ABI 1 `Module`. Adding required methods
   directly to Module would prevent released ABI 1 grammar code from compiling, contradicting backward compatibility.
@@ -79,7 +79,7 @@ type QueryMatch struct{ Pattern int; Captures []QueryCapture }   // Captures[i].
   inferred for opaque directives or property assertions.
 
 
-## Review corrections (Q1 follow-up, F1–F5)
+## Review corrections (follow-up to the 2026-11-14 implementation, F1–F5)
 
 - The range is validated against the input length, but EndByte is forwarded unchanged to C. In particular, zero
   retains C's unlimited-end semantics. StartByte still must not exceed the effective end (source length for validation).
@@ -102,13 +102,13 @@ type QueryMatch struct{ Pattern int; Captures []QueryCapture }   // Captures[i].
   neither a narrow byte range nor MatchLimit bounds the whole-tree index. Freeing the index makes its space
   reusable inside the instance; linear memory is returned to the OS only on instance discard.
   TestQueryNarrowRangeReuse retains a 2.28 MB JSON regression: after warming, 20 narrow-range calls must finish within
-  1 second (P18's per-exec rebuild took 9.65 seconds). This is a regression bound, not a platform speed guarantee.
+  1 second (the per-exec rebuild measured in the session-15 independent query review took 9.65 seconds). This is a regression bound, not a platform speed guarantee.
 - Predicate validation follows CLI v0.27.2: #any-of? and #not-any-of? accept a capture with an empty alternative list.
   #set!, #is? and #is-not? accept one to three arguments containing one or two literals and at most one capture, in
   any order; a key literal is required. Properties exposes #set!'s key/value; capture qualification is validated but
   does not add property semantics to the query filter. Unknown predicates/directives remain opaque properties.
 - #any-eq?, #any-not-eq?, #any-match?, #any-not-match? validate the corresponding eq/match argument shapes (and regex)
-  but do not filter, matching the CLI 0.27.2 behavior recorded in P16. They are exposed as properties. This statement
+  but do not filter, matching the CLI 0.27.2 behavior recorded in the session-15 independent query review. They are exposed as properties. This statement
   concerns that CLI version; it is not a claim about all Rust binding consumers.
 - The per-instance cache now uses weak Query keys. An unreachable Query's runtime cleanup enqueues a retirement with
   weak owner/instance identities; no generated engine call runs on the GC goroutine. The next owner engine operation

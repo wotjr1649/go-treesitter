@@ -92,10 +92,10 @@ iteration. Its first result is `ChildByFieldName`, even when that result is insi
 This iterator is not a C-verified API: v0.27.2 has no children-by-field API. Its ordering and explicit-null behavior
 are Go API semantics covered by retained tests (E3).
 
-Historical Q13 E5 native C agreement for `ChildByFieldName` covers fresh parses of the reproducible pinned
-1,761-input corpus on Windows amd64. Q13 also checked 2,779 additional local inputs, recorded separately in the
-[archived evidence and identities](../design/engine-abi.md#field-lookup-evidence). Q14 reran the P31 guard on the same reproducible corpus with E5 agreement; its input and source identities are archived with that evidence.
-Q16 extends E5 agreement on Windows amd64 to all 5,283 reproducible seeded incremental edits of the 15 grammars
+Historical E5 native C agreement for `ChildByFieldName` (2026-11-15 field-export-cost run) covers fresh parses of the reproducible pinned
+1,761-input corpus on Windows amd64. That run also checked 2,779 additional local inputs, recorded separately in the
+[archived evidence and identities](../design/engine-abi.md#field-lookup-evidence). The 2026-11-15 wave-2 batch 2 ABI 3 run reran the field-export cost-filter guard (independently reviewed 2026-11-15) on the same reproducible corpus with E5 agreement; its input and source identities are archived with that evidence.
+The 2026-11-15 edited-tree field-lookup run extends E5 agreement on Windows amd64 to all 5,283 reproducible seeded incremental edits of the 15 grammars
 and five retained T-SQL incremental-difference cases. `TestFieldLookupEdits` compares `ChildByFieldName` with C's incremental tree and checks that
 `ChildrenByFieldName`'s first result (including no result) equals it, including cases where C's
 incremental and fresh parses differ. The [scope and identities](../design/engine-abi.md#field-lookup-evidence)

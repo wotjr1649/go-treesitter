@@ -115,8 +115,19 @@ first; fallback enumerates all branches and public repository tags in pages of 1
 Public tags count as published release refs even without a GitHub Release entry. API/listing errors or quota exhaustion
 fail as incomplete checks, rather than being reported as an orphan. `GITHUB_TOKEN` is recommended: the complete inventory
 can exceed the anonymous 60-request quota. The report records request count and remaining quota, and stops requests
-when it reaches zero. It reads only `pins.json` and public API answers and changes nothing.
+when it reaches zero. It reads `pins.json`, the checked-in acceptance list and public API answers; it never changes pins.
 Run by `.github/workflows/upstream-watch.yml` with its read-only token.
+
+Owner-accepted warnings live in [upstreamwatch/accepted-warnings.json](upstreamwatch/accepted-warnings.json),
+embedded at build time. Each entry matches a component and exact warning kind (a newer release kind includes its
+version), with an accepted date, exclusive UTC expiry date and a linked reason. Active matches appear in **Accepted
+warnings** with their expiry; only unaccepted warnings count at the top or prevent automatic issue closure. On the
+expiry date they become new warnings again. Entries without any current match are shown as **Stale acceptances**
+for review, even when expired; they do not count as current warnings. Tool/runtime release failures remain failures.
+
+`-issue FILE` writes the complete issue body even for zero unaccepted warnings, preserving accepted/stale entries
+when the workflow closes the issue. `-state FILE` writes `warn`, `clean` or `error`; hard errors remove the body and
+leave the issue unchanged. The issue job uses that state rather than inferring warnings from the body's existence.
 
 ## Recorded grammar patches
 

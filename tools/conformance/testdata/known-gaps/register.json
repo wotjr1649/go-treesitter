@@ -1,6 +1,6 @@
 {
   "Schema": 1,
-  "EvidenceBase": "a2fec5f2ba66547602a24012517460f771e2bb37",
+  "EvidenceBase": "c138aaa1053cf714569428ee598130a904c48c83",
   "EvidencePlatform": "windows/amd64",
   "Runtime": "v0.27.2",
   "Grammars": {
@@ -16,6 +16,13 @@
       "Commit": "9150f7d56bb47f1a809fa23623f1ba1413e93fa9",
       "PinSHA256": "fd3a1d3d78d51e89f50b3da162e251ab091242d606aa8a582939dc1e5baa1532",
       "ProvenanceSHA256": "16408d4d74390f4287b34fadf53248d954a87ef4b95aff38fe7777e013ed1981",
+      "PatchCount": 0
+    },
+    "tsql": {
+      "Name": "T-SQL",
+      "Commit": "2e34d86ec58f3d1a771efc0ca1e71c536690a0b7",
+      "PinSHA256": "f92a08a6f2faad79363b0e32bcb4a533918cd512f35c81e247ba3497c3db4080",
+      "ProvenanceSHA256": "17b1492ca3d9493efd249c466c776a36283d6d50be25e0390f735ce50c96002c",
       "PatchCount": 0
     }
   },
@@ -34,7 +41,7 @@
           "URL": "https://docs.python.org/3/reference/expressions.html#binary-bitwise-operations"
         }
       ],
-      "Upstream": ""
+      "Upstream": "https://github.com/tree-sitter/tree-sitter-python/issues/358"
     },
     {
       "ID": "python-await-power",
@@ -108,6 +115,38 @@
         {
           "Title": "C# specification 12.8.3: Interpolated string expressions",
           "URL": "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/expressions#1283-interpolated-string-expressions"
+        }
+      ],
+      "Upstream": ""
+    },
+    {
+      "ID": "tsql-non-ascii-identifier",
+      "Grammar": "tsql",
+      "Input": "SELECT 1 AS 별칭;\nDECLARE @변수 INT;\nCREATE TABLE t (열 INT);\n",
+      "InputSHA256": "c472521c07e5373fcf69a734e9a3acc72b6e1efa4a9552b2bb56f399eb384aa3",
+      "DumpSHA256": "58866d9108f250a422d7b3df33c50221237cd7814591502acf0eff762e164a14",
+      "Observed": "The root has errors: ERROR nodes cover the Hangul alias after AS [12,18), the @Hangul variable [28,35), and the Hangul column name [57,60). The three identifiers are not recognized as regular identifiers.",
+      "Expected": "SQL Server regular identifiers may begin with a Unicode 3.2 letter, including Hangul, and may contain Unicode letters thereafter. A leading @ denotes a local variable. The unquoted alias 별칭, variable @변수 and column 열 in this input satisfy these identifier rules and should not cause syntax errors.",
+      "Specs": [
+        {
+          "Title": "Microsoft Learn: Database identifiers — Rules for regular identifiers",
+          "URL": "https://learn.microsoft.com/en-us/sql/relational-databases/databases/database-identifiers?view=sql-server-ver17#rules-for-regular-identifiers"
+        }
+      ],
+      "Upstream": ""
+    },
+    {
+      "ID": "csharp-conditional-splits-statement",
+      "Grammar": "csharp",
+      "Input": "class C { void M() {\n#if A\nif (true)\n#else\nif (false)\n#endif\n{ }\n} }\n",
+      "InputSHA256": "b0e13a41549542013633c8b08a00593220c6413d0704e4bfc2d0fc3e4db07b97",
+      "DumpSHA256": "8149d9af64945eb54e95a9594d60b0bd1dc426efff639cd07af41092929bfdb5",
+      "Observed": "The root has errors: preproc_if contains nested if_statement nodes, an ERROR over #else [37,42), and a missing semicolon at byte 53. The shared block [61,64) is parsed as a separate sibling instead of the body of the if head that either branch selects.",
+      "Expected": "C# conditional compilation operates during lexical analysis: only the selected section supplies ordinary tokens, and unselected sections are skipped source text. Whether A is defined or undefined, this input selects one complete if head followed by the shared block. Either selection is a valid program, and so is the source with the directive lines removed (two nested if statements), so this input is a grammar defect: the grammar models #if/#else/#endif as a node holding whole statements. Inputs whose branches cannot be combined without evaluating symbols (for example a { opened in each branch) are an inherent limit of parsing every branch and are not claimed here. The register records only this input; it does not require a particular tree for inactive text.",
+      "Specs": [
+        {
+          "Title": "C# specification 6.5.5: Conditional compilation directives",
+          "URL": "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#655-conditional-compilation-directives"
         }
       ],
       "Upstream": ""

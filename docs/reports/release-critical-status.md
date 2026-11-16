@@ -83,14 +83,14 @@ to the new engine.
 
 ## Historical batch-2 measurements
 
-The following Q9/Q10 observations predate this ABI 3 integration. They retain their original identities and do not
-pass any Q14 gate or extend the fifteen-grammar ABI 3 field-lookup evidence.
+The following wave-2 batch 2 and fwcd Kotlin observations (2026-11-14/15) predate this ABI 3 integration. They retain their original identities and do not
+pass any ABI 3 integration gate or extend the fifteen-grammar ABI 3 field-lookup evidence.
 
-## Wave-2 batch 2 candidates (Q9)
+## Wave-2 batch 2 candidates (archive `2026-11-15-q9-batch2`)
 
 YAML, PHP (the `php` parser only), PowerShell, R, Dart, XML (the `xml` parser only), and Ruby passed the local
-Windows amd64 gates on the Q9 detached working tree based on `2f9e0005f11c8520a37cf2878cc30219aac1950f`.
-Grammar identities are those recorded in the Q9 artifacts and preserved by the Q10 patch
+Windows amd64 gates on the batch 2 detached working tree based on `2f9e0005f11c8520a37cf2878cc30219aac1950f`.
+Grammar identities are those recorded in the batch 2 artifacts and preserved by the fwcd Kotlin patch
 `da79b3cc909c93f8d05ebc545bc0966f750d4b8590400ba8b8e771c2f11325fa`, not the current ABI 3 module identities.
 The native reference used the same pinned sources and wasi-libc character functions. These results do not claim hosted platforms or release approval.
 
@@ -116,42 +116,42 @@ patch `0001-no-early-eof` (Bash, Ruby and Python patches and YAML `0002` came la
 [limitations](limitations.md)). Native unpatched/patched comparison (E4) covered 159 inputs: 18 existing error trees changed, ten first-NUL
 truncations became full-length error trees, and every other error-free tree stayed identical. Patched root-end faults: zero.
 PHP four, Dart one and Ruby one seeded edits differ between incremental and fresh in native and engine alike;
-these are [native characterizations](../validation/known-regressions.md#q9-seed-1-native-incremental-vs-fresh-characterization),
-not engine/native mismatches. See [limitations](limitations.md). Kotlin was evaluated separately on fwcd in Q10 below.
+these are [native characterizations](../validation/known-regressions.md#wave-2-batch-2-seed-1-native-incremental-vs-fresh-characterization),
+not engine/native mismatches. See [limitations](limitations.md). Kotlin was evaluated separately on fwcd in the next section.
 
-## Kotlin from fwcd (Q10)
+## Kotlin from fwcd (2026-11-15)
 
 Kotlin uses the unmodified tier-3 `fwcd/tree-sitter-kotlin` default-branch commit
 `d6af96d2e23ef0a8ff5ab512864378cf08fba311` (2026-10-31; selected 2026-11-15), per ADR-0024.
 Its module uses the development go.mod form. The old kit grammar and its scanner patch are absent.
-These are local Windows amd64 results on the detached Q10 tree based on `2f9e000`, not hosted or release approval.
+These are local Windows amd64 results on the detached fwcd Kotlin tree based on `2f9e000`, not hosted or release approval.
 
-| Gate | Q10 result | Level |
+| Gate | Kotlin result | Level |
 |---|---|---|
 | Module + root/generator/native-ref/conformance/bench tests | PASS, all 23 grammar modules (CGO disabled) | E3 |
 | Corpus / edits / ChangedRanges vs native | 1,462 / 4,386 / 4,386; zero differences | E5, those inputs |
 | Raw query comparisons (upstream highlights.scm and tags.scm + ten probes, stride 1) | 17,544, zero differences | E5 |
 | Balancing stop / trials | 258 / 350, every next parse matches native | E5, test-only probe |
-| P27 hang/minimized/variant inputs with an outer 60s watchdog on each side | 55 / 55 finish and match | E5, those inputs |
+| Kotlin hang/minimized/variant inputs (2026-11-14 scanner-guard verification) with an outer 60s watchdog on each side | 55 / 55 finish and match | E5, those inputs |
 | Eleven JetBrains inputs, large speed geomean / per-file median geomean | 1.023x / 1.041x native (limit 2.5x) | E4 |
 | Small corpus speed | 1462 / 1462 pass (<=1ms or <=2.5x native) | E4 |
 | Memory (11 inputs x parse/snapshot x 3 fresh processes) | 66 / 66 pass, regions returned, private delta <=16 MiB, peak <=100 x input +64 MiB | E4 |
 | Regeneration | 17 / 17 files byte-identical in one independent regeneration | E3 |
 
 Three seeded incremental trees differ from fresh exactly as native C does; their complete signatures are
-in the [native characterization register](../validation/known-regressions.md#q10-seed-1-kotlin-native-incremental-vs-fresh-characterization).
+in the [native characterization register](../validation/known-regressions.md#fwcd-kotlin-seed-1-native-incremental-vs-fresh-characterization).
 No new grammar patch, weakened criterion or benchmark retry was used. The original batch-2 seven grammar
 engine bytes and the 256 wave-1/batch-1 files are unchanged. The nightly differential lane now isolates its Go
 case and native commands with the [30s wall-clock watchdog](../specs/validation.md); timeout inputs are retained
 and fail that grammar while the supervisor continues. Hosted Linux/arm64 nightly execution has not run.
 
-## Q14 wave-2 batch 2 ABI 3 integration
+## Wave-2 batch 2 ABI 3 integration (2026-11-15)
 
 Candidates: YAML (patched), PHP, PowerShell, R, Dart, XML, Ruby and unpatched fwcd Kotlin. The baseline is
-`35233d365418147ee8cac8bd7c54f5f617bfe753` plus the Q12/Q13 ABI 3 field-lookup patch. Existing fifteen-module
+`35233d365418147ee8cac8bd7c54f5f617bfe753` plus the ABI 3 field-lookup patch (2026-11-15 field-lookup ABI and field-export-cost runs). Existing fifteen-module
 results above remain bound to their recorded identities; they do not transfer to the eight new modules.
 
-| Gate | Q14 state | Measured scope |
+| Gate | ABI 3 integration state | Measured scope |
 |---|---|---|
 | Module tests | PASS 23/23, E3 | Fifteen ABI-v3 modules plus eight new modules, CGO disabled; unchanged root/engine code |
 | Root / generator / native-ref / full conformance | PASS, E3 | Root and fifteen tests in ABI-v3 phase; final generator/native-ref and integrated full conformance pass |
@@ -163,9 +163,9 @@ results above remain bound to their recorded identities; they do not transfer to
 | Regeneration | PASS, E4 bytes | YAML and R twice each, 17/17 files identical every run; original fifteen 256 files byte-identical to T13b |
 | Patch / mirror inventory and actionlint | PASS, E3/static | YAML one patch, others zero; 30 archive candidate rows (historical inventory; v0.4.0 publishes 24 source rows only); workflow lint passed |
 
-T13b is `60ccaf3ab36aff760e6633aa99bd0d1f6d1469f9`: base plus Q12/Q13 and P31 F1–F4. Its shim SHA-256 is
+T13b is `60ccaf3ab36aff760e6633aa99bd0d1f6d1469f9`: base plus the ABI 3 field-lookup patch and the F1–F4 fixes from the 2026-11-15 independent review of the field-export cost filter. Its shim SHA-256 is
 `b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05`; the 23-grammar pins SHA-256 is
-`8ce3944348352142818521d96d99785f3dc720cc9a1b5f732c4cebaf5560a6e9`. The maintainer-local evidence archive (Q14 handoff)
+`8ce3944348352142818521d96d99785f3dc720cc9a1b5f732c4cebaf5560a6e9`. The maintainer-local evidence archive (`2026-11-15-q14-batch2` handoff)
 binds the Windows/Go/tool identities, input hashes, original failures and interrupted attempts, raw results and patches.
 The nine recorded native incremental/fresh differences for PHP/Dart/Ruby/Kotlin exactly match their old input,
 edit-coordinate, dump and range signatures. Existing fifteen-grammar differences remain unchanged. No criterion was relaxed.
@@ -188,12 +188,12 @@ engine run [43707969156](https://github.com/wotjr1649/go-treesitter/actions/runs
 passed 69/69 grammar/platform combinations (23 grammars, Linux x64/arm64 and macOS arm64). These are historical
 results, not gates for the later PHP/PowerShell/Dart pin moves or for the release commit.
 
-## v0.4.0 preparation after Q17 and Q18
+## v0.4.0 preparation after the pin refresh and schema-tool fixes
 
-Baseline for this preparation is `506e4f7`: Q17 moved PHP to `58d5643086ae`, PowerShell to `65ea6919e816` and
-Dart to `0038280b774b`; Q18 added offline schema commands and ADR-0025. The current pins SHA-256 is
-`18a8497b6e0fa028b4d7d1607ff2505a51fc3a182a4989f61dd55b114255c3a1`. Q14's aggregate counts above keep their
-old pins identity. Q17's maintainer-local evidence archive records Windows amd64 / Go 1.27.4 measurements on the
+Baseline for this preparation is `506e4f7`: the 2026-11-15 nvim-treesitter pin refresh moved PHP to `58d5643086ae`, PowerShell to `65ea6919e816` and
+Dart to `0038280b774b`; the 2026-11-15 schema-tool fixes added offline schema commands and ADR-0025. The current pins SHA-256 is
+`18a8497b6e0fa028b4d7d1607ff2505a51fc3a182a4989f61dd55b114255c3a1`. The wave-2 batch 2 ABI 3 integration's aggregate counts above keep their
+old pins identity. The pin refresh's maintainer-local evidence archive (`2026-11-15-q17-pins-nvim`) records Windows amd64 / Go 1.27.4 measurements on the
 new three pins (base `dc3b23d`, candidate tree `a0f905db15810e380dac3256317931eaa6c70b80`):
 
 | Grammar | Corpus / seeded edits | Raw query pairs | Fresh-field result rows | Scope |
@@ -202,21 +202,21 @@ new three pins (base `dc3b23d`, candidate tree `a0f905db15810e380dac3256317931ea
 | PowerShell | 165 / 495 | 1,980 | 271 | E5; zero product/native differences |
 | Dart | 205 / 615 | 2,665 | 864 | E5; zero product/native differences |
 
-Q16's edited-tree `ChildByFieldName` E5 evidence covers the original fifteen grammars (5,283 seeded edits and five
+The 2026-11-15 edited-tree `ChildByFieldName` E5 evidence covers the original fifteen grammars (5,283 seeded edits and five
 retained T-SQL cases, Windows amd64, base `2a1d01d`); it does not cover the eight additions. CI now has the strict
 edited-field shard for every grammar; release-commit conformance run [43718543939](https://github.com/wotjr1649/go-treesitter/actions/runs/43718543939) (`f8a9f29`) passed it for all 23 grammars on Linux x64 and arm64 (per platform: 12,798 edits, 97,858 edited-field native result rows, zero differences).
 
 Release commit `f8a9f29`: engine [43718543915](https://github.com/wotjr1649/go-treesitter/actions/runs/43718543915) 144/144 jobs, regeneration [43718543860](https://github.com/wotjr1649/go-treesitter/actions/runs/43718543860) 24/24, Windows
 [43718543945](https://github.com/wotjr1649/go-treesitter/actions/runs/43718543945) 4/4, bench [43718548275](https://github.com/wotjr1649/go-treesitter/actions/runs/43718548275) 69/69 (highest large-input ratio 2.334x, YAML Linux x64),
 balancing-cancel [43718551120](https://github.com/wotjr1649/go-treesitter/actions/runs/43718551120) 23/23, upstream watch [43718596677](https://github.com/wotjr1649/go-treesitter/actions/runs/43718596677) pass (T-SQL pin reachable).
-Packaging and compatibility (P39 local rehearsal on `f8a9f29`, Windows amd64): release-form regeneration leaves all 23
+Packaging and compatibility (v0.4.0 local release rehearsal on `f8a9f29`, Windows amd64): release-form regeneration leaves all 23
 `engine_gen.*` byte-identical; empty-cache consumers on Go 1.26.0 and 1.27.4 parse every grammar and run six
 queries; linux/arm64 builds; `grammars/json` v0.1.0 (ABI 1) and v0.3.0 (ABI 2) work with root v0.4.0.
 Ruby headroom: 2.0 MiB (macOS arm64) to 8.3 MiB (Linux x64).
 
 The prior fifteen-grammar nightly run
 [43699872727](https://github.com/wotjr1649/go-treesitter/actions/runs/43699872727) (`a9c0077`, seed 20261115)
-failed on Bash linux/arm64 at iteration 43175. P37's maintainer-local evidence archive classifies it as native C
+failed on Bash linux/arm64 at iteration 43175. The maintainer-local evidence archive of the failure classification classifies it as native C
 `char` signedness: signed/unsigned probes on Windows reproduce the runner's Go/native dumps respectively (E2 probe,
 that input); Ruby also shows a native signedness difference. Baseline `506e4f7` does not yet force signed `char` in
 the native reference. The reference now builds with `-fsigned-char` (PR #36, `3213f3c`); conformance run

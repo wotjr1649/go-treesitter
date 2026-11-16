@@ -34,7 +34,7 @@ binary process: a scanner that never polls the context can therefore be killed. 
 process watchdog. The supervisor waits for process exit before proceeding. `TSG_NIGHTLY_INPUT_TIMEOUT` sets the
 limit; the workflow pins it to `30s` and records it in each summary/reproducer.
 
-The bound was selected from the Q9 Windows amd64 product/native measurements at base `2f9e000` plus batch2-v1:
+The bound was selected from the wave-2 batch 2 (2026-11-14/15) Windows amd64 product/native measurements at base `2f9e000` plus batch2-v1:
 the maximum corpus per-input median was **0.7535 ms** (Dart, `flutter-002.in`, engine), the maximum large-input
 individual sample was **925.9276 ms** (Ruby, `gb18030-tbl.rb`, engine), and the maximum native edit process duration
 was **3006.6 ms** (Ruby, `expressions-068-e1`, including process startup). Thirty seconds gives about 10x the largest
@@ -47,7 +47,7 @@ replay command under `$TSG_CONF_OUT/nightly/`; it does not shrink or retry a hun
 nightly differential comparisons; `ciconf -inputs-only` extracts their seeds without unsupervised preflight parses.
 Go fuzz targets retain their separate fuzz/test budgets.
 
-The Q10 fwcd Kotlin run also stayed within this diagnostic bound: its largest large-input sample was
+The 2026-11-15 fwcd Kotlin run also stayed within this diagnostic bound: its largest large-input sample was
 3.702327 s (`_Arrays.kt`, engine), leaving about an 8.1x margin under 30 s. The nightly mutation inputs
 are bounded by its existing `maxCase` policy; this observation does not change any resource gate.
 
@@ -86,7 +86,7 @@ Every claim carries a level. Do not state a claim above the level you actually p
 | **Development** | Product lane builds; focused tests for changed behavior pass; every known-regression signature still matches its record. | **yes**, if ratcheted |
 | **Integration** | Development gate, plus the result contract is exercised end to end and a consumer can depend on the API shape. | yes, if documented in the consumer-facing limitations |
 | **Release-Critical** | For each language *claimed in scope*: zero unresolved correctness blockers; conformance (fresh and edit cases) agrees with the native reference; every `incremental != fresh` case is an upstream-attributed ratchet. | **no** |
-| **Release** | Release-Critical for the claimed scope, plus platform validation, reproducible generation, resource budgets (large-input parse geomean <= 2.5x native; small files <= 1 ms or <= 2.5x native; peak <= 100 x input + 64 MB; after `Close` every engine region returned and private bytes within start + 16 MB, ADR-0022; on macOS the footprint delta is net of the growth of the runtime's released heap bytes and a snapshot case must have been collected, ADR-0022 macOS amendment), packaging, and an explicit limitations list. | **no** |
+| **Release** | Release-Critical for the claimed scope, plus platform validation, reproducible generation, resource budgets (large-input parse geomean <= 2.5x native; small files <= 1 ms or <= 2.5x native, where a file failing the first pass gets one paired confirmation pass and fails only if both fail, with both passes recorded; peak <= 100 x input + 64 MB; after `Close` every engine region returned and private bytes within start + 16 MB, ADR-0022; on macOS the footprint delta is net of the growth of the runtime's released heap bytes and a snapshot case must have been collected, ADR-0022 macOS amendment), packaging, and an explicit limitations list. | **no** |
 
 A language with an open known regression keeps the **Development gate green** and the
 **Release-Critical gate red for that language**. Both statements are true at once; say both.

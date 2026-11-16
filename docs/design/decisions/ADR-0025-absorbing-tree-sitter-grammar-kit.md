@@ -41,3 +41,11 @@ incomplete.
 
 - ADR-0020's "grammar-kit only for supply-chain checks" becomes "the useful checks live in `tools/`".
 - Known gaps carry E3 evidence (retained tests bound to pins), not one-off probes.
+
+## Amendment (2026-11-16): decision 4
+
+- `SECURITY.md` is added at the repository root.
+- The kit's 124 queries stay deferred as query-lane inputs.
+- T-SQL verdicts from SQL Server (the 726 PARSEONLY cases) are not absorbed here. The owner's grammar repository
+  `wotjr1649/tree-sitter-mssql` takes them over as its own oracle. This repository keeps the pinned T-SQL grammar
+  (ADR-0024) and its known gaps.

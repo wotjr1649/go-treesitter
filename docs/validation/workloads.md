@@ -41,13 +41,13 @@ directory. The older C observations and digests remain in Git history at `9ad82e
 
 The identity rules below still apply: bind every result to the pinned runtime and grammar identities.
 
-## Wave-2 batch 1 large inputs (Q7)
+## Wave-2 batch 1 large inputs (2026-11-14)
 
 `tools/bench/ci/large.json` pins one real source file for each new grammar. The fetch command verifies both the
 source SHA-256 and its license SHA-256, and writes the license beside the input as `<file>.LICENSE`.
 `-langs` selects the same grammar for fetch and measurement. Files are not concatenated or enlarged.
 
-Q7 gate measurements used `tools/gen/pins.json` SHA-256
+The batch 1 gate measurements used `tools/gen/pins.json` SHA-256
 `34bb8edcd9bd17c44aabad17e20d1836f0f527e890fd491d918133a3c21cb514`, before YAML was removed.
 After that removal the pins file is `c17b1b5e7b0c6f024284ee68f33bbbf3622cdef7810e9c0ee9b9e58807902af4`;
 the eight grammars listed below retain identical pins and generated module bytes. The recorded gate results
@@ -65,7 +65,7 @@ keep their original measurement identity.
 | cpp | [json.hpp](https://raw.githubusercontent.com/nlohmann/json/81888ff9f005c022e60f2de572327b2e50222222/single_include/nlohmann/json.hpp) | 1,929,376 | `686e19239b9135b5822f96876fd59de90bde335d598c2e71ded84201d6f5e584` | [MIT](https://raw.githubusercontent.com/nlohmann/json/81888ff9f005c022e60f2de572327b2e50222222/LICENSE.MIT) |
 
 The Java input is real generated protobuf compatibility code,
-and C++ is nlohmann/json's single-header distribution (the Q6 input, retained unchanged). These files represent their
+and C++ is nlohmann/json's single-header distribution (the input of the 2026-11-14 large-grammar size/speed spike, retained unchanged). These files represent their
 specific shapes, not all applications in each language. HTML, CSS, Java, C, Rust, and Bash are below 1 MB; each
 exceeds the small-file lane's 25 KB boundary. All source bytes are LF and their hashes refer to the downloaded bytes.
 CSS, C, Bash, and C++ inputs contain syntax the pinned grammars recover from on both native C and Go; their outcomes
@@ -82,7 +82,7 @@ must remain visible in the evidence.
 - `.gitattributes` must pin `*.cs`, `*.ts`, `*.tsx`, `*.js`, `*.jsx`, `*.py`, `*.go` fixtures to LF
   and mark `*.bin` as `-text`, before the first external fixture lands.
 
-## Wave-2 batch 2 large inputs (Q9)
+## Wave-2 batch 2 large inputs (2026-11-15)
 
 The following unmodified real inputs and their licenses are SHA-256-pinned in `tools/bench/ci/large.json`.
 The YAML and Ruby inputs reuse the previously recorded bytes; no input is concatenated or enlarged.
@@ -97,8 +97,8 @@ The YAML and Ruby inputs reuse the previously recorded bytes; no input is concat
 | xml | [wayland.xml](https://raw.githubusercontent.com/wayland-mirror/wayland/f2ecaa61a3a82944ae069de5413104ab7ba2109f/protocol/wayland.xml) | 168,986 | `4831fd1cdbca6319037660bec5da0f3c5636fd81573cb61e01e4709570dac294` | [MIT](https://raw.githubusercontent.com/wayland-mirror/wayland/f2ecaa61a3a82944ae069de5413104ab7ba2109f/COPYING) |
 | ruby | [gb18030-tbl.rb](https://raw.githubusercontent.com/ruby/ruby/b7e8fad02273da0947e45fee172b26c6f49e694e/enc/trans/gb18030-tbl.rb) | 1,357,449 | `2755eb2a433e528b1f51213c4b5905a139ceff3d1d2ef5349dbb1f15bc77201f` | [BSD-2-Clause](https://raw.githubusercontent.com/ruby/ruby/b7e8fad02273da0947e45fee172b26c6f49e694e/BSDL) |
 
-Apache Arrow's NOTICE and Ruby's LEGAL are retained with the local Q9 input evidence; their source identities
-and SHA-256 values are in the Q9 input manifest. Gate results are reported independently of this input register.
+Apache Arrow's NOTICE and Ruby's LEGAL are retained with the local batch 2 input evidence; their source identities
+and SHA-256 values are in the batch 2 input manifest. Gate results are reported independently of this input register.
 
 ## Tier 1 — smoke (inline, present from the foundation session)
 
@@ -313,9 +313,9 @@ separately from parser arena/scratch receipts.
   needed, they are copied in once, hashed, and licensed here.
 - No repository-wide corpus. Every workload is named, bounded, and justified by a claim it supports.
 
-## Q10 Kotlin inputs (JetBrains stdlib and tests)
+## Kotlin inputs (JetBrains stdlib and tests)
 
-Eleven P23/P27 inputs, reused without byte changes from `JetBrains/kotlin` commit
+Eleven inputs from the 2026-11-14 Kotlin speed analysis and scanner-guard verification, reused without byte changes from `JetBrains/kotlin` commit
 `e12dc36e784c4c65886009eb622504b3db65b699`. Sources and Apache-2.0 license hashes are pinned in
 [`tools/bench/ci/large.json`](../../tools/bench/ci/large.json); each input is checked before measurement.
 The grammar source is the unmodified tier-3 `fwcd/tree-sitter-kotlin` pin (ADR-0024).
@@ -337,7 +337,7 @@ The grammar source is the unmodified tier-3 `fwcd/tree-sitter-kotlin` pin (ADR-0
 The license is `JetBrains/kotlin` `license/LICENSE.txt`, SHA-256
 `cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30`.
 
-## TSX large input (Q22)
+## TSX large input (2026-11-16)
 
 `tools/bench/ci/large.json` pins Excalidraw's unmodified `App.tsx` at v0.18.0 commit
 `817d8c553c3389650f8b4503984a6d4a5d2f0c11`. It is one real application source file,
