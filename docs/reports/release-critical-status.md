@@ -18,22 +18,64 @@ plus one C# known-gap documentation correction. Pins SHA-256:
 `5467afce00a76529acf5dd13243a51d8218fa164c595ce171fc7fe6d78ea9913`; ABI 3, recipe `v2-O3`.
 C now uses `tree-sitter-grammars/tree-sitter-c@f3202ac`; four new ADR-0023 scanner patches join YAML's retained
 `0001`. Snapshot arrays use 25 rather than 41 bytes per node, plus source, sparse exceptions and a lazy line index.
-The release commit is [FILL AT RELEASE]. All hosted results below must bind that commit and the exact pins/inputs;
-retain and classify failures rather than retrying until green.
+The release commit candidate is `02d10aa18cf70baea757d17e9cac39070c774fd9` (main after PR #50).
+All nine hosted runs below completed successfully on 2026-11-16; each run's `headSha` equals this candidate.
+The pins hash above is unchanged. Counts and measurements below bind this commit, these pins and the named
+inputs/platforms; they do not establish E6 or publication approval. Retain and classify failures rather than retrying until green.
 
 | Gate | v0.5.0 state | Scope / required evidence |
 |---|---|---|
-| Conformance | [FILL AT RELEASE] | All 24 grammars, native dumps, seeded edits/ranges, queries, fresh/edited fields and retained known gaps; include bounded grammar-kit inputs; E5 only on the inputs/platforms run |
-| Engine CI | [FILL AT RELEASE] | Hosted Linux/macOS/Windows amd64 and arm64 execution, per-platform identities |
-| Reproducible generation | [FILL AT RELEASE] | All 24 committed grammar modules; PostgreSQL unpatched CLI regeneration and provenance |
-| Windows product lane | [FILL AT RELEASE] | Native Windows amd64/arm64 execution, CGO=0 |
-| Speed / memory bench | [FILL AT RELEASE] | All 24 grammars on configured platforms; TSX large workload; preserve first-pass small-file failures and their single paired confirmation results |
-| Balancing cancellation | [FILL AT RELEASE] | All 24 grammar probe builds; input-specific recovery evidence |
-| Nightly diff | [FILL AT RELEASE] | One release-commit run over every pinned grammar; retain/classify failures, seeds and reproducers |
-| Upstream watch | [FILL AT RELEASE] | Pin reachability/source warnings, accepted warnings with six-month expiry; no automatic pin moves |
+| Conformance | PASS, E5; [43835484209](https://github.com/wotjr1649/go-treesitter/actions/runs/43835484209): 48 grammar/platform shards + two aggregate jobs; per Linux platform 4,616 inputs, 13,188 edits/range comparisons, 58,574 query/input pairs (stride 1), 46,401 fresh-field and 103,966 edited-field native result rows, zero differences | All 24 grammars, native dumps, seeded edits/ranges, queries, fresh/edited fields and retained known gaps; include bounded grammar-kit inputs; E5 only on the inputs/platforms run |
+| Engine CI | PASS, E3; [43835484351](https://github.com/wotjr1649/go-treesitter/actions/runs/43835484351): 150/150 jobs (144 grammar jobs + six engine jobs) | Hosted Linux/macOS/Windows amd64 and arm64 execution, per-platform identities |
+| Reproducible generation | PASS, E3; [43835484231](https://github.com/wotjr1649/go-treesitter/actions/runs/43835484231): 24/24 grammar drift shards + aggregate job; no committed-byte differences | All 24 committed grammar modules; PostgreSQL unpatched CLI regeneration and provenance |
+| Windows product lane | PASS, E3 product; [43835484319](https://github.com/wotjr1649/go-treesitter/actions/runs/43835484319): amd64/arm64 product jobs, licenses and diagnostic race job, 4/4 total | Native Windows amd64/arm64 execution, CGO=0 |
+| Speed / memory bench | PASS, E4; [43835556351](https://github.com/wotjr1649/go-treesitter/actions/runs/43835556351): 72/72 grammar/platform combinations, highest large-input geomean 2.385x (HTML, Linux amd64); no small-file confirmation needed | All 24 grammars on configured platforms; TSX large workload; preserve first-pass small-file failures and their single paired confirmation results |
+| Balancing cancellation | PASS, E5 probe builds; [43835560830](https://github.com/wotjr1649/go-treesitter/actions/runs/43835560830): 24/24 grammars on Linux amd64; 5,929 balancing stops, 8,266 next-parse comparisons with zero differences; JSON no-reset control mismatches 3/3 | All 24 grammar probe builds; input-specific recovery evidence |
+| Nightly diff | PASS, E5 only for sampled cases; [43835565191](https://github.com/wotjr1649/go-treesitter/actions/runs/43835565191): 48/48 grammar/platform jobs, Linux amd64/arm64, seed 20261116; no mismatches | One release-commit run over every pinned grammar; retain/classify failures, seeds and reproducers |
+| Upstream watch | PASS, E1 source-health observation; [43835569820](https://github.com/wotjr1649/go-treesitter/actions/runs/43835569820): zero unaccepted warnings, nine accepted warnings (expiry 2027-05-16 UTC, exclusive); two jobs passed | Pin reachability/source warnings, accepted warnings with six-month expiry; no automatic pin moves |
 | Local module ZIP rehearsal | PASS, local E3 packaging | Windows amd64 empty-cache file GOPROXY, root + 24 grammars at v0.5.0, CGO=0 run and linux/arm64 build; packaging evidence only |
 | Source-row inventory | PASS, local static check | 33 rows: 25 pin-matching source rows, eight toolchain rows excluded; publication requires those 25 archives plus SHA256SUMS |
 | Tag/proxy resolution and published mirror assets | [FILL AT RELEASE] | Separate later publication steps: root then grammar tags, direct/public proxy consumers, draft/upload digest check, attestation and all source downloads from the published first base |
+
+Hosted scope on `02d10aa18cf70baea757d17e9cac39070c774fd9`:
+
+- Conformance [43835484209](https://github.com/wotjr1649/go-treesitter/actions/runs/43835484209): the per-platform totals include the bounded kit subset (279 fresh
+  inputs and 177 edit pairs across seven grammars); native and engine incremental trees differ from fresh in
+  the same 22 cases per platform, with zero engine/native differences. Strict fresh/edit fields and all seven
+  retained known-gap inputs passed on each Linux platform. PostgreSQL contributes 71 inputs, 213 edits/range
+  comparisons and 923 query/input pairs per platform; its fresh/edit named-field result counts are zero because
+  the grammar has no named fields. Input scope is the pinned upstream corpora plus the
+  [bounded kit register](../validation/workloads.md#bounded-grammar-kit-inputs), not arbitrary inputs.
+- Engine [43835484351](https://github.com/wotjr1649/go-treesitter/actions/runs/43835484351) executes Linux amd64/arm64, macOS arm64 and Windows amd64/arm64 on Go
+  1.27.x; Linux amd64 also executes the oldest supported Go 1.26.x. Product jobs use `CGO_ENABLED=0`.
+  Regeneration [43835484231](https://github.com/wotjr1649/go-treesitter/actions/runs/43835484231) includes PostgreSQL's two independent unpatched C regenerations
+  using pinned CLI 0.27.2 and compares generated modules/provenance with committed bytes on Linux amd64.
+  Pin-move [43835484205](https://github.com/wotjr1649/go-treesitter/actions/runs/43835484205) also passed on this candidate; pins were not changed by these runs.
+- Bench [43835556351](https://github.com/wotjr1649/go-treesitter/actions/runs/43835556351) covers all 24 grammars on Linux amd64/arm64 and macOS arm64. TSX
+  `App.tsx` large-input geomeans are 1.579x / 1.882x / 1.790x on those platforms respectively.
+  All 4,337 eligible small files per platform passed their first pass (13,011 file/platform decisions total);
+  no file entered the single paired confirmation pass, so there are no second-pass measurements.
+  Parameters were five large rounds x five repetitions, three corpus rounds x seven repetitions, and three
+  fresh memory processes per input/operation. Ruby `gb18030-tbl.rb` snapshot maxima from raw `mem.csv`
+  are 175.602 / 175.480 / 180.375 MiB against the calculated 193.456 MiB limit (rounded), leaving
+  17.855 / 17.976 / 13.081 MiB on Linux amd64 / Linux arm64 / macOS arm64. Thus Ruby headroom ranges
+  from 13.081 to 17.976 MiB. Memory rows passed peak, private-byte and region-return checks on these runs;
+  macOS private bytes use the ADR-0022 adjustment (raw deltas remain reported). Ratios describe shared
+  runners in the paired measurement windows, not absolute performance on other hardware.
+- Nightly [43835565191](https://github.com/wotjr1649/go-treesitter/actions/runs/43835565191) used default four-minute differential budgets per grammar, 30-second
+  Go fuzz-target budgets and a 30-second per-operation watchdog, with seed 20261116 on Linux amd64/arm64.
+  The 48 differential summaries record 1,202,392 cases and no mismatches; this is sampled E5 evidence,
+  not universal parity. Earlier failed nightly runs remain in the historical sections below.
+- Upstream watch [43835569820](https://github.com/wotjr1649/go-treesitter/actions/runs/43835569820) accepted CSS, Go, HTML, Java, JavaScript, Python, TSX and
+  TypeScript source-age warnings plus the newer T-SQL stable release warning under the recorded 2026-11-16
+  decisions; each expires 2027-05-16 UTC (exclusive). Zero unaccepted warnings does not mean zero warnings.
+
+Post-publication PR: [FILL AT RELEASE]. Keep the tag/proxy row open for publication date and immutable
+pre-release, root/grammar tag commits, root ZIP `h1`, empty-cache direct/public-proxy resolution (checksum database,
+all 25 module consumers and linux/arm64 build), uploaded 25-source-archive inventory plus `SHA256SUMS`, digest
+comparison, attestation/release verification, and download/hash checks from the published first mirror base.
+The final-candidate packaging rehearsal is still a separate publication-procedure check; the preparation-base
+local rehearsal below does not transfer automatically.
 
 Local rehearsal on the preparation base above (Windows amd64, Go 1.27.4, CGO=0) used
 `golang.org/x/mod/zip` to create/check 25 v0.5.0 module ZIPs from a tracked snapshot with documentation edits.
