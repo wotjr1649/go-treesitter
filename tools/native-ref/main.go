@@ -30,19 +30,20 @@ import (
 )
 
 type source struct {
-	Regenerate    bool              `json:"regenerate,omitempty"`
-	Patches       []patches.Pin     `json:"patches,omitempty"`
-	Mirrors       []string          `json:"-"`
-	Repo          string            `json:"repo"`
-	Commit        string            `json:"commit"`
-	ExtractDir    string            `json:"extractDir"`
-	Archive       string            `json:"archive"`
-	ArchiveURL    string            `json:"archiveURL"`
-	ArchiveSHA256 string            `json:"archiveSHA256"`
-	GrammarDir    string            `json:"grammarDir"`
-	Dirs          []string          `json:"dirs"`
-	Files         map[string]string `json:"files"`
-	CSymbol       string            `json:"cSymbol"`
+	Regenerate      bool              `json:"regenerate,omitempty"`
+	NPMDependencies []string          `json:"npmDependencies,omitempty"`
+	Patches         []patches.Pin     `json:"patches,omitempty"`
+	Mirrors         []string          `json:"-"`
+	Repo            string            `json:"repo"`
+	Commit          string            `json:"commit"`
+	ExtractDir      string            `json:"extractDir"`
+	Archive         string            `json:"archive"`
+	ArchiveURL      string            `json:"archiveURL"`
+	ArchiveSHA256   string            `json:"archiveSHA256"`
+	GrammarDir      string            `json:"grammarDir"`
+	Dirs            []string          `json:"dirs"`
+	Files           map[string]string `json:"files"`
+	CSymbol         string            `json:"cSymbol"`
 }
 
 type pins struct {
@@ -69,6 +70,8 @@ func main() {
 	fetch := flag.Bool("fetch", false, "download a missing archive from GitHub (sha256 still verified)")
 	corpus := flag.String("corpus", "", "also extract each grammar archive's test/corpus into DIR/<extractDir>/test/corpus (the archive is sha256-verified first)")
 	queries := flag.String("queries", "", "also extract each grammar archive's queries/ into DIR/<extractDir>/queries (the archive is sha256-verified first)")
+	reference := flag.Bool("reference", false, "comparison only: keep committed parser C (LFS placeholders still regenerate)")
+	candidate := flag.Bool("candidate", false, "comparison only: regenerate even a generator exception")
 	unpatched := flag.Bool("unpatched", false, "comparison only: compile the original pinned grammar without its ADR-0023 patches")
 	nobuild := flag.Bool("nobuild", false, "verify and extract only; do not compile (-out is then optional)")
 	patchAlert := flag.Int("patch-alert", 3, "warn when a grammar has more than this many patches")
@@ -77,13 +80,21 @@ func main() {
 		fmt.Fprintln(os.Stderr, "usage: native-ref -dl DIR -work DIR -out DIR [-pins F] [-cc gcc] [-fetch] [-corpus DIR] [-queries DIR] [-nobuild] [lang ...]")
 		os.Exit(2)
 	}
-	if err := run(*log, *dl, *work, *out, *cc, *opt, *corpus, *queries, *fetch, *nobuild, *unpatched, flag.Args(), *patchAlert); err != nil {
+	if *reference && *candidate {
+		fmt.Fprintln(os.Stderr, "native-ref: -reference and -candidate are mutually exclusive")
+		os.Exit(2)
+	}
+	if err := runMode(*log, *dl, *work, *out, *cc, *opt, *corpus, *queries, *fetch, *nobuild, *unpatched, *reference, *candidate, flag.Args(), *patchAlert); err != nil {
 		fmt.Fprintln(os.Stderr, "native-ref:", err)
 		os.Exit(1)
 	}
 }
 
 func run(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuild, unpatched bool, langs []string, patchAlert ...int) error {
+	return runMode(pinsFile, dl, work, out, cc, opt, corpus, queries, fetch, nobuild, unpatched, false, false, langs, patchAlert...)
+}
+
+func runMode(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuild, unpatched, reference, candidate bool, langs []string, patchAlert ...int) error {
 	threshold := 3
 	if len(patchAlert) > 0 {
 		threshold = patchAlert[0]
@@ -157,6 +168,27 @@ func run(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuil
 				return fmt.Errorf("%s: %s sha256 %s, pinned %s (%v)", l, name, got, want, err)
 			}
 		}
+		if candidate {
+			g.Regenerate = true
+		}
+		referenceOID := ""
+		if reference {
+			parser, err := os.ReadFile(filepath.Join(gdir, "parser.c"))
+			if err != nil {
+				return err
+			}
+			g.Regenerate = strings.HasPrefix(string(parser), "version https://git-lfs.github.com/spec/v1")
+			if g.Regenerate {
+				for _, line := range strings.Split(string(parser), "\n") {
+					if oid, ok := strings.CutPrefix(line, "oid sha256:"); ok {
+						referenceOID = strings.TrimSpace(oid)
+					}
+				}
+				if len(referenceOID) != 64 {
+					return fmt.Errorf("%s: committed LFS parser has no sha256 OID", l)
+				}
+			}
+		}
 		fmt.Fprintf(os.Stderr, "%s patches=%d alert-threshold=%d", l, len(g.Patches), threshold)
 		if len(g.Patches) > threshold {
 			fmt.Fprint(os.Stderr, " WARNING: review temporary patch burden")
@@ -171,6 +203,12 @@ func run(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuil
 				return fmt.Errorf("%s: patches: %w", l, err)
 			}
 			gdir = filepath.Join(patched, filepath.FromSlash(g.GrammarDir))
+		}
+		if referenceOID != "" {
+			got, err := fileSHA(filepath.Join(gdir, "parser.c"))
+			if err != nil || got != referenceOID {
+				return fmt.Errorf("%s: regenerated LFS reference sha256 %s, committed OID %s (%v)", l, got, referenceOID, err)
+			}
 		}
 		if corpus != "" && !corpusDone[g.Archive] { // prepare has verified the archive's sha256
 			if err := extract(filepath.Join(dl, g.Archive), filepath.Join(corpus, g.ExtractDir), []string{"test/corpus", path.Join(path.Dir(g.GrammarDir), "test/corpus")}); err != nil {

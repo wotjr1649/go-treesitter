@@ -14,8 +14,8 @@ Identity: grammar `26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64`; runtime `v0.27.2`;
 The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`pins.json`](../../tools/gen/pins.json),
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/python/provenance.json).
 
-- Source identity SHA-256: `541729622eee59fa4885980a139ec10badbc43394468e0aa6d327149f6925932`
-- Module provenance SHA-256: `99acbb437ac979fa8f0d30b074d11396b03357f9febe25ce275bb5c8eef80756`
+- Source identity SHA-256: `fe37ad83c6804c3f5a4aad3405bfaeb510dbaa5eda22714dc077abdd9786597f`
+- Module provenance SHA-256: `b709417aaa96677369f1bc56eeeb85a4a97189a440fb09ef010b1f65fb66f40d`
 
 ## python-bitwise-precedence
 

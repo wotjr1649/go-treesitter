@@ -14,8 +14,8 @@ Identity: grammar `2e34d86ec58f3d1a771efc0ca1e71c536690a0b7`; runtime `v0.27.2`;
 The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`pins.json`](../../tools/gen/pins.json),
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/tsql/provenance.json).
 
-- Source identity SHA-256: `f92a08a6f2faad79363b0e32bcb4a533918cd512f35c81e247ba3497c3db4080`
-- Module provenance SHA-256: `17b1492ca3d9493efd249c466c776a36283d6d50be25e0390f735ce50c96002c`
+- Source identity SHA-256: `8fb519c8f90cfc05b8a5194e3dce530bcd7f5c133cda3f7ca835ffe271bd9b61`
+- Module provenance SHA-256: `d202ed4dcabfe6a70b5938fd35d3f82ae8ee3ef5941e7f05867fe5da0676fb09`
 
 ## tsql-non-ascii-identifier
 

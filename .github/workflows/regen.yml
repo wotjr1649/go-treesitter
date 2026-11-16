@@ -21,7 +21,8 @@ jobs:
       matrix:
         lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin, postgres]
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    # PostgreSQL shares an identical LFS reference: budget 30 min local, 2x hosted + 30 min margin.
+    timeout-minutes: ${{ matrix.lang == 'postgres' && 90 || 60 }}
     env:
       CGO_ENABLED: "0"
       GOENV: "off"
@@ -42,7 +43,34 @@ jobs:
       # Downloads each pinned archive into a new empty directory and checks its sha256 before extracting;
       # builds wasm2go from its pinned module version; regenerates the selected module into grammars/.
       - name: Regenerate grammar modules
-        run: bash tools/gen/regen.sh "$RUNNER_TEMP/regen" "${{ matrix.lang }}"
+        run: /usr/bin/time -v -o "$RUNNER_TEMP/regen-cost.txt" bash tools/gen/regen.sh "$RUNNER_TEMP/regen" "${{ matrix.lang }}"
+      - name: Build generator behaviour gate tools
+        run: |
+          (cd tools/native-ref && go build -trimpath -o "$RUNNER_TEMP/native-ref" . && go build -trimpath -o "$RUNNER_TEMP/ciconf" ./ciconf)
+          (cd tools/bench && go build -trimpath -o "$RUNNER_TEMP/benchci" ./ci)
+          python3 -m unittest discover -s tools/native-ref -p 'generatorgate_test.py'
+      - name: Compare regenerated and reference C behaviour (ADR-0027)
+        run: |
+          /usr/bin/time -v -o "$RUNNER_TEMP/generator-gate-cost.txt" \
+            python3 tools/native-ref/generatorgate.py --lang "${{ matrix.lang }}" \
+              --native-ref "$RUNNER_TEMP/native-ref" --ciconf "$RUNNER_TEMP/ciconf" --benchci "$RUNNER_TEMP/benchci" \
+              --cli "$RUNNER_TEMP/regen/bin/tree-sitter" --dl "$RUNNER_TEMP/regen/dl" --out "$RUNNER_TEMP/generator-gate"
+      - name: Upload generator gate evidence and hosted cost
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: generator-gate-${{ matrix.lang }}-ubuntu-24.04
+          path: |
+            ${{ runner.temp }}/regen-cost.txt
+            ${{ runner.temp }}/generator-gate-cost.txt
+            ${{ runner.temp }}/generator-gate/report.json
+            ${{ runner.temp }}/generator-gate/**/*.log
+            ${{ runner.temp }}/generator-gate/**/*.command.json
+            ${{ runner.temp }}/generator-gate/reference/data
+            ${{ runner.temp }}/generator-gate/candidate/data
+            ${{ runner.temp }}/generator-gate/large
+          if-no-files-found: warn
+          retention-days: 14
       - name: Pinned CLI integration tests (patched and unpatched inputs)
         if: ${{ matrix.lang == 'postgres' }}
         working-directory: tools/gen
@@ -52,6 +80,7 @@ jobs:
           test -s "$TREE_SITTER_CLI_ARCHIVE"
           go test -count=1 -timeout 60s -v ./grammarpatch -run '^(TestSyntheticGrammarRegeneration|TestUnpatchedGrammarRegeneration)$'
       - name: Compare with the committed modules
+        if: ${{ !cancelled() }}
         run: |
           git status --porcelain -- grammars/
           git diff --exit-code --stat -- grammars/

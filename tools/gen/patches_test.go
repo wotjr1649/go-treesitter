@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/wotjr1649/go-treesitter/tools/gen/patches"
 	"os"
 	"path/filepath"
@@ -97,5 +98,43 @@ func TestUnpatchedRegenerationIsPrepared(t *testing.T) {
 	_, err := preparePatches(&o, &Pins{}, GrammarPin{Regenerate: true}, t.TempDir(), &Identity{})
 	if err == nil || !strings.Contains(err.Error(), "-dl is required") {
 		t.Fatalf("unpatched regeneration skipped: %v", err)
+	}
+}
+
+func TestGeneratorExceptionPins(t *testing.T) {
+	p, err := loadPins("pins.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	g := p.Grammars["csharp"]
+	for _, tc := range []struct {
+		name       string
+		regenerate bool
+		exception  *GeneratorException
+	}{
+		{"missing", false, nil},
+		{"reason", false, &GeneratorException{FailingInputs: []string{"input"}}},
+		{"inputs", false, &GeneratorException{Reason: "why"}},
+		{"regenerated-exception", true, g.GeneratorException},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			clone := *p
+			clone.Grammars = map[string]GrammarPin{"csharp": g}
+			changed := g
+			changed.Regenerate = tc.regenerate
+			changed.GeneratorException = tc.exception
+			clone.Grammars["csharp"] = changed
+			b, err := json.Marshal(clone)
+			if err != nil {
+				t.Fatal(err)
+			}
+			name := filepath.Join(t.TempDir(), "pins.json")
+			if err := os.WriteFile(name, b, 0644); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := loadPins(name); err == nil {
+				t.Fatal("invalid schema-3 exception accepted")
+			}
+		})
 	}
 }

@@ -183,3 +183,47 @@ func TestUnpatchedRegenerationRequiresCLI(t *testing.T) {
 		t.Fatalf("unpatched regeneration bypassed CLI validation: %v", err)
 	}
 }
+
+// TestPinnedGrammarInputs exercises cwd module resolution and the post-generation YAML C patch.
+func TestPinnedGrammarInputs(t *testing.T) {
+	dl := os.Getenv("TSG_GRAMMAR_ARCHIVES")
+	cli := os.Getenv("TSG_GRAMMAR_CLI")
+	arc := os.Getenv("TREE_SITTER_CLI_ARCHIVE")
+	if dl == "" || cli == "" || arc == "" {
+		t.Skip("set TSG_GRAMMAR_ARCHIVES, TSG_GRAMMAR_CLI and TREE_SITTER_CLI_ARCHIVE")
+	}
+	raw, err := os.ReadFile("../pins.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var p struct {
+		Tools struct {
+			TreeSitterCLI         string `json:"treeSitterCLI"`
+			TreeSitterCLIArchives map[string]struct {
+				SHA256 string `json:"sha256"`
+			} `json:"treeSitterCLIArchives"`
+		} `json:"tools"`
+		Grammars map[string]struct {
+			Archive, ArchiveSHA256, GrammarDir string
+			NPMDependencies                    []string
+			Patches                            []patches.Pin
+		} `json:"grammars"`
+	}
+	if err := json.Unmarshal(raw, &p); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"cpp", "typescript", "tsx", "yaml"} {
+		t.Run(name, func(t *testing.T) {
+			g := p.Grammars[name]
+			c := Config{Archive: filepath.Join(dl, g.Archive), ArchiveSHA256: g.ArchiveSHA256, PatchRoot: "..", Work: filepath.Join(t.TempDir(), "work"), GrammarDir: g.GrammarDir, Regenerate: true, Patches: g.Patches, NPMDependencies: g.NPMDependencies, FetchNPM: true, NPMCache: filepath.Join(dl, "npm"), CLI: cli, CLIArchive: arc, CLIArchiveSHA256: p.Tools.TreeSitterCLIArchives[runtime.GOOS+"-"+runtime.GOARCH].SHA256, CLIVersion: p.Tools.TreeSitterCLI}
+			_, prov, err := Prepare(c)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(prov.NPM) != len(g.NPMDependencies) || !prov.Deterministic || prov.Outputs["parser.c"] == "" {
+				t.Fatalf("incomplete inputs %+v", prov)
+			}
+			t.Logf("cli=%s runtime=%s inputs=%s parser=%s npm=%+v", prov.CLI, prov.JSRuntime, prov.InputSHA256, prov.Outputs["parser.c"], prov.NPM)
+		})
+	}
+}

@@ -10,7 +10,7 @@ Every grammar module is generated, never hand-edited, from:
 | Input | Rule |
 |---|---|
 | tree-sitter runtime C (`lib/src/lib.c` tree) | an upstream **release**, unmodified |
-| grammar `parser.c`, `scanner.c`, headers | upstream grammar repository at a full commit; owner-approved temporary source patches follow ADR-0023 |
+| grammar inputs, `scanner.c`, headers | upstream grammar repository at a full commit; `parser.c` is regenerated with the single pinned CLI under ADR-0027, except recorded behaviour-gate exceptions; owner-approved temporary source patches follow ADR-0023 |
 | `tools/gen/shim/tsg_abi.c` | this repository's own C, versioned by the engine ABI |
 | toolchain | wasi-sdk (clang) and binaryen `wasm-opt` pinned by upstream release archive sha256 per platform; wasm2go pinned by module version + `go.sum` hash and built with `go install -trimpath`; versions and the recipe name recorded per generation (host binary hashes are not identity) |
 | post-processing | the hash-checked `memory_grow` replacement of `tools/gen` (ADR-0020 §8) |
@@ -20,10 +20,13 @@ of ADR-0023; grammar-input changes regenerate C with the pinned CLI, identically
 The YAML early-EOF fix, Bash/Ruby heredoc comparisons and YAML/Python serialization bounds are C-only patches;
 original/result source hashes and each patch identity are recorded in the pins and generated provenance.
 The unpatched native comparison is separate from the product comparison.
-A grammar pinned with `regenerate: true` may also regenerate from unmodified upstream inputs without patches
-(for example an archived LFS pointer). Both builders use the shared, pinned CLI path: independent generation
-twice, byte comparison, input-tree hash and generated-file hashes in provenance. The original archive/tree/file
-pins continue to identify the archived bytes; generated C hashes are additional identities.
+Under ADR-0027 every grammar sets `regenerate: true` unless its recorded exception retains the reference C.
+Both builders use the shared, pinned CLI path: independent generation twice, byte comparison, input-tree hash and
+generated-file hashes in provenance. Grammar-input patches apply before generation and C/header patches after it.
+External npm grammar inputs come from the upstream lockfile, are integrity-checked and extracted without install
+scripts, and are recorded in provenance. The original archive/tree/file pins continue to identify the archived
+bytes; generated C hashes are additional identities. CLI or grammar moves require the ADR-0027 native behaviour
+gate, including upstream tests with isolated compiled-language caches; schema changes enter the schema register.
 
 ## Machine-readable source of truth
 

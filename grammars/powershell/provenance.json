@@ -1,4 +1,20 @@
 {
+  "grammarGeneration": {
+    "patches": null,
+    "cli": "0.27.2",
+    "jsRuntime": "native",
+    "inputSHA256": "691e47a5c964a07d328974e110dc20665f8cd72e59e9912f40e34db9fa042455",
+    "outputs": {
+      "grammar.json": "a7504b323a1730437b32d7f312f9ce16ede8b8d7c4d608fa3a98bdec309492f2",
+      "node-types.json": "db02c7bdba010b518e4fa12b3ba045d0156d475f414b3ff4622eb30f51281c4e",
+      "parser.c": "ac011b830da6ecdea26fd3daca930b430f41a0a2df7d2f8286b6324593f7e412",
+      "scanner.c": "dab03ff73a44495c72e6b51f43fd2f5128a1a29344a29974f12fba250328cf99",
+      "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+      "tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
+      "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
+    },
+    "deterministic": true
+  },
   "schema": 1,
   "abi": 3,
   "name": "powershell",
@@ -15,15 +31,25 @@
       "grammar.tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
       "grammar.tree_sitter/array.h": "31e60a1bff6f715afacce03b5b70efe42b58371b4f9595dd4af52a577ff9608c",
       "grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
+      "patched.grammar.grammar.json": "a7504b323a1730437b32d7f312f9ce16ede8b8d7c4d608fa3a98bdec309492f2",
+      "patched.grammar.node-types.json": "db02c7bdba010b518e4fa12b3ba045d0156d475f414b3ff4622eb30f51281c4e",
+      "patched.grammar.parser.c": "ac011b830da6ecdea26fd3daca930b430f41a0a2df7d2f8286b6324593f7e412",
+      "patched.grammar.scanner.c": "dab03ff73a44495c72e6b51f43fd2f5128a1a29344a29974f12fba250328cf99",
+      "patched.grammar.tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+      "patched.grammar.tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
+      "patched.grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
+      "patches.inputs": "691e47a5c964a07d328974e110dc20665f8cd72e59e9912f40e34db9fa042455",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
       "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
     },
-    "RecipeSHA256": "f80a095eb15ac42f0d729a6834bc16e2602bf10fcf0030c688197433208aa950",
+    "RecipeSHA256": "ff9fc55da6dcc85c316dde276088aec3aaae350c8218d56fc159c4b0649ca419",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
+      "js-runtime": "native",
       "llvm": "895aa2c896ada719451be2e3673c83da8ddf1141",
       "recipe": "v2-O3",
+      "tree-sitter-cli": "0.27.2",
       "wasi-sdk": "34.0",
       "wasm2go": "v0.4.21",
       "wasm2go-sum": "h1:F9xQyNnXIjWesQgt7tLxqVUg2pmxwBOrRCLpEFv3QUc="

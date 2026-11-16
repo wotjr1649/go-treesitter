@@ -31,7 +31,7 @@ func New(v0 Xtsg, v1 Xwasi_snapshot_preview1) *Module {
 	m.elements = [][]any{{m.fn23, m.fn24, m.fn25, m.fn14, m.fn15, m.fn16, m.fn17, m.fn18, m.fn19, m.fn54, m.fn76, m.fn75, m.fn78, m.fn77, m.fn73, m.fn4, m.fn5, m.fn6, m.Xfree, m.fn94, m.fn95, m.fn101, m.fn96, m.fn99, m.fn100, m.fn106, m.fn129, m.fn107, m.fn136, m.fn139, fn137, m.fn148}}
 	table_init(m.t0, m.elements[0], i32(1), 0, len(m.elements[0]))
 	m.elements[0] = nil
-	memory_init(m.memory, data[0:22668], uint32(i32(65536)), 0, len(data[0:22668]))
+	memory_init(m.memory, data[0:22892], uint32(i32(65536)), 0, len(data[0:22892]))
 	m.g0 = i32(65536)
 	m.g1 = i32(0)
 	if i, ok := any(v0).(interface {
@@ -80,11 +80,11 @@ func (m *Module) fn2(v0, v1, v2, v3 int32) int32 {
 	return m._wasi_snapshot_preview1.Xfd_write(v0, v1, v2, v3)
 }
 func (m *Module) X_initialize() {
-	t0 := int32(load32(m.memory, uint64(uint32(i32(88256)))))
+	t0 := int32(load32(m.memory, uint64(uint32(i32(88480)))))
 	if t0 != 0 {
 		panic("unreachable")
 	}
-	store32(m.memory, uint64(uint32(i32(88256))), uint32(i32(1)))
+	store32(m.memory, uint64(uint32(i32(88480))), uint32(i32(1)))
 }
 func (m *Module) fn4(v0 int32) int32 {
 	var v1, v2 int32
@@ -101,7 +101,7 @@ func (m *Module) fn4(v0 int32) int32 {
 			goto l0
 		}
 		store32(m.memory, uint64(uint32(v1)), uint32(v0))
-		t2 := int32(load32(m.memory, uint64(uint32(i32(85888)))))
+		t2 := int32(load32(m.memory, uint64(uint32(i32(86112)))))
 		m.fn141(t2, i32(66359), v1)
 		panic("unreachable")
 	}
@@ -124,7 +124,7 @@ func (m *Module) fn5(v0, v1 int32) int32 {
 			goto l0
 		}
 		store32(m.memory, uint64(uint32(v2)), uint32(v0*v1))
-		t2 := int32(load32(m.memory, uint64(uint32(i32(85888)))))
+		t2 := int32(load32(m.memory, uint64(uint32(i32(86112)))))
 		m.fn141(t2, i32(66359), v2)
 		panic("unreachable")
 	}
@@ -147,7 +147,7 @@ func (m *Module) fn6(v0, v1 int32) int32 {
 			goto l0
 		}
 		store32(m.memory, uint64(uint32(v2)), uint32(v1))
-		t2 := int32(load32(m.memory, uint64(uint32(i32(85888)))))
+		t2 := int32(load32(m.memory, uint64(uint32(i32(86112)))))
 		m.fn141(t2, i32(66316), v2)
 		panic("unreachable")
 	}
@@ -270,12 +270,12 @@ func (m *Module) fn7(v0, v1, v2, v3, v4 int32) {
 							var p24 int32
 							{
 								if v8 != 0 {
-									t25 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+									t25 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 									t26 := m.t0[uint(t25)].(func(int32, int32) int32)(v8, v6)
 									p24 = t26
 									goto l4
 								}
-								t27 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+								t27 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 								t28 := m.t0[uint(t27)].(func(int32) int32)(v6)
 								p24 = t28
 							}
@@ -353,12 +353,12 @@ func (m *Module) fn7(v0, v1, v2, v3, v4 int32) {
 							var p41 int32
 							{
 								if v8 != 0 {
-									t42 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+									t42 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 									t43 := m.t0[uint(t42)].(func(int32, int32) int32)(v8, v5)
 									p41 = t43
 									goto l8
 								}
-								t44 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+								t44 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 								t45 := m.t0[uint(t44)].(func(int32) int32)(v5)
 								p41 = t45
 							}
@@ -433,12 +433,12 @@ func (m *Module) fn7(v0, v1, v2, v3, v4 int32) {
 						var p58 int32
 						{
 							if v7 != 0 {
-								t59 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+								t59 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 								t60 := m.t0[uint(t59)].(func(int32, int32) int32)(v7, v5)
 								p58 = t60
 								goto l12
 							}
-							t61 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+							t61 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 							t62 := m.t0[uint(t61)].(func(int32) int32)(v5)
 							p58 = t62
 						}
@@ -662,12 +662,12 @@ func (m *Module) fn8(v0, v1 int32) int32 {
 							var p43 int32
 							{
 								if v7 != 0 {
-									t44 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+									t44 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 									t45 := m.t0[uint(t44)].(func(int32, int32) int32)(v7, v6)
 									p43 = t45
 									goto l9
 								}
-								t46 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+								t46 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 								t47 := m.t0[uint(t46)].(func(int32) int32)(v6)
 								p43 = t47
 							}
@@ -973,12 +973,12 @@ func (m *Module) fn9(v0 int32) {
 					var p55 int32
 					{
 						if v7 != 0 {
-							t56 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+							t56 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 							t57 := m.t0[uint(t56)].(func(int32, int32) int32)(v7, v4)
 							p55 = t57
 							goto l10
 						}
-						t58 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+						t58 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 						t59 := m.t0[uint(t58)].(func(int32) int32)(v4)
 						p55 = t59
 					}
@@ -1292,10 +1292,10 @@ l0:
 }
 func (m *Module) fn11(v0, v1 int32) int32 {
 	var v2 int32
-	v2 = i32(67481)
+	v2 = i32(67486)
 	switch v1 - i32(65534) {
 	case 0:
-		return i32(67480)
+		return i32(67485)
 	default:
 		t0 := int32(load32(m.memory, uint64(uint32(v0))+8))
 		t1 := int32(load32(m.memory, uint64(uint32(v0))+4))
@@ -1321,7 +1321,7 @@ func (m *Module) fn12(v0, v1, v2, v3 int32) int32 {
 			if v2 != i32(5) {
 				goto l0
 			}
-			t1 := m.fn151(v1, i32(67481), i32(5))
+			t1 := m.fn151(v1, i32(67486), i32(5))
 			if t1 != 0 {
 				goto l0
 			}
@@ -1677,9 +1677,9 @@ func (m *Module) fn19(v0, v1 int32) {
 				store32(m.memory, uint64(uint32(t4)), uint32(v2))
 				v3 = v0 + i32(132)
 				t6 := v3
-				p5 := i32(67255)
+				p5 := i32(67260)
 				if uint32(v2-i32(32)) < uint32(i32(95)) {
-					p5 = i32(67679)
+					p5 = i32(67684)
 				}
 				m.fn146(t6, i32(1024), p5, v4)
 				t7 := int32(load32(m.memory, uint64(uint32(v0))+92))
@@ -1696,9 +1696,9 @@ func (m *Module) fn19(v0, v1 int32) {
 			store32(m.memory, uint64(uint32(t10))+16, uint32(v2))
 			v3 = v0 + i32(132)
 			t12 := v3
-			p11 := i32(67273)
+			p11 := i32(67278)
 			if uint32(v2-i32(32)) < uint32(i32(95)) {
-				p11 = i32(67699)
+				p11 = i32(67704)
 			}
 			m.fn146(t12, i32(1024), p11, v4+i32(16))
 			t13 := int32(load32(m.memory, uint64(uint32(v0))+92))
@@ -2011,9 +2011,9 @@ func (m *Module) fn22(v0 int32) {
 	store32(m.memory, uint64(uint32(v0))+52, uint32(t1))
 	t2 := int64(load64(m.memory, uint64(uint32(v0))+32))
 	store64(m.memory, uint64(uint32(v0))+44, uint64(t2))
-	t3 := int64(load64(m.memory, uint64(uint32(i32(68284)))))
+	t3 := int64(load64(m.memory, uint64(uint32(i32(68288)))))
 	store64(m.memory, uint64(uint32(v0))+56, uint64(t3))
-	t4 := int32(load32(m.memory, uint64(uint32(i32(68292)))))
+	t4 := int32(load32(m.memory, uint64(uint32(i32(68296)))))
 	store32(m.memory, uint64(uint32(v0))+64, uint32(t4))
 	{
 		t5 := int32(load32(m.memory, uint64(uint32(v0))+104))
@@ -2118,7 +2118,7 @@ func (m *Module) fn24(v0, v1, v2 int32) int32 {
 							t2 := v2
 							v4 = v4 & i32(15)
 							store32(m.memory, uint64(uint32(t2)), uint32(v4))
-							t3 := int32(m.memory[uint64(uint32(v4))+67650])
+							t3 := int32(m.memory[uint64(uint32(v4))+67655])
 							t4 := int32(m.memory[uint64(uint32(v0))+1])
 							v3 = t4
 							if i32_shr_u(t3, int32(uint32(v3)>>5))&i32(1) == 0 {
@@ -2136,7 +2136,7 @@ func (m *Module) fn24(v0, v1, v2 int32) int32 {
 						}
 						t6 := int32(m.memory[uint64(uint32(v0))+1])
 						v3 = t6
-						t7 := int32(int8(m.memory[uint64(uint32(int32(uint32(v3)>>4)))+68348]))
+						t7 := int32(int8(m.memory[uint64(uint32(int32(uint32(v3)>>4)))+68352]))
 						if i32_shr_u(t7, v4)&i32(1) == 0 {
 							goto l0
 						}
@@ -2994,12 +2994,12 @@ func (m *Module) fn33(v0, v1 int32) {
 				var p13 int32
 				{
 					if v2 != 0 {
-						t14 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+						t14 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 						t15 := m.t0[uint(t14)].(func(int32, int32) int32)(v2, v3)
 						p13 = t15
 						goto l1
 					}
-					t16 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+					t16 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 					t17 := m.t0[uint(t16)].(func(int32) int32)(v3)
 					p13 = t17
 				}
@@ -3079,12 +3079,12 @@ func (m *Module) fn33(v0, v1 int32) {
 								var p36 int32
 								{
 									if v2 != 0 {
-										t37 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+										t37 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 										t38 := m.t0[uint(t37)].(func(int32, int32) int32)(v2, v5)
 										p36 = t38
 										goto l3
 									}
-									t39 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+									t39 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 									t40 := m.t0[uint(t39)].(func(int32) int32)(v5)
 									p36 = t40
 								}
@@ -3109,7 +3109,7 @@ func (m *Module) fn33(v0, v1 int32) {
 							goto l4
 						}
 					}
-					t43 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t43 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t43)].(func(int32))(v7)
 					goto l5
 				}
@@ -3123,7 +3123,7 @@ func (m *Module) fn33(v0, v1 int32) {
 						goto l6
 					}
 					t46 := int32(load32(m.memory, uint64(uint32(v4))+48))
-					t47 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t47 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t47)].(func(int32))(t46)
 				}
 			l6:
@@ -3159,12 +3159,12 @@ func (m *Module) fn33(v0, v1 int32) {
 						var p55 int32
 						{
 							if v3 != 0 {
-								t56 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+								t56 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 								t57 := m.t0[uint(t56)].(func(int32, int32) int32)(v3, v1)
 								p55 = t57
 								goto l8
 							}
-							t58 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+							t58 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 							t59 := m.t0[uint(t58)].(func(int32) int32)(v1)
 							p55 = t59
 						}
@@ -3185,7 +3185,7 @@ func (m *Module) fn33(v0, v1 int32) {
 					goto l5
 				}
 			l7:
-				t61 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+				t61 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 				m.t0[uint(t61)].(func(int32))(v4)
 			}
 		l5:
@@ -3242,14 +3242,14 @@ func (m *Module) fn34(v0 int32) {
 					t12 := int32(load32(m.memory, uint64(uint32(v1))))
 					v9 = t12
 					if v9 != 0 {
-						t13 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+						t13 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 						m.t0[uint(t13)].(func(int32))(v9)
 						t14 := int32(load32(m.memory, uint64(uint32(v5))))
 						v1 = t14
 					}
 					store32(m.memory, uint64(uint32(v1))+8, uint32(i32(0)))
 					store64(m.memory, uint64(uint32(v1)), uint64(i64(0)))
-					t15 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t15 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t15)].(func(int32))(v1)
 				}
 				t16 := int32(load32(m.memory, uint64(uint32(v8))))
@@ -3275,12 +3275,12 @@ func (m *Module) fn34(v0 int32) {
 		var p21 int32
 		{
 			if v1 != 0 {
-				t22 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+				t22 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 				t23 := m.t0[uint(t22)].(func(int32, int32) int32)(v1, i32(256))
 				p21 = t23
 				goto l1
 			}
-			t24 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+			t24 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 			t25 := m.t0[uint(t24)].(func(int32) int32)(i32(256))
 			p21 = t25
 		}
@@ -3528,12 +3528,12 @@ l4:
 					var p21 int32
 					{
 						if v6 != 0 {
-							t22 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+							t22 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 							t23 := m.t0[uint(t22)].(func(int32, int32) int32)(v6, v3)
 							p21 = t23
 							goto l2
 						}
-						t24 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+						t24 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 						t25 := m.t0[uint(t24)].(func(int32) int32)(v3)
 						p21 = t25
 					}
@@ -3548,7 +3548,7 @@ l4:
 				store32(m.memory, uint64(uint32(v6+v3<<2)), uint32(v0))
 				goto l3
 			}
-			t27 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t27 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t27)].(func(int32))(v0)
 		}
 	l3:
@@ -3574,7 +3574,7 @@ func (m *Module) fn37(v0 int32) {
 		if v1 == 0 {
 			return
 		}
-		m.fn145(i32(67830), i32(15), i32(1), v1)
+		m.fn145(i32(67835), i32(15), i32(1), v1)
 		v1 = v0 + i32(132)
 	l3:
 		{
@@ -3592,7 +3592,7 @@ func (m *Module) fn37(v0 int32) {
 						goto l2
 					}
 					t4 := int32(load32(m.memory, uint64(uint32(v0))+1292))
-					m.fn145(i32(68277), i32(5), i32(1), t4)
+					m.fn145(i32(68282), i32(5), i32(1), t4)
 					return
 				}
 			l1:
@@ -3642,7 +3642,7 @@ func (m *Module) fn38(v0, v1, v2, v3, v4 int32) {
 l0:
 	v3 = p1
 	store32(m.memory, uint64(uint32(v5))+80, uint32(v0))
-	m.fn141(v4, i32(67813), v5+i32(80))
+	m.fn141(v4, i32(67818), v5+i32(80))
 	m.fn56(v2, v4, v3&i32(0xffff))
 	m.fn143(i32(34), v4)
 	{
@@ -3684,7 +3684,7 @@ l1:
 	}
 l2:
 	if p13 != 0 {
-		m.fn145(i32(67574), i32(25), i32(1), v4)
+		m.fn145(i32(67579), i32(25), i32(1), v4)
 		t19 := int32(load32(m.memory, uint64(uint32(v0))))
 		v3 = t19
 	}
@@ -3773,10 +3773,10 @@ l5:
 			goto l6
 		}
 		store32(m.memory, uint64(uint32(v5))+16, uint32(v3))
-		m.fn141(v4, i32(67722), v5+i32(16))
+		m.fn141(v4, i32(67727), v5+i32(16))
 	}
 l6:
-	m.fn145(i32(68045), i32(3), i32(1), v4)
+	m.fn145(i32(68050), i32(3), i32(1), v4)
 	{
 		t37 := int32(load32(m.memory, uint64(uint32(v0))))
 		v3 = t37
@@ -3830,7 +3830,7 @@ l6:
 			store32(m.memory, uint64(uint32(v5))+8, uint32(v7))
 			store32(m.memory, uint64(uint32(v5))+4, uint32(v3))
 			store32(m.memory, uint64(uint32(v5)), uint32(v0))
-			m.fn141(v4, i32(67956), v5)
+			m.fn141(v4, i32(67961), v5)
 			v6 = v6 + i32(8)
 			var p49 int32
 			{
@@ -3975,7 +3975,7 @@ l0:
 				p24 = i32(8)
 			}
 			v1 = p24
-			t25 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+			t25 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 			t26 := m.t0[uint(t25)].(func(int32, int32) int32)(t22, v1<<4)
 			v7 = t26
 			store32(m.memory, uint64(uint32(v0))+8, uint32(v1))
@@ -4136,7 +4136,7 @@ func (m *Module) fn40(v0, v1 int32) int32 {
 					t34 := int64(load64(m.memory, uint64(uint32(v2))+40))
 					store64(m.memory, uint64(uint32(v2))+8, uint64(t34))
 					m.fn33(v19, v2+i32(8))
-					t35 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t35 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t35)].(func(int32))(v17)
 					{
 						t36 := int32(load32(m.memory, uint64(uint32(v0))+96))
@@ -4146,7 +4146,7 @@ func (m *Module) fn40(v0, v1 int32) int32 {
 								goto l6
 							}
 						}
-						v3 = i32(67481)
+						v3 = i32(67486)
 						{
 							var p38 int32
 							if v20 != 0 {
@@ -4160,7 +4160,7 @@ func (m *Module) fn40(v0, v1 int32) int32 {
 							case 1:
 								goto l8
 							case 0:
-								v3 = i32(67480)
+								v3 = i32(67485)
 								goto l8
 							default:
 								t40 := int32(load32(m.memory, uint64(uint32(v0))+1184))
@@ -4190,7 +4190,7 @@ func (m *Module) fn40(v0, v1 int32) int32 {
 						t48 := int32(load32(m.memory, uint64(uint32(v0))+1184))
 						m.fn48(t47, t48, v4)
 						t49 := int32(load32(m.memory, uint64(uint32(v0))+1292))
-						m.fn145(i32(68280), i32(2), i32(1), t49)
+						m.fn145(i32(68285), i32(2), i32(1), t49)
 					}
 				l6:
 					v11 = v11 + i32(1)
@@ -4481,7 +4481,7 @@ func (m *Module) fn42(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10 int32) {
 				p18 = t22
 				goto l4
 			}
-			t23 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+			t23 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 			t24 := m.t0[uint(t23)].(func(int32) int32)(i32(76))
 			p18 = t24
 		}
@@ -4609,7 +4609,7 @@ l0:
 							goto l2
 						}
 					}
-					v5 = i32(67481)
+					v5 = i32(67486)
 					{
 						t10 := int32(load16(m.memory, uint64(uint32(v4))+40))
 						v4 = t10
@@ -4617,7 +4617,7 @@ l0:
 						case 1:
 							goto l4
 						case 0:
-							v5 = i32(67480)
+							v5 = i32(67485)
 							goto l4
 						default:
 							t11 := int32(load32(m.memory, uint64(uint32(v0))+1184))
@@ -4677,7 +4677,7 @@ l0:
 							p28 = i32(8)
 						}
 						v5 = p28
-						t29 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+						t29 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 						t30 := m.t0[uint(t29)].(func(int32, int32) int32)(t26, v5<<4)
 						v6 = t30
 						store32(m.memory, uint64(uint32(v3))+8, uint32(v5))
@@ -4769,7 +4769,7 @@ func (m *Module) fn44(v0, v1, v2 int32) {
 		}
 		t6 := int32(load32(m.memory, uint64(uint32(v3))+36))
 		v6 = t6<<3 + i32(76)
-		t7 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+		t7 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 		t8 := m.t0[uint(t7)].(func(int32) int32)(v6)
 		v4 = t8
 		if v6 != 0 {
@@ -4819,7 +4819,7 @@ func (m *Module) fn44(v0, v1, v2 int32) {
 					v4 = t21
 					goto l3
 				}
-				t22 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+				t22 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 				t23 := m.t0[uint(t22)].(func(int32) int32)(v4)
 				v4 = t23
 				t24 := int32(load32(m.memory, uint64(uint32(v3))+72))
@@ -4872,7 +4872,7 @@ func (m *Module) fn45(v0, v1, v2, v3, v4 int32) {
 			p3 = t7
 			goto l0
 		}
-		t8 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+		t8 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 		t9 := m.t0[uint(t8)].(func(int32) int32)(i32(164))
 		p3 = t9
 	}
@@ -5141,7 +5141,7 @@ func (m *Module) fn46(v0, v1, v2, v3, v4, v5, v6, v7 int32) int32 {
 						}
 					}
 					if v10 != 0 {
-						t32 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+						t32 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 						m.t0[uint(t32)].(func(int32))(v10)
 					}
 					v16 = v16 + i32(1)
@@ -5197,7 +5197,7 @@ func (m *Module) fn46(v0, v1, v2, v3, v4, v5, v6, v7 int32) int32 {
 							}
 						}
 						if v11 != 0 {
-							t44 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+							t44 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 							m.t0[uint(t44)].(func(int32))(v11)
 						}
 						v11 = v10
@@ -5257,12 +5257,12 @@ func (m *Module) fn46(v0, v1, v2, v3, v4, v5, v6, v7 int32) int32 {
 							var p57 int32
 							{
 								if v3 != 0 {
-									t58 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+									t58 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 									t59 := m.t0[uint(t58)].(func(int32, int32) int32)(v3, v12)
 									p57 = t59
 									goto l10
 								}
-								t60 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+								t60 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 								t61 := m.t0[uint(t60)].(func(int32) int32)(v12)
 								p57 = t61
 							}
@@ -5356,7 +5356,7 @@ func (m *Module) fn46(v0, v1, v2, v3, v4, v5, v6, v7 int32) int32 {
 							if v10 == 0 {
 								goto l13
 							}
-							t84 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+							t84 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 							m.t0[uint(t84)].(func(int32))(v10)
 						}
 					l13:
@@ -5533,14 +5533,14 @@ func (m *Module) fn47(v0, v1, v2 int32) {
 				t11 := int32(load32(m.memory, uint64(uint32(v3))))
 				v7 = t11
 				if v7 != 0 {
-					t12 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t12 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t12)].(func(int32))(v7)
 					t13 := int32(load32(m.memory, uint64(uint32(v2))+4))
 					v3 = t13
 				}
 				store32(m.memory, uint64(uint32(v3))+8, uint32(i32(0)))
 				store64(m.memory, uint64(uint32(v3)), uint64(i64(0)))
-				t14 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+				t14 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 				m.t0[uint(t14)].(func(int32))(v3)
 			}
 			t15 := int32(load32(m.memory, uint64(uint32(v2))))
@@ -5578,12 +5578,12 @@ func (m *Module) fn48(v0, v1, v2 int32) {
 		var p3 int32
 		{
 			if v5 != 0 {
-				t4 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+				t4 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 				t5 := m.t0[uint(t4)].(func(int32, int32) int32)(v5, i32(768))
 				p3 = t5
 				goto l0
 			}
-			t6 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+			t6 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 			t7 := m.t0[uint(t6)].(func(int32) int32)(i32(768))
 			p3 = t7
 		}
@@ -5592,15 +5592,15 @@ func (m *Module) fn48(v0, v1, v2 int32) {
 		store32(m.memory, uint64(uint32(v0))+32, uint32(i32(32)))
 	}
 	store32(m.memory, uint64(uint32(v0))+24, uint32(v5))
-	t8 := int32(load32(m.memory, uint64(uint32(i32(85888)))))
+	t8 := int32(load32(m.memory, uint64(uint32(i32(86112)))))
 	p9 := t8
 	if v2 != 0 {
 		p9 = v2
 	}
 	v6 = p9
-	m.fn145(i32(67923), i32(16), i32(1), v6)
-	m.fn145(i32(68131), i32(14), i32(1), v6)
-	m.fn145(i32(67989), i32(22), i32(1), v6)
+	m.fn145(i32(67928), i32(16), i32(1), v6)
+	m.fn145(i32(68136), i32(14), i32(1), v6)
+	m.fn145(i32(67994), i32(22), i32(1), v6)
 	store32(m.memory, uint64(uint32(v0))+28, uint32(i32(0)))
 	t10 := int32(load32(m.memory, uint64(uint32(v0))+4))
 	v2 = t10
@@ -5613,14 +5613,14 @@ func (m *Module) fn48(v0, v1, v2 int32) {
 			t12 := int32(load32(m.memory, uint64(uint32(v10))+28))
 			if t12 != i32(2) {
 				store32(m.memory, uint64(uint32(v3))+160, uint32(v7))
-				m.fn141(v6, i32(68012), v3+i32(160))
+				m.fn141(v6, i32(68017), v3+i32(160))
 				t13 := int32(load32(m.memory, uint64(uint32(v10))))
 				store32(m.memory, uint64(uint32(v3))+148, uint32(t13))
 				store32(m.memory, uint64(uint32(v3))+144, uint32(v7))
-				m.fn141(v6, i32(67419), v3+i32(144))
+				m.fn141(v6, i32(67424), v3+i32(144))
 				t14 := int32(load32(m.memory, uint64(uint32(v10))+28))
 				if t14 == i32(1) {
-					m.fn145(i32(67895), i32(10), i32(1), v6)
+					m.fn145(i32(67900), i32(10), i32(1), v6)
 				}
 				t15 := int32(load32(m.memory, uint64(uint32(v0))))
 				v5 = t15 + v5
@@ -5662,7 +5662,7 @@ func (m *Module) fn48(v0, v1, v2 int32) {
 					if t24 == 0 {
 						goto l2
 					}
-					m.fn145(i32(67518), i32(9), i32(1), v6)
+					m.fn145(i32(67523), i32(9), i32(1), v6)
 					t25 := int32(load32(m.memory, uint64(uint32(v10))+4))
 					v4 = t25
 					t26 := int32(load32(m.memory, uint64(uint32(v4))+4))
@@ -5701,7 +5701,7 @@ func (m *Module) fn48(v0, v1, v2 int32) {
 						t34 := int32(load32(m.memory, uint64(uint32(v5))))
 						v5 = t34
 					}
-					m.fn145(i32(67549), i32(24), i32(1), v6)
+					m.fn145(i32(67554), i32(24), i32(1), v6)
 					t35 := int32(load32(m.memory, uint64(uint32(v4))+72))
 					if t35 == 0 {
 						goto l4
@@ -5711,7 +5711,7 @@ func (m *Module) fn48(v0, v1, v2 int32) {
 					{
 						t36 := int32(int8(m.memory[uint64(uint32(v2+v5))]))
 						store32(m.memory, uint64(uint32(v3))+96, uint32(t36))
-						m.fn141(v6, i32(67466), v3+i32(96))
+						m.fn141(v6, i32(67471), v3+i32(96))
 						v2 = v2 + i32(1)
 						t37 := int32(load32(m.memory, uint64(uint32(v4))+72))
 						if uint32(v2) < uint32(t37) {
@@ -5720,7 +5720,7 @@ func (m *Module) fn48(v0, v1, v2 int32) {
 					}
 				}
 			l4:
-				m.fn145(i32(68045), i32(3), i32(1), v6)
+				m.fn145(i32(68050), i32(3), i32(1), v6)
 				t38 := int32(load32(m.memory, uint64(uint32(v0))+24))
 				v2 = t38
 				t39 := int32(load32(m.memory, uint64(uint32(v0))+28))
@@ -5745,12 +5745,12 @@ func (m *Module) fn48(v0, v1, v2 int32) {
 					var p44 int32
 					{
 						if v2 != 0 {
-							t45 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+							t45 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 							t46 := m.t0[uint(t45)].(func(int32, int32) int32)(v2, v5)
 							p44 = t46
 							goto l6
 						}
-						t47 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+						t47 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 						t48 := m.t0[uint(t47)].(func(int32) int32)(v5)
 						p44 = t48
 					}
@@ -5828,12 +5828,12 @@ l22:
 					goto l8
 				}
 				store32(m.memory, uint64(uint32(v3))+80, uint32(v9))
-				m.fn141(v6, i32(67456), v3+i32(80))
+				m.fn141(v6, i32(67461), v3+i32(80))
 				{
 					t63 := int32(load16(m.memory, uint64(uint32(v9))))
 					v4 = t63
 					if v4 == 0 {
-						m.fn145(i32(67803), i32(9), i32(1), v6)
+						m.fn145(i32(67808), i32(9), i32(1), v6)
 						goto l10
 					}
 					{
@@ -5856,12 +5856,12 @@ l22:
 						if p66 == 0 {
 							goto l11
 						}
-						m.fn145(i32(67846), i32(29), i32(1), v6)
+						m.fn145(i32(67851), i32(29), i32(1), v6)
 						goto l10
 					}
 				l11:
 					store32(m.memory, uint64(uint32(v3))+64, uint32(v4))
-					m.fn141(v6, i32(67739), v3-i32(-64))
+					m.fn141(v6, i32(67744), v3-i32(-64))
 				}
 			l10:
 				t68 := int32(load32(m.memory, uint64(uint32(v9))+8))
@@ -5878,7 +5878,7 @@ l22:
 				store32(m.memory, uint64(uint32(v3))+40, uint32(v8))
 				store32(m.memory, uint64(uint32(v3))+36, uint32(v4))
 				store32(m.memory, uint64(uint32(v3))+32, uint32(v2+i32(1)))
-				m.fn141(v6, i32(68049), v3+i32(32))
+				m.fn141(v6, i32(68054), v3+i32(32))
 				t73 := int32(load16(m.memory, uint64(uint32(v9))+144))
 				if t73 != 0 {
 					v4 = v9 + i32(28)
@@ -5893,9 +5893,9 @@ l22:
 						v16 = t76
 						store32(m.memory, uint64(uint32(t77))+20, uint32(v16))
 						store32(m.memory, uint64(uint32(v3))+16, uint32(v9))
-						m.fn141(v6, i32(67445), v3+i32(16))
+						m.fn141(v6, i32(67450), v3+i32(16))
 						if t75&i32(1) != 0 {
-							m.fn145(i32(67906), i32(13), i32(1), v6)
+							m.fn145(i32(67911), i32(13), i32(1), v6)
 						}
 						{
 							{
@@ -5913,9 +5913,9 @@ l22:
 											p81 = int32(uint32(t82)>>2) & i32(1)
 										}
 										if p81 != 0 {
-											m.fn145(i32(67879), i32(15), i32(1), v6)
+											m.fn145(i32(67884), i32(15), i32(1), v6)
 										}
-										m.fn145(i32(67838), i32(7), i32(1), v6)
+										m.fn145(i32(67843), i32(7), i32(1), v6)
 										t84 := v1
 										t85 := v6
 										var p83 int32
@@ -5942,7 +5942,7 @@ l22:
 										m.fn56(t84, t85, p83&i32(0xffff))
 										goto l15
 									}
-									m.fn145(i32(67245), i32(9), i32(1), v6)
+									m.fn145(i32(67250), i32(9), i32(1), v6)
 									goto l16
 								l14:
 									m.fn143(i32(39), v6)
@@ -5978,10 +5978,10 @@ l22:
 						l17:
 							store32(m.memory, uint64(uint32(t92))+4, uint32(p91))
 							store32(m.memory, uint64(uint32(v3)), uint32(v7))
-							m.fn141(v6, i32(67750), v3)
+							m.fn141(v6, i32(67755), v3)
 						}
 					l16:
-						m.fn145(i32(68127), i32(3), i32(1), v6)
+						m.fn145(i32(68132), i32(3), i32(1), v6)
 						t97 := int32(load32(m.memory, uint64(uint32(v0))+24))
 						v2 = t97
 						var p98 int32
@@ -6008,12 +6008,12 @@ l22:
 								var p104 int32
 								{
 									if v2 != 0 {
-										t105 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+										t105 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 										t106 := m.t0[uint(t105)].(func(int32, int32) int32)(v2, v8)
 										p104 = t106
 										goto l18
 									}
-									t107 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+									t107 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 									t108 := m.t0[uint(t107)].(func(int32) int32)(v8)
 									p104 = t108
 								}
@@ -6067,12 +6067,12 @@ l22:
 					v13 = p117
 					v4 = v13 << 2
 					if v10 != 0 {
-						t118 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+						t118 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 						t119 := m.t0[uint(t118)].(func(int32, int32) int32)(v10, v4)
 						v10 = t119
 						goto l20
 					}
-					t120 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+					t120 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 					t121 := m.t0[uint(t120)].(func(int32) int32)(v4)
 					v10 = t121
 				}
@@ -6093,9 +6093,9 @@ l22:
 			goto l22
 		}
 	}
-	m.fn145(i32(67920), i32(2), i32(1), v6)
+	m.fn145(i32(67925), i32(2), i32(1), v6)
 	if v10 != 0 {
-		t123 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+		t123 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 		m.t0[uint(t123)].(func(int32))(v10)
 	}
 	m.g0 = v3 + i32(224)
@@ -6227,12 +6227,12 @@ func (m *Module) fn49(v0, v1, v2 int32) {
 							var p28 int32
 							{
 								if v6 != 0 {
-									t29 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+									t29 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 									t30 := m.t0[uint(t29)].(func(int32, int32) int32)(v6, v4)
 									p28 = t30
 									goto l5
 								}
-								t31 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+								t31 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 								t32 := m.t0[uint(t31)].(func(int32) int32)(v4)
 								p28 = t32
 							}
@@ -6578,7 +6578,7 @@ l0:
 									}
 								}
 								if v9 != 0 {
-									t64 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t64 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t64)].(func(int32))(v9)
 								}
 								store32(m.memory, uint64(uint32(v4))+224, uint32(i32(0)))
@@ -6619,7 +6619,7 @@ l0:
 									}
 								}
 								if v9 != 0 {
-									t73 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t73 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t73)].(func(int32))(v9)
 								}
 								store32(m.memory, uint64(uint32(v4))+224, uint32(i32(0)))
@@ -6683,7 +6683,7 @@ l0:
 										}
 										v3 = i32(0)
 										v24 = v9 << 3
-										t85 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+										t85 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 										t86 := m.t0[uint(t85)].(func(int32) int32)(v24)
 										v12 = t86
 										v6 = i32(0)
@@ -6718,12 +6718,12 @@ l0:
 												v7 = p92
 												v11 = v7 << 3
 												if v12 != 0 {
-													t93 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+													t93 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 													t94 := m.t0[uint(t93)].(func(int32, int32) int32)(v12, v11)
 													v12 = t94
 													goto l15
 												}
-												t95 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+												t95 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 												t96 := m.t0[uint(t95)].(func(int32) int32)(v11)
 												v12 = t96
 											}
@@ -6738,7 +6738,7 @@ l0:
 										v6 = t97
 										v3 = v24 + i32(76)
 										if uint32(v3) > uint32(v7<<3) {
-											t98 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+											t98 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 											t99 := m.t0[uint(t98)].(func(int32, int32) int32)(v12, v3)
 											v12 = t99
 										}
@@ -6803,12 +6803,12 @@ l0:
 											var p119 int32
 											{
 												if v3 != 0 {
-													t120 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+													t120 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 													t121 := m.t0[uint(t120)].(func(int32, int32) int32)(v3, v9)
 													p119 = t121
 													goto l17
 												}
-												t122 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+												t122 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 												t123 := m.t0[uint(t122)].(func(int32) int32)(v9)
 												p119 = t123
 											}
@@ -6845,7 +6845,7 @@ l0:
 											goto l19
 										}
 									}
-									t127 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t127 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t127)].(func(int32))(v10)
 									goto l12
 								}
@@ -6870,7 +6870,7 @@ l0:
 									v6 = v10 + i32(76)
 									t131 := int32(load32(m.memory, uint64(uint32(v4))+224))
 									if uint32(v6) > uint32(t131<<3) {
-										t132 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+										t132 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 										t133 := m.t0[uint(t132)].(func(int32, int32) int32)(v5, v6)
 										v5 = t133
 										store32(m.memory, uint64(uint32(v4))+224, uint32(int32(uint32(v6)>>3)))
@@ -6940,7 +6940,7 @@ l0:
 								t154 := int32(load32(m.memory, uint64(uint32(v4))+216))
 								v3 = t154
 								if v3 != 0 {
-									t155 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t155 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t155)].(func(int32))(v3)
 								}
 								t156 := int32(load32(m.memory, uint64(uint32(v4))+228))
@@ -7015,7 +7015,7 @@ l0:
 				m.fn48(t168, t169, v3)
 				v6 = i32(1)
 				t170 := int32(load32(m.memory, uint64(uint32(v0))+1292))
-				m.fn145(i32(68280), i32(2), i32(1), t170)
+				m.fn145(i32(68285), i32(2), i32(1), t170)
 				goto l1
 			}
 		l2:
@@ -7070,7 +7070,7 @@ l1:
 				t181 := int32(load32(m.memory, uint64(uint32(v0))+1184))
 				m.fn48(v3, t181, v5)
 				t182 := int32(load32(m.memory, uint64(uint32(v0))+1292))
-				m.fn145(i32(68280), i32(2), i32(1), t182)
+				m.fn145(i32(68285), i32(2), i32(1), t182)
 				t183 := int32(load32(m.memory, uint64(uint32(v0))+1156))
 				v3 = t183
 			}
@@ -7108,16 +7108,16 @@ l1:
 						goto l31
 					}
 				}
-				t193 := int32(load32(m.memory, uint64(uint32(i32(67079)))))
+				t193 := int32(load32(m.memory, uint64(uint32(i32(67084)))))
 				store32(m.memory, uint64(uint32(v0))+140, uint32(t193))
-				t194 := int64(load64(m.memory, uint64(uint32(i32(67071)))))
+				t194 := int64(load64(m.memory, uint64(uint32(i32(67076)))))
 				store64(m.memory, uint64(uint32(v0))+132, uint64(t194))
 				m.fn37(v0)
 			}
 		l31:
 			t195 := int32(load32(m.memory, uint64(uint32(v0))+1184))
 			v5 = t195
-			t196 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+			t196 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 			t197 := m.t0[uint(t196)].(func(int32, int32) int32)(i32(0), i32(76))
 			v3 = t197
 			store32(m.memory, uint64(uint32(v4))+232, uint32(i32(1)))
@@ -7383,13 +7383,13 @@ l1:
 			}
 			v5 = p267
 			t269 := v0 + i32(132)
-			v3 = i32(67481)
+			v3 = i32(67486)
 			v5 = v5 & i32(0xffff)
 			switch v5 - i32(65534) {
 			case 1:
 				goto l45
 			case 0:
-				v3 = i32(67480)
+				v3 = i32(67485)
 				goto l45
 			default:
 				t270 := int32(load32(m.memory, uint64(uint32(v0))+1184))
@@ -7411,7 +7411,7 @@ l1:
 			m.fn37(v0)
 		}
 	l43:
-		t276 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+		t276 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 		t277 := m.t0[uint(t276)].(func(int32) int32)(i32(8))
 		v3 = t277
 		t278 := int64(load64(m.memory, uint64(uint32(v2))))
@@ -7420,7 +7420,7 @@ l1:
 		store64(m.memory, uint64(uint32(t279)), uint64(v29))
 		t280 := int32(load32(m.memory, uint64(uint32(v0))+1184))
 		v5 = t280
-		t281 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+		t281 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 		t282 := m.t0[uint(t281)].(func(int32, int32) int32)(v3, i32(84))
 		v3 = t282
 		store32(m.memory, uint64(uint32(v4))+256, uint32(i32(1)))
@@ -7528,7 +7528,7 @@ l1:
 						t310 := int32(load32(m.memory, uint64(uint32(v5))))
 						v3 = t310
 						if v3 != 0 {
-							t311 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+							t311 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 							m.t0[uint(t311)].(func(int32))(v3)
 						}
 						store32(m.memory, uint64(uint32(v5))+8, uint32(i32(0)))
@@ -7591,12 +7591,12 @@ l1:
 					var p328 int32
 					{
 						if v3 != 0 {
-							t329 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+							t329 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 							t330 := m.t0[uint(t329)].(func(int32, int32) int32)(v3, v5)
 							p328 = t330
 							goto l53
 						}
-						t331 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+						t331 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 						t332 := m.t0[uint(t331)].(func(int32) int32)(v5)
 						p328 = t332
 					}
@@ -7783,14 +7783,14 @@ func (m *Module) fn51(v0, v1 int32) {
 			t10 := int32(load32(m.memory, uint64(uint32(v2))))
 			v7 = t10
 			if v7 != 0 {
-				t11 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+				t11 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 				m.t0[uint(t11)].(func(int32))(v7)
 				t12 := int32(load32(m.memory, uint64(uint32(v3))+4))
 				v2 = t12
 			}
 			store32(m.memory, uint64(uint32(v2))+8, uint32(i32(0)))
 			store64(m.memory, uint64(uint32(v2)), uint64(i64(0)))
-			t13 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t13 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t13)].(func(int32))(v2)
 		}
 		t14 := int32(load32(m.memory, uint64(uint32(v3))))
@@ -7854,28 +7854,28 @@ func (m *Module) fn52(v0, v1, v2 int32) int32 {
 		var p15 int32
 		{
 			v4 = v6 + i32(16)
-			v7 = i32(68320)
+			v7 = i32(68324)
 			var p16 int32
 			{
 				t17 := int32(load32(m.memory, uint64(uint32(v6+i32(24)))))
 				v3 = t17
 				if v3 == 0 {
-					p16 = i32(68320)
+					p16 = i32(68324)
 					goto l1
 				}
 				if v3&i32(1) != 0 {
-					p16 = i32(68320)
+					p16 = i32(68324)
 					goto l1
 				}
 				t18 := int32(m.memory[uint64(uint32(v3))+44])
 				if t18&i32(64) == 0 {
-					p16 = i32(68320)
+					p16 = i32(68324)
 					goto l1
 				}
 				t19 := int32(load32(m.memory, uint64(uint32(v3))+36))
 				p20 := v3 + i32(48)
 				if t19 != 0 {
-					p20 = i32(68320)
+					p20 = i32(68324)
 				}
 				p16 = p20
 			}
@@ -7897,7 +7897,7 @@ func (m *Module) fn52(v0, v1, v2 int32) int32 {
 				t23 := int32(load32(m.memory, uint64(uint32(v4))+36))
 				p24 := v4 + i32(48)
 				if t23 != 0 {
-					p24 = i32(68320)
+					p24 = i32(68324)
 				}
 				v7 = p24
 			}
@@ -8457,12 +8457,12 @@ l0:
 		var p13 int32
 		{
 			if v5 != 0 {
-				t14 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+				t14 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 				t15 := m.t0[uint(t14)].(func(int32, int32) int32)(v5, v2)
 				p13 = t15
 				goto l3
 			}
-			t16 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+			t16 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 			t17 := m.t0[uint(t16)].(func(int32) int32)(v2)
 			p13 = t17
 		}
@@ -8511,7 +8511,7 @@ func (m *Module) fn55(v0, v1, v2, v3, v4, v5 int32) {
 		if v8 == 0 {
 			goto l0
 		}
-		t3 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+		t3 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 		t4 := m.t0[uint(t3)].(func(int32) int32)(v8 << 3)
 		v12 = t4
 		t5 := int32(load32(m.memory, uint64(uint32(v1))+28))
@@ -8545,12 +8545,12 @@ l1:
 		var p13 int32
 		{
 			if v7 != 0 {
-				t14 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+				t14 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 				t15 := m.t0[uint(t14)].(func(int32, int32) int32)(v7, v6)
 				p13 = t15
 				goto l2
 			}
-			t16 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+			t16 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 			t17 := m.t0[uint(t16)].(func(int32) int32)(v6)
 			p13 = t17
 		}
@@ -8633,7 +8633,7 @@ l1:
 									goto l5
 								}
 								v16 = i32(0)
-								t32 := int32(load32(m.memory, uint64(uint32(i32(88108)))))
+								t32 := int32(load32(m.memory, uint64(uint32(i32(88332)))))
 								t33 := m.t0[uint(t32)].(func(int32, int32) int32)(v17, i32(8))
 								v2 = t33
 								v6 = v12 << 3
@@ -8775,7 +8775,7 @@ l1:
 								v10 = v9 + i32(1)
 								t61 := int32(load32(m.memory, uint64(uint32(v1))+20))
 								if uint32(v10) > uint32(t61) {
-									t62 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+									t62 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 									t63 := m.t0[uint(t62)].(func(int32, int32) int32)(v8, v10<<4)
 									v8 = t63
 									store32(m.memory, uint64(uint32(v1))+20, uint32(v10))
@@ -8836,7 +8836,7 @@ l1:
 									p77 = i32(8)
 								}
 								v8 = p77
-								t78 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+								t78 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 								t79 := m.t0[uint(t78)].(func(int32, int32) int32)(t75, v8<<5)
 								v6 = t79
 								store32(m.memory, uint64(uint32(v1))+8, uint32(v8))
@@ -8900,12 +8900,12 @@ l1:
 								var p93 int32
 								{
 									if v6 != 0 {
-										t94 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+										t94 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 										t95 := m.t0[uint(t94)].(func(int32, int32) int32)(v6, v2)
 										p93 = t95
 										goto l18
 									}
-									t96 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+									t96 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 									t97 := m.t0[uint(t96)].(func(int32) int32)(v2)
 									p93 = t97
 								}
@@ -8963,7 +8963,7 @@ l1:
 						t104 := int32(load32(m.memory, uint64(uint32(v11))+4))
 						v2 = t104
 						if v2 != 0 {
-							t105 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+							t105 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 							m.t0[uint(t105)].(func(int32))(v2)
 						}
 						store32(m.memory, uint64(uint32(v11))+12, uint32(i32(0)))
@@ -9050,7 +9050,7 @@ l1:
 										p132 = i32(8)
 									}
 									v2 = p132
-									t133 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+									t133 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 									t134 := m.t0[uint(t133)].(func(int32, int32) int32)(t129, v2*i32(24))
 									v7 = t134
 									store32(m.memory, uint64(uint32(v1))+32, uint32(v2))
@@ -9080,7 +9080,7 @@ l1:
 									v7 = v11 - i32(20)
 									t143 := int32(load32(m.memory, uint64(uint32(v7))))
 									v8 = t143
-									t144 := int32(load32(m.memory, uint64(uint32(i32(88108)))))
+									t144 := int32(load32(m.memory, uint64(uint32(i32(88332)))))
 									t145 := m.t0[uint(t144)].(func(int32, int32) int32)(v6, i32(8))
 									t146 := v7
 									v6 = t145
@@ -9174,12 +9174,12 @@ l1:
 													var p170 int32
 													{
 														if v7 != 0 {
-															t171 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+															t171 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 															t172 := m.t0[uint(t171)].(func(int32, int32) int32)(v7, v2)
 															p170 = t172
 															goto l26
 														}
-														t173 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+														t173 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 														t174 := m.t0[uint(t173)].(func(int32) int32)(v2)
 														p170 = t174
 													}
@@ -9266,12 +9266,12 @@ l1:
 }
 func (m *Module) fn56(v0, v1, v2 int32) {
 	var v3 int32
-	v3 = i32(67481)
+	v3 = i32(67486)
 	switch v2 - i32(65534) {
 	case 1:
 		goto l9
 	case 0:
-		v3 = i32(67480)
+		v3 = i32(67485)
 		goto l9
 	default:
 		t0 := int32(load32(m.memory, uint64(uint32(v0))+56))
@@ -9345,7 +9345,7 @@ func (m *Module) fn57(v0 int32) int32 {
 									t6 := v0
 									v2 = v2 & i32(15)
 									store32(m.memory, uint64(uint32(t6))+12, uint32(v2))
-									t7 := int32(m.memory[uint64(uint32(v2))+67650])
+									t7 := int32(m.memory[uint64(uint32(v2))+67655])
 									t8 := int32(m.memory[uint64(uint32(v3))+1])
 									v1 = t8
 									if i32_shr_u(t7, int32(uint32(v1)>>5))&i32(1) == 0 {
@@ -9363,7 +9363,7 @@ func (m *Module) fn57(v0 int32) int32 {
 								}
 								t10 := int32(m.memory[uint64(uint32(v3))+1])
 								v1 = t10
-								t11 := int32(int8(m.memory[uint64(uint32(int32(uint32(v1)>>4)))+68348]))
+								t11 := int32(int8(m.memory[uint64(uint32(int32(uint32(v1)>>4)))+68352]))
 								if i32_shr_u(t11, v2)&i32(1) == 0 {
 									goto l0
 								}
@@ -9509,12 +9509,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 				var p14 int32
 				{
 					if v10 != 0 {
-						t15 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+						t15 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 						t16 := m.t0[uint(t15)].(func(int32, int32) int32)(v10, v8)
 						p14 = t16
 						goto l2
 					}
-					t17 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+					t17 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 					t18 := m.t0[uint(t17)].(func(int32) int32)(v8)
 					p14 = t18
 				}
@@ -9590,12 +9590,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 							var p134 int32
 							{
 								if v7 != 0 {
-									t135 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+									t135 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 									t136 := m.t0[uint(t135)].(func(int32, int32) int32)(v7, v6)
 									p134 = t136
 									goto l37
 								}
-								t137 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+								t137 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 								t138 := m.t0[uint(t137)].(func(int32) int32)(v6)
 								p134 = t138
 							}
@@ -9717,7 +9717,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 												if v3 == 0 {
 													goto l28
 												}
-												t183 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+												t183 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 												m.t0[uint(t183)].(func(int32))(v3)
 												goto l28
 											}
@@ -9801,12 +9801,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 													var p205 int32
 													{
 														if v2 != 0 {
-															t206 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+															t206 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 															t207 := m.t0[uint(t206)].(func(int32, int32) int32)(v2, v3)
 															p205 = t207
 															goto l56
 														}
-														t208 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+														t208 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 														t209 := m.t0[uint(t208)].(func(int32) int32)(v3)
 														p205 = t209
 													}
@@ -9862,12 +9862,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 																	var p222 int32
 																	{
 																		if v1 != 0 {
-																			t223 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+																			t223 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 																			t224 := m.t0[uint(t223)].(func(int32, int32) int32)(v1, v2)
 																			p222 = t224
 																			goto l61
 																		}
-																		t225 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+																		t225 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 																		t226 := m.t0[uint(t225)].(func(int32) int32)(v2)
 																		p222 = t226
 																	}
@@ -9968,12 +9968,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 															var p249 int32
 															{
 																if v2 != 0 {
-																	t250 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+																	t250 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 																	t251 := m.t0[uint(t250)].(func(int32, int32) int32)(v2, v4)
 																	p249 = t251
 																	goto l67
 																}
-																t252 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+																t252 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 																t253 := m.t0[uint(t252)].(func(int32) int32)(v4)
 																p249 = t253
 															}
@@ -10099,12 +10099,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 														var p281 int32
 														{
 															if v2 != 0 {
-																t282 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+																t282 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 																t283 := m.t0[uint(t282)].(func(int32, int32) int32)(v2, v4)
 																p281 = t283
 																goto l75
 															}
-															t284 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+															t284 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 															t285 := m.t0[uint(t284)].(func(int32) int32)(v4)
 															p281 = t285
 														}
@@ -10168,7 +10168,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 								default:
 									goto l79
 								case 6:
-									t291 := m.fn151(v10, i32(67491), i32(7))
+									t291 := m.fn151(v10, i32(67496), i32(7))
 									if t291 != 0 {
 										goto l79
 									}
@@ -10293,12 +10293,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 							var p320 int32
 							{
 								if v7 != 0 {
-									t321 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+									t321 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 									t322 := m.t0[uint(t321)].(func(int32, int32) int32)(v7, v11)
 									p320 = t322
 									goto l87
 								}
-								t323 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+								t323 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 								t324 := m.t0[uint(t323)].(func(int32) int32)(v11)
 								p320 = t324
 							}
@@ -10699,12 +10699,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 													var p408 int32
 													{
 														if v3 != 0 {
-															t409 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+															t409 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 															t410 := m.t0[uint(t409)].(func(int32, int32) int32)(v3, v6)
 															p408 = t410
 															goto l113
 														}
-														t411 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+														t411 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 														t412 := m.t0[uint(t411)].(func(int32) int32)(v6)
 														p408 = t412
 													}
@@ -10754,12 +10754,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 													var p422 int32
 													{
 														if v3 != 0 {
-															t423 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+															t423 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 															t424 := m.t0[uint(t423)].(func(int32, int32) int32)(v3, v6)
 															p422 = t424
 															goto l114
 														}
-														t425 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+														t425 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 														t426 := m.t0[uint(t425)].(func(int32) int32)(v6)
 														p422 = t426
 													}
@@ -10784,7 +10784,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 										if v3 == 0 {
 											goto l28
 										}
-										t430 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+										t430 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 										m.t0[uint(t430)].(func(int32))(v3)
 										goto l28
 									} else {
@@ -10840,12 +10840,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 								var p153 int32
 								{
 									if v7 != 0 {
-										t154 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+										t154 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 										t155 := m.t0[uint(t154)].(func(int32, int32) int32)(v7, v6)
 										p153 = t155
 										goto l38
 									}
-									t156 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+									t156 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 									t157 := m.t0[uint(t156)].(func(int32) int32)(v6)
 									p153 = t157
 								}
@@ -10937,13 +10937,13 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 													t66 := int32(load32(m.memory, uint64(uint32(v9))+16))
 													v3 = t66
 													if v3 != 0 {
-														t67 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+														t67 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 														m.t0[uint(t67)].(func(int32))(v3)
 													}
 													if v11 == 0 {
 														goto l28
 													}
-													t68 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+													t68 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 													m.t0[uint(t68)].(func(int32))(v11)
 													goto l28
 												}
@@ -10952,13 +10952,13 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 											t27 := int32(load32(m.memory, uint64(uint32(v9))+16))
 											v0 = t27
 											if v0 != 0 {
-												t28 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+												t28 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 												m.t0[uint(t28)].(func(int32))(v0)
 											}
 											if v11 == 0 {
 												goto l0
 											}
-											t29 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+											t29 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 											m.t0[uint(t29)].(func(int32))(v11)
 											goto l0
 										}
@@ -10976,12 +10976,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 													var p34 int32
 													{
 														if v6 != 0 {
-															t35 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+															t35 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 															t36 := m.t0[uint(t35)].(func(int32, int32) int32)(v6, v7)
 															p34 = t36
 															goto l11
 														}
-														t37 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+														t37 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 														t38 := m.t0[uint(t37)].(func(int32) int32)(v7)
 														p34 = t38
 													}
@@ -11044,12 +11044,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 													var p48 int32
 													{
 														if v10 != 0 {
-															t49 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+															t49 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 															t50 := m.t0[uint(t49)].(func(int32, int32) int32)(v10, v7)
 															p48 = t50
 															goto l15
 														}
-														t51 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+														t51 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 														t52 := m.t0[uint(t51)].(func(int32) int32)(v7)
 														p48 = t52
 													}
@@ -11171,12 +11171,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 									v16 = p76
 									v7 = v16 << 2
 									if v11 != 0 {
-										t77 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+										t77 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 										t78 := m.t0[uint(t77)].(func(int32, int32) int32)(v11, v7)
 										v11 = t78
 										goto l30
 									}
-									t79 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+									t79 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 									t80 := m.t0[uint(t79)].(func(int32) int32)(v7)
 									v11 = t80
 								}
@@ -11208,12 +11208,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 									var p89 int32
 									{
 										if v7 != 0 {
-											t90 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+											t90 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 											t91 := m.t0[uint(t90)].(func(int32, int32) int32)(v7, v8)
 											p89 = t91
 											goto l31
 										}
-										t92 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+										t92 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 										t93 := m.t0[uint(t92)].(func(int32) int32)(v8)
 										p89 = t93
 									}
@@ -11302,7 +11302,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 						t109 := int32(load32(m.memory, uint64(uint32(v9))+16))
 						v0 = t109
 						if v0 != 0 {
-							t110 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+							t110 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 							m.t0[uint(t110)].(func(int32))(v0)
 						}
 						p111 := v3
@@ -11348,7 +11348,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 					if v3 == 0 {
 						goto l28
 					}
-					t118 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t118 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t118)].(func(int32))(v3)
 					goto l28
 				}
@@ -11398,12 +11398,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 										var p485 int32
 										{
 											if v1 != 0 {
-												t486 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+												t486 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 												t487 := m.t0[uint(t486)].(func(int32, int32) int32)(v1, v3)
 												p485 = t487
 												goto l131
 											}
-											t488 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+											t488 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 											t489 := m.t0[uint(t488)].(func(int32) int32)(v3)
 											p485 = t489
 										}
@@ -11464,12 +11464,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 										var p503 int32
 										{
 											if v1 != 0 {
-												t504 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+												t504 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 												t505 := m.t0[uint(t504)].(func(int32, int32) int32)(v1, v3)
 												p503 = t505
 												goto l132
 											}
-											t506 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+											t506 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 											t507 := m.t0[uint(t506)].(func(int32) int32)(v3)
 											p503 = t507
 										}
@@ -11555,7 +11555,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 							l129:
 								t525 := int32(load16(m.memory, uint64(uint32(v5))+4))
 								if t525 != 0 {
-									v0 = v8 + i32(68375)
+									v0 = v8 + i32(68379)
 									v1 = i32(0)
 									var p526 int32
 									if uint32(v8-i32(3)) < uint32(i32(2)) {
@@ -11608,7 +11608,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 								p435 = p437
 								goto l119
 							case 21:
-								t438 := int32(m.memory[uint64(uint32(v8+i32(68368)))])
+								t438 := int32(m.memory[uint64(uint32(v8+i32(68372)))])
 								p435 = t438
 								goto l119
 							}
@@ -11679,12 +11679,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 								var p457 int32
 								{
 									if v10 != 0 {
-										t458 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+										t458 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 										t459 := m.t0[uint(t458)].(func(int32, int32) int32)(v10, v6)
 										p457 = t459
 										goto l122
 									}
-									t460 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+									t460 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 									t461 := m.t0[uint(t460)].(func(int32) int32)(v6)
 									p457 = t461
 								}
@@ -11778,7 +11778,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 			if v0 == 0 {
 				goto l0
 			}
-			t532 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t532 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t532)].(func(int32))(v0)
 			goto l0
 		}
@@ -11791,7 +11791,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 			goto l0
 		}
 	l50:
-		t534 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+		t534 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 		m.t0[uint(t534)].(func(int32))(v10)
 	}
 l0:
@@ -11858,12 +11858,12 @@ l60:
 			var p15 int32
 			{
 				if v3 != 0 {
-					t16 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+					t16 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 					t17 := m.t0[uint(t16)].(func(int32, int32) int32)(v3, v6)
 					p15 = t17
 					goto l3
 				}
-				t18 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+				t18 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 				t19 := m.t0[uint(t18)].(func(int32) int32)(v6)
 				p15 = t19
 			}
@@ -12030,7 +12030,7 @@ l60:
 										p50 = t54
 										goto l11
 									}
-									t55 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+									t55 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 									t56 := m.t0[uint(t55)].(func(int32) int32)(i32(70))
 									p50 = t56
 								}
@@ -12061,12 +12061,12 @@ l60:
 									var p63 int32
 									{
 										if v3 != 0 {
-											t64 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+											t64 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 											t65 := m.t0[uint(t64)].(func(int32, int32) int32)(v3, v4)
 											p63 = t65
 											goto l12
 										}
-										t66 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+										t66 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 										t67 := m.t0[uint(t66)].(func(int32) int32)(v4)
 										p63 = t67
 									}
@@ -12734,12 +12734,12 @@ l60:
 										var p196 int32
 										{
 											if v8 != 0 {
-												t197 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+												t197 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 												t198 := m.t0[uint(t197)].(func(int32, int32) int32)(v8, v5)
 												p196 = t198
 												goto l50
 											}
-											t199 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+											t199 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 											t200 := m.t0[uint(t199)].(func(int32) int32)(v5)
 											p196 = t200
 										}
@@ -12815,12 +12815,12 @@ l60:
 											var p214 int32
 											{
 												if v7 != 0 {
-													t215 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+													t215 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 													t216 := m.t0[uint(t215)].(func(int32, int32) int32)(v7, v5)
 													p214 = t216
 													goto l56
 												}
-												t217 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+												t217 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 												t218 := m.t0[uint(t217)].(func(int32) int32)(v5)
 												p214 = t218
 											}
@@ -12915,7 +12915,7 @@ func (m *Module) fn61(v0 int32) {
 		t0 := int32(load32(m.memory, uint64(uint32(v0))+60))
 		v1 = t0
 		if v1 != 0 {
-			t1 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t1 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t1)].(func(int32))(v1)
 		}
 		store32(m.memory, uint64(uint32(v0))+68, uint32(i32(0)))
@@ -12923,7 +12923,7 @@ func (m *Module) fn61(v0 int32) {
 		t2 := int32(load32(m.memory, uint64(uint32(v0))+72))
 		v1 = t2
 		if v1 != 0 {
-			t3 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t3 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t3)].(func(int32))(v1)
 		}
 		store32(m.memory, uint64(uint32(v0))+80, uint32(i32(0)))
@@ -12931,7 +12931,7 @@ func (m *Module) fn61(v0 int32) {
 		t4 := int32(load32(m.memory, uint64(uint32(v0))+84))
 		v1 = t4
 		if v1 != 0 {
-			t5 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t5 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t5)].(func(int32))(v1)
 		}
 		store32(m.memory, uint64(uint32(v0))+92, uint32(i32(0)))
@@ -12939,7 +12939,7 @@ func (m *Module) fn61(v0 int32) {
 		t6 := int32(load32(m.memory, uint64(uint32(v0))+96))
 		v1 = t6
 		if v1 != 0 {
-			t7 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t7 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t7)].(func(int32))(v1)
 		}
 		store32(m.memory, uint64(uint32(v0))+104, uint32(i32(0)))
@@ -12947,7 +12947,7 @@ func (m *Module) fn61(v0 int32) {
 		t8 := int32(load32(m.memory, uint64(uint32(v0))+108))
 		v1 = t8
 		if v1 != 0 {
-			t9 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t9 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t9)].(func(int32))(v1)
 		}
 		store32(m.memory, uint64(uint32(v0))+116, uint32(i32(0)))
@@ -12955,7 +12955,7 @@ func (m *Module) fn61(v0 int32) {
 		t10 := int32(load32(m.memory, uint64(uint32(v0))+132))
 		v1 = t10
 		if v1 != 0 {
-			t11 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t11 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t11)].(func(int32))(v1)
 		}
 		store32(m.memory, uint64(uint32(v0))+140, uint32(i32(0)))
@@ -12963,7 +12963,7 @@ func (m *Module) fn61(v0 int32) {
 		t12 := int32(load32(m.memory, uint64(uint32(v0))+120))
 		v1 = t12
 		if v1 != 0 {
-			t13 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t13 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t13)].(func(int32))(v1)
 		}
 		store32(m.memory, uint64(uint32(v0))+128, uint32(i32(0)))
@@ -12971,7 +12971,7 @@ func (m *Module) fn61(v0 int32) {
 		t14 := int32(load32(m.memory, uint64(uint32(v0))+144))
 		v1 = t14
 		if v1 != 0 {
-			t15 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t15 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t15)].(func(int32))(v1)
 		}
 		store32(m.memory, uint64(uint32(v0))+152, uint32(i32(0)))
@@ -12997,14 +12997,14 @@ func (m *Module) fn61(v0 int32) {
 			if v2 != i32(1) {
 				goto l0
 			}
-			t21 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t21 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t21)].(func(int32))(v1)
 		}
 	l0:
 		t22 := int32(load32(m.memory, uint64(uint32(v0))))
 		v1 = t22
 		if v1 != 0 {
-			t23 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t23 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t23)].(func(int32))(v1)
 		}
 		store32(m.memory, uint64(uint32(v0))+8, uint32(i32(0)))
@@ -13012,7 +13012,7 @@ func (m *Module) fn61(v0 int32) {
 		t24 := int32(load32(m.memory, uint64(uint32(v0))+12))
 		v1 = t24
 		if v1 != 0 {
-			t25 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t25 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t25)].(func(int32))(v1)
 		}
 		store32(m.memory, uint64(uint32(v0))+20, uint32(i32(0)))
@@ -13020,7 +13020,7 @@ func (m *Module) fn61(v0 int32) {
 		t26 := int32(load32(m.memory, uint64(uint32(v0))+24))
 		v1 = t26
 		if v1 != 0 {
-			t27 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t27 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t27)].(func(int32))(v1)
 		}
 		store32(m.memory, uint64(uint32(v0))+32, uint32(i32(0)))
@@ -13028,7 +13028,7 @@ func (m *Module) fn61(v0 int32) {
 		t28 := int32(load32(m.memory, uint64(uint32(v0))+36))
 		v1 = t28
 		if v1 != 0 {
-			t29 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t29 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t29)].(func(int32))(v1)
 		}
 		store32(m.memory, uint64(uint32(v0))+44, uint32(i32(0)))
@@ -13045,7 +13045,7 @@ func (m *Module) fn61(v0 int32) {
 				t32 := int32(load32(m.memory, uint64(uint32(v5))))
 				v6 = t32
 				if v6 != 0 {
-					t33 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t33 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t33)].(func(int32))(v6)
 					t34 := int32(load32(m.memory, uint64(uint32(v0))+52))
 					v2 = t34
@@ -13062,12 +13062,12 @@ func (m *Module) fn61(v0 int32) {
 		t35 := int32(load32(m.memory, uint64(uint32(v0))+48))
 		v1 = t35
 		if v1 != 0 {
-			t36 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t36 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t36)].(func(int32))(v1)
 		}
 		store32(m.memory, uint64(uint32(v0))+56, uint32(i32(0)))
 		store64(m.memory, uint64(uint32(v0))+48, uint64(i64(0)))
-		t37 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+		t37 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 		m.t0[uint(t37)].(func(int32))(v0)
 	}
 }
@@ -13098,12 +13098,12 @@ func (m *Module) fn62(v0, v1 int32) {
 			var p7 int32
 			{
 				if v4 != 0 {
-					t8 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+					t8 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 					t9 := m.t0[uint(t8)].(func(int32, int32) int32)(v4, v2)
 					p7 = t9
 					goto l0
 				}
-				t10 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+				t10 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 				t11 := m.t0[uint(t10)].(func(int32) int32)(v2)
 				p7 = t11
 			}
@@ -13228,12 +13228,12 @@ func (m *Module) fn63(v0, v1 int32) int32 {
 										var p16 int32
 										{
 											if v3 != 0 {
-												t17 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+												t17 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 												t18 := m.t0[uint(t17)].(func(int32, int32) int32)(v3, v2)
 												p16 = t18
 												goto l5
 											}
-											t19 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+											t19 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 											t20 := m.t0[uint(t19)].(func(int32) int32)(v2)
 											p16 = t20
 										}
@@ -13272,12 +13272,12 @@ func (m *Module) fn63(v0, v1 int32) int32 {
 										var p28 int32
 										{
 											if v3 != 0 {
-												t29 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+												t29 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 												t30 := m.t0[uint(t29)].(func(int32, int32) int32)(v3, v2)
 												p28 = t30
 												goto l7
 											}
-											t31 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+											t31 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 											t32 := m.t0[uint(t31)].(func(int32) int32)(v2)
 											p28 = t32
 										}
@@ -13316,12 +13316,12 @@ func (m *Module) fn63(v0, v1 int32) int32 {
 										var p40 int32
 										{
 											if v3 != 0 {
-												t41 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+												t41 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 												t42 := m.t0[uint(t41)].(func(int32, int32) int32)(v3, v2)
 												p40 = t42
 												goto l8
 											}
-											t43 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+											t43 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 											t44 := m.t0[uint(t43)].(func(int32) int32)(v2)
 											p40 = t44
 										}
@@ -13360,12 +13360,12 @@ func (m *Module) fn63(v0, v1 int32) int32 {
 										var p52 int32
 										{
 											if v3 != 0 {
-												t53 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+												t53 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 												t54 := m.t0[uint(t53)].(func(int32, int32) int32)(v3, v2)
 												p52 = t54
 												goto l9
 											}
-											t55 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+											t55 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 											t56 := m.t0[uint(t55)].(func(int32) int32)(v2)
 											p52 = t56
 										}
@@ -13397,12 +13397,12 @@ func (m *Module) fn63(v0, v1 int32) int32 {
 										var p62 int32
 										{
 											if v3 != 0 {
-												t63 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+												t63 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 												t64 := m.t0[uint(t63)].(func(int32, int32) int32)(v3, v5)
 												p62 = t64
 												goto l11
 											}
-											t65 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+											t65 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 											t66 := m.t0[uint(t65)].(func(int32) int32)(v5)
 											p62 = t66
 										}
@@ -13479,7 +13479,7 @@ func (m *Module) fn63(v0, v1 int32) int32 {
 								if v2 == 0 {
 									goto l16
 								}
-								t77 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+								t77 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 								t78 := m.t0[uint(t77)].(func(int32, int32) int32)(v2, v6)
 								p5 = t78
 								goto l17
@@ -13501,12 +13501,12 @@ func (m *Module) fn63(v0, v1 int32) int32 {
 								var p84 int32
 								{
 									if v2 != 0 {
-										t85 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+										t85 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 										t86 := m.t0[uint(t85)].(func(int32, int32) int32)(v2, v6)
 										p84 = t86
 										goto l19
 									}
-									t87 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+									t87 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 									t88 := m.t0[uint(t87)].(func(int32) int32)(v6)
 									p84 = t88
 								}
@@ -13557,7 +13557,7 @@ func (m *Module) fn63(v0, v1 int32) int32 {
 					}
 					goto l14
 				l16:
-					t93 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+					t93 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 					t94 := m.t0[uint(t93)].(func(int32) int32)(v6)
 					p5 = t94
 				}
@@ -13692,12 +13692,12 @@ func (m *Module) fn65(v0, v1, v2 int32) int32 {
 				var p14 int32
 				{
 					if v4 != 0 {
-						t15 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+						t15 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 						t16 := m.t0[uint(t15)].(func(int32, int32) int32)(v4, v3)
 						p14 = t16
 						goto l4
 					}
-					t17 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+					t17 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 					t18 := m.t0[uint(t17)].(func(int32) int32)(v3)
 					p14 = t18
 				}
@@ -13749,12 +13749,12 @@ func (m *Module) fn65(v0, v1, v2 int32) int32 {
 			var p32 int32
 			{
 				if v4 != 0 {
-					t33 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+					t33 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 					t34 := m.t0[uint(t33)].(func(int32, int32) int32)(v4, v1)
 					p32 = t34
 					goto l5
 				}
-				t35 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+				t35 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 				t36 := m.t0[uint(t35)].(func(int32) int32)(v1)
 				p32 = t36
 			}
@@ -13967,12 +13967,12 @@ func (m *Module) fn69(v0, v1 int32) {
 			var p14 int32
 			{
 				if v4 != 0 {
-					t15 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+					t15 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 					t16 := m.t0[uint(t15)].(func(int32, int32) int32)(v4, v3)
 					p14 = t16
 					goto l4
 				}
-				t17 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+				t17 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 				t18 := m.t0[uint(t17)].(func(int32) int32)(v3)
 				p14 = t18
 			}
@@ -14071,12 +14071,12 @@ func (m *Module) fn70(v0, v1 int32) int32 {
 				var p20 int32
 				{
 					if v2 != 0 {
-						t21 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+						t21 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 						t22 := m.t0[uint(t21)].(func(int32, int32) int32)(v2, v5)
 						p20 = t22
 						goto l2
 					}
-					t23 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+					t23 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 					t24 := m.t0[uint(t23)].(func(int32) int32)(v5)
 					p20 = t24
 				}
@@ -14127,12 +14127,12 @@ func (m *Module) fn70(v0, v1 int32) int32 {
 			var p30 int32
 			{
 				if v3 != 0 {
-					t31 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+					t31 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 					t32 := m.t0[uint(t31)].(func(int32, int32) int32)(v3, v2)
 					p30 = t32
 					goto l4
 				}
-				t33 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+				t33 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 				t34 := m.t0[uint(t33)].(func(int32) int32)(v2)
 				p30 = t34
 			}
@@ -14215,12 +14215,12 @@ func (m *Module) fn71(v0, v1, v2, v3 int32) {
 			var p11 int32
 			{
 				if v1 != 0 {
-					t12 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+					t12 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 					t13 := m.t0[uint(t12)].(func(int32, int32) int32)(v1, v4)
 					p11 = t13
 					goto l2
 				}
-				t14 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+				t14 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 				t15 := m.t0[uint(t14)].(func(int32) int32)(v4)
 				p11 = t15
 			}
@@ -14276,12 +14276,12 @@ func (m *Module) fn71(v0, v1, v2, v3 int32) {
 			var p29 int32
 			{
 				if v1 != 0 {
-					t30 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+					t30 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 					t31 := m.t0[uint(t30)].(func(int32, int32) int32)(v1, v4)
 					p29 = t31
 					goto l3
 				}
-				t32 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+				t32 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 				t33 := m.t0[uint(t32)].(func(int32) int32)(v4)
 				p29 = t33
 			}
@@ -14337,12 +14337,12 @@ func (m *Module) fn71(v0, v1, v2, v3 int32) {
 			var p47 int32
 			{
 				if v1 != 0 {
-					t48 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+					t48 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 					t49 := m.t0[uint(t48)].(func(int32, int32) int32)(v1, v2)
 					p47 = t49
 					goto l4
 				}
-				t50 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+				t50 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 				t51 := m.t0[uint(t50)].(func(int32) int32)(v2)
 				p47 = t51
 			}
@@ -14507,12 +14507,12 @@ l1:
 						var p37 int32
 						{
 							if v4 != 0 {
-								t38 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+								t38 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 								t39 := m.t0[uint(t38)].(func(int32, int32) int32)(v4, v1)
 								p37 = t39
 								goto l5
 							}
-							t40 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+							t40 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 							t41 := m.t0[uint(t40)].(func(int32) int32)(v1)
 							p37 = t41
 						}
@@ -14579,12 +14579,12 @@ l1:
 				var p54 int32
 				{
 					if v4 != 0 {
-						t55 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+						t55 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 						t56 := m.t0[uint(t55)].(func(int32, int32) int32)(v4, v1)
 						p54 = t56
 						goto l10
 					}
-					t57 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+					t57 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 					t58 := m.t0[uint(t57)].(func(int32) int32)(v1)
 					p54 = t58
 				}
@@ -14919,12 +14919,12 @@ func (m *Module) fn74(v0 int32) int32 {
 								var p39 int32
 								{
 									if v2 != 0 {
-										t40 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+										t40 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 										t41 := m.t0[uint(t40)].(func(int32, int32) int32)(v2, v4)
 										p39 = t41
 										goto l4
 									}
-									t42 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+									t42 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 									t43 := m.t0[uint(t42)].(func(int32) int32)(v4)
 									p39 = t43
 								}
@@ -14997,12 +14997,12 @@ func (m *Module) fn74(v0 int32) int32 {
 						var p59 int32
 						{
 							if v2 != 0 {
-								t60 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+								t60 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 								t61 := m.t0[uint(t60)].(func(int32, int32) int32)(v2, v3)
 								p59 = t61
 								goto l9
 							}
-							t62 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+							t62 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 							t63 := m.t0[uint(t62)].(func(int32) int32)(v3)
 							p59 = t63
 						}
@@ -15279,22 +15279,22 @@ func (m *Module) fn79(v0, v1, v2 int32) {
 					if p29 != p31 {
 						goto l2
 					}
-					v12 = i32(68320)
+					v12 = i32(68324)
 					var p33 int32
 					{
 						if v14 != 0 {
-							p33 = i32(68320)
+							p33 = i32(68324)
 							goto l7
 						}
 						t34 := int32(m.memory[uint64(uint32(v5))+44])
 						if t34&i32(64) == 0 {
-							p33 = i32(68320)
+							p33 = i32(68324)
 							goto l7
 						}
 						t35 := int32(load32(m.memory, uint64(uint32(v5))+36))
 						p36 := v5 + i32(48)
 						if t35 != 0 {
-							p36 = i32(68320)
+							p36 = i32(68324)
 						}
 						p33 = p36
 					}
@@ -15311,7 +15311,7 @@ func (m *Module) fn79(v0, v1, v2 int32) {
 						t38 := int32(load32(m.memory, uint64(uint32(v4))+36))
 						p39 := v17
 						if t38 != 0 {
-							p39 = i32(68320)
+							p39 = i32(68324)
 						}
 						v12 = p39
 					}
@@ -15606,12 +15606,12 @@ func (m *Module) fn80(v0, v1 int32) {
 					var p15 int32
 					{
 						if v2 != 0 {
-							t16 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+							t16 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 							t17 := m.t0[uint(t16)].(func(int32, int32) int32)(v2, v4)
 							p15 = t17
 							goto l2
 						}
-						t18 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+						t18 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 						t19 := m.t0[uint(t18)].(func(int32) int32)(v4)
 						p15 = t19
 					}
@@ -16283,7 +16283,7 @@ l1:
 	v9 = v7<<3 + i32(76)
 	t6 := int32(load32(m.memory, uint64(uint32(v2))+8))
 	if uint32(v9) > uint32(t6<<3) {
-		t7 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+		t7 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 		t8 := m.t0[uint(t7)].(func(int32, int32) int32)(v6, v9)
 		v6 = t8
 		store32(m.memory, uint64(uint32(v2))+8, uint32(int32(uint32(v9)>>3)))
@@ -16361,7 +16361,7 @@ func (m *Module) fn83(v0, v1 int32) {
 	v6 = t4
 	t5 := int32(load32(m.memory, uint64(uint32(v1))+8))
 	v7 = t5
-	t6 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+	t6 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 	t7 := m.t0[uint(t6)].(func(int32) int32)(i32(224))
 	v1 = t7
 	store32(m.memory, uint64(uint32(v1))+24, uint32(i32(0)))
@@ -16770,7 +16770,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 			l5:
 				t12 := int32(load32(m.memory, uint64(uint32(v0))+1184))
 				v2 = t12
-				v3 = i32(67481)
+				v3 = i32(67486)
 				{
 					var p13 int32
 					if v5&i32(1) != 0 {
@@ -16784,7 +16784,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					case 1:
 						goto l7
 					case 0:
-						v3 = i32(67480)
+						v3 = i32(67485)
 						goto l7
 					default:
 						t15 := int32(load32(m.memory, uint64(uint32(v2))+8))
@@ -16800,7 +16800,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 				}
 			l7:
 				t19 := v0 + i32(132)
-				v1 = i32(67481)
+				v1 = i32(67486)
 				{
 					var p20 int32
 					if v6&i32(1) != 0 {
@@ -16814,7 +16814,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					case 1:
 						goto l10
 					case 0:
-						v1 = i32(67480)
+						v1 = i32(67485)
 						goto l10
 					default:
 						t22 := int32(load32(m.memory, uint64(uint32(v2))+8))
@@ -16882,7 +16882,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					}
 					t33 := int32(load32(m.memory, uint64(uint32(v0))+1184))
 					v2 = t33
-					v1 = i32(67481)
+					v1 = i32(67486)
 					{
 						var p34 int32
 						if v6&i32(1) != 0 {
@@ -16896,7 +16896,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 						case 1:
 							goto l17
 						case 0:
-							v1 = i32(67480)
+							v1 = i32(67485)
 							goto l17
 						default:
 							t36 := int32(load32(m.memory, uint64(uint32(v2))+8))
@@ -16912,7 +16912,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					}
 				l17:
 					t40 := v0 + i32(132)
-					v3 = i32(67481)
+					v3 = i32(67486)
 					{
 						var p41 int32
 						if v5&i32(1) != 0 {
@@ -16926,7 +16926,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 						case 1:
 							goto l20
 						case 0:
-							v3 = i32(67480)
+							v3 = i32(67485)
 							goto l20
 						default:
 							t43 := int32(load32(m.memory, uint64(uint32(v2))+8))
@@ -16992,7 +16992,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 				l27:
 					t52 := int32(load32(m.memory, uint64(uint32(v0))+1184))
 					v8 = t52
-					v1 = i32(67481)
+					v1 = i32(67486)
 					{
 						var p53 int32
 						if v5&i32(1) != 0 {
@@ -17006,7 +17006,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 						case 1:
 							goto l29
 						case 0:
-							v1 = i32(67480)
+							v1 = i32(67485)
 							goto l29
 						default:
 							t55 := int32(load32(m.memory, uint64(uint32(v8))+8))
@@ -17034,7 +17034,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 						v2 = t60
 					}
 				l31:
-					v3 = i32(67481)
+					v3 = i32(67486)
 					{
 						var p61 int32
 						if v6&i32(1) != 0 {
@@ -17048,7 +17048,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 						case 1:
 							goto l33
 						case 0:
-							v3 = i32(67480)
+							v3 = i32(67485)
 							goto l33
 						default:
 							t63 := int32(load32(m.memory, uint64(uint32(v8))+8))
@@ -17082,7 +17082,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					store32(m.memory, uint64(uint32(v7))+40, uint32(v3))
 					store32(m.memory, uint64(uint32(v7))+36, uint32(v2))
 					store32(m.memory, uint64(uint32(v7))+32, uint32(v1))
-					m.fn146(t67, i32(1024), i32(67294), v7+i32(32))
+					m.fn146(t67, i32(1024), i32(67299), v7+i32(32))
 					goto l12
 				}
 			l26:
@@ -17118,7 +17118,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 			l37:
 				t75 := int32(load32(m.memory, uint64(uint32(v0))+1184))
 				v3 = t75
-				v1 = i32(67481)
+				v1 = i32(67486)
 				{
 					var p76 int32
 					if v6&i32(1) != 0 {
@@ -17132,7 +17132,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					case 1:
 						goto l39
 					case 0:
-						v1 = i32(67480)
+						v1 = i32(67485)
 						goto l39
 					default:
 						t78 := int32(load32(m.memory, uint64(uint32(v3))+8))
@@ -17160,7 +17160,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					v4 = t83
 				}
 			l41:
-				v2 = i32(67481)
+				v2 = i32(67486)
 				{
 					var p84 int32
 					if v5&i32(1) != 0 {
@@ -17174,7 +17174,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					case 1:
 						goto l43
 					case 0:
-						v2 = i32(67480)
+						v2 = i32(67485)
 						goto l43
 					default:
 						t86 := int32(load32(m.memory, uint64(uint32(v3))+8))
@@ -17211,7 +17211,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 				store32(m.memory, uint64(uint32(v7))+56, uint32(v2))
 				store32(m.memory, uint64(uint32(v7))+52, uint32(v4))
 				store32(m.memory, uint64(uint32(v7))+48, uint32(v1))
-				m.fn146(t90, i32(1024), i32(67294), v7+i32(48))
+				m.fn146(t90, i32(1024), i32(67299), v7+i32(48))
 				goto l12
 			}
 			v8 = i32(1)
@@ -17267,12 +17267,12 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					var p108 int32
 					{
 						if v2 != 0 {
-							t109 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+							t109 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 							t110 := m.t0[uint(t109)].(func(int32, int32) int32)(v2, v3)
 							p108 = t110
 							goto l47
 						}
-						t111 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+						t111 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 						t112 := m.t0[uint(t111)].(func(int32) int32)(v3)
 						p108 = t112
 					}
@@ -17315,12 +17315,12 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					var p123 int32
 					{
 						if v2 != 0 {
-							t124 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+							t124 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 							t125 := m.t0[uint(t124)].(func(int32, int32) int32)(v2, v3)
 							p123 = t125
 							goto l48
 						}
-						t126 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+						t126 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 						t127 := m.t0[uint(t126)].(func(int32) int32)(v3)
 						p123 = t127
 					}
@@ -17488,12 +17488,12 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 								var p162 int32
 								{
 									if v2 != 0 {
-										t163 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+										t163 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 										t164 := m.t0[uint(t163)].(func(int32, int32) int32)(v2, v4)
 										p162 = t164
 										goto l57
 									}
-									t165 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+									t165 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 									t166 := m.t0[uint(t165)].(func(int32) int32)(v4)
 									p162 = t166
 								}
@@ -17535,12 +17535,12 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 								var p176 int32
 								{
 									if v2 != 0 {
-										t177 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+										t177 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 										t178 := m.t0[uint(t177)].(func(int32, int32) int32)(v2, v4)
 										p176 = t178
 										goto l58
 									}
-									t179 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+									t179 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 									t180 := m.t0[uint(t179)].(func(int32) int32)(v4)
 									p176 = t180
 								}
@@ -17592,7 +17592,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 			l64:
 				t185 := int32(load32(m.memory, uint64(uint32(v0))+1184))
 				v2 = t185
-				v1 = i32(67481)
+				v1 = i32(67486)
 				{
 					var p186 int32
 					if v6&i32(1) != 0 {
@@ -17606,7 +17606,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					case 1:
 						goto l66
 					case 0:
-						v1 = i32(67480)
+						v1 = i32(67485)
 						goto l66
 					default:
 						t188 := int32(load32(m.memory, uint64(uint32(v2))+8))
@@ -17622,7 +17622,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 				}
 			l66:
 				t192 := v0 + i32(132)
-				v3 = i32(67481)
+				v3 = i32(67486)
 				{
 					var p193 int32
 					if v5&i32(1) != 0 {
@@ -17636,7 +17636,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					case 1:
 						goto l69
 					case 0:
-						v3 = i32(67480)
+						v3 = i32(67485)
 						goto l69
 					default:
 						t195 := int32(load32(m.memory, uint64(uint32(v2))+8))
@@ -17669,7 +17669,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 			l71:
 				t200 := int32(load32(m.memory, uint64(uint32(v0))+1184))
 				v2 = t200
-				v3 = i32(67481)
+				v3 = i32(67486)
 				{
 					var p201 int32
 					if v5&i32(1) != 0 {
@@ -17683,7 +17683,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					case 1:
 						goto l73
 					case 0:
-						v3 = i32(67480)
+						v3 = i32(67485)
 						goto l73
 					default:
 						t203 := int32(load32(m.memory, uint64(uint32(v2))+8))
@@ -17699,7 +17699,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 				}
 			l73:
 				t207 := v0 + i32(132)
-				v1 = i32(67481)
+				v1 = i32(67486)
 				{
 					var p208 int32
 					if v6&i32(1) != 0 {
@@ -17713,7 +17713,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					case 1:
 						goto l76
 					case 0:
-						v1 = i32(67480)
+						v1 = i32(67485)
 						goto l76
 					default:
 						t210 := int32(load32(m.memory, uint64(uint32(v2))+8))
@@ -17747,7 +17747,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 			l78:
 				t215 := int32(load32(m.memory, uint64(uint32(v0))+1184))
 				v2 = t215
-				v1 = i32(67481)
+				v1 = i32(67486)
 				{
 					var p216 int32
 					if v6&i32(1) != 0 {
@@ -17761,7 +17761,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					case 1:
 						goto l80
 					case 0:
-						v1 = i32(67480)
+						v1 = i32(67485)
 						goto l80
 					default:
 						t218 := int32(load32(m.memory, uint64(uint32(v2))+8))
@@ -17777,7 +17777,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 				}
 			l80:
 				t222 := v0 + i32(132)
-				v3 = i32(67481)
+				v3 = i32(67486)
 				{
 					var p223 int32
 					if v5&i32(1) != 0 {
@@ -17791,7 +17791,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					case 1:
 						goto l83
 					case 0:
-						v3 = i32(67480)
+						v3 = i32(67485)
 						goto l83
 					default:
 						t225 := int32(load32(m.memory, uint64(uint32(v2))+8))
@@ -17946,28 +17946,28 @@ l0:
 				if v10 != t27 {
 					goto l2
 				}
-				v4 = i32(68320)
+				v4 = i32(68324)
 				var p28 int32
 				{
 					t29 := int32(load32(m.memory, uint64(uint32(v0+i32(12)))))
 					v3 = t29
 					if v3 == 0 {
-						p28 = i32(68320)
+						p28 = i32(68324)
 						goto l5
 					}
 					if v3&i32(1) != 0 {
-						p28 = i32(68320)
+						p28 = i32(68324)
 						goto l5
 					}
 					t30 := int32(m.memory[uint64(uint32(v3))+44])
 					if t30&i32(64) == 0 {
-						p28 = i32(68320)
+						p28 = i32(68324)
 						goto l5
 					}
 					t31 := int32(load32(m.memory, uint64(uint32(v3))+36))
 					p32 := v3 + i32(48)
 					if t31 != 0 {
-						p32 = i32(68320)
+						p32 = i32(68324)
 					}
 					p28 = p32
 				}
@@ -17989,7 +17989,7 @@ l0:
 					t35 := int32(load32(m.memory, uint64(uint32(v3))+36))
 					p36 := v3 + i32(48)
 					if t35 != 0 {
-						p36 = i32(68320)
+						p36 = i32(68324)
 					}
 					v4 = p36
 				}
@@ -18110,12 +18110,12 @@ l6:
 					var p16 int32
 					{
 						if v5 != 0 {
-							t17 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+							t17 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 							t18 := m.t0[uint(t17)].(func(int32, int32) int32)(v5, v3)
 							p16 = t18
 							goto l5
 						}
-						t19 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+						t19 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 						t20 := m.t0[uint(t19)].(func(int32) int32)(v3)
 						p16 = t20
 					}
@@ -18361,7 +18361,7 @@ func (m *Module) fn92(v0, v1, v2 int32) {
 				p41 = t45
 				goto l9
 			}
-			t46 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+			t46 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 			t47 := m.t0[uint(t46)].(func(int32) int32)(i32(70))
 			p41 = t47
 		}
@@ -18379,12 +18379,12 @@ func (m *Module) fn92(v0, v1, v2 int32) {
 			var p51 int32
 			{
 				if v3 != 0 {
-					t52 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+					t52 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 					t53 := m.t0[uint(t52)].(func(int32, int32) int32)(v3, v2)
 					p51 = t53
 					goto l10
 				}
-				t54 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+				t54 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 				t55 := m.t0[uint(t54)].(func(int32) int32)(v2)
 				p51 = t55
 			}
@@ -18460,12 +18460,12 @@ func (m *Module) fn93(v0, v1, v2 int32) int32 {
 					var p12 int32
 					{
 						if v3 != 0 {
-							t13 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+							t13 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 							t14 := m.t0[uint(t13)].(func(int32, int32) int32)(v3, v2)
 							p12 = t14
 							goto l2
 						}
-						t15 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+						t15 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 						t16 := m.t0[uint(t15)].(func(int32) int32)(v2)
 						p12 = t16
 					}
@@ -19456,7 +19456,7 @@ l117:
 					}
 					v4 = i32(1)
 					v1 = i32(0)
-					v6 = i32(74752)
+					v6 = i32(74976)
 					v5 = v3
 					switch v2 - i32(9) {
 					case 0, 1, 2, 3, 4, 23:
@@ -19466,28 +19466,28 @@ l117:
 					default:
 						goto l77
 					case 29:
-						v6 = i32(74756)
+						v6 = i32(74980)
 						goto l79
 					case 30:
-						v6 = i32(74760)
+						v6 = i32(74984)
 						goto l79
 					case 38:
-						v6 = i32(74764)
+						v6 = i32(74988)
 						goto l79
 					case 51:
-						v6 = i32(74768)
+						v6 = i32(74992)
 						goto l79
 					case 52:
-						v6 = i32(74772)
+						v6 = i32(74996)
 						goto l79
 					case 53:
-						v6 = i32(74776)
+						v6 = i32(75000)
 						goto l79
 					case 59:
-						v6 = i32(74780)
+						v6 = i32(75004)
 						goto l79
 					case 91:
-						v6 = i32(74784)
+						v6 = i32(75008)
 					}
 				l79:
 					t5 := int32(load16(m.memory, uint64(uint32(v6))+2))
@@ -19810,7 +19810,7 @@ func (m *Module) fn95() int32 {
 	return t0
 }
 func (m *Module) fn96(v0, v1, v2 int32) int32 {
-	var v3, v4, v5, v6, v7, v8, v9, v10, v11 int32
+	var v3, v4, v5, v6, v7, v8, v9, v10, v11, v12 int32
 	t0 := m.g0
 	v7 = t0 - i32(16)
 	m.g0 = v7
@@ -19849,11 +19849,11 @@ func (m *Module) fn96(v0, v1, v2 int32) int32 {
 						p10 = 1
 					}
 					v0 = p10
-					p11 := i32(67503)
+					p11 := i32(67508)
 					if v0 != 0 {
-						p11 = i32(67471)
+						p11 = i32(67476)
 					}
-					v5 = p11
+					v6 = p11
 					p12 := i32(7)
 					if v0 != 0 {
 						p12 = i32(8)
@@ -19863,7 +19863,7 @@ func (m *Module) fn96(v0, v1, v2 int32) int32 {
 				l4:
 					{
 						{
-							t13 := int32(int8(m.memory[uint64(uint32(v2+v5))]))
+							t13 := int32(int8(m.memory[uint64(uint32(v2+v6))]))
 							t14 := m.fn135(v3)
 							if t13 == t14 {
 								v2 = v2 + i32(1)
@@ -19971,12 +19971,12 @@ func (m *Module) fn96(v0, v1, v2 int32) int32 {
 					goto l1
 				default:
 					if v3 == 0 {
-						t86 := int32(m.memory[uint64(uint32(v2))+6])
-						if t86 != i32(1) {
+						t83 := int32(m.memory[uint64(uint32(v2))+6])
+						if t83 != i32(1) {
 							goto l1
 						}
-						t87 := m.fn98(v0, v1)
-						v3 = t87
+						t84 := m.fn98(v0, v1)
+						v3 = t84
 						goto l5
 					}
 					fallthrough
@@ -20007,10 +20007,10 @@ func (m *Module) fn96(v0, v1, v2 int32) int32 {
 									v2 = i32(0)
 								l19:
 									{
-										v5 = v2 + i32(74800)
-										t42 := m.fn150(v5)
+										v6 = v2 + i32(75024)
+										t42 := m.fn150(v6)
 										if t42 == v3 {
-											t43 := m.fn149(v4, v5, v3)
+											t43 := m.fn149(v4, v6, v3)
 											if t43 == 0 {
 												goto l18
 											}
@@ -20049,10 +20049,10 @@ func (m *Module) fn96(v0, v1, v2 int32) int32 {
 									{
 									l23:
 										{
-											v8 = v2 + i32(74800)
-											t49 := m.fn150(v8)
+											v5 = v2 + i32(75024)
+											t49 := m.fn150(v5)
 											if t49 == v3 {
-												t50 := m.fn149(v4, v8, v3)
+												t50 := m.fn149(v4, v5, v3)
 												if t50 == 0 {
 													goto l22
 												}
@@ -20062,14 +20062,14 @@ func (m *Module) fn96(v0, v1, v2 int32) int32 {
 												goto l23
 											}
 										}
-										v8 = i32(126)
-										v5 = v3
+										v9 = i32(126)
+										v6 = v3
 										goto l24
 									l22:
-										t51 := int32(load32(m.memory, uint64(uint32(v2+i32(74816)))))
-										v8 = t51
+										t51 := int32(load32(m.memory, uint64(uint32(v2+i32(75040)))))
+										v9 = t51
 										if v2 == i32(2500) {
-											v5 = v3
+											v6 = v3
 											goto l24
 										}
 										if v4 != 0 {
@@ -20082,53 +20082,47 @@ func (m *Module) fn96(v0, v1, v2 int32) int32 {
 									t52 := int32(load32(m.memory, uint64(uint32(v0))))
 									v2 = t52
 									t53 := int32(load32(m.memory, uint64(uint32(v0))+4))
-									t54 := v0
-									v9 = t53
-									v6 = v9 + i32(1)
-									t55 := int32(load32(m.memory, uint64(uint32(v0))+8))
-									t56 := v6
-									v11 = t55
-									var p57 int32
-									if uint32(t56) > uint32(v11) {
-										v9 = v11 << 1
-										p58 := v6
-										if uint32(v6) < uint32(v9) {
-											p58 = v9
+									v11 = t53
+									v5 = v11 + i32(1)
+									t54 := int32(load32(m.memory, uint64(uint32(v0))+8))
+									t55 := v5
+									v8 = t54
+									if uint32(t55) > uint32(v8) {
+										v8 = v8 << 1
+										p56 := v5
+										if uint32(v5) < uint32(v8) {
+											p56 = v8
 										}
-										v6 = p58
-										p59 := v6
-										if uint32(v6) <= uint32(i32(8)) {
-											p59 = i32(8)
+										v8 = p56
+										p57 := v8
+										if uint32(v8) <= uint32(i32(8)) {
+											p57 = i32(8)
 										}
-										v9 = p59
-										v6 = v9 << 4
-										var p60 int32
+										v12 = p57
+										v8 = v12 << 4
 										{
 											if v2 != 0 {
-												t61 := m.fn164(v2, v6)
-												p60 = t61
+												t58 := m.fn164(v2, v8)
+												v2 = t58
+												t59 := int32(load32(m.memory, uint64(uint32(v0))+4))
+												v11 = t59
+												v5 = v11 + i32(1)
 												goto l25
 											}
-											t62 := m.fn160(v6)
-											p60 = t62
+											t60 := m.fn160(v8)
+											v2 = t60
 										}
 									l25:
-										v2 = p60
-										store32(m.memory, uint64(uint32(v0))+8, uint32(v9))
-										store32(m.memory, uint64(uint32(v0)), uint32(v2))
-										t63 := int32(load32(m.memory, uint64(uint32(v0))+4))
-										v9 = t63
-										p57 = v9 + i32(1)
-									} else {
-										p57 = v6
+										store32(m.memory, uint64(uint32(v0))+8, uint32(v12))
 									}
-									store32(m.memory, uint64(uint32(t54))+4, uint32(p57))
-									v0 = v2 + v9<<4
+									store32(m.memory, uint64(uint32(v0))+4, uint32(v5))
+									store32(m.memory, uint64(uint32(v0)), uint32(v2))
+									v0 = v2 + v11<<4
+									store32(m.memory, uint64(uint32(v0)), uint32(v9))
+									store32(m.memory, uint64(uint32(v0))+8, uint32(v6))
 									store32(m.memory, uint64(uint32(v0))+12, uint32(v10))
-									store32(m.memory, uint64(uint32(v0))+8, uint32(v5))
 									store32(m.memory, uint64(uint32(v0))+4, uint32(v4))
-									store32(m.memory, uint64(uint32(v0)), uint32(v8))
-									switch v8 - i32(99) {
+									switch v9 - i32(99) {
 									case 0:
 										store16(m.memory, uint64(uint32(v1))+4, uint16(i32(1)))
 										v3 = i32(1)
@@ -20143,19 +20137,19 @@ func (m *Module) fn96(v0, v1, v2 int32) int32 {
 								}
 							l21:
 								;
-								var p64 int32
+								var p61 int32
 								if v3 != i32(0) {
-									p64 = 1
+									p61 = 1
 								}
-								v3 = p64
+								v3 = p61
 								goto l5
 							}
 						l18:
-							t65 := int32(load32(m.memory, uint64(uint32(v2+i32(74816)))))
-							v5 = t65
-							t66 := v3
+							t62 := int32(load32(m.memory, uint64(uint32(v2+i32(75040)))))
+							v5 = t62
+							t63 := v3
 							if v2 == i32(2500) {
-								p36 = t66
+								p36 = t63
 								goto l20
 							}
 							if v4 != 0 {
@@ -20165,44 +20159,44 @@ func (m *Module) fn96(v0, v1, v2 int32) int32 {
 							p36 = i32(0)
 						}
 					l20:
-						v8 = p36
+						v6 = p36
 						{
-							t67 := int32(load32(m.memory, uint64(uint32(v0))+4))
-							v6 = t67
-							if v6 == 0 {
+							t64 := int32(load32(m.memory, uint64(uint32(v0))+4))
+							v9 = t64
+							if v9 == 0 {
 								v2 = i32(4)
 								goto l29
 							}
 							v2 = i32(4)
-							t68 := int32(load32(m.memory, uint64(uint32(v0))))
-							v9 = t68
-							v10 = v9 + v6<<4
-							t69 := int32(load32(m.memory, uint64(uint32(v10-i32(16)))))
-							if t69 != v5 {
+							t65 := int32(load32(m.memory, uint64(uint32(v0))))
+							v11 = t65
+							v10 = v11 + v9<<4
+							t66 := int32(load32(m.memory, uint64(uint32(v10-i32(16)))))
+							if t66 != v5 {
 								goto l29
 							}
 							if v5 == i32(126) {
-								t70 := int32(load32(m.memory, uint64(uint32(v10-i32(8)))))
-								if t70 != v8 {
+								t67 := int32(load32(m.memory, uint64(uint32(v10-i32(8)))))
+								if t67 != v6 {
 									goto l29
 								}
-								t71 := int32(load32(m.memory, uint64(uint32(v10-i32(12)))))
-								t72 := m.fn149(t71, v4, v8)
-								if t72 != 0 {
+								t68 := int32(load32(m.memory, uint64(uint32(v10-i32(12)))))
+								t69 := m.fn149(t68, v4, v6)
+								if t69 != 0 {
 									goto l29
 								}
 							}
-							t73 := v0
-							v0 = v6 - i32(1)
-							store32(m.memory, uint64(uint32(t73))+4, uint32(v0))
+							t70 := v0
+							v0 = v9 - i32(1)
+							store32(m.memory, uint64(uint32(t70))+4, uint32(v0))
 							v2 = i32(3)
-							v0 = v9 + v0<<4
-							t74 := int32(load32(m.memory, uint64(uint32(v0))))
-							if t74 != i32(126) {
+							v0 = v11 + v0<<4
+							t71 := int32(load32(m.memory, uint64(uint32(v0))))
+							if t71 != i32(126) {
 								goto l29
 							}
-							t75 := int32(load32(m.memory, uint64(uint32(v0))+4))
-							v0 = t75
+							t72 := int32(load32(m.memory, uint64(uint32(v0))+4))
+							v0 = t72
 							if v0 == 0 {
 								goto l29
 							}
@@ -20221,44 +20215,44 @@ func (m *Module) fn96(v0, v1, v2 int32) int32 {
 					m.fn162(v4)
 				l30:
 					;
-					var p76 int32
+					var p73 int32
 					if v3 != i32(0) {
-						p76 = 1
+						p73 = 1
 					}
-					v3 = p76
+					v3 = p73
 					goto l5
 				case 0:
-					t77 := int32(m.memory[uint64(uint32(v2))+5])
-					if t77 != i32(1) {
+					t74 := int32(m.memory[uint64(uint32(v2))+5])
+					if t74 != i32(1) {
 						goto l1
 					}
 					v3 = i32(0)
-					t78 := int32(load32(m.memory, uint64(uint32(v1))+8))
-					m.t0[uint(t78)].(func(int32, int32))(v1, i32(0))
-					t79 := int32(load32(m.memory, uint64(uint32(v1))))
-					if t79 != i32(62) {
+					t75 := int32(load32(m.memory, uint64(uint32(v1))+8))
+					m.t0[uint(t75)].(func(int32, int32))(v1, i32(0))
+					t76 := int32(load32(m.memory, uint64(uint32(v1))))
+					if t76 != i32(62) {
 						goto l5
 					}
-					t80 := int32(load32(m.memory, uint64(uint32(v1))+8))
-					m.t0[uint(t80)].(func(int32, int32))(v1, i32(0))
+					t77 := int32(load32(m.memory, uint64(uint32(v1))+8))
+					m.t0[uint(t77)].(func(int32, int32))(v1, i32(0))
 					v3 = i32(1)
-					t81 := int32(load32(m.memory, uint64(uint32(v0))+4))
-					v2 = t81
+					t78 := int32(load32(m.memory, uint64(uint32(v0))+4))
+					v2 = t78
 					if v2 == 0 {
 						goto l5
 					}
-					t82 := v0
+					t79 := v0
 					v2 = v2 - i32(1)
-					store32(m.memory, uint64(uint32(t82))+4, uint32(v2))
+					store32(m.memory, uint64(uint32(t79))+4, uint32(v2))
 					{
-						t83 := int32(load32(m.memory, uint64(uint32(v0))))
-						v0 = t83 + v2<<4
-						t84 := int32(load32(m.memory, uint64(uint32(v0))))
-						if t84 != i32(126) {
+						t80 := int32(load32(m.memory, uint64(uint32(v0))))
+						v0 = t80 + v2<<4
+						t81 := int32(load32(m.memory, uint64(uint32(v0))))
+						if t81 != i32(126) {
 							goto l31
 						}
-						t85 := int32(load32(m.memory, uint64(uint32(v0))+4))
-						v0 = t85
+						t82 := int32(load32(m.memory, uint64(uint32(v0))+4))
+						v0 = t82
 						if v0 == 0 {
 							goto l31
 						}
@@ -20274,12 +20268,12 @@ func (m *Module) fn96(v0, v1, v2 int32) int32 {
 		v3 = i32(0)
 		goto l5
 	l11:
-		t88 := int32(m.memory[uint64(uint32(v2))+6])
-		if t88 != i32(1) {
+		t85 := int32(m.memory[uint64(uint32(v2))+6])
+		if t85 != i32(1) {
 			goto l5
 		}
-		t89 := m.fn98(v0, v1)
-		v3 = t89
+		t86 := m.fn98(v0, v1)
+		v3 = t86
 	}
 l5:
 	m.g0 = v7 + i32(16)
@@ -20302,53 +20296,54 @@ l3:
 			case 0, 13:
 				goto l0
 			default:
-				goto l1
+				return
 			}
 		}
 	l0:
-		t3 := int32(load32(m.memory, uint64(uint32(v0))+4))
-		v5 = t3
+		t3 := int32(load32(m.memory, uint64(uint32(v0))))
+		v3 = t3
+		t4 := int32(load32(m.memory, uint64(uint32(v0))+4))
+		v5 = t4
 		v4 = v5 + i32(1)
-		t4 := int32(load32(m.memory, uint64(uint32(v0))+8))
-		t5 := v4
-		v2 = t4
-		if uint32(t5) > uint32(v2) {
+		t5 := int32(load32(m.memory, uint64(uint32(v0))+8))
+		t6 := v4
+		v2 = t5
+		if uint32(t6) > uint32(v2) {
 			v2 = v2 << 1
-			p6 := v4
+			p7 := v4
 			if uint32(v2) > uint32(v4) {
-				p6 = v2
-			}
-			v2 = p6
-			p7 := v2
-			if uint32(v2) <= uint32(i32(8)) {
-				p7 = i32(8)
+				p7 = v2
 			}
 			v2 = p7
-			var p8 int32
+			p8 := v2
+			if uint32(v2) <= uint32(i32(8)) {
+				p8 = i32(8)
+			}
+			v2 = p8
+			var p9 int32
 			{
 				if v3 != 0 {
-					t9 := m.fn164(v3, v2)
-					p8 = t9
+					t10 := m.fn164(v3, v2)
+					p9 = t10
 					goto l2
 				}
-				t10 := m.fn160(v2)
-				p8 = t10
+				t11 := m.fn160(v2)
+				p9 = t11
 			}
 		l2:
-			v3 = p8
+			v3 = p9
 			store32(m.memory, uint64(uint32(v0))+8, uint32(v2))
 		}
-		t11 := int32(load32(m.memory, uint64(uint32(v1))))
-		t12 := m.fn135(t11)
-		v2 = t12
+		store32(m.memory, uint64(uint32(v0)), uint32(v3))
+		t12 := int32(load32(m.memory, uint64(uint32(v1))))
+		t13 := m.fn135(t12)
+		v2 = t13
 		store32(m.memory, uint64(uint32(v0))+4, uint32(v4))
 		m.memory[uint64(uint32(v3+v5))] = byte(v2)
-		t13 := int32(load32(m.memory, uint64(uint32(v1))+8))
-		m.t0[uint(t13)].(func(int32, int32))(v1, i32(0))
+		t14 := int32(load32(m.memory, uint64(uint32(v1))+8))
+		m.t0[uint(t14)].(func(int32, int32))(v1, i32(0))
 		goto l3
 	}
-l1:
-	store32(m.memory, uint64(uint32(v0)), uint32(v3))
 }
 func (m *Module) fn98(v0, v1 int32) int32 {
 	var v2, v3, v4, v5, v6, v7, v8, v9 int32
@@ -20436,7 +20431,7 @@ l2:
 		{
 		l8:
 			{
-				v3 = v2 + i32(74800)
+				v3 = v2 + i32(75024)
 				t15 := m.fn150(v3)
 				if t15 == v4 {
 					t16 := m.fn149(v5, v3, v4)
@@ -20452,7 +20447,7 @@ l2:
 			v3 = i32(126)
 			goto l9
 		l7:
-			t17 := int32(load32(m.memory, uint64(uint32(v2+i32(74816)))))
+			t17 := int32(load32(m.memory, uint64(uint32(v2+i32(75040)))))
 			v3 = t17
 			if v2 == i32(2500) {
 				goto l9
@@ -20914,36 +20909,33 @@ l13:
 	return v4
 }
 func (m *Module) fn100(v0, v1, v2 int32) {
-	var v3, v4, v5, v6, v7, v8, v9, v10, v11, v12 int32
+	var v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13 int32
 	t0 := int32(load32(m.memory, uint64(uint32(v0))+4))
 	v5 = t0
 	if v5 != 0 {
 		v3 = i32(12)
-	l1:
+	l0:
 		{
 			t1 := int32(load32(m.memory, uint64(uint32(v0))))
-			v6 = t1 + v3
-			t2 := int32(load32(m.memory, uint64(uint32(v6-i32(12)))))
-			if t2 != i32(126) {
+			v8 = t1 + v3
+			t2 := int32(load32(m.memory, uint64(uint32(v8-i32(12)))))
+			if t2 == i32(126) {
+				v4 = v8 - i32(8)
+				t3 := int32(load32(m.memory, uint64(uint32(v4))))
+				v9 = t3
+				if v9 != 0 {
+					m.fn162(v9)
+					t4 := int32(load32(m.memory, uint64(uint32(v0))+4))
+					v5 = t4
+				}
+				store32(m.memory, uint64(uint32(v4)), uint32(i32(0)))
+				store64(m.memory, uint64(uint32(v8-i32(4))), uint64(i64(0)))
+			}
+			v3 = v3 + i32(16)
+			v6 = v6 + i32(1)
+			if uint32(v6) < uint32(v5) {
 				goto l0
 			}
-			v8 = v6 - i32(8)
-			t3 := int32(load32(m.memory, uint64(uint32(v8))))
-			v10 = t3
-			if v10 == 0 {
-				goto l0
-			}
-			m.fn162(v10)
-			store64(m.memory, uint64(uint32(v6-i32(4))), uint64(i64(0)))
-			store32(m.memory, uint64(uint32(v8)), uint32(i32(0)))
-			t4 := int32(load32(m.memory, uint64(uint32(v0))+4))
-			v5 = t4
-		}
-	l0:
-		v3 = v3 + i32(16)
-		v4 = v4 + i32(1)
-		if uint32(v4) < uint32(v5) {
-			goto l1
 		}
 	}
 	store32(m.memory, uint64(uint32(v0))+4, uint32(i32(0)))
@@ -20951,180 +20943,164 @@ func (m *Module) fn100(v0, v1, v2 int32) {
 		if v2 == 0 {
 			return
 		}
-		t5 := int32(load16(m.memory, uint64(uint32(v1))))
-		v5 = t5
-		t6 := int32(load16(m.memory, uint64(uint32(v1))+2))
+		t5 := int32(load32(m.memory, uint64(uint32(v0))))
+		v3 = t5
+		t6 := int32(load16(m.memory, uint64(uint32(v1))))
 		v8 = t6
-		t7 := int32(load32(m.memory, uint64(uint32(v0))+8))
-		if uint32(v8) > uint32(t7) {
-			v2 = v8 << 4
-			var p8 int32
+		t7 := int32(load16(m.memory, uint64(uint32(v1))+2))
+		v9 = t7
+		t8 := int32(load32(m.memory, uint64(uint32(v0))+8))
+		if uint32(v9) > uint32(t8) {
+			v2 = v9 << 4
+			var p9 int32
 			{
-				t9 := int32(load32(m.memory, uint64(uint32(v0))))
-				v3 = t9
 				if v3 != 0 {
 					t10 := m.fn164(v3, v2)
-					p8 = t10
-					goto l3
+					p9 = t10
+					goto l2
 				}
 				t11 := m.fn160(v2)
-				p8 = t11
+				p9 = t11
 			}
-		l3:
-			v2 = p8
-			store32(m.memory, uint64(uint32(v0))+8, uint32(v8))
-			store32(m.memory, uint64(uint32(v0)), uint32(v2))
+		l2:
+			v3 = p9
+			store32(m.memory, uint64(uint32(v0))+8, uint32(v9))
 		}
-		if v8 == 0 {
+		store32(m.memory, uint64(uint32(v0)), uint32(v3))
+		if v9 == 0 {
 			return
 		}
-		if v5 != 0 {
-			v2 = v5
-			v6 = i32(4)
-		l6:
+		if v8 != 0 {
+			v2 = v8
+			v5 = i32(4)
+		l5:
 			{
-				v4 = v6 + i32(1)
+				v4 = v5 + i32(1)
 				v10 = i32(0)
 				var p12 int32
 				{
-					t13 := int32(int8(m.memory[uint64(uint32(v1+v6))]))
-					v11 = t13
-					if v11 != i32(126) {
-						v3 = i32(0)
+					t13 := int32(int8(m.memory[uint64(uint32(v1+v5))]))
+					v12 = t13
+					if v12 != i32(126) {
+						v6 = i32(0)
 						t14 := v4
 						p12 = t14
-						goto l4
+						goto l3
 					}
 					t15 := int32(m.memory[uint64(uint32(v1+v4))])
-					v3 = t15
+					v6 = t15
 					var p16 int32
-					if v3 != 0 {
-						t17 := m.fn160(v3)
+					if v6 != 0 {
+						t17 := m.fn160(v6)
 						p16 = t17
 					} else {
 						p16 = i32(0)
 					}
 					v10 = p16
-					v4 = v6 + i32(2)
-					if v3 != 0 {
-						memory_copy(m.memory, uint32(v10), uint32(v1+v4), uint32(v3))
+					v5 = v5 + i32(2)
+					if v6 != 0 {
+						memory_copy(m.memory, uint32(v10), uint32(v1+v5), uint32(v6))
 					}
-					p12 = v3 + v4
+					p12 = v5 + v6
 				}
-			l4:
-				v6 = p12
-				t18 := int32(load32(m.memory, uint64(uint32(v0))))
-				v4 = t18
-				t19 := int32(load32(m.memory, uint64(uint32(v0))+4))
-				t20 := v0
-				v9 = t19
-				v7 = v9 + i32(1)
-				t21 := int32(load32(m.memory, uint64(uint32(v0))+8))
-				t22 := v7
-				v12 = t21
-				var p23 int32
-				if uint32(t22) > uint32(v12) {
-					v9 = v12 << 1
-					p24 := v7
-					if uint32(v7) < uint32(v9) {
-						p24 = v9
+			l3:
+				v5 = p12
+				t18 := int32(load32(m.memory, uint64(uint32(v0))+4))
+				v11 = t18
+				v4 = v11 + i32(1)
+				t19 := int32(load32(m.memory, uint64(uint32(v0))+8))
+				t20 := v4
+				v7 = t19
+				if uint32(t20) > uint32(v7) {
+					v7 = v7 << 1
+					p21 := v4
+					if uint32(v4) < uint32(v7) {
+						p21 = v7
 					}
-					v7 = p24
-					p25 := v7
+					v7 = p21
+					p22 := v7
 					if uint32(v7) <= uint32(i32(8)) {
-						p25 = i32(8)
+						p22 = i32(8)
 					}
-					v9 = p25
-					v7 = v9 << 4
-					var p26 int32
+					v13 = p22
+					v7 = v13 << 4
 					{
-						if v4 != 0 {
-							t27 := m.fn164(v4, v7)
-							p26 = t27
-							goto l5
+						if v3 != 0 {
+							t23 := m.fn164(v3, v7)
+							v3 = t23
+							t24 := int32(load32(m.memory, uint64(uint32(v0))+4))
+							v11 = t24
+							v4 = v11 + i32(1)
+							goto l4
 						}
-						t28 := m.fn160(v7)
-						p26 = t28
+						t25 := m.fn160(v7)
+						v3 = t25
 					}
-				l5:
-					v4 = p26
-					store32(m.memory, uint64(uint32(v0))+8, uint32(v9))
-					store32(m.memory, uint64(uint32(v0)), uint32(v4))
-					t29 := int32(load32(m.memory, uint64(uint32(v0))+4))
-					v9 = t29
-					p23 = v9 + i32(1)
-				} else {
-					p23 = v7
+				l4:
+					store32(m.memory, uint64(uint32(v0))+8, uint32(v13))
 				}
-				store32(m.memory, uint64(uint32(t20))+4, uint32(p23))
-				v4 = v4 + v9<<4
-				store32(m.memory, uint64(uint32(v4))+12, uint32(v3))
-				store32(m.memory, uint64(uint32(v4))+8, uint32(v3))
+				store32(m.memory, uint64(uint32(v0))+4, uint32(v4))
+				store32(m.memory, uint64(uint32(v0)), uint32(v3))
+				v4 = v3 + v11<<4
+				store32(m.memory, uint64(uint32(v4)), uint32(v12))
+				store32(m.memory, uint64(uint32(v4))+8, uint32(v6))
+				store32(m.memory, uint64(uint32(v4))+12, uint32(v6))
 				store32(m.memory, uint64(uint32(v4))+4, uint32(v10))
-				store32(m.memory, uint64(uint32(v4)), uint32(v11))
 				v2 = v2 - i32(1)
 				if v2 != 0 {
-					goto l6
+					goto l5
 				}
 			}
 		}
-		if uint32(v5) >= uint32(v8) {
+		if uint32(v8) >= uint32(v9) {
 			return
 		}
-		v5 = v8 - v5
-	l8:
+		v5 = v9 - v8
+	l7:
 		{
-			t30 := int32(load32(m.memory, uint64(uint32(v0))))
-			v3 = t30
-			t31 := int32(load32(m.memory, uint64(uint32(v0))+4))
-			t32 := v0
-			v6 = t31
-			v1 = v6 + i32(1)
-			t33 := int32(load32(m.memory, uint64(uint32(v0))+8))
-			t34 := v1
-			v2 = t33
-			var p35 int32
-			if uint32(t34) > uint32(v2) {
-				v2 = v2 << 1
-				p36 := v1
-				if uint32(v1) < uint32(v2) {
-					p36 = v2
+			t26 := int32(load32(m.memory, uint64(uint32(v0))+4))
+			v4 = t26
+			v6 = v4 + i32(1)
+			t27 := int32(load32(m.memory, uint64(uint32(v0))+8))
+			t28 := v6
+			v1 = t27
+			if uint32(t28) > uint32(v1) {
+				v1 = v1 << 1
+				p29 := v6
+				if uint32(v1) > uint32(v6) {
+					p29 = v1
 				}
-				v1 = p36
-				p37 := v1
+				v1 = p29
+				p30 := v1
 				if uint32(v1) <= uint32(i32(8)) {
-					p37 = i32(8)
+					p30 = i32(8)
 				}
-				v2 = p37
+				v2 = p30
 				v1 = v2 << 4
-				var p38 int32
 				{
 					if v3 != 0 {
-						t39 := m.fn164(v3, v1)
-						p38 = t39
-						goto l7
+						t31 := m.fn164(v3, v1)
+						v3 = t31
+						t32 := int32(load32(m.memory, uint64(uint32(v0))+4))
+						v4 = t32
+						v6 = v4 + i32(1)
+						goto l6
 					}
-					t40 := m.fn160(v1)
-					p38 = t40
+					t33 := m.fn160(v1)
+					v3 = t33
 				}
-			l7:
-				v3 = p38
+			l6:
 				store32(m.memory, uint64(uint32(v0))+8, uint32(v2))
-				store32(m.memory, uint64(uint32(v0)), uint32(v3))
-				t41 := int32(load32(m.memory, uint64(uint32(v0))+4))
-				v6 = t41
-				p35 = v6 + i32(1)
-			} else {
-				p35 = v1
 			}
-			store32(m.memory, uint64(uint32(t32))+4, uint32(p35))
-			v1 = v3 + v6<<4
+			store32(m.memory, uint64(uint32(v0))+4, uint32(v6))
+			store32(m.memory, uint64(uint32(v0)), uint32(v3))
+			v1 = v3 + v4<<4
+			store32(m.memory, uint64(uint32(v1)), uint32(i32(127)))
 			store64(m.memory, uint64(uint32(v1))+8, uint64(i64(0)))
 			store32(m.memory, uint64(uint32(v1))+4, uint32(i32(0)))
-			store32(m.memory, uint64(uint32(v1)), uint32(i32(127)))
 			v5 = v5 - i32(1)
 			if v5 != 0 {
-				goto l8
+				goto l7
 			}
 		}
 	}
@@ -21135,31 +21111,28 @@ func (m *Module) fn101(v0 int32) {
 	v2 = t0
 	if v2 != 0 {
 		v1 = i32(12)
-	l1:
+	l0:
 		{
 			t1 := int32(load32(m.memory, uint64(uint32(v0))))
 			v3 = t1 + v1
 			t2 := int32(load32(m.memory, uint64(uint32(v3-i32(12)))))
-			if t2 != i32(126) {
+			if t2 == i32(126) {
+				v4 = v3 - i32(8)
+				t3 := int32(load32(m.memory, uint64(uint32(v4))))
+				v5 = t3
+				if v5 != 0 {
+					m.fn162(v5)
+					t4 := int32(load32(m.memory, uint64(uint32(v0))+4))
+					v2 = t4
+				}
+				store32(m.memory, uint64(uint32(v4)), uint32(i32(0)))
+				store64(m.memory, uint64(uint32(v3-i32(4))), uint64(i64(0)))
+			}
+			v1 = v1 + i32(16)
+			v6 = v6 + i32(1)
+			if uint32(v6) < uint32(v2) {
 				goto l0
 			}
-			v4 = v3 - i32(8)
-			t3 := int32(load32(m.memory, uint64(uint32(v4))))
-			v5 = t3
-			if v5 == 0 {
-				goto l0
-			}
-			m.fn162(v5)
-			store64(m.memory, uint64(uint32(v3-i32(4))), uint64(i64(0)))
-			store32(m.memory, uint64(uint32(v4)), uint32(i32(0)))
-			t4 := int32(load32(m.memory, uint64(uint32(v0))+4))
-			v2 = t4
-		}
-	l0:
-		v1 = v1 + i32(16)
-		v6 = v6 + i32(1)
-		if uint32(v6) < uint32(v2) {
-			goto l1
 		}
 	}
 	t5 := int32(load32(m.memory, uint64(uint32(v0))))
@@ -21175,11 +21148,11 @@ func (m *Module) Xtsg_abi_version() int32 {
 func (m *Module) Xtsg_init() int32 {
 	var v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15 int32
 	var v16 int64
-	t0 := int32(load32(m.memory, uint64(uint32(i32(88272)))))
+	t0 := int32(load32(m.memory, uint64(uint32(i32(88496)))))
 	if t0 == 0 {
 		t1 := m.fn160(i32(540688))
 		v0 = t1
-		store32(m.memory, uint64(uint32(i32(88272))), uint32(v0))
+		store32(m.memory, uint64(uint32(i32(88496))), uint32(v0))
 		if v0 == 0 {
 			return i32(-1)
 		}
@@ -21187,7 +21160,7 @@ func (m *Module) Xtsg_init() int32 {
 		store64(m.memory, uint64(uint32(v0)), uint64(i64(10071003988)))
 	}
 	{
-		t2 := int32(load32(m.memory, uint64(uint32(i32(88264)))))
+		t2 := int32(load32(m.memory, uint64(uint32(i32(88488)))))
 		if t2 != 0 {
 			goto l0
 		}
@@ -21195,7 +21168,7 @@ func (m *Module) Xtsg_init() int32 {
 		v3 = t3 - i32(16)
 		m.g0 = v3
 		v5 = i32(1)
-		t4 := int32(load32(m.memory, uint64(uint32(i32(88108)))))
+		t4 := int32(load32(m.memory, uint64(uint32(i32(88332)))))
 		t5 := m.t0[uint(t4)].(func(int32, int32) int32)(i32(1), i32(1352))
 		v2 = t5
 		store32(m.memory, uint64(uint32(v2))+28, uint32(i32(4)))
@@ -21206,16 +21179,16 @@ func (m *Module) Xtsg_init() int32 {
 		store32(m.memory, uint64(uint32(v2))+8, uint32(i32(9)))
 		store64(m.memory, uint64(uint32(v2)), uint64(i64(0)))
 		memory_zero(m.memory, uint32(v2+i32(32)), uint32(i32(1124)))
-		t6 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+		t6 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 		t7 := m.t0[uint(t6)].(func(int32, int32) int32)(i32(0), i32(24))
 		t8 := v2
 		v0 = t7
 		store32(m.memory, uint64(uint32(t8))+68, uint32(v0))
-		t9 := int64(load64(m.memory, uint64(uint32(i32(68312)))))
+		t9 := int64(load64(m.memory, uint64(uint32(i32(68316)))))
 		store64(m.memory, uint64(uint32(v0))+16, uint64(t9))
-		t10 := int64(load64(m.memory, uint64(uint32(i32(68304)))))
+		t10 := int64(load64(m.memory, uint64(uint32(i32(68308)))))
 		store64(m.memory, uint64(uint32(v0))+8, uint64(t10))
-		t11 := int64(load64(m.memory, uint64(uint32(i32(68296)))))
+		t11 := int64(load64(m.memory, uint64(uint32(i32(68300)))))
 		store64(m.memory, uint64(uint32(v0)), uint64(t11))
 		store32(m.memory, uint64(uint32(v2))+100, uint32(i32(1)))
 		{
@@ -21274,18 +21247,18 @@ func (m *Module) Xtsg_init() int32 {
 		store32(m.memory, uint64(uint32(v2)), uint32(i32(0)))
 		store32(m.memory, uint64(uint32(v2))+116, uint32(v5))
 		store64(m.memory, uint64(uint32(v2))+1192, uint64(i64(0)))
-		t23 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+		t23 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 		t24 := m.t0[uint(t23)].(func(int32) int32)(i32(64))
 		store32(m.memory, uint64(uint32(v2))+1192, uint32(t24))
 		store32(m.memory, uint64(uint32(v2))+1200, uint32(i32(4)))
-		t25 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+		t25 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 		t26 := m.t0[uint(t25)].(func(int32) int32)(i32(256))
 		v0 = t26
 		store64(m.memory, uint64(uint32(v2))+1172, uint64(i64(0)))
 		store64(m.memory, uint64(uint32(v2))+1164, uint64(i64(0x2000000000)))
 		store32(m.memory, uint64(uint32(v2))+1160, uint32(v0))
 		store32(m.memory, uint64(uint32(v2))+1180, uint32(i32(0)))
-		t27 := int32(load32(m.memory, uint64(uint32(i32(88108)))))
+		t27 := int32(load32(m.memory, uint64(uint32(i32(88332)))))
 		t28 := m.t0[uint(t27)].(func(int32, int32) int32)(i32(1), i32(56))
 		v0 = t28
 		store64(m.memory, uint64(uint32(v0))+40, uint64(i64(0)))
@@ -21294,7 +21267,7 @@ func (m *Module) Xtsg_init() int32 {
 		store64(m.memory, uint64(uint32(v0))+16, uint64(i64(0)))
 		store64(m.memory, uint64(uint32(v0))+8, uint64(i64(0)))
 		store64(m.memory, uint64(uint32(v0)), uint64(i64(0)))
-		t29 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+		t29 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 		t30 := m.t0[uint(t29)].(func(int32) int32)(i32(128))
 		store32(m.memory, uint64(uint32(v0)), uint32(t30))
 		store32(m.memory, uint64(uint32(v0))+8, uint32(i32(4)))
@@ -21305,12 +21278,12 @@ func (m *Module) Xtsg_init() int32 {
 			var p33 int32
 			{
 				if v1 != 0 {
-					t34 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+					t34 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 					t35 := m.t0[uint(t34)].(func(int32, int32) int32)(v1, i32(64))
 					p33 = t35
 					goto l3
 				}
-				t36 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+				t36 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 				t37 := m.t0[uint(t36)].(func(int32) int32)(i32(64))
 				p33 = t37
 			}
@@ -21326,12 +21299,12 @@ func (m *Module) Xtsg_init() int32 {
 			var p40 int32
 			{
 				if v1 != 0 {
-					t41 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+					t41 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 					t42 := m.t0[uint(t41)].(func(int32, int32) int32)(v1, i32(96))
 					p40 = t42
 					goto l4
 				}
-				t43 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+				t43 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 				t44 := m.t0[uint(t43)].(func(int32) int32)(i32(96))
 				p40 = t44
 			}
@@ -21347,12 +21320,12 @@ func (m *Module) Xtsg_init() int32 {
 			var p47 int32
 			{
 				if v1 != 0 {
-					t48 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+					t48 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 					t49 := m.t0[uint(t48)].(func(int32, int32) int32)(v1, i32(200))
 					p47 = t49
 					goto l5
 				}
-				t50 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+				t50 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 				t51 := m.t0[uint(t50)].(func(int32) int32)(i32(200))
 				p47 = t51
 			}
@@ -21376,7 +21349,7 @@ func (m *Module) Xtsg_init() int32 {
 				p53 = t56
 				goto l6
 			}
-			t57 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+			t57 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 			t58 := m.t0[uint(t57)].(func(int32) int32)(i32(164))
 			p53 = t58
 		}
@@ -21421,7 +21394,7 @@ func (m *Module) Xtsg_init() int32 {
 		store64(m.memory, uint64(uint32(v0)), uint64(i64(0)))
 		m.g0 = v3 + i32(16)
 		v3 = v2
-		store32(m.memory, uint64(uint32(i32(88264))), uint32(v3))
+		store32(m.memory, uint64(uint32(i32(88488))), uint32(v3))
 		v1 = i32(-1)
 		if v2 == 0 {
 			goto l0
@@ -21448,27 +21421,27 @@ func (m *Module) Xtsg_init() int32 {
 			if v1 != i32(1) {
 				goto l7
 			}
-			t68 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t68 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t68)].(func(int32))(v0)
 		}
 	l7:
 		v1 = i32(0)
 		store32(m.memory, uint64(uint32(v3))+1184, uint32(i32(0)))
 		{
-			t69 := int32(load32(m.memory, uint64(uint32(i32(68380)))))
+			t69 := int32(load32(m.memory, uint64(uint32(i32(68384)))))
 			if uint32(t69-i32(16)) < uint32(i32(-3)) {
 				goto l8
 			}
-			t70 := int32(load32(m.memory, uint64(uint32(i32(68472)))))
+			t70 := int32(load32(m.memory, uint64(uint32(i32(68476)))))
 			if t70 == 0 {
 				goto l8
 			}
-			store32(m.memory, uint64(uint32(v3))+1184, uint32(i32(68380)))
+			store32(m.memory, uint64(uint32(v3))+1184, uint32(i32(68384)))
 			v1 = i32(1)
 		}
 	l8:
 		if v1 == 0 {
-			t71 := int32(load32(m.memory, uint64(uint32(i32(88264)))))
+			t71 := int32(load32(m.memory, uint64(uint32(i32(88488)))))
 			v0 = t71
 			v7 = i32(0)
 			t72 := m.g0
@@ -21497,7 +21470,7 @@ func (m *Module) Xtsg_init() int32 {
 					if v2 != i32(1) {
 						goto l9
 					}
-					t78 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t78 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t78)].(func(int32))(v1)
 				}
 			l9:
@@ -21510,7 +21483,7 @@ func (m *Module) Xtsg_init() int32 {
 				t81 := int32(load32(m.memory, uint64(uint32(v1))+12))
 				v2 = t81
 				if v2 != 0 {
-					t82 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t82 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t82)].(func(int32))(v2)
 					store32(m.memory, uint64(uint32(v1))+20, uint32(i32(0)))
 					store64(m.memory, uint64(uint32(v1))+12, uint64(i64(0)))
@@ -21518,7 +21491,7 @@ func (m *Module) Xtsg_init() int32 {
 				t83 := int32(load32(m.memory, uint64(uint32(v1))+24))
 				v2 = t83
 				if v2 != 0 {
-					t84 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t84 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t84)].(func(int32))(v2)
 					store32(m.memory, uint64(uint32(v1))+32, uint32(i32(0)))
 					store64(m.memory, uint64(uint32(v1))+24, uint64(i64(0)))
@@ -21560,14 +21533,14 @@ func (m *Module) Xtsg_init() int32 {
 								t96 := int32(load32(m.memory, uint64(uint32(v2))))
 								v11 = t96
 								if v11 != 0 {
-									t97 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t97 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t97)].(func(int32))(v11)
 									t98 := int32(load32(m.memory, uint64(uint32(v8))))
 									v2 = t98
 								}
 								store32(m.memory, uint64(uint32(v2))+8, uint32(i32(0)))
 								store64(m.memory, uint64(uint32(v2)), uint64(i64(0)))
-								t99 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+								t99 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 								m.t0[uint(t99)].(func(int32))(v2)
 							}
 							t100 := int32(load32(m.memory, uint64(uint32(v10))))
@@ -21595,7 +21568,7 @@ func (m *Module) Xtsg_init() int32 {
 							{
 								t104 := int32(load32(m.memory, uint64(uint32(v1))+36))
 								t105 := int32(load32(m.memory, uint64(uint32(t104+v2))))
-								t106 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+								t106 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 								m.t0[uint(t106)].(func(int32))(t105)
 								v2 = v2 + i32(4)
 								v4 = v4 + i32(1)
@@ -21610,7 +21583,7 @@ func (m *Module) Xtsg_init() int32 {
 								goto l12
 							}
 						}
-						t109 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+						t109 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 						m.t0[uint(t109)].(func(int32))(v2)
 					}
 				l12:
@@ -21620,18 +21593,18 @@ func (m *Module) Xtsg_init() int32 {
 				t110 := int32(load32(m.memory, uint64(uint32(v1))))
 				v2 = t110
 				if v2 != 0 {
-					t111 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t111 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t111)].(func(int32))(v2)
 				}
 				store32(m.memory, uint64(uint32(v1))+8, uint32(i32(0)))
 				store64(m.memory, uint64(uint32(v1)), uint64(i64(0)))
-				t112 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+				t112 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 				m.t0[uint(t112)].(func(int32))(v1)
 				m.g0 = v5 + i32(16)
 				t113 := int32(load32(m.memory, uint64(uint32(v0))+1192))
 				v1 = t113
 				if v1 != 0 {
-					t114 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t114 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t114)].(func(int32))(v1)
 					store32(m.memory, uint64(uint32(v0))+1200, uint32(i32(0)))
 					store64(m.memory, uint64(uint32(v0))+1192, uint64(i64(0)))
@@ -21639,7 +21612,7 @@ func (m *Module) Xtsg_init() int32 {
 				t115 := int32(load32(m.memory, uint64(uint32(v0))+1312))
 				v1 = t115
 				if v1 != 0 {
-					t116 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t116 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t116)].(func(int32))(v1)
 					store32(m.memory, uint64(uint32(v0))+1320, uint32(i32(0)))
 					store64(m.memory, uint64(uint32(v0))+1312, uint64(i64(0)))
@@ -21652,7 +21625,7 @@ func (m *Module) Xtsg_init() int32 {
 					store64(m.memory, uint64(uint32(v0))+1304, uint64(i64(0)))
 				}
 				t119 := int32(load32(m.memory, uint64(uint32(v0))+68))
-				t120 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+				t120 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 				m.t0[uint(t120)].(func(int32))(t119)
 				v1 = v0 + i32(1248)
 				t121 := int32(load32(m.memory, uint64(uint32(v0))+1248))
@@ -21682,7 +21655,7 @@ func (m *Module) Xtsg_init() int32 {
 							{
 								t127 := int32(load32(m.memory, uint64(uint32(v0))+1160))
 								t128 := int32(load32(m.memory, uint64(uint32(t127+v1))))
-								t129 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+								t129 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 								m.t0[uint(t129)].(func(int32))(t128)
 								v1 = v1 + i32(8)
 								v2 = v2 + i32(1)
@@ -21697,7 +21670,7 @@ func (m *Module) Xtsg_init() int32 {
 								goto l14
 							}
 						}
-						t132 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+						t132 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 						m.t0[uint(t132)].(func(int32))(v1)
 					}
 				l14:
@@ -21707,7 +21680,7 @@ func (m *Module) Xtsg_init() int32 {
 				t133 := int32(load32(m.memory, uint64(uint32(v0))+1172))
 				v1 = t133
 				if v1 != 0 {
-					t134 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t134 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t134)].(func(int32))(v1)
 					store32(m.memory, uint64(uint32(v0))+1180, uint32(i32(0)))
 					store64(m.memory, uint64(uint32(v0))+1172, uint64(i64(0)))
@@ -21715,7 +21688,7 @@ func (m *Module) Xtsg_init() int32 {
 				t135 := int32(load32(m.memory, uint64(uint32(v0))+1268))
 				v1 = t135
 				if v1 != 0 {
-					t136 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t136 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t136)].(func(int32))(v1)
 				}
 				store32(m.memory, uint64(uint32(v0))+1276, uint32(i32(0)))
@@ -21723,7 +21696,7 @@ func (m *Module) Xtsg_init() int32 {
 				t137 := int32(load32(m.memory, uint64(uint32(v0))+1212))
 				v1 = t137
 				if v1 != 0 {
-					t138 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t138 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t138)].(func(int32))(v1)
 				}
 				store32(m.memory, uint64(uint32(v0))+1220, uint32(i32(0)))
@@ -21731,7 +21704,7 @@ func (m *Module) Xtsg_init() int32 {
 				t139 := int32(load32(m.memory, uint64(uint32(v0))+1224))
 				v1 = t139
 				if v1 != 0 {
-					t140 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t140 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t140)].(func(int32))(v1)
 				}
 				store32(m.memory, uint64(uint32(v0))+1232, uint32(i32(0)))
@@ -21739,33 +21712,33 @@ func (m *Module) Xtsg_init() int32 {
 				t141 := int32(load32(m.memory, uint64(uint32(v0))+1236))
 				v1 = t141
 				if v1 != 0 {
-					t142 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t142 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t142)].(func(int32))(v1)
 				}
 				store32(m.memory, uint64(uint32(v0))+1244, uint32(i32(0)))
 				store64(m.memory, uint64(uint32(v0))+1236, uint64(i64(0)))
-				t143 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+				t143 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 				m.t0[uint(t143)].(func(int32))(v0)
 			}
 			m.g0 = v3 + i32(32)
-			store32(m.memory, uint64(uint32(i32(88264))), uint32(i32(0)))
+			store32(m.memory, uint64(uint32(i32(88488))), uint32(i32(0)))
 			return i32(-1)
 		}
 		v1 = i32(0)
-		t144 := int32(load32(m.memory, uint64(uint32(i32(88348)))))
+		t144 := int32(load32(m.memory, uint64(uint32(i32(88572)))))
 		if t144 != 0 {
 			goto l0
 		}
-		t145 := int32(load32(m.memory, uint64(uint32(i32(68408)))))
+		t145 := int32(load32(m.memory, uint64(uint32(i32(68412)))))
 		v9 = t145
 		t146 := m.fn163(v9, i32(2))
 		v10 = t146
-		store32(m.memory, uint64(uint32(i32(88348))), uint32(v10))
-		t147 := int32(load32(m.memory, uint64(uint32(i32(68412)))))
+		store32(m.memory, uint64(uint32(i32(88572))), uint32(v10))
+		t147 := int32(load32(m.memory, uint64(uint32(i32(68416)))))
 		v11 = t147
 		t148 := m.fn163(v11+i32(1), i32(24))
 		v0 = t148
-		store32(m.memory, uint64(uint32(i32(88352))), uint32(v0))
+		store32(m.memory, uint64(uint32(i32(88576))), uint32(v0))
 		if v10 == 0 {
 			goto l15
 		}
@@ -21784,14 +21757,14 @@ func (m *Module) Xtsg_init() int32 {
 			if v11 == 0 {
 				goto l17
 			}
-			t149 := int32(load32(m.memory, uint64(uint32(i32(68444)))))
+			t149 := int32(load32(m.memory, uint64(uint32(i32(68448)))))
 			v0 = t149 + v6<<2
 			t150 := int32(load16(m.memory, uint64(uint32(v0))+2))
 			v1 = t150
 			if v1 == 0 {
 				goto l17
 			}
-			t151 := int32(load32(m.memory, uint64(uint32(i32(68448)))))
+			t151 := int32(load32(m.memory, uint64(uint32(i32(68452)))))
 			t152 := int32(load16(m.memory, uint64(uint32(v0))))
 			v0 = t151 + t152<<2
 			v12 = v0 + v1<<2
@@ -21875,7 +21848,7 @@ l0:
 }
 func (m *Module) Xtsg_parser_reset() {
 	var v0 int32
-	t0 := int32(load32(m.memory, uint64(uint32(i32(88264)))))
+	t0 := int32(load32(m.memory, uint64(uint32(i32(88488)))))
 	v0 = t0
 	if v0 != 0 {
 		m.fn35(v0)
@@ -21888,7 +21861,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 	v22 = t0 - i32(48)
 	m.g0 = v22
 	{
-		t1 := int32(load32(m.memory, uint64(uint32(i32(88264)))))
+		t1 := int32(load32(m.memory, uint64(uint32(i32(88488)))))
 		v3 = t1
 		if v3 == 0 {
 			goto l0
@@ -21897,7 +21870,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 		store32(m.memory, uint64(uint32(v22))+40, uint32(v0))
 		store32(m.memory, uint64(uint32(v22))+28, uint32(i32(26)))
 		store64(m.memory, uint64(uint32(v22))+16, uint64(i64(0)))
-		t2 := int64(load64(m.memory, uint64(uint32(i32(77320)))))
+		t2 := int64(load64(m.memory, uint64(uint32(i32(77544)))))
 		store64(m.memory, uint64(uint32(v22)), uint64(t2))
 		store64(m.memory, uint64(uint32(v22))+32, uint64(i64(0)))
 		store32(m.memory, uint64(uint32(v22))+24, uint32(v22+i32(40)))
@@ -22054,9 +22027,9 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 								goto l9
 							}
 						}
-						t38 := int64(load64(m.memory, uint64(uint32(i32(67000)))))
+						t38 := int64(load64(m.memory, uint64(uint32(i32(67005)))))
 						store64(m.memory, uint64(uint32(v3))+139, uint64(t38))
-						t39 := int64(load64(m.memory, uint64(uint32(i32(66993)))))
+						t39 := int64(load64(m.memory, uint64(uint32(i32(66998)))))
 						store64(m.memory, uint64(uint32(v3))+132, uint64(t39))
 						m.fn37(v3)
 						t40 := int32(m.memory[uint64(uint32(v3))+1349])
@@ -22112,12 +22085,12 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 							var p56 int32
 							{
 								if v2 != 0 {
-									t57 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+									t57 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 									t58 := m.t0[uint(t57)].(func(int32, int32) int32)(v2, i32(128))
 									p56 = t58
 									goto l12
 								}
-								t59 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+								t59 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 								t60 := m.t0[uint(t59)].(func(int32) int32)(i32(128))
 								p56 = t60
 							}
@@ -22168,7 +22141,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 									p72 = i32(8)
 								}
 								v0 = p72
-								t73 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+								t73 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 								t74 := m.t0[uint(t73)].(func(int32, int32) int32)(t70, v0<<4)
 								v1 = t74
 								store32(m.memory, uint64(uint32(v3))+1276, uint32(v0))
@@ -22223,10 +22196,10 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 							v1 = t84
 							t85 := int64(load64(m.memory, uint64(uint32(v3))+1304))
 							store64(m.memory, uint64(uint32(v4))+592, uint64(t85))
-							m.fn145(i32(67940), i32(15), i32(1), v0)
-							m.fn145(i32(67989), i32(22), i32(1), v0)
+							m.fn145(i32(67945), i32(15), i32(1), v0)
+							m.fn145(i32(67994), i32(22), i32(1), v0)
 							m.fn38(v4+i32(592), i32(0), v1, i32(0), v0)
-							m.fn145(i32(67920), i32(2), i32(1), v0)
+							m.fn145(i32(67925), i32(2), i32(1), v0)
 							t86 := int32(load32(m.memory, uint64(uint32(v3))+1292))
 							m.fn143(i32(10), t86)
 						}
@@ -22276,9 +22249,9 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 							goto l8
 						}
 					}
-					t95 := int32(load16(m.memory, uint64(uint32(i32(67128)))))
+					t95 := int32(load16(m.memory, uint64(uint32(i32(67133)))))
 					store16(m.memory, uint64(uint32(v3))+140, uint16(t95))
-					t96 := int64(load64(m.memory, uint64(uint32(i32(67120)))))
+					t96 := int64(load64(m.memory, uint64(uint32(i32(67125)))))
 					store64(m.memory, uint64(uint32(v3))+132, uint64(t96))
 					m.fn37(v3)
 				}
@@ -22420,7 +22393,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 															goto l22
 														}
 													}
-													v2 = i32(67481)
+													v2 = i32(67486)
 													{
 														var p131 int32
 														if v7 != 0 {
@@ -22434,7 +22407,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 														case 1:
 															goto l25
 														case 0:
-															v2 = i32(67480)
+															v2 = i32(67485)
 															goto l25
 														default:
 															t133 := int32(load32(m.memory, uint64(uint32(v3))+1184))
@@ -22472,7 +22445,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																	goto l27
 																}
 															}
-															v2 = i32(67481)
+															v2 = i32(67486)
 															{
 																var p142 int32
 																if v7 != 0 {
@@ -22486,7 +22459,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																case 1:
 																	goto l29
 																case 0:
-																	v2 = i32(67480)
+																	v2 = i32(67485)
 																	goto l29
 																default:
 																	t144 := int32(load32(m.memory, uint64(uint32(v3))+1184))
@@ -22547,7 +22520,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																p160 = i32(8)
 															}
 															v0 = p160
-															t161 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+															t161 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 															t162 := m.t0[uint(t161)].(func(int32, int32) int32)(t158, v0<<4)
 															v1 = t162
 															store32(m.memory, uint64(uint32(v3))+1276, uint32(v0))
@@ -22567,28 +22540,28 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 														store64(m.memory, uint64(uint32(v0)), uint64(v56))
 														goto l32
 													}
-													v9 = i32(68320)
+													v9 = i32(68324)
 													var p166 int32
 													{
 														t167 := int32(load32(m.memory, uint64(uint32(v3))+1280))
 														v0 = t167
 														if v0 == 0 {
-															p166 = i32(68320)
+															p166 = i32(68324)
 															goto l33
 														}
 														if v0&i32(1) != 0 {
-															p166 = i32(68320)
+															p166 = i32(68324)
 															goto l33
 														}
 														t168 := int32(m.memory[uint64(uint32(v0))+44])
 														if t168&i32(64) == 0 {
-															p166 = i32(68320)
+															p166 = i32(68324)
 															goto l33
 														}
 														t169 := int32(load32(m.memory, uint64(uint32(v0))+36))
 														p170 := v0 + i32(48)
 														if t169 != 0 {
-															p170 = i32(68320)
+															p170 = i32(68324)
 														}
 														p166 = p170
 													}
@@ -22605,7 +22578,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 														t172 := int32(load32(m.memory, uint64(uint32(v20))+36))
 														p173 := v11
 														if t172 != 0 {
-															p173 = i32(68320)
+															p173 = i32(68324)
 														}
 														v9 = p173
 													}
@@ -22650,7 +22623,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																							p190 = t193
 																							goto l47
 																						}
-																						p189 = i32(66982)
+																						p189 = i32(66987)
 																						goto l42
 																					}
 																					p189 = i32(66400)
@@ -22666,13 +22639,13 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																				v5 = t192
 																				if v5 != i32(0xffff) {
 																					if v0&i32(512) != 0 {
-																						p189 = i32(66982)
+																						p189 = i32(66987)
 																						goto l42
 																					}
 																					if v0&i32(24) == 0 {
 																						goto l45
 																					}
-																					p189 = i32(67190)
+																					p189 = i32(67195)
 																					goto l42
 																				}
 																				p189 = i32(66938)
@@ -22716,7 +22689,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																	if uint32(t200) >= uint32(v15) {
 																		goto l48
 																	}
-																	p189 = i32(67201)
+																	p189 = i32(67206)
 																}
 															l42:
 																v5 = p189
@@ -22728,7 +22701,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																			goto l50
 																		}
 																	}
-																	v2 = i32(67481)
+																	v2 = i32(67486)
 																	{
 																		var p203 int32
 																		if v7 != 0 {
@@ -22742,7 +22715,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																		case 1:
 																			goto l52
 																		case 0:
-																			v2 = i32(67480)
+																			v2 = i32(67485)
 																			goto l52
 																		default:
 																			t205 := int32(load32(m.memory, uint64(uint32(v3))+1184))
@@ -22802,7 +22775,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																			p221 = i32(8)
 																		}
 																		v0 = p221
-																		t222 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+																		t222 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 																		t223 := m.t0[uint(t222)].(func(int32, int32) int32)(t219, v0<<4)
 																		v14 = t223
 																		store32(m.memory, uint64(uint32(v3))+1276, uint32(v0))
@@ -22956,14 +22929,14 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																	v6 = p261
 																	t263 := int32(load32(m.memory, uint64(uint32(v3))+1184))
 																	v0 = t263
-																	v2 = i32(67481)
-																	v1 = i32(67481)
+																	v2 = i32(67486)
+																	v1 = i32(67486)
 																	v6 = v6 & i32(0xffff)
 																	switch v6 - i32(65534) {
 																	case 1:
 																		goto l63
 																	case 0:
-																		v1 = i32(67480)
+																		v1 = i32(67485)
 																		goto l63
 																	default:
 																		v1 = i32(0)
@@ -22981,7 +22954,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																	case 1:
 																		goto l66
 																	case 0:
-																		v2 = i32(67480)
+																		v2 = i32(67485)
 																		goto l66
 																	default:
 																		v2 = i32(0)
@@ -23039,7 +23012,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																				p282 = i32(8)
 																			}
 																			v0 = p282
-																			t283 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+																			t283 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 																			t284 := m.t0[uint(t283)].(func(int32, int32) int32)(t280, v0<<4)
 																			v2 = t284
 																			store32(m.memory, uint64(uint32(v3))+1276, uint32(v0))
@@ -23080,7 +23053,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																	goto l70
 																}
 															}
-															v2 = i32(67481)
+															v2 = i32(67486)
 															{
 																var p293 int32
 																if v7 != 0 {
@@ -23094,7 +23067,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																case 1:
 																	goto l72
 																case 0:
-																	v2 = i32(67480)
+																	v2 = i32(67485)
 																	goto l72
 																default:
 																	t295 := int32(load32(m.memory, uint64(uint32(v3))+1184))
@@ -23141,7 +23114,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 															goto l31
 														}
 													}
-													v2 = i32(67481)
+													v2 = i32(67486)
 													{
 														var p181 int32
 														if v7 != 0 {
@@ -23155,7 +23128,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 														case 1:
 															goto l39
 														case 0:
-															v2 = i32(67480)
+															v2 = i32(67485)
 															goto l39
 														default:
 															t183 := int32(load32(m.memory, uint64(uint32(v3))+1184))
@@ -23207,28 +23180,28 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 											p304 = i32(0)
 											goto l76
 										}
-										v0 = i32(68320)
+										v0 = i32(68324)
 										var p308 int32
 										{
 											t309 := int32(load32(m.memory, uint64(uint32(v47))))
 											v2 = t309
 											if v2 == 0 {
-												p308 = i32(68320)
+												p308 = i32(68324)
 												goto l77
 											}
 											if v2&i32(1) != 0 {
-												p308 = i32(68320)
+												p308 = i32(68324)
 												goto l77
 											}
 											t310 := int32(m.memory[uint64(uint32(v2))+44])
 											if t310&i32(64) == 0 {
-												p308 = i32(68320)
+												p308 = i32(68324)
 												goto l77
 											}
 											t311 := int32(load32(m.memory, uint64(uint32(v2))+36))
 											p312 := v2 + i32(48)
 											if t311 != 0 {
-												p312 = i32(68320)
+												p312 = i32(68324)
 											}
 											p308 = p312
 										}
@@ -23248,7 +23221,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 											t314 := int32(load32(m.memory, uint64(uint32(v20))+36))
 											p315 := v20 + i32(48)
 											if t314 != 0 {
-												p315 = i32(68320)
+												p315 = i32(68324)
 											}
 											v0 = p315
 										}
@@ -23722,7 +23695,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																											if v1 == 0 {
 																												goto l96
 																											}
-																											v2 = i32(68320)
+																											v2 = i32(68324)
 																											t430 := int32(load32(m.memory, uint64(uint32(v3))+1288))
 																											t431 := int32(load32(m.memory, uint64(uint32(v3))+1184))
 																											t432 := int32(load32(m.memory, uint64(uint32(t431))+124))
@@ -23739,7 +23712,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																												t435 := int32(load32(m.memory, uint64(uint32(v28))+36))
 																												p436 := v43
 																												if t435 != 0 {
-																													p436 = i32(68320)
+																													p436 = i32(68324)
 																												}
 																												v2 = p436
 																											}
@@ -23868,12 +23841,12 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																													goto l96
 																												}
 																											}
-																											v2 = i32(67481)
+																											v2 = i32(67486)
 																											switch v23 - i32(65534) {
 																											case 1:
 																												goto l106
 																											case 0:
-																												v2 = i32(67480)
+																												v2 = i32(67485)
 																												goto l106
 																											default:
 																												t470 := int32(load32(m.memory, uint64(uint32(v7))+8))
@@ -24239,15 +24212,15 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																						}
 																					l86:
 																						v9 = i32(0)
-																						t553 := int64(load64(m.memory, uint64(uint32(i32(67411)))))
+																						t553 := int64(load64(m.memory, uint64(uint32(i32(67416)))))
 																						store64(m.memory, uint64(uint32(v13))+30, uint64(t553))
-																						t554 := int64(load64(m.memory, uint64(uint32(i32(67405)))))
+																						t554 := int64(load64(m.memory, uint64(uint32(i32(67410)))))
 																						store64(m.memory, uint64(uint32(v13))+24, uint64(t554))
-																						t555 := int64(load64(m.memory, uint64(uint32(i32(67397)))))
+																						t555 := int64(load64(m.memory, uint64(uint32(i32(67402)))))
 																						store64(m.memory, uint64(uint32(v13))+16, uint64(t555))
-																						t556 := int64(load64(m.memory, uint64(uint32(i32(67389)))))
+																						t556 := int64(load64(m.memory, uint64(uint32(i32(67394)))))
 																						store64(m.memory, uint64(uint32(v13))+8, uint64(t556))
-																						t557 := int64(load64(m.memory, uint64(uint32(i32(67381)))))
+																						t557 := int64(load64(m.memory, uint64(uint32(i32(67386)))))
 																						store64(m.memory, uint64(uint32(v13)), uint64(t557))
 																						v0 = i32(0)
 																						goto l123
@@ -24405,7 +24378,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																					p598 = t602
 																					goto l127
 																				}
-																				t603 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+																				t603 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 																				t604 := m.t0[uint(t603)].(func(int32) int32)(i32(76))
 																				p598 = t604
 																			}
@@ -24714,7 +24687,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																		store32(m.memory, uint64(uint32(v7))+72, uint32(v12))
 																		v6 = v7 + i32(48)
 																		if uint32(v12) >= uint32(i32(25)) {
-																			t679 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+																			t679 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 																			t680 := m.t0[uint(t679)].(func(int32) int32)(v12)
 																			t681 := v6
 																			v6 = t680
@@ -24754,13 +24727,13 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																	p688 = t689
 																}
 																v1 = p688
-																v2 = i32(67481)
+																v2 = i32(67486)
 																v1 = v1 & i32(0xffff)
 																switch v1 - i32(65534) {
 																case 1:
 																	goto l139
 																case 0:
-																	v2 = i32(67480)
+																	v2 = i32(67485)
 																	goto l139
 																default:
 																	t690 := int32(load32(m.memory, uint64(uint32(v3))+1184))
@@ -24769,11 +24742,11 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																	v2 = t692
 																}
 															l139:
-																t693 := int64(load64(m.memory, uint64(uint32(i32(67541)))))
+																t693 := int64(load64(m.memory, uint64(uint32(i32(67546)))))
 																store64(m.memory, uint64(uint32(v13))+13, uint64(t693))
-																t694 := int64(load64(m.memory, uint64(uint32(i32(67536)))))
+																t694 := int64(load64(m.memory, uint64(uint32(i32(67541)))))
 																store64(m.memory, uint64(uint32(v13))+8, uint64(t694))
-																t695 := int64(load64(m.memory, uint64(uint32(i32(67528)))))
+																t695 := int64(load64(m.memory, uint64(uint32(i32(67533)))))
 																store64(m.memory, uint64(uint32(v13)), uint64(t695))
 																{
 																	t696 := int32(m.memory[uint64(uint32(v2))])
@@ -25182,9 +25155,9 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																				goto l168
 																			}
 																		}
-																		t775 := int32(load32(m.memory, uint64(uint32(i32(67377)))))
+																		t775 := int32(load32(m.memory, uint64(uint32(i32(67382)))))
 																		store32(m.memory, uint64(uint32(v13))+8, uint32(t775))
-																		t776 := int64(load64(m.memory, uint64(uint32(i32(67369)))))
+																		t776 := int64(load64(m.memory, uint64(uint32(i32(67374)))))
 																		store64(m.memory, uint64(uint32(v13)), uint64(t776))
 																		goto l169
 																	}
@@ -25394,12 +25367,12 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																				goto l183
 																			}
 																		}
-																		v15 = i32(67481)
+																		v15 = i32(67486)
 																		switch v0 - i32(65534) {
 																		case 1:
 																			goto l185
 																		case 0:
-																			v15 = i32(67480)
+																			v15 = i32(67485)
 																			goto l185
 																		default:
 																			t825 := int32(load32(m.memory, uint64(uint32(v3))+1184))
@@ -25479,7 +25452,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 															t845 := int32(load32(m.memory, uint64(uint32(v3))+1184))
 															m.fn48(t844, t845, v0)
 															t846 := int32(load32(m.memory, uint64(uint32(v3))+1292))
-															m.fn145(i32(68280), i32(2), i32(1), t846)
+															m.fn145(i32(68285), i32(2), i32(1), t846)
 														}
 														t847 := int32(load32(m.memory, uint64(uint32(v4))+576))
 														v0 = t847
@@ -25705,7 +25678,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																goto l205
 															}
 														}
-														v2 = i32(67481)
+														v2 = i32(67486)
 														{
 															var p905 int32
 															if v11 != 0 {
@@ -25719,7 +25692,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 															case 1:
 																goto l207
 															case 0:
-																v2 = i32(67480)
+																v2 = i32(67485)
 																goto l207
 															default:
 																t907 := int32(load32(m.memory, uint64(uint32(v9))+8))
@@ -25841,13 +25814,13 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 														p937 = t938
 													}
 													v0 = p937
-													v2 = i32(67481)
+													v2 = i32(67486)
 													v0 = v0 & i32(0xffff)
 													switch v0 - i32(65534) {
 													case 1:
 														goto l216
 													case 0:
-														v2 = i32(67480)
+														v2 = i32(67485)
 														goto l216
 													default:
 														t939 := int32(load32(m.memory, uint64(uint32(v3))+1184))
@@ -25887,7 +25860,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 												t952 := int32(load32(m.memory, uint64(uint32(v3))+1184))
 												m.fn48(t951, t952, v0)
 												t953 := int32(load32(m.memory, uint64(uint32(v3))+1292))
-												m.fn145(i32(68280), i32(2), i32(1), t953)
+												m.fn145(i32(68285), i32(2), i32(1), t953)
 											}
 											t954 := int32(load32(m.memory, uint64(uint32(v3))+1156))
 											t955 := v36
@@ -26695,7 +26668,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 															p1142 = i32(8)
 														}
 														v6 = p1142
-														t1143 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+														t1143 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 														t1144 := m.t0[uint(t1143)].(func(int32, int32) int32)(t1140, v6<<5)
 														v1 = t1144
 														store32(m.memory, uint64(uint32(v7))+8, uint32(v6))
@@ -26818,12 +26791,12 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																	goto l260
 																}
 															}
-															v1 = i32(67481)
+															v1 = i32(67486)
 															switch v9 - i32(65534) {
 															case 1:
 																goto l262
 															case 0:
-																v1 = i32(67480)
+																v1 = i32(67485)
 																goto l262
 															default:
 																t1179 := int32(load32(m.memory, uint64(uint32(v3))+1184))
@@ -26903,7 +26876,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 						l267:
 							t1196 := int32(load32(m.memory, uint64(uint32(v3))+1156))
 							v0 = t1196
-							t1197 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+							t1197 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 							t1198 := m.t0[uint(t1197)].(func(int32) int32)(i32(12))
 							v1 = t1198
 							store32(m.memory, uint64(uint32(v1))+8, uint32(i32(0)))
@@ -26919,14 +26892,14 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 								t1201 := int32(load32(m.memory, uint64(uint32(v2))))
 								v1 = t1201
 								if v1 != 0 {
-									t1202 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t1202 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t1202)].(func(int32))(v1)
 									t1203 := int32(load32(m.memory, uint64(uint32(v0))+4))
 									v2 = t1203
 								}
 								store32(m.memory, uint64(uint32(v2))+8, uint32(i32(0)))
 								store64(m.memory, uint64(uint32(v2)), uint64(i64(0)))
-								t1204 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+								t1204 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 								m.t0[uint(t1204)].(func(int32))(v2)
 							}
 							t1205 := int32(load32(m.memory, uint64(uint32(v4))+624))
@@ -26952,7 +26925,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 								t1210 := int32(load32(m.memory, uint64(uint32(v3))+1184))
 								m.fn48(t1209, t1210, v0)
 								t1211 := int32(load32(m.memory, uint64(uint32(v3))+1292))
-								m.fn145(i32(68280), i32(2), i32(1), t1211)
+								m.fn145(i32(68285), i32(2), i32(1), t1211)
 							}
 							v6 = i32(1)
 						}
@@ -26973,9 +26946,9 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 							goto l271
 						}
 					}
-					t1214 := int32(m.memory[uint64(uint32(i32(67138)))])
+					t1214 := int32(m.memory[uint64(uint32(i32(67143)))])
 					m.memory[uint64(uint32(v13))+8] = byte(t1214)
-					t1215 := int64(load64(m.memory, uint64(uint32(i32(67130)))))
+					t1215 := int64(load64(m.memory, uint64(uint32(i32(67135)))))
 					store64(m.memory, uint64(uint32(v13)), uint64(t1215))
 					m.fn37(v3)
 					t1216 := int32(load32(m.memory, uint64(uint32(v3))+1292))
@@ -26987,7 +26960,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 					t1218 := int32(load32(m.memory, uint64(uint32(v3))+1184))
 					m.fn48(t1217, t1218, v0)
 					t1219 := int32(load32(m.memory, uint64(uint32(v3))+1292))
-					m.fn145(i32(68280), i32(2), i32(1), t1219)
+					m.fn145(i32(68285), i32(2), i32(1), t1219)
 					goto l271
 				}
 			l19:
@@ -27083,12 +27056,12 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 						var p1238 int32
 						{
 							if v2 != 0 {
-								t1239 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+								t1239 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 								t1240 := m.t0[uint(t1239)].(func(int32, int32) int32)(v2, i32(64))
 								p1238 = t1240
 								goto l278
 							}
-							t1241 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+							t1241 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 							t1242 := m.t0[uint(t1241)].(func(int32) int32)(i32(64))
 							p1238 = t1242
 						}
@@ -27277,12 +27250,12 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 										var p1290 int32
 										{
 											if v17 != 0 {
-												t1291 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+												t1291 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 												t1292 := m.t0[uint(t1291)].(func(int32, int32) int32)(v17, v8)
 												p1290 = t1292
 												goto l283
 											}
-											t1293 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+											t1293 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 											t1294 := m.t0[uint(t1293)].(func(int32) int32)(v8)
 											p1290 = t1294
 										}
@@ -27435,12 +27408,12 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 									var p1331 int32
 									{
 										if v1 != 0 {
-											t1332 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+											t1332 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 											t1333 := m.t0[uint(t1332)].(func(int32, int32) int32)(v1, v0)
 											p1331 = t1333
 											goto l289
 										}
-										t1334 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+										t1334 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 										t1335 := m.t0[uint(t1334)].(func(int32) int32)(v0)
 										p1331 = t1335
 									}
@@ -27486,9 +27459,9 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 								goto l292
 							}
 						}
-						t1343 := int32(m.memory[uint64(uint32(i32(67151)))])
+						t1343 := int32(m.memory[uint64(uint32(i32(67156)))])
 						m.memory[uint64(uint32(v3))+136] = byte(t1343)
-						t1344 := int32(load32(m.memory, uint64(uint32(i32(67147)))))
+						t1344 := int32(load32(m.memory, uint64(uint32(i32(67152)))))
 						store32(m.memory, uint64(uint32(v3))+132, uint32(t1344))
 						m.fn37(v3)
 						t1345 := int64(load64(m.memory, uint64(uint32(v3))+1204))
@@ -27503,10 +27476,10 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 							goto l293
 						}
 						store64(m.memory, uint64(uint32(v4))+592, uint64(v56))
-						m.fn145(i32(67940), i32(15), i32(1), v0)
-						m.fn145(i32(67989), i32(22), i32(1), v0)
+						m.fn145(i32(67945), i32(15), i32(1), v0)
+						m.fn145(i32(67994), i32(22), i32(1), v0)
 						m.fn38(v4+i32(592), i32(0), v1, i32(0), v0)
-						m.fn145(i32(67920), i32(2), i32(1), v0)
+						m.fn145(i32(67925), i32(2), i32(1), v0)
 						t1349 := int32(load32(m.memory, uint64(uint32(v3))+1292))
 						m.fn143(i32(10), t1349)
 					}
@@ -27522,7 +27495,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 				v5 = t1352
 				t1353 := int32(load32(m.memory, uint64(uint32(v3))+68))
 				v6 = t1353
-				t1354 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+				t1354 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 				t1355 := m.t0[uint(t1354)].(func(int32) int32)(i32(28))
 				v2 = t1355
 				store64(m.memory, uint64(uint32(v2)), uint64(v56))
@@ -27546,14 +27519,14 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 				t1359 := m.g1
 				v1 = t1359
 				if v1 == 0 {
-					t1360 := int32(load32(m.memory, uint64(uint32(i32(88260)))))
+					t1360 := int32(load32(m.memory, uint64(uint32(i32(88484)))))
 					v1 = t1360 + i32(1)
-					store32(m.memory, uint64(uint32(i32(88260))), uint32(v1))
+					store32(m.memory, uint64(uint32(i32(88484))), uint32(v1))
 					m.g1 = v1
 				}
 				store32(m.memory, uint64(uint32(v2))+16, uint32(i32(0)))
 				store32(m.memory, uint64(uint32(v2))+12, uint32(v1))
-				t1361 := int32(load32(m.memory, uint64(uint32(i32(88108)))))
+				t1361 := int32(load32(m.memory, uint64(uint32(i32(88332)))))
 				t1362 := m.t0[uint(t1361)].(func(int32, int32) int32)(v5, i32(24))
 				t1363 := v2
 				v0 = t1362
@@ -27580,7 +27553,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 		if v5 != 0 {
 			goto l0
 		}
-		t1364 := int32(load32(m.memory, uint64(uint32(i32(88264)))))
+		t1364 := int32(load32(m.memory, uint64(uint32(i32(88488)))))
 		m.fn35(t1364)
 	}
 l0:
@@ -27593,7 +27566,7 @@ func (m *Module) fn106(v0, v1, v2, v3 int32) int32 {
 	v2 = t0
 	if uint32(t1) >= uint32(v2) {
 		store32(m.memory, uint64(uint32(v3)), uint32(i32(0)))
-		return i32(68282)
+		return i32(68287)
 	}
 	t2 := int32(load32(m.memory, uint64(uint32(v0))))
 	store32(m.memory, uint64(uint32(v3)), uint32(v2-v1))
@@ -27657,7 +27630,7 @@ func (m *Module) Xtsg_descendant_count(v0 int32) int32 {
 }
 func (m *Module) Xtsg_tree_delete(v0 int32) {
 	var v1, v2, v3, v4, v5, v6 int32
-	t0 := int32(load32(m.memory, uint64(uint32(i32(88344)))))
+	t0 := int32(load32(m.memory, uint64(uint32(i32(88568)))))
 	v1 = t0
 	if v1 != 0 {
 	l0:
@@ -27703,16 +27676,16 @@ func (m *Module) Xtsg_tree_delete(v0 int32) {
 				l2:
 					{
 						t8 := int32(load32(m.memory, uint64(uint32(v0))))
-						t9 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+						t9 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 						m.t0[uint(t9)].(func(int32))(t8)
 						t10 := int32(load32(m.memory, uint64(uint32(v0+i32(8)))))
-						t11 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+						t11 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 						m.t0[uint(t11)].(func(int32))(t10)
 						t12 := int32(load32(m.memory, uint64(uint32(v0+i32(16)))))
-						t13 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+						t13 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 						m.t0[uint(t13)].(func(int32))(t12)
 						t14 := int32(load32(m.memory, uint64(uint32(v0+i32(24)))))
-						t15 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+						t15 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 						m.t0[uint(t15)].(func(int32))(t14)
 						v0 = v0 + i32(32)
 						t16 := v6
@@ -27729,7 +27702,7 @@ func (m *Module) Xtsg_tree_delete(v0 int32) {
 			l3:
 				{
 					t17 := int32(load32(m.memory, uint64(uint32(v0))))
-					t18 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t18 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t18)].(func(int32))(t17)
 					v0 = v0 + i32(8)
 					v5 = v5 - i32(1)
@@ -27739,13 +27712,13 @@ func (m *Module) Xtsg_tree_delete(v0 int32) {
 				}
 			}
 		l1:
-			t19 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t19 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t19)].(func(int32))(v3)
 		}
 		t20 := int32(load32(m.memory, uint64(uint32(v2))+20))
 		v0 = t20
 		if v0 != 0 {
-			t21 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t21 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t21)].(func(int32))(v0)
 		}
 		{
@@ -27769,7 +27742,7 @@ func (m *Module) Xtsg_tree_delete(v0 int32) {
 			if v3 != i32(1) {
 				goto l4
 			}
-			t27 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t27 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t27)].(func(int32))(v0)
 		}
 	l4:
@@ -27794,14 +27767,14 @@ func (m *Module) Xtsg_tree_delete(v0 int32) {
 			if v3 != i32(1) {
 				goto l5
 			}
-			t33 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t33 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t33)].(func(int32))(v0)
 		}
 	l5:
 		t34 := int32(load32(m.memory, uint64(uint32(v1))+20))
-		t35 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+		t35 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 		m.t0[uint(t35)].(func(int32))(t34)
-		t36 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+		t36 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 		m.t0[uint(t36)].(func(int32))(v1)
 	}
 	m.g0 = v2 + i32(32)
@@ -27970,7 +27943,7 @@ func (m *Module) Xtsg_tree_edit(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9 int32) {
 	t46 := m.g0
 	v8 = t46 - i32(16)
 	m.g0 = v8
-	t47 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+	t47 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 	t48 := m.t0[uint(t47)].(func(int32) int32)(i32(320))
 	v9 = t48
 	t49 := int32(load32(m.memory, uint64(uint32(v2))))
@@ -28302,7 +28275,7 @@ l22:
 							p124 = t128
 							goto l12
 						}
-						t129 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+						t129 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 						t130 := m.t0[uint(t129)].(func(int32) int32)(i32(76))
 						p124 = t130
 					}
@@ -28601,12 +28574,12 @@ l22:
 						v27 = p187
 						v26 = v27 * i32(40)
 						if v9 != 0 {
-							t188 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+							t188 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 							t189 := m.t0[uint(t188)].(func(int32, int32) int32)(v9, v26)
 							v9 = t189
 							goto l20
 						}
-						t190 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+						t190 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 						t191 := m.t0[uint(t190)].(func(int32) int32)(v26)
 						v9 = t191
 					}
@@ -28645,7 +28618,7 @@ l22:
 		}
 	}
 	if v9 != 0 {
-		t196 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+		t196 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 		m.t0[uint(t196)].(func(int32))(v9)
 	}
 	t197 := int64(load64(m.memory, uint64(uint32(v39))))
@@ -28670,16 +28643,16 @@ l22:
 			l24:
 				{
 					t201 := int32(load32(m.memory, uint64(uint32(v1))))
-					t202 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t202 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t202)].(func(int32))(t201)
 					t203 := int32(load32(m.memory, uint64(uint32(v1+i32(8)))))
-					t204 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t204 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t204)].(func(int32))(t203)
 					t205 := int32(load32(m.memory, uint64(uint32(v1+i32(16)))))
-					t206 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t206 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t206)].(func(int32))(t205)
 					t207 := int32(load32(m.memory, uint64(uint32(v1+i32(24)))))
-					t208 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t208 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t208)].(func(int32))(t207)
 					v1 = v1 + i32(32)
 					t209 := v3
@@ -28696,7 +28669,7 @@ l22:
 		l25:
 			{
 				t210 := int32(load32(m.memory, uint64(uint32(v1))))
-				t211 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+				t211 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 				m.t0[uint(t211)].(func(int32))(t210)
 				v1 = v1 + i32(8)
 				v2 = v2 - i32(1)
@@ -28706,13 +28679,13 @@ l22:
 			}
 		}
 	l23:
-		t212 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+		t212 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 		m.t0[uint(t212)].(func(int32))(v0)
 	}
 	t213 := int32(load32(m.memory, uint64(uint32(v18))+36))
 	v0 = t213
 	if v0 != 0 {
-		t214 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+		t214 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 		m.t0[uint(t214)].(func(int32))(v0)
 	}
 	m.g0 = v18 + i32(48)
@@ -28758,7 +28731,7 @@ l0:
 	v1 = p3
 	store16(m.memory, uint64(uint32(v14))+60, uint16(i32(0)))
 	store32(m.memory, uint64(uint32(v14))+44, uint32(v0))
-	t12 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+	t12 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 	t13 := m.t0[uint(t12)].(func(int32) int32)(i32(224))
 	v6 = t13
 	store32(m.memory, uint64(uint32(v6))+24, uint32(i32(0)))
@@ -28801,12 +28774,12 @@ l1:
 		var p25 int32
 		{
 			if v6 != 0 {
-				t26 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+				t26 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 				t27 := m.t0[uint(t26)].(func(int32, int32) int32)(v6, i32(224))
 				p25 = t27
 				goto l2
 			}
-			t28 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+			t28 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 			t29 := m.t0[uint(t28)].(func(int32) int32)(i32(224))
 			p25 = t29
 		}
@@ -28849,12 +28822,12 @@ l1:
 		var p39 int32
 		{
 			if v1 != 0 {
-				t40 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+				t40 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 				t41 := m.t0[uint(t40)].(func(int32, int32) int32)(v1, i32(224))
 				p39 = t41
 				goto l3
 			}
-			t42 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+			t42 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 			t43 := m.t0[uint(t42)].(func(int32) int32)(i32(224))
 			p39 = t43
 		}
@@ -28897,12 +28870,12 @@ l1:
 		var p52 int32
 		{
 			if v1 != 0 {
-				t53 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+				t53 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 				t54 := m.t0[uint(t53)].(func(int32, int32) int32)(v1, i32(224))
 				p52 = t54
 				goto l4
 			}
-			t55 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+			t55 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 			t56 := m.t0[uint(t55)].(func(int32) int32)(i32(224))
 			p52 = t56
 		}
@@ -29041,7 +29014,7 @@ l6:
 			goto l8
 		}
 	l7:
-		t101 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+		t101 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 		t102 := m.t0[uint(t101)].(func(int32) int32)(i32(192))
 		v16 = t102
 		store32(m.memory, uint64(uint32(v16))+20, uint32(v6))
@@ -29415,28 +29388,28 @@ l83:
 							if v0 == 0 {
 								goto l26
 							}
-							v4 = i32(68320)
+							v4 = i32(68324)
 							var p171 int32
 							{
 								t172 := int32(load32(m.memory, uint64(uint32(v2))+72))
 								v0 = t172
 								if v0 == 0 {
-									p171 = i32(68320)
+									p171 = i32(68324)
 									goto l31
 								}
 								if v0&i32(1) != 0 {
-									p171 = i32(68320)
+									p171 = i32(68324)
 									goto l31
 								}
 								t173 := int32(m.memory[uint64(uint32(v0))+44])
 								if t173&i32(64) == 0 {
-									p171 = i32(68320)
+									p171 = i32(68324)
 									goto l31
 								}
 								t174 := int32(load32(m.memory, uint64(uint32(v0))+36))
 								p175 := v0 + i32(48)
 								if t174 != 0 {
-									p175 = i32(68320)
+									p175 = i32(68324)
 								}
 								p171 = p175
 							}
@@ -29458,7 +29431,7 @@ l83:
 								t178 := int32(load32(m.memory, uint64(uint32(v0))+36))
 								p179 := v0 + i32(48)
 								if t178 != 0 {
-									p179 = i32(68320)
+									p179 = i32(68324)
 								}
 								v4 = p179
 							}
@@ -30479,12 +30452,12 @@ l83:
 			v23 = p473
 			v1 = v23 * i32(24)
 			if v16 != 0 {
-				t474 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+				t474 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 				t475 := m.t0[uint(t474)].(func(int32, int32) int32)(v16, v1)
 				v16 = t475
 				goto l80
 			}
-			t476 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+			t476 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 			t477 := m.t0[uint(t476)].(func(int32) int32)(v1)
 			v16 = t477
 		}
@@ -30642,12 +30615,12 @@ l85:
 			}
 			v7 = p517 * i32(24)
 			if v16 != 0 {
-				t518 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+				t518 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 				t519 := m.t0[uint(t518)].(func(int32, int32) int32)(v16, v7)
 				v16 = t519
 				goto l88
 			}
-			t520 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+			t520 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 			t521 := m.t0[uint(t520)].(func(int32) int32)(v7)
 			v16 = t521
 		}
@@ -30697,12 +30670,12 @@ l89:
 		}
 		v7 = p525 * i32(24)
 		if v16 != 0 {
-			t526 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+			t526 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 			t527 := m.t0[uint(t526)].(func(int32, int32) int32)(v16, v7)
 			v16 = t527
 			goto l90
 		}
-		t528 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+		t528 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 		t529 := m.t0[uint(t528)].(func(int32) int32)(v7)
 		v16 = t529
 	}
@@ -30731,19 +30704,19 @@ l87:
 	t536 := int32(load32(m.memory, uint64(uint32(v14))+8))
 	v0 = t536
 	if v0 != 0 {
-		t537 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+		t537 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 		m.t0[uint(t537)].(func(int32))(v0)
 	}
 	t538 := int32(load32(m.memory, uint64(uint32(v14))+48))
 	v0 = t538
 	if v0 != 0 {
-		t539 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+		t539 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 		m.t0[uint(t539)].(func(int32))(v0)
 	}
 	t540 := int32(load32(m.memory, uint64(uint32(v14))+28))
 	v0 = t540
 	if v0 != 0 {
-		t541 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+		t541 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 		m.t0[uint(t541)].(func(int32))(v0)
 	}
 	t542 := int32(load32(m.memory, uint64(uint32(v14))+4))
@@ -30783,43 +30756,43 @@ l87:
 }
 func (m *Module) Xtsg_export_end() {
 	var v0 int32
-	t0 := int32(m.memory[uint64(uint32(i32(88316)))])
+	t0 := int32(m.memory[uint64(uint32(i32(88540)))])
 	if t0 != 0 {
-		t1 := int32(load32(m.memory, uint64(uint32(i32(88300)))))
+		t1 := int32(load32(m.memory, uint64(uint32(i32(88524)))))
 		v0 = t1
 		if v0 != 0 {
-			t2 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t2 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t2)].(func(int32))(v0)
 		}
-		store32(m.memory, uint64(uint32(i32(88308))), uint32(i32(0)))
-		store64(m.memory, uint64(uint32(i32(88300))), uint64(i64(0)))
-		m.memory[uint64(uint32(i32(88316)))] = byte(i32(0))
+		store32(m.memory, uint64(uint32(i32(88532))), uint32(i32(0)))
+		store64(m.memory, uint64(uint32(i32(88524))), uint64(i64(0)))
+		m.memory[uint64(uint32(i32(88540)))] = byte(i32(0))
 	}
-	t3 := int32(load32(m.memory, uint64(uint32(i32(88284)))))
+	t3 := int32(load32(m.memory, uint64(uint32(i32(88508)))))
 	m.fn162(t3)
-	store32(m.memory, uint64(uint32(i32(88284))), uint32(i32(0)))
-	t4 := int32(load32(m.memory, uint64(uint32(i32(88356)))))
+	store32(m.memory, uint64(uint32(i32(88508))), uint32(i32(0)))
+	t4 := int32(load32(m.memory, uint64(uint32(i32(88580)))))
 	m.fn162(t4)
-	store64(m.memory, uint64(uint32(i32(88356))), uint64(i64(0)))
-	store32(m.memory, uint64(uint32(i32(88288))), uint32(i32(0)))
-	t5 := int32(load32(m.memory, uint64(uint32(i32(88332)))))
+	store64(m.memory, uint64(uint32(i32(88580))), uint64(i64(0)))
+	store32(m.memory, uint64(uint32(i32(88512))), uint32(i32(0)))
+	t5 := int32(load32(m.memory, uint64(uint32(i32(88556)))))
 	m.fn162(t5)
-	store32(m.memory, uint64(uint32(i32(88364))), uint32(i32(0)))
-	store32(m.memory, uint64(uint32(i32(88332))), uint32(i32(0)))
-	store32(m.memory, uint64(uint32(i32(88328))), uint32(i32(0)))
-	t6 := int32(load32(m.memory, uint64(uint32(i32(88272)))))
+	store32(m.memory, uint64(uint32(i32(88588))), uint32(i32(0)))
+	store32(m.memory, uint64(uint32(i32(88556))), uint32(i32(0)))
+	store32(m.memory, uint64(uint32(i32(88552))), uint32(i32(0)))
+	t6 := int32(load32(m.memory, uint64(uint32(i32(88496)))))
 	v0 = t6
 	if v0 != 0 {
 		store32(m.memory, uint64(uint32(v0))+12, uint32(i32(0)))
 	}
-	m.memory[uint64(uint32(i32(88268)))] = byte(i32(1))
+	m.memory[uint64(uint32(i32(88492)))] = byte(i32(1))
 }
 func (m *Module) Xtsg_export_buf() int32 {
-	t0 := int32(load32(m.memory, uint64(uint32(i32(88272)))))
+	t0 := int32(load32(m.memory, uint64(uint32(i32(88496)))))
 	return t0
 }
 func (m *Module) Xtsg_export_err() int32 {
-	t0 := int32(m.memory[uint64(uint32(i32(88276)))])
+	t0 := int32(m.memory[uint64(uint32(i32(88500)))])
 	return t0
 }
 func (m *Module) Xtsg_export_begin(v0 int32) int32 {
@@ -30827,46 +30800,46 @@ func (m *Module) Xtsg_export_begin(v0 int32) int32 {
 	t0 := m.g0
 	v1 = t0 - i32(128)
 	m.g0 = v1
-	t1 := int32(m.memory[uint64(uint32(i32(88316)))])
+	t1 := int32(m.memory[uint64(uint32(i32(88540)))])
 	if t1 != 0 {
-		t2 := int32(load32(m.memory, uint64(uint32(i32(88300)))))
+		t2 := int32(load32(m.memory, uint64(uint32(i32(88524)))))
 		v2 = t2
 		if v2 != 0 {
-			t3 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t3 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t3)].(func(int32))(v2)
 		}
-		store32(m.memory, uint64(uint32(i32(88308))), uint32(i32(0)))
-		store64(m.memory, uint64(uint32(i32(88300))), uint64(i64(0)))
-		m.memory[uint64(uint32(i32(88316)))] = byte(i32(0))
+		store32(m.memory, uint64(uint32(i32(88532))), uint32(i32(0)))
+		store64(m.memory, uint64(uint32(i32(88524))), uint64(i64(0)))
+		m.memory[uint64(uint32(i32(88540)))] = byte(i32(0))
 	}
-	t4 := int32(load32(m.memory, uint64(uint32(i32(88284)))))
+	t4 := int32(load32(m.memory, uint64(uint32(i32(88508)))))
 	m.fn162(t4)
-	store32(m.memory, uint64(uint32(i32(88284))), uint32(i32(0)))
-	t5 := int32(load32(m.memory, uint64(uint32(i32(88356)))))
+	store32(m.memory, uint64(uint32(i32(88508))), uint32(i32(0)))
+	t5 := int32(load32(m.memory, uint64(uint32(i32(88580)))))
 	m.fn162(t5)
-	store64(m.memory, uint64(uint32(i32(88356))), uint64(i64(0)))
-	store32(m.memory, uint64(uint32(i32(88288))), uint32(i32(0)))
-	t6 := int32(load32(m.memory, uint64(uint32(i32(88332)))))
+	store64(m.memory, uint64(uint32(i32(88580))), uint64(i64(0)))
+	store32(m.memory, uint64(uint32(i32(88512))), uint32(i32(0)))
+	t6 := int32(load32(m.memory, uint64(uint32(i32(88556)))))
 	m.fn162(t6)
-	store32(m.memory, uint64(uint32(i32(88364))), uint32(i32(0)))
-	store32(m.memory, uint64(uint32(i32(88332))), uint32(i32(0)))
-	store32(m.memory, uint64(uint32(i32(88328))), uint32(i32(0)))
+	store32(m.memory, uint64(uint32(i32(88588))), uint32(i32(0)))
+	store32(m.memory, uint64(uint32(i32(88556))), uint32(i32(0)))
+	store32(m.memory, uint64(uint32(i32(88552))), uint32(i32(0)))
 	{
 		var p7 int32
 		{
 			{
-				t8 := int32(load32(m.memory, uint64(uint32(i32(88272)))))
+				t8 := int32(load32(m.memory, uint64(uint32(i32(88496)))))
 				v2 = t8
 				if v2 == 0 {
-					m.memory[uint64(uint32(i32(88276)))] = byte(i32(0))
-					m.memory[uint64(uint32(i32(88268)))] = byte(i32(0))
+					m.memory[uint64(uint32(i32(88500)))] = byte(i32(0))
+					m.memory[uint64(uint32(i32(88492)))] = byte(i32(0))
 					if v0 == 0 {
 						p7 = i32(0)
 						goto l0
 					}
 					t9 := m.fn160(i32(540688))
 					v2 = t9
-					store32(m.memory, uint64(uint32(i32(88272))), uint32(v2))
+					store32(m.memory, uint64(uint32(i32(88496))), uint32(v2))
 					if v2 == 0 {
 						p7 = i32(0)
 						goto l0
@@ -30876,22 +30849,22 @@ func (m *Module) Xtsg_export_begin(v0 int32) int32 {
 					goto l1
 				}
 				store32(m.memory, uint64(uint32(v2))+12, uint32(i32(0)))
-				m.memory[uint64(uint32(i32(88268)))] = byte(i32(0))
-				m.memory[uint64(uint32(i32(88276)))] = byte(i32(0))
+				m.memory[uint64(uint32(i32(88492)))] = byte(i32(0))
+				m.memory[uint64(uint32(i32(88500)))] = byte(i32(0))
 				if v0 == 0 {
 					p7 = i32(0)
 					goto l0
 				}
 			}
 		l1:
-			store32(m.memory, uint64(uint32(i32(88280))), uint32(i32(256)))
+			store32(m.memory, uint64(uint32(i32(88504))), uint32(i32(256)))
 			t10 := m.fn160(i32(1024))
 			v2 = t10
-			store32(m.memory, uint64(uint32(i32(88284))), uint32(v2))
+			store32(m.memory, uint64(uint32(i32(88508))), uint32(v2))
 			if v2 == 0 {
 				panic("unreachable")
 			}
-			store32(m.memory, uint64(uint32(i32(88288))), uint32(v0))
+			store32(m.memory, uint64(uint32(i32(88512))), uint32(v0))
 			m.fn31(v1+i32(104), v0)
 			t11 := int64(load64(m.memory, uint64(uint32(v1))+120))
 			store64(m.memory, uint64(uint32(v1))+48, uint64(t11))
@@ -30900,7 +30873,7 @@ func (m *Module) Xtsg_export_begin(v0 int32) int32 {
 			t13 := int64(load64(m.memory, uint64(uint32(v1))+104))
 			store64(m.memory, uint64(uint32(v1))+32, uint64(t13))
 			t14 := m.fn30(v1 + i32(32))
-			store32(m.memory, uint64(uint32(i32(88292))), uint32(t14))
+			store32(m.memory, uint64(uint32(i32(88516))), uint32(t14))
 			m.fn31(v1+i32(60), v0)
 			t15 := int64(load64(m.memory, uint64(uint32(v1))+76))
 			store64(m.memory, uint64(uint32(v1))+24, uint64(t15))
@@ -30910,15 +30883,15 @@ func (m *Module) Xtsg_export_begin(v0 int32) int32 {
 			store64(m.memory, uint64(uint32(v1))+8, uint64(t17))
 			m.fn83(v1+i32(84), v1+i32(8))
 			t18 := int32(load32(m.memory, uint64(uint32(v1))+100))
-			store32(m.memory, uint64(uint32(i32(88312))), uint32(t18))
+			store32(m.memory, uint64(uint32(i32(88536))), uint32(t18))
 			t19 := int64(load64(m.memory, uint64(uint32(v1))+92))
-			store64(m.memory, uint64(uint32(i32(88304))), uint64(t19))
+			store64(m.memory, uint64(uint32(i32(88528))), uint64(t19))
 			t20 := int64(load64(m.memory, uint64(uint32(v1))+84))
-			store64(m.memory, uint64(uint32(i32(88296))), uint64(t20))
-			m.memory[uint64(uint32(i32(88316)))] = byte(i32(1))
-			store32(m.memory, uint64(uint32(i32(88320))), uint32(i32(0)))
-			store32(m.memory, uint64(uint32(i32(88324))), uint32(i32(0)))
-			t21 := int32(load32(m.memory, uint64(uint32(i32(88292)))))
+			store64(m.memory, uint64(uint32(i32(88520))), uint64(t20))
+			m.memory[uint64(uint32(i32(88540)))] = byte(i32(1))
+			store32(m.memory, uint64(uint32(i32(88544))), uint32(i32(0)))
+			store32(m.memory, uint64(uint32(i32(88548))), uint32(i32(0)))
+			t21 := int32(load32(m.memory, uint64(uint32(i32(88516)))))
 			p7 = t21
 		}
 	l0:
@@ -30932,16 +30905,16 @@ func (m *Module) Xtsg_export_next() int32 {
 	t0 := m.g0
 	v0 = t0 - i32(512)
 	m.g0 = v0
-	t1 := int32(load32(m.memory, uint64(uint32(i32(88272)))))
+	t1 := int32(load32(m.memory, uint64(uint32(i32(88496)))))
 	v4 = t1
 	store32(m.memory, uint64(uint32(v4))+12, uint32(i32(0)))
-	store32(m.memory, uint64(uint32(i32(88328))), uint32(i32(0)))
+	store32(m.memory, uint64(uint32(i32(88552))), uint32(i32(0)))
 	{
-		t2 := int32(m.memory[uint64(uint32(i32(88316)))])
+		t2 := int32(m.memory[uint64(uint32(i32(88540)))])
 		if t2 == 0 {
 			goto l0
 		}
-		t3 := int32(m.memory[uint64(uint32(i32(88268)))])
+		t3 := int32(m.memory[uint64(uint32(i32(88492)))])
 		if t3&i32(1) != 0 {
 			goto l0
 		}
@@ -30961,7 +30934,7 @@ func (m *Module) Xtsg_export_next() int32 {
 			{
 				{
 					{
-						t4 := int32(load32(m.memory, uint64(uint32(i32(88320)))))
+						t4 := int32(load32(m.memory, uint64(uint32(i32(88544)))))
 						v1 = t4
 						var p5 int32
 						if v1&i32(255) != 0 {
@@ -30969,38 +30942,38 @@ func (m *Module) Xtsg_export_next() int32 {
 						} else {
 							t6 := m.fn0()
 							if t6 != 0 {
-								m.memory[uint64(uint32(i32(88268)))] = byte(i32(1))
-								m.memory[uint64(uint32(i32(88276)))] = byte(i32(1))
+								m.memory[uint64(uint32(i32(88492)))] = byte(i32(1))
+								m.memory[uint64(uint32(i32(88500)))] = byte(i32(1))
 								v1 = v4
 								goto l2
 							}
-							t7 := int32(load32(m.memory, uint64(uint32(i32(88320)))))
+							t7 := int32(load32(m.memory, uint64(uint32(i32(88544)))))
 							p5 = t7
 						}
-						t8 := int32(load32(m.memory, uint64(uint32(i32(88292)))))
+						t8 := int32(load32(m.memory, uint64(uint32(i32(88516)))))
 						if uint32(p5) >= uint32(t8) {
-							m.memory[uint64(uint32(i32(88268)))] = byte(i32(1))
-							m.memory[uint64(uint32(i32(88276)))] = byte(i32(1))
+							m.memory[uint64(uint32(i32(88492)))] = byte(i32(1))
+							m.memory[uint64(uint32(i32(88500)))] = byte(i32(1))
 							v1 = v4
 							goto l2
 						}
-						t9 := int32(load32(m.memory, uint64(uint32(i32(88280)))))
+						t9 := int32(load32(m.memory, uint64(uint32(i32(88504)))))
 						v1 = t9
-						t10 := int32(load32(m.memory, uint64(uint32(i32(88324)))))
+						t10 := int32(load32(m.memory, uint64(uint32(i32(88548)))))
 						if uint32(v1) <= uint32(t10+i32(1)) {
 							if uint32(v1) >= uint32(i32(0x20000000)) {
 								goto l3
 							}
-							store32(m.memory, uint64(uint32(i32(88280))), uint32(v1<<1))
-							t11 := int32(load32(m.memory, uint64(uint32(i32(88284)))))
+							store32(m.memory, uint64(uint32(i32(88504))), uint32(v1<<1))
+							t11 := int32(load32(m.memory, uint64(uint32(i32(88508)))))
 							t12 := m.fn164(t11, v1<<3)
 							v1 = t12
 							if v1 == 0 {
 								goto l3
 							}
-							store32(m.memory, uint64(uint32(i32(88284))), uint32(v1))
+							store32(m.memory, uint64(uint32(i32(88508))), uint32(v1))
 						}
-						m.fn87(v0+i32(392), i32(88296))
+						m.fn87(v0+i32(392), i32(88520))
 						t13 := int64(load64(m.memory, uint64(uint32(v0))+408))
 						t14 := v0
 						v22 = t13
@@ -31028,7 +31001,7 @@ func (m *Module) Xtsg_export_next() int32 {
 						if t22 != 0 {
 							goto l4
 						}
-						t23 := int32(load32(m.memory, uint64(uint32(i32(88348)))))
+						t23 := int32(load32(m.memory, uint64(uint32(i32(88572)))))
 						t24 := int32(load32(m.memory, uint64(uint32(v1))+36))
 						var p25 int32
 						if t24 != 0 {
@@ -31049,8 +31022,8 @@ func (m *Module) Xtsg_export_next() int32 {
 							}
 							var p28 int32
 							if v2 != 0 {
-								t29 := int32(load32(m.memory, uint64(uint32(i32(68464)))))
-								t30 := int32(load16(m.memory, uint64(uint32(i32(68416)))))
+								t29 := int32(load32(m.memory, uint64(uint32(i32(68468)))))
+								t30 := int32(load16(m.memory, uint64(uint32(i32(68420)))))
 								p28 = t29 + v2*t30<<1
 							} else {
 								p28 = i32(0)
@@ -31132,13 +31105,13 @@ func (m *Module) Xtsg_export_next() int32 {
 							v5 = t43
 						}
 						v7 = i32(1)
-						t44 := int32(load32(m.memory, uint64(uint32(i32(68412)))))
+						t44 := int32(load32(m.memory, uint64(uint32(i32(68416)))))
 						if t44 == 0 {
 							v6 = i32(0)
 							goto l9
 						}
-						t45 := int32(load32(m.memory, uint64(uint32(i32(68448)))))
-						t46 := int32(load32(m.memory, uint64(uint32(i32(68444)))))
+						t45 := int32(load32(m.memory, uint64(uint32(i32(68452)))))
+						t46 := int32(load32(m.memory, uint64(uint32(i32(68448)))))
 						v1 = t46 + v5<<2
 						t47 := int32(load16(m.memory, uint64(uint32(v1))))
 						v6 = t45 + t47<<2
@@ -31150,7 +31123,7 @@ func (m *Module) Xtsg_export_next() int32 {
 						if v1 == 0 {
 							goto l9
 						}
-						t50 := int32(load32(m.memory, uint64(uint32(i32(88352)))))
+						t50 := int32(load32(m.memory, uint64(uint32(i32(88576)))))
 						v1 = t50
 						v2 = v6
 						v5 = v3 - i32(4)
@@ -31249,7 +31222,7 @@ func (m *Module) Xtsg_export_next() int32 {
 								t65 := int32(load32(m.memory, uint64(uint32(v1))+4))
 								v2 = t65
 								if v2 != 0 {
-									t66 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t66 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t66)].(func(int32))(v2)
 								}
 								store32(m.memory, uint64(uint32(v1))+12, uint32(i32(0)))
@@ -31264,7 +31237,7 @@ func (m *Module) Xtsg_export_next() int32 {
 								if v1 == 0 {
 									goto l14
 								}
-								t68 := int32(load32(m.memory, uint64(uint32(i32(88352)))))
+								t68 := int32(load32(m.memory, uint64(uint32(i32(88576)))))
 								v1 = t68 + v1*i32(24)
 								t69 := int32(load32(m.memory, uint64(uint32(v1))+16))
 								if t69 != 0 {
@@ -31290,7 +31263,7 @@ func (m *Module) Xtsg_export_next() int32 {
 					t74 := int32(load32(m.memory, uint64(uint32(v1))+4))
 					v2 = t74
 					if v2 != 0 {
-						t75 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+						t75 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 						m.t0[uint(t75)].(func(int32))(v2)
 					}
 					store32(m.memory, uint64(uint32(v1))+12, uint32(i32(0)))
@@ -31317,7 +31290,7 @@ func (m *Module) Xtsg_export_next() int32 {
 							store64(m.memory, uint64(uint32(v0))+304, uint64(t81))
 							t82 := int64(load64(m.memory, uint64(uint32(v0))+484))
 							store64(m.memory, uint64(uint32(v0))+312, uint64(t82))
-							t83 := int32(load32(m.memory, uint64(uint32(i32(88352)))))
+							t83 := int32(load32(m.memory, uint64(uint32(i32(88576)))))
 							t84 := v0
 							v1 = t83 + v3*i32(24)
 							t85 := int64(load64(m.memory, uint64(uint32(v1))))
@@ -31348,10 +31321,10 @@ func (m *Module) Xtsg_export_next() int32 {
 										v5 = i32(-1)
 										goto l16
 									}
-									t95 := int32(load32(m.memory, uint64(uint32(i32(88356)))))
+									t95 := int32(load32(m.memory, uint64(uint32(i32(88580)))))
 									v7 = t95
 									if v7 == 0 {
-										t96 := int32(load32(m.memory, uint64(uint32(i32(88288)))))
+										t96 := int32(load32(m.memory, uint64(uint32(i32(88512)))))
 										m.fn31(v0+i32(444), t96)
 										t97 := int64(load64(m.memory, uint64(uint32(v0))+460))
 										store64(m.memory, uint64(uint32(v0))+264, uint64(t97))
@@ -31359,18 +31332,18 @@ func (m *Module) Xtsg_export_next() int32 {
 										store64(m.memory, uint64(uint32(v0))+256, uint64(t98))
 										t99 := int64(load64(m.memory, uint64(uint32(v0))+444))
 										store64(m.memory, uint64(uint32(v0))+248, uint64(t99))
-										t100 := m.fn119(i32(88356), v0+i32(248))
+										t100 := m.fn119(i32(88580), v0+i32(248))
 										if t100 == 0 {
 											goto l13
 										}
-										t101 := int32(load32(m.memory, uint64(uint32(i32(88356)))))
+										t101 := int32(load32(m.memory, uint64(uint32(i32(88580)))))
 										v7 = t101
 										t102 := int32(load32(m.memory, uint64(uint32(v0))+484))
 										v5 = t102
 									}
 									v1 = (int32(uint32(v5)>>16) ^ v5) * i32(2146121005)
 									v1 = int32(uint32(v1)>>15) ^ v1
-									t103 := int32(load32(m.memory, uint64(uint32(i32(88360)))))
+									t103 := int32(load32(m.memory, uint64(uint32(i32(88584)))))
 									v9 = t103 - i32(1)
 								l17:
 									{
@@ -31397,11 +31370,11 @@ func (m *Module) Xtsg_export_next() int32 {
 								}
 							l16:
 								{
-									t107 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
+									t107 := int32(load32(m.memory, uint64(uint32(i32(88552)))))
 									v2 = t107
-									t108 := int32(load32(m.memory, uint64(uint32(i32(88364)))))
+									t108 := int32(load32(m.memory, uint64(uint32(i32(88588)))))
 									if v2 != t108 {
-										t109 := int32(load32(m.memory, uint64(uint32(i32(88332)))))
+										t109 := int32(load32(m.memory, uint64(uint32(i32(88556)))))
 										v1 = t109
 										goto l18
 									}
@@ -31413,21 +31386,21 @@ func (m *Module) Xtsg_export_next() int32 {
 									if uint64(v22) >= uint64(i64(0x15555556)) {
 										goto l3
 									}
-									t111 := int32(load32(m.memory, uint64(uint32(i32(88332)))))
+									t111 := int32(load32(m.memory, uint64(uint32(i32(88556)))))
 									v2 = int32(v22)
 									t112 := m.fn164(t111, v2*i32(12)|i32(4))
 									v1 = t112
 									if v1 == 0 {
 										goto l3
 									}
-									store32(m.memory, uint64(uint32(i32(88364))), uint32(v2))
-									store32(m.memory, uint64(uint32(i32(88332))), uint32(v1))
-									t113 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
+									store32(m.memory, uint64(uint32(i32(88588))), uint32(v2))
+									store32(m.memory, uint64(uint32(i32(88556))), uint32(v1))
+									t113 := int32(load32(m.memory, uint64(uint32(i32(88552)))))
 									v2 = t113
 								}
 							l18:
-								store32(m.memory, uint64(uint32(i32(88328))), uint32(v2+i32(1)))
-								t114 := int32(load32(m.memory, uint64(uint32(i32(88320)))))
+								store32(m.memory, uint64(uint32(i32(88552))), uint32(v2+i32(1)))
+								t114 := int32(load32(m.memory, uint64(uint32(i32(88544)))))
 								v7 = t114
 								v1 = v1 + v2*i32(12)
 								store32(m.memory, uint64(uint32(v1))+12, uint32(v5))
@@ -31497,7 +31470,7 @@ func (m *Module) Xtsg_export_next() int32 {
 				v1 = v4 << 1
 				t132 := m.fn27(v0 + i32(176))
 				store16(m.memory, uint64(uint32(t131+v1)), uint16(t132))
-				t133 := m.fn88(i32(88296))
+				t133 := m.fn88(i32(88520))
 				store16(m.memory, uint64(uint32(v1+v19)), uint16(t133))
 				t134 := int64(load64(m.memory, uint64(uint32(v0))+408))
 				store64(m.memory, uint64(uint32(v0))+168, uint64(t134))
@@ -31651,9 +31624,9 @@ func (m *Module) Xtsg_export_next() int32 {
 				store32(m.memory, uint64(uint32(v1+v13)), uint32(t192))
 				t193 := int32(load32(m.memory, uint64(uint32(v0))+448))
 				store32(m.memory, uint64(uint32(v1+v12)), uint32(t193))
-				t194 := int32(load32(m.memory, uint64(uint32(i32(88284)))))
+				t194 := int32(load32(m.memory, uint64(uint32(i32(88508)))))
 				v2 = t194
-				t195 := int32(load32(m.memory, uint64(uint32(i32(88324)))))
+				t195 := int32(load32(m.memory, uint64(uint32(i32(88548)))))
 				t196 := v1 + v11
 				v1 = t195
 				var p197 int32
@@ -31664,31 +31637,31 @@ func (m *Module) Xtsg_export_next() int32 {
 					p197 = i32(-1)
 				}
 				store32(m.memory, uint64(uint32(t196)), uint32(p197))
-				t199 := int32(load32(m.memory, uint64(uint32(i32(88320)))))
+				t199 := int32(load32(m.memory, uint64(uint32(i32(88544)))))
 				t200 := v2 + v1<<2
 				v1 = t199
 				store32(m.memory, uint64(uint32(t200)), uint32(v1))
-				store32(m.memory, uint64(uint32(i32(88320))), uint32(v1+i32(1)))
+				store32(m.memory, uint64(uint32(i32(88544))), uint32(v1+i32(1)))
 				v4 = v4 + i32(1)
-				t201 := m.fn84(i32(88296))
+				t201 := m.fn84(i32(88520))
 				if t201 != 0 {
 					goto l28
 				}
-				t202 := m.fn85(i32(88296))
+				t202 := m.fn85(i32(88520))
 				if t202 != 0 {
 					goto l29
 				}
 			l30:
 				{
-					t203 := m.fn86(i32(88296))
+					t203 := m.fn86(i32(88520))
 					if t203 == 0 {
-						m.memory[uint64(uint32(i32(88268)))] = byte(i32(1))
+						m.memory[uint64(uint32(i32(88492)))] = byte(i32(1))
 						v1 = v4
 						goto l2
 					}
-					t204 := int32(load32(m.memory, uint64(uint32(i32(88324)))))
-					store32(m.memory, uint64(uint32(i32(88324))), uint32(t204-i32(1)))
-					t205 := m.fn85(i32(88296))
+					t204 := int32(load32(m.memory, uint64(uint32(i32(88548)))))
+					store32(m.memory, uint64(uint32(i32(88548))), uint32(t204-i32(1)))
+					t205 := m.fn85(i32(88520))
 					if t205 == 0 {
 						goto l30
 					}
@@ -31698,8 +31671,8 @@ func (m *Module) Xtsg_export_next() int32 {
 		l3:
 			panic("unreachable")
 		l28:
-			t206 := int32(load32(m.memory, uint64(uint32(i32(88324)))))
-			store32(m.memory, uint64(uint32(i32(88324))), uint32(t206+i32(1)))
+			t206 := int32(load32(m.memory, uint64(uint32(i32(88548)))))
+			store32(m.memory, uint64(uint32(i32(88548))), uint32(t206+i32(1)))
 		}
 	l29:
 		v1 = i32(0x4000)
@@ -31708,47 +31681,47 @@ func (m *Module) Xtsg_export_next() int32 {
 		}
 		goto l2
 	l13:
-		m.memory[uint64(uint32(i32(88276)))] = byte(i32(1))
-		m.memory[uint64(uint32(i32(88268)))] = byte(i32(1))
+		m.memory[uint64(uint32(i32(88500)))] = byte(i32(1))
+		m.memory[uint64(uint32(i32(88492)))] = byte(i32(1))
 		v1 = v4
 	l2:
-		t207 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
+		t207 := int32(load32(m.memory, uint64(uint32(i32(88552)))))
 		v4 = t207
 		if v4 != 0 {
-			t208 := int32(load32(m.memory, uint64(uint32(i32(88332)))))
+			t208 := int32(load32(m.memory, uint64(uint32(i32(88556)))))
 			v2 = t208
 			store32(m.memory, uint64(uint32(v2)), uint32(v4))
-			t209 := int32(load32(m.memory, uint64(uint32(i32(88272)))))
+			t209 := int32(load32(m.memory, uint64(uint32(i32(88496)))))
 			store32(m.memory, uint64(uint32(t209))+12, uint32(v2))
 		}
-		t210 := int32(m.memory[uint64(uint32(i32(88268)))])
+		t210 := int32(m.memory[uint64(uint32(i32(88492)))])
 		if t210 == 0 {
 			goto l0
 		}
-		t211 := int32(load32(m.memory, uint64(uint32(i32(88320)))))
-		t212 := int32(load32(m.memory, uint64(uint32(i32(88292)))))
+		t211 := int32(load32(m.memory, uint64(uint32(i32(88544)))))
+		t212 := int32(load32(m.memory, uint64(uint32(i32(88516)))))
 		if t211 != t212 {
-			m.memory[uint64(uint32(i32(88276)))] = byte(i32(1))
+			m.memory[uint64(uint32(i32(88500)))] = byte(i32(1))
 		}
-		t213 := int32(m.memory[uint64(uint32(i32(88316)))])
+		t213 := int32(m.memory[uint64(uint32(i32(88540)))])
 		if t213 != 0 {
-			t214 := int32(load32(m.memory, uint64(uint32(i32(88300)))))
+			t214 := int32(load32(m.memory, uint64(uint32(i32(88524)))))
 			v4 = t214
 			if v4 != 0 {
-				t215 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+				t215 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 				m.t0[uint(t215)].(func(int32))(v4)
 			}
-			store32(m.memory, uint64(uint32(i32(88308))), uint32(i32(0)))
-			store64(m.memory, uint64(uint32(i32(88300))), uint64(i64(0)))
-			m.memory[uint64(uint32(i32(88316)))] = byte(i32(0))
+			store32(m.memory, uint64(uint32(i32(88532))), uint32(i32(0)))
+			store64(m.memory, uint64(uint32(i32(88524))), uint64(i64(0)))
+			m.memory[uint64(uint32(i32(88540)))] = byte(i32(0))
 		}
-		t216 := int32(load32(m.memory, uint64(uint32(i32(88284)))))
+		t216 := int32(load32(m.memory, uint64(uint32(i32(88508)))))
 		m.fn162(t216)
-		store32(m.memory, uint64(uint32(i32(88284))), uint32(i32(0)))
-		t217 := int32(load32(m.memory, uint64(uint32(i32(88356)))))
+		store32(m.memory, uint64(uint32(i32(88508))), uint32(i32(0)))
+		t217 := int32(load32(m.memory, uint64(uint32(i32(88580)))))
 		m.fn162(t217)
-		store64(m.memory, uint64(uint32(i32(88356))), uint64(i64(0)))
-		store32(m.memory, uint64(uint32(i32(88288))), uint32(i32(0)))
+		store64(m.memory, uint64(uint32(i32(88580))), uint64(i64(0)))
+		store32(m.memory, uint64(uint32(i32(88512))), uint32(i32(0)))
 	}
 l0:
 	m.g0 = v0 + i32(512)
@@ -31813,7 +31786,7 @@ l0:
 					t12 := int32(load32(m.memory, uint64(uint32(v1))+4))
 					v3 = t12
 					if v3 != 0 {
-						t13 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+						t13 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 						m.t0[uint(t13)].(func(int32))(v3)
 					}
 					store32(m.memory, uint64(uint32(v1))+12, uint32(i32(0)))
@@ -31879,7 +31852,7 @@ l0:
 			t27 := int32(load32(m.memory, uint64(uint32(v1))+4))
 			v0 = t27
 			if v0 != 0 {
-				t28 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+				t28 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 				m.t0[uint(t28)].(func(int32))(v0)
 			}
 			store32(m.memory, uint64(uint32(v1))+12, uint32(i32(0)))
@@ -31898,16 +31871,16 @@ l1:
 }
 func (m *Module) Xtsg_lang_meta() int32 {
 	var v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13 int32
-	t0 := int32(load32(m.memory, uint64(uint32(i32(68412)))))
+	t0 := int32(load32(m.memory, uint64(uint32(i32(68416)))))
 	v8 = t0
 	v7 = v8 + i32(1)
-	t1 := int32(load32(m.memory, uint64(uint32(i32(68388)))))
-	t2 := int32(load32(m.memory, uint64(uint32(i32(68384)))))
+	t1 := int32(load32(m.memory, uint64(uint32(i32(68392)))))
+	t2 := int32(load32(m.memory, uint64(uint32(i32(68388)))))
 	v2 = t1 + t2
 	if v2 != 0 {
 	l0:
 		{
-			t3 := m.fn11(i32(68380), v3&i32(0xffff))
+			t3 := m.fn11(i32(68384), v3&i32(0xffff))
 			v0 = t3
 			var p4 int32
 			if v0 != 0 {
@@ -31932,7 +31905,7 @@ func (m *Module) Xtsg_lang_meta() int32 {
 			v4 = v3 & i32(0xffff)
 			v0 = i32(0)
 			{
-				t7 := int32(load32(m.memory, uint64(uint32(i32(68412)))))
+				t7 := int32(load32(m.memory, uint64(uint32(i32(68416)))))
 				v5 = t7
 				if v5 == 0 {
 					goto l1
@@ -31940,7 +31913,7 @@ func (m *Module) Xtsg_lang_meta() int32 {
 				if uint32(v4) > uint32(v5) {
 					goto l1
 				}
-				t8 := int32(load32(m.memory, uint64(uint32(i32(68440)))))
+				t8 := int32(load32(m.memory, uint64(uint32(i32(68444)))))
 				t9 := int32(load32(m.memory, uint64(uint32(t8+v4<<2))))
 				v0 = t9
 			}
@@ -31963,7 +31936,7 @@ func (m *Module) Xtsg_lang_meta() int32 {
 	v4 = t12
 	if v4 != 0 {
 		store64(m.memory, uint64(uint32(v4)), uint64(i64(5591487316)))
-		t13 := int32(load32(m.memory, uint64(uint32(i32(68380)))))
+		t13 := int32(load32(m.memory, uint64(uint32(i32(68384)))))
 		v0 = t13
 		store32(m.memory, uint64(uint32(v4))+20, uint32(v1))
 		store32(m.memory, uint64(uint32(v4))+16, uint32(v7))
@@ -31988,10 +31961,10 @@ func (m *Module) Xtsg_lang_meta() int32 {
 			var p15 int32
 			{
 				v0 = v3 & i32(0xffff)
-				t16 := m.fn11(i32(68380), v0)
+				t16 := m.fn11(i32(68384), v0)
 				v6 = t16
 				if v6 == 0 {
-					v6 = i32(68282)
+					v6 = i32(68287)
 					p15 = i32(0)
 					goto l4
 				}
@@ -32011,7 +31984,7 @@ func (m *Module) Xtsg_lang_meta() int32 {
 				p18 = i32(3)
 				goto l8
 			default:
-				t20 := int32(load32(m.memory, uint64(uint32(i32(68452)))))
+				t20 := int32(load32(m.memory, uint64(uint32(i32(68456)))))
 				v0 = t20 + v0*i32(3)
 				t21 := int32(m.memory[uint64(uint32(v0))+1])
 				t22 := int32(m.memory[uint64(uint32(v0))])
@@ -32061,7 +32034,7 @@ func (m *Module) Xtsg_lang_meta() int32 {
 					v2 = v3 & i32(0xffff)
 					v5 = i32(0)
 					{
-						t30 := int32(load32(m.memory, uint64(uint32(i32(68412)))))
+						t30 := int32(load32(m.memory, uint64(uint32(i32(68416)))))
 						v7 = t30
 						if v7 == 0 {
 							goto l10
@@ -32069,13 +32042,13 @@ func (m *Module) Xtsg_lang_meta() int32 {
 						if uint32(v2) > uint32(v7) {
 							goto l10
 						}
-						t31 := int32(load32(m.memory, uint64(uint32(i32(68440)))))
+						t31 := int32(load32(m.memory, uint64(uint32(i32(68444)))))
 						t32 := int32(load32(m.memory, uint64(uint32(t31+v2<<2))))
 						v5 = t32
 					}
 				l10:
 					if v5 == 0 {
-						v5 = i32(68282)
+						v5 = i32(68287)
 						p29 = i32(0)
 						goto l11
 					}
@@ -32101,37 +32074,37 @@ func (m *Module) Xtsg_lang_meta() int32 {
 func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 	var v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28 int32
 	var v29, v30 int64
-	store32(m.memory, uint64(uint32(i32(88340))), uint32(i32(0)))
-	store32(m.memory, uint64(uint32(i32(88336))), uint32(i32(0)))
+	store32(m.memory, uint64(uint32(i32(88564))), uint32(i32(0)))
+	store32(m.memory, uint64(uint32(i32(88560))), uint32(i32(0)))
 	t0 := m.g0
 	v4 = t0 - i32(128)
 	m.g0 = v4
 	{
-		t1 := int32(load32(m.memory, uint64(uint32(i32(68380)))))
+		t1 := int32(load32(m.memory, uint64(uint32(i32(68384)))))
 		if uint32(t1-i32(16)) <= uint32(i32(-4)) {
-			store32(m.memory, uint64(uint32(i32(88340))), uint32(i32(6)))
+			store32(m.memory, uint64(uint32(i32(88564))), uint32(i32(6)))
 			goto l0
 		}
-		t2 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+		t2 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 		t3 := m.t0[uint(t2)].(func(int32) int32)(i32(164))
 		v5 = t3
 		{
-			t4 := int32(load32(m.memory, uint64(uint32(i32(68472)))))
+			t4 := int32(load32(m.memory, uint64(uint32(i32(68476)))))
 			if t4 != 0 {
 				goto l1
 			}
-			t5 := int32(load32(m.memory, uint64(uint32(i32(68484)))))
-			if t5 != i32(68380) {
+			t5 := int32(load32(m.memory, uint64(uint32(i32(68488)))))
+			if t5 != i32(68384) {
 				goto l1
 			}
-			t6 := int32(load32(m.memory, uint64(uint32(i32(68548)))))
-			store32(m.memory, uint64(uint32(i32(68548))), uint32(t6+i32(1)))
+			t6 := int32(load32(m.memory, uint64(uint32(i32(68552)))))
+			store32(m.memory, uint64(uint32(i32(68552))), uint32(t6+i32(1)))
 		}
 	l1:
 		memory_zero(m.memory, uint32(v5), uint32(i32(156)))
 		store32(m.memory, uint64(uint32(v5))+160, uint32(i32(0)))
-		store32(m.memory, uint64(uint32(v5))+156, uint32(i32(68380)))
-		t7 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+		store32(m.memory, uint64(uint32(v5))+156, uint32(i32(68384)))
+		t7 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 		t8 := m.t0[uint(t7)].(func(int32) int32)(i32(16))
 		t9 := v5
 		v3 = t8
@@ -32188,12 +32161,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						var p23 int32
 						{
 							if v3 != 0 {
-								t24 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+								t24 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 								t25 := m.t0[uint(t24)].(func(int32, int32) int32)(v3, v2)
 								p23 = t25
 								goto l3
 							}
-							t26 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+							t26 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 							t27 := m.t0[uint(t26)].(func(int32) int32)(v2)
 							p23 = t27
 						}
@@ -32227,7 +32200,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 					store32(m.memory, uint64(uint32(v4))+120, uint32(i32(0)))
 					store64(m.memory, uint64(uint32(v4))+112, uint64(i64(0)))
 					t33 := m.fn59(v5, v4+i32(12), i32(0), i32(0), i32(0), v4+i32(112))
-					store32(m.memory, uint64(uint32(i32(88340))), uint32(t33))
+					store32(m.memory, uint64(uint32(i32(88564))), uint32(t33))
 					t34 := int32(load32(m.memory, uint64(uint32(v5))+60))
 					v0 = t34
 					t35 := int32(load32(m.memory, uint64(uint32(v5))+64))
@@ -32254,12 +32227,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						var p42 int32
 						{
 							if v0 != 0 {
-								t43 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+								t43 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 								t44 := m.t0[uint(t43)].(func(int32, int32) int32)(v0, v3)
 								p42 = t44
 								goto l4
 							}
-							t45 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+							t45 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 							t46 := m.t0[uint(t45)].(func(int32) int32)(v3)
 							p42 = t46
 						}
@@ -32297,19 +32270,19 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 					t56 := v3 - i32(8)
 					v2 = t54 - t55
 					store32(m.memory, uint64(uint32(t56)), uint32(v2))
-					t57 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
+					t57 := int32(load32(m.memory, uint64(uint32(i32(88564)))))
 					v0 = t57
 					if v0 != 0 {
 						if v0 == i32(-1) {
-							store32(m.memory, uint64(uint32(i32(88340))), uint32(i32(1)))
+							store32(m.memory, uint64(uint32(i32(88564))), uint32(i32(1)))
 						}
-						store32(m.memory, uint64(uint32(i32(88336))), uint32(v2))
+						store32(m.memory, uint64(uint32(i32(88560))), uint32(v2))
 						t58 := int32(load32(m.memory, uint64(uint32(v4))+112))
 						v0 = t58
 						if v0 == 0 {
 							goto l5
 						}
-						t59 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+						t59 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 						m.t0[uint(t59)].(func(int32))(v0)
 						goto l5
 					}
@@ -32340,12 +32313,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						var p69 int32
 						{
 							if v0 != 0 {
-								t70 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+								t70 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 								t71 := m.t0[uint(t70)].(func(int32, int32) int32)(v0, v3)
 								p69 = t71
 								goto l6
 							}
-							t72 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+							t72 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 							t73 := m.t0[uint(t72)].(func(int32) int32)(v3)
 							p69 = t73
 						}
@@ -32520,12 +32493,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 							var p111 int32
 							{
 								if v2 != 0 {
-									t112 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+									t112 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 									t113 := m.t0[uint(t112)].(func(int32, int32) int32)(v2, v0)
 									p111 = t113
 									goto l15
 								}
-								t114 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+								t114 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 								t115 := m.t0[uint(t114)].(func(int32) int32)(v0)
 								p111 = t115
 							}
@@ -32641,7 +32614,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 									p138 = i32(8)
 								}
 								v2 = p138
-								t139 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+								t139 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 								t140 := m.t0[uint(t139)].(func(int32, int32) int32)(t136, v2*i32(20))
 								v17 = t140
 								store32(m.memory, uint64(uint32(v5))+68, uint32(v2))
@@ -32689,12 +32662,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 								var p152 int32
 								{
 									if v17 != 0 {
-										t153 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+										t153 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 										t154 := m.t0[uint(t153)].(func(int32, int32) int32)(v17, v6)
 										p152 = t154
 										goto l20
 									}
-									t155 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+									t155 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 									t156 := m.t0[uint(t155)].(func(int32) int32)(v6)
 									p152 = t156
 								}
@@ -32777,12 +32750,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						v7 = p170
 						v3 = v7 << 1
 						if v26 != 0 {
-							t171 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+							t171 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 							t172 := m.t0[uint(t171)].(func(int32, int32) int32)(v26, v3)
 							v26 = t172
 							goto l24
 						}
-						t173 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+						t173 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 						t174 := m.t0[uint(t173)].(func(int32) int32)(v3)
 						v26 = t174
 					}
@@ -32932,12 +32905,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 												v9 = p208
 												v2 = v9 << 2
 												if v24 != 0 {
-													t209 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+													t209 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 													t210 := m.t0[uint(t209)].(func(int32, int32) int32)(v24, v2)
 													v24 = t210
 													goto l30
 												}
-												t211 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+												t211 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 												t212 := m.t0[uint(t211)].(func(int32) int32)(v2)
 												v24 = t212
 											}
@@ -33050,7 +33023,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 													}
 												}
 												t234 := int32(load32(m.memory, uint64(uint32(v0))))
-												store32(m.memory, uint64(uint32(i32(88336))), uint32(t234))
+												store32(m.memory, uint64(uint32(i32(88560))), uint32(t234))
 												v15 = i32(0)
 												goto l35
 											}
@@ -33134,12 +33107,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 										var p247 int32
 										{
 											if v3 != 0 {
-												t248 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+												t248 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 												t249 := m.t0[uint(t248)].(func(int32, int32) int32)(v3, v1)
 												p247 = t249
 												goto l44
 											}
-											t250 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+											t250 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 											t251 := m.t0[uint(t250)].(func(int32) int32)(v1)
 											p247 = t251
 										}
@@ -33255,12 +33228,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 								var p271 int32
 								{
 									if v3 != 0 {
-										t272 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+										t272 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 										t273 := m.t0[uint(t272)].(func(int32, int32) int32)(v3, v1)
 										p271 = t273
 										goto l53
 									}
-									t274 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+									t274 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 									t275 := m.t0[uint(t274)].(func(int32) int32)(v1)
 									p271 = t275
 								}
@@ -33307,7 +33280,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 				}
 				v2 = i32(0)
 				t284 := int32(load32(m.memory, uint64(uint32(v13))+20))
-				t285 := int32(load32(m.memory, uint64(uint32(i32(88108)))))
+				t285 := int32(load32(m.memory, uint64(uint32(i32(88332)))))
 				t286 := m.t0[uint(t285)].(func(int32, int32) int32)(t284*i32(257), i32(2))
 				v28 = t286
 				t287 := int32(load32(m.memory, uint64(uint32(v5))+156))
@@ -33546,12 +33519,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 											var p340 int32
 											{
 												if v0 != 0 {
-													t341 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+													t341 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 													t342 := m.t0[uint(t341)].(func(int32, int32) int32)(v0, v3)
 													p340 = t342
 													goto l71
 												}
-												t343 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+												t343 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 												t344 := m.t0[uint(t343)].(func(int32) int32)(v3)
 												p340 = t344
 											}
@@ -33765,12 +33738,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 									var p384 int32
 									{
 										if v0 != 0 {
-											t385 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+											t385 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 											t386 := m.t0[uint(t385)].(func(int32, int32) int32)(v0, v3)
 											p384 = t386
 											goto l81
 										}
-										t387 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+										t387 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 										t388 := m.t0[uint(t387)].(func(int32) int32)(v3)
 										p384 = t388
 									}
@@ -33828,7 +33801,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						t396 := int32(load32(m.memory, uint64(uint32(v20))+4))
 						v0 = t396
 						if v0 != 0 {
-							t397 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+							t397 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 							m.t0[uint(t397)].(func(int32))(v0)
 						}
 						store32(m.memory, uint64(uint32(v20))+12, uint32(i32(0)))
@@ -33853,12 +33826,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						var p400 int32
 						{
 							if v14 != 0 {
-								t401 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+								t401 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 								t402 := m.t0[uint(t401)].(func(int32, int32) int32)(v14, v1)
 								p400 = t402
 								goto l87
 							}
-							t403 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+							t403 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 							t404 := m.t0[uint(t403)].(func(int32) int32)(v1)
 							p400 = t404
 						}
@@ -34004,12 +33977,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 									var p424 int32
 									{
 										if v7 != 0 {
-											t425 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+											t425 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 											t426 := m.t0[uint(t425)].(func(int32, int32) int32)(v7, v0)
 											p424 = t426
 											goto l98
 										}
-										t427 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+										t427 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 										t428 := m.t0[uint(t427)].(func(int32) int32)(v0)
 										p424 = t428
 									}
@@ -34056,12 +34029,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 									v16 = p432
 									v1 = v16 * i32(6)
 									if v14 != 0 {
-										t433 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+										t433 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 										t434 := m.t0[uint(t433)].(func(int32, int32) int32)(v14, v1)
 										v14 = t434
 										goto l100
 									}
-									t435 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+									t435 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 									t436 := m.t0[uint(t435)].(func(int32) int32)(v1)
 									v14 = t436
 								}
@@ -34218,12 +34191,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 								var p467 int32
 								{
 									if v1 != 0 {
-										t468 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+										t468 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 										t469 := m.t0[uint(t468)].(func(int32, int32) int32)(v1, v6)
 										p467 = t469
 										goto l113
 									}
-									t470 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+									t470 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 									t471 := m.t0[uint(t470)].(func(int32) int32)(v6)
 									p467 = t471
 								}
@@ -34261,12 +34234,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 								var p475 int32
 								{
 									if v1 != 0 {
-										t476 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+										t476 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 										t477 := m.t0[uint(t476)].(func(int32, int32) int32)(v1, v3)
 										p475 = t477
 										goto l115
 									}
-									t478 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+									t478 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 									t479 := m.t0[uint(t478)].(func(int32) int32)(v3)
 									p475 = t479
 								}
@@ -34317,7 +34290,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 											p483 = t487
 											goto l117
 										}
-										t488 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+										t488 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 										t489 := m.t0[uint(t488)].(func(int32) int32)(i32(70))
 										p483 = t489
 									}
@@ -34360,12 +34333,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 										var p496 int32
 										{
 											if v0 != 0 {
-												t497 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+												t497 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 												t498 := m.t0[uint(t497)].(func(int32, int32) int32)(v0, v7)
 												p496 = t498
 												goto l118
 											}
-											t499 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+											t499 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 											t500 := m.t0[uint(t499)].(func(int32) int32)(v7)
 											p496 = t500
 										}
@@ -34523,7 +34496,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 					}
 				l112:
 					t529 := int32(load32(m.memory, uint64(uint32(p439))))
-					store32(m.memory, uint64(uint32(i32(88336))), uint32(t529))
+					store32(m.memory, uint64(uint32(i32(88560))), uint32(t529))
 					v15 = i32(0)
 				}
 			l104:
@@ -34606,12 +34579,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 										var p546 int32
 										{
 											if v11 != 0 {
-												t547 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+												t547 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 												t548 := m.t0[uint(t547)].(func(int32, int32) int32)(v11, v3)
 												p546 = t548
 												goto l136
 											}
-											t549 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+											t549 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 											t550 := m.t0[uint(t549)].(func(int32) int32)(v3)
 											p546 = t550
 										}
@@ -34867,12 +34840,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 							var p592 int32
 							{
 								if v1 != 0 {
-									t593 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+									t593 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 									t594 := m.t0[uint(t593)].(func(int32, int32) int32)(v1, v9)
 									p592 = t594
 									goto l152
 								}
-								t595 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+								t595 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 								t596 := m.t0[uint(t595)].(func(int32) int32)(v9)
 								p592 = t596
 							}
@@ -34910,12 +34883,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 							var p600 int32
 							{
 								if v1 != 0 {
-									t601 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+									t601 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 									t602 := m.t0[uint(t601)].(func(int32, int32) int32)(v1, v2)
 									p600 = t602
 									goto l154
 								}
-								t603 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+								t603 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 								t604 := m.t0[uint(t603)].(func(int32) int32)(v2)
 								p600 = t604
 							}
@@ -35000,7 +34973,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 												p618 = t622
 												goto l159
 											}
-											t623 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+											t623 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 											t624 := m.t0[uint(t623)].(func(int32) int32)(i32(70))
 											p618 = t624
 										}
@@ -35043,12 +35016,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 											var p631 int32
 											{
 												if v0 != 0 {
-													t632 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+													t632 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 													t633 := m.t0[uint(t632)].(func(int32, int32) int32)(v0, v12)
 													p631 = t633
 													goto l160
 												}
-												t634 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+												t634 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 												t635 := m.t0[uint(t634)].(func(int32) int32)(v12)
 												p631 = t635
 											}
@@ -35134,12 +35107,12 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 										var p652 int32
 										{
 											if v7 != 0 {
-												t653 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+												t653 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 												t654 := m.t0[uint(t653)].(func(int32, int32) int32)(v7, v1)
 												p652 = t654
 												goto l168
 											}
-											t655 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+											t655 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 											t656 := m.t0[uint(t655)].(func(int32) int32)(v1)
 											p652 = t656
 										}
@@ -35196,7 +35169,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 								t663 := int32(load32(m.memory, uint64(uint32(v3))))
 								v2 = t663
 								if v2 != 0 {
-									t664 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t664 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t664)].(func(int32))(v2)
 								}
 								store32(m.memory, uint64(uint32(v3)), uint32(i32(0)))
@@ -35205,7 +35178,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 								t665 := int32(load32(m.memory, uint64(uint32(v3))))
 								v2 = t665
 								if v2 != 0 {
-									t666 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t666 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t666)].(func(int32))(v2)
 								}
 								store32(m.memory, uint64(uint32(v3)), uint32(i32(0)))
@@ -35223,7 +35196,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						}
 					}
 				l173:
-					t667 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t667 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t667)].(func(int32))(v6)
 				}
 			l174:
@@ -35242,16 +35215,16 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 							l175:
 								{
 									t670 := int32(load32(m.memory, uint64(uint32(v1))))
-									t671 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t671 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t671)].(func(int32))(t670)
 									t672 := int32(load32(m.memory, uint64(uint32(v1+i32(4)))))
-									t673 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t673 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t673)].(func(int32))(t672)
 									t674 := int32(load32(m.memory, uint64(uint32(v1+i32(8)))))
-									t675 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t675 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t675)].(func(int32))(t674)
 									t676 := int32(load32(m.memory, uint64(uint32(v1+i32(12)))))
-									t677 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t677 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t677)].(func(int32))(t676)
 									v1 = v1 + i32(16)
 									t678 := v6
@@ -35268,7 +35241,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						l177:
 							{
 								t679 := int32(load32(m.memory, uint64(uint32(v1))))
-								t680 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+								t680 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 								m.t0[uint(t680)].(func(int32))(t679)
 								v1 = v1 + i32(4)
 								v0 = v0 - i32(1)
@@ -35283,7 +35256,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						}
 					}
 				l176:
-					t681 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t681 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t681)].(func(int32))(v2)
 				}
 			l178:
@@ -35303,16 +35276,16 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 							l179:
 								{
 									t684 := int32(load32(m.memory, uint64(uint32(v1))))
-									t685 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t685 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t685)].(func(int32))(t684)
 									t686 := int32(load32(m.memory, uint64(uint32(v1+i32(4)))))
-									t687 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t687 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t687)].(func(int32))(t686)
 									t688 := int32(load32(m.memory, uint64(uint32(v1+i32(8)))))
-									t689 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t689 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t689)].(func(int32))(t688)
 									t690 := int32(load32(m.memory, uint64(uint32(v1+i32(12)))))
-									t691 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t691 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t691)].(func(int32))(t690)
 									v1 = v1 + i32(16)
 									t692 := v6
@@ -35329,7 +35302,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						l181:
 							{
 								t693 := int32(load32(m.memory, uint64(uint32(v1))))
-								t694 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+								t694 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 								m.t0[uint(t694)].(func(int32))(t693)
 								v1 = v1 + i32(4)
 								v0 = v0 - i32(1)
@@ -35344,7 +35317,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						}
 					}
 				l180:
-					t695 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t695 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t695)].(func(int32))(v2)
 				}
 			l182:
@@ -35364,16 +35337,16 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 							l183:
 								{
 									t698 := int32(load32(m.memory, uint64(uint32(v1))))
-									t699 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t699 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t699)].(func(int32))(t698)
 									t700 := int32(load32(m.memory, uint64(uint32(v1+i32(4)))))
-									t701 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t701 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t701)].(func(int32))(t700)
 									t702 := int32(load32(m.memory, uint64(uint32(v1+i32(8)))))
-									t703 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t703 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t703)].(func(int32))(t702)
 									t704 := int32(load32(m.memory, uint64(uint32(v1+i32(12)))))
-									t705 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t705 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t705)].(func(int32))(t704)
 									v1 = v1 + i32(16)
 									t706 := v6
@@ -35390,7 +35363,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						l185:
 							{
 								t707 := int32(load32(m.memory, uint64(uint32(v1))))
-								t708 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+								t708 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 								m.t0[uint(t708)].(func(int32))(t707)
 								v1 = v1 + i32(4)
 								v0 = v0 - i32(1)
@@ -35405,7 +35378,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						}
 					}
 				l184:
-					t709 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t709 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t709)].(func(int32))(v2)
 				}
 			l186:
@@ -35425,16 +35398,16 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 							l187:
 								{
 									t712 := int32(load32(m.memory, uint64(uint32(v1))))
-									t713 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t713 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t713)].(func(int32))(t712)
 									t714 := int32(load32(m.memory, uint64(uint32(v1+i32(4)))))
-									t715 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t715 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t715)].(func(int32))(t714)
 									t716 := int32(load32(m.memory, uint64(uint32(v1+i32(8)))))
-									t717 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t717 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t717)].(func(int32))(t716)
 									t718 := int32(load32(m.memory, uint64(uint32(v1+i32(12)))))
-									t719 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+									t719 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 									m.t0[uint(t719)].(func(int32))(t718)
 									v1 = v1 + i32(16)
 									t720 := v6
@@ -35451,7 +35424,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						l189:
 							{
 								t721 := int32(load32(m.memory, uint64(uint32(v1))))
-								t722 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+								t722 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 								m.t0[uint(t722)].(func(int32))(t721)
 								v1 = v1 + i32(4)
 								v0 = v0 - i32(1)
@@ -35466,50 +35439,50 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						}
 					}
 				l188:
-					t723 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t723 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t723)].(func(int32))(v2)
 				}
 			l190:
 				t724 := int32(load32(m.memory, uint64(uint32(v4))+80))
 				v0 = t724
 				if v0 != 0 {
-					t725 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t725 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t725)].(func(int32))(v0)
 				}
 				t726 := int32(load32(m.memory, uint64(uint32(v4))+92))
 				v0 = t726
 				if v0 != 0 {
-					t727 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t727 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t727)].(func(int32))(v0)
 				}
 				if v14 != 0 {
-					t728 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t728 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t728)].(func(int32))(v14)
 				}
 				if v11 != 0 {
-					t729 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+					t729 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 					m.t0[uint(t729)].(func(int32))(v11)
 				}
-				t730 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+				t730 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 				m.t0[uint(t730)].(func(int32))(v28)
 			}
 		l35:
 			if v26 != 0 {
-				t731 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+				t731 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 				m.t0[uint(t731)].(func(int32))(v26)
 			}
 			if v24 != 0 {
-				t732 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+				t732 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 				m.t0[uint(t732)].(func(int32))(v24)
 			}
 			if v15 == 0 {
-				store32(m.memory, uint64(uint32(i32(88340))), uint32(i32(5)))
+				store32(m.memory, uint64(uint32(i32(88564))), uint32(i32(5)))
 				goto l5
 			}
 			t733 := int32(load32(m.memory, uint64(uint32(v5))+132))
 			v0 = t733
 			if v0 != 0 {
-				t734 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+				t734 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 				m.t0[uint(t734)].(func(int32))(v0)
 			}
 			store32(m.memory, uint64(uint32(v5))+140, uint32(i32(0)))
@@ -35525,11 +35498,11 @@ l0:
 	return v5
 }
 func (m *Module) Xtsg_query_error_offset() int32 {
-	t0 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
+	t0 := int32(load32(m.memory, uint64(uint32(i32(88560)))))
 	return t0
 }
 func (m *Module) Xtsg_query_error_type() int32 {
-	t0 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
+	t0 := int32(load32(m.memory, uint64(uint32(i32(88564)))))
 	return t0
 }
 func (m *Module) Xtsg_query_delete(v0 int32) {
@@ -35753,7 +35726,7 @@ func (m *Module) Xtsg_qcursor_new() int32 {
 		if v1 == 0 {
 			goto l0
 		}
-		t1 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+		t1 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 		t2 := m.t0[uint(t1)].(func(int32) int32)(i32(176))
 		v0 = t2
 		memory_zero(m.memory, uint32(v0), uint32(i32(76)))
@@ -35771,7 +35744,7 @@ func (m *Module) Xtsg_qcursor_new() int32 {
 		store64(m.memory, uint64(uint32(v0))+156, uint64(i64(0)))
 		store64(m.memory, uint64(uint32(v0))+164, uint64(i64(0)))
 		store32(m.memory, uint64(uint32(v0))+172, uint32(i32(0)))
-		t3 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+		t3 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 		t4 := m.t0[uint(t3)].(func(int32) int32)(i32(192))
 		store32(m.memory, uint64(uint32(v0))+24, uint32(t4))
 		store32(m.memory, uint64(uint32(v0))+32, uint32(i32(8)))
@@ -35782,12 +35755,12 @@ func (m *Module) Xtsg_qcursor_new() int32 {
 			var p7 int32
 			{
 				if v2 != 0 {
-					t8 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+					t8 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 					t9 := m.t0[uint(t8)].(func(int32, int32) int32)(v2, i32(192))
 					p7 = t9
 					goto l1
 				}
-				t10 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+				t10 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 				t11 := m.t0[uint(t10)].(func(int32) int32)(i32(192))
 				p7 = t11
 			}
@@ -35800,9 +35773,9 @@ func (m *Module) Xtsg_qcursor_new() int32 {
 		if v0 == 0 {
 			goto l0
 		}
-		t12 := int32(load32(m.memory, uint64(uint32(i32(88344)))))
+		t12 := int32(load32(m.memory, uint64(uint32(i32(88568)))))
 		store32(m.memory, uint64(uint32(v1))+36, uint32(t12))
-		store32(m.memory, uint64(uint32(i32(88344))), uint32(v1))
+		store32(m.memory, uint64(uint32(i32(88568))), uint32(v1))
 		return v1
 	}
 l0:
@@ -35811,7 +35784,7 @@ l0:
 func (m *Module) Xtsg_qcursor_delete(v0 int32) {
 	var v1, v2, v3, v4, v5, v6 int32
 	if v0 != 0 {
-		v1 = i32(88344)
+		v1 = i32(88568)
 	l0:
 		{
 			v2 = v1
@@ -35834,7 +35807,7 @@ func (m *Module) Xtsg_qcursor_delete(v0 int32) {
 		t3 := int32(load32(m.memory, uint64(uint32(v1))+24))
 		v2 = t3
 		if v2 != 0 {
-			t4 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t4 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t4)].(func(int32))(v2)
 		}
 		store32(m.memory, uint64(uint32(v1))+32, uint32(i32(0)))
@@ -35842,7 +35815,7 @@ func (m *Module) Xtsg_qcursor_delete(v0 int32) {
 		t5 := int32(load32(m.memory, uint64(uint32(v1))+36))
 		v2 = t5
 		if v2 != 0 {
-			t6 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t6 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t6)].(func(int32))(v2)
 		}
 		store32(m.memory, uint64(uint32(v1))+44, uint32(i32(0)))
@@ -35850,7 +35823,7 @@ func (m *Module) Xtsg_qcursor_delete(v0 int32) {
 		t7 := int32(load32(m.memory, uint64(uint32(v1))+8))
 		v2 = t7
 		if v2 != 0 {
-			t8 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t8 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t8)].(func(int32))(v2)
 		}
 		store32(m.memory, uint64(uint32(v1))+16, uint32(i32(0)))
@@ -35867,7 +35840,7 @@ func (m *Module) Xtsg_qcursor_delete(v0 int32) {
 						t11 := int32(load32(m.memory, uint64(uint32(v2+v3))))
 						v4 = t11
 						if v4 != 0 {
-							t12 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+							t12 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 							m.t0[uint(t12)].(func(int32))(v4)
 							t13 := int32(load32(m.memory, uint64(uint32(v1))+56))
 							v6 = t13
@@ -35890,7 +35863,7 @@ func (m *Module) Xtsg_qcursor_delete(v0 int32) {
 				}
 			}
 		l2:
-			t15 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t15 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t15)].(func(int32))(v2)
 		}
 	l3:
@@ -35899,12 +35872,12 @@ func (m *Module) Xtsg_qcursor_delete(v0 int32) {
 		t16 := int32(load32(m.memory, uint64(uint32(v1))+80))
 		v2 = t16
 		if v2 != 0 {
-			t17 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+			t17 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 			m.t0[uint(t17)].(func(int32))(v2)
 		}
 		store32(m.memory, uint64(uint32(v1))+88, uint32(i32(0)))
 		store64(m.memory, uint64(uint32(v1))+80, uint64(i64(0)))
-		t18 := int32(load32(m.memory, uint64(uint32(i32(88116)))))
+		t18 := int32(load32(m.memory, uint64(uint32(i32(88340)))))
 		m.t0[uint(t18)].(func(int32))(v1)
 		t19 := int32(load32(m.memory, uint64(uint32(v0))+24))
 		m.fn162(t19)
@@ -35996,12 +35969,12 @@ func (m *Module) Xtsg_qcursor_exec(v0, v1, v2, v3, v4, v5 int32) int32 {
 			var p26 int32
 			{
 				if v7 != 0 {
-					t27 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+					t27 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 					t28 := m.t0[uint(t27)].(func(int32, int32) int32)(v7, i32(224))
 					p26 = t28
 					goto l0
 				}
-				t29 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+				t29 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 				t30 := m.t0[uint(t29)].(func(int32) int32)(i32(224))
 				p26 = t30
 			}
@@ -36056,12 +36029,12 @@ func (m *Module) Xtsg_qcursor_exec(v0, v1, v2, v3, v4, v5 int32) int32 {
 					var p42 int32
 					{
 						if v7 != 0 {
-							t43 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+							t43 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 							t44 := m.t0[uint(t43)].(func(int32, int32) int32)(v7, v2)
 							p42 = t44
 							goto l1
 						}
-						t45 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+						t45 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 						t46 := m.t0[uint(t45)].(func(int32) int32)(v2)
 						p42 = t46
 					}
@@ -36201,12 +36174,12 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 									var p22 int32
 									{
 										if v2 != 0 {
-											t23 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+											t23 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 											t24 := m.t0[uint(t23)].(func(int32, int32) int32)(v2, v1)
 											p22 = t24
 											goto l2
 										}
-										t25 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+										t25 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 										t26 := m.t0[uint(t25)].(func(int32) int32)(v1)
 										p22 = t26
 									}
@@ -36351,12 +36324,12 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 															var p64 int32
 															{
 																if v7 != 0 {
-																	t65 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+																	t65 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 																	t66 := m.t0[uint(t65)].(func(int32, int32) int32)(v7, v2)
 																	p64 = t66
 																	goto l10
 																}
-																t67 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+																t67 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 																t68 := m.t0[uint(t67)].(func(int32) int32)(v2)
 																p64 = t68
 															}
@@ -36427,12 +36400,12 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 															var p87 int32
 															{
 																if v7 != 0 {
-																	t88 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+																	t88 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 																	t89 := m.t0[uint(t88)].(func(int32, int32) int32)(v7, v5)
 																	p87 = t89
 																	goto l13
 																}
-																t90 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+																t90 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 																t91 := m.t0[uint(t90)].(func(int32) int32)(v5)
 																p87 = t91
 															}
@@ -37866,12 +37839,12 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 																var p414 int32
 																{
 																	if v3 != 0 {
-																		t415 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+																		t415 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 																		t416 := m.t0[uint(t415)].(func(int32, int32) int32)(v3, v1)
 																		p414 = t416
 																		goto l90
 																	}
-																	t417 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+																	t417 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 																	t418 := m.t0[uint(t417)].(func(int32) int32)(v1)
 																	p414 = t418
 																}
@@ -38744,12 +38717,12 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 																var p635 int32
 																{
 																	if v1 != 0 {
-																		t636 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+																		t636 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 																		t637 := m.t0[uint(t636)].(func(int32, int32) int32)(v1, v3)
 																		p635 = t637
 																		goto l134
 																	}
-																	t638 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+																	t638 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 																	t639 := m.t0[uint(t638)].(func(int32) int32)(v3)
 																	p635 = t639
 																}
@@ -38837,12 +38810,12 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 																var p661 int32
 																{
 																	if v3 != 0 {
-																		t662 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+																		t662 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 																		t663 := m.t0[uint(t662)].(func(int32, int32) int32)(v3, v1)
 																		p661 = t663
 																		goto l138
 																	}
-																	t664 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+																	t664 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 																	t665 := m.t0[uint(t664)].(func(int32) int32)(v1)
 																	p661 = t665
 																}
@@ -38938,12 +38911,12 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 											var p691 int32
 											{
 												if v3 != 0 {
-													t692 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+													t692 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 													t693 := m.t0[uint(t692)].(func(int32, int32) int32)(v3, v1)
 													p691 = t693
 													goto l141
 												}
-												t694 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+												t694 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 												t695 := m.t0[uint(t694)].(func(int32) int32)(v1)
 												p691 = t695
 											}
@@ -39474,12 +39447,12 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 					var p822 int32
 					{
 						if v1 != 0 {
-							t823 := int32(load32(m.memory, uint64(uint32(i32(88112)))))
+							t823 := int32(load32(m.memory, uint64(uint32(i32(88336)))))
 							t824 := m.t0[uint(t823)].(func(int32, int32) int32)(v1, v3)
 							p822 = t824
 							goto l170
 						}
-						t825 := int32(load32(m.memory, uint64(uint32(i32(88104)))))
+						t825 := int32(load32(m.memory, uint64(uint32(i32(88328)))))
 						t826 := m.t0[uint(t825)].(func(int32) int32)(v3)
 						p822 = t826
 					}
@@ -39970,8 +39943,8 @@ func (m *Module) fn133(v0 int32) int32 {
 		var p1 int32
 		{
 			if uint32(v0) <= uint32(i32(0x1ffff)) {
-				t2 := int32(m.memory[uint64(uint32(int32(uint32(v0)>>8)))+77328])
-				t3 := int32(m.memory[uint64(uint32(int32(uint32(v0)>>3)&i32(31)|t2<<5))+77328])
+				t2 := int32(m.memory[uint64(uint32(int32(uint32(v0)>>8)))+77552])
+				t3 := int32(m.memory[uint64(uint32(int32(uint32(v0)>>3)&i32(31)|t2<<5))+77552])
 				t4 := i32_shr_u(t3, v0&i32(7)) & i32(1)
 				p1 = t4
 				goto l0
@@ -40001,7 +39974,7 @@ func (m *Module) fn134(v0 int32) int32 {
 	}
 	var p0 int32
 	if v0 != 0 {
-		v1 = i32(81228)
+		v1 = i32(81452)
 	l0:
 		{
 			v1 = v1 + i32(4)
@@ -40041,14 +40014,14 @@ func (m *Module) fn135(v0 int32) int32 {
 		v4 = v0 & i32(255)
 		t1 := int32(uint32(v4) / uint32(i32(3)))
 		v1 = t1
-		t2 := int32(load32(m.memory, uint64(uint32((t0-v1*i32(3))&i32(255)<<2))+81320))
+		t2 := int32(load32(m.memory, uint64(uint32((t0-v1*i32(3))&i32(255)<<2))+81544))
 		t3 := v1
 		v2 = int32(uint32(v0) >> 8)
-		t4 := int32(m.memory[uint64(uint32(v2))+82704])
-		t5 := int32(m.memory[uint64(uint32(t3+t4*i32(86)))+82704])
+		t4 := int32(m.memory[uint64(uint32(v2))+82928])
+		t5 := int32(m.memory[uint64(uint32(t3+t4*i32(86)))+82928])
 		t6 := int32(uint32(int32(uint32(t2*t5)>>11)) % uint32(i32(6)))
-		t7 := int32(m.memory[uint64(uint32(v2))+85376])
-		t8 := int32(load32(m.memory, uint64(uint32(t6<<2+t7<<2))+81344))
+		t7 := int32(m.memory[uint64(uint32(v2))+85600])
+		t8 := int32(load32(m.memory, uint64(uint32(t6<<2+t7<<2))+81568))
 		v2 = t8
 		v1 = v2 >> 8
 		v2 = v2 & i32(255)
@@ -40065,11 +40038,11 @@ func (m *Module) fn135(v0 int32) int32 {
 			v5 = int32(uint32(v2) >> 1)
 			v3 = v5 + v1
 			v6 = v3 << 1
-			t9 := int32(m.memory[uint64(uint32(v6))+82304])
+			t9 := int32(m.memory[uint64(uint32(v6))+82528])
 			v7 = t9
 			if v7 == v4 {
-				t10 := int32(m.memory[uint64(uint32(v6+i32(82304)))+1])
-				t11 := int32(load32(m.memory, uint64(uint32(t10<<2))+81344))
+				t10 := int32(m.memory[uint64(uint32(v6+i32(82528)))+1])
+				t11 := int32(load32(m.memory, uint64(uint32(t10<<2))+81568))
 				v1 = t11
 				v2 = v1 & i32(255)
 				if uint32(v2) <= uint32(i32(1)) {
@@ -40108,7 +40081,7 @@ func (m *Module) fn136(v0 int32) int32 {
 	v0 = t1 & i32(0xffff)
 	var p2 int32
 	if v0 != 0 {
-		store32(m.memory, uint64(uint32(i32(88368))), uint32(v0))
+		store32(m.memory, uint64(uint32(i32(88592))), uint32(v0))
 		p2 = i32(-1)
 	} else {
 		p2 = i32(0)
@@ -40126,14 +40099,14 @@ func (m *Module) fn138(v0, v1, v2 int32) int32 {
 	v4 = i32(-1)
 	{
 		if v2 < i32(0) {
-			store32(m.memory, uint64(uint32(i32(88368))), uint32(i32(28)))
+			store32(m.memory, uint64(uint32(i32(88592))), uint32(i32(28)))
 			goto l0
 		}
 		store32(m.memory, uint64(uint32(v3))+12, uint32(i32(0)))
 		t1 := m.fn2(v0, v1, v2, v3+i32(12))
 		v0 = t1 & i32(0xffff)
 		if v0 != 0 {
-			store32(m.memory, uint64(uint32(i32(88368))), uint32(v0))
+			store32(m.memory, uint64(uint32(i32(88592))), uint32(v0))
 			goto l0
 		}
 		t2 := int32(load32(m.memory, uint64(uint32(v3))+12))
@@ -40262,20 +40235,20 @@ func (m *Module) fn140(v0 int32) int32 {
 	var v1, v2, v3, v4 int32
 	t0 := int32(load32(m.memory, uint64(uint32(v0))+68))
 	v1 = t0
-	t1 := int32(load32(m.memory, uint64(uint32(i32(88376)))))
-	if t1 != i32(88376) {
-		store32(m.memory, uint64(uint32(i32(88376))), uint32(i32(88376)))
-		store32(m.memory, uint64(uint32(i32(88432))), uint32(i32(0)))
-		store32(m.memory, uint64(uint32(i32(88428))), uint32(i32(65536)))
-		store32(m.memory, uint64(uint32(i32(88424))), uint32(i32(65536)))
-		t2 := int32(load32(m.memory, uint64(uint32(i32(88372)))))
-		store32(m.memory, uint64(uint32(i32(88388))), uint32(t2))
-		store32(m.memory, uint64(uint32(i32(88120))), uint32(i32(65536)))
-		store32(m.memory, uint64(uint32(i32(88384))), uint32(i32(88376)))
-		store32(m.memory, uint64(uint32(i32(88380))), uint32(i32(88376)))
+	t1 := int32(load32(m.memory, uint64(uint32(i32(88600)))))
+	if t1 != i32(88600) {
+		store32(m.memory, uint64(uint32(i32(88600))), uint32(i32(88600)))
+		store32(m.memory, uint64(uint32(i32(88656))), uint32(i32(0)))
+		store32(m.memory, uint64(uint32(i32(88652))), uint32(i32(65536)))
+		store32(m.memory, uint64(uint32(i32(88648))), uint32(i32(65536)))
+		t2 := int32(load32(m.memory, uint64(uint32(i32(88596)))))
+		store32(m.memory, uint64(uint32(i32(88612))), uint32(t2))
+		store32(m.memory, uint64(uint32(i32(88344))), uint32(i32(65536)))
+		store32(m.memory, uint64(uint32(i32(88608))), uint32(i32(88600)))
+		store32(m.memory, uint64(uint32(i32(88604))), uint32(i32(88600)))
 	}
 	{
-		t3 := int32(load32(m.memory, uint64(uint32(i32(88396)))))
+		t3 := int32(load32(m.memory, uint64(uint32(i32(88620)))))
 		v3 = t3
 		if v3 == v1&i32(-0x40000001) {
 			goto l0
@@ -40915,14 +40888,14 @@ func (m *Module) fn152(v0, v1 int32) int32 {
 			goto l0
 		}
 		{
-			t2 := int32(load32(m.memory, uint64(uint32(i32(88520)))))
+			t2 := int32(load32(m.memory, uint64(uint32(i32(88744)))))
 			v2 = t2
 			var p3 int32
 			if v2 != 0 {
 				p3 = v2
 			} else {
-				store32(m.memory, uint64(uint32(i32(88520))), uint32(i32(88496)))
-				p3 = i32(88496)
+				store32(m.memory, uint64(uint32(i32(88744))), uint32(i32(88720)))
+				p3 = i32(88720)
 			}
 			t4 := int32(load32(m.memory, uint64(uint32(p3))))
 			if t4 == 0 {
@@ -40964,7 +40937,7 @@ func (m *Module) fn152(v0, v1 int32) int32 {
 			}
 		}
 	l1:
-		store32(m.memory, uint64(uint32(i32(88368))), uint32(i32(25)))
+		store32(m.memory, uint64(uint32(i32(88592))), uint32(i32(25)))
 		p1 = i32(-1)
 	l0:
 		p0 = p1
@@ -41507,7 +41480,7 @@ l5:
 						goto l12
 					}
 					v1 = v1 + i32(1)
-					t47 := int32(m.memory[uint64(uint32(v7*i32(58)+v5+i32(87551)))])
+					t47 := int32(m.memory[uint64(uint32(v7*i32(58)+v5+i32(87775)))])
 					v5 = t47
 					if uint32((v5-i32(1))&i32(255)) < uint32(i32(8)) {
 						goto l22
@@ -41676,13 +41649,13 @@ l5:
 														}
 														if p136&i32(32) == 0 {
 															v6 = v20 & i32(32)
-															p138 := i32(67487)
+															p138 := i32(67492)
 															if v6 != 0 {
 																p138 = i32(66975)
 															}
-															p139 := i32(67499)
+															p139 := i32(67504)
 															if v6 != 0 {
-																p139 = i32(67083)
+																p139 = i32(67088)
 															}
 															p140 := p139
 															if v37 != v37 {
@@ -42493,7 +42466,7 @@ l5:
 																if t259&i32(32) != 0 {
 																	goto l113
 																}
-																m.fn144(i32(67670), i32(1), v0)
+																m.fn144(i32(67675), i32(1), v0)
 															}
 														l113:
 															if v11 <= i32(0) {
@@ -42633,7 +42606,7 @@ l5:
 																	if t275&i32(32) != 0 {
 																		goto l121
 																	}
-																	m.fn144(i32(67670), i32(1), v0)
+																	m.fn144(i32(67675), i32(1), v0)
 																}
 															l121:
 																v6 = v29 - v5
@@ -42735,24 +42708,24 @@ l5:
 													v5 = t87
 													goto l55
 												case 44:
-													t88 := int32(load32(m.memory, uint64(uint32(i32(88368)))))
+													t88 := int32(load32(m.memory, uint64(uint32(i32(88592)))))
 													v5 = t88
-													t89 := int32(load32(m.memory, uint64(uint32(i32(88520)))))
+													t89 := int32(load32(m.memory, uint64(uint32(i32(88744)))))
 													v6 = t89
 													var p90 int32
 													if v6 != 0 {
 														p90 = v6
 													} else {
-														store32(m.memory, uint64(uint32(i32(88520))), uint32(i32(88496)))
-														p90 = i32(88496)
+														store32(m.memory, uint64(uint32(i32(88744))), uint32(i32(88720)))
+														p90 = i32(88720)
 													}
 													_ = int32(load32(m.memory, uint64(uint32(p90))+20))
 													p92 := i32(0)
 													if uint32(v5) <= uint32(i32(76)) {
 														p92 = v5
 													}
-													t93 := int32(load16(m.memory, uint64(uint32(p92<<1))+87456))
-													t94 := t93 + i32(85892)
+													t93 := int32(load16(m.memory, uint64(uint32(p92<<1))+87680))
+													t94 := t93 + i32(86116)
 													p52 = t94
 													goto l56
 												case 50:
@@ -42827,7 +42800,7 @@ l5:
 												l48:
 													{
 														v6 = v6 - i32(1)
-														t67 := int32(m.memory[uint64(uint32(int32(v39)&i32(15)))+88080])
+														t67 := int32(m.memory[uint64(uint32(int32(v39)&i32(15)))+88304])
 														m.memory[uint64(uint32(v6))] = byte(t67 | v5)
 														v39 = int64(uint64(v39) >> 4)
 														if v39 != i64(0) {
@@ -42979,7 +42952,7 @@ l5:
 								l37:
 									t95 := int32(load32(m.memory, uint64(uint32(v9))+40))
 									v6 = t95
-									p96 := i32(67672)
+									p96 := i32(67677)
 									if v6 != 0 {
 										p96 = v6
 									}
@@ -43221,7 +43194,7 @@ l5:
 				}
 			}
 		l12:
-			store32(m.memory, uint64(uint32(i32(88368))), uint32(i32(28)))
+			store32(m.memory, uint64(uint32(i32(88592))), uint32(i32(28)))
 			goto l25
 		l77:
 			v22 = v28 + v20<<26>>31&i32(9)
@@ -43325,7 +43298,7 @@ l5:
 				v5 = v6
 				t298 := v5
 				v6 = i32_trunc_sat_f64_s(v37)
-				t299 := int32(m.memory[uint64(uint32(v6+i32(88080)))])
+				t299 := int32(m.memory[uint64(uint32(v6+i32(88304)))])
 				m.memory[uint64(uint32(t298))] = byte(t299 | v8)
 				v37 = float64(float64(v37-float64(v6)) * float64(16))
 				{
@@ -43757,7 +43730,7 @@ l5:
 		goto l5
 	}
 l0:
-	store32(m.memory, uint64(uint32(i32(88368))), uint32(i32(61)))
+	store32(m.memory, uint64(uint32(i32(88592))), uint32(i32(61)))
 l25:
 	v19 = i32(-1)
 l16:
@@ -43807,8 +43780,8 @@ func (m *Module) fn156(v0, v1, v2 int32) {
 		store64(m.memory, uint64(uint32(v0)), math.Float64bits(t14))
 		return
 	case 17:
-		t15 := m.fn150(i32(68146))
-		m.fn145(i32(68146), i32(1), t15, i32(88128))
+		t15 := m.fn150(i32(68151))
+		m.fn145(i32(68151), i32(1), t15, i32(88352))
 		panic("unreachable")
 	case 0:
 		t16 := int32(load32(m.memory, uint64(uint32(v2))))
@@ -43912,7 +43885,7 @@ func (m *Module) fn158(v0 int32) int32 {
 		t2 := int32(memory_grow(&m.memory, int64(v1), maxMem))
 		v0 = t2
 		if v0 == i32(-1) {
-			store32(m.memory, uint64(uint32(i32(88368))), uint32(i32(48)))
+			store32(m.memory, uint64(uint32(i32(88592))), uint32(i32(48)))
 			return i32(-1)
 		}
 		return v0 << 16
@@ -43929,58 +43902,58 @@ func (m *Module) fn160(v0 int32) int32 {
 	t0 := m.g0
 	v10 = t0 - i32(16)
 	m.g0 = v10
-	t1 := int32(load32(m.memory, uint64(uint32(i32(88548)))))
+	t1 := int32(load32(m.memory, uint64(uint32(i32(88772)))))
 	v7 = t1
 	if v7 == 0 {
-		t2 := int32(load32(m.memory, uint64(uint32(i32(88996)))))
+		t2 := int32(load32(m.memory, uint64(uint32(i32(89220)))))
 		v1 = t2
 		if v1 == 0 {
-			store32(m.memory, uint64(uint32(i32(89004))), uint32(i32(65536)))
-			store64(m.memory, uint64(uint32(i32(89008))), uint64(i64(-1)))
-			store32(m.memory, uint64(uint32(i32(89000))), uint32(i32(65536)))
+			store32(m.memory, uint64(uint32(i32(89228))), uint32(i32(65536)))
+			store64(m.memory, uint64(uint32(i32(89232))), uint64(i64(-1)))
+			store32(m.memory, uint64(uint32(i32(89224))), uint32(i32(65536)))
 			v1 = (v10+i32(8))&i32(-16) ^ i32(0x55555558)
-			store32(m.memory, uint64(uint32(i32(88996))), uint32(v1))
-			store32(m.memory, uint64(uint32(i32(89016))), uint32(i32(0)))
-			store32(m.memory, uint64(uint32(i32(88968))), uint32(i32(0)))
+			store32(m.memory, uint64(uint32(i32(89220))), uint32(v1))
+			store32(m.memory, uint64(uint32(i32(89240))), uint32(i32(0)))
+			store32(m.memory, uint64(uint32(i32(89192))), uint32(i32(0)))
 		}
-		store32(m.memory, uint64(uint32(i32(88972))), uint32(i32(89024)))
-		store32(m.memory, uint64(uint32(i32(88540))), uint32(i32(89024)))
-		store32(m.memory, uint64(uint32(i32(88560))), uint32(v1))
-		store32(m.memory, uint64(uint32(i32(88556))), uint32(i32(-1)))
-		store32(m.memory, uint64(uint32(i32(88976))), uint32(i32(42048)))
-		store32(m.memory, uint64(uint32(i32(88960))), uint32(i32(42048)))
-		store32(m.memory, uint64(uint32(i32(88956))), uint32(i32(42048)))
+		store32(m.memory, uint64(uint32(i32(89196))), uint32(i32(89248)))
+		store32(m.memory, uint64(uint32(i32(88764))), uint32(i32(89248)))
+		store32(m.memory, uint64(uint32(i32(88784))), uint32(v1))
+		store32(m.memory, uint64(uint32(i32(88780))), uint32(i32(-1)))
+		store32(m.memory, uint64(uint32(i32(89200))), uint32(i32(41824)))
+		store32(m.memory, uint64(uint32(i32(89184))), uint32(i32(41824)))
+		store32(m.memory, uint64(uint32(i32(89180))), uint32(i32(41824)))
 		v1 = i32(-256)
 	l0:
 		{
-			t3 := v1 + i32(88840)
-			v2 = v1 + i32(88828)
+			t3 := v1 + i32(89064)
+			v2 = v1 + i32(89052)
 			store32(m.memory, uint64(uint32(t3)), uint32(v2))
 			t4 := v2
-			v5 = v1 + i32(88820)
+			v5 = v1 + i32(89044)
 			store32(m.memory, uint64(uint32(t4)), uint32(v5))
-			store32(m.memory, uint64(uint32(v1+i32(88832))), uint32(v5))
-			t5 := v1 + i32(88848)
-			v5 = v1 + i32(88836)
+			store32(m.memory, uint64(uint32(v1+i32(89056))), uint32(v5))
+			t5 := v1 + i32(89072)
+			v5 = v1 + i32(89060)
 			store32(m.memory, uint64(uint32(t5)), uint32(v5))
 			store32(m.memory, uint64(uint32(v5)), uint32(v2))
-			t6 := v1 + i32(88856)
-			v2 = v1 + i32(88844)
+			t6 := v1 + i32(89080)
+			v2 = v1 + i32(89068)
 			store32(m.memory, uint64(uint32(t6)), uint32(v2))
 			store32(m.memory, uint64(uint32(v2)), uint32(v5))
-			store32(m.memory, uint64(uint32(v1+i32(88852))), uint32(v2))
+			store32(m.memory, uint64(uint32(v1+i32(89076))), uint32(v2))
 			v1 = v1 + i32(32)
 			if v1 != 0 {
 				goto l0
 			}
 		}
 		store32(m.memory, uint64(uint32(i32(0x1ffcc))), uint32(i32(56)))
-		t7 := int32(load32(m.memory, uint64(uint32(i32(89012)))))
-		store32(m.memory, uint64(uint32(i32(88552))), uint32(t7))
-		v7 = i32(89032)
-		store32(m.memory, uint64(uint32(i32(88548))), uint32(v7))
-		store32(m.memory, uint64(uint32(i32(88536))), uint32(i32(41984)))
-		store32(m.memory, uint64(uint32(i32(89036))), uint32(i32(41985)))
+		t7 := int32(load32(m.memory, uint64(uint32(i32(89236)))))
+		store32(m.memory, uint64(uint32(i32(88776))), uint32(t7))
+		v7 = i32(89256)
+		store32(m.memory, uint64(uint32(i32(88772))), uint32(v7))
+		store32(m.memory, uint64(uint32(i32(88760))), uint32(i32(41760)))
+		store32(m.memory, uint64(uint32(i32(89260))), uint32(i32(41761)))
 	}
 	{
 		{
@@ -43988,7 +43961,7 @@ func (m *Module) fn160(v0 int32) int32 {
 				{
 					{
 						if uint32(v0) <= uint32(i32(236)) {
-							t8 := int32(load32(m.memory, uint64(uint32(i32(88524)))))
+							t8 := int32(load32(m.memory, uint64(uint32(i32(88748)))))
 							v3 = t8
 							t10 := v3
 							p9 := (v0 + i32(19)) & i32(496)
@@ -44002,14 +43975,14 @@ func (m *Module) fn160(v0 int32) int32 {
 								{
 									v4 = v1&i32(1) | v0 ^ i32(1)
 									v0 = v4 << 3
-									v1 = v0 + i32(88564)
-									t11 := int32(load32(m.memory, uint64(uint32(v0))+88572))
+									v1 = v0 + i32(88788)
+									t11 := int32(load32(m.memory, uint64(uint32(v0))+88796))
 									t12 := v1
 									v2 = t11
 									t13 := int32(load32(m.memory, uint64(uint32(v2))+8))
 									v5 = t13
 									if t12 == v5 {
-										store32(m.memory, uint64(uint32(i32(88524))), uint32(v3&i32_rotl(i32(-2), v4)))
+										store32(m.memory, uint64(uint32(i32(88748))), uint32(v3&i32_rotl(i32(-2), v4)))
 										goto l1
 									}
 									store32(m.memory, uint64(uint32(v1))+8, uint32(v5))
@@ -44023,7 +43996,7 @@ func (m *Module) fn160(v0 int32) int32 {
 								store32(m.memory, uint64(uint32(v0))+4, uint32(t14|i32(1)))
 								goto l2
 							}
-							t15 := int32(load32(m.memory, uint64(uint32(i32(88532)))))
+							t15 := int32(load32(m.memory, uint64(uint32(i32(88756)))))
 							t16 := v6
 							v8 = t15
 							if uint32(t16) <= uint32(v8) {
@@ -44034,15 +44007,15 @@ func (m *Module) fn160(v0 int32) int32 {
 									v2 = i32_shl(i32(2), v0)
 									v4 = int32(bits.TrailingZeros32(uint32((v2 | (i32(0) - v2)) & i32_shl(v1, v0))))
 									v1 = v4 << 3
-									v2 = v1 + i32(88564)
-									t17 := int32(load32(m.memory, uint64(uint32(v1))+88572))
+									v2 = v1 + i32(88788)
+									t17 := int32(load32(m.memory, uint64(uint32(v1))+88796))
 									t18 := v2
 									v0 = t17
 									t19 := int32(load32(m.memory, uint64(uint32(v0))+8))
 									v5 = t19
 									if t18 == v5 {
 										v3 = v3 & i32_rotl(i32(-2), v4)
-										store32(m.memory, uint64(uint32(i32(88524))), uint32(v3))
+										store32(m.memory, uint64(uint32(i32(88748))), uint32(v3))
 										goto l4
 									}
 									store32(m.memory, uint64(uint32(v2))+8, uint32(v5))
@@ -44056,15 +44029,15 @@ func (m *Module) fn160(v0 int32) int32 {
 								v4 = v0 + v6
 								store32(m.memory, uint64(uint32(v4))+4, uint32(v5|i32(1)))
 								if v8 != 0 {
-									v1 = v8&i32(-8) + i32(88564)
-									t21 := int32(load32(m.memory, uint64(uint32(i32(88544)))))
+									v1 = v8&i32(-8) + i32(88788)
+									t21 := int32(load32(m.memory, uint64(uint32(i32(88768)))))
 									v2 = t21
 									var p22 int32
 									{
 										t23 := v3
 										v7 = i32_shl(i32(1), int32(uint32(v8)>>3))
 										if t23&v7 == 0 {
-											store32(m.memory, uint64(uint32(i32(88524))), uint32(v3|v7))
+											store32(m.memory, uint64(uint32(i32(88748))), uint32(v3|v7))
 											t24 := v1
 											p22 = t24
 											goto l5
@@ -44080,16 +44053,16 @@ func (m *Module) fn160(v0 int32) int32 {
 									store32(m.memory, uint64(uint32(v2))+8, uint32(v3))
 								}
 								v1 = v0 + i32(8)
-								store32(m.memory, uint64(uint32(i32(88544))), uint32(v4))
-								store32(m.memory, uint64(uint32(i32(88532))), uint32(v5))
+								store32(m.memory, uint64(uint32(i32(88768))), uint32(v4))
+								store32(m.memory, uint64(uint32(i32(88756))), uint32(v5))
 								goto l2
 							}
-							t26 := int32(load32(m.memory, uint64(uint32(i32(88528)))))
+							t26 := int32(load32(m.memory, uint64(uint32(i32(88752)))))
 							v11 = t26
 							if v11 == 0 {
 								goto l3
 							}
-							t27 := int32(load32(m.memory, uint64(uint32(int32(bits.TrailingZeros32(uint32(v11)))<<2))+88828))
+							t27 := int32(load32(m.memory, uint64(uint32(int32(bits.TrailingZeros32(uint32(v11)))<<2))+89052))
 							v0 = t27
 							t28 := int32(load32(m.memory, uint64(uint32(v0))+4))
 							v4 = t28&i32(-8) - v6
@@ -44179,7 +44152,7 @@ func (m *Module) fn160(v0 int32) int32 {
 						}
 						v1 = v0 + i32(19)
 						v6 = v1 & i32(-16)
-						t46 := int32(load32(m.memory, uint64(uint32(i32(88528)))))
+						t46 := int32(load32(m.memory, uint64(uint32(i32(88752)))))
 						v8 = t46
 						if v8 == 0 {
 							goto l3
@@ -44192,7 +44165,7 @@ func (m *Module) fn160(v0 int32) int32 {
 							v9 = i32_shr_u(t47, i32(38)-v0)&i32(1) - v0<<1 + i32(62)
 						}
 						{
-							t48 := int32(load32(m.memory, uint64(uint32(v9<<2))+88828))
+							t48 := int32(load32(m.memory, uint64(uint32(v9<<2))+89052))
 							v0 = t48
 							if v0 == 0 {
 								v1 = i32(0)
@@ -44255,7 +44228,7 @@ func (m *Module) fn160(v0 int32) int32 {
 							if v0 == 0 {
 								goto l3
 							}
-							t59 := int32(load32(m.memory, uint64(uint32(int32(bits.TrailingZeros32(uint32(v0)))<<2))+88828))
+							t59 := int32(load32(m.memory, uint64(uint32(int32(bits.TrailingZeros32(uint32(v0)))<<2))+89052))
 							v1 = t59
 						}
 						if v1 == 0 {
@@ -44298,7 +44271,7 @@ func (m *Module) fn160(v0 int32) int32 {
 						if v5 == 0 {
 							goto l3
 						}
-						t67 := int32(load32(m.memory, uint64(uint32(i32(88532)))))
+						t67 := int32(load32(m.memory, uint64(uint32(i32(88756)))))
 						if uint32(v4) >= uint32(t67-v6) {
 							goto l3
 						}
@@ -44350,11 +44323,11 @@ func (m *Module) fn160(v0 int32) int32 {
 						goto l17
 					}
 				l3:
-					t77 := int32(load32(m.memory, uint64(uint32(i32(88532)))))
+					t77 := int32(load32(m.memory, uint64(uint32(i32(88756)))))
 					t78 := v6
 					v5 = t77
 					if uint32(t78) <= uint32(v5) {
-						t79 := int32(load32(m.memory, uint64(uint32(i32(88544)))))
+						t79 := int32(load32(m.memory, uint64(uint32(i32(88768)))))
 						v1 = t79
 						{
 							v0 = v5 - v6
@@ -44373,12 +44346,12 @@ func (m *Module) fn160(v0 int32) int32 {
 							v2 = i32(0)
 						}
 					l20:
-						store32(m.memory, uint64(uint32(i32(88532))), uint32(v0))
-						store32(m.memory, uint64(uint32(i32(88544))), uint32(v2))
+						store32(m.memory, uint64(uint32(i32(88756))), uint32(v0))
+						store32(m.memory, uint64(uint32(i32(88768))), uint32(v2))
 						v1 = v1 + i32(8)
 						goto l2
 					}
-					t81 := int32(load32(m.memory, uint64(uint32(i32(88536)))))
+					t81 := int32(load32(m.memory, uint64(uint32(i32(88760)))))
 					t82 := v6
 					v2 = t81
 					if uint32(t82) < uint32(v2) {
@@ -44386,8 +44359,8 @@ func (m *Module) fn160(v0 int32) int32 {
 						t83 := v0
 						v1 = v2 - v6
 						store32(m.memory, uint64(uint32(t83))+4, uint32(v1|i32(1)))
-						store32(m.memory, uint64(uint32(i32(88548))), uint32(v0))
-						store32(m.memory, uint64(uint32(i32(88536))), uint32(v1))
+						store32(m.memory, uint64(uint32(i32(88772))), uint32(v0))
+						store32(m.memory, uint64(uint32(i32(88760))), uint32(v1))
 						store32(m.memory, uint64(uint32(v7))+4, uint32(v6|i32(3)))
 						v1 = v7 + i32(8)
 						goto l2
@@ -44398,18 +44371,18 @@ func (m *Module) fn160(v0 int32) int32 {
 					t86 := v5
 					var p85 int32
 					{
-						t87 := int32(load32(m.memory, uint64(uint32(i32(88996)))))
+						t87 := int32(load32(m.memory, uint64(uint32(i32(89220)))))
 						if t87 != 0 {
-							t88 := int32(load32(m.memory, uint64(uint32(i32(89004)))))
+							t88 := int32(load32(m.memory, uint64(uint32(i32(89228)))))
 							p85 = t88
 							goto l21
 						}
-						store32(m.memory, uint64(uint32(i32(89004))), uint32(i32(65536)))
-						store64(m.memory, uint64(uint32(i32(89008))), uint64(i64(-1)))
-						store32(m.memory, uint64(uint32(i32(89000))), uint32(i32(65536)))
-						store32(m.memory, uint64(uint32(i32(88996))), uint32((v10+i32(12))&i32(-16)^i32(0x55555558)))
-						store32(m.memory, uint64(uint32(i32(89016))), uint32(i32(0)))
-						store32(m.memory, uint64(uint32(i32(88968))), uint32(i32(0)))
+						store32(m.memory, uint64(uint32(i32(89228))), uint32(i32(65536)))
+						store64(m.memory, uint64(uint32(i32(89232))), uint64(i64(-1)))
+						store32(m.memory, uint64(uint32(i32(89224))), uint32(i32(65536)))
+						store32(m.memory, uint64(uint32(i32(89220))), uint32((v10+i32(12))&i32(-16)^i32(0x55555558)))
+						store32(m.memory, uint64(uint32(i32(89240))), uint32(i32(0)))
+						store32(m.memory, uint64(uint32(i32(89192))), uint32(i32(0)))
 						p85 = i32(65536)
 					}
 				l21:
@@ -44419,16 +44392,16 @@ func (m *Module) fn160(v0 int32) int32 {
 					v4 = i32(0) - v0
 					v0 = t89 & v4
 					if uint32(t84) >= uint32(v0) {
-						store32(m.memory, uint64(uint32(i32(88368))), uint32(i32(48)))
+						store32(m.memory, uint64(uint32(i32(88592))), uint32(i32(48)))
 						goto l2
 					}
 					{
-						t90 := int32(load32(m.memory, uint64(uint32(i32(88964)))))
+						t90 := int32(load32(m.memory, uint64(uint32(i32(89188)))))
 						v1 = t90
 						if v1 == 0 {
 							goto l22
 						}
-						t91 := int32(load32(m.memory, uint64(uint32(i32(88956)))))
+						t91 := int32(load32(m.memory, uint64(uint32(i32(89180)))))
 						v8 = t91
 						v9 = v8 + v0
 						var p92 int32
@@ -44443,18 +44416,18 @@ func (m *Module) fn160(v0 int32) int32 {
 							goto l22
 						}
 						v1 = i32(0)
-						store32(m.memory, uint64(uint32(i32(88368))), uint32(i32(48)))
+						store32(m.memory, uint64(uint32(i32(88592))), uint32(i32(48)))
 						goto l2
 					}
 				l22:
-					t94 := int32(m.memory[uint64(uint32(i32(88968)))])
+					t94 := int32(m.memory[uint64(uint32(i32(89192)))])
 					if t94&i32(4) != 0 {
 						goto l23
 					}
 					{
 						{
 							if v7 != 0 {
-								v1 = i32(88972)
+								v1 = i32(89196)
 							l25:
 								{
 									t95 := int32(load32(m.memory, uint64(uint32(v1))))
@@ -44478,7 +44451,7 @@ func (m *Module) fn160(v0 int32) int32 {
 								goto l26
 							}
 							v3 = v0
-							t99 := int32(load32(m.memory, uint64(uint32(i32(89000)))))
+							t99 := int32(load32(m.memory, uint64(uint32(i32(89224)))))
 							v1 = t99
 							v4 = v1 - i32(1)
 							if v4&v2 != 0 {
@@ -44490,10 +44463,10 @@ func (m *Module) fn160(v0 int32) int32 {
 							if uint32(v3) > uint32(i32(0x7ffffffe)) {
 								goto l26
 							}
-							t100 := int32(load32(m.memory, uint64(uint32(i32(88964)))))
+							t100 := int32(load32(m.memory, uint64(uint32(i32(89188)))))
 							v1 = t100
 							if v1 != 0 {
-								t101 := int32(load32(m.memory, uint64(uint32(i32(88956)))))
+								t101 := int32(load32(m.memory, uint64(uint32(i32(89180)))))
 								v4 = t101
 								v7 = v4 + v3
 								if uint32(v7) <= uint32(v4) {
@@ -44532,7 +44505,7 @@ func (m *Module) fn160(v0 int32) int32 {
 						if v1 == i32(-1) {
 							goto l30
 						}
-						t106 := int32(load32(m.memory, uint64(uint32(i32(89004)))))
+						t106 := int32(load32(m.memory, uint64(uint32(i32(89228)))))
 						v2 = t106
 						v2 = (v2 + (v5 - v3)) & (i32(0) - v2)
 						if uint32(v2) > uint32(i32(0x7ffffffe)) {
@@ -44560,8 +44533,8 @@ func (m *Module) fn160(v0 int32) int32 {
 					goto l28
 				}
 			l26:
-				t109 := int32(load32(m.memory, uint64(uint32(i32(88968)))))
-				store32(m.memory, uint64(uint32(i32(88968))), uint32(t109|i32(4)))
+				t109 := int32(load32(m.memory, uint64(uint32(i32(89192)))))
+				store32(m.memory, uint64(uint32(i32(89192))), uint32(t109|i32(4)))
 			}
 		l23:
 			if uint32(v0) > uint32(i32(0x7ffffffe)) {
@@ -44586,19 +44559,19 @@ func (m *Module) fn160(v0 int32) int32 {
 			}
 		}
 	l28:
-		t112 := int32(load32(m.memory, uint64(uint32(i32(88956)))))
+		t112 := int32(load32(m.memory, uint64(uint32(i32(89180)))))
 		v0 = t112 + v3
-		store32(m.memory, uint64(uint32(i32(88956))), uint32(v0))
-		t113 := int32(load32(m.memory, uint64(uint32(i32(88960)))))
+		store32(m.memory, uint64(uint32(i32(89180))), uint32(v0))
+		t113 := int32(load32(m.memory, uint64(uint32(i32(89184)))))
 		if uint32(t113) < uint32(v0) {
-			store32(m.memory, uint64(uint32(i32(88960))), uint32(v0))
+			store32(m.memory, uint64(uint32(i32(89184))), uint32(v0))
 		}
 		{
 			{
-				t114 := int32(load32(m.memory, uint64(uint32(i32(88548)))))
+				t114 := int32(load32(m.memory, uint64(uint32(i32(88772)))))
 				v4 = t114
 				if v4 != 0 {
-					v1 = i32(88972)
+					v1 = i32(89196)
 				l33:
 					{
 						t115 := int32(load32(m.memory, uint64(uint32(v1))))
@@ -44621,16 +44594,16 @@ func (m *Module) fn160(v0 int32) int32 {
 							t131 := v4
 							v0 = (i32(-8) - v4) & i32(15)
 							v2 = t131 + v0
-							t132 := int32(load32(m.memory, uint64(uint32(i32(88536)))))
+							t132 := int32(load32(m.memory, uint64(uint32(i32(88760)))))
 							t133 := v2
 							v7 = t132 + v3
 							v0 = v7 - v0
 							store32(m.memory, uint64(uint32(t133))+4, uint32(v0|i32(1)))
 							store32(m.memory, uint64(uint32(v1))+4, uint32(v3+v5))
-							t134 := int32(load32(m.memory, uint64(uint32(i32(89012)))))
-							store32(m.memory, uint64(uint32(i32(88552))), uint32(t134))
-							store32(m.memory, uint64(uint32(i32(88536))), uint32(v0))
-							store32(m.memory, uint64(uint32(i32(88548))), uint32(v2))
+							t134 := int32(load32(m.memory, uint64(uint32(i32(89236)))))
+							store32(m.memory, uint64(uint32(i32(88776))), uint32(t134))
+							store32(m.memory, uint64(uint32(i32(88760))), uint32(v0))
+							store32(m.memory, uint64(uint32(i32(88772))), uint32(v2))
 							store32(m.memory, uint64(uint32(v4+v7))+4, uint32(i32(56)))
 							goto l36
 						}
@@ -44642,40 +44615,40 @@ func (m *Module) fn160(v0 int32) int32 {
 					}
 					goto l34
 				}
-				t120 := int32(load32(m.memory, uint64(uint32(i32(88540)))))
+				t120 := int32(load32(m.memory, uint64(uint32(i32(88764)))))
 				v0 = t120
 				p121 := i32(0)
 				if uint32(v0) <= uint32(v2) {
 					p121 = v0
 				}
 				if p121 == 0 {
-					store32(m.memory, uint64(uint32(i32(88540))), uint32(v2))
+					store32(m.memory, uint64(uint32(i32(88764))), uint32(v2))
 				}
-				store32(m.memory, uint64(uint32(i32(88976))), uint32(v3))
-				store32(m.memory, uint64(uint32(i32(88972))), uint32(v2))
-				store32(m.memory, uint64(uint32(i32(88556))), uint32(i32(-1)))
-				t122 := int32(load32(m.memory, uint64(uint32(i32(88996)))))
-				store32(m.memory, uint64(uint32(i32(88560))), uint32(t122))
-				store32(m.memory, uint64(uint32(i32(88984))), uint32(i32(0)))
+				store32(m.memory, uint64(uint32(i32(89200))), uint32(v3))
+				store32(m.memory, uint64(uint32(i32(89196))), uint32(v2))
+				store32(m.memory, uint64(uint32(i32(88780))), uint32(i32(-1)))
+				t122 := int32(load32(m.memory, uint64(uint32(i32(89220)))))
+				store32(m.memory, uint64(uint32(i32(88784))), uint32(t122))
+				store32(m.memory, uint64(uint32(i32(89208))), uint32(i32(0)))
 				v1 = i32(-256)
 			l35:
 				{
-					t123 := v1 + i32(88840)
-					v0 = v1 + i32(88828)
+					t123 := v1 + i32(89064)
+					v0 = v1 + i32(89052)
 					store32(m.memory, uint64(uint32(t123)), uint32(v0))
 					t124 := v0
-					v5 = v1 + i32(88820)
+					v5 = v1 + i32(89044)
 					store32(m.memory, uint64(uint32(t124)), uint32(v5))
-					store32(m.memory, uint64(uint32(v1+i32(88832))), uint32(v5))
-					t125 := v1 + i32(88848)
-					v5 = v1 + i32(88836)
+					store32(m.memory, uint64(uint32(v1+i32(89056))), uint32(v5))
+					t125 := v1 + i32(89072)
+					v5 = v1 + i32(89060)
 					store32(m.memory, uint64(uint32(t125)), uint32(v5))
 					store32(m.memory, uint64(uint32(v5)), uint32(v0))
-					t126 := v1 + i32(88856)
-					v0 = v1 + i32(88844)
+					t126 := v1 + i32(89080)
+					v0 = v1 + i32(89068)
 					store32(m.memory, uint64(uint32(t126)), uint32(v0))
 					store32(m.memory, uint64(uint32(v0)), uint32(v5))
-					store32(m.memory, uint64(uint32(v1+i32(88852))), uint32(v0))
+					store32(m.memory, uint64(uint32(v1+i32(89076))), uint32(v0))
 					v1 = v1 + i32(32)
 					if v1 != 0 {
 						goto l35
@@ -44688,20 +44661,20 @@ func (m *Module) fn160(v0 int32) int32 {
 				v5 = v3 - i32(56)
 				v0 = v5 - v0
 				store32(m.memory, uint64(uint32(t128))+4, uint32(v0|i32(1)))
-				t129 := int32(load32(m.memory, uint64(uint32(i32(89012)))))
-				store32(m.memory, uint64(uint32(i32(88552))), uint32(t129))
-				store32(m.memory, uint64(uint32(i32(88536))), uint32(v0))
-				store32(m.memory, uint64(uint32(i32(88548))), uint32(v1))
+				t129 := int32(load32(m.memory, uint64(uint32(i32(89236)))))
+				store32(m.memory, uint64(uint32(i32(88776))), uint32(t129))
+				store32(m.memory, uint64(uint32(i32(88760))), uint32(v0))
+				store32(m.memory, uint64(uint32(i32(88772))), uint32(v1))
 				store32(m.memory, uint64(uint32(v2+v5))+4, uint32(i32(56)))
 				goto l36
 			}
 		l34:
-			t135 := int32(load32(m.memory, uint64(uint32(i32(88540)))))
+			t135 := int32(load32(m.memory, uint64(uint32(i32(88764)))))
 			if uint32(t135) > uint32(v2) {
-				store32(m.memory, uint64(uint32(i32(88540))), uint32(v2))
+				store32(m.memory, uint64(uint32(i32(88764))), uint32(v2))
 			}
 			v5 = v2 + v3
-			v1 = i32(88972)
+			v1 = i32(89196)
 			{
 			l37:
 				{
@@ -44729,21 +44702,21 @@ func (m *Module) fn160(v0 int32) int32 {
 					v3 = v6 + v8
 					v7 = t172 - v3
 					{
-						t173 := int32(load32(m.memory, uint64(uint32(i32(88548)))))
+						t173 := int32(load32(m.memory, uint64(uint32(i32(88772)))))
 						if t173 == v4 {
-							store32(m.memory, uint64(uint32(i32(88548))), uint32(v3))
-							t174 := int32(load32(m.memory, uint64(uint32(i32(88536)))))
+							store32(m.memory, uint64(uint32(i32(88772))), uint32(v3))
+							t174 := int32(load32(m.memory, uint64(uint32(i32(88760)))))
 							v0 = t174 + v7
-							store32(m.memory, uint64(uint32(i32(88536))), uint32(v0))
+							store32(m.memory, uint64(uint32(i32(88760))), uint32(v0))
 							store32(m.memory, uint64(uint32(v3))+4, uint32(v0|i32(1)))
 							goto l48
 						}
-						t175 := int32(load32(m.memory, uint64(uint32(i32(88544)))))
+						t175 := int32(load32(m.memory, uint64(uint32(i32(88768)))))
 						if t175 == v4 {
-							store32(m.memory, uint64(uint32(i32(88544))), uint32(v3))
-							t176 := int32(load32(m.memory, uint64(uint32(i32(88532)))))
+							store32(m.memory, uint64(uint32(i32(88768))), uint32(v3))
+							t176 := int32(load32(m.memory, uint64(uint32(i32(88756)))))
 							v0 = t176 + v7
-							store32(m.memory, uint64(uint32(i32(88532))), uint32(v0))
+							store32(m.memory, uint64(uint32(i32(88756))), uint32(v0))
 							store32(m.memory, uint64(uint32(v3))+4, uint32(v0|i32(1)))
 							store32(m.memory, uint64(uint32(v0+v3)), uint32(v0))
 							goto l48
@@ -44759,8 +44732,8 @@ func (m *Module) fn160(v0 int32) int32 {
 									t179 := int32(load32(m.memory, uint64(uint32(v4))+8))
 									v0 = t179
 									if v0 == v1 {
-										t180 := int32(load32(m.memory, uint64(uint32(i32(88524)))))
-										store32(m.memory, uint64(uint32(i32(88524))), uint32(t180&i32_rotl(i32(-2), int32(uint32(v2)>>3))))
+										t180 := int32(load32(m.memory, uint64(uint32(i32(88748)))))
+										store32(m.memory, uint64(uint32(i32(88748))), uint32(t180&i32_rotl(i32(-2), int32(uint32(v2)>>3))))
 										goto l49
 									}
 									store32(m.memory, uint64(uint32(v1))+8, uint32(v0))
@@ -44821,14 +44794,14 @@ func (m *Module) fn160(v0 int32) int32 {
 									t188 := int32(load32(m.memory, uint64(uint32(v4))+28))
 									v0 = t188
 									v2 = v0 << 2
-									t189 := int32(load32(m.memory, uint64(uint32(v2))+88828))
+									t189 := int32(load32(m.memory, uint64(uint32(v2))+89052))
 									if t189 == v4 {
-										store32(m.memory, uint64(uint32(v2+i32(88828))), uint32(v1))
+										store32(m.memory, uint64(uint32(v2+i32(89052))), uint32(v1))
 										if v1 != 0 {
 											goto l53
 										}
-										t190 := int32(load32(m.memory, uint64(uint32(i32(88528)))))
-										store32(m.memory, uint64(uint32(i32(88528))), uint32(t190&i32_rotl(i32(-2), v0)))
+										t190 := int32(load32(m.memory, uint64(uint32(i32(88752)))))
+										store32(m.memory, uint64(uint32(i32(88752))), uint32(t190&i32_rotl(i32(-2), v0)))
 										goto l49
 									}
 									{
@@ -44870,15 +44843,15 @@ func (m *Module) fn160(v0 int32) int32 {
 						store32(m.memory, uint64(uint32(v3+v7)), uint32(v7))
 						store32(m.memory, uint64(uint32(v3))+4, uint32(v7|i32(1)))
 						if uint32(v7) <= uint32(i32(255)) {
-							v0 = v7&i32(248) + i32(88564)
+							v0 = v7&i32(248) + i32(88788)
 							var p195 int32
 							{
-								t196 := int32(load32(m.memory, uint64(uint32(i32(88524)))))
+								t196 := int32(load32(m.memory, uint64(uint32(i32(88748)))))
 								v1 = t196
 								t197 := v1
 								v2 = i32_shl(i32(1), int32(uint32(v7)>>3))
 								if t197&v2 == 0 {
-									store32(m.memory, uint64(uint32(i32(88524))), uint32(v1|v2))
+									store32(m.memory, uint64(uint32(i32(88748))), uint32(v1|v2))
 									t198 := v0
 									p195 = t198
 									goto l55
@@ -44902,14 +44875,14 @@ func (m *Module) fn160(v0 int32) int32 {
 						}
 						store32(m.memory, uint64(uint32(v3))+28, uint32(v1))
 						store64(m.memory, uint64(uint32(v3))+16, uint64(i64(0)))
-						v0 = v1<<2 + i32(88828)
-						t201 := int32(load32(m.memory, uint64(uint32(i32(88528)))))
+						v0 = v1<<2 + i32(89052)
+						t201 := int32(load32(m.memory, uint64(uint32(i32(88752)))))
 						v2 = t201
 						t202 := v2
 						v5 = i32_shl(i32(1), v1)
 						if t202&v5 == 0 {
 							store32(m.memory, uint64(uint32(v0)), uint32(v3))
-							store32(m.memory, uint64(uint32(i32(88528))), uint32(v2|v5))
+							store32(m.memory, uint64(uint32(i32(88752))), uint32(v2|v5))
 							store32(m.memory, uint64(uint32(v3))+24, uint32(v0))
 							store32(m.memory, uint64(uint32(v3))+8, uint32(v3))
 							store32(m.memory, uint64(uint32(v3))+12, uint32(v3))
@@ -44959,7 +44932,7 @@ func (m *Module) fn160(v0 int32) int32 {
 				}
 			}
 		l38:
-			v1 = i32(88972)
+			v1 = i32(89196)
 		l41:
 			{
 				t140 := int32(load32(m.memory, uint64(uint32(v1))))
@@ -44993,18 +44966,18 @@ func (m *Module) fn160(v0 int32) int32 {
 			}
 			v0 = p147
 			store32(m.memory, uint64(uint32(v0))+4, uint32(i32(35)))
-			t148 := int32(load32(m.memory, uint64(uint32(i32(89012)))))
-			store32(m.memory, uint64(uint32(i32(88552))), uint32(t148))
-			store32(m.memory, uint64(uint32(i32(88536))), uint32(v8))
-			store32(m.memory, uint64(uint32(i32(88548))), uint32(v1))
-			t149 := int64(load64(m.memory, uint64(uint32(i32(88980)))))
+			t148 := int32(load32(m.memory, uint64(uint32(i32(89236)))))
+			store32(m.memory, uint64(uint32(i32(88776))), uint32(t148))
+			store32(m.memory, uint64(uint32(i32(88760))), uint32(v8))
+			store32(m.memory, uint64(uint32(i32(88772))), uint32(v1))
+			t149 := int64(load64(m.memory, uint64(uint32(i32(89204)))))
 			store64(m.memory, uint64(uint32(v0))+16, uint64(t149))
-			t150 := int64(load64(m.memory, uint64(uint32(i32(88972)))))
+			t150 := int64(load64(m.memory, uint64(uint32(i32(89196)))))
 			store64(m.memory, uint64(uint32(v0))+8, uint64(t150))
-			store32(m.memory, uint64(uint32(i32(88980))), uint32(v0+i32(8)))
-			store32(m.memory, uint64(uint32(i32(88976))), uint32(v3))
-			store32(m.memory, uint64(uint32(i32(88972))), uint32(v2))
-			store32(m.memory, uint64(uint32(i32(88984))), uint32(i32(0)))
+			store32(m.memory, uint64(uint32(i32(89204))), uint32(v0+i32(8)))
+			store32(m.memory, uint64(uint32(i32(89200))), uint32(v3))
+			store32(m.memory, uint64(uint32(i32(89196))), uint32(v2))
+			store32(m.memory, uint64(uint32(i32(89208))), uint32(i32(0)))
 			v1 = v0 + i32(36)
 		l42:
 			store32(m.memory, uint64(uint32(v1)), uint32(i32(7)))
@@ -45024,15 +44997,15 @@ func (m *Module) fn160(v0 int32) int32 {
 			var p153 int32
 			{
 				if uint32(v2) <= uint32(i32(255)) {
-					v1 = v2&i32(248) + i32(88564)
+					v1 = v2&i32(248) + i32(88788)
 					var p154 int32
 					{
-						t155 := int32(load32(m.memory, uint64(uint32(i32(88524)))))
+						t155 := int32(load32(m.memory, uint64(uint32(i32(88748)))))
 						v0 = t155
 						t156 := v0
 						v2 = i32_shl(i32(1), int32(uint32(v2)>>3))
 						if t156&v2 == 0 {
-							store32(m.memory, uint64(uint32(i32(88524))), uint32(v0|v2))
+							store32(m.memory, uint64(uint32(i32(88748))), uint32(v0|v2))
 							t157 := v1
 							p154 = t157
 							goto l43
@@ -45056,15 +45029,15 @@ func (m *Module) fn160(v0 int32) int32 {
 				}
 				store32(m.memory, uint64(uint32(v4))+28, uint32(v1))
 				store64(m.memory, uint64(uint32(v4))+16, uint64(i64(0)))
-				v0 = v1<<2 + i32(88828)
+				v0 = v1<<2 + i32(89052)
 				{
-					t160 := int32(load32(m.memory, uint64(uint32(i32(88528)))))
+					t160 := int32(load32(m.memory, uint64(uint32(i32(88752)))))
 					v5 = t160
 					t161 := v5
 					v3 = i32_shl(i32(1), v1)
 					if t161&v3 == 0 {
 						store32(m.memory, uint64(uint32(v0)), uint32(v4))
-						store32(m.memory, uint64(uint32(i32(88528))), uint32(v3|v5))
+						store32(m.memory, uint64(uint32(i32(88752))), uint32(v3|v5))
 						goto l45
 					}
 					t163 := v2
@@ -45115,26 +45088,26 @@ func (m *Module) fn160(v0 int32) int32 {
 			store32(m.memory, uint64(uint32(v2+v4)), uint32(v1))
 		}
 	l36:
-		t168 := int32(load32(m.memory, uint64(uint32(i32(88536)))))
+		t168 := int32(load32(m.memory, uint64(uint32(i32(88760)))))
 		v1 = t168
 		if uint32(v1) <= uint32(v6) {
 			goto l31
 		}
-		t169 := int32(load32(m.memory, uint64(uint32(i32(88548)))))
+		t169 := int32(load32(m.memory, uint64(uint32(i32(88772)))))
 		v0 = t169
 		v2 = v0 + v6
 		t170 := v2
 		v1 = v1 - v6
 		store32(m.memory, uint64(uint32(t170))+4, uint32(v1|i32(1)))
-		store32(m.memory, uint64(uint32(i32(88536))), uint32(v1))
-		store32(m.memory, uint64(uint32(i32(88548))), uint32(v2))
+		store32(m.memory, uint64(uint32(i32(88760))), uint32(v1))
+		store32(m.memory, uint64(uint32(i32(88772))), uint32(v2))
 		store32(m.memory, uint64(uint32(v0))+4, uint32(v6|i32(3)))
 		v1 = v0 + i32(8)
 		goto l2
 	}
 l31:
 	v1 = i32(0)
-	store32(m.memory, uint64(uint32(i32(88368))), uint32(i32(48)))
+	store32(m.memory, uint64(uint32(i32(88592))), uint32(i32(48)))
 	goto l2
 l17:
 	{
@@ -45145,14 +45118,14 @@ l17:
 			t209 := int32(load32(m.memory, uint64(uint32(v5))+28))
 			v0 = t209
 			v2 = v0 << 2
-			t210 := int32(load32(m.memory, uint64(uint32(v2))+88828))
+			t210 := int32(load32(m.memory, uint64(uint32(v2))+89052))
 			if t210 == v5 {
-				store32(m.memory, uint64(uint32(v2+i32(88828))), uint32(v1))
+				store32(m.memory, uint64(uint32(v2+i32(89052))), uint32(v1))
 				if v1 != 0 {
 					goto l59
 				}
 				v8 = v8 & i32_rotl(i32(-2), v0)
-				store32(m.memory, uint64(uint32(i32(88528))), uint32(v8))
+				store32(m.memory, uint64(uint32(i32(88752))), uint32(v8))
 				goto l58
 			}
 			{
@@ -45200,15 +45173,15 @@ l58:
 		store32(m.memory, uint64(uint32(v5))+4, uint32(v6|i32(3)))
 		store32(m.memory, uint64(uint32(v3+v4)), uint32(v4))
 		if uint32(v4) <= uint32(i32(255)) {
-			v0 = v4&i32(248) + i32(88564)
+			v0 = v4&i32(248) + i32(88788)
 			var p216 int32
 			{
-				t217 := int32(load32(m.memory, uint64(uint32(i32(88524)))))
+				t217 := int32(load32(m.memory, uint64(uint32(i32(88748)))))
 				v1 = t217
 				t218 := v1
 				v2 = i32_shl(i32(1), int32(uint32(v4)>>3))
 				if t218&v2 == 0 {
-					store32(m.memory, uint64(uint32(i32(88524))), uint32(v1|v2))
+					store32(m.memory, uint64(uint32(i32(88748))), uint32(v1|v2))
 					t219 := v0
 					p216 = t219
 					goto l62
@@ -45232,12 +45205,12 @@ l58:
 		}
 		store32(m.memory, uint64(uint32(v3))+28, uint32(v1))
 		store64(m.memory, uint64(uint32(v3))+16, uint64(i64(0)))
-		v0 = v1<<2 + i32(88828)
+		v0 = v1<<2 + i32(89052)
 		t222 := v8
 		v2 = i32_shl(i32(1), v1)
 		if t222&v2 == 0 {
 			store32(m.memory, uint64(uint32(v0)), uint32(v3))
-			store32(m.memory, uint64(uint32(i32(88528))), uint32(v2|v8))
+			store32(m.memory, uint64(uint32(i32(88752))), uint32(v2|v8))
 			store32(m.memory, uint64(uint32(v3))+24, uint32(v0))
 			store32(m.memory, uint64(uint32(v3))+8, uint32(v3))
 			store32(m.memory, uint64(uint32(v3))+12, uint32(v3))
@@ -45293,13 +45266,13 @@ l8:
 			t229 := int32(load32(m.memory, uint64(uint32(v2))+28))
 			v0 = t229
 			v5 = v0 << 2
-			t230 := int32(load32(m.memory, uint64(uint32(v5))+88828))
+			t230 := int32(load32(m.memory, uint64(uint32(v5))+89052))
 			if t230 == v2 {
-				store32(m.memory, uint64(uint32(v5+i32(88828))), uint32(v1))
+				store32(m.memory, uint64(uint32(v5+i32(89052))), uint32(v1))
 				if v1 != 0 {
 					goto l66
 				}
-				store32(m.memory, uint64(uint32(i32(88528))), uint32(v11&i32_rotl(i32(-2), v0)))
+				store32(m.memory, uint64(uint32(i32(88752))), uint32(v11&i32_rotl(i32(-2), v0)))
 				goto l65
 			}
 			{
@@ -45346,14 +45319,14 @@ l65:
 	store32(m.memory, uint64(uint32(v2))+4, uint32(v6|i32(3)))
 	store32(m.memory, uint64(uint32(v4+v5)), uint32(v4))
 	if v8 != 0 {
-		v0 = v8&i32(-8) + i32(88564)
-		t236 := int32(load32(m.memory, uint64(uint32(i32(88544)))))
+		v0 = v8&i32(-8) + i32(88788)
+		t236 := int32(load32(m.memory, uint64(uint32(i32(88768)))))
 		v1 = t236
 		var p237 int32
 		{
 			v7 = i32_shl(i32(1), int32(uint32(v8)>>3))
 			if v7&v3 == 0 {
-				store32(m.memory, uint64(uint32(i32(88524))), uint32(v3|v7))
+				store32(m.memory, uint64(uint32(i32(88748))), uint32(v3|v7))
 				t238 := v0
 				p237 = t238
 				goto l69
@@ -45368,8 +45341,8 @@ l65:
 		store32(m.memory, uint64(uint32(v1))+12, uint32(v0))
 		store32(m.memory, uint64(uint32(v1))+8, uint32(v3))
 	}
-	store32(m.memory, uint64(uint32(i32(88544))), uint32(v5))
-	store32(m.memory, uint64(uint32(i32(88532))), uint32(v4))
+	store32(m.memory, uint64(uint32(i32(88768))), uint32(v5))
+	store32(m.memory, uint64(uint32(i32(88756))), uint32(v4))
 l68:
 	v1 = v2 + i32(8)
 l2:
@@ -45402,13 +45375,13 @@ func (m *Module) fn162(v0 int32) {
 			t3 := v3
 			v4 = t2
 			v3 = t3 - v4
-			t4 := int32(load32(m.memory, uint64(uint32(i32(88540)))))
+			t4 := int32(load32(m.memory, uint64(uint32(i32(88764)))))
 			if uint32(v3) < uint32(t4) {
 				return
 			}
 			v0 = v0 + v4
 			{
-				t5 := int32(load32(m.memory, uint64(uint32(i32(88544)))))
+				t5 := int32(load32(m.memory, uint64(uint32(i32(88768)))))
 				if t5 != v3 {
 					t6 := int32(load32(m.memory, uint64(uint32(v3))+12))
 					v1 = t6
@@ -45421,8 +45394,8 @@ func (m *Module) fn162(v0 int32) {
 							store32(m.memory, uint64(uint32(v2))+12, uint32(v1))
 							goto l1
 						}
-						t9 := int32(load32(m.memory, uint64(uint32(i32(88524)))))
-						store32(m.memory, uint64(uint32(i32(88524))), uint32(t9&i32_rotl(i32(-2), int32(uint32(v4)>>3))))
+						t9 := int32(load32(m.memory, uint64(uint32(i32(88748)))))
+						store32(m.memory, uint64(uint32(i32(88748))), uint32(t9&i32_rotl(i32(-2), int32(uint32(v4)>>3))))
 						goto l1
 					}
 					t10 := int32(load32(m.memory, uint64(uint32(v3))+24))
@@ -45474,7 +45447,7 @@ func (m *Module) fn162(v0 int32) {
 					goto l1
 				}
 				store32(m.memory, uint64(uint32(v5))+4, uint32(v2&i32(-2)))
-				store32(m.memory, uint64(uint32(i32(88532))), uint32(v0))
+				store32(m.memory, uint64(uint32(i32(88756))), uint32(v0))
 				store32(m.memory, uint64(uint32(v5)), uint32(v0))
 				store32(m.memory, uint64(uint32(v3))+4, uint32(v0|i32(1)))
 				return
@@ -45489,14 +45462,14 @@ func (m *Module) fn162(v0 int32) {
 				t18 := int32(load32(m.memory, uint64(uint32(v3))+28))
 				v4 = t18
 				v2 = v4 << 2
-				t19 := int32(load32(m.memory, uint64(uint32(v2))+88828))
+				t19 := int32(load32(m.memory, uint64(uint32(v2))+89052))
 				if t19 == v3 {
-					store32(m.memory, uint64(uint32(v2+i32(88828))), uint32(v1))
+					store32(m.memory, uint64(uint32(v2+i32(89052))), uint32(v1))
 					if v1 != 0 {
 						goto l6
 					}
-					t20 := int32(load32(m.memory, uint64(uint32(i32(88528)))))
-					store32(m.memory, uint64(uint32(i32(88528))), uint32(t20&i32_rotl(i32(-2), v4)))
+					t20 := int32(load32(m.memory, uint64(uint32(i32(88752)))))
+					store32(m.memory, uint64(uint32(i32(88752))), uint32(t20&i32_rotl(i32(-2), v4)))
 					goto l1
 				}
 				{
@@ -45539,28 +45512,28 @@ func (m *Module) fn162(v0 int32) {
 		}
 		{
 			if v4&i32(2) == 0 {
-				t25 := int32(load32(m.memory, uint64(uint32(i32(88548)))))
+				t25 := int32(load32(m.memory, uint64(uint32(i32(88772)))))
 				if t25 == v5 {
-					store32(m.memory, uint64(uint32(i32(88548))), uint32(v3))
-					t26 := int32(load32(m.memory, uint64(uint32(i32(88536)))))
+					store32(m.memory, uint64(uint32(i32(88772))), uint32(v3))
+					t26 := int32(load32(m.memory, uint64(uint32(i32(88760)))))
 					v0 = t26 + v0
-					store32(m.memory, uint64(uint32(i32(88536))), uint32(v0))
+					store32(m.memory, uint64(uint32(i32(88760))), uint32(v0))
 					store32(m.memory, uint64(uint32(v3))+4, uint32(v0|i32(1)))
-					t27 := int32(load32(m.memory, uint64(uint32(i32(88544)))))
+					t27 := int32(load32(m.memory, uint64(uint32(i32(88768)))))
 					if v3 != t27 {
 						return
 					}
-					store32(m.memory, uint64(uint32(i32(88532))), uint32(i32(0)))
-					store32(m.memory, uint64(uint32(i32(88544))), uint32(i32(0)))
+					store32(m.memory, uint64(uint32(i32(88756))), uint32(i32(0)))
+					store32(m.memory, uint64(uint32(i32(88768))), uint32(i32(0)))
 					return
 				}
-				t28 := int32(load32(m.memory, uint64(uint32(i32(88544)))))
+				t28 := int32(load32(m.memory, uint64(uint32(i32(88768)))))
 				v7 = t28
 				if v7 == v5 {
-					store32(m.memory, uint64(uint32(i32(88544))), uint32(v3))
-					t29 := int32(load32(m.memory, uint64(uint32(i32(88532)))))
+					store32(m.memory, uint64(uint32(i32(88768))), uint32(v3))
+					t29 := int32(load32(m.memory, uint64(uint32(i32(88756)))))
 					v0 = t29 + v0
-					store32(m.memory, uint64(uint32(i32(88532))), uint32(v0))
+					store32(m.memory, uint64(uint32(i32(88756))), uint32(v0))
 					store32(m.memory, uint64(uint32(v3))+4, uint32(v0|i32(1)))
 					store32(m.memory, uint64(uint32(v0+v3)), uint32(v0))
 					return
@@ -45572,8 +45545,8 @@ func (m *Module) fn162(v0 int32) {
 					t31 := int32(load32(m.memory, uint64(uint32(v5))+8))
 					v2 = t31
 					if v2 == v1 {
-						t32 := int32(load32(m.memory, uint64(uint32(i32(88524)))))
-						store32(m.memory, uint64(uint32(i32(88524))), uint32(t32&i32_rotl(i32(-2), int32(uint32(v4)>>3))))
+						t32 := int32(load32(m.memory, uint64(uint32(i32(88748)))))
+						store32(m.memory, uint64(uint32(i32(88748))), uint32(t32&i32_rotl(i32(-2), int32(uint32(v4)>>3))))
 						goto l8
 					}
 					store32(m.memory, uint64(uint32(v1))+8, uint32(v2))
@@ -45637,14 +45610,14 @@ func (m *Module) fn162(v0 int32) {
 				t40 := int32(load32(m.memory, uint64(uint32(v5))+28))
 				v4 = t40
 				v2 = v4 << 2
-				t41 := int32(load32(m.memory, uint64(uint32(v2))+88828))
+				t41 := int32(load32(m.memory, uint64(uint32(v2))+89052))
 				if t41 == v5 {
-					store32(m.memory, uint64(uint32(v2+i32(88828))), uint32(v1))
+					store32(m.memory, uint64(uint32(v2+i32(89052))), uint32(v1))
 					if v1 != 0 {
 						goto l13
 					}
-					t42 := int32(load32(m.memory, uint64(uint32(i32(88528)))))
-					store32(m.memory, uint64(uint32(i32(88528))), uint32(t42&i32_rotl(i32(-2), v4)))
+					t42 := int32(load32(m.memory, uint64(uint32(i32(88752)))))
+					store32(m.memory, uint64(uint32(i32(88752))), uint32(t42&i32_rotl(i32(-2), v4)))
 					goto l8
 				}
 				{
@@ -45682,19 +45655,19 @@ func (m *Module) fn162(v0 int32) {
 		if v3 != v7 {
 			goto l12
 		}
-		store32(m.memory, uint64(uint32(i32(88532))), uint32(v0))
+		store32(m.memory, uint64(uint32(i32(88756))), uint32(v0))
 		return
 	l12:
 		if uint32(v0) <= uint32(i32(255)) {
-			v2 = v0&i32(248) + i32(88564)
+			v2 = v0&i32(248) + i32(88788)
 			var p46 int32
 			{
-				t47 := int32(load32(m.memory, uint64(uint32(i32(88524)))))
+				t47 := int32(load32(m.memory, uint64(uint32(i32(88748)))))
 				v4 = t47
 				t48 := v4
 				v0 = i32_shl(i32(1), int32(uint32(v0)>>3))
 				if t48&v0 == 0 {
-					store32(m.memory, uint64(uint32(i32(88524))), uint32(v0|v4))
+					store32(m.memory, uint64(uint32(i32(88748))), uint32(v0|v4))
 					t49 := v2
 					p46 = t49
 					goto l15
@@ -45718,19 +45691,19 @@ func (m *Module) fn162(v0 int32) {
 		}
 		store32(m.memory, uint64(uint32(v3))+28, uint32(v1))
 		store64(m.memory, uint64(uint32(v3))+16, uint64(i64(0)))
-		v4 = v1<<2 + i32(88828)
+		v4 = v1<<2 + i32(89052)
 		var p52 int32
 		{
 			{
 				var p53 int32
 				{
-					t54 := int32(load32(m.memory, uint64(uint32(i32(88528)))))
+					t54 := int32(load32(m.memory, uint64(uint32(i32(88752)))))
 					v6 = t54
 					t55 := v6
 					v2 = i32_shl(i32(1), v1)
 					if t55&v2 == 0 {
 						store32(m.memory, uint64(uint32(v4)), uint32(v3))
-						store32(m.memory, uint64(uint32(i32(88528))), uint32(v2|v6))
+						store32(m.memory, uint64(uint32(i32(88752))), uint32(v2|v6))
 						v1 = i32(24)
 						p53 = i32(8)
 						goto l16
@@ -45785,13 +45758,13 @@ func (m *Module) fn162(v0 int32) {
 		store32(m.memory, uint64(uint32(v1+v3)), uint32(v4))
 		store32(m.memory, uint64(uint32(v3))+12, uint32(v2))
 		store32(m.memory, uint64(uint32(v0+v3)), uint32(v6))
-		t63 := int32(load32(m.memory, uint64(uint32(i32(88556)))))
+		t63 := int32(load32(m.memory, uint64(uint32(i32(88780)))))
 		v0 = t63 - i32(1)
 		p64 := i32(-1)
 		if v0 != 0 {
 			p64 = v0
 		}
-		store32(m.memory, uint64(uint32(i32(88556))), uint32(p64))
+		store32(m.memory, uint64(uint32(i32(88780))), uint32(p64))
 	}
 }
 func (m *Module) fn163(v0, v1 int32) int32 {
@@ -45843,7 +45816,7 @@ func (m *Module) fn164(v0, v1 int32) int32 {
 		return t0
 	}
 	if uint32(v1) >= uint32(i32(-64)) {
-		store32(m.memory, uint64(uint32(i32(88368))), uint32(i32(48)))
+		store32(m.memory, uint64(uint32(i32(88592))), uint32(i32(48)))
 		return i32(0)
 	}
 	p1 := (v1 + i32(19)) & i32(-16)
@@ -45864,7 +45837,7 @@ func (m *Module) fn164(v0, v1 int32) int32 {
 				if uint32(v2) <= uint32(v3) {
 					goto l0
 				}
-				t3 := int32(load32(m.memory, uint64(uint32(i32(89004)))))
+				t3 := int32(load32(m.memory, uint64(uint32(i32(89228)))))
 				if uint32(v2-v3) <= uint32(t3<<1) {
 					goto l1
 				}
@@ -45885,24 +45858,24 @@ func (m *Module) fn164(v0, v1 int32) int32 {
 				m.fn165(v2, v1)
 				return v0
 			}
-			t5 := int32(load32(m.memory, uint64(uint32(i32(88548)))))
+			t5 := int32(load32(m.memory, uint64(uint32(i32(88772)))))
 			if t5 == v4 {
-				t6 := int32(load32(m.memory, uint64(uint32(i32(88536)))))
+				t6 := int32(load32(m.memory, uint64(uint32(i32(88760)))))
 				v2 = t6 + v2
 				if uint32(v2) <= uint32(v3) {
 					goto l0
 				}
 				store32(m.memory, uint64(uint32(v7)), uint32(v3|v8&i32(1)|i32(2)))
 				v1 = v3 + v6
-				store32(m.memory, uint64(uint32(i32(88548))), uint32(v1))
+				store32(m.memory, uint64(uint32(i32(88772))), uint32(v1))
 				v2 = v2 - v3
-				store32(m.memory, uint64(uint32(i32(88536))), uint32(v2))
+				store32(m.memory, uint64(uint32(i32(88760))), uint32(v2))
 				store32(m.memory, uint64(uint32(v1))+4, uint32(v2|i32(1)))
 				return v0
 			}
-			t7 := int32(load32(m.memory, uint64(uint32(i32(88544)))))
+			t7 := int32(load32(m.memory, uint64(uint32(i32(88768)))))
 			if t7 == v4 {
-				t8 := int32(load32(m.memory, uint64(uint32(i32(88532)))))
+				t8 := int32(load32(m.memory, uint64(uint32(i32(88756)))))
 				v2 = t8 + v2
 				if uint32(v2) < uint32(v3) {
 					goto l0
@@ -45926,8 +45899,8 @@ func (m *Module) fn164(v0, v1 int32) int32 {
 					v1 = i32(0)
 				}
 			l2:
-				store32(m.memory, uint64(uint32(i32(88544))), uint32(v5))
-				store32(m.memory, uint64(uint32(i32(88532))), uint32(v1))
+				store32(m.memory, uint64(uint32(i32(88768))), uint32(v5))
+				store32(m.memory, uint64(uint32(i32(88756))), uint32(v1))
 				return v0
 			}
 			t11 := int32(load32(m.memory, uint64(uint32(v4))+4))
@@ -45947,8 +45920,8 @@ func (m *Module) fn164(v0, v1 int32) int32 {
 					t13 := int32(load32(m.memory, uint64(uint32(v4))+8))
 					v2 = t13
 					if v2 == v1 {
-						t14 := int32(load32(m.memory, uint64(uint32(i32(88524)))))
-						store32(m.memory, uint64(uint32(i32(88524))), uint32(t14&i32_rotl(i32(-2), int32(uint32(v5)>>3))))
+						t14 := int32(load32(m.memory, uint64(uint32(i32(88748)))))
+						store32(m.memory, uint64(uint32(i32(88748))), uint32(t14&i32_rotl(i32(-2), int32(uint32(v5)>>3))))
 						goto l3
 					}
 					store32(m.memory, uint64(uint32(v1))+8, uint32(v2))
@@ -46009,14 +45982,14 @@ func (m *Module) fn164(v0, v1 int32) int32 {
 					t22 := int32(load32(m.memory, uint64(uint32(v4))+28))
 					v2 = t22
 					v5 = v2 << 2
-					t23 := int32(load32(m.memory, uint64(uint32(v5))+88828))
+					t23 := int32(load32(m.memory, uint64(uint32(v5))+89052))
 					if t23 == v4 {
-						store32(m.memory, uint64(uint32(v5+i32(88828))), uint32(v1))
+						store32(m.memory, uint64(uint32(v5+i32(89052))), uint32(v1))
 						if v1 != 0 {
 							goto l7
 						}
-						t24 := int32(load32(m.memory, uint64(uint32(i32(88528)))))
-						store32(m.memory, uint64(uint32(i32(88528))), uint32(t24&i32_rotl(i32(-2), v2)))
+						t24 := int32(load32(m.memory, uint64(uint32(i32(88752)))))
+						store32(m.memory, uint64(uint32(i32(88752))), uint32(t24&i32_rotl(i32(-2), v2)))
 						goto l3
 					}
 					{
@@ -46110,7 +46083,7 @@ func (m *Module) fn165(v0, v1 int32) {
 			v1 = v2 + v1
 			{
 				v0 = v0 - v2
-				t2 := int32(load32(m.memory, uint64(uint32(i32(88544)))))
+				t2 := int32(load32(m.memory, uint64(uint32(i32(88768)))))
 				if v0 != t2 {
 					t3 := int32(load32(m.memory, uint64(uint32(v0))+12))
 					v3 = t3
@@ -46123,8 +46096,8 @@ func (m *Module) fn165(v0, v1 int32) {
 							store32(m.memory, uint64(uint32(v4))+12, uint32(v3))
 							goto l0
 						}
-						t6 := int32(load32(m.memory, uint64(uint32(i32(88524)))))
-						store32(m.memory, uint64(uint32(i32(88524))), uint32(t6&i32_rotl(i32(-2), int32(uint32(v2)>>3))))
+						t6 := int32(load32(m.memory, uint64(uint32(i32(88748)))))
+						store32(m.memory, uint64(uint32(i32(88748))), uint32(t6&i32_rotl(i32(-2), int32(uint32(v2)>>3))))
 						goto l0
 					}
 					t7 := int32(load32(m.memory, uint64(uint32(v0))+24))
@@ -46176,7 +46149,7 @@ func (m *Module) fn165(v0, v1 int32) {
 					goto l0
 				}
 				store32(m.memory, uint64(uint32(v5))+4, uint32(v2&i32(-2)))
-				store32(m.memory, uint64(uint32(i32(88532))), uint32(v1))
+				store32(m.memory, uint64(uint32(i32(88756))), uint32(v1))
 				store32(m.memory, uint64(uint32(v5)), uint32(v1))
 				store32(m.memory, uint64(uint32(v0))+4, uint32(v1|i32(1)))
 				return
@@ -46191,14 +46164,14 @@ func (m *Module) fn165(v0, v1 int32) {
 				t15 := int32(load32(m.memory, uint64(uint32(v0))+28))
 				v2 = t15
 				v4 = v2 << 2
-				t16 := int32(load32(m.memory, uint64(uint32(v4))+88828))
+				t16 := int32(load32(m.memory, uint64(uint32(v4))+89052))
 				if t16 == v0 {
-					store32(m.memory, uint64(uint32(v4+i32(88828))), uint32(v3))
+					store32(m.memory, uint64(uint32(v4+i32(89052))), uint32(v3))
 					if v3 != 0 {
 						goto l6
 					}
-					t17 := int32(load32(m.memory, uint64(uint32(i32(88528)))))
-					store32(m.memory, uint64(uint32(i32(88528))), uint32(t17&i32_rotl(i32(-2), v2)))
+					t17 := int32(load32(m.memory, uint64(uint32(i32(88752)))))
+					store32(m.memory, uint64(uint32(i32(88752))), uint32(t17&i32_rotl(i32(-2), v2)))
 					goto l0
 				}
 				{
@@ -46236,28 +46209,28 @@ func (m *Module) fn165(v0, v1 int32) {
 				t21 := int32(load32(m.memory, uint64(uint32(v5))+4))
 				v2 = t21
 				if v2&i32(2) == 0 {
-					t22 := int32(load32(m.memory, uint64(uint32(i32(88548)))))
+					t22 := int32(load32(m.memory, uint64(uint32(i32(88772)))))
 					if t22 == v5 {
-						store32(m.memory, uint64(uint32(i32(88548))), uint32(v0))
-						t23 := int32(load32(m.memory, uint64(uint32(i32(88536)))))
+						store32(m.memory, uint64(uint32(i32(88772))), uint32(v0))
+						t23 := int32(load32(m.memory, uint64(uint32(i32(88760)))))
 						v1 = t23 + v1
-						store32(m.memory, uint64(uint32(i32(88536))), uint32(v1))
+						store32(m.memory, uint64(uint32(i32(88760))), uint32(v1))
 						store32(m.memory, uint64(uint32(v0))+4, uint32(v1|i32(1)))
-						t24 := int32(load32(m.memory, uint64(uint32(i32(88544)))))
+						t24 := int32(load32(m.memory, uint64(uint32(i32(88768)))))
 						if v0 != t24 {
 							return
 						}
-						store32(m.memory, uint64(uint32(i32(88532))), uint32(i32(0)))
-						store32(m.memory, uint64(uint32(i32(88544))), uint32(i32(0)))
+						store32(m.memory, uint64(uint32(i32(88756))), uint32(i32(0)))
+						store32(m.memory, uint64(uint32(i32(88768))), uint32(i32(0)))
 						return
 					}
-					t25 := int32(load32(m.memory, uint64(uint32(i32(88544)))))
+					t25 := int32(load32(m.memory, uint64(uint32(i32(88768)))))
 					v8 = t25
 					if v8 == v5 {
-						store32(m.memory, uint64(uint32(i32(88544))), uint32(v0))
-						t26 := int32(load32(m.memory, uint64(uint32(i32(88532)))))
+						store32(m.memory, uint64(uint32(i32(88768))), uint32(v0))
+						t26 := int32(load32(m.memory, uint64(uint32(i32(88756)))))
 						v1 = t26 + v1
-						store32(m.memory, uint64(uint32(i32(88532))), uint32(v1))
+						store32(m.memory, uint64(uint32(i32(88756))), uint32(v1))
 						store32(m.memory, uint64(uint32(v0))+4, uint32(v1|i32(1)))
 						store32(m.memory, uint64(uint32(v0+v1)), uint32(v1))
 						return
@@ -46269,8 +46242,8 @@ func (m *Module) fn165(v0, v1 int32) {
 						t28 := int32(load32(m.memory, uint64(uint32(v5))+8))
 						v4 = t28
 						if v4 == v3 {
-							t29 := int32(load32(m.memory, uint64(uint32(i32(88524)))))
-							store32(m.memory, uint64(uint32(i32(88524))), uint32(t29&i32_rotl(i32(-2), int32(uint32(v2)>>3))))
+							t29 := int32(load32(m.memory, uint64(uint32(i32(88748)))))
+							store32(m.memory, uint64(uint32(i32(88748))), uint32(t29&i32_rotl(i32(-2), int32(uint32(v2)>>3))))
 							goto l8
 						}
 						store32(m.memory, uint64(uint32(v3))+8, uint32(v4))
@@ -46335,14 +46308,14 @@ func (m *Module) fn165(v0, v1 int32) {
 				t37 := int32(load32(m.memory, uint64(uint32(v5))+28))
 				v2 = t37
 				v4 = v2 << 2
-				t38 := int32(load32(m.memory, uint64(uint32(v4))+88828))
+				t38 := int32(load32(m.memory, uint64(uint32(v4))+89052))
 				if t38 == v5 {
-					store32(m.memory, uint64(uint32(v4+i32(88828))), uint32(v3))
+					store32(m.memory, uint64(uint32(v4+i32(89052))), uint32(v3))
 					if v3 != 0 {
 						goto l13
 					}
-					t39 := int32(load32(m.memory, uint64(uint32(i32(88528)))))
-					store32(m.memory, uint64(uint32(i32(88528))), uint32(t39&i32_rotl(i32(-2), v2)))
+					t39 := int32(load32(m.memory, uint64(uint32(i32(88752)))))
+					store32(m.memory, uint64(uint32(i32(88752))), uint32(t39&i32_rotl(i32(-2), v2)))
 					goto l8
 				}
 				{
@@ -46380,19 +46353,19 @@ func (m *Module) fn165(v0, v1 int32) {
 		if v0 != v8 {
 			goto l12
 		}
-		store32(m.memory, uint64(uint32(i32(88532))), uint32(v1))
+		store32(m.memory, uint64(uint32(i32(88756))), uint32(v1))
 		return
 	l12:
 		if uint32(v1) <= uint32(i32(255)) {
-			v2 = v1&i32(248) + i32(88564)
+			v2 = v1&i32(248) + i32(88788)
 			var p43 int32
 			{
-				t44 := int32(load32(m.memory, uint64(uint32(i32(88524)))))
+				t44 := int32(load32(m.memory, uint64(uint32(i32(88748)))))
 				v3 = t44
 				t45 := v3
 				v1 = i32_shl(i32(1), int32(uint32(v1)>>3))
 				if t45&v1 == 0 {
-					store32(m.memory, uint64(uint32(i32(88524))), uint32(v1|v3))
+					store32(m.memory, uint64(uint32(i32(88748))), uint32(v1|v3))
 					t46 := v2
 					p43 = t46
 					goto l15
@@ -46416,14 +46389,14 @@ func (m *Module) fn165(v0, v1 int32) {
 		}
 		store32(m.memory, uint64(uint32(v0))+28, uint32(v3))
 		store64(m.memory, uint64(uint32(v0))+16, uint64(i64(0)))
-		v2 = v3<<2 + i32(88828)
-		t49 := int32(load32(m.memory, uint64(uint32(i32(88528)))))
+		v2 = v3<<2 + i32(89052)
+		t49 := int32(load32(m.memory, uint64(uint32(i32(88752)))))
 		v4 = t49
 		t50 := v4
 		v7 = i32_shl(i32(1), v3)
 		if t50&v7 == 0 {
 			store32(m.memory, uint64(uint32(v2)), uint32(v0))
-			store32(m.memory, uint64(uint32(i32(88528))), uint32(v4|v7))
+			store32(m.memory, uint64(uint32(i32(88752))), uint32(v4|v7))
 			store32(m.memory, uint64(uint32(v0))+24, uint32(v2))
 			store32(m.memory, uint64(uint32(v0))+8, uint32(v0))
 			store32(m.memory, uint64(uint32(v0))+12, uint32(v0))

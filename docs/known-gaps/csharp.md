@@ -14,7 +14,7 @@ Identity: grammar `9150f7d56bb47f1a809fa23623f1ba1413e93fa9`; runtime `v0.27.2`;
 The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`pins.json`](../../tools/gen/pins.json),
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/csharp/provenance.json).
 
-- Source identity SHA-256: `fd3a1d3d78d51e89f50b3da162e251ab091242d606aa8a582939dc1e5baa1532`
+- Source identity SHA-256: `742374675380713a022e58e7c92055ca80095b454a2284ee77d20288fcf2807c`
 - Module provenance SHA-256: `16408d4d74390f4287b34fadf53248d954a87ef4b95aff38fe7777e013ed1981`
 
 ## csharp-default-constraint

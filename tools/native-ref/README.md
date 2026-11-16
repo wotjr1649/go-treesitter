@@ -24,8 +24,9 @@ go run . -pins ../gen/pins.json -dl <archive dir> -work <empty dir> -out <exe di
   the pinned `files` hash. Transient network failures get at most three attempts, with 1/2-second backoff and a two-minute
   timeout per attempt; HTTP errors and hash mismatches are not retried. Failed transfers leave no partial archive. Only
   the required source directories are extracted into `-work` (the pinned grammar/runtime `dirs` and wasi-libc's
-  `libc-top-half/musl/src/ctype`). Approved grammar-input patches additionally extract the full grammar archive
-  into a private directory and execute its grammar JS with the pinned CLI's native JS runtime (ADR-0023).
+  `libc-top-half/musl/src/ctype`). ADR-0027 regeneration additionally extracts the full grammar archive
+  into a private directory and executes its grammar JS with the pinned CLI's native JS runtime; only recorded
+  generator exceptions retain committed C. Grammar-input patches precede generation, and C patches follow it.
 - `-fsigned-char` and `-DNDEBUG` match the engine's plain-char signedness and disabled assertions for the driver,
   grammar and runtime. `-static` on Windows (no MinGW DLLs needed); upstream's `_POSIX_C_SOURCE`/`_DEFAULT_SOURCE`
   flags elsewhere. Windows retains 16-bit `wchar_t`, so C++ raw string delimiters and XML names with supplementary
@@ -139,6 +140,38 @@ still mandatory. A generation record is kept at `<work>/patches-<lang>/provenanc
 its original grammar inputs, since its archived C may be absent or an LFS pointer. It never changes the pin set.
 `-patch-alert N` sets the patch-count warning threshold (default 3). See `tools/gen/README.md` for the record schema.
 
+## Pinned generator behaviour gate (ADR-0027)
+
+Build `native-ref`, `ciconf`, and `tools/bench/ci` from this checkout, then run (Python 3.11+):
+
+```
+python tools/native-ref/generatorgate.py --lang json --native-ref <native-ref> --ciconf <ciconf> \
+  --benchci <benchci> --cli <pinned-tree-sitter> --dl <verified-archive-cache> --out <new-result-directory>
+```
+
+The tool builds committed-C (`native-ref -reference`) and regenerated-C (`-candidate`) variants independently,
+compares native corpus dumps, seeded incremental/fresh trees, changed ranges and field lookups, and compares
+the SHA-256-pinned large inputs in `tools/bench/ci/large.json`. It runs the upstream repository's own tests once
+per variant, with separate `TREE_SITTER_LIBDIR` directories; existing failures must keep their output signature.
+If a corpus failure prevents the CLI from reaching auxiliary tests, a declared supplemental invocation excludes
+exactly those failing corpus names and collects the remaining stages; the original failures remain in the comparison.
+Repositories with no upstream cases record `NOT_RUN_ZERO_CASES`. A committed LFS pointer is a reference only
+when regeneration reproduces its recorded SHA-256 OID. When that OID equals the candidate parser, there are no
+patches, and all other grammar C/header inputs are byte-identical, the reference shares the candidate's native
+build, data and upstream test results. The report explicitly records `LFS_OID_IDENTICAL_TO_CANDIDATE` and the OID;
+this avoids regenerating and compiling PostgreSQL a second time rather than claiming an independent comparison.
+The PostgreSQL shard budgets 30 minutes locally (generation plus one native build and tests), with a 90-minute
+hosted limit allowing a 2x slowdown plus 30 minutes of margin. This is an estimate, not a hosted measurement.
+Initial generator exceptions still exercise the candidate
+and must match exactly the `generatorException.failingInputs` IDs; a disappearing or expanding exception fails.
+The new output directory retains source/build identities, commands, input bytes, native results and upstream
+summaries. CI uploads these results and GNU `time -v` wall-time/max-RSS records; hosted measurements describe
+the runner that ran them, not a local estimate. No pin is changed by the gate.
+Text identities for pins, the gate script and the large-input manifest hash CRLF-normalized-to-LF bytes; binary
+tools, archives, parser sources and input/output dumps retain exact byte hashes. Each subprocess is supervised,
+including child-tree cleanup on exceptions, with bounded cleanup waits. `--large-dump-timeout SECONDS` controls
+each pinned large native dump (default 120 seconds); a timeout remains a retained failure.
+
 ## Unpatched comparison (ADR-0023)
 
 For a patched grammar, build separate executables into separate work/output directories, once normally and once
@@ -165,3 +198,10 @@ This adds the bounded, hash-checked source/edit projection documented in
 [`workloads.md`](../../docs/validation/workloads.md#bounded-grammar-kit-inputs).
 Kit inputs get their explicit pair edits, not three additional seeded edits.
 `-inputs-only` includes their fresh step sources without running native parsers.
+
+ADR-0027 regenerates every grammar except the recorded `generatorException` entries in `pins.json`.
+`grammar.js` patches apply before generation; recorded C patches apply afterwards, using generated
+before/after hashes where necessary. Selected `npmDependencies` are unpacked directly from the upstream
+`package-lock.json` tarball after SHA-512 integrity verification; install scripts never run.
+QuickJS receives these packages in the grammar working directory's `node_modules` (including TypeScript/TSX);
+no host Node installation participates. Lockfile, tarball and dependency identities are recorded in provenance.

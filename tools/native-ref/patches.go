@@ -24,7 +24,8 @@ func prepareGrammarPatches(pinsFile string, p pins, g source, dl, work, lang str
 		return root, patches.Apply(filepath.Dir(pinsFile), root, g.Patches)
 	}
 	c := grammarpatch.Config{Archive: filepath.Join(dl, g.Archive), ArchiveSHA256: g.ArchiveSHA256,
-		PatchRoot: filepath.Dir(pinsFile), Work: filepath.Join(work, "patches-"+lang), GrammarDir: g.GrammarDir, Patches: g.Patches, Regenerate: true}
+		PatchRoot: filepath.Dir(pinsFile), Work: filepath.Join(work, "patches-"+lang), GrammarDir: g.GrammarDir, Patches: g.Patches, Regenerate: true,
+		NPMDependencies: g.NPMDependencies, FetchNPM: fetch, NPMCache: filepath.Join(dl, "npm")}
 	if g.Regenerate {
 		cli, ok := p.Tools.TreeSitterCLIArchives[runtime.GOOS+"-"+runtime.GOARCH]
 		if !ok {

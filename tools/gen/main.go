@@ -45,6 +45,7 @@ var (
 type opts struct {
 	treeSitter, grammarSrc                                                                 string
 	patchStatus                                                                            bool
+	fetchNPM                                                                               bool
 	patchAlert                                                                             int
 	lang, root, src, dl, sdk, wasm2go, wasmOpt, recipe, out, work, repo, rootVersion, plan string
 	hash, noAPI, verifyBinaries                                                            bool
@@ -79,6 +80,7 @@ func main() {
 	flag.BoolVar(&o.noAPI, "no-api", false, "do not emit language_api.go (Language() needs the root treesitter package)")
 	flag.BoolVar(&o.balanceProbe, "balance-probe", false, "TEST ONLY: add balancing/reset observations and a deterministic conformance test; output must be a new directory outside grammars/")
 	flag.BoolVar(&o.mirrorAssets, "mirror-assets", false, "list pinned archives for every platform: file, sha256, upstream URL, kind (source/toolchain)")
+	flag.BoolVar(&o.fetchNPM, "fetch-npm", false, "download missing lockfile-pinned npm grammar tarballs (no install scripts)")
 	flag.StringVar(&o.treeSitter, "tree-sitter", "", "pinned tree-sitter CLI (needed for regenerate: true)")
 	flag.IntVar(&o.patchAlert, "patch-alert", 3, "warn when a grammar has more than this many patches")
 	flag.BoolVar(&o.patchStatus, "patch-status", false, "list every grammar's patch count and threshold warnings")

@@ -26,12 +26,16 @@ type Config struct {
 	Regenerate                                          bool
 	Archive, ArchiveSHA256, PatchRoot, Work, GrammarDir string
 	CLI, CLIArchive, CLIArchiveSHA256, CLIVersion       string
+	NPMDependencies                                     []string
+	NPMCache                                            string
+	FetchNPM                                            bool
 	Patches                                             []patches.Pin
 }
 
 // Provenance excludes host paths and binary hashes; per-platform archives are verified against pins.json.
 type Provenance struct {
 	Patches       []patches.Pin     `json:"patches"`
+	NPM           []NPMInput        `json:"npm,omitempty"`
 	CLI           string            `json:"cli,omitempty"`
 	JSRuntime     string            `json:"jsRuntime,omitempty"`
 	InputSHA256   string            `json:"inputSHA256"`
@@ -58,10 +62,10 @@ func checkFile(p, want string) error {
 }
 
 func local(name string) bool {
-	return name != "." && filepath.IsLocal(name) && !strings.Contains(name, "\\") && path.Clean(name) == name
+	return name != "." && filepath.IsLocal(name) && !strings.ContainsAny(name, "\\:\x00") && path.Clean(name) == name
 }
 
-// Prepare verifies the archive, applies exact patches, then generates twice in independent trees.
+// Prepare verifies inputs, patches grammar inputs, generates twice, then applies recorded C patches.
 // It never modifies the caller's original extracted inputs.
 func Prepare(c Config) (string, *Provenance, error) {
 	if len(c.Patches) == 0 && !c.Regenerate {
@@ -83,14 +87,26 @@ func Prepare(c Config) (string, *Provenance, error) {
 	if err := Validate(c.Patches, c.Regenerate); err != nil {
 		return "", nil, err
 	}
-	if err := patches.Apply(c.PatchRoot, root, c.Patches); err != nil {
+	var before, after []patches.Pin
+	for _, p := range c.Patches {
+		if c.Regenerate && (path.Ext(p.Source) == ".c" || path.Ext(p.Source) == ".h") {
+			after = append(after, p)
+		} else {
+			before = append(before, p)
+		}
+	}
+	if err := patches.Apply(c.PatchRoot, root, before); err != nil {
+		return "", nil, err
+	}
+	npm, err := prepareNPM(c, root)
+	if err != nil {
 		return "", nil, err
 	}
 	inputs, err := snapshot(root)
 	if err != nil {
 		return "", nil, err
 	}
-	prov := &Provenance{Patches: c.Patches, InputSHA256: treeHash(inputs)}
+	prov := &Provenance{Patches: c.Patches, NPM: npm, InputSHA256: treeHash(inputs)}
 	if c.Regenerate {
 		if err := verifyCLI(c); err != nil {
 			return "", nil, err
@@ -101,6 +117,9 @@ func Prepare(c Config) (string, *Provenance, error) {
 		}
 		for _, d := range []string{root, second} {
 			if err := generate(c, d); err != nil {
+				return "", nil, err
+			}
+			if err := patches.ApplyGenerated(c.PatchRoot, d, after); err != nil {
 				return "", nil, err
 			}
 		}
@@ -179,7 +198,7 @@ func generate(c Config, root string) error {
 	dir := filepath.Join(root, filepath.Dir(filepath.FromSlash(c.GrammarDir)))
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, c.CLI, "generate", "--js-runtime", "native")
+	cmd := exec.CommandContext(ctx, c.CLI, "generate", "--abi", "15", "--js-runtime", "native")
 	cmd.Dir = dir
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("tree-sitter generate: %w: %s", err, out)

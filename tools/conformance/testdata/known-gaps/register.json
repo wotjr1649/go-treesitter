@@ -7,22 +7,22 @@
     "python": {
       "Name": "Python",
       "Commit": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64",
-      "PinSHA256": "541729622eee59fa4885980a139ec10badbc43394468e0aa6d327149f6925932",
-      "ProvenanceSHA256": "99acbb437ac979fa8f0d30b074d11396b03357f9febe25ce275bb5c8eef80756",
+      "PinSHA256": "fe37ad83c6804c3f5a4aad3405bfaeb510dbaa5eda22714dc077abdd9786597f",
+      "ProvenanceSHA256": "b709417aaa96677369f1bc56eeeb85a4a97189a440fb09ef010b1f65fb66f40d",
       "PatchCount": 1
     },
     "csharp": {
       "Name": "C#",
       "Commit": "9150f7d56bb47f1a809fa23623f1ba1413e93fa9",
-      "PinSHA256": "fd3a1d3d78d51e89f50b3da162e251ab091242d606aa8a582939dc1e5baa1532",
+      "PinSHA256": "742374675380713a022e58e7c92055ca80095b454a2284ee77d20288fcf2807c",
       "ProvenanceSHA256": "16408d4d74390f4287b34fadf53248d954a87ef4b95aff38fe7777e013ed1981",
       "PatchCount": 0
     },
     "tsql": {
       "Name": "T-SQL",
       "Commit": "2e34d86ec58f3d1a771efc0ca1e71c536690a0b7",
-      "PinSHA256": "f92a08a6f2faad79363b0e32bcb4a533918cd512f35c81e247ba3497c3db4080",
-      "ProvenanceSHA256": "17b1492ca3d9493efd249c466c776a36283d6d50be25e0390f735ce50c96002c",
+      "PinSHA256": "8fb519c8f90cfc05b8a5194e3dce530bcd7f5c133cda3f7ca835ffe271bd9b61",
+      "ProvenanceSHA256": "d202ed4dcabfe6a70b5938fd35d3f82ae8ee3ef5941e7f05867fe5da0676fb09",
       "PatchCount": 0
     }
   },

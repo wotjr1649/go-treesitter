@@ -78,3 +78,32 @@ func TestApply(t *testing.T) {
 		})
 	}
 }
+
+func TestGeneratedPatchKeepsReferenceHashes(t *testing.T) {
+	root := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(root, "patches"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(root, "src"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	diff := []byte("--- a/src/parser.c\n+++ b/src/parser.c\n@@ -1 +1 @@\n-old\n+new\n")
+	if err := os.WriteFile(filepath.Join(root, "patches/fix.patch"), diff, 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "src/parser.c"), []byte("old\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	p := Pin{File: "patches/fix.patch", Source: "src/parser.c", SHA256: sum(diff), BeforeSHA256: "reference-before", AfterSHA256: "reference-after", GeneratedBeforeSHA256: sum([]byte("old\n")), GeneratedAfterSHA256: sum([]byte("new\n")), UpstreamReport: "https://example.com/1"}
+	pins := []Pin{p}
+	if err := ApplyGenerated(root, root, pins); err != nil {
+		t.Fatal(err)
+	}
+	if pins[0] != p {
+		t.Fatal("reference identities mutated")
+	}
+	p.GeneratedAfterSHA256 = ""
+	if err := ApplyGenerated(root, root, []Pin{p}); err == nil {
+		t.Fatal("partial generated identity accepted")
+	}
+}

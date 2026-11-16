@@ -14,12 +14,14 @@ import (
 
 // Pin identifies one single-file unified diff and both versions of its upstream source.
 type Pin struct {
-	File           string `json:"file"`
-	SHA256         string `json:"sha256"`
-	Source         string `json:"source"`
-	BeforeSHA256   string `json:"beforeSHA256"`
-	AfterSHA256    string `json:"afterSHA256"`
-	UpstreamReport string `json:"upstreamReport"`
+	File                  string `json:"file"`
+	SHA256                string `json:"sha256"`
+	Source                string `json:"source"`
+	BeforeSHA256          string `json:"beforeSHA256"`
+	AfterSHA256           string `json:"afterSHA256"`
+	UpstreamReport        string `json:"upstreamReport"`
+	GeneratedBeforeSHA256 string `json:"generatedBeforeSHA256,omitempty"`
+	GeneratedAfterSHA256  string `json:"generatedAfterSHA256,omitempty"`
 }
 
 func sum(b []byte) string { h := sha256.Sum256(b); return hex.EncodeToString(h[:]) }
@@ -92,4 +94,19 @@ func Apply(patchRoot, sourceRoot string, pins []Pin) error {
 		}
 	}
 	return nil
+}
+
+// ApplyGenerated preserves the original C identities for the reference variant.
+func ApplyGenerated(patchRoot, sourceRoot string, pins []Pin) error {
+	generated := append([]Pin(nil), pins...)
+	for i := range generated {
+		p := &generated[i]
+		if (p.GeneratedBeforeSHA256 == "") != (p.GeneratedAfterSHA256 == "") {
+			return fmt.Errorf("patch %s: incomplete generated C hashes", p.File)
+		}
+		if p.GeneratedBeforeSHA256 != "" {
+			p.BeforeSHA256, p.AfterSHA256 = p.GeneratedBeforeSHA256, p.GeneratedAfterSHA256
+		}
+	}
+	return Apply(patchRoot, sourceRoot, generated)
 }
