@@ -715,6 +715,35 @@
       },
       "licenseSHA256": "b336477d5469bf335e7d173814e1da57d4f13c23968959a71523668ac4a9a6c2",
       "cSymbol": "tree_sitter_postgres"
+    },
+    "swift": {
+      "reference": "none",
+      "regenerate": true,
+      "repo": "https://github.com/alex-pinkus/tree-sitter-swift",
+      "commit": "a1d4a7b80260bf960f9e25198cddecbe5e6c46aa",
+      "extractDir": "tree-sitter-swift-a1d4a7b8",
+      "archive": "tree-sitter-swift-a1d4a7b8.tar.gz",
+      "archiveSHA256": "6c6850eb5a98cd81f223f07bf0a19ee616e73226d66ab5267d90c006781cacb9",
+      "archiveURL": "https://codeload.github.com/alex-pinkus/tree-sitter-swift/tar.gz/a1d4a7b80260bf960f9e25198cddecbe5e6c46aa",
+      "grammarDir": "src",
+      "dirs": [
+        "src",
+        "grammar.js",
+        "tree-sitter.json"
+      ],
+      "treeSHA256": "772c7ca85ce72b53a22e9547d3321bd91197867d5b4c6263e8e6689b9e61b323",
+      "files": {
+        "scanner.c": "f054430c6a1eb29ef2ca779a9c2103466236a1fc0f44bc64f82d353ddd723946"
+      },
+      "licenseSHA256": "3533cec129bb4bba015c0d61d86dd7c3b7e82110e4d2ff7837a01eff5bad5ccc",
+      "cSymbol": "tree_sitter_swift",
+      "generateFrom": "grammar.json",
+      "upstreamTestException": {
+        "cli": "0.27.2",
+        "step": "tree-sitter test: queries/outline.scm -> test/outline/outline.swift",
+        "reason": "Owner-approved 2026-11-17: CLI query runner uses the Swift input path as the query path; corpus 312/312 and the explicit outline query must pass.",
+        "retireWhen": "On a CLI pin move, rerun the full suite; remove this exception only after the fixed CLI runs the outline query correctly."
+      }
     }
   }
 }

@@ -30,7 +30,9 @@ import (
 )
 
 type source struct {
+	Reference       string            `json:"reference,omitempty"`
 	Regenerate      bool              `json:"regenerate,omitempty"`
+	GenerateFrom    string            `json:"generateFrom,omitempty"`
 	NPMDependencies []string          `json:"npmDependencies,omitempty"`
 	Patches         []patches.Pin     `json:"patches,omitempty"`
 	Mirrors         []string          `json:"-"`
@@ -121,6 +123,14 @@ func runMode(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, no
 		}
 		sort.Strings(langs)
 	}
+	if reference {
+		for _, lang := range langs {
+			if p.Grammars[lang].Reference == "none" {
+				return fmt.Errorf("%s: reference none: NOT_APPLICABLE_NO_COMMITTED_PARSER", lang)
+			}
+		}
+	}
+
 	if ents, err := os.ReadDir(work); err == nil && len(ents) > 0 {
 		return fmt.Errorf("%s is not empty", work)
 	}

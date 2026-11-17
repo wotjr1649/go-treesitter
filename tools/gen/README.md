@@ -137,17 +137,17 @@ Everything a generation consumes is pinned, and the identity of a generated modu
 ## Regenerate
 
 ```
-bash tools/gen/regen.sh <new-empty-work-dir> [lang ...]      # all 24 modules by default
+bash tools/gen/regen.sh <new-empty-work-dir> [lang ...]      # all 25 modules by default
 ROOT_VERSION=v0.1.0 bash tools/gen/regen.sh <work-dir>       # switch a development tree to the release go.mod form
 ```
 
 `regen.sh` builds `gen`, prints the fetch plan (`gen -plan host`), downloads every archive into the new directory,
 verifies its sha256 **before** extracting, builds wasm2go from the pinned version, then runs `gen` per module into
 `grammars/<lang>`. `.github/workflows/regen.yml` runs it on Linux and requires `git diff --exit-code -- grammars/`.
-Without `ROOT_VERSION`, `regen.sh` derives the go.mod form from the committed `grammars/*/go.mod` (all 24 must be in the same form: development with `replace`, or release `require vX.Y.Z` without `replace`; otherwise it fails), so the drift check regenerates the committed form unchanged.
+Without `ROOT_VERSION`, `regen.sh` derives the go.mod form from the committed `grammars/*/go.mod` (all 25 must be in the same form: development with `replace`, or release `require vX.Y.Z` without `replace`; otherwise it fails), so the drift check regenerates the committed form unchanged.
 
 The modules are `bash`, `c`, `cpp`, `csharp`, `css`, `dart`, `golang`, `html`, `java`, `javascript` (including JSX), `json`,
-`kotlin`, `php`, `postgres`, `powershell`, `python`, `r`, `ruby`, `rust`, `tsql`, `tsx`, `typescript`, `xml`, and `yaml`. Each has a grammar-specific generated smoke-test sample.
+`kotlin`, `php`, `postgres`, `powershell`, `python`, `r`, `ruby`, `rust`, `swift`, `tsql`, `tsx`, `typescript`, `xml`, and `yaml`. Each has a grammar-specific generated smoke-test sample.
 Downloads allow three attempts with 1s/2s backoff only for transient transport failures. HTTP, certificate and local
 write errors end that URL attempt; transient HTTP 408/429/5xx responses also receive bounded retries. A failed upstream download or hash check then tries each configured mirror; sha256 verification remains mandatory before extraction. The retry self-check is
 `bash tools/gen/fetch_test.sh`.
@@ -171,7 +171,7 @@ and product shim in `probe/balance.c`. It uses the normal recipe and memory prov
 output outside `grammars/`, rejects `-root-version`, and marks its provenance `testOnly: "balancing-cancel"`; its wrapper
 hash and extra exports are bound into its identity. These modules are test artifacts, never product grammar modules.
 
-`bash tools/gen/balance-probe.sh <new-empty-work-dir> [lang ...]` fetches SHA-verified pinned inputs and builds all 24 probes
+`bash tools/gen/balance-probe.sh <new-empty-work-dir> [lang ...]` fetches SHA-verified pinned inputs and builds all 25 probes
 under `<work-dir>/probes/` and native references under `<work-dir>/native/`, without regenerating product modules.
 With language arguments it builds only those probes and native executables, for example `... <work-dir> javascript`.
 Then, from `tools/conformance`:
@@ -241,9 +241,9 @@ kind `source`/`toolchain`; no header):
 awk -F '\t' '$4 == "source"' release-assets.tsv > release-source-assets.tsv
 ```
 
-The command lists 33 rows for the current pins: 25 `source` archives and eight `toolchain` archives. The immutable v0.4.0 release
+The command lists 34 rows for the current pins: 26 `source` archives and eight `toolchain` archives. The immutable v0.4.0 release
 contains its original 24 source archives plus `SHA256SUMS`; the new C and PostgreSQL archives have no fallback there.
-The v0.5.0 release mirrors all 25 rows with column 4 equal to `source`, plus `SHA256SUMS`. Check their filenames against `runtime.archive`,
+The v0.5.0 release mirrors the 25 rows with column 4 equal to `source` that existed then, plus `SHA256SUMS`; the Swift archive added afterwards has no mirror fallback until a release carrying it is published. Check their filenames against `runtime.archive`,
 `wasiLibc.archive`, and each grammar's `archive` in `pins.json`, deduplicating TypeScript/TSX's shared archive;
 the [publication procedure](../../docs/specs/publication.md#pinned-archive-release-assets) specifies the inventory
 and digest checks. The eight SDK/binaryen/CLI host archives are excluded until complete bundled notices can be
@@ -282,3 +282,25 @@ selects grammars from `pins.json`: adding `postgres` checks its new schema, and 
 the old/new native comparison. Its unpatched regeneration flag also prepares the pinned CLI for that job.
 CLI errors (including OOM), compiler errors and timeouts propagate as job failures; no memory-dependent
 skip or `continue-on-error` is used for PostgreSQL generation.
+
+## Swift regeneration
+
+`swift` uses unmodified `alex-pinkus/tree-sitter-swift` grammar inputs; upstream commits no `parser.c`, so
+`regenerate: true`, `generateFrom: "grammar.json"` with the pinned CLI 0.27.2 produces `parser.c` and `node-types.json` twice
+independently, for both engine and fresh native C builds. There are zero patches. Of the current 25 grammar
+modules, Swift alone pins `reference: "none"`: no committed-parser comparison exists, and the gate explicitly
+records `NOT_APPLICABLE_NO_COMMITTED_PARSER`. Direct `native-ref -reference swift` fails with that status.
+The gate still requires candidate determinism, a strict generated-schema check, product-vs-fresh-native corpus,
+seeded edits and field lookups, pinned large-input comparisons, and the upstream repository's own tests.
+Swift reads the unmodified upstream-committed `src/grammar.json` (including emoji patterns); it never evaluates
+`grammar.js`. Other grammars keep the default JS input. `grammarGeneration.generateFrom` and
+`generateFromSHA256` identify the selected input before generation; the full input-tree hash is retained.
+The sole owner-approved upstream-test exception is the CLI 0.27.2 outline query-path defect, recorded in
+`pins.json` separately from generator exceptions. The original full-suite exit 1 and raw log are retained.
+The gate requires all 312 corpus cases and eight highlight cases to pass, matches the exact query error, then
+runs `tree-sitter query queries/outline.scm test/outline/outline.swift`; any other failure fails the gate.
+A CLI pin move invalidates the exception; retire it after the fixed CLI passes the full suite.
+The absent reference is not a pass for the remaining checks. The CLI generation takes about a second
+on the Windows measurement host. The scanner's allocation-failure branch calls `fprintf(stderr, ...)` and `exit(1)`; the engine
+host maps the resulting WASI `proc_exit` import to a trap (EngineFault), so `checkImports` allows it. See
+[limitations](../../docs/reports/limitations.md#swift-development-tree-after-v050).

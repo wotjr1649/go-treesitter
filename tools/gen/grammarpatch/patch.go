@@ -24,6 +24,7 @@ import (
 
 type Config struct {
 	Regenerate                                          bool
+	GenerateFrom                                        string
 	Archive, ArchiveSHA256, PatchRoot, Work, GrammarDir string
 	CLI, CLIArchive, CLIArchiveSHA256, CLIVersion       string
 	NPMDependencies                                     []string
@@ -34,13 +35,15 @@ type Config struct {
 
 // Provenance excludes host paths and binary hashes; per-platform archives are verified against pins.json.
 type Provenance struct {
-	Patches       []patches.Pin     `json:"patches"`
-	NPM           []NPMInput        `json:"npm,omitempty"`
-	CLI           string            `json:"cli,omitempty"`
-	JSRuntime     string            `json:"jsRuntime,omitempty"`
-	InputSHA256   string            `json:"inputSHA256"`
-	Outputs       map[string]string `json:"outputs"`
-	Deterministic bool              `json:"deterministic"`
+	Patches            []patches.Pin     `json:"patches"`
+	NPM                []NPMInput        `json:"npm,omitempty"`
+	CLI                string            `json:"cli,omitempty"`
+	JSRuntime          string            `json:"jsRuntime,omitempty"`
+	GenerateFrom       string            `json:"generateFrom,omitempty"`
+	GenerateFromSHA256 string            `json:"generateFromSHA256,omitempty"`
+	InputSHA256        string            `json:"inputSHA256"`
+	Outputs            map[string]string `json:"outputs"`
+	Deterministic      bool              `json:"deterministic"`
 }
 
 func hash(b []byte) string { h := sha256.Sum256(b); return hex.EncodeToString(h[:]) }
@@ -84,7 +87,7 @@ func Prepare(c Config) (string, *Provenance, error) {
 	if err := extract(c.Archive, root); err != nil {
 		return "", nil, err
 	}
-	if err := Validate(c.Patches, c.Regenerate); err != nil {
+	if err := Validate(c.Patches, c.Regenerate, c.GenerateFrom); err != nil {
 		return "", nil, err
 	}
 	var before, after []patches.Pin
@@ -107,6 +110,13 @@ func Prepare(c Config) (string, *Provenance, error) {
 		return "", nil, err
 	}
 	prov := &Provenance{Patches: c.Patches, NPM: npm, InputSHA256: treeHash(inputs)}
+	if c.GenerateFrom != "" {
+		prov.GenerateFrom = c.GenerateFrom
+		prov.GenerateFromSHA256 = inputs[path.Join(c.GrammarDir, c.GenerateFrom)]
+		if prov.GenerateFromSHA256 == "" {
+			return "", nil, fmt.Errorf("generation input %s missing", c.GenerateFrom)
+		}
+	}
 	if c.Regenerate {
 		if err := verifyCLI(c); err != nil {
 			return "", nil, err
@@ -148,7 +158,10 @@ func Prepare(c Config) (string, *Provenance, error) {
 }
 
 // Validate requires regeneration for non-C grammar inputs, including imported JS/JSON sources.
-func Validate(ps []patches.Pin, regenerate bool) error {
+func Validate(ps []patches.Pin, regenerate bool, generateFrom string) error {
+	if generateFrom != "" && (generateFrom != "grammar.json" || !regenerate) {
+		return fmt.Errorf("generateFrom must be grammar.json with regenerate true")
+	}
 	for _, p := range ps {
 		ext := path.Ext(p.Source)
 		if ext != ".c" && ext != ".h" && !regenerate {
@@ -199,6 +212,9 @@ func generate(c Config, root string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, c.CLI, "generate", "--abi", "15", "--js-runtime", "native")
+	if c.GenerateFrom != "" {
+		cmd.Args = append(cmd.Args, filepath.Join(filepath.Base(c.GrammarDir), c.GenerateFrom))
+	}
 	cmd.Dir = dir
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("tree-sitter generate: %w: %s", err, out)

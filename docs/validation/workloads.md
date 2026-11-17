@@ -443,3 +443,19 @@ the hosted bench fetch manifest includes the Pagila input and the upstream corpu
 | [Open-rental report SQL](../../tools/bench/testdata/postgres/rentals.sql) | 351 | `60832cb4371298e2c5cb3026e5bb70e80747da40e56bd6507087a1e2420c937e` | Repository MIT; original PostgreSQL example, LF, UTF-8 |
 
 The grammar corpus and queries are extracted from the SHA-pinned upstream archive by `native-ref`; seeded edits use seed 1.
+
+## Swift candidate
+
+`swift` is the Swift grammar of `alex-pinkus/tree-sitter-swift` (development tree after v0.5.0). The large inputs are
+real project files, not padding: one machine-generated file and two hand-written ones. They do not represent all
+Swift syntax, and no Swift language-version coverage is claimed. The hosted bench fetch manifest includes them; the
+upstream corpus supplies the small-file lane and one original small file adds a named small workload.
+
+| Input | Bytes | SHA-256 | License |
+|---|---:|---|---|
+| [swift-syntax `SyntaxNodes.swift`](https://github.com/swiftlang/swift-syntax/blob/0688b9cfc4c3dd234e4f55f1f056b2affc849873/Sources/SwiftSyntax/gyb_generated/syntax_nodes/SyntaxNodes.swift) (tag `0.50200.0`, generated code) | 425,161 | `337b909b59ed6b7ec3c295e30b5dfd8a2954b164e56660fd62c46906c4ec6016` | [Apache-2.0 with Runtime Library Exception](https://github.com/swiftlang/swift-syntax/blob/0688b9cfc4c3dd234e4f55f1f056b2affc849873/LICENSE.txt), SHA-256 `770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55` |
+| [Alamofire `Session.swift`](https://github.com/Alamofire/Alamofire/blob/513364f870f6bfc468f9d2ff0a95caccc10044c5/Source/Core/Session.swift) (tag `5.10.2`) | 76,405 | `88f520308efecbc71b168f3f2cd45d14b0326a82451460d9cf7a86adbb698c7b` | [MIT](https://github.com/Alamofire/Alamofire/blob/513364f870f6bfc468f9d2ff0a95caccc10044c5/LICENSE), SHA-256 `3ef1fbd5fd9cb08a9e071d6c0c6f68322deda2b93a814e5135a7829495dae698` |
+| [Alamofire `Request.swift`](https://github.com/Alamofire/Alamofire/blob/513364f870f6bfc468f9d2ff0a95caccc10044c5/Source/Core/Request.swift) (tag `5.10.2`) | 44,513 | `bc44fbbe62aa29c96b2d9821cb67f8cb48215f9875769ee539b03f081d0d556c` | same Alamofire license |
+| [Open-rental store](../../tools/bench/testdata/swift/rentals.swift) | 570 | `1a0a9a11f18cfaeab99eaeaceb05feb101054119dd2ebaa8d31fca977b96a5a6` | Repository MIT; original Swift example, LF, UTF-8 |
+
+The grammar corpus and queries are extracted from the SHA-pinned upstream archive by `native-ref`; seeded edits use seed 1.

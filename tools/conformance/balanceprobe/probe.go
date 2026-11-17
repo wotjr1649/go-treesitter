@@ -194,6 +194,8 @@ func inputs(lang string) (string, []string) {
 	switch lang {
 	case "kotlin":
 		return "fun f() {\n" + strings.Repeat("println(1)\n", count) + "}\n", []string{"fun next(x: Int): Int { return x + 2 }\n", "class Other { val n = 2 }\n", "fun broken(\n"}
+	case "swift":
+		return "func f() {\n" + strings.Repeat("print(1)\n", count) + "}\n", []string{"func next(_ x: Int) -> Int { return x + 2 }\n", "class Other { var n = 2 }\n", "func broken(\n"}
 	case "json":
 		return "[" + strings.Repeat(`{"a":1},`, count-1) + `{"a":1}]`, []string{`{"next":[2,3]}`, `[false,null,"different"]`, `{"broken":`}
 	case "golang":

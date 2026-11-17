@@ -35,6 +35,7 @@ own `LICENSE`.
 | tree-sitter-xml | `grammars/xml` | [MIT](LICENSES/tree-sitter-xml.txt) |
 | tree-sitter-ruby | `grammars/ruby` | [MIT](LICENSES/tree-sitter-ruby.txt) |
 | tree-sitter-kotlin | `grammars/kotlin` | [MIT](LICENSES/tree-sitter-kotlin.txt) |
+| tree-sitter-swift | `grammars/swift` | [MIT](LICENSES/tree-sitter-swift.txt) |
 | Newtonsoft.Json | Copied C# test fixtures | [MIT](testdata/newtonsoft/LICENSE.md) |
 
 [The license manifest](LICENSES/manifest.json) records the exact public source

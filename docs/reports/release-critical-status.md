@@ -7,7 +7,7 @@ to the new engine.
 
 ## v0.5.0 release scope
 
-- **v0.5.0 Release-Critical scope:** all 24 current pins, including `postgres` (SQL only, no PL/pgSQL). Swift is excluded; the T-SQL pin stays unchanged. Sources and tiers are in the [README](../../README.md#use).
+- **v0.5.0 Release-Critical scope:** all 24 current pins, including `postgres` (SQL only, no PL/pgSQL). Swift is excluded from v0.5.0 (the development tree adds it afterwards, [limitations](limitations.md#swift-development-tree-after-v050)); the T-SQL pin stays unchanged. Sources and tiers are in the [README](../../README.md#use).
 - **Release policy (ADR-0022):** Preview (GitHub pre-release), following [publication.md](../specs/publication.md) step by step. Tags and publication require separate owner authority.
 - Identity: tree-sitter v0.27.2 and the grammar commits in `tools/gen/pins.json`; Go 1.27.4; `CGO_ENABLED=0`.
 
@@ -319,7 +319,7 @@ maintainer-local evidence archive for later SBOM work.
 
 - Complete the v0.5.0 release-commit gates and fill the markers above before publication. Preserve the current T-SQL pin and all historical failure records.
 - After publication, check all selected source rows from the first mirror base and use one PR for mirror configuration plus development-form restoration.
-- PostgreSQL is included in v0.5.0; Swift remains outside scope.
+- PostgreSQL is included in v0.5.0; Swift remains outside v0.5.0 scope and has only local development-tree evidence, listed in [limitations](limitations.md#swift-development-tree-after-v050).
 
 
 ## PostgreSQL adoption evidence (Windows amd64, local, before the rebase)

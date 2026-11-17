@@ -44,6 +44,7 @@ var cliLib = map[string][2]string{
 	"dart":       {"dart", "dart"},
 	"xml":        {"xml", "xml"},
 	"ruby":       {"ruby", "ruby"},
+	"swift":      {"swift", "swift"},
 }
 
 // predicateSuite runs over the json corpus (the grammar with the simplest tree). Each entry states what it probes.

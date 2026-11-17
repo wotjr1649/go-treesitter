@@ -278,12 +278,123 @@ def large_input_data(args, repo, out, pinsfile, lang, env, reference=None):
     return projection
 
 
+def check_upstream(code, result, report):
+    cases = outcomes(result)
+    failures = [{"id": "upstream/" + name, "kind": "upstream", "outcome": value}
+                for name, value in cases.items() if not is_passed(value)]
+    if code or not cases or result["parse_stats"]["total_parses"] <= 0:
+        failures.append({"id": "upstream/command", "kind": "upstream", "exit": code,
+                         "error": "reference none requires a nonempty, passing upstream suite"})
+    report["differences"].extend(failures)
+
+
+def swift_query_exception(args, pins, grammar, code, result, raw, cwd, root, report, env):
+    exception = grammar.get("upstreamTestException")
+    if not exception:
+        return False
+    step = "tree-sitter test: queries/outline.scm -> test/outline/outline.swift"
+    error = ("Error: Query compilation failed\n\nCaused by:\n"
+             "    Query error at 1:1. Invalid syntax:\n    import Foundation\n    ^")
+    stats = result["parse_stats"]
+    cases = outcomes(result)
+    matched = (args.lang == "swift" and pins["tools"]["treeSitterCLI"] == exception.get("cli") == "0.27.2"
+               and exception.get("step") == step and exception.get("reason") and exception.get("retireWhen")
+               and code == 1 and raw.rstrip().endswith(error)
+               and stats["successful_parses"] == stats["total_parses"] == 312
+               and len(outcomes(result.get("parse_results", []))) == 312
+               and all(is_passed(value) and value not in ("Skipped", "Platform") for value in cases.values())
+               and not any(value for key, value in result.items() if key.endswith("_failures"))
+               and len(result.get("highlight_results", [])) == 8
+               and not result.get("tag_results")
+               and result.get("query_results") == [{"name": "outline", "children": []}])
+    report["upstreamTestException"] = exception
+    report["upstreamTestExceptionMatches"] = bool(matched)
+    if not matched:
+        raise ValueError("Swift upstream-test exception is stale or its exact failure signature changed")
+    # The original suite exit and log stay intact; this command checks the query the CLI failed to run.
+    execute([args.cli, "query", "queries/outline.scm", "test/outline/outline.swift",
+             "--config-path", root / "config.json"], cwd, root / "upstream-outline-query.log", env)
+    report["upstreamOutlineQueryExit"] = 0
+    report["upstreamOutlineQueryLogSHA256"] = sha(root / "upstream-outline-query.log")
+    return True
+
+
+def check_candidate(args, repo, out, grammar, report, env):
+    prepared = out / "candidate/work" / ("patches-" + args.lang)
+    source = prepared / "first" / grammar["grammarDir"]
+    provenance = json.loads((prepared / "provenance.json").read_text(encoding="utf-8"))
+    if provenance.get("deterministic") is not True or not provenance.get("outputs"):
+        raise ValueError("candidate determinism evidence missing")
+    for name, expected in provenance["outputs"].items():
+        if sha(source / name) != expected:
+            raise ValueError(f"candidate generation output identity drift: {name}")
+    module = repo / "grammars" / args.lang
+    product = json.loads((module / "provenance.json").read_text(encoding="utf-8"))
+    if product.get("grammarGeneration") != provenance or product["identity"]["GrammarRev"] != grammar["commit"]:
+        raise ValueError("product module and native candidate generation identities differ")
+    for name in ("engine_gen.go", "engine_gen.dat"):
+        if sha(module / name) != product["outputs"][name]:
+            raise ValueError(f"product module output identity drift: {name}")
+    report["candidateGeneration"] = provenance
+    report["candidateGenerationProvenanceSHA256"] = sha(prepared / "provenance.json")
+    report["productModuleFilesSHA256"] = {path.relative_to(module).as_posix(): sha(path)
+                                          for path in sorted(module.rglob("*")) if path.is_file()}
+    report["productModuleFileCount"] = len(report["productModuleFilesSHA256"])
+    report["candidateGenerationOutputFileCount"] = len(provenance["outputs"])
+    execute(["go", "run", ".", "schema", "check", source / "node-types.json"], repo / "tools/gen",
+            out / "candidate-schema.log", env)
+    assessment = json.loads((out / "candidate-schema.log").read_text(encoding="utf-8"))
+    report["candidateSchema"] = assessment
+    if assessment.get("assessment") != "PASS" or assessment["input"]["sha256"] != sha(source / "node-types.json"):
+        raise ValueError("candidate strict schema check failed")
+
+
+def product_conformance(args, repo, out, pins, lang, data, tests, label, report, env):
+    evidence = out / label
+    evidence.mkdir()
+    tags = ",".join("no_" + ("go" if name == "golang" else name)
+                    for name in sorted(pins["grammars"]) if name != args.lang)
+    product_env = env | {"CGO_ENABLED": "0", "GOENV": "off", "GOWORK": "off", "GOTOOLCHAIN": "local",
+                         "GOFLAGS": "", "TSG_DATA_DIR": str(data), "TSG_S15_DIR": "", "TSG_S15_LANGS": lang,
+                         "TSG_NATIVE_EXE_DIR": str(out / "candidate/exe"), "TSG_REQUIRE_FIELD_LOOKUP": "1",
+                         "TSG_S15_EDITS_SAMPLE": "0", "TSG_CONF_OUT": str(evidence)}
+    log = out / (label + ".log")
+    execute(["go", "test", "-json", "-count=1", "-timeout", "20m", "-tags", tags,
+             "-run", "^(" + "|".join(tests) + ")$", "."], repo / "tools/conformance", log, product_env, timeout=1500)
+    events = [json.loads(line) for line in log.read_text(encoding="utf-8").splitlines() if line.strip()]
+    passed = {event["Test"] for event in events if event.get("Action") == "pass" and "Test" in event}
+    skipped = [event["Test"] for event in events if event.get("Action") == "skip" and "Test" in event]
+    required = set(tests) | {test + "/" + lang for test in tests}
+    if not required <= passed or skipped:
+        raise ValueError(f"product checks missing or skipped: {sorted(required - passed)}, skipped={skipped}")
+    report[label] = {"tests": list(tests), "passed": sorted(passed), "skipped": skipped,
+                     "logSHA256": sha(log), "dataManifestSHA256": sha(data / "corpus/manifest.csv")}
+
+
+def large_product_data(out, lang, large):
+    data = out / "large-product-data"
+    (data / "corpus" / lang).mkdir(parents=True)
+    (data / "native/dumps" / lang).mkdir(parents=True)
+    with (data / "corpus/manifest.csv").open("w", newline="", encoding="utf-8") as stream:
+        writer = csv.writer(stream, lineterminator="\n")
+        writer.writerow(("id", "lang", "source_ref", "bytes", "sha256"))
+        for index, row in enumerate(large):
+            name = f"large-{index:04d}"
+            source = out / "large" / row["lang"] / row["file"]
+            shutil.copyfile(source, data / "corpus" / lang / (name + ".in"))
+            shutil.copyfile(out / "candidate" / ("large-" + row["file"] + ".dump"),
+                            data / "native/dumps" / lang / (name + ".dump"))
+            writer.writerow((lang + "/" + name, lang, "pinned-large/" + row["file"], source.stat().st_size, sha(source)))
+    return data
+
+
 def run(args):
     repo, out, dl = args.repo.resolve(), args.out.resolve(), args.dl.resolve()
     out.mkdir(parents=True, exist_ok=False)
     pinsfile = repo / "tools/gen/pins.json"
     pins = json.loads(pinsfile.read_text(encoding="utf-8"))
     grammar = pins["grammars"][args.lang]
+    no_reference = grammar.get("reference") == "none"
     lang = "go" if args.lang == "golang" else args.lang
     env = os.environ.copy()
     env.update(NO_COLOR="1", TERM="dumb", CGO_ENABLED="0", CC=args.cc)
@@ -295,6 +406,8 @@ def run(args):
               "upstreamRunPlan": "full suite once; after corpus failure, one supplemental run excluding exactly the failed corpus case names",
               "tools": {name: sha(getattr(args, name)) for name in ("native_ref", "ciconf", "benchci", "cli")},
               "differences": [], "pass": False}
+    if no_reference:
+        report.update(reference="none", referenceStatus="NOT_APPLICABLE_NO_COMMITTED_PARSER")
     save(out / "report.json", report)
     try:
         platform = {"win32": "windows", "linux": "linux", "darwin": "darwin"}[sys.platform]
@@ -304,8 +417,9 @@ def run(args):
         compiler = shutil.which(args.cc)
         if not compiler:
             raise ValueError(f"C compiler not found: {args.cc}")
+        execute([compiler, "--version"], repo, out / "compiler-version.log", env, timeout=10)
         report["compiler"] = {"command": args.cc, "sha256": sha(compiler),
-                              "version": subprocess.check_output([compiler, "--version"], text=True).splitlines()[0]}
+                              "version": (out / "compiler-version.log").read_text(encoding="utf-8").splitlines()[0]}
         cli_pin = pins["tools"]["treeSitterCLIArchives"][platform + "-" + arch]
         cli_archive = dl / Path(urlparse(cli_pin["url"]).path).name
         if sha(cli_archive) != cli_pin["sha256"]:
@@ -313,12 +427,15 @@ def run(args):
         with gzip.open(cli_archive, "rb") as stream:
             if hashlib.file_digest(stream, "sha256").hexdigest() != sha(args.cli):
                 raise ValueError("CLI differs from pinned archive")
-        report["commit"] = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip()
+        execute(["git", "rev-parse", "HEAD"], repo, out / "commit.log", env, timeout=10)
+        report["commit"] = (out / "commit.log").read_text(encoding="utf-8").strip()
         report["largeManifestSHA256"] = text_sha(repo / "tools/bench/ci/large.json")
         report["largeDumpTimeoutSeconds"] = args.large_dump_timeout
         reference = out / "reference"
         # The candidate supplies verified lockfile dependencies for both upstream test variants.
         for side, flag in (("candidate", "-candidate"), ("reference", "-reference")):
+            if side == "reference" and no_reference:
+                continue
             if side == "reference" and report.get("referenceReusesCandidate"):
                 reference = out / "candidate"
                 report.update({"reference" + key[len("candidate"):]: value
@@ -339,7 +456,11 @@ def run(args):
             report[side + "ExecutableSHA256"] = sha(root / "exe" / (args.lang + suffix))
             upstream = root / "upstream"
             extract(dl / grammar["archive"], upstream, grammar["archiveSHA256"])
-            if side == "candidate":
+            if no_reference:
+                if (upstream / grammar["grammarDir"] / "parser.c").exists():
+                    raise ValueError("reference none contradicts a committed parser.c")
+                report["committedParserAbsent"] = True
+            elif side == "candidate":
                 oid = identical_lfs_reference(upstream / grammar["grammarDir"], source / grammar["grammarDir"], grammar)
                 if oid:
                     report["referenceReusesCandidate"] = True
@@ -360,7 +481,11 @@ def run(args):
             raw = (root / "upstream.log").read_text(encoding="utf-8")
             report[side + "Upstream"] = summary(raw)
             report[side + "UpstreamExit"] = code
-            if code and all(is_passed(value) for value in outcomes(report[side + "Upstream"]).values()):
+            accepted = swift_query_exception(args, pins, grammar, code, report[side + "Upstream"], raw,
+                                            cwd, root, report, upstream_env)
+            if no_reference and not accepted:
+                check_upstream(code, report[side + "Upstream"], report)
+            if code and not accepted and all(is_passed(value) for value in outcomes(report[side + "Upstream"]).values()):
                 raise ValueError("upstream command failed without a reported failing test")
             if not outcomes(report[side + "Upstream"]):
                 if report[side + "Upstream"]["parse_stats"]["total_parses"] != 0:
@@ -368,31 +493,50 @@ def run(args):
                 report[side + "UpstreamCoverage"] = "NOT_RUN_ZERO_CASES"
             else:
                 report[side + "UpstreamCoverage"] = len(outcomes(report[side + "Upstream"]))
-            complete_upstream(args, repo, out, side, grammar, report, env)
-        report["differences"] = compare_data(reference / "data", out / "candidate/data")
-        report["differences"] += compare_upstream(report["referenceUpstream"], report["candidateUpstream"])
-        report["corpusInputs"] = len(rows(reference / "data/corpus/manifest.csv"))
-        report["seededEdits"] = len(rows(reference / "data/edits/manifest.csv"))
-        large_data = large_input_data(args, repo, out, pinsfile, lang, env, reference)
+            try:
+                complete_upstream(args, repo, out, side, grammar, report, env)
+            except Exception as error:
+                if not no_reference:
+                    raise
+                report["differences"].append({"id": "upstream/supplement", "kind": "upstream", "error": str(error)})
+        input_root = out / "candidate" if no_reference else reference
+        report["corpusInputs"] = len(rows(input_root / "data/corpus/manifest.csv"))
+        report["seededEdits"] = len(rows(input_root / "data/edits/manifest.csv"))
+        if no_reference:
+            if not report["corpusInputs"] or not report["seededEdits"]:
+                raise ValueError("reference none requires nonempty corpus and edits")
+            check_candidate(args, repo, out, grammar, report, env)
+            product_conformance(args, repo, out, pins, lang, input_root / "data",
+                                ("TestCorpus", "TestEdits", "TestFieldLookup", "TestFieldLookupEdits"),
+                                "product-conformance", report, env)
+        else:
+            report["differences"] = compare_data(reference / "data", out / "candidate/data")
+            report["differences"] += compare_upstream(report["referenceUpstream"], report["candidateUpstream"])
+        large_data = large_input_data(args, repo, out, pinsfile, lang, env, input_root)
         execute([args.benchci, "fetch", "-manifest", repo / "tools/bench/ci/large.json", "-data", large_data,
                  "-out", out / "large", "-langs", args.lang], repo, out / "large-fetch.log", env)
         large = rows(out / "large/manifest.csv")
         if not large:
             raise ValueError("no pinned large input")
         report["largeInputs"] = large
+        report["largeInputCount"] = len(large)
         suffix = ".exe" if os.name == "nt" else ""
         for row in large:
             path = out / "large" / row["lang"] / row["file"]
             if sha(path) != row["sha256"]:
                 raise ValueError(f"large input hash mismatch: {path}")
             logs = []
-            for root in dict.fromkeys((reference, out / "candidate")):
+            roots = (out / "candidate",) if no_reference else dict.fromkeys((reference, out / "candidate"))
+            for root in roots:
                 log = root / ("large-" + row["file"] + ".dump")
                 execute([root / "exe" / (args.lang + suffix), "dump", path], repo, log, env,
                         timeout=args.large_dump_timeout)
                 logs.append(log)
             if len(logs) == 2 and logs[0].read_bytes() != logs[1].read_bytes():
                 report["differences"].append({"id": "large/" + row["file"], "kind": "large", "inputSHA256": row["sha256"]})
+        if no_reference:
+            data = large_product_data(out, lang, large)
+            product_conformance(args, repo, out, pins, lang, data, ("TestCorpus",), "product-large", report, env)
         exception = grammar.get("generatorException")
         report["exception"] = exception
         report["pass"] = not report["differences"] and not exception
