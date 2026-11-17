@@ -21,7 +21,7 @@ values identify the pinned upstream inputs. `tsx` and `typescript` share one arc
 `REFERENCE_UNDECLARED` warning at `/9/fields/alias/types/0`: `as_pattern_target` (`named: true`) has no
 separate node declaration. This warning can accompany `PASS`; it does not establish parse behaviour.
 
-`postgres` regenerates `parser.c` and `node-types.json` without patches using the pinned CLI. Its candidate row below
+The v0.5.0 `postgres` baseline regenerated `parser.c` and `node-types.json` without patches using the pinned CLI. Its candidate row below
 records both the archived schema and the schema from the same independent generation run as the C parser;
 these bytes match. YAML's ADR-0023 C-only patch
 [`0001-no-early-eof.patch`](../../tools/gen/patches/yaml/0001-no-early-eof.patch) changes `parser.c`;
@@ -238,3 +238,14 @@ Generated `parser.c` SHA-256 `f21084a944bc2d927913f119860a513a22d897cb5c6f88f53a
 An earlier candidate revision (`35245fbfee2fccf16273c6f4299438fb76875970`) was not adopted: its archived schema
 fails the strict check with two duplicate identities (`?` and `??`, each once with and once without an empty `fields`
 object). This pin's schema has none. This is a first baseline, not a pin move; no release approval is inferred.
+
+## PostgreSQL Korean support (development tree after v0.5.0)
+
+The 2026-11-17 owner-approved Korean-support patches keep the upstream commit, archive, tree and source pins
+unchanged; their ordered identities are in `tools/gen/pins.json` and the
+[patch record](../../tools/gen/patches/postgres/README.md). The identifier grammar input changes before CLI 0.27.2
+regeneration and the dollar-tag scanner changes after it. The two independently generated source trees are
+byte-identical. The original archived and patched generated node-type schemas are both 508227 bytes with
+SHA-256 `7f9f350c2730fbddf36f096dbb27405f6ae29ba787b265f2bb494e6a887078d5`;
+`schema diff` passes with zero changes and no findings (E1 static schema comparison, Windows amd64).
+Equal schema bytes do not imply equal trees; the documented identifier and dollar-tag fixes change trees.

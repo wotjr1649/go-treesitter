@@ -269,7 +269,8 @@ downloads managed by this pin file.
 
 ## PostgreSQL regeneration cost
 
-`postgres` uses unmodified `gmr/tree-sitter-postgres` grammar inputs. Its archived `postgres/src/parser.c` is an
+`postgres` uses pinned `gmr/tree-sitter-postgres` grammar inputs with the temporary Korean-support
+patches disclosed in [patches/postgres/README.md](patches/postgres/README.md). Its archived `postgres/src/parser.c` is an
 LFS pointer; the original pointer and input tree remain pinned, and both builders compile the twice-generated C.
 PL/pgSQL is excluded. The CLI is pinned for Windows x64, Linux x64/arm64 and macOS arm64.
 

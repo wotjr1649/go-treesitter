@@ -49,6 +49,21 @@ Waiting for upstream leaves these grammars unavailable indefinitely; relaxing ou
    reference builds print the selected grammar's count and warn above `-patch-alert` (default 3; shell entry points
    accept `PATCH_ALERT_THRESHOLD`). This warning is a review signal, never an approval for another patch.
 
+## Amendment (2026-11-17): decision 1, PostgreSQL Korean support
+
+For the pinned `gmr/tree-sitter-postgres@59d0d8cd7506d68de1229fb4bbce838c83b60c8a`, the owner authorizes temporary,
+retirable patches that admit non-ASCII code points in unquoted identifiers and preserve complete code points in
+dollar-quote tags. This narrow exception is motivated by Korean support even though these defects do not block a
+release gate. The owner posted [upstream issue #101](https://github.com/gmr/tree-sitter-postgres/issues/101) for both
+defects; both patch records use that HTTPS URL. All other ADR-0023 requirements remain in force, including recorded
+source/patch hashes, disclosures, pinned deterministic regeneration, comparison against unpatched native
+corpus/fuzz trees, native agreement on the patched sources, and retirement when upstream incorporates the fixes.
+Grammar inputs are patched before generation; the scanner is patched after generation. The tree-sitter runtime
+is not patched.
+
+The owner approved this exception on 2026-11-17; merging the pull request carrying this amendment records the
+owner's approval of its text.
+
 ## Consequences
 
 - YAML can ship with a one-line patch to its generated `parser.c` (do not accept `end` before the end-of-input

@@ -49,8 +49,9 @@ and [source-row publication procedure](../specs/publication.md#pinned-archive-re
 `grammars/postgres` uses the owner-designated BSD-3-Clause `gmr/tree-sitter-postgres` pin
 `59d0d8cd7506d68de1229fb4bbce838c83b60c8a`. Only PostgreSQL SQL is included; PL/pgSQL, other SQL dialects and
 compatibility across PostgreSQL server versions are not claimed. The upstream archived parser is an LFS pointer;
-`regenerate: true` produces C from unmodified grammar inputs with pinned CLI 0.27.2, twice independently, for both
-engine and native reference. There are zero upstream patches. This grammar declares no named fields, so `ChildByFieldName` cannot expose
+`regenerate: true` produces C with pinned CLI 0.27.2, twice independently, for both
+engine and native reference. The v0.5.0 baseline used unmodified inputs with zero patches; the development
+tree adds the Korean-support patches disclosed below. This grammar declares no named fields, so `ChildByFieldName` cannot expose
 semantic SQL roles; use node kinds and children. Strict fresh/edit field tests compare the native empty-field
 results and tree headers, without nonempty named-field lookup coverage.
 
@@ -59,6 +60,46 @@ open-rental report. One large INSERT file does not represent all SQL statement c
 the existing grammar and strict-field shards; candidate `02d10aa` conformance [43835484209](https://github.com/wotjr1649/go-treesitter/actions/runs/43835484209) passed PostgreSQL on Linux amd64/arm64, each with 71 fresh inputs, 213 edits/range comparisons and 923 query/input pairs, zero differences (E5). Fresh/edit named-field rows are zero, as expected for this schema. Regeneration [43835484231](https://github.com/wotjr1649/go-treesitter/actions/runs/43835484231) passed its Linux amd64 drift shard, including the unpatched CLI regeneration. Bench [43835556351](https://github.com/wotjr1649/go-treesitter/actions/runs/43835556351) passed PostgreSQL on Linux amd64/arm64 and macOS arm64 (E4). Full gate scope and the remaining post-publication checks are on the [v0.5.0 gate board](release-critical-status.md#v050-preparation-gates). The
 [generator cost note](../../tools/gen/README.md#postgresql-regeneration-cost) records sequential generation,
 runner memory, time budgets and the uncached drift policy.
+
+### PostgreSQL Korean support (development tree after v0.5.0)
+
+The owner approved two temporary patches on 2026-11-17 as an explicit exception to ADR-0023 decision 1
+for Korean support, although the gap does not block a release gate. The original grammar commit, archive,
+tree and source-file pins stay unchanged. The grammar-input patch admits all non-ASCII code points in
+unquoted identifiers, mapping PostgreSQL's high-bit-byte lexer rule to UTF-8 code points; ASCII start and
+continuation rules stay the same. This includes NFD combining marks, supplementary characters and U+3000,
+not only letters. `SELECT값` is one identifier, not a `SELECT` keyword plus a suffix. A standalone
+`SELECT값;` therefore remains a syntax error, while `SELECT SELECT값;` is clean.
+
+The scanner patch stores complete `int32_t` tag code points: `$끝$…$끝$` closes and `$걁$…$A$` does not.
+The existing 63-code-point dollar-tag cap remains; PostgreSQL's actual dollar tags are not subject to
+this cap. Other scanner/grammar algorithms, quoted identifiers and PL/pgSQL scope are unchanged.
+The grammar's `\s+` extras skip only ASCII whitespace. U+3000 and other non-ASCII spaces outside the
+original identifier range were lexing errors before and are identifier characters now. In the retained
+`SELECT 　;` and `SELECT 　값;` cases U+3000 belongs to the name, and `SELECT　값;` remains one invalid
+standalone name. `SELECT a　FROM t;` is clean but treats `a　FROM` as one identifier and `t` as its alias;
+a clean tree can therefore conceal an unintended separator typed with an IME.
+This is a lexical repair, not full PostgreSQL SQL validity or invalid-UTF-8 coverage.
+The existing grammar also accepts adjacent numeric/parameter aliases without PostgreSQL's `integer_junk` /
+`param_junk` checks: `SELECT 9name;` and `SELECT $9END$body$9END$;` are clean before and after this patch;
+the corrected identifier token exposes the same limitation for `SELECT 9값;` and
+`SELECT $9끝$body$9끝$;`. The latter is a parameter plus alias, not a valid dollar tag.
+PostgreSQL rejects these as trailing junk. They are retained observations of a separate upstream limit,
+not claims that the patch makes these inputs valid SQL.
+
+The [patch record](../../tools/gen/patches/postgres/README.md) and generated provenance disclose the reason,
+patch/source identities and [upstream issue #101](https://github.com/gmr/tree-sitter-postgres/issues/101), which covers both defects
+and the `script/codegen.js` identifier template. The dated [ADR-0023 amendment](../design/decisions/ADR-0023-temporary-upstream-grammar-patches.md#amendment-2026-11-17-decision-1-postgresql-korean-support)
+records the owner-approved exception.
+
+Two complete product-module generations emit identical bytes, and the archived/patched node-type schema
+has zero static changes. Retained [fresh and incremental regression tests](../../tools/conformance/postgres_patches_test.go)
+use the existing `TestScannerPatches` CI filter. On Windows amd64 the product dumps equal fresh signed-char native dumps on 71 corpus inputs, 213 edits
+and changed-range comparisons, and 53 focused probes (E5 for those inputs). The same 53 probe dumps equal
+an unsigned-char grammar/runtime/ctype diagnostic, with the unchanged driver compiled separately as
+signed-char to retain its assertion. The unpatched/patched native comparison covers 107 corpus/fuzz inputs:
+15 changed, all existing error trees whose identifier or dollar-tag tokens are corrected; no clean baseline
+tree changes in that set (E4). These local inputs do not establish hosted-platform or release-gate coverage.
 
 ## Swift (development tree after v0.5.0)
 
