@@ -5,11 +5,12 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
+
+	proc "github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 // Keep the ADR-0023 scanner fixes exercised beyond the upstream corpora.
@@ -79,7 +80,7 @@ func TestScannerPatches(t *testing.T) {
 					}
 					ctx, cancel := context.WithTimeout(bg, 30*time.Second)
 					defer cancel()
-					want, err := exec.CommandContext(ctx, exe, "dump", file).Output()
+					want, err := proc.CommandContext(ctx, exe, "dump", file).Output()
 					if err != nil {
 						t.Fatal(err)
 					}

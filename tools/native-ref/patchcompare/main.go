@@ -15,11 +15,12 @@ import (
 	"go/parser"
 	"go/token"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 type input struct {
@@ -146,7 +147,7 @@ func run(before, after, corpus, source, target, out string, allowNUL bool) (bool
 		var dumps [2][]byte
 		for i, exe := range []string{before, after} {
 			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-			cmd := exec.CommandContext(ctx, exe, "dump", p)
+			cmd := proc.CommandContext(ctx, exe, "dump", p)
 			var stderr bytes.Buffer
 			cmd.Stderr = &stderr
 			b, e := cmd.Output()

@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"testing"
+
+	proc "github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 // These edge bytes supplement the upstream corpus, including missing/zero-width nodes at EOF.
@@ -24,7 +25,7 @@ func TestSnapshotPointsNative(t *testing.T) {
 				if err := os.WriteFile(path, []byte(src), 0o600); err != nil {
 					t.Fatal(err)
 				}
-				want, err := exec.Command(exe, "dump", path).Output()
+				want, err := proc.Command(exe, "dump", path).Output()
 				if err != nil {
 					t.Fatal(err)
 				}

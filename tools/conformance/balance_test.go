@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"testing"
 	"time"
+
+	proc "github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 // TestBalancingCancel drives only gen -balance-probe outputs, never product grammar modules.
@@ -53,7 +54,7 @@ func TestBalancingCancel(t *testing.T) {
 			}
 			ctx, cancel := context.WithTimeout(context.Background(), 11*time.Minute)
 			defer cancel()
-			cmd := exec.CommandContext(ctx, "go", "test", "-mod=mod", "-count=1", "-v", "-timeout", "10m", "-run", "^TestBalancingCancelProbe$", ".")
+			cmd := proc.CommandContext(ctx, "go", "test", "-mod=mod", "-count=1", "-v", "-timeout", "10m", "-run", "^TestBalancingCancelProbe$", ".")
 			cmd.Dir = dir
 			cmd.Env = append(os.Environ(), "CGO_ENABLED=0", "GOWORK=off", "GOTOOLCHAIN=local", "GOPROXY=off", "TSG_NATIVE_EXE_DIR="+nativeDir, "TSG_CONF_OUT="+out)
 			out, err := cmd.CombinedOutput()

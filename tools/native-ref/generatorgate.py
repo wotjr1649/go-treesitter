@@ -14,12 +14,13 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import shutil
-import signal
 import subprocess
 import sys
 import tarfile
 import time
 from urllib.parse import urlparse
+
+import proctree
 
 
 def sha(path):
@@ -36,50 +37,46 @@ def save(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def stop_tree(proc):
-    if os.name == "nt":
-        try:
-            result = subprocess.run(["taskkill", "/F", "/T", "/PID", str(proc.pid)],
-                                    capture_output=True, check=False, timeout=10)
-            if result.returncode and proc.poll() is None:
-                proc.kill()
-                proc.wait(timeout=10)
-                raise RuntimeError(f"taskkill failed for child tree {proc.pid}")
-        except (OSError, subprocess.TimeoutExpired):
-            proc.kill()
-            proc.wait(timeout=10)
-            raise RuntimeError(f"taskkill did not finish for child tree {proc.pid}")
-    else:
-        try:
-            os.killpg(proc.pid, signal.SIGKILL)
-        except ProcessLookupError:
-            pass
-    try:
-        proc.wait(timeout=10)
-    except subprocess.TimeoutExpired:
-        proc.kill()
-        proc.wait(timeout=10)
+stop_tree = proctree.stop_tree
 
 
 def execute(args, cwd, log, env=None, timeout=1800, allowed=(0,)):
+    if timeout is None or timeout <= 0:
+        raise ValueError("a positive command timeout is required")
     start = time.monotonic()
-    with log.open("wb") as output:
-        proc = subprocess.Popen(list(map(str, args)), cwd=cwd, env=env, stdout=output,
-                                stderr=subprocess.STDOUT,
-                                start_new_session=os.name != "nt",
-                                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0)
-        code = None
-        try:
+    proc, code, failure, cleanup = None, None, None, None
+    try:
+        with log.open("wb") as output:
             try:
-                code = proc.wait(timeout=timeout)
-            except subprocess.TimeoutExpired:
-                code = 124
-        finally:
-            if code is None or code == 124:
-                stop_tree(proc)
-    receipt = {"command": list(map(str, args)), "cwd": str(cwd), "exit": code,
-               "wallSeconds": time.monotonic() - start, "timeoutSeconds": timeout, "logSHA256": sha(log)}
-    save(log.with_suffix(".command.json"), receipt)
+                proc = proctree.start(list(map(str, args)), cwd=cwd, env=env,
+                                      stdout=output, stderr=subprocess.STDOUT)
+                try:
+                    code = proc.wait(timeout=timeout)
+                except subprocess.TimeoutExpired:
+                    code = 124
+            except BaseException as error:
+                failure = error
+            finally:
+                if proc is not None:
+                    try:
+                        stop_tree(proc)
+                    except BaseException as error:
+                        cleanup = error
+    finally:
+        receipt = {"command": list(map(str, args)), "cwd": str(cwd), "exit": code,
+                   "wallSeconds": time.monotonic() - start, "timeoutSeconds": timeout,
+                   "logSHA256": sha(log) if log.exists() else None}
+        if failure is not None:
+            receipt["error"] = repr(failure)
+        if cleanup is not None:
+            receipt["cleanupError"] = repr(cleanup)
+        save(log.with_suffix(".command.json"), receipt)
+    if failure is not None:
+        if cleanup is not None:
+            failure.add_note(f"child tree cleanup also failed: {cleanup!r}")
+        raise failure
+    if cleanup is not None:
+        raise RuntimeError(f"child tree cleanup failed; retained {log}") from cleanup
     if code not in allowed:
         raise RuntimeError(f"command exited {code}; retained {log}")
     return code

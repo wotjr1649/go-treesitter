@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"maps"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -16,6 +15,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	proc "github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 //go:generate go test -run ^TestKnownGapDocs$ -args -update-known-gap-docs
@@ -201,7 +202,7 @@ func TestKnownGaps(t *testing.T) {
 				}
 				ctx, cancel := context.WithTimeout(bg, 30*time.Second)
 				defer cancel()
-				cmd := exec.CommandContext(ctx, exe, "dump", input)
+				cmd := proc.CommandContext(ctx, exe, "dump", input)
 				var stderr bytes.Buffer
 				cmd.Stderr = &stderr
 				native, err := cmd.Output()
@@ -356,7 +357,7 @@ var taskCode = regexp.MustCompile(`\b[PQ][0-9]{1,2}\b`)
 // A tracked file may name a scratch path only where it is a rule (the files below), a frozen record, or a line that also
 // says the evidence moved to a "maintainer-local" archive. This file is listed because it holds the needle.
 func TestKnownGapDocsNoDeadScratchRefs(t *testing.T) {
-	out, err := exec.Command("git", "-C", "../..", "ls-files").Output()
+	out, err := proc.Command("git", "-C", "../..", "ls-files").Output()
 	if err != nil {
 		t.Skipf("git ls-files: %v", err)
 	}

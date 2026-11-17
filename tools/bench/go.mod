@@ -60,3 +60,7 @@ replace (
 	github.com/wotjr1649/go-treesitter/grammars/xml => ../../grammars/xml
 	github.com/wotjr1649/go-treesitter/grammars/yaml => ../../grammars/yaml
 )
+
+require github.com/wotjr1649/go-treesitter/tools/bench/proc v0.0.0
+
+replace github.com/wotjr1649/go-treesitter/tools/bench/proc => ./proc

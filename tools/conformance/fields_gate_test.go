@@ -2,11 +2,12 @@ package conformance
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
+
+	proc "github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 func TestFieldLookupGateConfiguration(t *testing.T) {
@@ -75,7 +76,7 @@ func TestFieldLookupGateConfiguration(t *testing.T) {
 	} {
 		for _, strict := range []string{"", "1"} {
 			t.Run(tc.name+"/strict="+strict, func(t *testing.T) {
-				cmd := exec.Command(exe, "-test.run=^"+tc.test+"$", "-test.v")
+				cmd := proc.Command(exe, "-test.run=^"+tc.test+"$", "-test.v")
 				cmd.Env = append(os.Environ(), "TSG_DATA_DIR="+tc.data, "TSG_S15_DIR=", "TSG_NATIVE_EXE_DIR="+tc.native,
 					"TSG_S15_LANGS="+tc.langs, "TSG_REQUIRE_FIELD_LOOKUP="+strict, "TSG_CONF_OUT=")
 				out, err := cmd.CombinedOutput()

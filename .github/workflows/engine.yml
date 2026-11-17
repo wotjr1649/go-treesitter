@@ -52,6 +52,15 @@ jobs:
         run: |
           go vet ./internal/engine ./internal/langid ./experimental/... .
           go test -count=1 -timeout 600s ./internal/engine ./experimental/... .
+      - name: Subprocess tree supervision
+        if: ${{ !cancelled() }}
+        working-directory: tools/bench/proc
+        run: |
+          go vet ./...
+          go test -count=1 -timeout 120s -v ./...
+      - name: Python subprocess and gate regression tests
+        if: ${{ !cancelled() }}
+        run: ${{ runner.os == 'Windows' && 'python' || 'python3' }} -m unittest discover -s tools/native-ref -p '*_test.py'
       - name: Generator unit tests
         if: ${{ !cancelled() }}
         working-directory: tools/gen
