@@ -635,6 +635,7 @@ func TestQueryCLIPredicateValidation(t *testing.T) {
 		{"any-eq?", []string{"k", "@word"}, false}, {"any-eq?", []string{"@word"}, false},
 		{"any-match?", []string{"@word", "@word"}, false}, {"any-not-match?", []string{"@word", "("}, false},
 		{"any-match?", []string{"@word", "^k"}, true}, {"any-not-any-of?", []string{"@word", "k"}, true},
+		{"any-match?", []string{"@word", `\w+\b`}, true}, {"any-not-match?", []string{"@word", `\Qk\E`}, false},
 	} {
 		t.Run(tc.op+strings.Join(tc.args, "/"), func(t *testing.T) {
 			literals := []string{tc.op}

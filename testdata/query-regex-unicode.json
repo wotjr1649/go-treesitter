@@ -1,0 +1,2437 @@
+{
+  "go_unicode": "17.0.0",
+  "rust_unicode": "16.0.0",
+  "crate_sha256": "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4",
+  "properties": [
+    {
+      "name": "C",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "3a05cd7834004862f33642955e1c71698e65656aaf1df77ca61015ff45c9f30c",
+      "rust_only": [
+        {
+          "Lo": 2191,
+          "Hi": 2191
+        },
+        {
+          "Lo": 3164,
+          "Hi": 3164
+        },
+        {
+          "Lo": 3292,
+          "Hi": 3292
+        },
+        {
+          "Lo": 6863,
+          "Hi": 6877
+        },
+        {
+          "Lo": 6880,
+          "Hi": 6891
+        },
+        {
+          "Lo": 8385,
+          "Hi": 8385
+        },
+        {
+          "Lo": 11158,
+          "Hi": 11158
+        },
+        {
+          "Lo": 42958,
+          "Hi": 42959
+        },
+        {
+          "Lo": 42962,
+          "Hi": 42962
+        },
+        {
+          "Lo": 42964,
+          "Hi": 42964
+        },
+        {
+          "Lo": 42993,
+          "Hi": 42993
+        },
+        {
+          "Lo": 64451,
+          "Hi": 64466
+        },
+        {
+          "Lo": 64912,
+          "Hi": 64913
+        },
+        {
+          "Lo": 64968,
+          "Hi": 64974
+        },
+        {
+          "Lo": 67904,
+          "Hi": 67929
+        },
+        {
+          "Lo": 69317,
+          "Hi": 69319
+        },
+        {
+          "Lo": 69328,
+          "Hi": 69336
+        },
+        {
+          "Lo": 69370,
+          "Hi": 69371
+        },
+        {
+          "Lo": 72544,
+          "Hi": 72551
+        },
+        {
+          "Lo": 73136,
+          "Hi": 73179
+        },
+        {
+          "Lo": 73184,
+          "Hi": 73193
+        },
+        {
+          "Lo": 93856,
+          "Hi": 93880
+        },
+        {
+          "Lo": 93883,
+          "Hi": 93907
+        },
+        {
+          "Lo": 94194,
+          "Hi": 94198
+        },
+        {
+          "Lo": 100344,
+          "Hi": 100351
+        },
+        {
+          "Lo": 101641,
+          "Hi": 101662
+        },
+        {
+          "Lo": 101760,
+          "Hi": 101874
+        },
+        {
+          "Lo": 118010,
+          "Hi": 118012
+        },
+        {
+          "Lo": 118458,
+          "Hi": 118480
+        },
+        {
+          "Lo": 118496,
+          "Hi": 118512
+        },
+        {
+          "Lo": 124608,
+          "Hi": 124638
+        },
+        {
+          "Lo": 124640,
+          "Hi": 124661
+        },
+        {
+          "Lo": 124670,
+          "Hi": 124671
+        },
+        {
+          "Lo": 128728,
+          "Hi": 128728
+        },
+        {
+          "Lo": 128887,
+          "Hi": 128890
+        },
+        {
+          "Lo": 129232,
+          "Hi": 129240
+        },
+        {
+          "Lo": 129620,
+          "Hi": 129623
+        },
+        {
+          "Lo": 129674,
+          "Hi": 129674
+        },
+        {
+          "Lo": 129678,
+          "Hi": 129678
+        },
+        {
+          "Lo": 129736,
+          "Hi": 129736
+        },
+        {
+          "Lo": 129741,
+          "Hi": 129741
+        },
+        {
+          "Lo": 129770,
+          "Hi": 129770
+        },
+        {
+          "Lo": 129775,
+          "Hi": 129775
+        },
+        {
+          "Lo": 130042,
+          "Hi": 130042
+        },
+        {
+          "Lo": 177978,
+          "Hi": 177983
+        },
+        {
+          "Lo": 183970,
+          "Hi": 183981
+        },
+        {
+          "Lo": 205744,
+          "Hi": 210041
+        }
+      ]
+    },
+    {
+      "name": "Cc",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "354de85a7be602318827a7ba0a2cc0c6ed92ba1606bfb2632bc89c7f8a750ccb"
+    },
+    {
+      "name": "Cf",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "6d559ae8a432ccfe9d40e8b9cffe0e8313dd9bb63fea58ac68fe05e98223c8ba"
+    },
+    {
+      "name": "Cn",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "03402b507ad9b370746b04e6ca2677f4e1b72a98c0096bfe884691dd45bc9c22",
+      "rust_only": [
+        {
+          "Lo": 2191,
+          "Hi": 2191
+        },
+        {
+          "Lo": 3164,
+          "Hi": 3164
+        },
+        {
+          "Lo": 3292,
+          "Hi": 3292
+        },
+        {
+          "Lo": 6863,
+          "Hi": 6877
+        },
+        {
+          "Lo": 6880,
+          "Hi": 6891
+        },
+        {
+          "Lo": 8385,
+          "Hi": 8385
+        },
+        {
+          "Lo": 11158,
+          "Hi": 11158
+        },
+        {
+          "Lo": 42958,
+          "Hi": 42959
+        },
+        {
+          "Lo": 42962,
+          "Hi": 42962
+        },
+        {
+          "Lo": 42964,
+          "Hi": 42964
+        },
+        {
+          "Lo": 42993,
+          "Hi": 42993
+        },
+        {
+          "Lo": 64451,
+          "Hi": 64466
+        },
+        {
+          "Lo": 64912,
+          "Hi": 64913
+        },
+        {
+          "Lo": 64968,
+          "Hi": 64974
+        },
+        {
+          "Lo": 67904,
+          "Hi": 67929
+        },
+        {
+          "Lo": 69317,
+          "Hi": 69319
+        },
+        {
+          "Lo": 69328,
+          "Hi": 69336
+        },
+        {
+          "Lo": 69370,
+          "Hi": 69371
+        },
+        {
+          "Lo": 72544,
+          "Hi": 72551
+        },
+        {
+          "Lo": 73136,
+          "Hi": 73179
+        },
+        {
+          "Lo": 73184,
+          "Hi": 73193
+        },
+        {
+          "Lo": 93856,
+          "Hi": 93880
+        },
+        {
+          "Lo": 93883,
+          "Hi": 93907
+        },
+        {
+          "Lo": 94194,
+          "Hi": 94198
+        },
+        {
+          "Lo": 100344,
+          "Hi": 100351
+        },
+        {
+          "Lo": 101641,
+          "Hi": 101662
+        },
+        {
+          "Lo": 101760,
+          "Hi": 101874
+        },
+        {
+          "Lo": 118010,
+          "Hi": 118012
+        },
+        {
+          "Lo": 118458,
+          "Hi": 118480
+        },
+        {
+          "Lo": 118496,
+          "Hi": 118512
+        },
+        {
+          "Lo": 124608,
+          "Hi": 124638
+        },
+        {
+          "Lo": 124640,
+          "Hi": 124661
+        },
+        {
+          "Lo": 124670,
+          "Hi": 124671
+        },
+        {
+          "Lo": 128728,
+          "Hi": 128728
+        },
+        {
+          "Lo": 128887,
+          "Hi": 128890
+        },
+        {
+          "Lo": 129232,
+          "Hi": 129240
+        },
+        {
+          "Lo": 129620,
+          "Hi": 129623
+        },
+        {
+          "Lo": 129674,
+          "Hi": 129674
+        },
+        {
+          "Lo": 129678,
+          "Hi": 129678
+        },
+        {
+          "Lo": 129736,
+          "Hi": 129736
+        },
+        {
+          "Lo": 129741,
+          "Hi": 129741
+        },
+        {
+          "Lo": 129770,
+          "Hi": 129770
+        },
+        {
+          "Lo": 129775,
+          "Hi": 129775
+        },
+        {
+          "Lo": 130042,
+          "Hi": 130042
+        },
+        {
+          "Lo": 177978,
+          "Hi": 177983
+        },
+        {
+          "Lo": 183970,
+          "Hi": 183981
+        },
+        {
+          "Lo": 205744,
+          "Hi": 210041
+        }
+      ]
+    },
+    {
+      "name": "Co",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "79f323be38d1ef6ac7a381f8db5a118dd2e6f78715094adc93841508fed51429"
+    },
+    {
+      "name": "Cs",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "L",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "a9b1af5abc5d08b6d199de2e66a73db19b82b413e6d747e13b5941252bb05058",
+      "go_only": [
+        {
+          "Lo": 2191,
+          "Hi": 2191
+        },
+        {
+          "Lo": 3164,
+          "Hi": 3164
+        },
+        {
+          "Lo": 3292,
+          "Hi": 3292
+        },
+        {
+          "Lo": 42958,
+          "Hi": 42959
+        },
+        {
+          "Lo": 42962,
+          "Hi": 42962
+        },
+        {
+          "Lo": 42964,
+          "Hi": 42964
+        },
+        {
+          "Lo": 42993,
+          "Hi": 42993
+        },
+        {
+          "Lo": 67904,
+          "Hi": 67929
+        },
+        {
+          "Lo": 69317,
+          "Hi": 69319
+        },
+        {
+          "Lo": 73136,
+          "Hi": 73179
+        },
+        {
+          "Lo": 93856,
+          "Hi": 93880
+        },
+        {
+          "Lo": 93883,
+          "Hi": 93907
+        },
+        {
+          "Lo": 94194,
+          "Hi": 94195
+        },
+        {
+          "Lo": 100344,
+          "Hi": 100351
+        },
+        {
+          "Lo": 101641,
+          "Hi": 101662
+        },
+        {
+          "Lo": 101760,
+          "Hi": 101874
+        },
+        {
+          "Lo": 124608,
+          "Hi": 124638
+        },
+        {
+          "Lo": 124640,
+          "Hi": 124642
+        },
+        {
+          "Lo": 124644,
+          "Hi": 124645
+        },
+        {
+          "Lo": 124647,
+          "Hi": 124653
+        },
+        {
+          "Lo": 124656,
+          "Hi": 124660
+        },
+        {
+          "Lo": 124670,
+          "Hi": 124671
+        },
+        {
+          "Lo": 177978,
+          "Hi": 177983
+        },
+        {
+          "Lo": 183970,
+          "Hi": 183981
+        },
+        {
+          "Lo": 205744,
+          "Hi": 210041
+        }
+      ]
+    },
+    {
+      "name": "LC",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "b0c5c3e8c9d0430e1c89aeef8f33703e507033b8c582fcda0112c5907d71d918",
+      "go_only": [
+        {
+          "Lo": 42958,
+          "Hi": 42959
+        },
+        {
+          "Lo": 42962,
+          "Hi": 42962
+        },
+        {
+          "Lo": 42964,
+          "Hi": 42964
+        },
+        {
+          "Lo": 93856,
+          "Hi": 93880
+        },
+        {
+          "Lo": 93883,
+          "Hi": 93907
+        }
+      ],
+      "rust_only": [
+        {
+          "Lo": 661,
+          "Hi": 661
+        }
+      ]
+    },
+    {
+      "name": "Ll",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "d7e246fce4077f84ae46dbbce79a2de6bce338d8c09c2925a8cd4ab7b41cea68",
+      "go_only": [
+        {
+          "Lo": 42959,
+          "Hi": 42959
+        },
+        {
+          "Lo": 93883,
+          "Hi": 93907
+        }
+      ],
+      "rust_only": [
+        {
+          "Lo": 661,
+          "Hi": 661
+        }
+      ]
+    },
+    {
+      "name": "Lm",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "cde6213697f60ac8980d16db28c440bea9a7d887a6e9126bd94e1172ecf1257c",
+      "go_only": [
+        {
+          "Lo": 42993,
+          "Hi": 42993
+        },
+        {
+          "Lo": 69317,
+          "Hi": 69317
+        },
+        {
+          "Lo": 73177,
+          "Hi": 73177
+        },
+        {
+          "Lo": 94194,
+          "Hi": 94195
+        },
+        {
+          "Lo": 124671,
+          "Hi": 124671
+        }
+      ]
+    },
+    {
+      "name": "Lo",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "21f122d63243e8b31cbd73a156c23bcc2565b7868235b3955cb78ad90298f15f",
+      "go_only": [
+        {
+          "Lo": 661,
+          "Hi": 661
+        },
+        {
+          "Lo": 2191,
+          "Hi": 2191
+        },
+        {
+          "Lo": 3164,
+          "Hi": 3164
+        },
+        {
+          "Lo": 3292,
+          "Hi": 3292
+        },
+        {
+          "Lo": 67904,
+          "Hi": 67929
+        },
+        {
+          "Lo": 69318,
+          "Hi": 69319
+        },
+        {
+          "Lo": 73136,
+          "Hi": 73176
+        },
+        {
+          "Lo": 73178,
+          "Hi": 73179
+        },
+        {
+          "Lo": 100344,
+          "Hi": 100351
+        },
+        {
+          "Lo": 101641,
+          "Hi": 101662
+        },
+        {
+          "Lo": 101760,
+          "Hi": 101874
+        },
+        {
+          "Lo": 124608,
+          "Hi": 124638
+        },
+        {
+          "Lo": 124640,
+          "Hi": 124642
+        },
+        {
+          "Lo": 124644,
+          "Hi": 124645
+        },
+        {
+          "Lo": 124647,
+          "Hi": 124653
+        },
+        {
+          "Lo": 124656,
+          "Hi": 124660
+        },
+        {
+          "Lo": 124670,
+          "Hi": 124670
+        },
+        {
+          "Lo": 177978,
+          "Hi": 177983
+        },
+        {
+          "Lo": 183970,
+          "Hi": 183981
+        },
+        {
+          "Lo": 205744,
+          "Hi": 210041
+        }
+      ]
+    },
+    {
+      "name": "Lt",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "6d30d5d8074d3e7441218e8ac9c4f9c6f4f1858d7200fec0b133a7c720c83bec"
+    },
+    {
+      "name": "Lu",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "ed990cbaed4751f22752212087ff21f3e4e4c4009e27fb60802c95a2e9d6c754",
+      "go_only": [
+        {
+          "Lo": 42958,
+          "Hi": 42958
+        },
+        {
+          "Lo": 42962,
+          "Hi": 42962
+        },
+        {
+          "Lo": 42964,
+          "Hi": 42964
+        },
+        {
+          "Lo": 93856,
+          "Hi": 93880
+        }
+      ]
+    },
+    {
+      "name": "M",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "ff9ecf3a5217c88d872614f0e90f11179d114540ba7f493b4e1b46e8cf2cbd5a",
+      "go_only": [
+        {
+          "Lo": 6863,
+          "Hi": 6877
+        },
+        {
+          "Lo": 6880,
+          "Hi": 6891
+        },
+        {
+          "Lo": 69370,
+          "Hi": 69371
+        },
+        {
+          "Lo": 72544,
+          "Hi": 72551
+        },
+        {
+          "Lo": 124643,
+          "Hi": 124643
+        },
+        {
+          "Lo": 124646,
+          "Hi": 124646
+        },
+        {
+          "Lo": 124654,
+          "Hi": 124655
+        },
+        {
+          "Lo": 124661,
+          "Hi": 124661
+        }
+      ]
+    },
+    {
+      "name": "Mc",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "9dc1e9cee9b39eec824d79cb52db9f36ca5962638a3e91cdfdea6c4688ddd638",
+      "go_only": [
+        {
+          "Lo": 72545,
+          "Hi": 72545
+        },
+        {
+          "Lo": 72549,
+          "Hi": 72549
+        },
+        {
+          "Lo": 72551,
+          "Hi": 72551
+        }
+      ]
+    },
+    {
+      "name": "Me",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "07f1c649976882fc980600124f17a4e51678b28a7daad1c578f74d3f90614948"
+    },
+    {
+      "name": "Mn",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "a4ffc1de487d607610a5fba70ea01f7abdb30ae22728e8fc3f7c9f98e8c655f5",
+      "go_only": [
+        {
+          "Lo": 6863,
+          "Hi": 6877
+        },
+        {
+          "Lo": 6880,
+          "Hi": 6891
+        },
+        {
+          "Lo": 69370,
+          "Hi": 69371
+        },
+        {
+          "Lo": 72544,
+          "Hi": 72544
+        },
+        {
+          "Lo": 72546,
+          "Hi": 72548
+        },
+        {
+          "Lo": 72550,
+          "Hi": 72550
+        },
+        {
+          "Lo": 124643,
+          "Hi": 124643
+        },
+        {
+          "Lo": 124646,
+          "Hi": 124646
+        },
+        {
+          "Lo": 124654,
+          "Hi": 124655
+        },
+        {
+          "Lo": 124661,
+          "Hi": 124661
+        }
+      ]
+    },
+    {
+      "name": "N",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "6544158a02119d3c2dba97742816d90fba408fa5ff58606b7c75bcc0463e7f4e",
+      "go_only": [
+        {
+          "Lo": 73184,
+          "Hi": 73193
+        },
+        {
+          "Lo": 94196,
+          "Hi": 94198
+        }
+      ]
+    },
+    {
+      "name": "Nd",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "5b2ccf5d3b91114f7a9efff810e2960fe2d02d9cc126e9ec82d12da31263efb9",
+      "go_only": [
+        {
+          "Lo": 73184,
+          "Hi": 73193
+        }
+      ]
+    },
+    {
+      "name": "Nl",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "8c79b41a9cbfad102ce099fb19cc897a86e6e4ee8751bd20cd2062d6316bc128",
+      "go_only": [
+        {
+          "Lo": 94196,
+          "Hi": 94198
+        }
+      ]
+    },
+    {
+      "name": "No",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "0facb66efc16298d5bbe5bd135e6a5407d112b7297fff742666f8e81528339c0"
+    },
+    {
+      "name": "P",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "0e6e08f789ee2279bc0c97ac33c071b7933497c8a32f097ccc0025e8bff47c8a",
+      "go_only": [
+        {
+          "Lo": 69328,
+          "Hi": 69328
+        }
+      ]
+    },
+    {
+      "name": "Pc",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "6069ffb5a17b14c7eb21745b121f54afcb27c91ba7f963b0b3bbc91c4a370dac"
+    },
+    {
+      "name": "Pd",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "d9467393bdfa0475c43dd59df1f232e3dbd28b9d0f7287b83f374a1e8f4c9f13"
+    },
+    {
+      "name": "Pe",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "f5db1d4431a95a626a6834a3bbe23bb720dfe77a56d124eaa1d14ce0b1b8d5e3"
+    },
+    {
+      "name": "Pf",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "36b8fd13ecef25ab033779843abf033a36344e0cc3763d91fb803db67f346700"
+    },
+    {
+      "name": "Pi",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "cfc6556f18c6626c3562148493b14a6dacd67d04403336cce2b3b5c608cdfc2c"
+    },
+    {
+      "name": "Po",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "47d7a53fb414ac41709aef2bc1ceb21efde0c79f7512ae23252b0e464e721d5c",
+      "go_only": [
+        {
+          "Lo": 69328,
+          "Hi": 69328
+        }
+      ]
+    },
+    {
+      "name": "Ps",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "59fe9f4bef49bac4ce1ada49358c5e7af10b47423134f367fb90d9577be89f45"
+    },
+    {
+      "name": "S",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "6a3de9017a4fa0e08825a0be9fa0747901cba283ea1ffd52f61a2eb1fd9e9776",
+      "go_only": [
+        {
+          "Lo": 8385,
+          "Hi": 8385
+        },
+        {
+          "Lo": 11158,
+          "Hi": 11158
+        },
+        {
+          "Lo": 64451,
+          "Hi": 64466
+        },
+        {
+          "Lo": 64912,
+          "Hi": 64913
+        },
+        {
+          "Lo": 64968,
+          "Hi": 64974
+        },
+        {
+          "Lo": 69329,
+          "Hi": 69336
+        },
+        {
+          "Lo": 118010,
+          "Hi": 118012
+        },
+        {
+          "Lo": 118458,
+          "Hi": 118480
+        },
+        {
+          "Lo": 118496,
+          "Hi": 118512
+        },
+        {
+          "Lo": 128728,
+          "Hi": 128728
+        },
+        {
+          "Lo": 128887,
+          "Hi": 128890
+        },
+        {
+          "Lo": 129232,
+          "Hi": 129240
+        },
+        {
+          "Lo": 129620,
+          "Hi": 129623
+        },
+        {
+          "Lo": 129674,
+          "Hi": 129674
+        },
+        {
+          "Lo": 129678,
+          "Hi": 129678
+        },
+        {
+          "Lo": 129736,
+          "Hi": 129736
+        },
+        {
+          "Lo": 129741,
+          "Hi": 129741
+        },
+        {
+          "Lo": 129770,
+          "Hi": 129770
+        },
+        {
+          "Lo": 129775,
+          "Hi": 129775
+        },
+        {
+          "Lo": 130042,
+          "Hi": 130042
+        }
+      ]
+    },
+    {
+      "name": "Sc",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "51c37331ce13cf1987d46492a9741a6e77efe33798638b8ddb94cb463c49887e",
+      "go_only": [
+        {
+          "Lo": 8385,
+          "Hi": 8385
+        }
+      ]
+    },
+    {
+      "name": "Sk",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "b7ca015f1df81547cd61a0936725b9263817bc23a1a1517bb9baaca429474c58"
+    },
+    {
+      "name": "Sm",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "3e9c79b3d502c7a45094262c70538b2f76b623f2f47b05333859a6b6d50477b0",
+      "go_only": [
+        {
+          "Lo": 118512,
+          "Hi": 118512
+        },
+        {
+          "Lo": 129232,
+          "Hi": 129240
+        }
+      ]
+    },
+    {
+      "name": "So",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "5e9ae4e292a6ed091d97dc3f4905d9351861ae1e757686c4a9176949b989b1e9",
+      "go_only": [
+        {
+          "Lo": 11158,
+          "Hi": 11158
+        },
+        {
+          "Lo": 64451,
+          "Hi": 64466
+        },
+        {
+          "Lo": 64912,
+          "Hi": 64913
+        },
+        {
+          "Lo": 64968,
+          "Hi": 64974
+        },
+        {
+          "Lo": 69329,
+          "Hi": 69336
+        },
+        {
+          "Lo": 118010,
+          "Hi": 118012
+        },
+        {
+          "Lo": 118458,
+          "Hi": 118480
+        },
+        {
+          "Lo": 118496,
+          "Hi": 118511
+        },
+        {
+          "Lo": 128728,
+          "Hi": 128728
+        },
+        {
+          "Lo": 128887,
+          "Hi": 128890
+        },
+        {
+          "Lo": 129620,
+          "Hi": 129623
+        },
+        {
+          "Lo": 129674,
+          "Hi": 129674
+        },
+        {
+          "Lo": 129678,
+          "Hi": 129678
+        },
+        {
+          "Lo": 129736,
+          "Hi": 129736
+        },
+        {
+          "Lo": 129741,
+          "Hi": 129741
+        },
+        {
+          "Lo": 129770,
+          "Hi": 129770
+        },
+        {
+          "Lo": 129775,
+          "Hi": 129775
+        },
+        {
+          "Lo": 130042,
+          "Hi": 130042
+        }
+      ]
+    },
+    {
+      "name": "Z",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "77f94c271dce5593342790ffb4db7f00d9ff79a0da7382851b7351cd776f0f8b"
+    },
+    {
+      "name": "Zl",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "d348c2e09e1ed75a1c41c64f35749ec4578d925f3c3bc2af33747cb4dac7b2de"
+    },
+    {
+      "name": "Zp",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "ef452a7beaf5c09e70bc4ffcbce13f8f5e6fe5500b6cb48aa6de38b307002f39"
+    },
+    {
+      "name": "Zs",
+      "kind": "category",
+      "rust_present": true,
+      "rust_sha256": "4e9217c18e343d6a2ff5f8f998735f99023cfcc4babaaae1c5f43cbb39daf009"
+    },
+    {
+      "name": "Adlam",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "33fb7474ff924d2fc3dd75a291abca40aedb92a118b2e4dfdf87c88a39731327"
+    },
+    {
+      "name": "Ahom",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "3f61b2d02563edd9f05ae0da21b0454f301c7ad030acd824db200f666a168c5e"
+    },
+    {
+      "name": "Anatolian_Hieroglyphs",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "be1af8298a35ef945a7c34e48def0b541176c84228ec339e91d56aba0c33a953"
+    },
+    {
+      "name": "Arabic",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "fcc9c8c9429f7fe412bd60f26089afe4e842a2aeeb2471699427ae58b63f522c",
+      "go_only": [
+        {
+          "Lo": 2191,
+          "Hi": 2191
+        },
+        {
+          "Lo": 64451,
+          "Hi": 64466
+        },
+        {
+          "Lo": 64912,
+          "Hi": 64913
+        },
+        {
+          "Lo": 64968,
+          "Hi": 64974
+        },
+        {
+          "Lo": 69317,
+          "Hi": 69319
+        },
+        {
+          "Lo": 69328,
+          "Hi": 69336
+        },
+        {
+          "Lo": 69370,
+          "Hi": 69371
+        }
+      ]
+    },
+    {
+      "name": "Armenian",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "bdd999d7c8cdefc4140fa76a8c1ab3208e9fd36d9fb4464b61daf090f9e13f25"
+    },
+    {
+      "name": "Avestan",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "8e8905ba4b5143450a30d5d6802665c2401e809df6889e9f36151045d2599af0"
+    },
+    {
+      "name": "Balinese",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "b0fe61c0480aac7bd635274a4e0e9baec522d6aa35f49d9311c3917ed82d8720"
+    },
+    {
+      "name": "Bamum",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "76e09bb147a1112ebe5c57294ae6a16200f1b9bf73ed6563cd842431d78f7d6a"
+    },
+    {
+      "name": "Bassa_Vah",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "cec60f43f00309cfb47fb52b10af0c12f15c5d867938e7a27ff0c9323b83b7f8"
+    },
+    {
+      "name": "Batak",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "5bd3c0134159682294af160db353ed725498ff3d03ef90f6b67d36aaeb7a447b"
+    },
+    {
+      "name": "Bengali",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "546394cb213d244845da39b1e206b847c8733f84ae0d8e976cd74a9cbbeaaef9"
+    },
+    {
+      "name": "Beria_Erfe",
+      "kind": "script",
+      "rust_present": false,
+      "rust_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "go_only": [
+        {
+          "Lo": 93856,
+          "Hi": 93880
+        },
+        {
+          "Lo": 93883,
+          "Hi": 93907
+        }
+      ]
+    },
+    {
+      "name": "Bhaiksuki",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "7b3ad36fbf04e43fb891e8a6af4b0607475624e300dcc3ba414ca3dd234f1acd"
+    },
+    {
+      "name": "Bopomofo",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "d258ed9dcee9c2b8b5242f210592a955f9bf358a1062d70f909f33f5d9011f20"
+    },
+    {
+      "name": "Brahmi",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "0997f0eb3d3ebab52d972ef2c94b4cfd7c45ebd8abc49f7ed4c00d9ff407473a"
+    },
+    {
+      "name": "Braille",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "e003c8c731290285fcc44c4a786aa8f3af3ac445ad09bf059e760a45e1d1fb63"
+    },
+    {
+      "name": "Buginese",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "ea61641aa50df7a098972eba01052e1e70e2c782f4581f86e21d93f79e78f910"
+    },
+    {
+      "name": "Buhid",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "3ad3a7a4ac5966220b1bffb46bef7b82f5c4dd218ba58a5b03bc0c0645649aed"
+    },
+    {
+      "name": "Canadian_Aboriginal",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "27bf6ea300cf26bea7e8d69fdc60a65c2064a5f168e18fa904fb01572dc1d8ed"
+    },
+    {
+      "name": "Carian",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "47d3a113c020c881dcdb232bca36f271dc379038e9895d18a10cd4fd33710b70"
+    },
+    {
+      "name": "Caucasian_Albanian",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "c4843380daf8e9bb818768e06c6d395b06192d7f8a2f058351b3f695d66ab95b"
+    },
+    {
+      "name": "Chakma",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "4dc6dc57a01c8e488775d6ba2ac9033375b9a70ec59ee8699010df47e2a17258"
+    },
+    {
+      "name": "Cham",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "d57c88dac27c34ec5738011e0a4e3ff3b1595cfbbf6ae8bc8dd4abc5ecdaa31b"
+    },
+    {
+      "name": "Cherokee",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "e31fc467329049112ef80fb9ebb5f156598bb2156bd6f569e9d461038a08c433"
+    },
+    {
+      "name": "Chorasmian",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "0b4ee703326a22ba965faa64c342a1d27315f67bb246de13fc8d8f4bbf437239"
+    },
+    {
+      "name": "Common",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "8e41afb1514fb604dc4ef102000f8c4190dd92d3ab4dcad1bc83b715288c55fb",
+      "go_only": [
+        {
+          "Lo": 8385,
+          "Hi": 8385
+        },
+        {
+          "Lo": 11158,
+          "Hi": 11158
+        },
+        {
+          "Lo": 118010,
+          "Hi": 118012
+        },
+        {
+          "Lo": 118458,
+          "Hi": 118480
+        },
+        {
+          "Lo": 118496,
+          "Hi": 118512
+        },
+        {
+          "Lo": 128728,
+          "Hi": 128728
+        },
+        {
+          "Lo": 128887,
+          "Hi": 128890
+        },
+        {
+          "Lo": 129232,
+          "Hi": 129240
+        },
+        {
+          "Lo": 129620,
+          "Hi": 129623
+        },
+        {
+          "Lo": 129674,
+          "Hi": 129674
+        },
+        {
+          "Lo": 129678,
+          "Hi": 129678
+        },
+        {
+          "Lo": 129736,
+          "Hi": 129736
+        },
+        {
+          "Lo": 129741,
+          "Hi": 129741
+        },
+        {
+          "Lo": 129770,
+          "Hi": 129770
+        },
+        {
+          "Lo": 129775,
+          "Hi": 129775
+        },
+        {
+          "Lo": 130042,
+          "Hi": 130042
+        }
+      ]
+    },
+    {
+      "name": "Coptic",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "75082ebe0531ed9a6c11ec7a8663ae7200f1a05474d68c9354564460094465f3"
+    },
+    {
+      "name": "Cuneiform",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "b2305ddd1d455cd2c837674738a46307673332a374a119c66b4c681d23ee8960"
+    },
+    {
+      "name": "Cypriot",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "11307584f0705ae9c47752e9c93bd863e51591f839f64811d39e95cec400a175"
+    },
+    {
+      "name": "Cypro_Minoan",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "ccde71dd726c57da10ea778a398e544d673b3ecb99b973d1b197761e361a7b60"
+    },
+    {
+      "name": "Cyrillic",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "8f90211ccd5590d3151ec463ed2531cafe2fbad6e40a9341ee09e1afdc88cc98"
+    },
+    {
+      "name": "Deseret",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "4dd0ec0fd3870d0a75a0fe3942f2b7343e6b237e949a65234e578469b2c77199"
+    },
+    {
+      "name": "Devanagari",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "a7645cf1e1660776d401d919aa13bf2cd04c1ed3292e3d4b981f0c54dbb86fc4"
+    },
+    {
+      "name": "Dives_Akuru",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "aaad97e18be450333fba1f9e31f3d3d945deb375b48028cf509d7d727906346f"
+    },
+    {
+      "name": "Dogra",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "e0daedc64aefdabb461a9c1a5325856c2907e50af4fc139105762b2c0aaab8c1"
+    },
+    {
+      "name": "Duployan",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "7e62fcdb67eea5bff468c9db5a8c175ae193f789f790e723ea16c74834f5ad6a"
+    },
+    {
+      "name": "Egyptian_Hieroglyphs",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "251e105b38f9b4b51c886843c2e40d138452c99c05a8a6a8bb6967ba9f9a34f8"
+    },
+    {
+      "name": "Elbasan",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "4d0ebab5a719793d79ef3c93e48cc3df5fbb3ed13e67e30b56491dad1acdcb8e"
+    },
+    {
+      "name": "Elymaic",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "4f8447010f32e2699a9fc48a0965549be6a471111bc42f250545f25a122a658c"
+    },
+    {
+      "name": "Ethiopic",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "01dc64f47be437cd02f09474605e7892831c8fb31608cfce8a87d442ddd4fb1f"
+    },
+    {
+      "name": "Garay",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "2a957aa7f9b3102616aac3b0c49cb192a9a13fc2145c5cc87da0eccea972a1e4"
+    },
+    {
+      "name": "Georgian",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "b2851814b7b49b4967f491652e1d48bdbfdc5045c9d1a9ab30c5a31ad27ad9fb"
+    },
+    {
+      "name": "Glagolitic",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "72aa7095a3c9111be99512c218f4ddbf2d358ccf8745f84b9421b4e2fe69b5f5"
+    },
+    {
+      "name": "Gothic",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "462ca93f40f4f370bd39a33566717f363d56ca6a315cad27cbd295f9f1809258"
+    },
+    {
+      "name": "Grantha",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "a3565f3d51f7eb1c20adadc5468d149cf9d4376d7ab7a8531fbdc0ddc512c76b"
+    },
+    {
+      "name": "Greek",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "f7508c8f5bb78bea1532af77d199124367c53e09e95fd7cdba4b55c52bbb1144"
+    },
+    {
+      "name": "Gujarati",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "1d549bfe41971df20fa0a9b1ebd4ddeeb1da84a931b25526c3e2266c82f7da8e"
+    },
+    {
+      "name": "Gunjala_Gondi",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "428df3b494ffff30ba6407e465dfb7cf966b535c8c73a75648e934935630898c"
+    },
+    {
+      "name": "Gurmukhi",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "47d80b4b023b69490fea104ae84482c48b6e8a29935faf98d6d82dfd43d8bac9"
+    },
+    {
+      "name": "Gurung_Khema",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "72bbd7e6782fb28371692992a612a26d3d22f9426a8064e4ecd7641d32587d34"
+    },
+    {
+      "name": "Han",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "53fb5ccc2ddbe31ae252fb6168a8b1099e8bfa450968a3212dadb53078e7d6a7",
+      "go_only": [
+        {
+          "Lo": 94194,
+          "Hi": 94198
+        },
+        {
+          "Lo": 177978,
+          "Hi": 177983
+        },
+        {
+          "Lo": 183970,
+          "Hi": 183981
+        },
+        {
+          "Lo": 205744,
+          "Hi": 210041
+        }
+      ]
+    },
+    {
+      "name": "Hangul",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "82ae003ae6263d587ec2769204778f3600da7f1725b4efcfc2f25f93633a265d"
+    },
+    {
+      "name": "Hanifi_Rohingya",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "69c44d1d3ea8b9cd99732a5b9bef872cc56a0c43bc45236c3f11902aeb6e2231"
+    },
+    {
+      "name": "Hanunoo",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "9efd0e2b5463e1a35c2b0c47ab7b7a3c98a2830ef76b8ca6fc2cd78c455ecea9"
+    },
+    {
+      "name": "Hatran",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "6b3a90339fc693973d504af1e16c0ed8748a6233ac78f26726f026ba7b520b85"
+    },
+    {
+      "name": "Hebrew",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "50f5483985e13431e2be0adc3965e0d3d84477d0bfa8cf90e69b72e6566e49e2"
+    },
+    {
+      "name": "Hiragana",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "c94ff043b87258b079ea50b36c1bd99c76c47f20e52b26d5874fa6e9f1b6f1ed"
+    },
+    {
+      "name": "Imperial_Aramaic",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "72460a104e382cbd2fae502bf0472bdfadc7398208d64d65faefe6134aa978f5"
+    },
+    {
+      "name": "Inherited",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "21178a9f5a6268399a6822fd4ab464320f44c1717cbdc77b2593034cef736986",
+      "go_only": [
+        {
+          "Lo": 6863,
+          "Hi": 6877
+        },
+        {
+          "Lo": 6880,
+          "Hi": 6891
+        }
+      ]
+    },
+    {
+      "name": "Inscriptional_Pahlavi",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "4b51bfd270794ebbc41728b3e7fba2b119e1e48f76d9bc571bd1005dad17efc1"
+    },
+    {
+      "name": "Inscriptional_Parthian",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "b1d7c59f813f5b5130564732199e94ec2d824db8b9ec7aa6b7ac1efefc4cdbe9"
+    },
+    {
+      "name": "Javanese",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "d7fafc464331348ca30f2744d7dfa32b6b6965a3a91712149c10227164f1dd3a"
+    },
+    {
+      "name": "Kaithi",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "493b1b7b1782210c230b9cb54d2d0de513c99f924a35032a984317a5945f44a9"
+    },
+    {
+      "name": "Kannada",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "aa2ead8f810d8d582ab935c4de43825654887388cde4374218fe7eb7ce9cb8cd",
+      "go_only": [
+        {
+          "Lo": 3292,
+          "Hi": 3292
+        }
+      ]
+    },
+    {
+      "name": "Katakana",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "1d24fc881561762d2c87a8e7acf678d1003911fb01b9fa7f8dd4ed84d8084051"
+    },
+    {
+      "name": "Kawi",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "b46031d720bcee39c568c60ba07029928ef55e0449ba5de175418a8ddf92cc0d"
+    },
+    {
+      "name": "Kayah_Li",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "c30c9255efdcee9c9b1251f14475d70b8e2f33678df95de1d9d2729b5f1b159a"
+    },
+    {
+      "name": "Kharoshthi",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "da2d35a5e34d16a3b47776f674aab0d9b9ac2dfa6d8c29250333d9e08fe313ab"
+    },
+    {
+      "name": "Khitan_Small_Script",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "19877c148ad4ed39fcd9c87e3b7e9f24cc801186686b8a2e9c91a658804e4e81"
+    },
+    {
+      "name": "Khmer",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "d1c377187069ea216802b3b980a1e7b5f467a11d3e8e1bfa6f04b15055a94ee9"
+    },
+    {
+      "name": "Khojki",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "0168194168a21a1eee4dbcfb4ea0ca8748c2afe5e94cac212f2bf532115d80cc"
+    },
+    {
+      "name": "Khudawadi",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "badcb074b0afa295c0f603a0fb380ab07025ca0fc04ee83b52b0dabad85cd7fc"
+    },
+    {
+      "name": "Kirat_Rai",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "414746f2b08abc26b0e4a21cad3ae6dcf67b6998f80df4f3953800564412abc5"
+    },
+    {
+      "name": "Lao",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "0c754c0f1f9672317b6490be258877969517003eeec7c204c903e945b3cd2376"
+    },
+    {
+      "name": "Latin",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "50affd392a63e9395709645ea21a188e5c85213bb91fa1a5a4363408e862b0e6",
+      "go_only": [
+        {
+          "Lo": 42958,
+          "Hi": 42959
+        },
+        {
+          "Lo": 42962,
+          "Hi": 42962
+        },
+        {
+          "Lo": 42964,
+          "Hi": 42964
+        },
+        {
+          "Lo": 42993,
+          "Hi": 42993
+        }
+      ]
+    },
+    {
+      "name": "Lepcha",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "edb674581b544dbb039bab3f4ff09d2e8b1d70684270df10f479021b2808aecd"
+    },
+    {
+      "name": "Limbu",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "45d2a0abebed15e1aa2ec88bc67b0e7ec9cc3b3c228f0271ca1a141b2c688f61"
+    },
+    {
+      "name": "Linear_A",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "4da15c1156d14302099d75c036662c0452fe4082ef794a139a543b61f1148904"
+    },
+    {
+      "name": "Linear_B",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "776369db937f74725a5b24688bf570191bf03c12161a1f9ed6eae25b2a94ed6f"
+    },
+    {
+      "name": "Lisu",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "d931d1823b15a0d17686fce7f18ec51c71339ae586c6f8aee70e4895235c76fc"
+    },
+    {
+      "name": "Lycian",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "4d93028802bf099913ccb1d4e87dc52d1bb52ae82afa6b7a9db9da27d295729d"
+    },
+    {
+      "name": "Lydian",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "e5e17e7a0c608ccfa71f03e704a9ac1e34728734819f7d7972ba5abbe301c85d"
+    },
+    {
+      "name": "Mahajani",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "93cc7b1cbe82bfe2cf653f701705b83c9461d2f3e0c464ce096e1e4ac576276b"
+    },
+    {
+      "name": "Makasar",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "2d666c32e0299f678c20ce5a6111dbbdff1bfeab654e0353533f02e3e97111bf"
+    },
+    {
+      "name": "Malayalam",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "73960baf589f034256982471f030395c96ec474964de667ac241b580c3a357d4"
+    },
+    {
+      "name": "Mandaic",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "d12881bae701478bce93fbf2e4901f943ec61a825075ca0108cbbf603f61527d"
+    },
+    {
+      "name": "Manichaean",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "1204662cd97b402eba37951baa4c23112c4f14c7132b78bba746ef856854224b"
+    },
+    {
+      "name": "Marchen",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "f0869e294d29b3573bff2f19558309326303b5f2c2b2d31963fcd631d665293c"
+    },
+    {
+      "name": "Masaram_Gondi",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "b869d2f27912ed5d1b1f89a23a5e3c389c42c22f10c9fb9de298c763bf0a0020"
+    },
+    {
+      "name": "Medefaidrin",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "a6b34c4fdf8815c0b656c5a4535f5627086dee85d8b02c3254bcebece947421b"
+    },
+    {
+      "name": "Meetei_Mayek",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "892acbdc246588f658072480009304c0442407fe3b93574463b95eb21bce0d0d"
+    },
+    {
+      "name": "Mende_Kikakui",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "8e7fc7617c5ae4dad0afe5c329160d9d441886bd53b9ab6be2de9453f2def10e"
+    },
+    {
+      "name": "Meroitic_Cursive",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "4d741762f9b7e47f1d201d0fdc3390f39702caf8037f49210aad6632b88078ea"
+    },
+    {
+      "name": "Meroitic_Hieroglyphs",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "c2a0d9759b518711919a5842ebfa1a88b79e29d233cea609d9aff68232c207ae"
+    },
+    {
+      "name": "Miao",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "b067aa4e90901b17c12e3f2a6db8dd1cc71fb3c5c83b58dc928f04098868a31c"
+    },
+    {
+      "name": "Modi",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "f91b9d2b3a0c3963eeaf516b968bfc747ae52c24821b1661c6f557ec9b93637a"
+    },
+    {
+      "name": "Mongolian",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "5e5ce902d76f622403d185855b760ed2dd5105bad9316eb5416c25ce2940debf"
+    },
+    {
+      "name": "Mro",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "f7bbee2a70300fb5acbcb8441328f8f3d1818663eef5b2230a07b873887f4b7a"
+    },
+    {
+      "name": "Multani",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "0542b5642bb64ea2f79b6600aeb6364fb2cc6d512e2aa7af7fa9bbac47a601d7"
+    },
+    {
+      "name": "Myanmar",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "2fd303068c05fab32e73c2a1d3b38089d06e8492a8d32312335f7061bfb94627"
+    },
+    {
+      "name": "Nabataean",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "a5061c4bc46f6854fa38ceeba952af7c53b4e403250fd9e327d9b462b51f34ea"
+    },
+    {
+      "name": "Nag_Mundari",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "872d6f81fb55acb25de2989110ee8a37ebf7cb5c523bc3d11a91c1963d491aa9"
+    },
+    {
+      "name": "Nandinagari",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "9c02269de10f17008be8a0f0c2c8e1c10a508a39dc93f139826d6712d9df83dd"
+    },
+    {
+      "name": "New_Tai_Lue",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "a74869c42303b7ff4524a0b2d310f9a9c83bde6a47cb1af96569f800b0d7cc34"
+    },
+    {
+      "name": "Newa",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "b3dec77d6a52536ed727e6cc40fa1ece784dffc59c801b802dfd8c961acb5e7b"
+    },
+    {
+      "name": "Nko",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "53f5b79400adf9559e864523af22a5da4318a60fc29c7e93954e32776b94d76a"
+    },
+    {
+      "name": "Nushu",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "f908571474edea165487e0fde4556ced699e2ba486f0287e11ec9dd34c98a98f"
+    },
+    {
+      "name": "Nyiakeng_Puachue_Hmong",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "bc657691b87a0bfd933770cd53f1280d7f5067ceef8d6ffe7abd39c12138b84f"
+    },
+    {
+      "name": "Ogham",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "4a7b8eedf8ced8387aa7a7c171c08f9b6e25f3c0f24ebfa9b406cb3900e8c3c5"
+    },
+    {
+      "name": "Ol_Chiki",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "7a3902637be45499a675265d5d20e981cdf08f8f665cd5ab8258ab17be1334e3"
+    },
+    {
+      "name": "Ol_Onal",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "c47f2b250361667c3e0510adecbbdd68dab36451394a0f407784eeb31141c9e6"
+    },
+    {
+      "name": "Old_Hungarian",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "c98e55349e69bff786484ff3990e54db6f285e8816bc9db24fb2c4f6c9d99aab"
+    },
+    {
+      "name": "Old_Italic",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "9ba4811303a186d7cdf98245ae6ae867d47581a78c3a1b44aa4b3004d4be343c"
+    },
+    {
+      "name": "Old_North_Arabian",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "d84a1442c02bf597250d29decdf335ff8bb8cc6108311c01ba83ad62b9fdc204"
+    },
+    {
+      "name": "Old_Permic",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "4cb68d3f0bafa1abe73b51b2de9325cf67a08d897663c7a6afa42538a348fde4"
+    },
+    {
+      "name": "Old_Persian",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "360d578090cac7ac9897789912039a90ebbf2f6cf8f7f829ce4e0c343c337be0"
+    },
+    {
+      "name": "Old_Sogdian",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "9f171da128e5485a074b1f1a80b2e498d77af24542368e6e12bd474bd7076eb1"
+    },
+    {
+      "name": "Old_South_Arabian",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "c37b20d8165f99fa2d6f7120647b34ec937a9161382c236f334c49b3a3181fb3"
+    },
+    {
+      "name": "Old_Turkic",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "47f06423ab5a1fb73d09699f07b19c60550564a63531a837f30867c466cd78bb"
+    },
+    {
+      "name": "Old_Uyghur",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "6a48648e0a3759cfdfdd7644f2841015cbac224c405d5d6fbc240cf2bf21277a"
+    },
+    {
+      "name": "Oriya",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "005ac4bb619a4ba05785d122acceaaa4242e63c8fa977cc6aee909d0a5745f57"
+    },
+    {
+      "name": "Osage",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "1d8dbf24025176dd97ef14c05860118d1c49a2b0498671ef54c3ac116814ec56"
+    },
+    {
+      "name": "Osmanya",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "7c283f9f42b0db316b153d36c28f0b8b871bdab0fbbe02c3f2f7bd003257417a"
+    },
+    {
+      "name": "Pahawh_Hmong",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "9fb134257a534fbde58e224c11214418bb5b4b17f18c522645a7b4a0b8f68419"
+    },
+    {
+      "name": "Palmyrene",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "35d2d36dc0afefc67ad29e1b22031cfab1ae09fe1eec9afdd0cc2abc645d3607"
+    },
+    {
+      "name": "Pau_Cin_Hau",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "518604dc1d490ab3b8aeab30d527e63c884863f800d0d792d79f8aac38873f0c"
+    },
+    {
+      "name": "Phags_Pa",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "ccde7e04d10f48971608caa6b19d69dddb2937c46f5b7f8017a2d0226f9f8688"
+    },
+    {
+      "name": "Phoenician",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "3c1e7020c4d3d70484d587ef2944fe10ec3d91c861fe0b99cf5d6694ad8db91f"
+    },
+    {
+      "name": "Psalter_Pahlavi",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "a855c48d12303218b62ae3bf798f358c3deb95efaeab65b8c672955bff22720e"
+    },
+    {
+      "name": "Rejang",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "d5a0ce46c0f0f5bfab04d9ad2e82540d6fc9a839ccdf18514ff1d1ec58fb7242"
+    },
+    {
+      "name": "Runic",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "04cbf2f350e280e4aab49862fafd0a5133256a9b259d7177db7e2dee73f65e2b"
+    },
+    {
+      "name": "Samaritan",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "8c9aa16ecdbf7663799bc4b9faf98060a9ed822fb22bd766b7edb88e9aafc76b"
+    },
+    {
+      "name": "Saurashtra",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "5d583707e75ab137efc121e76449d06505a0da3949c17bd11b065008db65a9d1"
+    },
+    {
+      "name": "Sharada",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "6a6ed1d60c2fad648b3a523e700e2e2e2df67babd24981bf9adada98241a758e",
+      "go_only": [
+        {
+          "Lo": 72544,
+          "Hi": 72551
+        }
+      ]
+    },
+    {
+      "name": "Shavian",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "fdb29747890ed6d1cc2422d17857c4273335e6bcf0fba3ffad6e10d9c20e2121"
+    },
+    {
+      "name": "Siddham",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "8e90690d7b916a7d42d166b062d7d70e49bfdb6f65a21d6e59f3d569f029270d"
+    },
+    {
+      "name": "Sidetic",
+      "kind": "script",
+      "rust_present": false,
+      "rust_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "go_only": [
+        {
+          "Lo": 67904,
+          "Hi": 67929
+        }
+      ]
+    },
+    {
+      "name": "SignWriting",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "a08d219a7ed64b8bd0ba26ca22fd87af5112e983b3bba35aecab21445521c9ef"
+    },
+    {
+      "name": "Sinhala",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "03d7eb5d0ddce967e70467948138916a799dbfd02c310a170693a65aea235573"
+    },
+    {
+      "name": "Sogdian",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "2bb82385955783c17c2c861164ed50102a5899863e3d7f937686afde2b78183d"
+    },
+    {
+      "name": "Sora_Sompeng",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "d6abc408e9a502580044dc91f4d4b71d90f8711052ca1a39d7814ffae8ff3ec6"
+    },
+    {
+      "name": "Soyombo",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "bbdb3316b3233c360319bfea29b8d69cb4bb7e080ba91bb72ffc04a61798a57a"
+    },
+    {
+      "name": "Sundanese",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "a8b8dee2e30a7e5e9fd67c11be99c757a90de693df96f1e2a771933fe1fd45cd"
+    },
+    {
+      "name": "Sunuwar",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "1df19075d895ed1a46057a78ab636f9262110bda71505073095953a38f797231"
+    },
+    {
+      "name": "Syloti_Nagri",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "752509a77e62a5dd7d662a2c9531c13b268a404fd2b2a087b30be667d5074ee3"
+    },
+    {
+      "name": "Syriac",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "652bad13c6a87cc77a01680d8ccd3233745b1de4eb70ab65c2798a2077d8e928"
+    },
+    {
+      "name": "Tagalog",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "80512662bcbb7464357bee2a9eb72479b8b89f872bb5d8ca262e384ce7a0f4ff"
+    },
+    {
+      "name": "Tagbanwa",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "635d7ce3f32197c9eecd9e3c903a12e0e9aece62966152680380260f4c1da514"
+    },
+    {
+      "name": "Tai_Le",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "0ae28b5c07c10ae66175f9d255f50105058d89e958aeb732cddbc1c3b96be774"
+    },
+    {
+      "name": "Tai_Tham",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "f83c0b362ad6fc40f8d02b0a3aea22bf98f53873bdf87303c7f7310731e9e967"
+    },
+    {
+      "name": "Tai_Viet",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "28466e6bc20c74962bedd56b50fb99921aaa1bc4ed91611d41a24a6ca11209a1"
+    },
+    {
+      "name": "Tai_Yo",
+      "kind": "script",
+      "rust_present": false,
+      "rust_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "go_only": [
+        {
+          "Lo": 124608,
+          "Hi": 124638
+        },
+        {
+          "Lo": 124640,
+          "Hi": 124661
+        },
+        {
+          "Lo": 124670,
+          "Hi": 124671
+        }
+      ]
+    },
+    {
+      "name": "Takri",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "e6e0dae4f235c0ec93d9b16169a992b53249a95cbc143cd0f2196a8b29c28e05"
+    },
+    {
+      "name": "Tamil",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "eb2a0b58cb18768a97829cb52da99738adc62ee719ca86642a2204e430f43b8c"
+    },
+    {
+      "name": "Tangsa",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "5bb66addfcc6a7489b44308927a46b9f6692aa90a9abc27577904f17bd08b4cf"
+    },
+    {
+      "name": "Tangut",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "ce76514d1156d3a713c0b48d63e5aaa4d9d08e48792b0ca4ac6e28ed5f19acab",
+      "go_only": [
+        {
+          "Lo": 100344,
+          "Hi": 100351
+        },
+        {
+          "Lo": 101641,
+          "Hi": 101662
+        },
+        {
+          "Lo": 101760,
+          "Hi": 101874
+        }
+      ]
+    },
+    {
+      "name": "Telugu",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "ff17e16cf08058e5efa869e1a9120924e64dd9664cef0334b9f2fc71c744bf0f",
+      "go_only": [
+        {
+          "Lo": 3164,
+          "Hi": 3164
+        }
+      ]
+    },
+    {
+      "name": "Thaana",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "fffaac592857f1b31fe01053c39cf176641f8e74faa1a01dd53d16f3707f69c9"
+    },
+    {
+      "name": "Thai",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "c370594222251ff7eecf4444d77cdc342d2251c09ee81f8887265c35f111ef24"
+    },
+    {
+      "name": "Tibetan",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "9d5cf20c32b4f9c075b073df4612fb90e08b48b4013cb1d14112fbb23a1a0f5b"
+    },
+    {
+      "name": "Tifinagh",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "b26f8b51e2090c1db69628b58d8d8708df4a479ae45386259cd3cfb9300515ba"
+    },
+    {
+      "name": "Tirhuta",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "fd404d10d3cc56d0d2fb70a44ef8ca876945a7873a485fbb8d14e99a2d1980f6"
+    },
+    {
+      "name": "Todhri",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "8a4f1a79f2d8d754e799999440b7a857e54a9e0f853cc72b7ba324e0d74a4a1d"
+    },
+    {
+      "name": "Tolong_Siki",
+      "kind": "script",
+      "rust_present": false,
+      "rust_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "go_only": [
+        {
+          "Lo": 73136,
+          "Hi": 73179
+        },
+        {
+          "Lo": 73184,
+          "Hi": 73193
+        }
+      ]
+    },
+    {
+      "name": "Toto",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "c47ec9be1e2dcd447f170ce66212406a2cc0db25097c0df464fdd456e5807fd7"
+    },
+    {
+      "name": "Tulu_Tigalari",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "5d01f7101b0841880620d21a1a83b346d8b8cef536426e4c25eb375518d5e20b"
+    },
+    {
+      "name": "Ugaritic",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "baffed9ecb177b5ecf7d0beecc5ae9d40313fc1d4a658a9ccad5e7b476759d99"
+    },
+    {
+      "name": "Vai",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "dfe8da68dd079e044e4094489aae3a910ec3c9a6520f8799b1314f46d40333c5"
+    },
+    {
+      "name": "Vithkuqi",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "f0ae9e39272ed442d3af8d136643e0c3e2d4df009dd22c4041380555ba311d73"
+    },
+    {
+      "name": "Wancho",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "dfd03fa9ec4b1a71a1938127d85c0f85a048e48e15f3d4f2319290da5093adbb"
+    },
+    {
+      "name": "Warang_Citi",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "e7c7b69a32e503306d8e26a778fc8650a0ea6a621375cc9867eb45eef39f11f5"
+    },
+    {
+      "name": "Yezidi",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "d0a54491fc1302d9a9bc958b62bd60e462f4aa457ce24f351e5a7a94450ad95a"
+    },
+    {
+      "name": "Yi",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "74a7732fc091e925ea017c20a840ea070ff8e5388b6e738a4489e6ae8a027e7d"
+    },
+    {
+      "name": "Zanabazar_Square",
+      "kind": "script",
+      "rust_present": true,
+      "rust_sha256": "f42c6d0fb738e9fb47bea1fb6905feb6aeb6e20eaa03b38a5ebd4cb784ef25ba"
+    }
+  ]
+}

@@ -2,6 +2,9 @@ package conformance
 
 import (
 	"bytes"
+	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,6 +14,8 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
+	"unicode"
 
 	treesitter "github.com/wotjr1649/go-treesitter"
 	proc "github.com/wotjr1649/go-treesitter/tools/bench/proc"
@@ -18,10 +23,10 @@ import (
 
 // Predicate comparison against the tree-sitter CLI (local only; CI compares native raw matches, see query_native_test.go).
 // The CLI evaluates the text predicates (Rust), the Go side filters them itself, so the same query over the same bytes
-// must give the same matches. The only accepted class of difference is RE2 (Go regexp) versus Rust regex syntax.
+// must give the same matches. The synthetic regex matrix records explicit syntax/Unicode residuals as E3 evidence.
 //
 //	TSG_TS_CLI      path of tree-sitter v0.27.2
-//	TSG_TS_LIB_DIR  directory holding one shared library per grammar (parser.c + scanner.c, see the P16 build script)
+//	TSG_TS_LIB_DIR  directory holding one shared library per grammar (built from its pinned parser.c + scanner.c)
 //
 // Without TSG_TS_CLI the test skips.
 
@@ -423,4 +428,211 @@ func firstListDiff(got, want []string) string {
 		}
 	}
 	return "identical"
+}
+
+func TestQueryCLIInvalidUTF8Output(t *testing.T) {
+	// CLI 0.27.2 omits invalid UTF-8 capture text, retaining the byte span.
+	out := []byte("bad.json\n  pattern: 0\n    capture: 0 - s, start: (0, 0), end: (0, 3), text: ``\n")
+	got, err := parseCLI(out, map[string][]byte{"bad.json": {'"', 0xff, '"'}})
+	if err != nil || !slices.Equal(got["bad.json"], []string{"p0 [s(0,0)-(0,3)]"}) {
+		t.Fatalf("invalid UTF-8 capture: %v, %v", got, err)
+	}
+}
+
+// TestQueryCLIRegexMatrix needs only the local CLI and json library, not a native corpus data directory.
+func TestQueryCLIRegexMatrix(t *testing.T) {
+	cli := os.Getenv("TSG_TS_CLI")
+	if cli == "" {
+		t.Skip("TSG_TS_CLI (tree-sitter v0.27.2) is not set")
+	}
+	libDir := os.Getenv("TSG_TS_LIB_DIR")
+	if libDir == "" {
+		t.Fatal("TSG_TS_LIB_DIR is required with TSG_TS_CLI")
+	}
+	if languages["json"] == nil {
+		t.Skip("json is not linked")
+	}
+	ext := ".so"
+	if runtime.GOOS == "windows" {
+		ext = ".dll"
+	} else if runtime.GOOS == "darwin" {
+		ext = ".dylib"
+	}
+	lib := filepath.Join(libDir, "json"+ext)
+	data := readFile(t, filepath.Join("..", "..", "testdata", "query-regex-cli.json"))
+	var fixture struct {
+		CLIVersion    string `json:"cli_version"`
+		CLISHA256     string `json:"cli_sha256"`
+		LibrarySHA256 string `json:"json_library_sha256"`
+		Inputs        []struct{ Name, Base64 string }
+		Patterns      []struct {
+			Name        string
+			Pattern     string `json:"pattern_base64"`
+			Matches     []bool
+			GoOverrides map[string]bool `json:"go_overrides"`
+			Residual    string
+		}
+		Acceptance []struct {
+			Name      string
+			Pattern   string `json:"pattern_base64"`
+			CLIAccept bool   `json:"cli_accept"`
+			GoReject  string `json:"go_reject"`
+		}
+	}
+	if err := json.Unmarshal(data, &fixture); err != nil {
+		t.Fatal(err)
+	}
+	seen := map[string]bool{}
+	checkName := func(category, name string) {
+		key := category + "/" + strings.ToLower(name)
+		if seen[key] {
+			t.Fatalf("case-insensitive fixture filename collision: %s", key)
+		}
+		seen[key] = true
+	}
+	for _, input := range fixture.Inputs {
+		checkName("input", input.Name)
+	}
+	for _, row := range fixture.Patterns {
+		checkName("pattern", row.Name)
+	}
+	for _, probe := range fixture.Acceptance {
+		checkName("accept", probe.Name)
+	}
+	if sha(readFile(t, cli)) != fixture.CLISHA256 || sha(readFile(t, lib)) != fixture.LibrarySHA256 {
+		t.Fatal("CLI or json library SHA-256 differs from recorded fixture")
+	}
+	home, dir := t.TempDir(), t.TempDir()
+	run := func(t *testing.T, args ...string) ([]byte, []byte, error) {
+		t.Helper()
+		ctx, cancel := context.WithTimeout(bg, 15*time.Second)
+		defer cancel()
+		cmd := proc.CommandContext(ctx, cli, args...)
+		cmd.Env = cliEnv(home)
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
+		out, err := cmd.Output()
+		if ctx.Err() != nil {
+			t.Fatalf("CLI timed out: %v", args)
+		}
+		return out, stderr.Bytes(), err
+	}
+	version, stderr, err := run(t, "--version")
+	if err != nil || strings.TrimSpace(string(version)) != fixture.CLIVersion {
+		t.Fatalf("CLI version: %q, %v, %s", version, err, stderr)
+	}
+	decode := func(t *testing.T, value string) []byte {
+		t.Helper()
+		b, err := base64.StdEncoding.DecodeString(value)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return b
+	}
+	srcs := map[string][]byte{}
+	trees := map[string]*treesitter.Tree{}
+	var paths []string
+	parser := newParser(t, "json")
+	for _, input := range fixture.Inputs {
+		name := input.Name + ".json"
+		src := decode(t, input.Base64)
+		srcs[name] = src
+		path := filepath.Join(dir, name)
+		if err := os.WriteFile(path, src, 0o644); err != nil {
+			t.Fatal(err)
+		}
+		paths = append(paths, path)
+		tree, err := parser.Parse(bg, src, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		trees[name] = tree
+		t.Cleanup(tree.Close)
+	}
+	list := filepath.Join(dir, "paths.txt")
+	if err := os.WriteFile(list, []byte(strings.Join(paths, "\n")+"\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	query := func(t *testing.T, name, pattern string, all bool) ([]byte, []byte, error, *treesitter.Query, error) {
+		t.Helper()
+		source := "((document) @s (#match? @s " + strconv.Quote(pattern) + "))"
+		path := filepath.Join(dir, name+".scm")
+		if err := os.WriteFile(path, []byte(source), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		args := []string{"query", "-l", lib, "--lang-name", "json"}
+		if all {
+			args = append(args, "--paths", list, path)
+		} else {
+			args = append(args, path, paths[0])
+		}
+		out, stderr, cerr := run(t, args...)
+		q, gerr := treesitter.NewQuery(languages["json"](), source)
+		return out, stderr, cerr, q, gerr
+	}
+	var comparisons, residuals int
+	for _, row := range fixture.Patterns {
+		t.Run(row.Name, func(t *testing.T) {
+			out, stderr, cerr, q, gerr := query(t, "matrix-"+row.Name, string(decode(t, row.Pattern)), true)
+			preserve("cli/regex/"+row.Name+".stdout", out)
+			preserve("cli/regex/"+row.Name+".stderr", stderr)
+			if cerr != nil || gerr != nil {
+				t.Fatalf("CLI=%v %s Go=%v", cerr, stderr, gerr)
+			}
+			matches, err := parseCLI(out, srcs)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(row.Matches) != len(fixture.Inputs) {
+				t.Fatal("incomplete fixture matrix")
+			}
+			for i, input := range fixture.Inputs {
+				name := input.Name + ".json"
+				cliMatch := len(matches[name]) != 0
+				if cliMatch != row.Matches[i] {
+					t.Errorf("%s: CLI=%v recorded=%v", input.Name, cliMatch, row.Matches[i])
+				}
+				goMatch := false
+				for _, err := range trees[name].Matches(bg, q, nil) {
+					if err != nil {
+						t.Fatal(err)
+					}
+					goMatch = true
+				}
+				want := cliMatch
+				if override, ok := row.GoOverrides[input.Name]; ok {
+					if row.Residual == "" {
+						t.Fatal("unexplained residual")
+					}
+					want = override
+					if row.Name == "property-L" && input.Name == "unicode17-new-letter" {
+						want = unicode.IsLetter('\U00010940')
+					}
+					if want != cliMatch {
+						residuals++
+						t.Logf("residual %s: CLI=%v Go=%v: %s", input.Name, cliMatch, want, row.Residual)
+					}
+				}
+				comparisons++
+				if goMatch != want {
+					t.Errorf("%s: CLI=%v Go=%v expected Go=%v residual=%q", input.Name, cliMatch, goMatch, want, row.Residual)
+				}
+			}
+		})
+	}
+	for _, probe := range fixture.Acceptance {
+		t.Run("accept/"+probe.Name, func(t *testing.T) {
+			out, stderr, cerr, _, gerr := query(t, "accept-"+probe.Name, string(decode(t, probe.Pattern)), false)
+			preserve("cli/regex/accept-"+probe.Name+".stdout", out)
+			preserve("cli/regex/accept-"+probe.Name+".stderr", stderr)
+			if (cerr == nil) != probe.CLIAccept || (gerr != nil) != (probe.GoReject != "") {
+				t.Errorf("CLI accepted=%v (recorded=%v) %s; Go rejection=%v (expected=%q)", cerr == nil, probe.CLIAccept, stderr, gerr, probe.GoReject)
+			}
+			if probe.CLIAccept != (probe.GoReject == "") {
+				residuals++
+				t.Logf("acceptance residual: CLI accepts=%v; Go accepts=%v; Go rejection=%q", probe.CLIAccept, probe.GoReject == "", probe.GoReject)
+			}
+		})
+	}
+	t.Logf("E3 recorded matrix: %d patterns x %d inputs = %d comparisons; %d acceptance probes; %d explicit residuals", len(fixture.Patterns), len(fixture.Inputs), comparisons, len(fixture.Acceptance), residuals)
 }

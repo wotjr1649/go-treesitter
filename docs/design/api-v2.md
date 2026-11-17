@@ -202,6 +202,13 @@ func NewIndex(*Snapshot) *Index; (*Snapshot) Index() *Index  // OfType, OfSymbol
 preorder index (equal to C's descendant index); text predicates (`#eq?`, `#match?`, `#any-of?`) are evaluated in Go
 against the snapshot's owned source. A parser is busy while an iterator is open (`Parse` returns an error).
 
+In the development tree after v0.5.0, regex predicates default to Unicode 16.0.0 shorthand classes, word boundaries
+and simple case folding from CLI 0.27.2's pinned `regex-syntax` 0.8.11 tables. `\p{...}` categories/scripts instead
+follow the consumer's Go toolchain. Scoped `(?-u:...)` retains ASCII shorthand classes and boundaries; unsupported
+Rust or Go-only syntax returns a query error. `#any-*` predicates still validate and expose properties without
+filtering. See the [regex subset](query-abi.md#regex-predicate-subset-development-tree-after-v050) and
+[migration guidance](../../MIGRATING.md#unreleased-after-v050).
+
 ## 9. Out of scope for v0.0.1
 
 Live per-node navigation over the instance, included ranges, shared-runtime linking, legacy encodings (v0.1 `encoding`

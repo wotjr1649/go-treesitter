@@ -41,7 +41,7 @@ type QueryMatch struct{ Pattern int; Captures []QueryCapture }   // Captures[i].
 ```
 - The query compiles per parser instance on first use and is dropped on instance reset (generation).
 - `Matches` takes the tree's snapshot (exporting it if needed), then streams matches; text predicates (`#eq?`, `#match?`
-  (Go `regexp`, RE2 — documented difference from Rust regex), `#any-of?`, and their `not-` forms) filter in Go.
+  (the regex subset below), `#any-of?`, and their `not-` forms) filter in Go.
 - The parser is busy while an iterator is open: `Parse`/`Reset` return an error; breaking the loop releases it.
 - Cancellation and limits follow the parse outcome table: ctx halt → `Timeout`/`Cancelled` error from the iterator,
   match limit exceeded → reported on the iterator (`QueryMatch` stream ends with `ErrQueryMatchLimit`), traps →
@@ -52,8 +52,8 @@ type QueryMatch struct{ Pattern int; Captures []QueryCapture }   // Captures[i].
   node descendant index, symbol, range) without predicates. Inputs: each grammar repository's own `queries/*.scm`
   (highlights, tags, locals, injections where present; pinned and sha256-verified) over the corpus inputs. Gate: raw
   matches byte-identical to native for every query file and input.
-- Predicates: compared with tree-sitter CLI v0.27.2 `query` output (it evaluates text predicates) on the same inputs;
-  differences only where RE2 and Rust regex differ, each listed.
+- Predicates: retained CLI v0.27.2 `query` outputs record pattern/input boolean results with CLI identity and hashes;
+  product-lane tests compare against that matrix (E3). This is separate from native C raw-query evidence (E5).
 - Cancellation-then-parse regression and fuzzing of `NewQuery` (no panics, errors carry offsets).
 
 ## Implementation refinements (2026-11-14)
@@ -73,8 +73,8 @@ type QueryMatch struct{ Pattern int; Captures []QueryCapture }   // Captures[i].
   source length excludes those EOF nodes; MatchLimit=0 uses UINT32_MAX, matching C's default. Byte ranges outside
   the owned source, reversed ranges and queries from another Language return InvalidInput. The options are copied
   when creating the sequence. Query validation checks predicate arity and compiles regexes before returning Query.
-- #eq? compares a capture to a literal or pairs of equally sized capture lists. #match? uses Go regexp (RE2), not the
-  CLI's Rust regex; #any-of? checks literal membership. Each occurrence must satisfy the predicate; not- forms negate
+- #eq? compares a capture to a literal or pairs of equally sized capture lists. #match? uses the regex subset below;
+  #any-of? checks literal membership. Each occurrence must satisfy the predicate; not- forms negate
   each occurrence. Optional captures with no occurrences satisfy their text predicate. No additional filtering is
   inferred for opaque directives or property assertions.
 
@@ -117,3 +117,54 @@ type QueryMatch struct{ Pattern int; Captures []QueryCapture }   // Captures[i].
 - MatchLimit bounds in-progress states, not returned results. On overflow the iterator reports ErrQueryMatchLimit
   and discards any match produced by that same next call. Previously yielded matches remain valid; small limits may
   yield no matches at all. The public doc comments state this explicitly.
+
+## Regex predicate subset (development tree after v0.5.0)
+
+`#match?` and `#not-match?` use boolean search semantics. Shorthand classes `\w`, `\d`, `\s` (and their negations),
+`\b`/`\B` word membership and `(?i)` simple case folding use generated Unicode 16.0.0 tables from `regex-syntax`
+0.8.11, pinned by the tree-sitter CLI 0.27.2 lockfile. These tables are embedded in the standard-library-only root
+module. Case folding precedes class negation, including for computed shorthand sets. Literal and class folding do
+not use Go's own Unicode fold tables.
+
+The translator emits canonical Go regex syntax with explicit rune ranges. Go `regexp` handles patterns without
+word-boundary assertions on valid UTF-8. A bounded-state matcher over `regexp/syntax.Prog` handles word boundaries
+and invalid UTF-8 text, using per-call state. No Unicode character-consuming instruction advances over invalid
+bytes; an encoded U+FFFD is an ordinary valid character. Unicode assertions use regex-automata 0.4.18 forward
+decoding and its four-byte reverse-decoding window, including beside lone continuation bytes. The reverse decoder
+can recognize a word character ending before the assertion; this affects assertions only, never byte consumption.
+Matching does not return regex captures or submatch priorities. Query captures continue to come from the C query engine.
+
+Scoped `(?-u:...)` supports ASCII shorthand classes and word boundaries. Consuming classes are accepted only when
+their final computed set is ASCII: `(?-u:[^\W_])` works, while `(?-u:\W)`, `(?-u:\D)`, `(?-u:\S)` and `(?-u:[^a])`
+are rejected. Its `\s` preserves Go's old ASCII set without vertical tab, unlike CLI 0.27.2's ASCII `\s`; this is a
+recorded residual difference. It does not enable byte matching: `(?-u:.)`, non-ASCII byte matching and `(?i-u)` are
+rejected. `\p{...}` accepts Go categories and scripts using the consumer's Go toolchain tables, so those properties
+can differ from the pinned Unicode 16 shorthand/fold tables. Rust-only properties, including `Alphabetic`, `Emoji`,
+`scx`, `age`, `gcb`, `wb` and `sb`, are rejected.
+
+Unsupported constructs return a query predicate error naming the construct: `\<`, `\>`, extended `\b{...}` assertions,
+class set operations (`&&`, `--`, `~~`), nested classes other than POSIX classes, verbose `(?x)` and CRLF `(?R)` modes,
+`\Q...\E`, octal escapes, `\0`, unrecognized letter escapes, repetitions above 1000 and dotted capture-group names.
+Use hex escapes for octal/NUL literals and individually escaped punctuation instead of `\Q...\E`.
+ASCII punctuation escapes such as `\_`, `\%` and `\!` are accepted. POSIX classes inside brackets, including
+`[[:alpha:]]` and `[[:^digit:]]`, use Rust's ASCII sets; negated sets complement within the active Unicode/byte mode.
+Only recognized lowercase POSIX names are supported; unknown or case-variant forms such as `[[:Alpha:]]` are
+rejected, even though the CLI can interpret them as nested classes.
+These acceptance limits remain even where the CLI accepts the pattern. This is a supported subset, not the full
+Rust regex language. `#any-match?` and `#any-not-match?` validate this syntax but remain non-filtering properties.
+
+Compilation budgets also differ: a repetition count is limited to 1000 here, while the CLI's UTF-8 byte-automaton
+size limit can reject a valid Unicode pattern such as `\w{1000}` that this implementation accepts. The recorded
+acceptance probes retain both directions of this difference. Group nesting is limited to 99 nested groups
+(the outer expression counts toward a depth limit of 100). Nested repetition (`a**`, `a*+`, `a{2}{3}`, `a*??`),
+spaces inside repetition counts (`a{ 1 }`, `a{1 ,2}`), and hex escapes longer than eight digits are rejected.
+Property names must match Go names exactly: Rust aliases and loose names such as `Letter`, `lu`, `LU`, `Latn`,
+`Zyyy`, `han`, `Hira`, `gc=Lu`, `Math`, `Any`, `ASCII`, `Assigned` and ` L ` are rejected. Go's `\p{Cs}`
+and `\P{Cs}` are accepted as empty/all-scalar sets, although the CLI rejects the surrogate category.
+Group names are restricted to ASCII letters, digits and underscores, with a letter or underscore first; regex
+captures are not returned by boolean predicates.
+
+The retained E3 matrix records where behavior agrees with tree-sitter CLI 0.27.2 on its named patterns and inputs,
+including the ASCII-space and Go Unicode-property residuals described above. CLI/library identities, input bytes,
+results and acceptance differences are retained in [`testdata/query-regex-cli.json`](../../testdata/query-regex-cli.json).
+It does not establish native C agreement or general regex equivalence.

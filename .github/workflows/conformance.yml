@@ -112,7 +112,7 @@ jobs:
           TSG_NATIVE_EXE_DIR: ${{ runner.temp }}/exe
           TSG_QUERY_DIR: ${{ runner.temp }}/queries
           TSG_QUERY_PROBE_STRIDE: "1"
-        run: go test -count=1 -timeout 20m -v -run 'TestStripPredicates|TestQueryNative' .
+        run: go test -count=1 -timeout 20m -v -run 'TestStripPredicates|TestQueryNative|TestQueryCLIInvalidUTF8Output' .
       # The fuzz targets need no data: this runs their seed corpora once (no fuzzing).
       - name: Fuzz seed corpora
         if: ${{ !cancelled() }}
