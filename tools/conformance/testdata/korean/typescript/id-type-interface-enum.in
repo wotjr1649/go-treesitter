@@ -1,0 +1,3 @@
+type 형식 = { 필드: string };
+interface 인터페이스<형> { 메서드(매개: 형): void }
+enum 열거 { 하나, 둘 = 2 }

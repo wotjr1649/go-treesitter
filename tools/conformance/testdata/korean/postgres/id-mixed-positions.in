@@ -1,0 +1,1 @@
+SELECT 값1, _이름, camel한글, 한글camel FROM t;

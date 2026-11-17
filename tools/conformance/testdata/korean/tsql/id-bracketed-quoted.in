@@ -1,0 +1,1 @@
+SELECT [한 글] FROM [테이블] WHERE "열" = 1;

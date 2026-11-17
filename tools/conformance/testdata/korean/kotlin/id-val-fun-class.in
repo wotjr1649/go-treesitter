@@ -1,0 +1,5 @@
+val 값 = 1
+fun 함수(매개: Int): Int = 매개
+class 클래스(val 필드: Int) {
+    fun 메서드() {}
+}

@@ -1,0 +1,10 @@
+package main
+
+type 형 struct {
+	필드 int
+}
+
+func 이름(매개 int) int {
+	var 값 int = 매개
+	return 값
+}

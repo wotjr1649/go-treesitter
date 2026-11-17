@@ -1,0 +1,9 @@
+struct 구조 {
+    int 필드;
+};
+
+int 값 = 1;
+
+int 함수(int 매개) {
+    return 매개;
+}

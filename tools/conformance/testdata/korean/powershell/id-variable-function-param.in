@@ -1,0 +1,5 @@
+$값 = 1
+function 함수 {
+    param($매개)
+    return $매개
+}

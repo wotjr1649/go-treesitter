@@ -1,0 +1,10 @@
+값 = 1
+
+def 함수(매개, *인자, 키워드=1):
+    return 매개
+
+class 클래스:
+    필드 = 1
+
+    def 메서드(self):
+        return self.필드

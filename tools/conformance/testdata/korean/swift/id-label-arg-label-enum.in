@@ -1,0 +1,4 @@
+enum 열거 { case 하나, 둘 }
+func f(바깥 안쪽: Int) {
+끝: for _ in 0..<1 { break 끝 }
+}

@@ -1,0 +1,4 @@
+const char *a = "한글\n끝";
+const char *b = u8"한글";
+const wchar_t *c = L"한글";
+int d = '한';

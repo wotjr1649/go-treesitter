@@ -1,6 +1,6 @@
 {
   "Schema": 1,
-  "EvidenceBase": "c138aaa1053cf714569428ee598130a904c48c83",
+  "EvidenceBase": "b5d00506d20ad65ddd84a8e5b9195b0fe7a32e2f",
   "EvidencePlatform": "windows/amd64",
   "Runtime": "v0.27.2",
   "Grammars": {
@@ -23,6 +23,48 @@
       "Commit": "2e34d86ec58f3d1a771efc0ca1e71c536690a0b7",
       "PinSHA256": "8fb519c8f90cfc05b8a5194e3dce530bcd7f5c133cda3f7ca835ffe271bd9b61",
       "ProvenanceSHA256": "d202ed4dcabfe6a70b5938fd35d3f82ae8ee3ef5941e7f05867fe5da0676fb09",
+      "PatchCount": 0
+    },
+    "css": {
+      "Name": "CSS",
+      "Commit": "dda5cfc5722c429eaba1c910ca32c2c0c5bb1a3f",
+      "PinSHA256": "b9a0f4f0a51a022cf9c5dbb58c3a53b812db256ef13e389c253021fade559c07",
+      "ProvenanceSHA256": "de2242a5f97018c57fe02d80134d61038a81c106713459f756e41fff3d34628d",
+      "PatchCount": 0
+    },
+    "powershell": {
+      "Name": "PowerShell",
+      "Commit": "65ea6919e816a7ac142acec7ee72757f89db8439",
+      "PinSHA256": "65eb15e64f6ee61fbb99ddf4ef30daf04969251c00e790c739fe94d63ae573d0",
+      "ProvenanceSHA256": "88599b11c325f80c683a593cdbfb6fa989132fad357f2f1d1d91c2cb45b4a0a9",
+      "PatchCount": 0
+    },
+    "xml": {
+      "Name": "XML",
+      "Commit": "5000ae8f22d11fbe93939b05c1e37cf21117162d",
+      "PinSHA256": "0367e2b839cccbb01756ff178acf69b44f6d7cda95ce8f91f8799726d65095bb",
+      "ProvenanceSHA256": "4c627ded7a2e3f397c42d56970d2c1be864f3b3c1770250c99592b9c50a06c0f",
+      "PatchCount": 0
+    },
+    "html": {
+      "Name": "HTML",
+      "Commit": "73a3947324f6efddf9e17c0ea58d454843590cc0",
+      "PinSHA256": "7779ebc983293964f36db015ba0d3899633512e43f793df325e96af59d7998e6",
+      "ProvenanceSHA256": "6f76108a55d89c60b1a5700a184651725aed3a5e5d74e90cbbe5534519e6b84f",
+      "PatchCount": 0
+    },
+    "ruby": {
+      "Name": "Ruby",
+      "Commit": "ad907a69da0c8a4f7a943a7fe012712208da6dee",
+      "PinSHA256": "5bade487c23b69aa12c533a7f99c3f0cd0f5353f713672995fa40b03ecca877f",
+      "ProvenanceSHA256": "5e35a40f7732dd36521090e57f56be114a4f99a42972c6623c7e3ad432418bce",
+      "PatchCount": 1
+    },
+    "swift": {
+      "Name": "Swift",
+      "Commit": "a1d4a7b80260bf960f9e25198cddecbe5e6c46aa",
+      "PinSHA256": "40352a892de6474434464c097d8fac4a30c1851a238faa20a870c534993c65b0",
+      "ProvenanceSHA256": "fd8e84edbd3d53e70006ad44084e8403e912728e22c0839a5f92e9dc9cbaa280",
       "PatchCount": 0
     }
   },
@@ -150,6 +192,238 @@
         }
       ],
       "Upstream": ""
+    },
+    {
+      "ID": "css-non-latin1-identifier",
+      "Grammar": "css",
+      "Input": ".한글 { a: b }\n",
+      "InputSHA256": "c44e56c8e90aefcabb5524f92a06c1bd411fa417c98a5097f873bc68a28ffa6a",
+      "DumpSHA256": "72e0bc04a41301b1575bbd9466831ff1c2a0a3941c070cc5b4b40f85c9a07095",
+      "Observed": "The root has errors: the rule is an ERROR over [0,16) with nested ERROR nodes over the Hangul class name [1,7) and the declaration characters a [10,11) and b [13,14). The identifier regex accepts ASCII letters, _ and U+00A0-U+00FF only, so no Hangul syllable can start or continue an identifier; the ASCII twin .abc { a: b } parses without errors.",
+      "Expected": "The Hangul syllables in this input are in the allowed non-ASCII ident range U+3001-U+D7FF, so .한글 is a class selector and the rule parses without errors.",
+      "Specs": [
+        {
+          "Title": "CSS Syntax Module Level 3 (2026-10-01): ident-start code point",
+          "URL": "https://www.w3.org/TR/2026/CRD-css-syntax-3-20261001/#ident-start-code-point"
+        }
+      ],
+      "Upstream": ""
+    },
+    {
+      "ID": "css-non-latin1-value",
+      "Grammar": "css",
+      "Input": "a { b: 한글 }\n",
+      "InputSHA256": "9e72dd72130d55d7d5294e143ea1fbd1656ec0c3a7879e306db4fb46d9c730a1",
+      "DumpSHA256": "1e2f75f20d41affef8fa61e82f8570e8b5432cabbd307af2b2b93048e5ea58f3",
+      "Observed": "The root has errors: the declaration is an ERROR over [4,13) and the Hangul value [7,13) is a nested ERROR. The value identifier uses the same Latin-1-limited regex as selectors; a { b: abc } parses without errors.",
+      "Expected": "한글 is an identifier value (plain_value) of the declaration b, with no error.",
+      "Specs": [
+        {
+          "Title": "CSS Syntax Module Level 3 (2026-10-01): ident-start code point",
+          "URL": "https://www.w3.org/TR/2026/CRD-css-syntax-3-20261001/#ident-start-code-point"
+        }
+      ],
+      "Upstream": ""
+    },
+    {
+      "ID": "powershell-non-ascii-variable",
+      "Grammar": "powershell",
+      "Input": "$값 = 1\n",
+      "InputSHA256": "db49aa30808854327648da38cc72ba6ff061d6b94ffd85f676cc7ed73007b305",
+      "DumpSHA256": "ff2553c1e47efffd60e016e45fe33395cb23277545d31828077d2bcf51d6a960",
+      "Observed": "The root has errors: an ERROR over [0,6) holds a nested ERROR over the Hangul name [1,4); $값 is not a variable node. Variable names are matched by [a-zA-Z0-9_]+; $abc = 1 parses without errors.",
+      "Expected": "A variable node for $값: a variable name is made of Unicode letters (Lu, Ll, Lt, Lm, Lo), digits and _. PowerShell 7 accepts this assignment.",
+      "Specs": [
+        {
+          "Title": "PowerShell language specification 2.3.2: Variables",
+          "URL": "https://learn.microsoft.com/en-us/powershell/scripting/lang-spec/chapter-02#232-variables"
+        }
+      ],
+      "Upstream": "https://github.com/airbus-cert/tree-sitter-powershell/issues/70"
+    },
+    {
+      "ID": "powershell-non-ascii-parameter",
+      "Grammar": "powershell",
+      "Input": "Get-Item -이름 1\n",
+      "InputSHA256": "abd09ce235e8bf26fbda31ed9ba8e71dc98fb11e4419079023c3563971bd8501",
+      "DumpSHA256": "2c005039026c270d0236b4ae5ba2e59e0ff32ad2e28a531b14b77d9cf6feaf97",
+      "Observed": "The root has errors: an ERROR over [10,16) (with a nested ERROR over the same bytes) covers the Hangul part of the parameter name after the dash; -abc parses without errors.",
+      "Expected": "A command parameter -이름 (first character a Unicode letter of class Lo) followed by the argument 1. PowerShell 7 binds such a parameter.",
+      "Specs": [
+        {
+          "Title": "PowerShell language specification 2.3.4: Parameters",
+          "URL": "https://learn.microsoft.com/en-us/powershell/scripting/lang-spec/chapter-02#234-parameters"
+        }
+      ],
+      "Upstream": "https://github.com/airbus-cert/tree-sitter-powershell/issues/70"
+    },
+    {
+      "ID": "powershell-non-ascii-hash-key",
+      "Grammar": "powershell",
+      "Input": "@{ 키 = 1 }\n",
+      "InputSHA256": "36d8389a9207140ff42e58070fb6acfbe34a3e379f3a042645a38baf7713be1e",
+      "DumpSHA256": "3dfeaf6bbfa19ccb41d7f3f3bf4dc87e0b7902130ba89d4a9424abc992c4a0bb",
+      "Observed": "The root has errors: inside the hash literal an ERROR over [2,11) holds a nested ERROR over the bare-word key [2,6); the ASCII key in @{ abc = 1 } parses without errors.",
+      "Expected": "A hash entry whose key-expression is the simple name 키, with value 1. PowerShell 7 creates a hashtable with key 키.",
+      "Specs": [
+        {
+          "Title": "PowerShell language specification 7.9: Hash literal expression",
+          "URL": "https://learn.microsoft.com/en-us/powershell/scripting/lang-spec/chapter-07#719-hash-literal-expression"
+        }
+      ],
+      "Upstream": "https://github.com/airbus-cert/tree-sitter-powershell/issues/70"
+    },
+    {
+      "ID": "powershell-non-ascii-member-name",
+      "Grammar": "powershell",
+      "Input": "$a.속성\n",
+      "InputSHA256": "d2957ffd9cf127b90abe9e4501222c83cb046282b2cd92849890c41a91b988e9",
+      "DumpSHA256": "0b112ae9830abee51162581a268b68aa5c736d39d43836c49ccf586b1e332436",
+      "Observed": "The root has errors: the root is an ERROR holding the variable $a [0,2), the dot [2,3) and an ERROR over the Hangul member name [3,10); $a.abc parses without errors.",
+      "Expected": "A member access on $a with the member name 속성. PowerShell 7 reads such a property.",
+      "Specs": [
+        {
+          "Title": "PowerShell language specification 7.1.2: Member access",
+          "URL": "https://learn.microsoft.com/en-us/powershell/scripting/lang-spec/chapter-07#712-member-access"
+        }
+      ],
+      "Upstream": "https://github.com/airbus-cert/tree-sitter-powershell/issues/70"
+    },
+    {
+      "ID": "powershell-non-ascii-type-name",
+      "Grammar": "powershell",
+      "Input": "[한글]$a\n",
+      "InputSHA256": "457f66f792b63d6f3b42fe25797be4b4f3cd9a8a69efc579a9273cd8d622606e",
+      "DumpSHA256": "df14b91b3f302cf2fe155dab67530176c8d691a3c85cd94bf142d394ce57721b",
+      "Observed": "The root has errors: an ERROR over [0,8) holds a nested ERROR over the Hangul type name [1,7). Type names are matched by [a-zA-Z0-9_]+.",
+      "Expected": "A cast or type literal whose type identifier is 한글: type characters are Unicode letters (Lu, Ll, Lt, Lm, Lo), digits and _. Whether the type exists is outside this syntax test.",
+      "Specs": [
+        {
+          "Title": "PowerShell language specification 2.3.5.7: Type names",
+          "URL": "https://learn.microsoft.com/en-us/powershell/scripting/lang-spec/chapter-02#2357-type-names"
+        }
+      ],
+      "Upstream": "https://github.com/airbus-cert/tree-sitter-powershell/issues/70"
+    },
+    {
+      "ID": "xml-non-ascii-attribute-name",
+      "Grammar": "xml",
+      "Input": "<a 속성=\"1\"/>\n",
+      "InputSHA256": "139be011e1c15c050238fa61f3dec2db1ddcb0203211c724545850540e6d92e3",
+      "DumpSHA256": "4eb87bb3ff40d1b9dd8e8e84a4bfd34fc20ab6fd5e17fb1e87e3747e80baf849",
+      "Observed": "The root has errors: an ERROR over the attribute [3,13) replaces the Attribute node. The Name regex is [a-zA-Z_][a-zA-Z0-9_:.·-]*; element names with Hangul parse because the external scanner reads them, attribute names do not.",
+      "Expected": "An Attribute whose Name is 속성: NameStartChar includes U+3001-U+D7FF and NameChar continues with the same ranges.",
+      "Specs": [
+        {
+          "Title": "XML 1.0 (Fifth Edition): Names and Tokens",
+          "URL": "https://www.w3.org/TR/xml/#NT-NameStartChar"
+        }
+      ],
+      "Upstream": "https://github.com/tree-sitter-grammars/tree-sitter-xml/issues/40"
+    },
+    {
+      "ID": "xml-non-ascii-namespace-prefix",
+      "Grammar": "xml",
+      "Input": "<a xmlns:접두=\"u\"/>\n",
+      "InputSHA256": "fc57295ceda51575cf2bd7a888411a60d7ed9cdb4ee414cb5021760f5889596e",
+      "DumpSHA256": "fa9d64054a422ab64209949368e3b2a2efb1a08412b8e52bed029f9c1762530e",
+      "Observed": "The root has errors: an ERROR over the namespace declaration [9,15) replaces the prefix after xmlns:. The prefix is matched by the ASCII-only Name regex.",
+      "Expected": "A namespace declaration attribute xmlns:접두: a prefix is an NCName, whose first character may be any NameStartChar except the colon, including Hangul.",
+      "Specs": [
+        {
+          "Title": "Namespaces in XML 1.0: Attribute Names for Namespace Declaration",
+          "URL": "https://www.w3.org/TR/xml-names/#NT-NSAttName"
+        },
+        {
+          "Title": "Namespaces in XML 1.0: NCName",
+          "URL": "https://www.w3.org/TR/xml-names/#NT-NCName"
+        }
+      ],
+      "Upstream": "https://github.com/tree-sitter-grammars/tree-sitter-xml/issues/40"
+    },
+    {
+      "ID": "xml-hangul-tag-low-byte-mismatch",
+      "Grammar": "xml",
+      "Input": "<x걁>body</x굁>\n",
+      "InputSHA256": "b6c286fbc013a3b8c3158dd57033888565e62ac4856bcf97cc21ff2eb0f42c94",
+      "DumpSHA256": "45328da4fb016cacd52269648048f6e555e633b8686405f1768013d6de5a7c72",
+      "Observed": "The root has no error: </x굁> (U+AD41) closes <x걁> (U+AC41) and the document parses as one element. The scanner stores each tag-name code point as one signed byte, so names whose code points share the low byte 0x41 compare equal; </xA> closes <x걁> as well. The ASCII twin <xa>body</xb> is an ERROR, as is <x한>body</x글>.",
+      "Expected": "An end-tag name must equal the name in the start tag. </x굁> does not match <x걁>, so the input is not well-formed and must produce an error, as the ASCII twin does.",
+      "Specs": [
+        {
+          "Title": "XML 1.0 (Fifth Edition): Element Type Match",
+          "URL": "https://www.w3.org/TR/xml/#GIMatch"
+        }
+      ],
+      "Upstream": "https://github.com/tree-sitter-grammars/tree-sitter-xml/issues/40"
+    },
+    {
+      "ID": "html-hangul-tag-low-byte-mismatch",
+      "Grammar": "html",
+      "Input": "<x-걁>body</x-굁>\n",
+      "InputSHA256": "8c47babd119327f3687226049a3a3bc8ec5a3501d467dc490c0b4fad118f92bb",
+      "DumpSHA256": "71b903e64d0654a58d3d97fb924ffa548093162c8c29f538c8951a289affec77",
+      "Observed": "The root has no error: </x-굁> (U+AD41) closes <x-걁> (U+AC41) and the dump equals that of the matching pair <x-걁>body</x-걁>. The scanner stores each upper-cased tag-name code point in one byte, so names whose code points share the low byte 0x41 compare equal; </x-A> closes <x-걁> as well. The ASCII twin <x-a>body</x-b> is an ERROR.",
+      "Expected": "An end tag whose name differs from the start tag does not close the element. The custom element name x-걁 is valid (PCENChar includes U+3001-U+D7FF), and so is the different name x-굁, which must not be treated as its end tag.",
+      "Specs": [
+        {
+          "Title": "HTML Standard: Valid custom element name",
+          "URL": "https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name"
+        },
+        {
+          "Title": "HTML Standard: End tags",
+          "URL": "https://html.spec.whatwg.org/multipage/syntax.html#end-tags"
+        }
+      ],
+      "Upstream": ""
+    },
+    {
+      "ID": "ruby-non-ascii-symbol",
+      "Grammar": "ruby",
+      "Input": "a = :한글\n",
+      "InputSHA256": "ab172f39384a073ea728126cdf4c99a6abcea56ea9d597046ce156aa5fa9a0c3",
+      "DumpSHA256": "3e1608561ae0e0f94fd804caed90a3774f5e586c37cb93afdb85a1ebdd425b36",
+      "Observed": "The root has errors: the colon [4,5) is an ERROR node and the Hangul word [5,11) is parsed as a separate identifier, so there is no simple_symbol. :abc parses as a simple_symbol; %s(한글) and { 한글: 1 } parse without errors.",
+      "Expected": "A simple_symbol :한글 on the right of the assignment.",
+      "Specs": [
+        {
+          "Title": "Ruby 3.3 syntax: Literals (Symbol Literals)",
+          "URL": "https://docs.ruby-lang.org/en/3.3/syntax/literals_rdoc.html#label-Symbol+Literals"
+        }
+      ],
+      "Upstream": "https://github.com/tree-sitter/tree-sitter-ruby/issues/292"
+    },
+    {
+      "ID": "ruby-non-ascii-global-variable",
+      "Grammar": "ruby",
+      "Input": "$전역 = 1\n",
+      "InputSHA256": "9f198f0b9205eae6a2276ed454de726e3823017f9f451141782a85ead409fa0b",
+      "DumpSHA256": "3d49ee51af0fbdff6eec0d5903c9a85a18305cc4ceabf6d828f9abb3014c69e4",
+      "Observed": "The root has errors: the dollar sign [0,1) is an ERROR node (nested ERROR) and the Hangul name [1,7) starts a separate assignment with an identifier on its left. $abc = 1 parses as a global_variable assignment; @필드 and @@클래스 parse.",
+      "Expected": "A global_variable $전역 assigned 1.",
+      "Specs": [
+        {
+          "Title": "Ruby syntax: Assignment (Global variables)",
+          "URL": "https://docs.ruby-lang.org/en/3.3/syntax/assignment_rdoc.html#label-Global+Variables"
+        }
+      ],
+      "Upstream": ""
+    },
+    {
+      "ID": "swift-non-ascii-statement-label",
+      "Grammar": "swift",
+      "Input": "끝: for _ in 0..<1 { }\n",
+      "InputSHA256": "55ced9ae4acaaecd7b2e10bea37f181ed942a9f63fc0bfeaeef551c54bf60d79",
+      "DumpSHA256": "f33ff90486aa2acb14d5f8b389cdce7ee35b97e5794506ceaf7ef1341fa97942",
+      "Observed": "The root has errors: an ERROR over [0,4) holds the Hangul word as a simple_identifier and the colon, followed by an unlabeled for_statement. statement_label is matched by /[a-zA-Z_][a-zA-Z_0-9]*:/; abc: for _ in 0..<1 { } parses as a labeled statement, and break 끝 and Hangul identifiers elsewhere parse.",
+      "Expected": "A for_statement labeled 끝: a label is an identifier, and Swift identifiers may contain Hangul.",
+      "Specs": [
+        {
+          "Title": "The Swift Programming Language: Labeled Statement",
+          "URL": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/statements/#Labeled-Statement"
+        }
+      ],
+      "Upstream": "https://github.com/alex-pinkus/tree-sitter-swift/issues/658"
     }
   ]
 }

@@ -1,0 +1,5 @@
+let 값 = 1
+func 함수(매개: Int) -> Int { return 매개 }
+struct 구조 {
+    var 필드 = 1
+}

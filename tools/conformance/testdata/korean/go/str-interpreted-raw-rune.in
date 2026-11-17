@@ -1,0 +1,6 @@
+package main
+
+var a = "한글\n끝"
+var b = `원시
+한글`
+var c = '한'
