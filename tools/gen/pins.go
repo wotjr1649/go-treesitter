@@ -118,6 +118,11 @@ type GeneratorException struct {
 	FailingInputs []string `json:"failingInputs"`
 }
 
+// Must equal the CLI value generatorgate.py swift_query_exception accepts.
+const swiftExceptionCLI = "0.27.2"
+
+const swiftExceptionStep = "tree-sitter test: queries/outline.scm -> test/outline/outline.swift"
+
 type UpstreamTestException struct {
 	CLI        string `json:"cli"`
 	Step       string `json:"step"`
@@ -148,6 +153,12 @@ func loadPins(path string) (*Pins, error) {
 			_, hasParser := g.Files["parser.c"]
 			if !g.Regenerate || hasParser || g.GeneratorException != nil {
 				return nil, fmt.Errorf("%s: reference none requires regeneration, no committed parser.c pin, and no generator exception", name)
+			}
+		}
+		if x := g.UpstreamTestException; x != nil {
+			// Same conditions as swift_query_exception in tools/native-ref/generatorgate.py, including the CLI value.
+			if name != "swift" || x.CLI != p.Tools.TreeSitterCLI || x.CLI != swiftExceptionCLI || x.Step != swiftExceptionStep || x.Reason == "" || x.RetireWhen == "" {
+				return nil, fmt.Errorf("%s: invalid upstream test exception", name)
 			}
 		}
 		if err := grammarpatch.Validate(g.Patches, g.Regenerate, g.GenerateFrom); err != nil {

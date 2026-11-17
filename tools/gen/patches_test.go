@@ -160,6 +160,27 @@ func TestReferenceModePins(t *testing.T) {
 		{"unknown-input", func(g *GrammarPin) { g.GenerateFrom = "../grammar.json" }, "generateFrom"},
 		{"requires-generation", func(g *GrammarPin) { g.Regenerate = false }, "reference none requires"},
 		{"forbids-parser-pin", func(g *GrammarPin) { g.Files = map[string]string{"parser.c": ""} }, "reference none requires"},
+		{"exception-ok", func(g *GrammarPin) {}, ""},
+		{"exception-missing-reason", func(g *GrammarPin) {
+			x := *g.UpstreamTestException
+			x.Reason = ""
+			g.UpstreamTestException = &x
+		}, "invalid upstream test exception"},
+		{"exception-missing-retire", func(g *GrammarPin) {
+			x := *g.UpstreamTestException
+			x.RetireWhen = ""
+			g.UpstreamTestException = &x
+		}, "invalid upstream test exception"},
+		{"exception-wrong-cli", func(g *GrammarPin) {
+			x := *g.UpstreamTestException
+			x.CLI = "0.0.0"
+			g.UpstreamTestException = &x
+		}, "invalid upstream test exception"},
+		{"exception-wrong-step", func(g *GrammarPin) {
+			x := *g.UpstreamTestException
+			x.Step = "other"
+			g.UpstreamTestException = &x
+		}, "invalid upstream test exception"},
 		{"forbids-exception", func(g *GrammarPin) {
 			g.GeneratorException = &GeneratorException{Reason: "reason", FailingInputs: []string{"case"}}
 		}, "reference none requires"},
@@ -186,5 +207,54 @@ func TestReferenceModePins(t *testing.T) {
 				t.Fatalf("want %q, got %v", tc.want, err)
 			}
 		})
+	}
+}
+
+func TestUpstreamTestExceptionSwiftOnly(t *testing.T) {
+	p, err := loadPins("pins.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	clone := *p
+	clone.Grammars = map[string]GrammarPin{"c": p.Grammars["swift"]}
+	b, err := json.Marshal(clone)
+	if err != nil {
+		t.Fatal(err)
+	}
+	name := filepath.Join(t.TempDir(), "pins.json")
+	if err := os.WriteFile(name, b, 0644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := loadPins(name); err == nil || !strings.Contains(err.Error(), "invalid upstream test exception") {
+		t.Fatalf("want invalid upstream test exception, got %v", err)
+	}
+}
+
+// The generator gate accepts the Swift exception only for CLI 0.27.2, so moving the
+// CLI pin and the exception together must not make loadPins accept a stale exception.
+func TestUpstreamTestExceptionCLIValue(t *testing.T) {
+	p, err := loadPins("pins.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, cli := range []string{"0.27.3", ""} {
+		clone := *p
+		clone.Tools.TreeSitterCLI = cli
+		g := clone.Grammars["swift"]
+		x := *g.UpstreamTestException
+		x.CLI = cli
+		g.UpstreamTestException = &x
+		clone.Grammars = map[string]GrammarPin{"swift": g}
+		b, err := json.Marshal(clone)
+		if err != nil {
+			t.Fatal(err)
+		}
+		name := filepath.Join(t.TempDir(), "pins.json")
+		if err := os.WriteFile(name, b, 0644); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := loadPins(name); err == nil || !strings.Contains(err.Error(), "invalid upstream test exception") {
+			t.Fatalf("cli %q: want invalid upstream test exception, got %v", cli, err)
+		}
 	}
 }
