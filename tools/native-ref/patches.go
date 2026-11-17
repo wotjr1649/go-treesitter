@@ -92,3 +92,14 @@ func unpackCLI(archive, bin string) error {
 	}
 	return closeErr
 }
+
+// referenceCPatches omits grammar-input fixes while retaining the common post-generation fixes.
+func referenceCPatches(all []patches.Pin) []patches.Pin {
+	var result []patches.Pin
+	for _, patch := range all {
+		if ext := path.Ext(patch.Source); ext == ".c" || ext == ".h" {
+			result = append(result, patch)
+		}
+	}
+	return result
+}

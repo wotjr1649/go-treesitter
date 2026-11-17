@@ -1,0 +1,84 @@
+{
+  "identity": {
+    "grammarCommit": "59d0d8cd7506d68de1229fb4bbce838c83b60c8a",
+    "seed": 1,
+    "corpusManifestSHA256": "d83283169a3aef023108f1980a459e7324cc81fbc1c825813e485ca140bc7089",
+    "editsManifestSHA256": "5ad03207dd95fa20edde19e42776590a9ff389dfbbcde54d729575bdd043030e",
+    "largeManifestSHA256": "7072bab52eba33d03aa21963ab7ddef0376c5564acd0311047afa24ba49094fe",
+    "patchCorpusFilesSHA256": {
+      "korean-identifiers.txt": "5ddf7ad1aafcf144351bab7ffef3352897b01cc51ef5e4378d148d57048ad0f3"
+    },
+    "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "cli": "0.27.2",
+    "grammarArchiveSHA256": "f82ef824c0135805cbe23eb408721b41ff36373c4126052d178d7f5c22690da6",
+    "patches": [
+      {
+        "file": "patches/postgres/0001-non-ascii-identifiers.patch",
+        "source": "postgres/grammar.js",
+        "sha256": "b69c8c7d92ce5f4fd24160a20ec54f413398a044d7caff7e640f2f46276e4c76",
+        "beforeSHA256": "4d26dfd2721cbc632c2d6c2bdf9bcb26eb50bcd1c5b6061269cbc08af12684c6",
+        "afterSHA256": "9640494432595d98462abaa7a3732d6682e01023947b2a9effdb56750c67c1c9",
+        "upstreamReport": "https://github.com/gmr/tree-sitter-postgres/issues/101"
+      },
+      {
+        "file": "patches/postgres/0002-dollar-tag-code-points.patch",
+        "source": "postgres/src/scanner.c",
+        "sha256": "f9756f730cc4d41f075986ed8afbd217c69d3adcc734d70ec306ce3831c83a59",
+        "beforeSHA256": "4d7872a6bb2126e206a7aa0730b7f272b41d9e75c2d11af274fc4db2cd7c3352",
+        "afterSHA256": "597b11ba2c7f9e6843332236132806ea1cab116e18767c01a290bf316244b441",
+        "upstreamReport": "https://github.com/gmr/tree-sitter-postgres/issues/101"
+      }
+    ]
+  },
+  "reason": "ADR-0023 PostgreSQL amendment / upstream issue #101: admit complete non-ASCII code points in unquoted identifiers; the scanner C fix is identical on both sides. Only the Korean identifier fixture and its seeded edits differ; upstream corpus, upstream tests and Pagila large input remain identical.",
+  "retireWhen": "Retire with 0001-non-ascii-identifiers.patch when the upstream pin incorporates the fix; review anew for any identity, fixture or result change.",
+  "differences": [
+    {
+      "id": "corpus/postgres/grammar-patch-korean-identifiers-001",
+      "kind": "corpus",
+      "inputSHA256": "7386ad1bd5af94a5b89fca2ae2168c8cd40b47a3b05d19e2580b54d004f56a15",
+      "referenceDumpSHA256": "1ba86be2b631db6396c8ace09d929fbfdc1c6d8de20843e80185b3e4e6e4a34e",
+      "candidateDumpSHA256": "12d69a8e2a3ec1dadacb4fcba4585dcf321ea248fcc2fd3558c6c8f2e943e7eb"
+    },
+    {
+      "id": "edits/postgres/grammar-patch-korean-identifiers-001-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256"
+      ],
+      "oldSHA256": "7386ad1bd5af94a5b89fca2ae2168c8cd40b47a3b05d19e2580b54d004f56a15",
+      "newSHA256": "a375fd9740d740e8f66841c291f9d5391f5c03803dc9219b043b16a995a6714c",
+      "referenceDumpSHA256": "78d5262df347bad4e02839bb0b0ea459604c54b1d6b93607e5d8c7703c9328b2",
+      "candidateDumpSHA256": "8caee76bcf395049d67fa3316be3e60c127cc41411e188f27af1fc9f9f8b0f35"
+    },
+    {
+      "id": "edits/postgres/grammar-patch-korean-identifiers-001-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "7386ad1bd5af94a5b89fca2ae2168c8cd40b47a3b05d19e2580b54d004f56a15",
+      "newSHA256": "57f06be3fb00202657c3a2c72ad3cad1c14c15cfe9497a436dfa90ac0088d352",
+      "referenceDumpSHA256": "41b4dad5615997abca34e47249fb4694db0fb1e370c8eb5a7ce25286b97d8ba8",
+      "candidateDumpSHA256": "601d67995e02f6c7185676e4786190235057e5968e72849a2bade514d710b132"
+    },
+    {
+      "id": "edits/postgres/grammar-patch-korean-identifiers-001-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "7386ad1bd5af94a5b89fca2ae2168c8cd40b47a3b05d19e2580b54d004f56a15",
+      "newSHA256": "466eb79197fb5ab2ffbc3d0c5d97b49f033d5568dd66c67fe48d330edf260095",
+      "referenceDumpSHA256": "e93003e549c51b8c672dc4d4777f7230c8f38293bf05ab3a5d1770fc642ad06e",
+      "candidateDumpSHA256": "89f7c22a9c18923cc6bc51b0f99191718011a273b942bd6c6d072b17d5c55edb"
+    }
+  ]
+}

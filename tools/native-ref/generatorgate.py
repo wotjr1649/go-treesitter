@@ -129,6 +129,75 @@ def rows(path):
         return list(csv.DictReader(stream))
 
 
+def value_sha(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False,
+                                     separators=(",", ":")).encode("utf-8")).hexdigest()
+
+
+def dump_hashes(before, after):
+    return {"referenceDumpSHA256": sha(before), "candidateDumpSHA256": sha(after)}
+
+
+def edit_hash(root, row):
+    # Include all semantic results, incremental/fresh dump hashes, ranges and fields; exclude timing.
+    value = {key: val for key, val in row.items() if key != "edit_ms"}
+    for suffix in ("ranges", "fields"):
+        value[suffix] = sha(root / "edits" / (row["id"] + "." + suffix))
+    return value_sha(value)
+
+
+def grammar_input_patches(grammar):
+    return [patch for patch in grammar.get("patches", [])
+            if PurePosixPath(patch["source"]).suffix not in (".c", ".h")]
+
+
+def check_patch_expectations(repo, pins, grammar, report):
+    path = repo / "tools/gen/patches" / report["grammar"] / "generator-expectations.json"
+    expected = json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
+    if expected is None:
+        return not report["differences"]
+    if set(expected) != {"identity", "reason", "retireWhen", "differences"}:
+        raise ValueError("invalid grammar-patch expectation fields")
+    if not grammar_input_patches(grammar):
+        raise ValueError("generator expectations require a grammar-input patch")
+    identity = {"grammarCommit": grammar["commit"], "runtimeCommit": pins["runtime"]["commit"],
+                "cli": pins["tools"]["treeSitterCLI"], "seed": report["seed"],
+                "grammarArchiveSHA256": grammar["archiveSHA256"],
+                "corpusManifestSHA256": report["corpusManifestSHA256"],
+                "editsManifestSHA256": report["editsManifestSHA256"],
+                "largeManifestSHA256": report["largeManifestSHA256"],
+                "patchCorpusFilesSHA256": report["patchCorpusFilesSHA256"],
+                "patches": grammar["patches"]}
+    if expected.get("identity") != identity or not expected.get("reason") or not expected.get("retireWhen"):
+        raise ValueError("grammar-patch expectation identity or rationale is stale")
+    recorded = expected.get("differences", [])
+    ids = [item["id"] for item in recorded]
+    if len(set(ids)) != len(ids) or any(
+            not re.fullmatch("[0-9a-f]{64}", item.get(key, ""))
+            for item in recorded for key in ("referenceDumpSHA256", "candidateDumpSHA256")):
+        raise ValueError("invalid grammar-patch expectation signatures")
+    report["patchExpectationsSHA256"] = text_sha(path)
+    report["patchExpectationsMatch"] = sorted(recorded, key=lambda x: x["id"]) == sorted(
+        report["differences"], key=lambda x: x["id"])
+    return report["patchExpectationsMatch"]
+
+
+def add_patch_corpus(repo, corpus, grammar, lang):
+    fixtures = repo / "tools/gen/patches" / lang / "corpus"
+    identity = {}
+    for fixture in sorted(fixtures.glob("*.txt")):
+        if fixture.is_symlink() or not fixture.is_file():
+            raise ValueError("patch corpus must contain regular files")
+        root = corpus / grammar["extractDir"] / "test/corpus"
+        if not root.is_dir():
+            root = corpus / grammar["extractDir"] / Path(grammar["grammarDir"]).parent / "test/corpus"
+        # Never replace an upstream fixture; ciconf supplies the same seeded edits on both sides.
+        with (root / ("grammar-patch-" + fixture.name)).open("xb") as target:
+            target.write(fixture.read_bytes())
+        identity[fixture.name] = sha(fixture)
+    return identity
+
+
 def compare_data(before, after):
     differences = []
     for rel in ("corpus/manifest.csv", "edits/manifest.csv"):
@@ -143,7 +212,8 @@ def compare_data(before, after):
     for row in corpus:
         rel = Path("native/dumps") / (row["id"] + ".dump")
         if (before / rel).read_bytes() != (after / rel).read_bytes():
-            differences.append({"id": "corpus/" + row["id"], "kind": "corpus", "inputSHA256": row["sha256"]})
+            differences.append({"id": "corpus/" + row["id"], "kind": "corpus", "inputSHA256": row["sha256"],
+                                **dump_hashes(before / rel, after / rel)})
     a, b = rows(before / "edits/results-native.csv"), rows(after / "edits/results-native.csv")
     identities = [r["id"] for r in edit_inputs]
     if len(set(identities)) != len(identities) or any([r["id"] for r in side] != identities for side in (a, b)):
@@ -158,21 +228,29 @@ def compare_data(before, after):
         if changed:
             differences.append({"id": "edits/" + old["id"], "kind": "edit", "changed": changed,
                                 "oldSHA256": edits[old["id"]]["old_sha256"],
-                                "newSHA256": edits[old["id"]]["new_sha256"]})
+                                "newSHA256": edits[old["id"]]["new_sha256"],
+                                "referenceDumpSHA256": edit_hash(before, old),
+                                "candidateDumpSHA256": edit_hash(after, new)})
     return differences
 
 
-def outcomes(value, path=()):
+def outcomes(value, path=(), strict=False):
     result = {}
     if isinstance(value, dict):
         if "outcome" in value:
             return {"/".join(path + (value.get("name", ""),)): value["outcome"]}
         for key, child in value.items():
             if key in ("parse_results", "highlight_results", "tag_results", "query_results", "children"):
-                result.update(outcomes(child, path + ((value["name"],) if "name" in value else (key,))))
+                nested = outcomes(child, path + ((value["name"],) if "name" in value else (key,)), strict)
+                if strict and result.keys() & nested.keys():
+                    raise ValueError("duplicate upstream outcome identity")
+                result.update(nested)
     elif isinstance(value, list):
         for child in value:
-            result.update(outcomes(child, path))
+            nested = outcomes(child, path, strict)
+            if strict and result.keys() & nested.keys():
+                raise ValueError("duplicate upstream outcome identity")
+            result.update(nested)
     return result
 
 
@@ -181,10 +259,27 @@ def is_passed(outcome):
         isinstance(outcome, dict) and set(outcome) == {"AssertionPassed"})
 
 
-def compare_upstream(before, after):
-    a, b = outcomes(before), outcomes(after)
+def compare_upstream(before, after, strict=False):
+    a, b = outcomes(before, strict=strict), outcomes(after, strict=strict)
     if a.keys() != b.keys():
         raise ValueError("upstream test cases changed")
+    if strict:
+        changed = []
+        def record(identity, old, new):
+            if old != new:
+                changed.append({"id": "upstream/" + identity, "kind": "upstream",
+                                "referenceDumpSHA256": value_sha(old),
+                                "candidateDumpSHA256": value_sha(new)})
+        for key in a:
+            record(key, a[key], b[key])
+        for category in ("parse_failures", "highlight_failures", "tag_failures", "query_failures"):
+            old, new = {}, {}
+            for side, source in ((old, before), (new, after)):
+                for failure in source.get(category, []):
+                    side.setdefault(failure["name"], []).append(failure)
+            for name in sorted(old.keys() | new.keys()):
+                record(category + "/" + name, old.get(name), new.get(name))
+        return changed
     changed = [{"id": "upstream/" + key, "kind": "upstream", "before": a[key], "after": b[key]}
                for key in a if a[key] != b[key] and not is_passed(b[key])]
     # Existing failing trees must retain the same failure, not only the test name.
@@ -442,7 +537,16 @@ def run(args):
             root.mkdir()
             execute([args.native_ref, "-pins", pinsfile, "-dl", dl, "-work", root / "work", "-out", root / "exe",
                      "-corpus", root / "corpus", "-cc", args.cc, flag, args.lang], repo, root / "build.log", env)
-            execute([args.ciconf, "-pins", pinsfile, "-corpus", root / "corpus", "-exe", root / "exe",
+            corpus = root / "corpus"
+            if (repo / "tools/gen/patches" / args.lang / "corpus").is_dir():
+                # Keep upstream-only corpora intact for pinned concat large inputs.
+                corpus = root / "comparison-corpus"
+                shutil.copytree(root / "corpus", corpus)
+            fixtures = add_patch_corpus(repo, corpus, grammar, args.lang)
+            if report.get("patchCorpusFilesSHA256", fixtures) != fixtures:
+                raise ValueError("patch corpus changed between variants")
+            report["patchCorpusFilesSHA256"] = fixtures
+            execute([args.ciconf, "-pins", pinsfile, "-corpus", corpus, "-exe", root / "exe",
                      "-out", root / "data", "-lang", lang, "-seed", args.seed, "-j", args.jobs,
                      "-kit", repo / "tools/conformance/testdata/kit"], repo, root / "ciconf.log", env)
             source = root / "work" / ("patches-" + args.lang) / "first"
@@ -457,6 +561,13 @@ def run(args):
                 if (upstream / grammar["grammarDir"] / "parser.c").exists():
                     raise ValueError("reference none contradicts a committed parser.c")
                 report["committedParserAbsent"] = True
+            elif side == "reference":
+                parser = (upstream / grammar["grammarDir"] / "parser.c").read_bytes()
+                if parser.startswith(b"version https://git-lfs.github.com/spec/v1\n"):
+                    report["referenceKind"] = "LFS_OID_VERIFIED_BEFORE_C_PATCHES"
+                    report["referenceLFSOID"] = re.search(rb"(?m)^oid sha256:([0-9a-f]{64})$", parser)[1].decode("ascii")
+                    report["referenceCPatches"] = [patch for patch in grammar.get("patches", [])
+                                                   if patch not in grammar_input_patches(grammar)]
             elif side == "candidate":
                 oid = identical_lfs_reference(upstream / grammar["grammarDir"], source / grammar["grammarDir"], grammar)
                 if oid:
@@ -499,6 +610,8 @@ def run(args):
         input_root = out / "candidate" if no_reference else reference
         report["corpusInputs"] = len(rows(input_root / "data/corpus/manifest.csv"))
         report["seededEdits"] = len(rows(input_root / "data/edits/manifest.csv"))
+        report["corpusManifestSHA256"] = sha(input_root / "data/corpus/manifest.csv")
+        report["editsManifestSHA256"] = sha(input_root / "data/edits/manifest.csv")
         if no_reference:
             if not report["corpusInputs"] or not report["seededEdits"]:
                 raise ValueError("reference none requires nonempty corpus and edits")
@@ -508,7 +621,8 @@ def run(args):
                                 "product-conformance", report, env)
         else:
             report["differences"] = compare_data(reference / "data", out / "candidate/data")
-            report["differences"] += compare_upstream(report["referenceUpstream"], report["candidateUpstream"])
+            report["differences"] += compare_upstream(report["referenceUpstream"], report["candidateUpstream"],
+                                                       strict=bool(grammar_input_patches(grammar)))
         large_data = large_input_data(args, repo, out, pinsfile, lang, env, input_root)
         execute([args.benchci, "fetch", "-manifest", repo / "tools/bench/ci/large.json", "-data", large_data,
                  "-out", out / "large", "-langs", args.lang], repo, out / "large-fetch.log", env)
@@ -530,13 +644,14 @@ def run(args):
                         timeout=args.large_dump_timeout)
                 logs.append(log)
             if len(logs) == 2 and logs[0].read_bytes() != logs[1].read_bytes():
-                report["differences"].append({"id": "large/" + row["file"], "kind": "large", "inputSHA256": row["sha256"]})
+                report["differences"].append({"id": "large/" + row["file"], "kind": "large", "inputSHA256": row["sha256"],
+                                              **dump_hashes(*logs)})
         if no_reference:
             data = large_product_data(out, lang, large)
             product_conformance(args, repo, out, pins, lang, data, ("TestCorpus",), "product-large", report, env)
         exception = grammar.get("generatorException")
         report["exception"] = exception
-        report["pass"] = not report["differences"] and not exception
+        report["pass"] = check_patch_expectations(repo, pins, grammar, report) and not exception
         if exception:
             report["exceptionMatches"] = exception_matches(exception["failingInputs"], report["differences"])
             report["pass"] = report["exceptionMatches"] and not grammar.get("regenerate", False)

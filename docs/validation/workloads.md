@@ -459,3 +459,11 @@ upstream corpus supplies the small-file lane and one original small file adds a 
 | [Open-rental store](../../tools/bench/testdata/swift/rentals.swift) | 570 | `1a0a9a11f18cfaeab99eaeaceb05feb101054119dd2ebaa8d31fca977b96a5a6` | Repository MIT; original Swift example, LF, UTF-8 |
 
 The grammar corpus and queries are extracted from the SHA-pinned upstream archive by `native-ref`; seeded edits use seed 1.
+
+
+## Grammar-input patch regression corpus
+
+`tools/gen/patches/postgres/corpus/korean-identifiers.txt` is an original repository MIT fixture, UTF-8 with LF
+line endings. The generator gate adds its `SELECT 한글;` input to both native variants and derives three seed-1
+edits. It exercises ADR-0023's non-ASCII unquoted identifier fix without changing the upstream corpus or its tests.
+Corpus-format file: 520 bytes, SHA-256 `5ddf7ad1aafcf144351bab7ffef3352897b01cc51ef5e4378d148d57048ad0f3`.

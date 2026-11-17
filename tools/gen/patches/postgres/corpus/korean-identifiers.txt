@@ -1,0 +1,23 @@
+==================
+Korean unquoted identifier (ADR-0023)
+==================
+SELECT 한글;
+
+---
+
+(source_file
+  (toplevel_stmt
+    (stmt
+      (SelectStmt
+        (select_no_parens
+          (simple_select
+            (kw_select)
+            (opt_target_list
+              (target_list
+                (target_el
+                  (a_expr
+                    (a_expr
+                      (c_expr
+                        (columnref
+                          (ColId
+                            (identifier)))))))))))))))
