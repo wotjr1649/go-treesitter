@@ -51,7 +51,7 @@ for lang in "${LANGS[@]}"; do
   echo "== test-only $lang"
   "$GEN" -balance-probe -lang "$lang" -root tools/gen -src "$W/src" -dl "$W/dl" -sdk "$W/sdk" \
     -wasm2go "$W/bin/wasm2go$EXE" -wasm-opt "$W/binaryen/bin/wasm-opt$EXE" \
-    -tree-sitter "$W/bin/tree-sitter$EXE" -patch-alert "${PATCH_ALERT_THRESHOLD:-3}" \
+    -tree-sitter "$W/bin/tree-sitter$EXE" -fetch-npm -patch-alert "${PATCH_ALERT_THRESHOLD:-3}" \
     -out "$W/probes/$lang" -work "$W/work" -repo .
 done
 sha256sum -c "$W/shim-before.sha256"

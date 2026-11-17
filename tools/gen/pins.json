@@ -1,5 +1,5 @@
 {
-  "schema": 2,
+  "schema": 3,
   "mirrors": [
     "https://github.com/wotjr1649/go-treesitter/releases/download/v0.5.0",
     "https://github.com/wotjr1649/go-treesitter/releases/download/v0.4.0"
@@ -135,7 +135,8 @@
         "parser.c": "9a266ae4a0305b8a2769bee90a14ac06914bdc83a509f16428311eac2845637e"
       },
       "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
-      "cSymbol": "tree_sitter_json"
+      "cSymbol": "tree_sitter_json",
+      "regenerate": true
     },
     "golang": {
       "repo": "https://github.com/tree-sitter/tree-sitter-go",
@@ -152,7 +153,8 @@
         "parser.c": "3dbf6ed1238b5dfcf2be4d2f2d4cb27a14d34f34d7784eccccbfd532fd4a6d85"
       },
       "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
-      "cSymbol": "tree_sitter_go"
+      "cSymbol": "tree_sitter_go",
+      "regenerate": true
     },
     "python": {
       "repo": "https://github.com/tree-sitter/tree-sitter-python",
@@ -180,7 +182,8 @@
           "afterSHA256": "7a0c6bb9e0c121ff3e25f9180dd6625526725c2ddb62321ccc2cf35adaf488eb",
           "upstreamReport": "https://github.com/tree-sitter/tree-sitter-python/issues/350"
         }
-      ]
+      ],
+      "regenerate": true
     },
     "typescript": {
       "repo": "https://github.com/tree-sitter/tree-sitter-typescript",
@@ -199,7 +202,11 @@
         "scanner.c": "9125013b42cb888379d9be909f1d73dfb75a37626c2cdbf4122718a2b431a6d3"
       },
       "licenseSHA256": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
-      "cSymbol": "tree_sitter_typescript"
+      "cSymbol": "tree_sitter_typescript",
+      "regenerate": true,
+      "npmDependencies": [
+        "tree-sitter-javascript"
+      ]
     },
     "tsx": {
       "repo": "https://github.com/tree-sitter/tree-sitter-typescript",
@@ -218,7 +225,11 @@
         "scanner.c": "d563cd30b2f39718c9ae4292795c5ce03a2ad01954ba3a86ef84c2781a736673"
       },
       "licenseSHA256": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
-      "cSymbol": "tree_sitter_tsx"
+      "cSymbol": "tree_sitter_tsx",
+      "regenerate": true,
+      "npmDependencies": [
+        "tree-sitter-javascript"
+      ]
     },
     "csharp": {
       "repo": "https://github.com/tree-sitter/tree-sitter-c-sharp",
@@ -236,7 +247,17 @@
         "scanner.c": "2ee1241a6a275e72a06838f5df927700bd405c16b48f986e2c33d1264cae4818"
       },
       "licenseSHA256": "778fb7d63b8c1844da315648c02f325c4713a6f4a5d19644fd413421422776d3",
-      "cSymbol": "tree_sitter_c_sharp"
+      "cSymbol": "tree_sitter_c_sharp",
+      "regenerate": false,
+      "generatorException": {
+        "reason": "ADR-0027: CLI 0.27.2 changes switch type-pattern parsing; retain reference C until owner accepts or upstream fixes it.",
+        "failingInputs": [
+          "corpus/csharp/statements-002",
+          "edits/csharp/statements-002-e1",
+          "edits/csharp/statements-002-e3",
+          "upstream/parse_results/statements/Switch statements"
+        ]
+      }
     },
     "tsql": {
       "repo": "https://github.com/alfpricot/tree-sitter-mssql",
@@ -255,7 +276,8 @@
       },
       "licenseSHA256": "cffa335b2bf899b98e49d14a7f96464b6823a98f9a5d544bef5c6d3b5e46d42c",
       "noticeSHA256": "fe7b7e195134b018606dc3d40250c240f2bb9e1f5bbadb6542c169c49b21dcb1",
-      "cSymbol": "tree_sitter_mssql"
+      "cSymbol": "tree_sitter_mssql",
+      "regenerate": true
     },
     "javascript": {
       "repo": "https://github.com/tree-sitter/tree-sitter-javascript",
@@ -277,7 +299,8 @@
         "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
       },
       "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
-      "cSymbol": "tree_sitter_javascript"
+      "cSymbol": "tree_sitter_javascript",
+      "regenerate": true
     },
     "html": {
       "repo": "https://github.com/tree-sitter/tree-sitter-html",
@@ -300,7 +323,8 @@
         "tree_sitter/parser.h": "a1f6ef161fbaf48a0e10fca90ef5290a062462b307b3898aa562993853b9f80a"
       },
       "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
-      "cSymbol": "tree_sitter_html"
+      "cSymbol": "tree_sitter_html",
+      "regenerate": true
     },
     "css": {
       "repo": "https://github.com/tree-sitter/tree-sitter-css",
@@ -322,7 +346,8 @@
         "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
       },
       "licenseSHA256": "c5cfb43042b6b72045f4ba997834d0a7786d2793d91680868b5815b39f14fc78",
-      "cSymbol": "tree_sitter_css"
+      "cSymbol": "tree_sitter_css",
+      "regenerate": true
     },
     "java": {
       "repo": "https://github.com/tree-sitter/tree-sitter-java",
@@ -343,7 +368,8 @@
         "tree_sitter/parser.h": "a1f6ef161fbaf48a0e10fca90ef5290a062462b307b3898aa562993853b9f80a"
       },
       "licenseSHA256": "52ed137b039cd9c46409bc22e89938af911c95b157feae2d040b51e6084369a7",
-      "cSymbol": "tree_sitter_java"
+      "cSymbol": "tree_sitter_java",
+      "regenerate": true
     },
     "c": {
       "repo": "https://github.com/tree-sitter-grammars/tree-sitter-c",
@@ -364,7 +390,8 @@
         "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
       },
       "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
-      "cSymbol": "tree_sitter_c"
+      "cSymbol": "tree_sitter_c",
+      "regenerate": true
     },
     "rust": {
       "repo": "https://github.com/tree-sitter/tree-sitter-rust",
@@ -386,7 +413,8 @@
         "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
       },
       "licenseSHA256": "31d5b6f4243d5c7c6e1c4ebbbb9f6407bd1457a08bcc4f706521710341acba36",
-      "cSymbol": "tree_sitter_rust"
+      "cSymbol": "tree_sitter_rust",
+      "regenerate": true
     },
     "bash": {
       "repo": "https://github.com/tree-sitter/tree-sitter-bash",
@@ -418,7 +446,8 @@
           "afterSHA256": "2578185990c634a3e1b546c23615e3339ea55bb77a2117799b2e6a960cdf472e",
           "upstreamReport": "https://github.com/tree-sitter/tree-sitter-bash/issues/370"
         }
-      ]
+      ],
+      "regenerate": true
     },
     "cpp": {
       "repo": "https://github.com/tree-sitter/tree-sitter-cpp",
@@ -440,7 +469,11 @@
         "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
       },
       "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
-      "cSymbol": "tree_sitter_cpp"
+      "cSymbol": "tree_sitter_cpp",
+      "regenerate": true,
+      "npmDependencies": [
+        "tree-sitter-c"
+      ]
     },
     "php": {
       "repo": "https://github.com/tree-sitter/tree-sitter-php",
@@ -463,7 +496,8 @@
         "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
       },
       "licenseSHA256": "664764fabf40c0b318e06324a5a12379092a2df25b8cbf2415f71bc0bb352346",
-      "cSymbol": "tree_sitter_php"
+      "cSymbol": "tree_sitter_php",
+      "regenerate": true
     },
     "powershell": {
       "repo": "https://github.com/airbus-cert/tree-sitter-powershell",
@@ -485,7 +519,8 @@
         "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
       },
       "licenseSHA256": "1fca8454c0d77a73f9922a52d39e1f7c339f5da5d03f2766eff66b859fa19477",
-      "cSymbol": "tree_sitter_powershell"
+      "cSymbol": "tree_sitter_powershell",
+      "regenerate": true
     },
     "r": {
       "repo": "https://github.com/r-lib/tree-sitter-r",
@@ -507,7 +542,8 @@
         "tree_sitter/parser.h": "a1f6ef161fbaf48a0e10fca90ef5290a062462b307b3898aa562993853b9f80a"
       },
       "licenseSHA256": "de2e49529f03d573bc3fa229dc83acfe22c63a5ad1766b289563edfd45b72dea",
-      "cSymbol": "tree_sitter_r"
+      "cSymbol": "tree_sitter_r",
+      "regenerate": true
     },
     "dart": {
       "repo": "https://github.com/UserNobody14/tree-sitter-dart",
@@ -529,7 +565,8 @@
         "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
       },
       "licenseSHA256": "d270cb3a4985d75033bd77d875ccebff1d66e32788a3f727891e28d76132dd46",
-      "cSymbol": "tree_sitter_dart"
+      "cSymbol": "tree_sitter_dart",
+      "regenerate": true
     },
     "xml": {
       "repo": "https://github.com/tree-sitter-grammars/tree-sitter-xml",
@@ -552,7 +589,8 @@
         "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
       },
       "licenseSHA256": "3297073719030b7261afd78b7267931ccc03a27f7a65ca6fc644316180f71bf6",
-      "cSymbol": "tree_sitter_xml"
+      "cSymbol": "tree_sitter_xml",
+      "regenerate": true
     },
     "ruby": {
       "repo": "https://github.com/tree-sitter/tree-sitter-ruby",
@@ -584,7 +622,8 @@
           "afterSHA256": "d40efa691677b020f805dae9ed59cb49cd45a17c234c22a06b837dba42389f98",
           "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/305"
         }
-      ]
+      ],
+      "regenerate": true
     },
     "yaml": {
       "repo": "https://github.com/tree-sitter-grammars/tree-sitter-yaml",
@@ -617,7 +656,9 @@
           "source": "src/parser.c",
           "beforeSHA256": "02c5d32e95fa018a3c3ba7d7134d84bb7d5595c8874aa7ae6582745d9b40dede",
           "afterSHA256": "91564e108b65d2dd9487cf5b419d4d161e339b41c3e7ad462da91971ee52383f",
-          "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/14"
+          "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/14",
+          "generatedBeforeSHA256": "02dc8c5f297936b198d1371874b8f5226f8dd35b75f6a82894d12a2cbc219eba",
+          "generatedAfterSHA256": "f73a21c19edce96d26011221ff1cae8cf636d98c54472815a0051a868a8d37f8"
         },
         {
           "file": "patches/yaml/0002-bound-serialized-indent-bytes.patch",
@@ -627,7 +668,8 @@
           "afterSHA256": "c1177bf7a0ecf12160807a86a61c874101f81d764512f6bca3b8e4a03fccde32",
           "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/48"
         }
-      ]
+      ],
+      "regenerate": true
     },
     "kotlin": {
       "repo": "https://github.com/fwcd/tree-sitter-kotlin",
@@ -649,7 +691,8 @@
         "tree_sitter/parser.h": "a1f6ef161fbaf48a0e10fca90ef5290a062462b307b3898aa562993853b9f80a"
       },
       "licenseSHA256": "948495f61768f7de26bcc61113d8cd95f50bbc15adb678c28c941c6c8fcd5903",
-      "cSymbol": "tree_sitter_kotlin"
+      "cSymbol": "tree_sitter_kotlin",
+      "regenerate": true
     },
     "postgres": {
       "regenerate": true,

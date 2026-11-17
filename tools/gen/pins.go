@@ -90,21 +90,28 @@ type ToolPins struct {
 }
 
 type GrammarPin struct {
-	Regenerate    bool              `json:"regenerate,omitempty"`
-	Patches       []patches.Pin     `json:"patches,omitempty"`
-	Repo          string            `json:"repo"`
-	Commit        string            `json:"commit"` // full commit
-	ExtractDir    string            `json:"extractDir"`
-	Archive       string            `json:"archive"`
-	ArchiveSHA256 string            `json:"archiveSHA256"`
-	ArchiveURL    string            `json:"archiveURL,omitempty"` // explicit upstream archive URL when its bytes differ from the API tarball
-	GrammarDir    string            `json:"grammarDir"`           // directory with parser.c, relative to ExtractDir
-	Dirs          []string          `json:"dirs"`                 // hashed trees, relative to ExtractDir
-	TreeSHA256    string            `json:"treeSHA256"`
-	Files         map[string]string `json:"files"` // parser.c / scanner.c -> sha256
-	LicenseSHA256 string            `json:"licenseSHA256"`
-	NoticeSHA256  string            `json:"noticeSHA256,omitempty"` // upstream NOTICE file, when the grammar repository has one
-	CSymbol       string            `json:"cSymbol"`                // tree_sitter_xxx
+	Regenerate         bool                `json:"regenerate,omitempty"`
+	GeneratorException *GeneratorException `json:"generatorException,omitempty"`
+	NPMDependencies    []string            `json:"npmDependencies,omitempty"`
+	Patches            []patches.Pin       `json:"patches,omitempty"`
+	Repo               string              `json:"repo"`
+	Commit             string              `json:"commit"` // full commit
+	ExtractDir         string              `json:"extractDir"`
+	Archive            string              `json:"archive"`
+	ArchiveSHA256      string              `json:"archiveSHA256"`
+	ArchiveURL         string              `json:"archiveURL,omitempty"` // explicit upstream archive URL when its bytes differ from the API tarball
+	GrammarDir         string              `json:"grammarDir"`           // directory with parser.c, relative to ExtractDir
+	Dirs               []string            `json:"dirs"`                 // hashed trees, relative to ExtractDir
+	TreeSHA256         string              `json:"treeSHA256"`
+	Files              map[string]string   `json:"files"` // parser.c / scanner.c -> sha256
+	LicenseSHA256      string              `json:"licenseSHA256"`
+	NoticeSHA256       string              `json:"noticeSHA256,omitempty"` // upstream NOTICE file, when the grammar repository has one
+	CSymbol            string              `json:"cSymbol"`                // tree_sitter_xxx
+}
+
+type GeneratorException struct {
+	Reason        string   `json:"reason"`
+	FailingInputs []string `json:"failingInputs"`
 }
 
 func loadPins(path string) (*Pins, error) {
@@ -120,6 +127,17 @@ func loadPins(path string) (*Pins, error) {
 	}
 	if err := validateMirrors(p.Mirrors); err != nil {
 		return nil, err
+	}
+
+	if p.Schema >= 3 {
+		for name, g := range p.Grammars {
+			if !g.Regenerate && (g.GeneratorException == nil || g.GeneratorException.Reason == "" || len(g.GeneratorException.FailingInputs) == 0) {
+				return nil, fmt.Errorf("%s: reference C requires a recorded generator exception", name)
+			}
+			if g.Regenerate && g.GeneratorException != nil {
+				return nil, fmt.Errorf("%s: generator exception must retain reference C", name)
+			}
+		}
 	}
 	return &p, nil
 }

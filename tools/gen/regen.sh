@@ -4,8 +4,8 @@
 #   tools/gen/regen.sh <work-dir> [lang ...]
 #
 # <work-dir> must not exist or must be empty: every archive is downloaded and extracted only into it, its sha256 is
-# checked before extraction. Only grammars pinned with regenerate: true execute grammar JS, with the pinned CLI's native
-# JS runtime and a twice-generated determinism check (ADR-0023). The fetch plan
+# checked before extraction. All non-exception grammars execute grammar JS with the pinned CLI's native
+# JS runtime and a twice-generated determinism check (ADR-0027). The fetch plan
 # (URLs, sha256, destinations) comes from tools/gen/pins.json via `gen -plan`; wasm2go is built from its pinned
 # module version with `go install -trimpath`. Output goes to grammars/<lang> in this repository.
 # go.mod form: derived from the committed grammars/*/go.mod. Release form (`require ... vX.Y.Z`, no `replace`) regenerates
@@ -78,6 +78,6 @@ for lang in "${LANGS[@]}"; do
   echo "== $lang"
   "$GEN" -lang "$lang" -root tools/gen -src "$W/src" -dl "$W/dl" -sdk "$W/sdk" \
     -wasm2go "$W/bin/wasm2go$EXE" -wasm-opt "$W/binaryen/bin/wasm-opt$EXE" \
-    -tree-sitter "$W/bin/tree-sitter$EXE" -patch-alert "${PATCH_ALERT_THRESHOLD:-3}" \
+    -tree-sitter "$W/bin/tree-sitter$EXE" -fetch-npm -patch-alert "${PATCH_ALERT_THRESHOLD:-3}" \
     -out "grammars/$lang" -work "$W/work" -repo . ${ROOT_VERSION:+-root-version "$ROOT_VERSION"}
 done

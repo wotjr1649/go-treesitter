@@ -1,4 +1,31 @@
 {
+  "grammarGeneration": {
+    "patches": null,
+    "npm": [
+      {
+        "name": "tree-sitter-javascript",
+        "version": "0.23.1",
+        "resolved": "https://registry.npmjs.org/tree-sitter-javascript/-/tree-sitter-javascript-0.23.1.tgz",
+        "integrity": "sha512-/bnhbrTD9frUYHQTiYnPcxyHORIw157ERBa6dqzaKxvR/x3PC4Yzd+D1pZIMS6zNg2v3a8BZ0oK7jHqsQo9fWA==",
+        "lockfileSHA256": "ecf16a3cca44269fc027c20278e818d4fb2bca683dd68217496cbda8b68ab93e",
+        "archiveSHA256": "90e80b25a67517a4daf6ad751557bee21efbda7b7a5a554897933245d1734398",
+        "scriptsExecuted": false
+      }
+    ],
+    "cli": "0.27.2",
+    "jsRuntime": "native",
+    "inputSHA256": "db4120ca95c3c2d8824bb9173a9dc6fd53b16ec46454b8004681fdd41a174769",
+    "outputs": {
+      "grammar.json": "fb5737b2364aa13f40726174f85cacd51878435966ef14bfe3c295bd7e8bf897",
+      "node-types.json": "10fc80f3b49f46aa6a64c805372359c08540fc8232934ef0f75f84a5cf91e000",
+      "parser.c": "f719065cac4af87cc1f22c1b55cca6813f7dfb82a794c4b93dc971e20673c7d6",
+      "scanner.c": "9125013b42cb888379d9be909f1d73dfb75a37626c2cdbf4122718a2b431a6d3",
+      "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+      "tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
+      "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
+    },
+    "deterministic": true
+  },
   "schema": 1,
   "abi": 3,
   "name": "typescript",
@@ -12,15 +39,25 @@
       "grammar.parser.c": "74fe453edd70f4eae9af0a1050cbd7943d8971d59165b6aaebbaa0a0b716d1aa",
       "grammar.scanner.c": "9125013b42cb888379d9be909f1d73dfb75a37626c2cdbf4122718a2b431a6d3",
       "grammar.tree": "b5748a3b788124e0e09a269a16bb52e39971a14b0740049cdabec7fc94178ccc",
+      "patched.grammar.grammar.json": "fb5737b2364aa13f40726174f85cacd51878435966ef14bfe3c295bd7e8bf897",
+      "patched.grammar.node-types.json": "10fc80f3b49f46aa6a64c805372359c08540fc8232934ef0f75f84a5cf91e000",
+      "patched.grammar.parser.c": "f719065cac4af87cc1f22c1b55cca6813f7dfb82a794c4b93dc971e20673c7d6",
+      "patched.grammar.scanner.c": "9125013b42cb888379d9be909f1d73dfb75a37626c2cdbf4122718a2b431a6d3",
+      "patched.grammar.tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
+      "patched.grammar.tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
+      "patched.grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
+      "patches.inputs": "db4120ca95c3c2d8824bb9173a9dc6fd53b16ec46454b8004681fdd41a174769",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
       "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
     },
-    "RecipeSHA256": "1313bcac8a8abe752b2af41f4b6265ae60055110e49a535f0cf4695e5fe429a4",
+    "RecipeSHA256": "b5d8674ceacd93ae66832f7f9bfbc69085e386c1ecbf22857b1b8ec05caa9ea3",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
+      "js-runtime": "native",
       "llvm": "895aa2c896ada719451be2e3673c83da8ddf1141",
       "recipe": "v2-O3",
+      "tree-sitter-cli": "0.27.2",
       "wasi-sdk": "34.0",
       "wasm2go": "v0.4.21",
       "wasm2go-sum": "h1:F9xQyNnXIjWesQgt7tLxqVUg2pmxwBOrRCLpEFv3QUc="
@@ -35,9 +72,9 @@
     "LICENSES/wasi-libc/cloudlibc-LICENSE": "c8b789cf5a746611e6300a0cc7750dbf92b61912a709d04e639245f7290656d0",
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
-    "engine_gen.dat": "ef6f0287b530ec8405b8d359f24dfe39152fc1e7bd982c7cedbb9300adb6622c",
-    "engine_gen.go": "b3ccc142a978de1c980c6096577c24f8db9e99b4688e18ac2013052515cccdf4",
-    "wasm": "1b8393a9a59e85992f9be7b759cbb1c37eca0ce4330b8be8216586e3c5c62e28",
-    "wasm.clang": "36847f33699608ea7a27834760dda7b9193bef86e660284a1413dec05b340e8c"
+    "engine_gen.dat": "f17397f2393258babc215a8f4362a8a51cbfd55c0cafd7860c77e77f3874698d",
+    "engine_gen.go": "e16c20ddb836fbffd2c14acfdda8479ba575624e8fdb75a7b7a35f7176ff2be9",
+    "wasm": "467f16297ddb2b247a28abffca1e019bef32e4d1e2a5a7b7671a23517bec567c",
+    "wasm.clang": "ffa857154c8804e126710bb5751362ac3d2e6d26dc576f8f8fed900130a210a9"
   }
 }

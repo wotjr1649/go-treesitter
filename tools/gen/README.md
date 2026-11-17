@@ -195,18 +195,30 @@ Recorded C-only patches exist for bash and ruby (`0001-heredoc-lookahead-char`),
 counts. Retire each with an approved pin move when upstream fixes it; `native-ref -unpatched` supplies the required
 corpus/fuzz baseline.
 
-`regenerate: true` also works without patches, for upstream grammars that omit generated C or store an LFS pointer.
-For `grammar.js` or related grammar-input patches, set the same flag. `gen` and `native-ref` use
-the same implementation: verify the full archive, extract a private copy, apply the recorded patches, then run
-the pinned CLI twice on independent trees using `generate --js-runtime native`. Every resulting file must match.
-The CLI gzip and its decompressed executable are checked against the per-platform pin before execution. The
-generated module's optional `grammarGeneration` provenance records CLI version/runtime, input-tree hash (after any patches)
-and generated source hashes; `native-ref` writes the same record under its `work/patches-<lang>/provenance.json`.
-Both compilers read C from this private result. The original extracted source and archive stay intact.
+ADR-0027 sets `regenerate: true` for every grammar except entries with a recorded `generatorException`
+(reason and exact failing input IDs). An exception retains the committed reference C. The original archive,
+tree and file pins always identify upstream bytes; generation adds identities instead of replacing them.
+`gen` and `native-ref` share one implementation: verify the full archive, extract a private copy, apply grammar-input
+patches, then run the pinned CLI twice on independent trees using `generate --abi 15 --js-runtime native`.
+C/header patches apply after generation. Every resulting file must match. When generated C differs from committed C,
+a patch records `generatedBeforeSHA256`/`generatedAfterSHA256` alongside the original reference hashes; the same
+hash-checked patch bytes apply to each variant (YAML `0001-no-early-eof` uses this).
 
-`regen.sh` fetches the CLI only when a grammar requires regeneration; direct `gen` invocations supply `-tree-sitter`
-and keep the corresponding pinned gzip in `-dl`. `native-ref -fetch` downloads it on demand. Existing unpatched
-modules are unchanged. Patches modifying multiple files are represented by ordered single-file records.
+Selected `npmDependencies` are unpacked from the upstream `package-lock.json` tarball after SHA-512 integrity
+verification; npm and install scripts never run. QuickJS resolves these packages from the grammar working
+directory's `node_modules`, including TypeScript/TSX imports through `../common`. No host Node participates.
+The tarballs are cached in `<dl>/npm` by integrity identity. Direct `gen` calls require explicit `-fetch-npm`
+for a missing tarball; `native-ref` requires `-fetch`. `regen.sh` and `balance-probe.sh` opt in with `-fetch-npm`.
+Without that flag, generation uses only verified cached tarballs and fails if one is missing. npm inputs are selected
+from the verified upstream lockfile after source extraction, outside `-plan`; this explicit opt-in keeps generation
+from silently adding network access. Corrupt cached tarballs fail instead of being replaced.
+
+The CLI gzip and decompressed executable are checked against the per-platform pin before execution.
+`grammarGeneration` provenance records CLI/runtime, input-tree hash (after grammar-input patches and npm supply),
+lockfile/tarball/dependency identities, and generated source hashes. `native-ref` writes the same record under
+`work/patches-<lang>/provenance.json`. Both compilers read C from this private result; the extracted source and
+archive remain intact. `regen.sh` fetches the CLI; direct `gen` calls supply `-tree-sitter` and its pinned gzip
+in `-dl`. `native-ref -fetch` downloads it on demand. Ordered single-file records represent multi-file patches.
 
 `gen -patch-status [-patch-alert N]` lists all grammar patch counts, including zero; counts greater than `N` warn
 (default 3). Both builders print the selected grammar's count. `PATCH_ALERT_THRESHOLD=N` configures the shell
