@@ -113,11 +113,24 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   and loses state, so roughly 330 Hangul syllables in total can exhaust it; other scanner state lowers
   the bound. This change does not remove other upstream heredoc syntax limits.
   Published v0.5.0 retains the earlier low-byte patch; these changes apply to the development tree.
-  Prefix-line closing in Bash remains a known upstream limitation (`EOF` can close on `EOFX`).
   Bash `<<-` still strips `iswspace` characters, including U+3000, rather than tabs only.
   Different invalid bytes with the same number of decode errors can match. Stored words with different
-  error counts differ, but existing Bash prefix and Ruby repeated-word scanning can still close on a longer line.
+  error counts differ, but Ruby repeated-word scanning can still close on a longer line.
   Ruby also closes on repeated end words such as `EOFEOF`; ordinary `EOFX` remains body text.
+- **Bash heredoc closing lines:** after the UTF-8 storage change, the Bash scanner now requires the
+  matched end word to be followed immediately by LF, CRLF or EOF.
+  A prefix such as `EOFX` for `EOF`, `끝났다` for `끝`, trailing text, or `INNER)` stays in the body.
+  Leading spaces and tabs before the end word are still ignored for every heredoc, including plain
+  `<<EOF`: ` EOF` and `\tEOF` close it, although Bash keeps those lines in the body. This upstream
+  limitation is unchanged; the new rule applies only after the end word.
+  Consumers can observe different trees, including errors for scripts that used `INNER)` as a
+  terminator instead of putting `INNER` and `)` on separate lines. This does not promise full
+  logical-line continuation handling. Bash's `<<-` whitespace rule, invalid-byte aliases and
+  scanner serialization limit remain; Ruby's repeated-word limitation is unchanged.
+
+  In CRLF inputs the `heredoc_end` span now includes the CR byte; an end word followed by CR and EOF
+  is also accepted. End-boundary state shares the existing serialized `started` byte, preserving the
+  previous end-word capacity.
 
 Query regex predicates change their default meaning without changing Go signatures or the engine ABI.
 `#match?` and `#not-match?` use Unicode `\w`, `\d`, `\s` and `\b`/`\B`, and Unicode simple case folding for `(?i)`,
