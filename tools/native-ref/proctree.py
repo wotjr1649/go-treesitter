@@ -8,6 +8,7 @@ import ctypes
 import os
 import signal
 import subprocess
+import sys
 
 
 if os.name != "nt":
@@ -138,7 +139,7 @@ def stop_tree(proc):
         if job is not None:
             _checked(_kernel.CloseHandle(job))
             proc._tree_job = None
-    else:
+    elif getattr(proc, "_tree_stopped", False) is not True:  # a Mock attribute is not True
         try:
             if proc._tree_group:
                 if proc.pid <= 1:
@@ -148,6 +149,11 @@ def stop_tree(proc):
                 proc.kill()
         except ProcessLookupError:
             pass
+        except PermissionError:
+            # macOS reports EPERM, not ESRCH, for a group left with only zombies (our own descendants).
+            if sys.platform != "darwin":
+                raise
+        proc._tree_stopped = True
     proc.wait(timeout=10)
 
 

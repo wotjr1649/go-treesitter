@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"runtime"
 	"sync"
 	"syscall"
 	"time"
@@ -31,6 +32,10 @@ func stopUnix(cmd *exec.Cmd, group bool) error {
 		err = cmd.Process.Kill()
 	}
 	if errors.Is(err, syscall.ESRCH) || errors.Is(err, os.ErrProcessDone) {
+		return nil
+	}
+	// macOS reports EPERM, not ESRCH, for a group left with only zombies (our own descendants).
+	if group && runtime.GOOS == "darwin" && errors.Is(err, syscall.EPERM) {
 		return nil
 	}
 	return err
