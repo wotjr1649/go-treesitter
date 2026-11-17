@@ -15,6 +15,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/wotjr1649/go-treesitter/tools/gen/grammarpatch"
 	"github.com/wotjr1649/go-treesitter/tools/gen/patches"
 )
 
@@ -90,28 +91,38 @@ type ToolPins struct {
 }
 
 type GrammarPin struct {
-	Regenerate         bool                `json:"regenerate,omitempty"`
-	GeneratorException *GeneratorException `json:"generatorException,omitempty"`
-	NPMDependencies    []string            `json:"npmDependencies,omitempty"`
-	Patches            []patches.Pin       `json:"patches,omitempty"`
-	Repo               string              `json:"repo"`
-	Commit             string              `json:"commit"` // full commit
-	ExtractDir         string              `json:"extractDir"`
-	Archive            string              `json:"archive"`
-	ArchiveSHA256      string              `json:"archiveSHA256"`
-	ArchiveURL         string              `json:"archiveURL,omitempty"` // explicit upstream archive URL when its bytes differ from the API tarball
-	GrammarDir         string              `json:"grammarDir"`           // directory with parser.c, relative to ExtractDir
-	Dirs               []string            `json:"dirs"`                 // hashed trees, relative to ExtractDir
-	TreeSHA256         string              `json:"treeSHA256"`
-	Files              map[string]string   `json:"files"` // parser.c / scanner.c -> sha256
-	LicenseSHA256      string              `json:"licenseSHA256"`
-	NoticeSHA256       string              `json:"noticeSHA256,omitempty"` // upstream NOTICE file, when the grammar repository has one
-	CSymbol            string              `json:"cSymbol"`                // tree_sitter_xxx
+	Reference             string                 `json:"reference,omitempty"` // omitted/committed, or none when upstream has no parser C
+	Regenerate            bool                   `json:"regenerate,omitempty"`
+	GenerateFrom          string                 `json:"generateFrom,omitempty"`
+	UpstreamTestException *UpstreamTestException `json:"upstreamTestException,omitempty"`
+	GeneratorException    *GeneratorException    `json:"generatorException,omitempty"`
+	NPMDependencies       []string               `json:"npmDependencies,omitempty"`
+	Patches               []patches.Pin          `json:"patches,omitempty"`
+	Repo                  string                 `json:"repo"`
+	Commit                string                 `json:"commit"` // full commit
+	ExtractDir            string                 `json:"extractDir"`
+	Archive               string                 `json:"archive"`
+	ArchiveSHA256         string                 `json:"archiveSHA256"`
+	ArchiveURL            string                 `json:"archiveURL,omitempty"` // explicit upstream archive URL when its bytes differ from the API tarball
+	GrammarDir            string                 `json:"grammarDir"`           // directory with parser.c, relative to ExtractDir
+	Dirs                  []string               `json:"dirs"`                 // hashed trees, relative to ExtractDir
+	TreeSHA256            string                 `json:"treeSHA256"`
+	Files                 map[string]string      `json:"files"` // parser.c / scanner.c -> sha256
+	LicenseSHA256         string                 `json:"licenseSHA256"`
+	NoticeSHA256          string                 `json:"noticeSHA256,omitempty"` // upstream NOTICE file, when the grammar repository has one
+	CSymbol               string                 `json:"cSymbol"`                // tree_sitter_xxx
 }
 
 type GeneratorException struct {
 	Reason        string   `json:"reason"`
 	FailingInputs []string `json:"failingInputs"`
+}
+
+type UpstreamTestException struct {
+	CLI        string `json:"cli"`
+	Step       string `json:"step"`
+	Reason     string `json:"reason"`
+	RetireWhen string `json:"retireWhen"`
 }
 
 func loadPins(path string) (*Pins, error) {
@@ -127,6 +138,21 @@ func loadPins(path string) (*Pins, error) {
 	}
 	if err := validateMirrors(p.Mirrors); err != nil {
 		return nil, err
+	}
+
+	for name, g := range p.Grammars {
+		if g.Reference != "" && g.Reference != "committed" && g.Reference != "none" {
+			return nil, fmt.Errorf("%s: unknown reference mode %q", name, g.Reference)
+		}
+		if g.Reference == "none" {
+			_, hasParser := g.Files["parser.c"]
+			if !g.Regenerate || hasParser || g.GeneratorException != nil {
+				return nil, fmt.Errorf("%s: reference none requires regeneration, no committed parser.c pin, and no generator exception", name)
+			}
+		}
+		if err := grammarpatch.Validate(g.Patches, g.Regenerate, g.GenerateFrom); err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
 	}
 
 	if p.Schema >= 3 {

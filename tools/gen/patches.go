@@ -33,7 +33,7 @@ func preparePatches(o *opts, p *Pins, g GrammarPin, work string, id *Identity) (
 	if len(g.Patches) == 0 && !g.Regenerate {
 		return nil, nil
 	}
-	if err := grammarpatch.Validate(g.Patches, g.Regenerate); err != nil {
+	if err := grammarpatch.Validate(g.Patches, g.Regenerate, g.GenerateFrom); err != nil {
 		return nil, err
 	}
 	if !g.Regenerate {
@@ -55,7 +55,7 @@ func preparePatches(o *opts, p *Pins, g GrammarPin, work string, id *Identity) (
 	}
 	c := grammarpatch.Config{Archive: filepath.Join(o.dl, g.Archive), ArchiveSHA256: g.ArchiveSHA256,
 		PatchRoot: o.root, Work: filepath.Join(work, "patches"), GrammarDir: g.GrammarDir, Patches: g.Patches, Regenerate: true,
-		NPMDependencies: g.NPMDependencies, FetchNPM: o.fetchNPM, NPMCache: filepath.Join(o.dl, "npm"),
+		GenerateFrom: g.GenerateFrom, NPMDependencies: g.NPMDependencies, FetchNPM: o.fetchNPM, NPMCache: filepath.Join(o.dl, "npm"),
 		CLI: bin, CLIArchive: filepath.Join(o.dl, path.Base(cli.URL)), CLIArchiveSHA256: cli.SHA256, CLIVersion: p.Tools.TreeSitterCLI}
 	root, prov, err := grammarpatch.Prepare(c)
 	if err != nil {

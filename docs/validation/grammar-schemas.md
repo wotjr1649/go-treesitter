@@ -7,10 +7,11 @@ behaviour: equal schemas can still parse differently (for example after a preced
 
 ## Offline strict-check inputs
 
-The current candidate pin set contains 24 grammars, including the 2026-11-15 PHP, PowerShell and Dart revisions, the 2026-11-15
+The historical v0.5.0 candidate pin set contained 24 grammars, including the 2026-11-15 PHP, PowerShell and Dart revisions, the 2026-11-15
 tree-identical T-SQL pin move and the C maintained-fork move below; `tools/gen/pins.json` SHA-256 is
-`5467afce00a76529acf5dd13243a51d8218fa164c595ce171fc7fe6d78ea9913`. All 24 archived schemas pass the
-strict check at this pin set (Windows amd64, Go 1.27.4).
+`5467afce00a76529acf5dd13243a51d8218fa164c595ce171fc7fe6d78ea9913`. All 24 archived schemas passed the
+strict check at that pin set (Windows amd64, Go 1.27.4).
+The current 25-grammar candidate additionally includes Swift; its first baseline is recorded below.
 The tables below record each schema once, grouped by the release that first recorded it; archive SHA-256
 values identify the pinned upstream inputs. `tsx` and `typescript` share one archive. Schema bytes come from
 `<grammarDir>/node-types.json` in that archive, after checking its digest, and match the generator's extracted input.
@@ -217,3 +218,23 @@ changes requiring review, not native behaviour results. Earlier records above re
 
 Static changes include serialized flags and alternatives; equality here does not establish parse behaviour.
 The generator behaviour gate and conformance results are recorded separately with their input identities.
+
+## Swift candidate (unpatched regeneration, after v0.5.0)
+
+`alex-pinkus/tree-sitter-swift@a1d4a7b80260bf960f9e25198cddecbe5e6c46aa` is the revision nvim-treesitter pins; tier 3
+per ADR-0024, MIT, adds module `swift` to the development tree (not part of v0.5.0). Archive SHA-256:
+`6c6850eb5a98cd81f223f07bf0a19ee616e73226d66ab5267d90c006781cacb9`. The archive has no `parser.c`;
+`regenerate: true`, `generateFrom: "grammar.json"` uses CLI 0.27.2 / `--js-runtime native` on the
+unmodified upstream-committed `src/grammar.json`, on two independent input trees and no patches. `grammar.js` is not evaluated. The generator's
+`node-types.json` is byte-identical to the archived `src/node-types.json`.
+
+| Schema | Directory | Bytes | SHA-256 | Status |
+|---|---|---:|---|---|
+| Archived and regenerated | `src` | 693860 | `f806012c196c40978d1c00145aa6adca089193a6307824f99f55cd618ebcb1b5` | first baseline; strict PASS, no findings |
+
+Generated `parser.c` SHA-256 `f21084a944bc2d927913f119860a513a22d897cb5c6f88f53abc46daf21ea149`,
+`grammar.json` `178a9783bac58092ed8cb7d95cf4ecda6ec734d70613e42aa628ed8274846e6d`. Local Windows amd64 / Go 1.27.4,
+`tools/gen/pins.json` SHA-256 `ee3fb85268c303d3cdc7dfda459cfabdf420ba321daaf4be55e3fe5ce70ed20b`; two independent generations of the module are byte-identical.
+An earlier candidate revision (`35245fbfee2fccf16273c6f4299438fb76875970`) was not adopted: its archived schema
+fails the strict check with two duplicate identities (`?` and `??`, each once with and once without an empty `fields`
+object). This pin's schema has none. This is a first baseline, not a pin move; no release approval is inferred.

@@ -65,7 +65,7 @@ cd tools/native-ref && go run ./ciconf -pins ../gen/pins.json -corpus <corpus di
 cd tools/conformance && TSG_DATA_DIR=<data dir> TSG_NATIVE_EXE_DIR=<exe dir> go test -run 'TestCorpus|TestEdits|TestParserPoolRealEngine' .
 ```
 
-`-lang` limits corpus preparation to the comma-separated conformance language names (default: all 24). JSX inputs use the JavaScript corpus and parser. PHP selects the PHP parser; XML selects XML, not DTD.
+`-lang` limits corpus preparation to the comma-separated conformance language names (default: all 25). JSX inputs use the JavaScript corpus and parser. PHP selects the PHP parser; XML selects XML, not DTD.
 Nested corpus directories follow each pin's `grammarDir`; XML upstream queries are under `queries/xml`.
 
 `-inputs-only` writes only corpus inputs, manifests and `inputs.json`; it needs no `-exe` and executes no parser.
@@ -148,6 +148,18 @@ Build `native-ref`, `ciconf`, and `tools/bench/ci` from this checkout, then run 
 python tools/native-ref/generatorgate.py --lang json --native-ref <native-ref> --ciconf <ciconf> \
   --benchci <benchci> --cli <pinned-tree-sitter> --dl <verified-archive-cache> --out <new-result-directory>
 ```
+
+The current pin set contains 25 grammar modules. A grammar with `reference: "none"` (Swift) has no committed
+upstream parser C: `native-ref -reference swift` returns `NOT_APPLICABLE_NO_COMMITTED_PARSER` as an error.
+The gate records that status and omits only the committed-C variant. It still requires candidate determinism,
+strict generated-schema validation, product-vs-fresh-native corpus/seeded-edit/field and pinned large-input
+comparisons, plus the upstream repository's own tests. Swift's `generateFrom: "grammar.json"` selects the same
+unmodified upstream `src/grammar.json` as the product generator, with the input hash in provenance.
+Its owner-approved `upstreamTestException` covers only CLI 0.27.2 passing the Swift input as the outline query path:
+all 312 corpus cases and eight highlight cases must pass, the full-suite exit 1 and exact query error remain in the
+report/log, and `tree-sitter query queries/outline.scm test/outline/outline.swift` must succeed. Any new failure or
+a disappearing signature fails. On a CLI pin move, recheck the full suite and retire the exception when fixed.
+This exception does not waive parser correctness or constitute release approval. Any other failed check fails the gate.
 
 The tool builds committed-C (`native-ref -reference`) and regenerated-C (`-candidate`) variants independently,
 compares native corpus dumps, seeded incremental/fresh trees, changed ranges and field lookups, and compares

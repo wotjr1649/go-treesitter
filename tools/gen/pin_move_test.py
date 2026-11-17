@@ -49,19 +49,21 @@ class PinsDiffTest(unittest.TestCase):
             ("source", "CHANGED"),
         ])
 
-    def test_postgres_addition_checks_new_schema_without_old_native(self):
+    def test_unpatched_regeneration_addition_checks_new_schema_without_old_native(self):
         pins = json.loads(Path(__file__).with_name("pins.json").read_bytes())
-        old = {"grammars": {k: v for k, v in pins["grammars"].items() if k != "postgres"}}
-        self.assertTrue(pins["grammars"]["postgres"]["regenerate"])
-        self.assertFalse(pins["grammars"]["postgres"].get("patches"))
-        self.assertEqual(pin_move.changed_grammars(old, pins), [("postgres", "ADDED")])
-        with tempfile.TemporaryDirectory() as temp:
-            review = pin_move.Review(Path(temp), Path(temp) / "cache")
-            with patch.object(review, "side") as side:
-                result = review.grammar("base", "head", old, pins, "postgres", "ADDED", set())
-            side.assert_called_once_with("head", pins, "postgres", "new", build=False)
-            self.assertEqual(result["schema"], "PASS (new only)")
-            self.assertTrue(result["pass"])
+        for lang in ("postgres", "swift"):
+            with self.subTest(lang=lang):
+                old = {"grammars": {k: v for k, v in pins["grammars"].items() if k != lang}}
+                self.assertTrue(pins["grammars"][lang]["regenerate"])
+                self.assertFalse(pins["grammars"][lang].get("patches"))
+                self.assertEqual(pin_move.changed_grammars(old, pins), [(lang, "ADDED")])
+                with tempfile.TemporaryDirectory() as temp:
+                    review = pin_move.Review(Path(temp), Path(temp) / "cache")
+                    with patch.object(review, "side") as side:
+                        result = review.grammar("base", "head", old, pins, lang, "ADDED", set())
+                    side.assert_called_once_with("head", pins, lang, "new", build=False)
+                    self.assertEqual(result["schema"], "PASS (new only)")
+                    self.assertTrue(result["pass"])
 
     def test_non_grammar_metadata_is_not_a_pin_move(self):
         self.assertEqual(pin_move.changed_grammars(

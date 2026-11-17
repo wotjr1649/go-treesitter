@@ -138,3 +138,53 @@ func TestGeneratorExceptionPins(t *testing.T) {
 		})
 	}
 }
+
+func TestReferenceModePins(t *testing.T) {
+	p, err := loadPins("pins.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	base := p.Grammars["swift"]
+	if base.Reference != "none" || len(p.Grammars) != 25 {
+		t.Fatalf("Swift reference or grammar count drifted: %q, %d", base.Reference, len(p.Grammars))
+	}
+	for _, tc := range []struct {
+		name string
+		edit func(*GrammarPin)
+		want string
+	}{
+		{"none", func(g *GrammarPin) {}, ""},
+		{"committed", func(g *GrammarPin) { g.Reference = "committed" }, ""},
+		{"omitted", func(g *GrammarPin) { g.Reference = "" }, ""},
+		{"unknown", func(g *GrammarPin) { g.Reference = "typo" }, "unknown reference mode"},
+		{"unknown-input", func(g *GrammarPin) { g.GenerateFrom = "../grammar.json" }, "generateFrom"},
+		{"requires-generation", func(g *GrammarPin) { g.Regenerate = false }, "reference none requires"},
+		{"forbids-parser-pin", func(g *GrammarPin) { g.Files = map[string]string{"parser.c": ""} }, "reference none requires"},
+		{"forbids-exception", func(g *GrammarPin) {
+			g.GeneratorException = &GeneratorException{Reason: "reason", FailingInputs: []string{"case"}}
+		}, "reference none requires"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			g := base
+			tc.edit(&g)
+			clone := *p
+			clone.Grammars = map[string]GrammarPin{"swift": g}
+			b, err := json.Marshal(clone)
+			if err != nil {
+				t.Fatal(err)
+			}
+			name := filepath.Join(t.TempDir(), "pins.json")
+			if err := os.WriteFile(name, b, 0644); err != nil {
+				t.Fatal(err)
+			}
+			_, err = loadPins(name)
+			if tc.want == "" {
+				if err != nil {
+					t.Fatal(err)
+				}
+			} else if err == nil || !strings.Contains(err.Error(), tc.want) {
+				t.Fatalf("want %q, got %v", tc.want, err)
+			}
+		})
+	}
+}

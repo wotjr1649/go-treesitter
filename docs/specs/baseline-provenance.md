@@ -22,7 +22,11 @@ original/result source hashes and each patch identity are recorded in the pins a
 The unpatched native comparison is separate from the product comparison.
 Under ADR-0027 every grammar sets `regenerate: true` unless its recorded exception retains the reference C.
 Both builders use the shared, pinned CLI path: independent generation twice, byte comparison, input-tree hash and
-generated-file hashes in provenance. Grammar-input patches apply before generation and C/header patches after it.
+generated-file hashes in provenance. A grammar's optional `generateFrom: "grammar.json"` selects its archived,
+unmodified `<grammarDir>/grammar.json` instead of evaluating `grammar.js`; its original hash and selection enter
+provenance, identically for both builders. Swift uses this input and has a narrowly ratcheted CLI upstream-test
+exception accepted by the owner; see [ADR-0027](../design/decisions/ADR-0027-one-pinned-generator-cli.md#swift-amendment-owner-2026-11-17).
+Grammar-input patches apply before generation and C/header patches after it.
 External npm grammar inputs come from the upstream lockfile, are integrity-checked and extracted without install
 scripts, and are recorded in provenance. The original archive/tree/file pins continue to identify the archived
 bytes; generated C hashes are additional identities. CLI or grammar moves require the ADR-0027 native behaviour

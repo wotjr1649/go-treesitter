@@ -58,3 +58,24 @@ have none.
   by the generation of the grammars not regenerated today.
 - Upstream contributions still use each repository's own CLI for regenerated files (ADR-0025 amendment of
   2026-11-16); this ADR concerns only the C we build.
+
+## Swift amendment (owner, 2026-11-17)
+
+Swift has no committed parser C and pins `reference: "none"`; the gate records
+`NOT_APPLICABLE_NO_COMMITTED_PARSER` for that comparison. It still requires two independent generations,
+strict schema validation, product/fresh-native corpus, seeded edits, field lookups and pinned large-input checks.
+
+Swift alone selects `generateFrom: "grammar.json"`: the pinned CLI reads the unmodified upstream-committed
+`src/grammar.json`, including emoji patterns, without evaluating `grammar.js`. The native runtime selection,
+archive identity and all tool/source revisions stay pinned. Generation provenance records the input choice and
+its original SHA-256, and native-ref uses the same common preparation path. This avoids Swift's version-detection
+fallback under native QuickJS, which omits the emoji patterns when evaluating this revision's `grammar.js`.
+
+The owner accepts one upstream-test exception, separate from the C# generator exception: CLI 0.27.2's
+`tree-sitter test` query runner uses `test/outline/outline.swift` as the query path instead of `queries/outline.scm`.
+The gate retains full-suite exit 1 and `Query compilation failed` / `Invalid syntax: import Foundation`, requires
+312/312 corpus cases and all eight highlight cases to pass, and additionally runs the correct command:
+`tree-sitter query queries/outline.scm test/outline/outline.swift`. That command must succeed. No corpus exclusion,
+expected-tree change or grammar patch is accepted. A new failure, stale signature or CLI pin change fails the
+exception check. When the CLI pin moves to a fixed version, rerun the full suite and remove this exception after
+it succeeds. This development exception does not approve a release.

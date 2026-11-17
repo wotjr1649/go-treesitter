@@ -364,5 +364,35 @@
     "license_spdx": "PostgreSQL",
     "license_url": "https://raw.githubusercontent.com/devrimgunduz/pagila/6ea53f812254c91a602f61c0ef62beca3fa676b1/LICENSE.txt",
     "license_sha256": "dcc10ac50b94172e627f7a5ec9c08f9e4568e6dd51a952f96ec09506f70163fb"
+  },
+  {
+    "lang": "swift",
+    "file": "SyntaxNodes.swift",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/swiftlang/swift-syntax/0688b9cfc4c3dd234e4f55f1f056b2affc849873/Sources/SwiftSyntax/gyb_generated/syntax_nodes/SyntaxNodes.swift",
+    "sha256": "337b909b59ed6b7ec3c295e30b5dfd8a2954b164e56660fd62c46906c4ec6016",
+    "license_spdx": "Apache-2.0 WITH Swift-exception",
+    "license_url": "https://raw.githubusercontent.com/swiftlang/swift-syntax/0688b9cfc4c3dd234e4f55f1f056b2affc849873/LICENSE.txt",
+    "license_sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+  },
+  {
+    "lang": "swift",
+    "file": "Session.swift",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/Alamofire/Alamofire/513364f870f6bfc468f9d2ff0a95caccc10044c5/Source/Core/Session.swift",
+    "sha256": "88f520308efecbc71b168f3f2cd45d14b0326a82451460d9cf7a86adbb698c7b",
+    "license_spdx": "MIT",
+    "license_url": "https://raw.githubusercontent.com/Alamofire/Alamofire/513364f870f6bfc468f9d2ff0a95caccc10044c5/LICENSE",
+    "license_sha256": "3ef1fbd5fd9cb08a9e071d6c0c6f68322deda2b93a814e5135a7829495dae698"
+  },
+  {
+    "lang": "swift",
+    "file": "Request.swift",
+    "kind": "url",
+    "url": "https://raw.githubusercontent.com/Alamofire/Alamofire/513364f870f6bfc468f9d2ff0a95caccc10044c5/Source/Core/Request.swift",
+    "sha256": "bc44fbbe62aa29c96b2d9821cb67f8cb48215f9875769ee539b03f081d0d556c",
+    "license_spdx": "MIT",
+    "license_url": "https://raw.githubusercontent.com/Alamofire/Alamofire/513364f870f6bfc468f9d2ff0a95caccc10044c5/LICENSE",
+    "license_sha256": "3ef1fbd5fd9cb08a9e071d6c0c6f68322deda2b93a814e5135a7829495dae698"
   }
 ]

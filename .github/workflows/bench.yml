@@ -40,7 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin, postgres]
+        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin, postgres, swift]
         runner: [ubuntu-24.04, ubuntu-24.04-arm, macos-latest]
         include:
           - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
@@ -93,6 +93,9 @@ jobs:
             go build -trimpath -tags "lang_$l" -o "$RUNNER_TEMP/bench/$l" .
             if [ "$l" = postgres ]; then
               go test -count=1 -tags lang_postgres -run '^TestPostgresSmallWorkload$' .
+            fi
+            if [ "$l" = swift ]; then
+              go test -count=1 -tags lang_swift -run '^TestSwiftSmallWorkload$' .
             fi
           done
           go build -o "$RUNNER_TEMP/benchci" ./ci

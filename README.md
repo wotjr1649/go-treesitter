@@ -18,7 +18,7 @@ The root module has no grammar. v0.5.0 provides 24 grammar modules using engine 
 Add the modules you need
 under `grammars/`: `bash`, `c`, `cpp`, `csharp`, `css`, `dart`, `golang`, `html`, `java`, `javascript` (including JSX),
 `json`, `kotlin`, `postgres` (PostgreSQL SQL only; PL/pgSQL excluded), `php` (PHP parser only), `powershell`, `python`, `r`, `ruby`, `rust`, `tsql`, `tsx`, `typescript`,
-`xml` (XML parser only), and `yaml`.
+`xml` (XML parser only), and `yaml`. The development tree after v0.5.0 also has `swift` (not part of any release).
 
 Use `typescript` for `.ts` and `tsx` for `.tsx`: the same upstream repository provides two grammars.
 `<T>expr` type assertions are TypeScript-only; JSX is TSX-only.
@@ -31,7 +31,7 @@ Each language has exactly one upstream repository, chosen by the tiers of
 | 1 | `bash`, `cpp`, `csharp`, `css`, `golang`, `html`, `java`, `javascript`, `json`, `php`, `python`, `ruby`, `rust`, `tsx`, `typescript` | `tree-sitter` organisation (`golang` uses `tree-sitter-go`; TSX and TypeScript share `tree-sitter-typescript`) |
 | 1 (maintained fork) | `c` | `tree-sitter-grammars/tree-sitter-c@f3202ac` (ADR-0024 rule 6) |
 | 2 | `xml`, `yaml` | `tree-sitter-grammars/tree-sitter-xml`, `tree-sitter-grammars/tree-sitter-yaml` |
-| 3 | `dart`, `kotlin`, `powershell`, `r` | `UserNobody14/tree-sitter-dart`, `fwcd/tree-sitter-kotlin`, `airbus-cert/tree-sitter-powershell`, `r-lib/tree-sitter-r` |
+| 3 | `dart`, `kotlin`, `powershell`, `r`, `swift` | `UserNobody14/tree-sitter-dart`, `fwcd/tree-sitter-kotlin`, `airbus-cert/tree-sitter-powershell`, `r-lib/tree-sitter-r`, `alex-pinkus/tree-sitter-swift` (development tree after v0.5.0) |
 | Owner-designated | `tsql`, `postgres` | `alfpricot/tree-sitter-mssql`, `gmr/tree-sitter-postgres` |
 
 Exact revisions are in [pins.json](tools/gen/pins.json). Bash, Ruby, YAML and Python carry recorded temporary C-only patches

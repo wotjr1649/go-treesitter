@@ -17,6 +17,148 @@ spec.loader.exec_module(gate)
 
 
 class GeneratorGateTest(unittest.TestCase):
+    def test_reference_none_requires_successful_nonempty_upstream_tests(self):
+        passed = {"parse_results": [{"name": "case", "outcome": "Passed"}],
+                  "parse_stats": {"total_parses": 1}}
+        report = {"differences": []}
+        gate.check_upstream(0, passed, report)
+        self.assertEqual(report["differences"], [])
+        failed = json.loads(json.dumps(passed))
+        failed["parse_results"][0]["outcome"] = "Failed"
+        for code, result in ((1, passed), (0, failed),
+                             (0, {"parse_results": [], "parse_stats": {"total_parses": 0}})):
+            report = {"differences": []}
+            gate.check_upstream(code, result, report)
+            self.assertTrue(report["differences"])
+
+    def test_swift_query_exception_ratchets_failure_and_checks_correct_query(self):
+        import copy
+        args = Namespace(lang="swift", cli="tree-sitter")
+        pins = {"tools": {"treeSitterCLI": "0.27.2"}}
+        grammar = {"upstreamTestException": {
+            "cli": "0.27.2", "step": "tree-sitter test: queries/outline.scm -> test/outline/outline.swift",
+            "reason": "owner approved", "retireWhen": "CLI pin move"}}
+        result = {"parse_results": [{"name": str(n), "outcome": "Passed"} for n in range(312)],
+                  "parse_stats": {"successful_parses": 312, "total_parses": 312}, "parse_failures": [],
+                  "highlight_results": [{"name": str(n), "outcome": {"AssertionPassed": {}}} for n in range(8)],
+                  "query_results": [{"name": "outline", "children": []}]}
+        raw = "Error: Query compilation failed\n\nCaused by:\n    Query error at 1:1. Invalid syntax:\n    import Foundation\n    ^\n"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            def execute(command, cwd, log, env):
+                self.assertEqual(command[:4], ["tree-sitter", "query", "queries/outline.scm", "test/outline/outline.swift"])
+                log.write_text("captures")
+            with patch.object(gate, "execute", execute):
+                report = {}
+                self.assertTrue(gate.swift_query_exception(args, pins, grammar, 1, result, raw, root, root, report, {}))
+                self.assertTrue(report["upstreamTestExceptionMatches"])
+                self.assertEqual(report["upstreamOutlineQueryExit"], 0)
+            for label in ("fixed", "new-cli", "signature", "extra-error", "corpus", "skip", "highlight", "query"):
+                changed = copy.deepcopy(result)
+                changed_pins = copy.deepcopy(pins)
+                code, log = 1, raw
+                if label == "fixed": code = 0
+                if label == "new-cli": changed_pins["tools"]["treeSitterCLI"] = "0.27.3"
+                if label == "signature": log = raw.replace("Foundation", "NewFailure")
+                if label == "extra-error": log += "new failure"
+                if label == "corpus": changed["parse_failures"] = [{"name": "emoji"}]
+                if label == "skip": changed["parse_results"][0]["outcome"] = "Skipped"
+                if label == "highlight": changed["highlight_results"][0]["outcome"] = "Failed"
+                if label == "query": changed["query_results"][0]["children"] = [{"name": "new", "outcome": "Failed"}]
+                with self.subTest(label=label), patch.object(gate, "execute") as command:
+                    with self.assertRaisesRegex(ValueError, "stale|signature"):
+                        gate.swift_query_exception(args, changed_pins, grammar, code, changed, log, root, root, {}, {})
+                    command.assert_not_called()
+            with patch.object(gate, "execute", side_effect=RuntimeError("query failed")):
+                with self.assertRaisesRegex(RuntimeError, "query failed"):
+                    gate.swift_query_exception(args, pins, grammar, 1, result, raw, root, root, {}, {})
+
+    def test_candidate_determinism_schema_and_product_lineage_are_required(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            prepared = root / "candidate/work/patches-swift"
+            source = prepared / "first/src"
+            module = root / "grammars/swift"
+            source.mkdir(parents=True)
+            module.mkdir(parents=True)
+            (source / "parser.c").write_bytes(b"parser")
+            (source / "node-types.json").write_bytes(b"[]")
+            outputs = {name: gate.sha(source / name) for name in ("parser.c", "node-types.json")}
+            provenance = {"deterministic": True, "outputs": outputs}
+            gate.save(prepared / "provenance.json", provenance)
+            for name in ("engine_gen.go", "engine_gen.dat"):
+                (module / name).write_bytes(name.encode())
+            product = {"grammarGeneration": provenance, "identity": {"GrammarRev": "rev"},
+                       "outputs": {name: gate.sha(module / name) for name in ("engine_gen.go", "engine_gen.dat")}}
+            gate.save(module / "provenance.json", product)
+            args = Namespace(lang="swift")
+            grammar = {"grammarDir": "src", "commit": "rev"}
+
+            def execute(command, cwd, log, env):
+                gate.save(log, {"assessment": "PASS", "input": {"sha256": outputs["node-types.json"]}})
+
+            report = {}
+            with patch.object(gate, "execute", execute):
+                gate.check_candidate(args, root, root, grammar, report, {})
+            self.assertEqual(report["candidateSchema"]["assessment"], "PASS")
+            self.assertIn("engine_gen.dat", report["productModuleFilesSHA256"])
+            with patch.object(gate, "execute", lambda command, cwd, log, env: gate.save(log, {"assessment": "FAIL"})):
+                with self.assertRaisesRegex(ValueError, "strict schema"):
+                    gate.check_candidate(args, root, root, grammar, {}, {})
+            provenance["deterministic"] = False
+            gate.save(prepared / "provenance.json", provenance)
+            with self.assertRaisesRegex(ValueError, "determinism"):
+                gate.check_candidate(args, root, root, grammar, {}, {})
+            provenance["deterministic"] = True
+            gate.save(prepared / "provenance.json", provenance)
+            (source / "parser.c").write_bytes(b"changed")
+            with self.assertRaisesRegex(ValueError, "generation output identity"):
+                gate.check_candidate(args, root, root, grammar, {}, {})
+            (source / "parser.c").write_bytes(b"parser")
+            product["identity"]["GrammarRev"] = "other"
+            gate.save(module / "provenance.json", product)
+            with self.assertRaisesRegex(ValueError, "generation identities differ"):
+                gate.check_candidate(args, root, root, grammar, {}, {})
+
+    def test_product_checks_reject_skips_and_missing_tests_and_force_full_product_lane(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "data/corpus").mkdir(parents=True)
+            (root / "data/corpus/manifest.csv").write_text("id,lang,source_ref,bytes,sha256\n")
+            args = Namespace(lang="swift")
+            pins = {"grammars": {"swift": {}, "golang": {}, "json": {}}}
+            for label, action in (("ok", "pass"), ("skip", "skip"), ("missing", "output")):
+                def execute(command, cwd, log, env, **kwargs):
+                    self.assertIn("no_go,no_json", command)
+                    self.assertEqual(env["CGO_ENABLED"], "0")
+                    self.assertEqual(env["TSG_S15_EDITS_SAMPLE"], "0")
+                    self.assertEqual(env["TSG_REQUIRE_FIELD_LOOKUP"], "1")
+                    log.write_text("\n".join(json.dumps({"Action": action, "Test": test})
+                                             for test in ("TestCorpus", "TestCorpus/swift")) + '\n{"Action": "pass"}\n')
+                with patch.object(gate, "execute", execute):
+                    if action == "pass":
+                        gate.product_conformance(args, root, root, pins, "swift", root / "data",
+                                                 ("TestCorpus",), label, {}, {})
+                    else:
+                        with self.assertRaisesRegex(ValueError, "missing or skipped"):
+                            gate.product_conformance(args, root, root, pins, "swift", root / "data",
+                                                     ("TestCorpus",), label, {}, {})
+
+    def test_large_product_projection_preserves_input_and_native_dump_bytes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "large/swift").mkdir(parents=True)
+            (root / "candidate").mkdir()
+            source = root / "large/swift/sample.swift"
+            source.write_bytes(b"let value = 1\r\n")
+            (root / "candidate/large-sample.swift.dump").write_bytes(b"native dump\n")
+            data = gate.large_product_data(root, "swift", [{"lang": "swift", "file": "sample.swift"}])
+            row = gate.rows(data / "corpus/manifest.csv")[0]
+            self.assertEqual(row["id"], "swift/large-0000")
+            self.assertEqual(row["sha256"], gate.sha(source))
+            self.assertEqual((data / "corpus/swift/large-0000.in").read_bytes(), source.read_bytes())
+            self.assertEqual((data / "native/dumps/swift/large-0000.dump").read_bytes(), b"native dump\n")
+
     def test_text_identity_is_lf_canonical_but_binary_identity_is_exact(self):
         with tempfile.TemporaryDirectory() as tmp:
             lf, crlf = Path(tmp) / "lf", Path(tmp) / "crlf"

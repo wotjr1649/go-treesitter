@@ -25,6 +25,7 @@ func fixture(t *testing.T, source bool) Config {
 		after = "module.exports = grammar({name: 'tiny', rules: {source_file: $ => repeat(choice('a', 'b'))}});\n"
 	}
 	files := map[string]string{"src/parser.c": "int a;\n", name: before,
+		"src/grammar.json": `{"name":"tiny","rules":{"source_file":{"type":"REPEAT","content":{"type":"STRING","value":"b"}}}}`,
 		"tree-sitter.json": `{"grammars":[{"name":"tiny","scope":"source.tiny","path":".","file-types":["tiny"]}],"metadata":{"version":"0.0.1","license":"MIT"}}`}
 	var b bytes.Buffer
 	z := gzip.NewWriter(&b)
@@ -101,11 +102,13 @@ func TestPatchRejectsUnrecordedOrWrongInputs(t *testing.T) {
 	}
 }
 
-func TestSyntheticGrammarRegeneration(t *testing.T) { testGrammarRegeneration(t, true) }
+func TestSyntheticGrammarRegeneration(t *testing.T) { testGrammarRegeneration(t, true, false) }
 
-func TestUnpatchedGrammarRegeneration(t *testing.T) { testGrammarRegeneration(t, false) }
+func TestUnpatchedGrammarRegeneration(t *testing.T) { testGrammarRegeneration(t, false, false) }
 
-func testGrammarRegeneration(t *testing.T, patched bool) {
+func TestJSONGrammarRegeneration(t *testing.T) { testGrammarRegeneration(t, false, true) }
+
+func testGrammarRegeneration(t *testing.T, patched, fromJSON bool) {
 	archive := os.Getenv("TREE_SITTER_CLI_ARCHIVE")
 	if archive == "" {
 		t.Skip("set TREE_SITTER_CLI_ARCHIVE to the pinned host .gz for the real CLI integration test")
@@ -113,6 +116,9 @@ func testGrammarRegeneration(t *testing.T, patched bool) {
 	c := fixture(t, true)
 	if !patched {
 		c.Patches = nil
+	}
+	if fromJSON {
+		c.GenerateFrom = "grammar.json"
 	}
 	b, err := os.ReadFile(filepath.Join("..", "pins.json"))
 	if err != nil {
@@ -159,11 +165,14 @@ func testGrammarRegeneration(t *testing.T, patched bool) {
 		t.Fatal(err)
 	}
 	parser, err := os.ReadFile(filepath.Join(root, "src", "parser.c"))
-	if err != nil || !bytes.Contains(parser, []byte("tree_sitter_tiny")) || (bytes.Contains(parser, []byte("anon_sym_b")) != patched) {
+	if err != nil || !bytes.Contains(parser, []byte("tree_sitter_tiny")) || (bytes.Contains(parser, []byte("anon_sym_b")) != (patched || fromJSON)) {
 		t.Fatalf("regenerated parser has wrong patch state: %v", err)
 	}
 	if len(prov.Patches) != len(c.Patches) || prov.InputSHA256 == "" || prov.CLI != c.CLIVersion || prov.JSRuntime != "native" || !prov.Deterministic || prov.Outputs["node-types.json"] == "" {
 		t.Fatalf("incomplete generation provenance: %+v", prov)
+	}
+	if fromJSON && (prov.GenerateFrom != "grammar.json" || prov.GenerateFromSHA256 == "") {
+		t.Fatalf("missing JSON input provenance: %+v", prov)
 	}
 	// The second independent generation's entire tree has already been compared by Prepare.
 	t.Logf("CLI=%s --js-runtime=%s input=%s parser.c=%s node-types.json=%s deterministic=%t", prov.CLI, prov.JSRuntime, prov.InputSHA256, prov.Outputs["parser.c"], prov.Outputs["node-types.json"], prov.Deterministic)
