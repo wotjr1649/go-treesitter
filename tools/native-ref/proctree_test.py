@@ -82,6 +82,22 @@ class ProcessTreeTest(unittest.TestCase):
                     proc.kill.assert_called_once_with()
                 proc.wait.assert_called_once_with(timeout=10)
 
+    def test_posix_stop_tree_kills_every_call_and_limits_darwin_eperm(self):
+        with patch.object(proctree.os, "name", "posix"),                 patch.object(os, "killpg", create=True) as killpg,                 patch.object(signal, "SIGKILL", 9, create=True):
+            group = Mock(pid=1234, _tree_group=True)
+            proctree.stop_tree(group)
+            proctree.stop_tree(group)  # late descendants must get a second group kill
+            self.assertEqual(killpg.call_count, 2)
+            killpg.side_effect = PermissionError
+            with patch.object(proctree.sys, "platform", "darwin"):
+                proctree.stop_tree(group)  # zombie-only group on macOS
+                leader = Mock(pid=1234, _tree_group=False)
+                leader.kill.side_effect = PermissionError
+                with self.assertRaises(PermissionError):
+                    proctree.stop_tree(leader)
+            with patch.object(proctree.sys, "platform", "linux"), self.assertRaises(PermissionError):
+                proctree.stop_tree(group)
+
     def test_posix_start_interruption_stops_the_started_process(self):
         for inherited, outermost in (("", True), ("1", False)):
             proc = Mock(pid=1234)

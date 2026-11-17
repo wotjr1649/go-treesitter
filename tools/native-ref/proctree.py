@@ -139,7 +139,8 @@ def stop_tree(proc):
         if job is not None:
             _checked(_kernel.CloseHandle(job))
             proc._tree_job = None
-    elif getattr(proc, "_tree_stopped", False) is not True:  # a Mock attribute is not True
+    else:
+        # Every call kills again: descendants forked while an earlier group kill ran must still be reached.
         try:
             if proc._tree_group:
                 if proc.pid <= 1:
@@ -151,9 +152,8 @@ def stop_tree(proc):
             pass
         except PermissionError:
             # macOS reports EPERM, not ESRCH, for a group left with only zombies (our own descendants).
-            if sys.platform != "darwin":
+            if not (proc._tree_group and sys.platform == "darwin"):
                 raise
-        proc._tree_stopped = True
     proc.wait(timeout=10)
 
 
