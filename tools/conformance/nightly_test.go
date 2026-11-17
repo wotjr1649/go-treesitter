@@ -9,7 +9,6 @@ import (
 	"hash/fnv"
 	"math/rand/v2"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -18,6 +17,7 @@ import (
 	"time"
 
 	treesitter "github.com/wotjr1649/go-treesitter"
+	proc "github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 // TestNightlyDiff is the time-budgeted differential fuzzer of .github/workflows/nightly-diff.yml. For each grammar it
@@ -216,7 +216,7 @@ func nightlyCommand(limit time.Duration, exe string, env []string, args ...strin
 	ctx, cancel := context.WithTimeout(bg, limit)
 	defer cancel()
 	var stderr bytes.Buffer
-	cmd := exec.CommandContext(ctx, exe, args...)
+	cmd := proc.CommandContext(ctx, exe, args...)
 	cmd.Env = env
 	cmd.Stderr = &stderr
 	out, err := cmd.Output() // Wait reaps the process before the next input/grammar.

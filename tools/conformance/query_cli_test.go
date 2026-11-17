@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -14,6 +13,7 @@ import (
 	"testing"
 
 	treesitter "github.com/wotjr1649/go-treesitter"
+	proc "github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 // Predicate comparison against the tree-sitter CLI (local only; CI compares native raw matches, see query_native_test.go).
@@ -317,7 +317,7 @@ func TestQueryCLI(t *testing.T) {
 			for _, qf := range qfiles {
 				qpath := filepath.Join(dir, qf.name+".scm")
 				os.WriteFile(qpath, []byte(qf.source), 0o644)
-				cmd := exec.Command(cli, "query", "-l", lib, "--lang-name", cliLib[lang][1], "--paths", list, qpath)
+				cmd := proc.Command(cli, "query", "-l", lib, "--lang-name", cliLib[lang][1], "--paths", list, qpath)
 				cmd.Env = cliEnv(home)
 				var stderr bytes.Buffer
 				cmd.Stderr = &stderr
@@ -388,7 +388,7 @@ func TestQueryCLI(t *testing.T) {
 		for _, qf := range acceptProbes {
 			qpath := filepath.Join(dir, qf.name+".scm")
 			os.WriteFile(qpath, []byte(qf.source), 0o644)
-			cmd := exec.Command(cli, "query", "-l", lib, "--lang-name", "json", qpath, src)
+			cmd := proc.Command(cli, "query", "-l", lib, "--lang-name", "json", qpath, src)
 			cmd.Env = cliEnv(home)
 			var stderr bytes.Buffer
 			cmd.Stderr = &stderr

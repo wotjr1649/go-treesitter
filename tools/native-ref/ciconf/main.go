@@ -34,6 +34,8 @@ import (
 	"sync"
 	"time"
 	"unicode/utf8"
+
+	"github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 // langs maps the conformance language name to its pins.json key.
@@ -208,7 +210,7 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected s
 	must(writeCSV(filepath.Join(out, "corpus", "skipped.csv"), []string{"id", "lang", "corpus_file", "test_name", "attrs", "reason"}, skipped))
 
 	if inputsOnly {
-		meta, err := json.MarshalIndent(map[string]any{"kitManifestSHA256": kitSHA, "kind": "ciconf-inputs/1", "pinsSHA256": sha(pinsRaw), "inputs": len(inputs), "skipped": len(skipped)}, "", "  ")
+		meta, err := json.MarshalIndent(map[string]any{"kitManifestSHA256": kitSHA, "kind": "ciconf-inputs/1", "pinsSHA256": pinsSHA(pinsRaw), "inputs": len(inputs), "skipped": len(skipped)}, "", "  ")
 		if err != nil {
 			return err
 		}
@@ -281,7 +283,7 @@ func run(pinsFile, corpus, exeDir, out string, seed uint64, jobs int, selected s
 		perLang[s[1]] = c
 	}
 	meta, _ := json.MarshalIndent(map[string]any{
-		"kind": "ciconf/1", "seed": seed, "seededEditsPerUpstreamInput": 3, "kitManifestSHA256": kitSHA, "kitPairEdits": len(kitEdits), "pinsSHA256": sha(pinsRaw),
+		"kind": "ciconf/1", "seed": seed, "seededEditsPerUpstreamInput": 3, "kitManifestSHA256": kitSHA, "kitPairEdits": len(kitEdits), "pinsSHA256": pinsSHA(pinsRaw),
 		"inputs": len(inputs), "edits": len(edits), "skipped": len(skipped), "perLang": perLang,
 	}, "", "  ")
 	must(writeFile(filepath.Join(out, "ci.json"), append(meta, '\n')))
@@ -465,7 +467,7 @@ func runExe(exe string, args ...string) (out []byte, code int, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
 	var stdout, stderr bytes.Buffer
-	cmd := exec.CommandContext(ctx, exe, args...)
+	cmd := proc.CommandContext(ctx, exe, args...)
 	cmd.Stdout, cmd.Stderr = &stdout, &stderr
 	err = cmd.Run()
 	if ee, ok := err.(*exec.ExitError); ok {
@@ -507,6 +509,8 @@ func parallel(workers, n int, fn func(i int)) {
 	close(ch)
 	wg.Wait()
 }
+
+func pinsSHA(b []byte) string { return sha(bytes.ReplaceAll(b, []byte("\r\n"), []byte("\n"))) }
 
 func sha(b []byte) string { h := sha256.Sum256(b); return hex.EncodeToString(h[:]) }
 

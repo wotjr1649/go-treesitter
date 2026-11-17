@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"slices"
@@ -16,6 +15,7 @@ import (
 	"time"
 
 	treesitter "github.com/wotjr1649/go-treesitter"
+	proc "github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 // Raw-match gate for queries (docs/design/query-abi.md, "Verification"): for every query file of the pinned grammar
@@ -316,7 +316,7 @@ func TestQueryNative(t *testing.T) {
 				go func(j *nativeJob) {
 					defer wg.Done()
 					defer func() { <-sem }()
-					j.out, j.err = exec.Command(exe, "query", qpaths[j.qi], files[j.input]).Output()
+					j.out, j.err = proc.Command(exe, "query", qpaths[j.qi], files[j.input]).Output()
 				}(&jobs[i])
 			}
 			wg.Wait()

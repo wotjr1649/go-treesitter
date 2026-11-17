@@ -2,12 +2,13 @@ package conformance
 
 import (
 	"bytes"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
 	"testing"
 	"time"
+
+	proc "github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 // TestFieldLookup compares Node.ChildByFieldName with C's ts_node_child_by_field_name (`<exe> fields`, see
@@ -47,7 +48,7 @@ func TestFieldLookup(t *testing.T) {
 				if err != nil {
 					t.Fatalf("%s: ParseSnapshot: %v", id, err)
 				}
-				want, err := exec.Command(exe, "fields", path).Output()
+				want, err := proc.Command(exe, "fields", path).Output()
 				if err != nil {
 					t.Fatalf("%s: native fields: %v", id, err)
 				}

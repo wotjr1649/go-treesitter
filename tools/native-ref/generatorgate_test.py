@@ -4,12 +4,13 @@ import io
 import json
 from pathlib import Path
 import subprocess
-import sys
 import tempfile
 import tarfile
 import unittest
 from unittest.mock import Mock, patch
 from argparse import Namespace
+
+from proctree_test import assert_stopped, tree_command
 
 spec = importlib.util.spec_from_file_location("generatorgate", Path(__file__).with_name("generatorgate.py"))
 gate = importlib.util.module_from_spec(spec)
@@ -198,34 +199,40 @@ class GeneratorGateTest(unittest.TestCase):
             for error in (KeyboardInterrupt(), OSError("wait failed")):
                 proc = Mock()
                 proc.wait.side_effect = error
-                with patch.object(gate.subprocess, "Popen", return_value=proc), patch.object(gate, "stop_tree") as stop:
+                with patch.object(gate.proctree, "start", return_value=proc), patch.object(gate, "stop_tree") as stop:
                     with self.assertRaises(type(error)):
                         gate.execute(["child"], tmp, Path(tmp) / "run.log")
                     stop.assert_called_once_with(proc)
 
-    def test_timeout_stops_child_and_retains_failure_receipt(self):
+    def test_timeout_stops_child_and_grandchild_and_retains_failure_receipt(self):
         with tempfile.TemporaryDirectory() as tmp:
             log = Path(tmp) / "timeout.log"
+            pids = Path(tmp) / "pids.json"
             with self.assertRaisesRegex(RuntimeError, "exited 124"):
-                gate.execute([sys.executable, "-c", "import time; time.sleep(60)"], tmp, log, timeout=0.1)
+                gate.execute(tree_command(pids), tmp, log, timeout=1)
+            assert_stopped(self, pids)
             receipt = json.loads(log.with_suffix(".command.json").read_text())
             self.assertEqual(receipt["exit"], 124)
-            self.assertEqual(receipt["timeoutSeconds"], 0.1)
+            self.assertEqual(receipt["timeoutSeconds"], 1)
 
-    def test_windows_taskkill_and_followup_wait_are_bounded(self):
-        proc = Mock(pid=123)
-        with patch.object(gate.os, "name", "nt"), patch.object(gate.subprocess, "run") as run:
-            run.return_value.returncode = 0
-            gate.stop_tree(proc)
-            self.assertEqual(run.call_args.kwargs["timeout"], 10)
-            proc.wait.assert_called_once_with(timeout=10)
-        proc.reset_mock()
-        with patch.object(gate.os, "name", "nt"), patch.object(gate.subprocess, "run") as run:
-            run.side_effect = subprocess.TimeoutExpired("taskkill", 10)
-            with self.assertRaisesRegex(RuntimeError, "taskkill did not finish"):
-                gate.stop_tree(proc)
-            proc.kill.assert_called_once()
-            proc.wait.assert_called_once_with(timeout=10)
+    def test_cleanup_failure_still_saves_receipt_and_preserves_interrupt(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            log = Path(tmp) / "failed.log"
+            cases = ((None, RuntimeError, 0), (KeyboardInterrupt(), KeyboardInterrupt, None),
+                     (subprocess.TimeoutExpired("child", 1), RuntimeError, 124))
+            for failure, expected, code in cases:
+                proc = Mock()
+                proc.wait.side_effect = failure
+                proc.wait.return_value = 0
+                with patch.object(gate.proctree, "start", return_value=proc), \
+                        patch.object(gate, "stop_tree", side_effect=RuntimeError("cleanup failed")):
+                    with self.assertRaises(expected):
+                        gate.execute(["child"], tmp, log)
+                receipt = json.loads(log.with_suffix(".command.json").read_text())
+                self.assertIn("cleanup failed", receipt["cleanupError"])
+                self.assertEqual(receipt["exit"], code)
+                if isinstance(failure, KeyboardInterrupt):
+                    self.assertIn("KeyboardInterrupt", receipt["error"])
 
     def test_assertion_success_is_not_an_unreported_cli_failure(self):
         passed = {"AssertionPassed": {"assertion_count": 13}}

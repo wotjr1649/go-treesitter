@@ -3,7 +3,6 @@ package conformance
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	treesitter "github.com/wotjr1649/go-treesitter"
+	proc "github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 // knownIncrementalDiffs are the five tsql cases whose incremental reparse differs from a fresh parse in native C
@@ -259,7 +259,7 @@ func nativeEdit(root, lang, name string, r []string) ([]byte, error) {
 		return nil, fmt.Errorf("no native executable (TSG_NATIVE_EXE_DIR)")
 	}
 	d := filepath.Join(root, "edits", lang)
-	return exec.Command(exe, "edit", filepath.Join(d, name+".old"), filepath.Join(d, name+".new"), r[3], r[4], r[5]).Output()
+	return proc.Command(exe, "edit", filepath.Join(d, name+".old"), filepath.Join(d, name+".new"), r[3], r[4], r[5]).Output()
 }
 
 // nativeRanges returns the native ts_tree_get_changed_ranges output for one case: the recorded
@@ -274,7 +274,7 @@ func nativeRanges(lang, root, name string, r []string) (string, bool) {
 	if !ok {
 		return "", false
 	}
-	out, err := exec.Command(exe, "changed-ranges", filepath.Join(d, name+".old"), filepath.Join(d, name+".new"), r[3], r[4], r[5]).Output()
+	out, err := proc.Command(exe, "changed-ranges", filepath.Join(d, name+".old"), filepath.Join(d, name+".new"), r[3], r[4], r[5]).Output()
 	if err != nil {
 		return "", false
 	}

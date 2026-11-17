@@ -3,10 +3,11 @@ package main
 import (
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"testing"
+
+	"github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 func TestWasiCtype(t *testing.T) {
@@ -43,10 +44,10 @@ func TestWasiCtype(t *testing.T) {
 	}
 	args = append(args, objects...)
 	args = append(args, "-o", exe)
-	if out, err := exec.Command(cc, args...).CombinedOutput(); err != nil {
+	if out, err := proc.Command(cc, args...).CombinedOutput(); err != nil {
 		t.Fatalf("compile: %v\n%s", err, out)
 	}
-	if out, err := exec.Command(exe).CombinedOutput(); err != nil {
+	if out, err := proc.Command(exe).CombinedOutput(); err != nil {
 		t.Fatalf("wasi-libc probe: %v\n%s", err, out)
 	}
 }

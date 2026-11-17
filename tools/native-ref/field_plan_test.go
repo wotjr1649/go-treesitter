@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 func TestFieldPlanClassification(t *testing.T) {
@@ -72,10 +73,10 @@ func TestFieldPlanClassification(t *testing.T) {
 				}
 			}
 			args = append(args, filepath.Join(lib, "src", "lib.c"), filepath.Join(here, "field_plan_probe.c"), "-o", exe)
-			if out, err := exec.Command(cc, args...).CombinedOutput(); err != nil {
+			if out, err := proc.Command(cc, args...).CombinedOutput(); err != nil {
 				t.Fatalf("compile: %v\n%s", err, out)
 			}
-			out, err := exec.Command(exe).CombinedOutput()
+			out, err := proc.Command(exe).CombinedOutput()
 			if !mutation && err != nil {
 				t.Fatalf("product shim: %v\n%s", err, out)
 			}

@@ -3,12 +3,12 @@ package conformance
 import (
 	"errors"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"testing"
 	"unicode/utf8"
 
 	treesitter "github.com/wotjr1649/go-treesitter"
+	proc "github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 // nativeDump runs the native reference dumper (native/exe2/<lang>.exe dump <file>).
@@ -18,7 +18,7 @@ func nativeDump(t *testing.T, root, lang string, src []byte) []byte {
 	if err := os.WriteFile(f, src, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	out, err := exec.Command(filepath.Join(root, "native", "exe2", lang+".exe"), "dump", f).Output()
+	out, err := proc.Command(filepath.Join(root, "native", "exe2", lang+".exe"), "dump", f).Output()
 	if err != nil {
 		t.Fatalf("native dump of a %d-byte input: %v", len(src), err)
 	}

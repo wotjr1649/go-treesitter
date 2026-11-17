@@ -37,6 +37,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 const (
@@ -309,7 +311,7 @@ func runCmd(timeout time.Duration, name string, args ...string) result {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	var so, se bytes.Buffer
-	c := exec.CommandContext(ctx, name, args...)
+	c := proc.CommandContext(ctx, name, args...)
 	c.Stdout, c.Stderr = &so, &se
 	err := c.Run()
 	r := result{out: so.String(), errOut: strings.TrimSpace(se.String())}

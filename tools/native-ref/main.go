@@ -19,13 +19,13 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
 
+	"github.com/wotjr1649/go-treesitter/tools/bench/proc"
 	"github.com/wotjr1649/go-treesitter/tools/gen/patches"
 )
 
@@ -257,7 +257,7 @@ func runMode(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, no
 		args = append(args, ctypeObjects...)
 		args = append(args, filepath.Join(here, "native_ref.c"), "-o", exe)
 		fmt.Println(cc, strings.Join(args, " "))
-		cmd := exec.Command(cc, args...)
+		cmd := proc.Command(cc, args...)
 		cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
 		if err := cmd.Run(); err != nil {
 			return fmt.Errorf("%s: compile: %w", l, err)

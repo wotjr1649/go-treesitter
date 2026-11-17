@@ -10,6 +10,8 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 // macOS. Without cgo there is no task_info/proc_pid_rusage and no mach_vm_region, so the two ADR-0022 numbers come from
@@ -25,7 +27,7 @@ func counters() processMemoryCounters {
 	if err := syscall.Getrusage(syscall.RUSAGE_SELF, &ru); err != nil {
 		fatal("getrusage:", err)
 	}
-	out, err := exec.Command("ps", "-o", "rss=", "-p", strconv.Itoa(syscall.Getpid())).Output()
+	out, err := proc.Command("ps", "-o", "rss=", "-p", strconv.Itoa(syscall.Getpid())).Output()
 	if err != nil {
 		fatal("ps:", err)
 	}
@@ -52,7 +54,7 @@ func vmmap() string {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
 	pid := strconv.Itoa(os.Getpid())
-	out, err := exec.CommandContext(ctx, "vmmap", "-wide", pid).Output()
+	out, err := proc.CommandContext(ctx, "vmmap", "-wide", pid).Output()
 	if err != nil {
 		var se []byte
 		if ee, ok := err.(*exec.ExitError); ok {

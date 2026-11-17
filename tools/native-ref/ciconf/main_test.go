@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -24,7 +25,7 @@ func TestSelectedLanguages(t *testing.T) {
 func TestInputsOnlyDoesNotRunNative(t *testing.T) {
 	root := t.TempDir()
 	pins := filepath.Join(root, "pins.json")
-	if err := os.WriteFile(pins, []byte(`{"grammars":{"json":{"extractDir":"json","grammarDir":"src"}}}`), 0o600); err != nil {
+	if err := os.WriteFile(pins, []byte("{\r\n\"grammars\":{\"json\":{\"extractDir\":\"json\",\"grammarDir\":\"src\"}}}\r\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	corpus := filepath.Join(root, "corpus")
@@ -48,7 +49,17 @@ func TestInputsOnlyDoesNotRunNative(t *testing.T) {
 			t.Fatalf("unexpected native evidence %s: %v", name, err)
 		}
 	}
-	if _, err := os.Stat(filepath.Join(out, "inputs.json")); err != nil {
+	meta, err := os.ReadFile(filepath.Join(out, "inputs.json"))
+	if err != nil {
 		t.Fatal(err)
+	}
+	var identity struct {
+		PinsSHA256 string `json:"pinsSHA256"`
+	}
+	if err := json.Unmarshal(meta, &identity); err != nil {
+		t.Fatal(err)
+	}
+	if want := sha([]byte("{\n\"grammars\":{\"json\":{\"extractDir\":\"json\",\"grammarDir\":\"src\"}}}\n")); identity.PinsSHA256 != want {
+		t.Fatalf("pins hash = %s, LF-canonical hash = %s", identity.PinsSHA256, want)
 	}
 }

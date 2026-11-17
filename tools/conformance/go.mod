@@ -29,6 +29,7 @@ require (
 	github.com/wotjr1649/go-treesitter/grammars/typescript v0.0.0
 	github.com/wotjr1649/go-treesitter/grammars/xml v0.0.0
 	github.com/wotjr1649/go-treesitter/grammars/yaml v0.0.0
+	github.com/wotjr1649/go-treesitter/tools/bench/proc v0.0.0
 )
 
 // Local development: the conformance lane runs against the working tree.
@@ -59,4 +60,5 @@ replace (
 	github.com/wotjr1649/go-treesitter/grammars/typescript => ../../grammars/typescript
 	github.com/wotjr1649/go-treesitter/grammars/xml => ../../grammars/xml
 	github.com/wotjr1649/go-treesitter/grammars/yaml => ../../grammars/yaml
+	github.com/wotjr1649/go-treesitter/tools/bench/proc => ../bench/proc
 )

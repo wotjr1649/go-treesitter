@@ -2,7 +2,6 @@ package conformance
 
 import (
 	"bytes"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -10,6 +9,7 @@ import (
 	"time"
 
 	treesitter "github.com/wotjr1649/go-treesitter"
+	proc "github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 // TestFieldLookupEdits compares all seeded edits with C's incremental tree, including
@@ -53,7 +53,7 @@ func TestFieldLookupEdits(t *testing.T) {
 						skipConformance(t, "no native edit-fields result or executable for "+lang)
 					}
 					var err error
-					want, err = exec.Command(exe, "edit-fields", oldPath, newPath, r[3], r[4], r[5]).Output()
+					want, err = proc.Command(exe, "edit-fields", oldPath, newPath, r[3], r[4], r[5]).Output()
 					if err != nil {
 						t.Fatalf("%s: native edit-fields: %v", id, err)
 					}
