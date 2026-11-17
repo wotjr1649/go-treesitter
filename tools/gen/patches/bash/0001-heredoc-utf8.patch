@@ -1,0 +1,65 @@
+--- a/src/scanner.c
++++ b/src/scanner.c
+@@ -66,6 +66,16 @@
+
+ static inline void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
+
++// Keep decode errors distinct from every valid UTF-8 sequence, including U+FFFD.
++static inline uint32_t encode_utf8(int32_t c, uint8_t *out) {
++    if (c < 0) { out[0] = 0xFF; return 1; }
++    if (c < 0x80) { out[0] = (uint8_t)c; return 1; }
++    uint32_t n = c < 0x800 ? 2 : c < 0x10000 ? 3 : 4;
++    out[0] = (uint8_t)((0xF00 >> n) | (c >> (6 * (n - 1))));
++    for (uint32_t i = 1; i < n; i++) out[i] = (uint8_t)(0x80 | ((c >> (6 * (n - 1 - i))) & 0x3F));
++    return n;
++}
++
+ static inline void skip(TSLexer *lexer) { lexer->advance(lexer, true); }
+
+ static inline bool in_error_recovery(const bool *valid_symbols) { return valid_symbols[ERROR_RECOVERY]; }
+@@ -180,7 +190,8 @@
+             }
+         }
+         empty = false;
+-        array_push(unquoted_word, lexer->lookahead);
++        uint8_t utf8[4];
++        array_extend(unquoted_word, encode_utf8(lexer->lookahead, utf8), utf8);
+         advance(lexer);
+     }
+     array_push(unquoted_word, '\0');
+@@ -225,22 +236,21 @@
+
+ static bool scan_heredoc_end_identifier(Heredoc *heredoc, TSLexer *lexer) {
+     reset_string(&heredoc->current_leading_word);
+-    // Scan the first 'n' characters on this line, to see if they match the
+-    // heredoc delimiter
+-    int32_t size = 0;
+-    if (heredoc->delimiter.size > 0) {
+-        while (lexer->lookahead != '\0' && lexer->lookahead != '\n' &&
+-               (int32_t)*array_get(&heredoc->delimiter, size) == lexer->lookahead &&
+-               heredoc->current_leading_word.size < heredoc->delimiter.size) {
+-            array_push(&heredoc->current_leading_word, lexer->lookahead);
+-            advance(lexer);
+-            size++;
+-        }
++    uint32_t size = 0;
++    while (lexer->lookahead != '\0' && lexer->lookahead != '\n' && size < heredoc->delimiter.size) {
++        uint8_t utf8[4];
++        uint32_t width = encode_utf8(lexer->lookahead, utf8);
++        if (size + width >= heredoc->delimiter.size ||
++            memcmp(heredoc->delimiter.contents + size, utf8, width) != 0) {
++            break;
++        }
++        array_extend(&heredoc->current_leading_word, width, utf8);
++        advance(lexer);
++        size += width;
+     }
+     array_push(&heredoc->current_leading_word, '\0');
+-    return heredoc->delimiter.size == 0
+-               ? false
+-               : strcmp(heredoc->current_leading_word.contents, heredoc->delimiter.contents) == 0;
++    return heredoc->current_leading_word.size == heredoc->delimiter.size &&
++           memcmp(heredoc->current_leading_word.contents, heredoc->delimiter.contents, heredoc->delimiter.size) == 0;
+ }
+
+ static bool scan_heredoc_content(Scanner *scanner, TSLexer *lexer, enum TokenType middle_type,

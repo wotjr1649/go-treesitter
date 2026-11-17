@@ -102,3 +102,19 @@ a v0.5.0 grammar module requires root v0.5.0. Release module versions are prepar
 [SECURITY.md](SECURITY.md) now describes private vulnerability reporting. The conformance corpus also gains a
 bounded grammar-kit input subset; it is additional test coverage, not a new parsing feature or a language-validity
 claim. See [limitations](docs/reports/limitations.md) for patch bounds and identity-bound evidence.
+
+## Unreleased (after v0.5.0)
+
+- **Bash/Ruby heredocs:** the recorded scanner patches now store end words as UTF-8 and compare full
+  encoded characters. Korean end words no longer alias their ASCII low byte or another syllable with the
+  same low byte. ASCII end-word bytes are unchanged. Invalid UTF-8 lookaheads compare as the same `0xFF`
+  sentinel, distinct from U+FFFD; invalid input is not validated by this comparison. The shared 1024-byte
+  scanner state buffer includes all open end words and metadata. Overflow returns zero serialized bytes
+  and loses state, so roughly 330 Hangul syllables in total can exhaust it; other scanner state lowers
+  the bound. This change does not remove other upstream heredoc syntax limits.
+  Published v0.5.0 retains the earlier low-byte patch; these changes apply to the development tree.
+  Prefix-line closing in Bash remains a known upstream limitation (`EOF` can close on `EOFX`).
+  Bash `<<-` still strips `iswspace` characters, including U+3000, rather than tabs only.
+  Different invalid bytes with the same number of decode errors can match. Stored words with different
+  error counts differ, but existing Bash prefix and Ruby repeated-word scanning can still close on a longer line.
+  Ruby also closes on repeated end words such as `EOFEOF`; ordinary `EOFX` remains body text.

@@ -1,0 +1,60 @@
+--- a/src/scanner.c
++++ b/src/scanner.c
+@@ -71,6 +71,16 @@
+     '\0', '\n', '\r', '\t', ' ', ':', ';', '`',  '"', '\'', '@', '$', '#', '.', ',', '|', '^', '&',
+     '<',  '=',  '>',  '+',  '-', '*', '/', '\\', '%', '?',  '!', '~', '(', ')', '[', ']', '{', '}',
+ };
++
++// Keep decode errors distinct from every valid UTF-8 sequence, including U+FFFD.
++static inline uint32_t encode_utf8(int32_t c, uint8_t *out) {
++    if (c < 0) { out[0] = 0xFF; return 1; }
++    if (c < 0x80) { out[0] = (uint8_t)c; return 1; }
++    uint32_t n = c < 0x800 ? 2 : c < 0x10000 ? 3 : 4;
++    out[0] = (uint8_t)((0xF00 >> n) | (c >> (6 * (n - 1))));
++    for (uint32_t i = 1; i < n; i++) out[i] = (uint8_t)(0x80 | ((c >> (6 * (n - 1 - i))) & 0x3F));
++    return n;
++}
+
+ static inline void skip(Scanner *scanner, TSLexer *lexer) {
+     scanner->has_leading_whitespace = true;
+@@ -608,7 +618,8 @@
+             quote = lexer->lookahead;
+             advance(lexer);
+             while (lexer->lookahead != quote && !lexer->eof(lexer)) {
+-                array_push(&word, lexer->lookahead);
++                uint8_t utf8[4];
++                array_extend(&word, encode_utf8(lexer->lookahead, utf8), utf8);
+                 advance(lexer);
+             }
+             advance(lexer);
+@@ -616,10 +627,12 @@
+
+         default:
+             if (iswalnum(lexer->lookahead) || lexer->lookahead == '_') {
+-                array_push(&word, lexer->lookahead);
++                uint8_t utf8[4];
++                array_extend(&word, encode_utf8(lexer->lookahead, utf8), utf8);
+                 advance(lexer);
+                 while (iswalnum(lexer->lookahead) || lexer->lookahead == '_') {
+-                    array_push(&word, lexer->lookahead);
++                    uint8_t utf8[4];
++                    array_extend(&word, encode_utf8(lexer->lookahead, utf8), utf8);
+                     advance(lexer);
+                 }
+             }
+@@ -707,9 +720,12 @@
+             return true;
+         }
+
+-        if (lexer->lookahead == *array_get(&heredoc->word, position_in_word) && look_for_heredoc_end) {
+-            advance(lexer);
+-            position_in_word++;
++        uint8_t utf8[4];
++        uint32_t width = encode_utf8(lexer->lookahead, utf8);
++        if (look_for_heredoc_end && position_in_word + width <= heredoc->word.size &&
++            memcmp(heredoc->word.contents + position_in_word, utf8, width) == 0) {
++            advance(lexer);
++            position_in_word += width;
+         } else {
+             position_in_word = 0;
+             look_for_heredoc_end = false;
