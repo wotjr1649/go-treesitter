@@ -158,3 +158,19 @@ Conversely, Go's surrogate category `\p{Cs}` and `\P{Cs}` are accepted as empty/
 rejects them. Unknown or case-variant POSIX-like forms (`[[:unknown:]]`, `[[:Alpha:]]`, `[[::]]`) that the CLI
 interprets as nested classes remain unsupported. The [recorded CLI fixture](testdata/query-regex-cli.json) retains
 these acceptance differences.
+
+Additions and one behaviour change in the root module; grammar modules and the engine ABI are unchanged.
+
+- **CP949 input:** `NewSourceCP949(raw)` decodes CP949 (the WHATWG `EUC-KR` index = windows-949; not IBM-949) with a
+  built-in table, and `Encoding` has a new value `CP949`. `NewSource` still detects only UTF-16 BOMs: it never guesses
+  CP949. See the [Korean and CP949 input guide](docs/guides/korean-input.md).
+- **`Source.Replacements()`** counts the U+FFFD a conversion wrote (CP949 invalid bytes, unpaired UTF-16 surrogates; 0 for
+  UTF-8). `WithStrictUTF8` and `HasInvalidUTF8` cannot see them, because U+FFFD is valid UTF-8.
+- **`Source.UTF8Offset(orig int) uint32`** maps an original offset to an offset in `Bytes()`, the inverse of
+  `OriginalOffset`.
+- **`LineIndex.Offset(line, col, kind)`** maps a line and column (`ByteColumn`, `UTF16Column`, `RuneColumn`) back to a byte
+  offset, clamping the way LSP does.
+- **Changed: `LineIndex.Pos` inside a character.** For an offset in the middle of a multi-byte character, `UTF16Col` and
+  `RuneCol` are now those of the character's start; before, each byte of the character was counted as a character, so the
+  columns were not monotonic in the offset. `ByteCol` is unchanged. Offsets at character boundaries, and every node
+  start and end of a valid UTF-8 source, give the same result as before.

@@ -180,5 +180,12 @@
     "license": "Unicode-DFS-2016",
     "source": "https://github.com/rust-lang/regex/blob/140167995737fa11dfe11b8af8b9aa143b790b4e/regex-syntax/src/unicode_tables/LICENSE-UNICODE",
     "sha256": "74db5baf44a41b1000312c673544b3374e4198af5605c7f9080a402cec42cfa3"
+  },
+  {
+    "component": "whatwg-encoding",
+    "path": "LICENSES/whatwg-encoding.txt",
+    "license": "CC-BY-4.0; BSD-3-Clause for portions incorporated into source code",
+    "source": "https://github.com/whatwg/encoding/blob/be17ac5c49881336538acfc7b40dba3c8009144b/LICENSE",
+    "sha256": "85dc6f5ccb57a6fe8c33d158f9fc8fc7ee5655a5d3db2cdd131c6a3d0f48a864"
   }
 ]

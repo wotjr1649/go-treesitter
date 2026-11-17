@@ -3,6 +3,14 @@
 Generates one grammar module (`grammars/<lang>`) from pinned upstream C: clang (wasi-sdk) → wasm → wasm-opt
 (recipe-dependent) → `wasm2go` → patched `memory_grow` → Go module. Design: `docs/design/engine-abi.md`, ADR-0020, ADR-0022.
 
+## CP949 decode table
+
+`go run . cp949` (from `tools/gen`) regenerates `../../cp949_table.go` from `testdata/index-euc-kr.txt`, the WHATWG
+Encoding Standard `EUC-KR` index (windows-949) pinned by commit URL, sha256 and `Identifier:` header in `cp949.go`.
+It needs no network and no `pins.json` entry; `TestCP949TableIsCurrent` compares the committed bytes with a fresh
+run. To move the pin, replace the testdata file, update the constants in `cp949.go`, `LICENSES/whatwg-encoding.txt`
+and its manifest entry, and regenerate.
+
 ## Offline node-type schema commands
 
 From `tools/gen`, use only local `node-types.json` files:

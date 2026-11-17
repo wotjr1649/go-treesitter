@@ -44,7 +44,13 @@ callback; the call returns after the C parser's cleanup.
 
 Bytes are parsed like C tree-sitter (UTF-8; a leading BOM is skipped; invalid bytes become decode errors in the
 tree). `HasInvalidUTF8` reports `!utf8.Valid(src)`. `NewSource`/`NewSourceUTF16` convert UTF-16 or BOM-prefixed input
-to UTF-8 and map offsets back to the original bytes.
+to UTF-8 and map offsets back to the original bytes. `NewSourceCP949` does the same for CP949 (the WHATWG `EUC-KR`
+index = windows-949); `NewSource` never detects it. A conversion writes U+FFFD for invalid input, and a U+FFFD is valid
+UTF-8: neither `HasInvalidUTF8` nor `WithStrictUTF8` reports it, so `Source.Replacements()` is the only count of them
+(0 for UTF-8 input, whose invalid bytes `HasInvalidUTF8` does report). `Source.UTF8Offset` is the inverse of
+`OriginalOffset`; for converted sources (UTF-16, CP949) both floor an offset inside a character to its start, while a
+UTF-8 source is not converted and both return the offset unchanged (clamped). See the
+[Korean and CP949 input guide](../guides/korean-input.md).
 
 ## Ownership, lifetime, concurrency
 

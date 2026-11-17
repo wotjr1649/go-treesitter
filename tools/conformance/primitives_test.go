@@ -62,9 +62,12 @@ func naiveCols(src string, off int) (line int, byteCol, u16, runes uint32) {
 		}
 	}
 	byteCol = uint32(off - last)
-	for t := src[last:off]; len(t) > 0; {
-		r, w := utf8.DecodeRuneInString(t)
-		t = t[w:]
+	for i := last; i < off; { // an offset inside a character gets the columns of its start
+		r, w := utf8.DecodeRuneInString(src[i:])
+		if i+w > off {
+			break
+		}
+		i += w
 		runes++
 		u16++
 		if r >= 0x10000 {
