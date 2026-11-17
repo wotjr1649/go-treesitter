@@ -12,13 +12,13 @@ import (
 	"io/fs"
 	"maps"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
 
+	"github.com/wotjr1649/go-treesitter/tools/bench/proc"
 	"github.com/wotjr1649/go-treesitter/tools/gen/patches"
 )
 
@@ -197,7 +197,7 @@ func verifyCLI(c Config) error {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
-	out, err := exec.CommandContext(ctx, c.CLI, "--version").CombinedOutput()
+	out, err := proc.CommandContext(ctx, c.CLI, "--version").CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("tree-sitter --version: %w: %s", err, out)
 	}
@@ -211,7 +211,7 @@ func generate(c Config, root string) error {
 	dir := filepath.Join(root, filepath.Dir(filepath.FromSlash(c.GrammarDir)))
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, c.CLI, "generate", "--abi", "15", "--js-runtime", "native")
+	cmd := proc.CommandContext(ctx, c.CLI, "generate", "--abi", "15", "--js-runtime", "native")
 	if c.GenerateFrom != "" {
 		cmd.Args = append(cmd.Args, filepath.Join(filepath.Base(c.GrammarDir), c.GenerateFrom))
 	}

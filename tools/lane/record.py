@@ -10,14 +10,17 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tools/native-ref"))
+import proctree
 
 
 def capture(command):
     try:
-        return subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=60).stdout.strip()
+        return proctree.run(command, cwd=ROOT, capture_output=True, text=True, timeout=60).stdout.strip()
     except (OSError, subprocess.TimeoutExpired):
         return None
 
@@ -42,16 +45,26 @@ def main():
                    'go_version': capture(['go', 'version']), 'command': command,
                    'cpu_load_percent_before': cpu_load()}
         started = time.time()
-        result = subprocess.run(command, cwd=ROOT, capture_output=True)
-        output = result.stdout + result.stderr
-        receipt.update(seconds=round(time.time() - started, 3), exit_code=result.returncode,
+        failure = None
+        try:
+            result = proctree.run(command, cwd=ROOT, capture_output=True, timeout=7200)
+            code, output = result.returncode, result.stdout + result.stderr
+        except subprocess.TimeoutExpired as error:
+            code, output = 124, (error.output or b'') + (error.stderr or b'')
+        except BaseException as error:
+            failure = error
+            code, output = None, b''
+            receipt['error'] = repr(error)
+        receipt.update(seconds=round(time.time() - started, 3), exit_code=code, timeout_seconds=7200,
                        cpu_load_percent_after=cpu_load(),
                        output_sha256=hashlib.sha256(output).hexdigest(),
                        output_tail=output[-16384:].decode('utf-8', 'replace'))
         json.dump(receipt, stream, indent=2)
         stream.write('\n')
     print(json.dumps({k: receipt[k] for k in ('exit_code', 'seconds', 'cpu_load_percent_before', 'cpu_load_percent_after')}))
-    return result.returncode
+    if failure is not None:
+        raise failure
+    return code
 
 
 if __name__ == '__main__':

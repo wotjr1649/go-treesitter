@@ -53,6 +53,9 @@ func TestBalanceProbeFiles(t *testing.T) {
 	if !strings.Contains(string(files["go.mod"]), `=> "`+filepath.ToSlash(repo)+`"`) {
 		t.Fatalf("local path not quoted: %s", files["go.mod"])
 	}
+	if !strings.Contains(string(files["go.mod"]), `replace github.com/wotjr1649/go-treesitter/tools/bench/proc => "`+filepath.ToSlash(filepath.Join(repo, "tools", "bench", "proc"))+`"`) {
+		t.Fatalf("missing subprocess module replacement: %s", files["go.mod"])
+	}
 	product, err := marshal(provenance{})
 	if err != nil {
 		t.Fatal(err)

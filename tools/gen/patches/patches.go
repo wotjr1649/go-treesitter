@@ -7,9 +7,10 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 // Pin identifies one single-file unified diff and both versions of its upstream source.
@@ -65,7 +66,7 @@ func Apply(patchRoot, sourceRoot string, pins []Pin) error {
 			return err
 		}
 		run := func(args ...string) ([]byte, error) {
-			c := exec.Command("git", append([]string{"-c", "core.autocrlf=false", "-c", "core.eol=lf", "apply", "--no-index"}, args...)...)
+			c := proc.Command("git", append([]string{"-c", "core.autocrlf=false", "-c", "core.eol=lf", "apply", "--no-index"}, args...)...)
 			c.Dir = sourceRoot
 			ceiling, err := filepath.Abs(sourceRoot)
 			if err != nil {

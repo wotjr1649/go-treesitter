@@ -10,13 +10,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
 	"testing"
 	"time"
+
+	proc "github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 // Host stops at the kth progress callback, independently of the machine's speed.
@@ -327,7 +328,7 @@ func Run(t *testing.T, m Module, h *Host, lang string) {
 		write(name+".src", []byte(source))
 		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()
-		cmd := exec.CommandContext(ctx, exe, "dump", filepath.Join(dir, name+".src"))
+		cmd := proc.CommandContext(ctx, exe, "dump", filepath.Join(dir, name+".src"))
 		var stderr bytes.Buffer
 		cmd.Stderr = &stderr
 		b, err := cmd.Output()

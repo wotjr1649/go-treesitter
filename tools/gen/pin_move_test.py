@@ -163,8 +163,8 @@ class MergeBaseTest(unittest.TestCase):
     def git(self, repo, *args):
         env = dict(os.environ, GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@example.invalid",
                    GIT_COMMITTER_NAME="t", GIT_COMMITTER_EMAIL="t@example.invalid")
-        return subprocess.run(["git", "-c", "commit.gpgsign=false", *args], cwd=repo, env=env, check=True,
-                              capture_output=True, text=True).stdout.strip()
+        return pin_move.proctree.run(["git", "-c", "commit.gpgsign=false", *args], cwd=repo, env=env, check=True,
+                              capture_output=True, text=True, timeout=120).stdout.strip()
 
     def commit(self, repo, commit, grammar_commit=None, orphan=False):
         if orphan:
