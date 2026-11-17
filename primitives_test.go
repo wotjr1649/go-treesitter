@@ -140,9 +140,12 @@ func naivePos(src string, off int) Position {
 		}
 	}
 	p.ByteCol = uint32(off - last)
-	for t := src[last:off]; len(t) > 0; {
-		r, w := utf8.DecodeRuneInString(t)
-		t = t[w:]
+	for i := last; i < off; { // an offset inside a character gets the columns of its start
+		r, w := utf8.DecodeRuneInString(src[i:])
+		if i+w > off {
+			break
+		}
+		i += w
 		p.RuneCol++
 		p.UTF16Col++
 		if r >= 0x10000 {

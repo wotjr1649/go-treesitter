@@ -1,0 +1,181 @@
+# Korean and legacy-encoded input
+
+How to get Korean text, and text in CP949, through the parser and back to the right bytes and columns. The parser
+itself only reads UTF-8; everything here is about the layer in front of it. Rules owned elsewhere are linked, not
+repeated: [invalid UTF-8 and `HasInvalidUTF8`](../specs/parser-result.md#input), [the `Source` and `LineIndex`
+signatures](../design/api-v2.md#7-primitives-that-set-this-library-apart-v001).
+
+## Choose the entry point
+
+| Your bytes | Call | Notes |
+|---|---|---|
+| UTF-8, with or without a BOM | `Parse` / `ParseSnapshot`, or `NewSource` | Used unchanged. A BOM stays in the text. |
+| UTF-16 with a BOM | `NewSource` | Detects `FF FE` / `FE FF`, converts, drops the BOM. |
+| UTF-16 without a BOM | `NewSourceUTF16(raw, bigEndian)` | You say the byte order. |
+| CP949 (Korean Windows, `.txt`/`.c`/`.java` from older tools) | `NewSourceCP949(raw)` | Built in, standard library only. |
+| Anything else (Shift_JIS, GBK, ...) | convert to UTF-8 yourself | Not built in. |
+
+**There is no auto-detection, by design.** `NewSource` keeps its BOM-only contract. A CP949 file has no marker, and
+heuristics fail silently: a short file can be valid in two encodings, and a wrong guess yields wrong text with no
+error. Detect at the edge, where you know more than the library can (file extension, project setting, a charset
+declaration), and call the matching constructor. `NewSourceCP949` refuses input that starts with `EF BB BF`, `FF FE` or
+`FE FF` with `ErrInvalidInput`: that is a byte order mark, so the input is UTF-8 or UTF-16.
+
+Passing CP949 bytes to `Parse` without decoding does not fail: the parser reads them as invalid UTF-8, a clean tree is
+returned (`HasError()` can be false, for example when the Korean text is inside a comment or string) and
+`HasInvalidUTF8()` is true. Check `HasInvalidUTF8` if you cannot tell what you were given.
+
+## CP949 means windows-949 here
+
+`NewSourceCP949` implements the WHATWG Encoding Standard's `EUC-KR` decoder and index: **windows-949 (also called UHC)**.
+It decodes plain EUC-KR (a subset) and the Unified Hangul Code extension, so all 11,172 Hangul syllables, 94
+compatibility jamo and 4,888 CJK ideographs are available (17,048 double-byte mappings in all). It is **not IBM-949**,
+which Java calls `Cp949` and ICU `cp949`. The table is generated from the pinned index (identity in the header of
+[`cp949_table.go`](../../cp949_table.go)); its licence is in [`THIRD_PARTY_NOTICES.md`](../../THIRD_PARTY_NOTICES.md).
+
+Invalid input becomes U+FFFD exactly as the standard says:
+
+- a lone `0x80` or `0xFF`, a lead byte at the end of the input, and an unmapped pair whose second byte is not ASCII
+  (including the user-defined areas with lead `0xC9` or `0xFE`) are one replacement for the unit;
+- a lead byte followed by an ASCII byte that completes no mapped pair is one replacement, and the ASCII byte is then read
+  on its own. A stray lead byte therefore never swallows a newline, quote or backslash.
+
+**Replacements are invisible to strict mode.** U+FFFD is valid UTF-8, so `WithStrictUTF8` and `HasInvalidUTF8` never see
+a decoded replacement. `Source.Replacements()` counts them (also unpaired UTF-16 surrogates; it is 0 for UTF-8, whose
+invalid bytes `HasInvalidUTF8` does report). Do not treat strict mode as a safeguard for decoded input: check
+`Replacements() == 0` where it matters, and always before writing anything back.
+
+## Offsets between the original and the UTF-8 text
+
+`Source.Bytes()` is what you parse; every node offset is into it. `Source.Original()` is what you were given.
+
+- `OriginalOffset(off)`: an offset in `Bytes()` to the offset in `Original()`.
+- `UTF8Offset(orig)`: an offset in `Original()` to the offset in `Bytes()`.
+
+For converted sources (UTF-16, CP949) both floor an offset that is inside a character to that character's start, clamp
+past the end (to the end of the other text), and map UTF-16 BOM bytes to 0 / past the BOM. They round-trip only at
+character boundaries. For UTF-8 sources the two texts are the same bytes and the offset is returned unchanged (clamped),
+so neither function checks or moves it to a character boundary. A CP949 character is 1 or 2 original bytes and 1 to 3
+UTF-8 bytes; a replacement can be 1 or 2 original bytes, so never compute widths from the decoded text.
+
+`UTF8Offset` is for positions in the original (an editor selection, a byte offset from another tool). Do not build an
+`InputEdit` from it; see below.
+
+## Columns, lines and the reverse conversion
+
+`Snapshot.Lines()` (or `NewLineIndex`) gives a `LineIndex`. `Pos(off)` returns the line and three columns:
+
+| Field | Counts | LSP `positionEncoding` (3.17) |
+|---|---|---|
+| `ByteCol` | bytes (tree-sitter's `Point.Column`) | `utf-8` |
+| `UTF16Col` | UTF-16 code units | `utf-16`, the default every server must support |
+| `RuneCol` | Unicode code points | `utf-32` |
+
+`Offset(line, col, kind)` converts back, with `kind` one of `ByteColumn`, `UTF16Column`, `RuneColumn`. It returns
+`(0, false)` for a line outside `[0, NumLines())` (a line is never clamped, so a wrong line is not silently moved) and
+clamps the column the way LSP does: past the end of the line's content gives the end of the content, which is before the
+line's LF and before the CR of a CRLF; a column inside a character (between the two units of an emoji, or inside the
+bytes of a Hangul syllable) gives that character's start. `Pos` is monotonic the same way: an offset inside a character
+reports the `UTF16Col` and `RuneCol` of the character's start, while `ByteCol` stays the plain distance from the line start.
+
+Where this differs from an LSP client (see [Position](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#position)
+in the 3.17 specification):
+
+- **Line terminators.** LSP lines end at `\n`, `\r\n` or `\r`. Here lines end at LF only, like tree-sitter rows, so a
+  lone `\r` is a character of the line, not a break.
+- **Invalid bytes.** Each byte that is not valid UTF-8 counts as one rune and one UTF-16 unit. A client that decoded the
+  file with replacement characters may count an invalid sequence differently.
+- **BOM.** A UTF-8 BOM is text here: on line 0 the columns include it (`Pos(3)` of `BOM + "a"` is `UTF16Col` 1, `ByteCol` 3),
+  where an LSP client usually counts from after it. Subtract the BOM's columns on line 0 when your client does. A UTF-16
+  BOM is dropped by `NewSource`, so there is nothing to subtract.
+
+## Normalization and display width
+
+The library does not normalize. A syllable can arrive precomposed (NFC, `한`, one rune) or as conjoining jamo (NFD,
+`ᄒ` `ᅡ` `ᆫ`, three runes), and the two are different byte strings with different `RuneCol` counts. macOS file names and
+some clipboards produce NFD. **CP949 cannot encode NFD jamo** (nor emoji, nor typographic marks such as the em dash),
+so normalize to NFC before encoding.
+
+A rune is not a screen column. Hangul syllables and CJK ideographs are wide (two cells) and conjoining jamo, combining
+marks and emoji sequences have their own widths: compute display width with a width library, not from `RuneCol`.
+
+## Writing edited text back to a CP949 file
+
+Re-encoding the whole `Bytes()` is lossy (a replaced byte is lost) and rewrites parts of the file nobody edited.
+Splice instead, and refuse when you cannot prove the result:
+
+1. Refuse if `Replacements() > 0`.
+2. Find the original span with `OriginalOffset` and check it with `UTF8Offset` (both ends must be character boundaries).
+3. Normalize the new text to NFC and encode it with a **strict** encoder. Never use `encoding.ReplaceUnsupported`: it
+   silently writes `0x1A` for a character the code page lacks.
+4. Splice into the original bytes: `Original()[:start] + encoded + Original()[end:]`.
+5. Decode the result again and require it to equal `Bytes()[:a] + newText + Bytes()[b:]` with no replacements; otherwise
+   do not write.
+
+Step 5 is what stops a lead byte before the splice point from pairing with inserted bytes. For example `x` `B0` decodes
+to `x` U+FFFD; inserting `a` after it gives `x` `B0` `61`, which decodes to `x캻`. The replacement turned into a
+different character outside the edit, and the inserted `a` is gone. Step 1 refuses such a file; step 5 catches it if you
+override step 1.
+
+```go
+// spliceCP949 replaces s.Bytes()[a:b] with text and returns the new CP949 bytes of the whole file.
+func spliceCP949(s *treesitter.Source, a, b uint32, text string) ([]byte, error) {
+	if s.Replacements() > 0 {
+		return nil, errors.New("the original has bytes that are not CP949; refusing to rewrite it")
+	}
+	oa, ob := s.OriginalOffset(a), s.OriginalOffset(b)
+	if a > b || s.UTF8Offset(oa) != a || s.UTF8Offset(ob) != b {
+		return nil, errors.New("the span does not start and end on character boundaries")
+	}
+	text = norm.NFC.String(text)                       // golang.org/x/text/unicode/norm
+	enc, err := korean.EUCKR.NewEncoder().String(text) // golang.org/x/text/encoding/korean: strict, errors on an unencodable rune
+	if err != nil {
+		return nil, err
+	}
+	out := slices.Concat(s.Original()[:oa], []byte(enc), s.Original()[ob:])
+	back, err := treesitter.NewSourceCP949(out)
+	if err != nil {
+		return nil, err
+	}
+	want := string(s.Bytes()[:a]) + text + string(s.Bytes()[b:])
+	if back.Replacements() != 0 || string(back.Bytes()) != want {
+		return nil, errors.New("the splice would change text outside the edit")
+	}
+	return out, nil
+}
+```
+
+The encoder lives in your program, not in this library. `korean.EUCKR` from `golang.org/x/text` is windows-949 too; a
+one-off comparison during development (not a test in this repository) found the same 17,048 pairs as this library's table.
+
+## Incremental editing
+
+CP949 decoding is not local: one changed byte can change how its neighbours pair, so an offset map for the old original
+does not describe the new one. After any change to the original:
+
+1. Decode the whole new original again with `NewSourceCP949` (O(n)).
+2. Find the edit from the common prefix and suffix of the old and new `Bytes()`.
+3. Build the `InputEdit` with `EditFor(old, new, start, oldEnd, newEnd)`, call `tree.Edit`, then `Parse(ctx, new, tree)`.
+
+```go
+func editBetween(old, new []byte) treesitter.InputEdit {
+	p := 0
+	for p < min(len(old), len(new)) && old[p] == new[p] {
+		p++
+	}
+	q := 0
+	for q < min(len(old), len(new))-p && old[len(old)-1-q] == new[len(new)-1-q] {
+		q++
+	}
+	return treesitter.EditFor(old, new, uint32(p), uint32(len(old)-q), uint32(len(new)-q))
+}
+```
+
+Do not use `UTF8Offset` to build the edit; it is for positions in the original, not for describing what changed in the
+decoded text.
+
+## CRLF
+
+Lines end at LF, so a CRLF file has a `\r` at the end of each line's content as far as `Pos` and tree-sitter points are
+concerned, but `Offset` stops before it: a column past the content of a CRLF line gives the offset of the `\r`. Decoding
+never changes line breaks: `0x0D` and `0x0A` are ASCII and always read on their own.

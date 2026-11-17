@@ -25,7 +25,6 @@ measurements) in the local session-15 handoff.
 github.com/wotjr1649/go-treesitter                  package treesitter: Parser, Tree, Snapshot, Node, Index, Query, ...
 github.com/wotjr1649/go-treesitter/internal/engine  frozen engine ABI (versioned), host imports, memory providers
 github.com/wotjr1649/go-treesitter/grammars/<lang>  one Go module per grammar: func Language() *treesitter.Language
-github.com/wotjr1649/go-treesitter/encoding         (v0.1, optional) legacy decoders via golang.org/x/text
 ```
 The `syntax` package and `internal/gtsadapter` are removed. Each grammar module carries its own translated runtime;
 `Language` stays opaque so a later shared runtime is not a breaking change. `NewParser` checks the grammar module's
@@ -163,9 +162,14 @@ first result is checked to equal it; the remaining iterator results have no C or
 
 All are lazy (computed on first use, once, safe for concurrent readers) and measured in T2:
 
-- **Positions and encodings.** `NewSourceUTF16`/BOM detection convert UTF-16 or BOM-prefixed input to UTF-8 and keep
-  an offset map to the original bytes; `(*Snapshot).Lines()` returns a `LineIndex` with byte → line and UTF-8,
-  UTF-16 and rune columns. Line starts build lazily in O(source bytes); byte points use binary search, while
+- **Positions and encodings.** `NewSourceUTF16`/BOM detection convert UTF-16 or BOM-prefixed input to UTF-8, and
+  `NewSourceCP949` converts CP949 (standard library only; the WHATWG `EUC-KR` index = windows-949, decoded by a
+  generated table; ADR-0021 amendment), keeping an offset map to the original bytes in both directions;
+  `(*Snapshot).Lines()` returns a `LineIndex` with byte → line and UTF-8, UTF-16 and rune columns, and back
+  (`Offset`). In a converted source (UTF-16, CP949) an offset inside a character maps to that character's start; a UTF-8
+  source is not converted, so its offsets pass through clamped. `LineIndex.Pos` floors `UTF16Col` and `RuneCol` to the
+  character's start, while `ByteCol` stays the byte distance from the line start. See the
+  [Korean and CP949 input guide](../guides/korean-input.md). Line starts build lazily in O(source bytes); byte points use binary search, while
   UTF-16/rune columns can additionally scan the non-ASCII line prefix. Standard library only.
 - **Merkle subtree hashes.** `Node.Hash()` (kind, field, leaf text, children) and `Node.ShapeHash()` (ignores extras
   such as comments). 7–11 ns/node, 8 B/node; equal-hash groups verified by full canonical serialization. Use cases:
@@ -184,9 +188,12 @@ Signatures as implemented (session 15 step 2):
 ```go
 func NewSource(raw []byte) (*Source, error)                  // BOM detection; UTF-8 (with or without BOM) is kept as is
 func NewSourceUTF16(raw []byte, bigEndian bool) (*Source, error)
+func NewSourceCP949(raw []byte) (*Source, error)             // no detection; EF BB BF / FF FE / FE FF prefix -> ErrInvalidInput
 func (*Source) Bytes() []byte; Original() []byte; Encoding() Encoding; OriginalOffset(utf8Off uint32) int
+func (*Source) UTF8Offset(orig int) uint32; Replacements() int   // Encoding values: UTF8, UTF16LE, UTF16BE, CP949
 func NewLineIndex(src string) *LineIndex; (*Snapshot) Lines() *LineIndex
 func (*LineIndex) NumLines() int; LineStart(line int) uint32; Line(off uint32) int; Pos(off uint32) Position // {Line, ByteCol, UTF16Col, RuneCol}
+func (*LineIndex) Offset(line int, col uint32, kind ColumnKind) (uint32, bool)  // ByteColumn, UTF16Column, RuneColumn
 func (Node) Hash() uint64; ShapeHash() uint64          // comparable within one grammar only (symbol ids are hashed)
 func (Node) Atom() Atom; (*Snapshot) AtomText(Atom) string; NumAtoms() int   // named non-empty leaves only
 // package experimental/match (not part of the stable treesitter API):
@@ -211,5 +218,5 @@ filtering. See the [regex subset](query-abi.md#regex-predicate-subset-developmen
 
 ## 9. Out of scope for v0.0.1
 
-Live per-node navigation over the instance, included ranges, shared-runtime linking, legacy encodings (v0.1 `encoding`
-package), a compatibility package for other Go tree-sitter APIs (a `MIGRATING.md` name map is written instead).
+Live per-node navigation over the instance, included ranges, shared-runtime linking, legacy encodings other than UTF-16
+and CP949, a compatibility package for other Go tree-sitter APIs (a `MIGRATING.md` name map is written instead).

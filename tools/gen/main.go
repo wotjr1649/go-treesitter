@@ -61,6 +61,13 @@ func main() {
 		}
 		return
 	}
+	if len(os.Args) > 1 && os.Args[1] == "cp949" {
+		if err := runCP949Command(os.Args[2:], os.Stdout); err != nil {
+			fmt.Fprintln(os.Stderr, "gen cp949:", err)
+			os.Exit(1)
+		}
+		return
+	}
 	var o opts
 	flag.StringVar(&o.lang, "lang", "", "grammar module to generate (key in pins.json)")
 	flag.StringVar(&o.root, "root", ".", "tools/gen directory (pins.json, shim/)")
