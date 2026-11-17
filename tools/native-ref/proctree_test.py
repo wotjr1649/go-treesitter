@@ -46,10 +46,22 @@ def tree_command(pidfile, exit_parent=False):
 
 def assert_stopped(test, pidfile):
     pids = json.loads(pidfile.read_text())
-    deadline = time.monotonic() + 5
+    # SIGKILL is acted on only when a task leaves uninterruptible sleep; allow for a loaded runner.
+    deadline = time.monotonic() + 30
     while any(process_alive(pid) for pid in pids) and time.monotonic() < deadline:
         time.sleep(0.02)
-    test.assertEqual([pid for pid in pids if process_alive(pid)], [], f"live tree: {pids}")
+    live = [pid for pid in pids if process_alive(pid)]
+    test.assertEqual(live, [], f"live tree: {pids}; states: {[process_state(pid) for pid in live]}")
+
+
+def process_state(pid):
+    """The /proc stat state and wait channel, for a failure message (POSIX with /proc only)."""
+    try:
+        state = Path(f"/proc/{pid}/stat").read_text().split(")", 1)[1].split()[0]
+        wchan = Path(f"/proc/{pid}/wchan").read_text()
+        return f"{pid}:{state}:{wchan}"
+    except OSError:
+        return f"{pid}:?"
 
 
 class ProcessTreeTest(unittest.TestCase):
