@@ -144,7 +144,7 @@ filenames and hashes; it does not establish uploaded/downloaded asset digests or
 | Gate | State | Evidence level |
 |---|---|---|
 | Raw query matches vs native C (grammars' own `queries/*.scm` + probe queries over the corpora) | PASS, 0 differences: 22,047 query/input pairs on Windows amd64 (local); 12,584 per platform in CI on Linux x64 and arm64 | E5 (those queries and inputs) |
-| Query predicates vs tree-sitter CLI 0.27.2 | Agree except the RE2/Rust regex difference (Unicode `\w`); 20/20 acceptance probes agree | E5 (those probes) |
+| Query predicates vs tree-sitter CLI 0.27.2 | Historical v0.2.0 behavior: agree except the RE2/Rust regex difference (Unicode `\w`); 20/20 acceptance probes agree. This predates the development-tree regex change after v0.5.0. | E3 (retained CLI probes; not native C evidence) |
 | Cancel during balancing, then reparse (all 7 grammars, test-only probe builds) | PASS: 1,729 stops in balancing, 2,411/2,411 next parses equal native, no-reset control 3/3 mismatches (Windows); Linux x64 run 43583147260 PASS with identical callback counts | E5 (probe builds, those inputs) |
 | Large-input speed (bench run 43584133627) | PASS: geomean 1.705x (Linux x64), 1.959x (Linux arm64), 1.818x (macOS arm64); limit 2.5x | bench lane |
 | Memory peak / release (same run) | PASS on all three; macOS private bytes under the ADR-0022 §3 macOS amendment | bench lane |

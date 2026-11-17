@@ -118,3 +118,43 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   Different invalid bytes with the same number of decode errors can match. Stored words with different
   error counts differ, but existing Bash prefix and Ruby repeated-word scanning can still close on a longer line.
   Ruby also closes on repeated end words such as `EOFEOF`; ordinary `EOFX` remains body text.
+
+Query regex predicates change their default meaning without changing Go signatures or the engine ABI.
+`#match?` and `#not-match?` use Unicode `\w`, `\d`, `\s` and `\b`/`\B`, and Unicode simple case folding for `(?i)`,
+from the Unicode 16.0.0 tables in tree-sitter CLI 0.27.2's pinned `regex-syntax` 0.8.11. For example, `\w` now includes
+Hangul, `\d` includes full-width digits, `\s` includes U+3000, and word boundaries recognize Hangul. The root module
+still uses only the Go standard library. `#any-match?` and `#any-not-match?` validate the same regex syntax but remain
+non-filtering properties, as in CLI 0.27.2.
+
+To retain ASCII shorthand and word-boundary behavior, scope those constructs with `(?-u:...)`, for example
+`(?-u:\w+\b)`. This escape hatch covers ASCII shorthand classes and boundaries; consuming classes are accepted
+only when their final computed set is ASCII. Thus `(?-u:[^\W_])` works, while `(?-u:\W)`, `(?-u:\D)`, `(?-u:\S)`
+and `(?-u:[^a])` are rejected. Its `\s` preserves Go's old ASCII set without vertical tab; CLI 0.27.2's ASCII `\s`
+includes vertical tab, a recorded residual difference. `(?-u:.)`, non-ASCII byte matching and `(?i-u)` are rejected.
+Invalid UTF-8 bytes cannot be consumed in Unicode mode; a literal U+FFFD still matches its valid UTF-8 encoding.
+
+Patterns previously accepted by Go may now return a query error. Replace `\Qtext\E` with individually escaped
+punctuation, octal `\101` with `\x{41}`, and `\0` with `\x{0}`. ASCII punctuation escapes such as `\_`, `\%` and `\!`
+remain accepted. Rust constructs outside the supported subset also return a query error rather than silently changing
+meaning: `\<`, `\>`, `\b{...}`, class set operations
+(`&&`, `--`, `~~`, including `[--a]`, `[&&]` and `[a--]`), nested classes other than POSIX classes, verbose `(?x)`
+and CRLF `(?R)` modes, Rust-only Unicode properties, repetitions above 1000 and dotted capture-group names. `\p{...}` supports Go categories and scripts and follows the consumer's
+Go toolchain Unicode version; it can therefore differ from the pinned Unicode 16 tables. See the
+[query contract](docs/design/query-abi.md#regex-predicate-subset-development-tree-after-v050) for the exact boundary.
+Compilation budgets differ too: the CLI can reject Unicode repetitions such as `\w{1000}` for compiled size while
+this implementation accepts them within its count limit.
+
+Additional CLI-accepted forms outside this subset are nested repetitions (`a**`, `a*+`, `a{2}{3}`, `a*??`,
+`a+?+`, `a{2}??`), whitespace inside repetition counts (`a{ 1 }`, `a{1 ,2}`), hex escapes longer than eight digits
+(`\x{000000041}`), and nesting of 100 or more groups (the CLI allows up to 250). Normalize repetitions and hex
+escapes and remove redundant groups. Byte classes such as `(?-u:[\x00-\xFF])` and byte folding enabled through
+separate flag groups (`(?-u)(?i)a`, `(?i)(?-u)a`) are also rejected. Group names containing dots, brackets or
+non-ASCII characters (`(?<n[1]>a)`, `(?<é>a)`) must be renamed to ASCII identifiers.
+
+Unicode property names must match Go category/script names exactly. Rust's aliases, case-insensitive and loose
+names (`Letter`, `lu`, `LU`, `Latn`, `Zyyy`, `han`, `Hira`, `gc=Lu`, `Math`, `Any`, `ASCII`, `Assigned`, ` L `)
+are rejected; use exact Go names such as `L`, `Lu`, `Latin`, `Common`, `Han` or `Hiragana` where applicable.
+Conversely, Go's surrogate category `\p{Cs}` and `\P{Cs}` are accepted as empty/all-scalar sets, whereas the CLI
+rejects them. Unknown or case-variant POSIX-like forms (`[[:unknown:]]`, `[[:Alpha:]]`, `[[::]]`) that the CLI
+interprets as nested classes remain unsupported. The [recorded CLI fixture](testdata/query-regex-cli.json) retains
+these acceptance differences.

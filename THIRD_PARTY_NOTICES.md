@@ -37,6 +37,8 @@ own `LICENSE`.
 | tree-sitter-kotlin | `grammars/kotlin` | [MIT](LICENSES/tree-sitter-kotlin.txt) |
 | tree-sitter-swift | `grammars/swift` | [MIT](LICENSES/tree-sitter-swift.txt) |
 | Newtonsoft.Json | Copied C# test fixtures | [MIT](testdata/newtonsoft/LICENSE.md) |
+| regex-syntax 0.8.11 | Generated Unicode character and simple case-fold tables for query regex predicates | [MIT](LICENSES/regex-MIT.txt) or [Apache-2.0](LICENSES/regex-APACHE.txt) |
+| Unicode data | Unicode 16.0.0 tables distributed in regex-syntax 0.8.11 | [Unicode data license](LICENSES/Unicode.txt) |
 
 [The license manifest](LICENSES/manifest.json) records the exact public source
 commit and SHA-256 of each copied notice. The Newtonsoft fixture manifest
@@ -44,6 +46,12 @@ separately binds that corpus and its license. The exact grammar commits and file
 hashes of each module are in its `provenance.json`. No third-party license text
 was rewritten as this project's license. The native C reference is development
 tooling, not a product dependency.
+
+`query_regex_tables.go` derives from the `regex-syntax` crate archive selected by
+tree-sitter CLI 0.27.2's `Cargo.lock`. `tools/gen/queryunicode` checks the archive's
+SHA-256 before generating the tables and copying its three license files byte for
+byte. The generated category/script difference fixture records the Rust source
+hash and the Go toolchain's Unicode version; `\p{...}` uses the latter's tables.
 
 ## wasi-libc, translated into every grammar module
 

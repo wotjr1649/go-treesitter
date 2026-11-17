@@ -3,7 +3,6 @@ package treesitter
 import (
 	"encoding/binary"
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/wotjr1649/go-treesitter/internal/engine"
@@ -38,8 +37,9 @@ func (e *QueryError) Error() string {
 	return fmt.Sprintf("treesitter: query error %d at byte %d: %s", e.Type, e.Offset, e.reason)
 }
 
-// Query is immutable and may be shared by parsers of its Language. Text predicates use Go regexp (RE2),
-// which differs from tree-sitter CLI's Rust regex. Directives, property assertions and the any-eq?/any-not-eq?/
+// Query is immutable and may be shared by parsers of its Language. Text predicates accept a Rust regex subset
+// with CLI 0.27.2 Unicode tables; Go general categories/scripts follow the Go toolchain (see docs/design/query-abi.md).
+// Directives, property assertions and the any-eq?/any-not-eq?/
 // any-match?/any-not-match? operators are validated and exposed as properties without filtering, as in CLI v0.27.2.
 // Reuse Query values to avoid repeated validation. An unreachable Query queues its compiled copies for deletion
 // by each parser's next engine operation, such as Parse or Matches (Reset/Close release the instance).
@@ -62,7 +62,7 @@ type queryArg struct {
 type textPredicate struct {
 	op     string
 	args   []queryArg
-	re     *regexp.Regexp
+	re     *queryRegex
 	negate bool
 }
 
@@ -279,7 +279,7 @@ func (q *Query) addPredicate(p *queryPattern, steps []queryArg) error {
 			return fail("expected a capture and a regex string")
 		}
 		var err error
-		pred.re, err = regexp.Compile(q.strings[args[1].id])
+		pred.re, err = compileQueryRegex(q.strings[args[1].id])
 		if err != nil {
 			return fail(err.Error())
 		}

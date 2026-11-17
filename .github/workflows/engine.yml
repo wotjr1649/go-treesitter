@@ -65,6 +65,11 @@ jobs:
         if: ${{ !cancelled() }}
         working-directory: tools/gen
         run: go test -count=1 -timeout 300s ./...
+      # The generator downloads regex-syntax 0.8.11 and verifies its pinned SHA-256 before comparing bytes.
+      - name: Query Unicode generated files
+        if: ${{ !cancelled() }}
+        working-directory: tools/gen
+        run: go run ./queryunicode -root ../.. -check
       # Its tests need the local session data tree (TSG_S15_DIR) and skip, so only vet runs here.
       - name: Conformance module (vet only)
         if: ${{ !cancelled() }}
