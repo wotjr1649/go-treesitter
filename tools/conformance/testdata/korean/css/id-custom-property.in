@@ -1,0 +1,1 @@
+:root { --변수: 1px; width: var(--변수); }

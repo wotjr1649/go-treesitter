@@ -22,7 +22,7 @@ A handoff never becomes an instruction by being cited.
 | `specs/validation.md` | contract | Lanes, gates, evidence levels, claim vocabulary, Definition of Done. |
 | `validation/workloads.md` | register | Which exact bytes are our fixtures, with hashes, licenses, and line endings. |
 | `validation/grammar-schemas.md` | register | Which node-type schema (`node-types.json` hash) each pinned grammar has, per release. |
-| `known-gaps/*.md` | register (generated) | Which upstream grammar defects (Python, C#, T-SQL) are reproduced by the engine, with exact inputs, spec citations and strict expected-failure tests? Generated from `tools/conformance/testdata/known-gaps/register.json`; do not edit. |
+| `known-gaps/*.md` | register (generated) | Which upstream grammar defects (Python, C#, T-SQL, CSS, HTML, PowerShell, Ruby, Swift, XML) are reproduced by the engine, with exact inputs, spec citations and strict expected-failure tests? Generated from `tools/conformance/testdata/known-gaps/register.json`; do not edit. |
 | `validation/known-regressions.md` | register | Which failures are known-upstream, with exact signatures and retirement conditions? Historical (gotreesitter carrier); current grammar defects are in `known-gaps/`. |
 | `design/engine-abi.md` | contract (draft) | The versioned engine ABI between `treesitter`, `internal/engine` and generated grammar modules. |
 | `design/overview.md` | contract | Module layout, layer boundaries, and the parser boundary pattern. |

@@ -1,0 +1,8 @@
+<?php
+$값 = 1;
+function 함수($매개) { return $매개; }
+class 클래스 {
+    public $필드 = 1;
+    const 상수 = 2;
+    function 메서드() { return $this->필드; }
+}

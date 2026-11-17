@@ -1,0 +1,10 @@
+class A {
+    string a = "한글\n끝";
+    string b = @"한글
+둘째 줄";
+    string c = $"{값}한글{값:N2}";
+    string d = """
+        원시 한글
+        """;
+    char e = '한';
+}

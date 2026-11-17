@@ -1,0 +1,3 @@
+const 값: number = 1;
+function 이름(매개: string): string { return 매개; }
+class 클래스 { 필드: number = 1; private 비공개 = 2; 메서드(): void {} }

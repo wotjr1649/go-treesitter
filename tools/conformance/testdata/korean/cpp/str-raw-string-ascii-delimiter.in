@@ -1,0 +1,2 @@
+const char *a = R"x(한글
+여러 줄)x";

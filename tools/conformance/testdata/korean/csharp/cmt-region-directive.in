@@ -1,0 +1,3 @@
+#region 한글 영역
+class A { }
+#endregion 끝

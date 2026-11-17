@@ -1,0 +1,3 @@
+const a: string = "한글\n끝";
+const b = `안녕 ${값} 한글`;
+type T = `접두 한글${string}`;

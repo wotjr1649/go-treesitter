@@ -1,0 +1,1 @@
+CREATE TABLE 테이블 (열 integer, 두번째열 text);

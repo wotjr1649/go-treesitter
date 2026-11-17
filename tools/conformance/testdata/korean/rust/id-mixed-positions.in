@@ -1,0 +1,1 @@
+fn f() { let 값1 = 0; let _이름 = 0; let camel한글 = 0; let 한글camel = 0; }

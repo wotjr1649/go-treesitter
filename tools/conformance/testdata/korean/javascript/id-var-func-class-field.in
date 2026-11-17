@@ -1,0 +1,8 @@
+const 값 = 1;
+function 이름(매개) { return 매개; }
+class 클래스 {
+  필드 = 1;
+  #비공개 = 2;
+  메서드() { return this.필드; }
+  static 정적 = 3;
+}

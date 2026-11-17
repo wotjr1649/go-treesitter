@@ -1,0 +1,8 @@
+namespace 이름공간 {
+class 클래스 {
+public:
+    int 필드;
+    void 메서드(int 매개) {}
+};
+}
+int 값 = 1;

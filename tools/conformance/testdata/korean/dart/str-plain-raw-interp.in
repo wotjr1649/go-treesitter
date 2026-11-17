@@ -1,0 +1,5 @@
+var a = '한글\n끝';
+var b = "한글 $ascii ${ascii}";
+var c = r'원시 한글';
+var d = '''여러
+한글 줄''';

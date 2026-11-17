@@ -1,0 +1,1 @@
+template <typename 형> 형 camel한글(형 한글camel, 형 _이름) { return 한글camel; }

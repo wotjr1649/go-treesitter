@@ -1,0 +1,3 @@
+package 패키지;
+enum 열거 { 하나, 둘 }
+class A { int 값1, _이름, camel한글, 한글camel; }

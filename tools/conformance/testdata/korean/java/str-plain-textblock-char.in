@@ -1,0 +1,8 @@
+class A {
+    String a = "한글\n끝";
+    String b = """
+        텍스트 블록
+        한글
+        """;
+    char c = '한';
+}

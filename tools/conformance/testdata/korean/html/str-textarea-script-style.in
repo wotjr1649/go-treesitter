@@ -1,0 +1,4 @@
+<textarea>한글
+둘째 줄</textarea>
+<script>var 값 = '한글';</script>
+<style>.한글 { content: "끝"; }</style>

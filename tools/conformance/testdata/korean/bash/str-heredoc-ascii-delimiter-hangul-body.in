@@ -1,0 +1,6 @@
+cat <<EOF
+한글 본문
+끝
+종료
+EOF
+echo after

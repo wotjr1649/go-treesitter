@@ -1,0 +1,5 @@
+const a = "한글\n끝";
+const b = '한글';
+const c = `안녕 ${값} 한글
+둘째 줄`;
+const d = /한글+/u;

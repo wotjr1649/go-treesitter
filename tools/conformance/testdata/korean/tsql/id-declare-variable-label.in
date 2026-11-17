@@ -1,0 +1,3 @@
+DECLARE @변수 INT = 1;
+끝:
+SELECT @변수;

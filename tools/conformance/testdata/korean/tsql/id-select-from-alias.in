@@ -1,0 +1,1 @@
+SELECT 값 AS 별칭 FROM 테이블;
