@@ -31,7 +31,7 @@ def process_alive(pid):
         os.kill(pid, 0)
         stat = Path(f"/proc/{pid}/stat")
         return not stat.exists() or stat.read_text().split(")", 1)[1].split()[0] != "Z"
-    except ProcessLookupError:
+    except (ProcessLookupError, FileNotFoundError):  # reaped between the checks
         return False
 
 
