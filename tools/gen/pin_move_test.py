@@ -51,7 +51,7 @@ class PinsDiffTest(unittest.TestCase):
 
     def test_unpatched_regeneration_addition_checks_new_schema_without_old_native(self):
         pins = json.loads(Path(__file__).with_name("pins.json").read_bytes())
-        for lang in ("postgres", "swift"):
+        for lang in ("json", "swift"):  # unpatched regenerated grammars (postgres now carries patches)
             with self.subTest(lang=lang):
                 old = {"grammars": {k: v for k, v in pins["grammars"].items() if k != lang}}
                 self.assertTrue(pins["grammars"][lang]["regenerate"])
