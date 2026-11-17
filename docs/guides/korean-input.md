@@ -1,9 +1,14 @@
 # Korean and legacy-encoded input
 
 How to get Korean text, and text in CP949, through the parser and back to the right bytes and columns. The parser
-itself only reads UTF-8; everything here is about the layer in front of it. Rules owned elsewhere are linked, not
-repeated: [invalid UTF-8 and `HasInvalidUTF8`](../specs/parser-result.md#input), [the `Source` and `LineIndex`
-signatures](../design/api-v2.md#7-primitives-that-set-this-library-apart-v001).
+itself only reads UTF-8; everything here is about the layer in front of it, plus what Korean text does inside the
+grammars and queries. Rules owned elsewhere are linked, not repeated: [invalid UTF-8 and
+`HasInvalidUTF8`](../specs/parser-result.md#input), [the `Source` and `LineIndex`
+signatures](../design/api-v2.md#7-primitives-that-set-this-library-apart-v001), [known limits](../reports/limitations.md).
+
+This guide describes the development tree after v0.5.0. The published v0.5.0 has no CP949 decoder, no
+`Source.UTF8Offset`, no `LineIndex.Offset`, the earlier query regex meaning and the earlier heredoc end-word comparison;
+[MIGRATING](../../MIGRATING.md#unreleased-after-v050) lists the changes.
 
 ## Choose the entry point
 
@@ -94,10 +99,105 @@ in the 3.17 specification):
 The library does not normalize. A syllable can arrive precomposed (NFC, `한`, one rune) or as conjoining jamo (NFD,
 `ᄒ` `ᅡ` `ᆫ`, three runes), and the two are different byte strings with different `RuneCol` counts. macOS file names and
 some clipboards produce NFD. **CP949 cannot encode NFD jamo** (nor emoji, nor typographic marks such as the em dash),
-so normalize to NFC before encoding.
+so normalize to NFC before encoding. Two names that differ only in normalization are different names to the parser and
+to queries.
 
 A rune is not a screen column. Hangul syllables and CJK ideographs are wide (two cells) and conjoining jamo, combining
 marks and emoji sequences have their own widths: compute display width with a width library, not from `RuneCol`.
+
+## Korean in queries
+
+In the development tree, `#match?` and `#not-match?` evaluate regular expressions the way the tree-sitter CLI does: `\w`,
+`\d`, `\s`, `\b`/`\B` and the case folding of `(?i)` are Unicode. `\w` matches Hangul syllables and jamo, so
+the pattern `^\w+$` accepts `한글`, and `\b` finds word edges next to Hangul. Write plain `\w` for Hangul; a class
+such as `\p{L}` is not needed. A node's text is a substring of the UTF-8 text that was parsed, so the predicates see
+decoded Hangul even when the file was CP949.
+
+To get the old ASCII meaning of a shorthand class or a boundary, scope it: `(?-u:\w+\b)` matches ASCII word characters
+only. What the regex subset accepts and where it differs from the CLI (`\p{...}` follows your Go toolchain, a few
+Rust-only forms are query errors) is owned by [limitations, row 5](../reports/limitations.md), the
+[query contract](../design/query-abi.md#regex-predicate-subset-development-tree-after-v050) and the
+[migration notes](../../MIGRATING.md#unreleased-after-v050); a pattern that Go accepted before can now be a query error.
+
+## Which grammars take Korean
+
+A grammar is a pinned upstream grammar, and some match names with ASCII-only or Latin-1 patterns, so a Hangul name can
+produce `ERROR` nodes even though the language allows it. The table says what was shown, per grammar and kind of text.
+
+- **yes**: every retained input of that kind parses with no `ERROR` or `MISSING` node, and each Hangul run sits in the
+  node kind the manifest records.
+- **no** / **partly**: a pinned upstream defect, reproduced by the engine and by native C. The linked page has the exact
+  input and the observed wrong tree. A tree is still returned; check `HasError()`.
+- **not recorded**: there is no retained input for it, so nothing is claimed either way.
+
+| Grammar | Identifiers and names | Strings and text | Comments |
+|---|---|---|---|
+| `bash` | yes (words, function names) | yes (quoted forms, heredocs) | yes |
+| `c` | yes | yes | yes |
+| `cpp` | yes | yes | yes |
+| `csharp` | yes | yes | yes |
+| `css` | no: fails on class, id and type selectors, custom properties, attribute selectors, identifier values ([CSS](../known-gaps/css.md)) | yes (a `content` string) | yes |
+| `dart` | not recorded | yes | yes |
+| `go` | yes | yes | yes |
+| `html` | yes (tag and attribute names; see note 1) | yes | yes |
+| `java` | yes | yes | yes |
+| `javascript` | yes | yes | yes |
+| `json` | yes (object keys) | yes | JSON has no comments |
+| `kotlin` | yes | yes | yes |
+| `php` | yes | yes | yes |
+| `postgres` | yes (unquoted and quoted; see note 2) | yes (string literals and `$태그$` dollar-quote tags and bodies; see note 2) | yes |
+| `powershell` | no: fails on variable, parameter, hash key, member name, type name ([PowerShell](../known-gaps/powershell.md)) | yes | yes |
+| `python` | yes | yes | yes |
+| `r` | yes | yes | yes |
+| `ruby` | partly: local variable names parse; fails on symbols, global variables ([Ruby](../known-gaps/ruby.md)) | yes | yes |
+| `rust` | yes | yes | yes |
+| `swift` | partly: variable, function, parameter, type and field names parse; fails on statement labels ([Swift](../known-gaps/swift.md)) | yes | yes |
+| `tsql` | partly: bracketed and double-quoted identifiers parse; fails on regular identifiers ([T-SQL](../known-gaps/tsql.md)) | yes | yes |
+| `tsx` | yes (includes JSX element names) | yes (includes JSX text) | yes |
+| `typescript` | yes | yes | yes |
+| `xml` | partly: element names (`Name`) parse; fails on attribute names, namespace prefixes ([XML](../known-gaps/xml.md))<sup>1</sup> | yes | yes |
+| `yaml` | yes | yes | yes |
+
+**Notes.**
+
+1. The scanner stores each tag-name character in one byte, so names whose characters share a low byte close each other:
+   `<x-걁>body</x-굁>` parses without an error. This pinned upstream defect is not exercised by the recorded rows: see
+   [HTML](../known-gaps/html.md#html-hangul-tag-low-byte-mismatch) and
+   [XML](../known-gaps/xml.md#xml-hangul-tag-low-byte-mismatch). Both pages show that an ASCII mismatch is still an `ERROR`.
+2. Development tree only; the published v0.5.0 `postgres` fails on Hangul identifiers and dollar-quote tags. U+3000 and other
+   non-ASCII spaces are identifier characters, as in PostgreSQL: see
+   [limitations, PostgreSQL Korean support](../reports/limitations.md#postgresql-korean-support-development-tree-after-v050).
+
+**Evidence.** `TestCorpusKorean` in [`tools/conformance`](../../tools/conformance/korean_test.go) runs the retained
+inputs listed in [`manifest.csv`](../../tools/conformance/testdata/korean/manifest.csv) through the product. In every
+product lane it is a retained test (`E3`): "parses these recorded inputs cleanly". In the CI conformance shards (Linux
+amd64 and arm64, with a freshly built native reference) it also compares each dump byte for byte with native C (`E5`),
+for those inputs, on those platforms and the pinned grammar identity. A "no" row is an expected failure: the test passes
+only while the recorded wrong tree is unchanged. Only Hangul was examined and only the recorded inputs are covered; other
+scripts, and other positions of the same upstream patterns, are expected to fail the same way but are not recorded
+([limitations, rows 18, 20 and 21](../reports/limitations.md)). Do not read the table as "this grammar fully supports
+Korean": "yes" means "these inputs".
+
+## Heredocs with Korean end words (Bash and Ruby)
+
+Upstream stores each end-word character in one byte, so a Korean end word never closed. The development tree stores end
+words as UTF-8 and compares whole characters: `<<끝` closes on a line holding `끝`, and a different syllable, or an ASCII
+byte that equals its low byte, no longer closes it. The published v0.5.0 keeps the earlier low-byte comparison, where
+two syllables with the same low byte close each other.
+
+- **Bash** closes only on a line that holds the end word and then a line ending (LF or CRLF) or the end of the input
+  (a CR directly before the end of input also closes it): `끝났다` does not close `<<끝`, and trailing text stays in the body.
+  In CRLF input the `heredoc_end` span includes the CR.
+- **Remaining limits.** Bash still ignores spaces and tabs before the end word for every heredoc (` 끝` closes a plain
+  `<<끝`, where Bash keeps that line in the body), and `<<-` strips every `iswspace` character, including U+3000, not only
+  tabs. Ruby still closes on a repeated end word (`끝끝` closes `<<끝`).
+- **Scanner state.** All open end words and the scanner's own state share one 1024-byte buffer. About 337 Hangul syllables
+  in total fit (a single end word of 337 is the last that fits in Bash, 338 in Ruby), fewer with other state. Past that the
+  state is lost without a signal from the parser: Bash then returns an error tree, and Ruby can return a tree with no
+  error, so a very long end word is not safe to rely on.
+
+The patches, the tests and the exact bounds are owned by [limitations, row 16](../reports/limitations.md) and
+[ADR-0023](../design/decisions/ADR-0023-temporary-upstream-grammar-patches.md).
 
 ## Writing edited text back to a CP949 file
 
