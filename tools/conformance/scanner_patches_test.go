@@ -128,15 +128,36 @@ func TestHeredocUTF8(t *testing.T) {
 			add("invalid-alias", "<<'\xff'", "�\nbody\n", "\xfe", "\xfe")
 			add("replacement-is-valid", "<<'�'", "\xff\nbody\n", "�", "�")
 			add("invalid-error-counts-short-line", "<<'\xff\xfe'", "\xfd\nbody\n", "\xfe\xff", "\xfe\xff")
-			prefixName := "prefix-line-exact"
+			add("prefix-line-exact", "<<'끝'", "끝났다\nbody\n", "끝", "끝")
 			if lang == "bash" {
-				prefixName = "prefix-line-known-bash-close"
-			}
-			add(prefixName, "<<'끝'", "끝났다\nbody\n", "끝", "끝")
-			if lang == "bash" {
-				// Existing upstream bug: Bash closes at a prefix; this patch does not repair it.
-				expectedError[prefixName] = true
-				expectedEnds[prefixName] = []uint32{uint32(strings.Index(cases[len(cases)-1].src, "\n끝났다") + 1 + len("끝"))}
+				for _, word := range []string{"EOF", "끝"} {
+					for _, opening := range []string{"<<" + word, "<<'" + word + "'", `<<"` + word + `"`, "<<-" + word} {
+						indent := ""
+						if strings.HasPrefix(opening, "<<-") {
+							indent = "\t"
+						}
+						add(fmt.Sprintf("exact-line-%x-%s", word, opening), opening,
+							indent+word+"X\n"+indent+word+" \n"+indent+word+"\t\n"+indent+word+word+"\nbody\n", indent+word, word)
+					}
+				}
+				// Existing upstream limit: plain <<EOF ignores leading spaces/tabs, unlike Bash.
+				for _, indent := range []string{" ", "\t"} {
+					name := fmt.Sprintf("plain-leading-whitespace-known-close-%x", indent)
+					add(name, "<<EOF", "body\n"+indent+"EOF\n", "EOF", "EOF")
+					expectedEnds[name] = []uint32{uint32(strings.Index(cases[len(cases)-1].src, "\n"+indent+"EOF") + 1 + len(indent+"EOF"))}
+				}
+				add("prefix-before-expansions", "<<EOF", "EOF$value\nEOF$(printf X)\nEO$(printf Y)\n", "EOF", "EOF")
+				add("suffix-after-substitution", "<<EOF", "$(printf X)EOF\nbody\n", "EOF", "EOF")
+				add("embedded-cr-prefix", "<<'EOF'", "EOF\rX\nbody\n", "EOF", "EOF")
+				for _, word := range []string{"EOF", "끝"} {
+					name := fmt.Sprintf("crlf-prefix-%x", word)
+					add(name, "<<'"+word+"'", word+"X\nbody\n", word, word)
+					c := &cases[len(cases)-1]
+					c.src = strings.ReplaceAll(c.src, "\n", "\r\n")
+					expectedEnds[name] = []uint32{uint32(strings.LastIndex(c.src, word) + len(word) + 1)}
+				}
+				add("no-final-newline", "<<EOF", "EOFX\nbody\n", "EOF", "EOF")
+				cases[len(cases)-1].src = strings.TrimSuffix(cases[len(cases)-1].src, "\necho after\n")
 			}
 			add("dash-wide-space", "<<-'끝'", "　끝\nbody\n", "끝", "끝")
 			if lang == "bash" {
@@ -160,6 +181,10 @@ func TestHeredocUTF8(t *testing.T) {
 			add("crlf", "<<'끝'", "body\n", "끝", "끝")
 			// The complete input uses CRLF, including the opening and following statement.
 			cases[len(cases)-1].src = strings.ReplaceAll(cases[len(cases)-1].src, "\n", "\r\n")
+			if lang == "bash" {
+				// The exact-line lookahead consumes CR before accepting LF.
+				expectedEnds["crlf"] = []uint32{uint32(strings.LastIndex(cases[len(cases)-1].src, "끝") + len("끝\r"))}
+			}
 			if lang == "ruby" {
 				add("squiggly", "<<~'끝'", "  body\n", "  끝", "끝")
 				add("repeated-word-known-ruby-close", "<<'끝'", "끝끝\nbody\n", "끝", "끝")
@@ -177,12 +202,19 @@ func TestHeredocUTF8(t *testing.T) {
 						t.Fatalf("heredoc error=%v end=%d, want error=%v end=%d", snap.Root().HasError(), snap.Root().EndByte(), expectedError[c.name], len(c.src))
 					}
 					var got, want []uint32
+					substitutions := 0
 					snap.Walk(func(n treesitter.Node, _ int) treesitter.WalkAction {
+						if n.Kind() == "command_substitution" {
+							substitutions++
+						}
 						if n.Kind() == "heredoc_end" {
 							got = append(got, n.EndByte())
 						}
 						return treesitter.Continue
 					})
+					if c.name == "prefix-before-expansions" && substitutions != 2 {
+						t.Fatalf("lost command substitutions after delimiter prefix: got %d, want 2", substitutions)
+					}
 					for _, word := range c.ends {
 						want = append(want, uint32(strings.LastIndex(c.src, word)+len(word)))
 					}
@@ -219,13 +251,17 @@ func TestHeredocUTF8Incremental(t *testing.T) {
 			continue
 		}
 		t.Run(lang, func(t *testing.T) {
-			old := "cat <<한글끝\nfirst $value\nsecond\n한글끝\necho after\n"
+			old := "cat <<한글끝\n한글끝났다\nfirst $value\nsecond\n한글끝\necho after\n"
 			if lang == "ruby" {
 				old = "x = <<~한글끝\nfirst #{1}\nsecond\n한글끝\nputs 1\n"
 			}
-			next := strings.Replace(old, "second", "둘째", 1)
+			replacement := "둘째"
+			if lang == "bash" {
+				replacement = "한글끝추가"
+			}
+			next := strings.Replace(old, "second", replacement, 1)
 			start := uint32(strings.Index(old, "second"))
-			oldEnd, newEnd := start+uint32(len("second")), start+uint32(len("둘째"))
+			oldEnd, newEnd := start+uint32(len("second")), start+uint32(len(replacement))
 			p := newParser(t, lang)
 			oldTree, err := p.Parse(bg, []byte(old), nil)
 			if err != nil {

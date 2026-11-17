@@ -440,10 +440,10 @@
       "patches": [
         {
           "file": "patches/bash/0001-heredoc-utf8.patch",
-          "sha256": "e2e003683f33dcd960e0a88863349ae7bf9316ac3aef5e6abc15d8d8faae88d4",
+          "sha256": "e5d01591adc75c082be73e7aeab9d67eed389259399ff808813495f31ebd831a",
           "source": "src/scanner.c",
           "beforeSHA256": "7cc25d70626f8939b35ecd504bf724e2001b817412aa29bceb4c4955a91558a9",
-          "afterSHA256": "8141bcf24df3c20dc95144aae851034e1760d9697f76ee4eabf29e2e34cb598d",
+          "afterSHA256": "3758afba8e38a77232d850b562be824729eaf548a65b106a2a48ba62cb920cb3",
           "upstreamReport": "https://github.com/tree-sitter/tree-sitter-bash/issues/370"
         }
       ],
