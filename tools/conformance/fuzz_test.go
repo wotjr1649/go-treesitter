@@ -244,5 +244,5 @@ func FuzzParseSwift(f *testing.F) {
 }
 
 func FuzzParsePostgres(f *testing.F) {
-	fuzzParse(f, "postgres", "SELECT customer_id FROM rental WHERE return_date IS NULL;\n", "CREATE TABLE film (id integer PRIMARY KEY, title text NOT NULL);\n", "SELECT (", "", "SELECT 1;\x00SELECT 2;\n")
+	fuzzParse(f, "postgres", "SELECT customer_id FROM rental WHERE return_date IS NULL;\n", "CREATE TABLE film (id integer PRIMARY KEY, title text NOT NULL);\n", "SELECT (", "", "SELECT 1;\x00SELECT 2;\n", "SELECT 값;\n", "SELECT SELECT값;\n", "SELECT $끝$본문$끝$;\n", "SELECT $걁$body$A$still$걁$;\n")
 }

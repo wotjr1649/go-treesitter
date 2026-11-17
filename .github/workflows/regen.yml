@@ -21,7 +21,7 @@ jobs:
       matrix:
         lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin, postgres, swift]
     runs-on: ubuntu-24.04
-    # PostgreSQL shares an identical LFS reference: budget 30 min local, 2x hosted + 30 min margin.
+    # PostgreSQL builds patched and upstream-LFS variants independently; retain the 90-minute shard budget.
     timeout-minutes: ${{ matrix.lang == 'postgres' && 90 || 60 }}
     env:
       CGO_ENABLED: "0"

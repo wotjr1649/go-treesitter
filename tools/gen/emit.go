@@ -350,6 +350,8 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 			if len(g.Patches) > 1 {
 				result += "\nYAML patch 0002 bounds serialized indentation by bytes written, preventing deep-nesting buffer overruns (upstream PR #47).\n"
 			}
+		case "postgres":
+			result += "\nOwner-approved exception (2026-11-17) to ADR-0023 decision 1 for Korean support; this gap does not block a release gate. Unquoted identifiers accept all non-ASCII code points, and dollar-quote tags compare complete code points. The upstream 63-code-point tag cap remains.\n"
 		case "python":
 			result += "\nThe indentation patch bounds serialization by bytes written, preventing the state-buffer overrun that deep indentation causes when an odd number of string delimiters is open, e.g. inside one string literal (upstream PR #351).\n"
 		}

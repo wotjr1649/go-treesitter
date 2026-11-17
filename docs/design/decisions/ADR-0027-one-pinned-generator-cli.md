@@ -79,3 +79,33 @@ The gate retains full-suite exit 1 and `Query compilation failed` / `Invalid syn
 expected-tree change or grammar patch is accepted. A new failure, stale signature or CLI pin change fails the
 exception check. When the CLI pin moves to a fixed version, rerun the full suite and remove this exception after
 it succeeds. This development exception does not approve a release.
+
+## Grammar-input patch comparisons (ADR-0023)
+
+The generator gate's reference omits grammar-input patches and retains the same recorded C/header fixes as
+its candidate. A committed parser remains the reference; an LFS parser is regenerated from unpatched grammar
+inputs, must match the committed SHA-256 OID **before** C/header patches apply, and is then built independently.
+Candidate sharing still requires no patches and identical C/header inputs.
+
+Deliberate grammar-input fixes record their reviewed behaviour differences beside the patch in
+`tools/gen/patches/<grammar>/generator-expectations.json`, rather than in `pins.json`: pins identify build inputs;
+this sidecar identifies the exact permitted comparison results. It binds the grammar archive/commit, runtime
+commit, CLI, complete patch records, seed, corpus/edit manifests, patch-corpus files and pinned large-input manifest. Each difference
+records its input ID/identity and both result SHA-256 signatures. Corpus/large signatures hash the dump bytes;
+edit signatures hash canonical JSON of the result row (excluding `edit_ms`) plus ranges/fields hashes, including
+the incremental/fresh dump hashes. Upstream signatures hash canonical JSON of each changed outcome or complete
+same-name failure list, including improvements. Canonical JSON uses sorted keys, compact separators, UTF-8 and
+unescaped Unicode. Duplicate upstream outcome identities fail.
+
+The actual and recorded difference lists must match exactly, including all fields: new, changed or disappeared
+differences, stale identities and malformed records fail. Without an expectation file, the zero-difference rule remains.
+The gate never writes or refreshes expectations automatically. A sidecar requires a reason and retirement condition,
+is reviewed with the patch, and is retired or reviewed anew when upstream inputs, CLI or patches change. This is
+separate from the C# generator exception: it permits only recorded fixes, without keeping an unreviewed candidate.
+
+A patch can retain regression inputs in `tools/gen/patches/<grammar>/corpus/*.txt` (tree-sitter corpus format).
+The gate adds them to a private copy of each native corpus under a `grammar-patch-` filename prefix without
+replacing upstream files, then ciconf generates the same three seeded edits per input. The original upstream-only
+corpus remains the source for pinned concat large inputs. These original repository fixtures are separate
+from upstream test expectations and the pinned grammar-kit projection; their hashes are recorded in the sidecar
+identity and execution report. They ensure behaviour-changing fixes are exercised even when upstream seeds are ASCII.

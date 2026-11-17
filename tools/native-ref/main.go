@@ -182,6 +182,7 @@ func runMode(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, no
 			g.Regenerate = true
 		}
 		referenceOID := ""
+		var referencePatches []patches.Pin
 		if reference {
 			parser, err := os.ReadFile(filepath.Join(gdir, "parser.c"))
 			if err != nil {
@@ -197,6 +198,12 @@ func runMode(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, no
 				if len(referenceOID) != 64 {
 					return fmt.Errorf("%s: committed LFS parser has no sha256 OID", l)
 				}
+			}
+			// Reference grammar inputs remain upstream; both variants retain the recorded C fixes.
+			referencePatches = referenceCPatches(g.Patches)
+			g.Patches = referencePatches
+			if referenceOID != "" {
+				g.Patches = nil // Prove the regenerated upstream parser's OID before any C patch.
 			}
 		}
 		fmt.Fprintf(os.Stderr, "%s patches=%d alert-threshold=%d", l, len(g.Patches), threshold)
@@ -218,6 +225,12 @@ func runMode(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, no
 			got, err := fileSHA(filepath.Join(gdir, "parser.c"))
 			if err != nil || got != referenceOID {
 				return fmt.Errorf("%s: regenerated LFS reference sha256 %s, committed OID %s (%v)", l, got, referenceOID, err)
+			}
+			if !unpatched {
+				root := filepath.Join(work, "patches-"+l, "first")
+				if err := patches.ApplyGenerated(filepath.Dir(pinsFile), root, referencePatches); err != nil {
+					return fmt.Errorf("%s: reference C patches: %w", l, err)
+				}
 			}
 		}
 		if corpus != "" && !corpusDone[g.Archive] { // prepare has verified the archive's sha256

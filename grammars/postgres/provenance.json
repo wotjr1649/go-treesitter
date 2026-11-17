@@ -1,14 +1,49 @@
 {
+  "patches": [
+    {
+      "file": "patches/postgres/0001-non-ascii-identifiers.patch",
+      "sha256": "b69c8c7d92ce5f4fd24160a20ec54f413398a044d7caff7e640f2f46276e4c76",
+      "source": "postgres/grammar.js",
+      "beforeSHA256": "4d26dfd2721cbc632c2d6c2bdf9bcb26eb50bcd1c5b6061269cbc08af12684c6",
+      "afterSHA256": "9640494432595d98462abaa7a3732d6682e01023947b2a9effdb56750c67c1c9",
+      "upstreamReport": "https://github.com/gmr/tree-sitter-postgres/issues/101"
+    },
+    {
+      "file": "patches/postgres/0002-dollar-tag-code-points.patch",
+      "sha256": "f9756f730cc4d41f075986ed8afbd217c69d3adcc734d70ec306ce3831c83a59",
+      "source": "postgres/src/scanner.c",
+      "beforeSHA256": "4d7872a6bb2126e206a7aa0730b7f272b41d9e75c2d11af274fc4db2cd7c3352",
+      "afterSHA256": "597b11ba2c7f9e6843332236132806ea1cab116e18767c01a290bf316244b441",
+      "upstreamReport": "https://github.com/gmr/tree-sitter-postgres/issues/101"
+    }
+  ],
   "grammarGeneration": {
-    "patches": null,
+    "patches": [
+      {
+        "file": "patches/postgres/0001-non-ascii-identifiers.patch",
+        "sha256": "b69c8c7d92ce5f4fd24160a20ec54f413398a044d7caff7e640f2f46276e4c76",
+        "source": "postgres/grammar.js",
+        "beforeSHA256": "4d26dfd2721cbc632c2d6c2bdf9bcb26eb50bcd1c5b6061269cbc08af12684c6",
+        "afterSHA256": "9640494432595d98462abaa7a3732d6682e01023947b2a9effdb56750c67c1c9",
+        "upstreamReport": "https://github.com/gmr/tree-sitter-postgres/issues/101"
+      },
+      {
+        "file": "patches/postgres/0002-dollar-tag-code-points.patch",
+        "sha256": "f9756f730cc4d41f075986ed8afbd217c69d3adcc734d70ec306ce3831c83a59",
+        "source": "postgres/src/scanner.c",
+        "beforeSHA256": "4d7872a6bb2126e206a7aa0730b7f272b41d9e75c2d11af274fc4db2cd7c3352",
+        "afterSHA256": "597b11ba2c7f9e6843332236132806ea1cab116e18767c01a290bf316244b441",
+        "upstreamReport": "https://github.com/gmr/tree-sitter-postgres/issues/101"
+      }
+    ],
     "cli": "0.27.2",
     "jsRuntime": "native",
-    "inputSHA256": "1e7bfc8512429f174d808969d1cee3c7b56f38ce2f1aa8c8dadac10724cddc20",
+    "inputSHA256": "b5e93e30f399900cdd247ba00639c17c0c69c477c53320e697e92f8feb7e2e7d",
     "outputs": {
-      "grammar.json": "44196485acee2ba51584af690fef4ca2d8b18ed5adf76fbeb1918c1e36cb2f2b",
+      "grammar.json": "9e750273e9d7e8c94b2f46fd4aef581d0a0b01fe5b768407afddf97782ce1244",
       "node-types.json": "7f9f350c2730fbddf36f096dbb27405f6ae29ba787b265f2bb494e6a887078d5",
-      "parser.c": "a9090d5082ae5c23892d05aa59e61476f9bd39ad634228f2046024debdf815b5",
-      "scanner.c": "4d7872a6bb2126e206a7aa0730b7f272b41d9e75c2d11af274fc4db2cd7c3352",
+      "parser.c": "3323887209035d7a8fc9a5df62b8a22d544e3f87c759597f49c84b524a601f52",
+      "scanner.c": "597b11ba2c7f9e6843332236132806ea1cab116e18767c01a290bf316244b441",
       "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
       "tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
       "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
@@ -28,18 +63,20 @@
       "grammar.parser.c": "9b714c169bc14fb13b23374f344fe1bd20b7db4a07546b2b671d644fe374bcc3",
       "grammar.scanner.c": "4d7872a6bb2126e206a7aa0730b7f272b41d9e75c2d11af274fc4db2cd7c3352",
       "grammar.tree": "8818f7575126241416893bbc18134b4873bc3d92298afe7962ce911f580c1e1b",
-      "patched.grammar.grammar.json": "44196485acee2ba51584af690fef4ca2d8b18ed5adf76fbeb1918c1e36cb2f2b",
+      "patched.grammar.grammar.json": "9e750273e9d7e8c94b2f46fd4aef581d0a0b01fe5b768407afddf97782ce1244",
       "patched.grammar.node-types.json": "7f9f350c2730fbddf36f096dbb27405f6ae29ba787b265f2bb494e6a887078d5",
-      "patched.grammar.parser.c": "a9090d5082ae5c23892d05aa59e61476f9bd39ad634228f2046024debdf815b5",
-      "patched.grammar.scanner.c": "4d7872a6bb2126e206a7aa0730b7f272b41d9e75c2d11af274fc4db2cd7c3352",
+      "patched.grammar.parser.c": "3323887209035d7a8fc9a5df62b8a22d544e3f87c759597f49c84b524a601f52",
+      "patched.grammar.scanner.c": "597b11ba2c7f9e6843332236132806ea1cab116e18767c01a290bf316244b441",
       "patched.grammar.tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
       "patched.grammar.tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
       "patched.grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
-      "patches.inputs": "1e7bfc8512429f174d808969d1cee3c7b56f38ce2f1aa8c8dadac10724cddc20",
+      "patches.1": "b69c8c7d92ce5f4fd24160a20ec54f413398a044d7caff7e640f2f46276e4c76",
+      "patches.2": "f9756f730cc4d41f075986ed8afbd217c69d3adcc734d70ec306ce3831c83a59",
+      "patches.inputs": "b5e93e30f399900cdd247ba00639c17c0c69c477c53320e697e92f8feb7e2e7d",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
       "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
     },
-    "RecipeSHA256": "8980a3e1bddd3e9fe81e381be7a4c2b6d04fada4ff214cfcfeee79b5991a7d80",
+    "RecipeSHA256": "19868ed294d3d9807462305ce34cdf90fa7f3207778c88bd70f723f6d56692ee",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -62,8 +99,8 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "3460eee0d212ad7246062f5f1a0cbcbbde59e99b045f81b04d91d224afced191",
-    "engine_gen.go": "ad7181e7824befe8e6d5fa873723c33d22775f4e4850cc88a6848bfde764ca7e",
-    "wasm": "dbc727e4ad00ca4e29410c9373e31b1d6b766ec2d7525c2e52153e24632c9142",
-    "wasm.clang": "377fc4e02af12b2ec91a7bf9027a227ebd494b32b8660eff758ea64528eac3f5"
+    "engine_gen.go": "b1a279e7811ea04af635fe53a568809e6ad65aa4311d488f9e336b4b1a8779ca",
+    "wasm": "3c8212e43537b9546f80207ff1c478d3d953a4442d45363aeb8bba6ba125deda",
+    "wasm.clang": "672f59323b438d00a22b069adb51620bba858f8239fd8802c9e179b8a8d513bf"
   }
 }

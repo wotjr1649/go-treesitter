@@ -695,6 +695,24 @@
       "regenerate": true
     },
     "postgres": {
+      "patches": [
+        {
+          "file": "patches/postgres/0001-non-ascii-identifiers.patch",
+          "source": "postgres/grammar.js",
+          "sha256": "b69c8c7d92ce5f4fd24160a20ec54f413398a044d7caff7e640f2f46276e4c76",
+          "beforeSHA256": "4d26dfd2721cbc632c2d6c2bdf9bcb26eb50bcd1c5b6061269cbc08af12684c6",
+          "afterSHA256": "9640494432595d98462abaa7a3732d6682e01023947b2a9effdb56750c67c1c9",
+          "upstreamReport": "https://github.com/gmr/tree-sitter-postgres/issues/101"
+        },
+        {
+          "file": "patches/postgres/0002-dollar-tag-code-points.patch",
+          "source": "postgres/src/scanner.c",
+          "sha256": "f9756f730cc4d41f075986ed8afbd217c69d3adcc734d70ec306ce3831c83a59",
+          "beforeSHA256": "4d7872a6bb2126e206a7aa0730b7f272b41d9e75c2d11af274fc4db2cd7c3352",
+          "afterSHA256": "597b11ba2c7f9e6843332236132806ea1cab116e18767c01a290bf316244b441",
+          "upstreamReport": "https://github.com/gmr/tree-sitter-postgres/issues/101"
+        }
+      ],
       "regenerate": true,
       "repo": "https://github.com/gmr/tree-sitter-postgres",
       "commit": "59d0d8cd7506d68de1229fb4bbce838c83b60c8a",

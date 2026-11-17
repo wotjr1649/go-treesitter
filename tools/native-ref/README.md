@@ -217,3 +217,11 @@ before/after hashes where necessary. Selected `npmDependencies` are unpacked dir
 `package-lock.json` tarball after SHA-512 integrity verification; install scripts never run.
 QuickJS receives these packages in the grammar working directory's `node_modules` (including TypeScript/TSX);
 no host Node installation participates. Lockfile, tarball and dependency identities are recorded in provenance.
+
+
+Grammar-input patches are omitted only for the gate's `-reference` build. Its C/header patches remain common
+with the candidate. LFS reference regeneration must equal the committed OID before those C/header fixes apply.
+Intentional grammar-input behaviour changes use a reviewed `tools/gen/patches/<lang>/generator-expectations.json`
+with exact input identities and both result hashes; new, changed or disappeared differences fail. The report retains
+all differences and the sidecar hash even on success. The record format and canonical hash rules are owned by
+[ADR-0027](../../docs/design/decisions/ADR-0027-one-pinned-generator-cli.md#grammar-input-patch-comparisons-adr-0023).

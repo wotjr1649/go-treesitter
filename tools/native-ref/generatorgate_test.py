@@ -18,6 +18,85 @@ spec.loader.exec_module(gate)
 
 
 class GeneratorGateTest(unittest.TestCase):
+    def test_patch_expectations_require_exact_input_and_result_signatures(self):
+        import copy
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            grammar = {"commit": "rev", "archiveSHA256": "archive", "patches": [
+                {"source": "grammar.js", "sha256": "patch"}]}
+            pins = {"runtime": {"commit": "runtime"}, "tools": {"treeSitterCLI": "0.27.2"}}
+            report = {"grammar": "tiny", "seed": 1, "corpusManifestSHA256": "corpus",
+                      "editsManifestSHA256": "edits", "largeManifestSHA256": "large", "patchCorpusFilesSHA256": {}, "differences": [
+                {"id": "corpus/tiny/korean", "kind": "corpus", "inputSHA256": "input",
+                 "referenceDumpSHA256": "a" * 64, "candidateDumpSHA256": "b" * 64}]}
+            self.assertFalse(gate.check_patch_expectations(repo, pins, grammar, report))
+            self.assertTrue(gate.check_patch_expectations(repo, pins, grammar, report | {"differences": []}))
+            identity = {"grammarCommit": "rev", "grammarArchiveSHA256": "archive",
+                        "runtimeCommit": "runtime", "cli": "0.27.2", "seed": 1,
+                        "patches": grammar["patches"], "corpusManifestSHA256": "corpus",
+                        "editsManifestSHA256": "edits", "largeManifestSHA256": "large", "patchCorpusFilesSHA256": {}}
+            expected = {"identity": identity, "reason": "recorded fix", "retireWhen": "upstream fix",
+                        "differences": copy.deepcopy(report["differences"])}
+            path = repo / "tools/gen/patches/tiny/generator-expectations.json"
+            gate.save(path, expected)
+            self.assertTrue(gate.check_patch_expectations(repo, pins, grammar, report))
+            for key in ("id", "inputSHA256", "referenceDumpSHA256", "candidateDumpSHA256"):
+                changed = copy.deepcopy(report)
+                changed["differences"][0][key] = "c" * 64
+                self.assertFalse(gate.check_patch_expectations(repo, pins, grammar, changed))
+            for diffs in ([], report["differences"] * 2):
+                changed = report | {"differences": diffs}
+                self.assertFalse(gate.check_patch_expectations(repo, pins, grammar, changed))
+            for key in identity:
+                stale = copy.deepcopy(expected)
+                stale["identity"][key] = None
+                gate.save(path, stale)
+                with self.assertRaisesRegex(ValueError, "identity"):
+                    gate.check_patch_expectations(repo, pins, grammar, report)
+            for diffs in (expected["differences"] * 2, [{"id": "case"}]):
+                gate.save(path, expected | {"differences": diffs})
+                with self.assertRaisesRegex(ValueError, "signatures"):
+                    gate.check_patch_expectations(repo, pins, grammar, report)
+
+    def test_strict_upstream_records_improvements_skips_and_changed_failure_trees(self):
+        before = {"parse_results": [{"name": "case", "outcome": "Failed"}],
+                  "parse_failures": [{"name": "case", "actual": "old"}]}
+        for outcome in ("Passed", "Skipped", "Platform", "Failed"):
+            after = {"parse_results": [{"name": "case", "outcome": outcome}],
+                     "parse_failures": [{"name": "case", "actual": "new"}]}
+            differences = gate.compare_upstream(before, after, strict=True)
+            self.assertTrue(differences)
+            self.assertTrue(all(len(x["referenceDumpSHA256"]) == 64 for x in differences))
+            self.assertTrue(all(x["referenceDumpSHA256"] != x["candidateDumpSHA256"] for x in differences))
+        self.assertEqual(gate.compare_upstream(before, before, strict=True), [])
+
+    def test_strict_upstream_does_not_lose_duplicate_names(self):
+        before = {"parse_results": [{"name": "case", "outcome": "Failed"}],
+                  "parse_failures": [{"name": "case", "actual": "A"}, {"name": "case", "actual": "B"}]}
+        after = json.loads(json.dumps(before))
+        after["parse_failures"][0]["actual"] = "changed"
+        self.assertEqual(len(gate.compare_upstream(before, after, strict=True)), 1)
+        before["parse_results"] *= 2
+        with self.assertRaisesRegex(ValueError, "duplicate upstream"):
+            gate.compare_upstream(before, before, strict=True)
+
+    def test_patch_corpus_is_additive_identical_and_cannot_overwrite_upstream(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            fixture = repo / "tools/gen/patches/lang/corpus/korean.txt"
+            fixture.parent.mkdir(parents=True)
+            fixture.write_bytes("SELECT 한글;\n".encode("utf-8"))
+            grammar = {"extractDir": "upstream", "grammarDir": "lang/src"}
+            for side in ("reference", "candidate"):
+                corpus = repo / side
+                target = corpus / "upstream/lang/test/corpus/grammar-patch-korean.txt"
+                target.parent.mkdir(parents=True)
+                self.assertEqual(gate.add_patch_corpus(repo, corpus, grammar, "lang"), {"korean.txt": gate.sha(fixture)})
+                self.assertEqual(target.read_bytes(), fixture.read_bytes())
+                with self.assertRaises(FileExistsError):
+                    gate.add_patch_corpus(repo, corpus, grammar, "lang")
+                self.assertEqual(target.read_bytes(), fixture.read_bytes())
+
     def test_reference_none_requires_successful_nonempty_upstream_tests(self):
         passed = {"parse_results": [{"name": "case", "outcome": "Passed"}],
                   "parse_stats": {"total_parses": 1}}
@@ -378,6 +457,10 @@ class GeneratorGateTest(unittest.TestCase):
             differences = gate.compare_data(*roots)
             self.assertEqual(differences[0]["id"], "edits/lang/case-e1")
             self.assertEqual(differences[0]["changed"], ["ranges"])
+            self.assertNotEqual(differences[0]["referenceDumpSHA256"], differences[0]["candidateDumpSHA256"])
+            original = differences[0]["candidateDumpSHA256"]
+            (roots[1] / "edits/lang/case-e1.fields").write_text("changed fields")
+            self.assertNotEqual(gate.compare_data(*roots)[0]["candidateDumpSHA256"], original)
             (roots[1] / "native/dumps/lang/case.dump").write_text("changed tree")
             self.assertEqual(len(gate.compare_data(*roots)), 2)
             (roots[1] / "edits/results-native.csv").write_text("id,edit_sha256,edit_ms\n")

@@ -29,9 +29,13 @@ def process_alive(pid):
             kernel.CloseHandle(handle)
     try:
         os.kill(pid, 0)
-        stat = Path(f"/proc/{pid}/stat")
-        return not stat.exists() or stat.read_text().split(")", 1)[1].split()[0] != "Z"
-    except (ProcessLookupError, FileNotFoundError):  # reaped between the checks
+    except ProcessLookupError:
+        return False
+    if not Path("/proc/self").exists():  # no /proc (macOS): a signalable pid is alive
+        return True
+    try:  # on Linux a task whose /proc entry is gone, or a zombie/dead task, is not running
+        return Path(f"/proc/{pid}/stat").read_text().split(")", 1)[1].split()[0] not in ("Z", "X", "x")
+    except OSError:
         return False
 
 
@@ -48,9 +52,14 @@ def assert_stopped(test, pidfile):
     pids = json.loads(pidfile.read_text())
     # SIGKILL is acted on only when a task leaves uninterruptible sleep; allow for a loaded runner.
     deadline = time.monotonic() + 30
-    while any(process_alive(pid) for pid in pids) and time.monotonic() < deadline:
+    stopped = 0  # require two consecutive all-stopped observations; assert on the last observation itself
+    live = pids
+    while time.monotonic() < deadline:
+        live = [pid for pid in pids if process_alive(pid)]
+        stopped = stopped + 1 if not live else 0
+        if stopped == 2:
+            break
         time.sleep(0.02)
-    live = [pid for pid in pids if process_alive(pid)]
     test.assertEqual(live, [], f"live tree: {pids}; states: {[process_state(pid) for pid in live]}")
 
 

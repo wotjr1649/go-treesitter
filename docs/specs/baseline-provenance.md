@@ -19,6 +19,8 @@ The runtime stays unmodified. Grammar changes require the recorded, hash-checked
 of ADR-0023; grammar-input changes regenerate C with the pinned CLI, identically for the engine and native reference.
 The YAML early-EOF fix, Bash/Ruby heredoc comparisons and YAML/Python serialization bounds are C-only patches;
 original/result source hashes and each patch identity are recorded in the pins and generated provenance.
+The PostgreSQL Korean-support exception (owner decision 2026-11-17) records a grammar-input
+identifier patch and a scanner code-point patch; see its [patch record](../../tools/gen/patches/postgres/README.md).
 The unpatched native comparison is separate from the product comparison.
 Under ADR-0027 every grammar sets `regenerate: true` unless its recorded exception retains the reference C.
 Both builders use the shared, pinned CLI path: independent generation twice, byte comparison, input-tree hash and

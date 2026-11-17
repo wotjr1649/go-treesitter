@@ -105,6 +105,22 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
 
 ## Unreleased (after v0.5.0)
 
+- **PostgreSQL Korean support (development tree after v0.5.0):** unquoted identifiers now accept every
+  non-ASCII code point, including Hangul, NFD combining characters and supplementary characters, matching
+  PostgreSQL's high-bit-byte lexical rule for UTF-8. ASCII identifier rules are unchanged. Adjacent names
+  such as `SELECT값` remain one identifier instead of a keyword plus an invalid suffix. Dollar-quote tags
+  compare full code points: `$끝$…$끝$` closes and `$걁$…$A$` does not. Existing trees containing these inputs
+  can change. The grammar's `\s+` extras skip only ASCII whitespace. U+3000 and other non-ASCII spaces
+  outside the original identifier range were lexing errors before and are identifier characters now, not SQL
+  separators. The upstream 63-code-point dollar-tag cap remains, unlike
+  PostgreSQL's unbounded dollar tags. PL/pgSQL and other upstream SQL grammar limits remain outside scope.
+  These two temporary patches are an owner-approved 2026-11-17 Korean-support exception to ADR-0023
+  decision 1, not a release-gate repair. See [upstream issue #101](https://github.com/gmr/tree-sitter-postgres/issues/101) and the
+  [patch record](tools/gen/patches/postgres/README.md).
+  The existing grammar can still accept `SELECT 9값;` as an integer plus alias, and
+  `SELECT $9끝$body$9끝$;` as a parameter plus alias; the analogous ASCII inputs were already accepted.
+  PostgreSQL rejects such adjacent numeric/parameter junk. A clean tree does not validate SQL against a server.
+
 - **Bash/Ruby heredocs:** the recorded scanner patches now store end words as UTF-8 and compare full
   encoded characters. Korean end words no longer alias their ASCII low byte or another syllable with the
   same low byte. ASCII end-word bytes are unchanged. Invalid UTF-8 lookaheads compare as the same `0xFF`
@@ -172,7 +188,7 @@ rejects them. Unknown or case-variant POSIX-like forms (`[[:unknown:]]`, `[[:Alp
 interprets as nested classes remain unsupported. The [recorded CLI fixture](testdata/query-regex-cli.json) retains
 these acceptance differences.
 
-Additions and one behaviour change in the root module; grammar modules and the engine ABI are unchanged.
+The following additions and one behaviour change affect the root module; the engine ABI is unchanged.
 
 - **CP949 input:** `NewSourceCP949(raw)` decodes CP949 (the WHATWG `EUC-KR` index = windows-949; not IBM-949) with a
   built-in table, and `Encoding` has a new value `CP949`. `NewSource` still detects only UTF-16 BOMs: it never guesses
