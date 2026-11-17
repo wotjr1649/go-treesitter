@@ -439,11 +439,11 @@
       "cSymbol": "tree_sitter_bash",
       "patches": [
         {
-          "file": "patches/bash/0001-heredoc-lookahead-char.patch",
-          "sha256": "5c2a16ea0121047b87902ce025930b104be1107c704fc91e8d07a6e7735e5406",
+          "file": "patches/bash/0001-heredoc-utf8.patch",
+          "sha256": "e2e003683f33dcd960e0a88863349ae7bf9316ac3aef5e6abc15d8d8faae88d4",
           "source": "src/scanner.c",
           "beforeSHA256": "7cc25d70626f8939b35ecd504bf724e2001b817412aa29bceb4c4955a91558a9",
-          "afterSHA256": "2578185990c634a3e1b546c23615e3339ea55bb77a2117799b2e6a960cdf472e",
+          "afterSHA256": "8141bcf24df3c20dc95144aae851034e1760d9697f76ee4eabf29e2e34cb598d",
           "upstreamReport": "https://github.com/tree-sitter/tree-sitter-bash/issues/370"
         }
       ],
@@ -615,11 +615,11 @@
       "cSymbol": "tree_sitter_ruby",
       "patches": [
         {
-          "file": "patches/ruby/0001-heredoc-lookahead-char.patch",
-          "sha256": "f98de0690410d24128412eca402b8f1d0c8182972b84c26794dd7441970130e7",
+          "file": "patches/ruby/0001-heredoc-utf8.patch",
+          "sha256": "e6b78632eb084a0438584d6e38cd53d8aaf141592db2f75e08c0f583507c6368",
           "source": "src/scanner.c",
           "beforeSHA256": "88c1c036d5af7c22a1bc9cc5e50411d414ac9624afed676d42957c566ac4083d",
-          "afterSHA256": "d40efa691677b020f805dae9ed59cb49cd45a17c234c22a06b837dba42389f98",
+          "afterSHA256": "387e6c2306b49962b93d6b571936169e2f1f372a374b48f7548bfa97e0ad508f",
           "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/305"
         }
       ],

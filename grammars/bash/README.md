@@ -6,7 +6,7 @@ Generated tree-sitter grammar module for go-treesitter. **Do not edit**: `engine
 - upstream grammar: https://github.com/tree-sitter/tree-sitter-bash at `a06c2e4415e9bc0346c6b86d401879ffb44058f7`
 - tree-sitter runtime: v0.27.2 (unmodified)
 - engine ABI: 3
-- recipe sha256: `4fa28f9cc41751824293f8da5e17cde45c2d046ba1098cc0a59a786048e2b3cc`
+- recipe sha256: `1fe4ecbafce70d653a95d7d51ff5a606820633227c89ad1831ace2e3abaa0835`
 - identity and output hashes: `provenance.json` (equals the compiled `engine.Identity`; `go test` checks it)
 
 `LICENSE` is the upstream grammar's license. `LICENSES/tree-sitter.txt` is the license of the tree-sitter runtime C translated into `engine_gen.go`. `LICENSES/wasi-libc/` holds the license texts of the wasi-libc code translated into `engine_gen.go` (wasi-libc `2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13`;
@@ -15,6 +15,6 @@ every file's hash is in `provenance.json`). Regenerate with `tools/gen` (see its
 
 This grammar differs temporarily from upstream under ADR-0023. Applied patches (full hashes in `provenance.json`):
 
-The heredoc patch compares an ASCII delimiter byte exactly and a non-ASCII one by its stored low byte, so non-ASCII delimiters close; two non-ASCII code points with the same low byte still match each other.
+The heredoc patch stores and compares UTF-8 end words, preserving ASCII bytes and distinguishing code points that share a low byte. Invalid lookaheads all compare as 0xFF, distinct from U+FFFD. The 1024-byte scanner state buffer includes all open end words and metadata; overflow loses state (about 330 Hangul syllables total, fewer with other state).
 
-- `patches/bash/0001-heredoc-lookahead-char.patch` changes `src/scanner.c`; upstream defect report: https://github.com/tree-sitter/tree-sitter-bash/issues/370.
+- `patches/bash/0001-heredoc-utf8.patch` changes `src/scanner.c`; upstream defect report: https://github.com/tree-sitter/tree-sitter-bash/issues/370.

@@ -190,7 +190,7 @@ Each grammar's optional `patches` list keeps the existing single-file records: `
 `source` (archive-root-relative), `sha256` (patch bytes), `beforeSHA256`, `afterSHA256`, and `upstreamReport` (HTTPS).
 Only owner-approved patches may be added. C-only patches keep their existing identities and disclosure format.
 No real grammar patch is introduced by the regeneration mechanism itself.
-Recorded C-only patches exist for bash and ruby (`0001-heredoc-lookahead-char`), yaml (`0001-no-early-eof`,
+Recorded C-only patches exist for bash and ruby (`0001-heredoc-utf8`), yaml (`0001-no-early-eof`,
 `0002-bound-serialized-indent-bytes`) and python (`0001-bound-serialized-indent-bytes`); `gen -patch-status` lists the
 counts. Retire each with an approved pin move when upstream fixes it; `native-ref -unpatched` supplies the required
 corpus/fuzz baseline.

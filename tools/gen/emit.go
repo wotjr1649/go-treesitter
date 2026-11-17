@@ -344,7 +344,7 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 		result += "\nThis grammar differs temporarily from upstream under ADR-0023. Applied patches (full hashes in `provenance.json`):\n"
 		switch lang {
 		case "bash", "ruby":
-			result += "\nThe heredoc patch compares an ASCII delimiter byte exactly and a non-ASCII one by its stored low byte, so non-ASCII delimiters close; two non-ASCII code points with the same low byte still match each other.\n"
+			result += "\nThe heredoc patch stores and compares UTF-8 end words, preserving ASCII bytes and distinguishing code points that share a low byte. Invalid lookaheads all compare as 0xFF, distinct from U+FFFD. The 1024-byte scanner state buffer includes all open end words and metadata; overflow loses state (about 330 Hangul syllables total, fewer with other state).\n"
 		case "yaml":
 			result += "\nYAML patch 0001 prevents premature end-of-input acceptance and silent source truncation.\n"
 			if len(g.Patches) > 1 {
