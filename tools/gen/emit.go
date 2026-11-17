@@ -8,13 +8,13 @@ import (
 	"fmt"
 	"go/format"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 
+	"github.com/wotjr1649/go-treesitter/tools/bench/proc"
 	"github.com/wotjr1649/go-treesitter/tools/gen/grammarpatch"
 	"github.com/wotjr1649/go-treesitter/tools/gen/patches"
 )
@@ -126,7 +126,7 @@ func goMod(lang, rootVersion string) string {
 // the default GOPROXY and GOSUMDB (so the checksum database has verified them). It fails when they are unavailable.
 func rootGoSum(version string) (string, error) {
 	const root = "github.com/wotjr1649/go-treesitter"
-	c := exec.Command("go", "mod", "download", "-json", root+"@"+version)
+	c := proc.Command("go", "mod", "download", "-json", root+"@"+version)
 	c.Env = append(os.Environ(), "GOWORK=off", "GOTOOLCHAIN=local", "GOFLAGS=")
 	c.Dir = os.TempDir()
 	var stderr bytes.Buffer

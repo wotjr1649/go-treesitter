@@ -2,10 +2,11 @@ package patches
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
 func TestApply(t *testing.T) {
@@ -14,10 +15,10 @@ func TestApply(t *testing.T) {
 		t.Run(tc, func(t *testing.T) {
 			root := t.TempDir()
 			// A build copy sits beneath the checkout; Git must not prepend that checkout's path.
-			if out, err := exec.Command("git", "-C", root, "init", "-q").CombinedOutput(); err != nil {
+			if out, err := proc.Command("git", "-C", root, "init", "-q").CombinedOutput(); err != nil {
 				t.Fatalf("git init: %s %v", out, err)
 			}
-			if out, err := exec.Command("git", "-C", root, "config", "core.autocrlf", "true").CombinedOutput(); err != nil {
+			if out, err := proc.Command("git", "-C", root, "config", "core.autocrlf", "true").CombinedOutput(); err != nil {
 				t.Fatalf("git config: %s %v", out, err)
 			}
 			src := filepath.Join(root, "source")

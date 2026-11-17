@@ -15,7 +15,6 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -23,6 +22,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/wotjr1649/go-treesitter/tools/bench/proc"
 	"github.com/wotjr1649/go-treesitter/tools/gen/patches"
 )
 
@@ -561,7 +561,7 @@ func recipeSHA256(pins *Pins, g GrammarPin, name string, rc recipe) string {
 }
 
 func runCmd(dir string, env []string, name string, args ...string) (string, error) {
-	c := exec.Command(name, args...)
+	c := proc.Command(name, args...)
 	c.Dir = dir
 	c.Env = append(os.Environ(), env...)
 	var buf bytes.Buffer

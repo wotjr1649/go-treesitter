@@ -10,6 +10,10 @@ import hashlib
 import json
 import os
 import subprocess
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "native-ref"))
+import proctree
 
 LANGS = 'bash c cpp csharp css golang html java javascript json python rust tsql tsx typescript'.split()
 PREFIX = 'github.com/wotjr1649/go-treesitter'
@@ -83,7 +87,7 @@ def main():
     (out / 'jobs.json').write_bytes(jobs)
     env = dict(os.environ, CGO_ENABLED='0', GOWORK='off', GOTOOLCHAIN='local')
     receipt = {'role': 'Q12/Q13 exact exception-table differential', 'jobsSHA256': sha(out / 'jobs.json'),
-               'inputs': len(parsed), 'go': subprocess.check_output(['go', 'version'], text=True).strip(), 'arms': {}}
+               'inputs': len(parsed), 'go': proctree.run(['go', 'version'], text=True, capture_output=True, check=True, timeout=60).stdout.strip(), 'arms': {}}
     (out / 'receipt.json').write_text(json.dumps(receipt, indent=2), encoding='utf-8')
     for arm in ['before', 'after']:
         root = getattr(args, arm).resolve()
@@ -101,9 +105,9 @@ def main():
         exe = work / 'check.exe'
         print('build/run ' + arm, flush=True)
         with (work / 'build.log').open('wb') as log:
-            subprocess.run(['go', 'build', '-o', str(exe), '.'], cwd=work, env=env, stdout=log, stderr=subprocess.STDOUT, check=True)
+            proctree.run(['go', 'build', '-o', str(exe), '.'], cwd=work, env=env, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=1800)
         with (out / (arm + '.jsonl')).open('wb') as data, (work / 'run.log').open('wb') as log:
-            subprocess.run([str(exe), str(out / 'jobs.json')], env=env, stdout=data, stderr=log, check=True)
+            proctree.run([str(exe), str(out / 'jobs.json')], env=env, stdout=data, stderr=log, check=True)
         if before != identity(root):
             raise RuntimeError('source changed during differential: ' + arm)
         receipt['arms'][arm] = {'root': str(root), 'sourceSHA256': before, 'executableSHA256': sha(exe),

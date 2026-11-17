@@ -9,13 +9,15 @@ import os
 from pathlib import Path, PurePosixPath
 import platform
 import re
-import signal
 import subprocess
+import sys
 import tarfile
 import time
 
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tools/native-ref"))
+import proctree
 NODE = re.compile(rb"([0-9]+)\t([^\t]+)\t(.*?)\t([01])\t([01])\t([01])\t([01])\t([01])\t([0-9]+)\t([0-9]+)\t([0-9]+:[0-9]+)\t([0-9]+:[0-9]+)\n", re.DOTALL)
 
 
@@ -32,7 +34,7 @@ def changed_grammars(old, new):
 def commits(repo, base, head, merge_base=False):
     """Resolve both refs; with merge_base, compare from the merge base so a stale branch is not judged against pins it lacks."""
     def git(*args):
-        done = subprocess.run(["git", *args], cwd=repo, capture_output=True, text=True, timeout=120)
+        done = proctree.run(["git", *args], cwd=repo, capture_output=True, text=True, timeout=120)
         out = done.stdout.strip()
         if done.returncode != 0 or not re.fullmatch(r"[0-9a-f]{40}", out):
             raise ValueError(f"git {args[0]} failed or returned no commit: {done.stderr.strip()}")
@@ -43,7 +45,7 @@ def commits(repo, base, head, merge_base=False):
 
 
 def pins_at(repo, commit):
-    done = subprocess.run(["git", "show", f"{commit}:tools/gen/pins.json"], cwd=repo, capture_output=True, timeout=120)
+    done = proctree.run(["git", "show", f"{commit}:tools/gen/pins.json"], cwd=repo, capture_output=True, timeout=120)
     if done.returncode != 0:
         raise ValueError(f"cannot read tools/gen/pins.json at {commit}")
     return json.loads(done.stdout)
@@ -136,21 +138,24 @@ class Review:
         started = time.monotonic()
         # File-backed output retains partial compiler/native evidence on failure or timeout.
         log.parent.mkdir(parents=True, exist_ok=True)
-        with log.with_suffix(".stdout").open("wb") as stdout, log.with_suffix(".stderr").open("wb") as stderr:
-            try:
-                process = subprocess.Popen([str(x) for x in args], cwd=cwd, env=self.env,
-                                           stdout=stdout, stderr=stderr, start_new_session=os.name != "nt")
-                code = process.wait(timeout=timeout)
-            except subprocess.TimeoutExpired:
-                if os.name == "nt":
-                    subprocess.run(["taskkill", "/PID", str(process.pid), "/T", "/F"],
-                                   stdout=stderr, stderr=stderr, timeout=30, check=True)
-                else:
-                    os.killpg(process.pid, signal.SIGKILL)
-                process.wait(timeout=30)
-                code = "TIMEOUT"
-        write_json(log.with_suffix(".json"), {"args": [str(x) for x in args], "cwd": str(cwd),
-                   "timeout_seconds": timeout, "seconds": time.monotonic() - started, "exit": code})
+        code, failure = None, None
+        try:
+            with log.with_suffix(".stdout").open("wb") as stdout, log.with_suffix(".stderr").open("wb") as stderr:
+                try:
+                    code = proctree.run(args, cwd=cwd, env=self.env, stdout=stdout,
+                                        stderr=stderr, timeout=timeout).returncode
+                except subprocess.TimeoutExpired:
+                    code = "TIMEOUT"
+                except BaseException as error:
+                    failure = error
+        finally:
+            receipt = {"args": [str(x) for x in args], "cwd": str(cwd),
+                       "timeout_seconds": timeout, "seconds": time.monotonic() - started, "exit": code}
+            if failure is not None:
+                receipt["error"] = repr(failure)
+            write_json(log.with_suffix(".json"), receipt)
+        if failure is not None:
+            raise failure
         output = log.with_suffix(".stdout").read_bytes()
         if check and code != 0:
             raise ValueError(f"command failed ({code}); see {log.relative_to(self.out)}.stderr")
