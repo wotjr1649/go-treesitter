@@ -78,7 +78,7 @@ jobs:
           TREE_SITTER_CLI_ARCHIVE: ${{ runner.temp }}/regen/dl/tree-sitter-linux-x64.gz
         run: |
           test -s "$TREE_SITTER_CLI_ARCHIVE"
-          go test -count=1 -timeout 60s -v ./grammarpatch -run '^(TestSyntheticGrammarRegeneration|TestUnpatchedGrammarRegeneration)$'
+          go test -count=1 -timeout 60s -v ./grammarpatch -run '^(TestSyntheticGrammarRegeneration|TestUnpatchedGrammarRegeneration|TestJSONGrammarRegeneration)$'
       - name: Compare with the committed modules
         if: ${{ !cancelled() }}
         run: |
