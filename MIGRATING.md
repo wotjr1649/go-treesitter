@@ -107,10 +107,15 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
 
 - **T-SQL v2.1.0:** `grammars/tsql` moves to the owner's `wotjr1649/tree-sitter-mssql`
   at `80037156b044543a8248299205a90552687c0c40`, with CLI 0.27.2 and no grammar patches.
-  The Go signatures and engine ABI are unchanged, but node kinds, child alternatives and tree shapes change;
-  this is a breaking grammar contract for consumers of node kinds, traversals and queries.
-  Review the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-t-sql-v210),
-  update affected queries and do not assume that an unchanged node name has unchanged children.
+  The Go signatures and engine ABI are unchanged. The schema diff's seven `CHILDREN_TYPE_REMOVED`
+  entries describe existing nodes gaining named fields: function/procedure bodies move to `body`,
+  the CTE identifier to `name`, and trigger object references to `name`/`target`.
+  These fields were already present in alfpricot v1.0.0 (`852cbd20d7dc`); the nodes remain children,
+  child traversal is unchanged by this field assignment, and `ChildByFieldName` now finds them.
+  For this schema change, only consumers relying on the node-types `children` list must change:
+  inspect `fields` as well. This is not a node removal or a general traversal/query compatibility break.
+  Other additions and intended syntax rejections in v2.1.0 can still change parse results; review the
+  [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-t-sql-v210).
   The recorded Hangul alias, variable, column and label cases now parse cleanly and remain Korean regression inputs.
   This development change does not choose a module release version or authorize publication.
 
