@@ -1,6 +1,25 @@
 {
+  "patches": [
+    {
+      "file": "patches/rust/0001-block-comment-code-points.patch",
+      "sha256": "55482130e86ed22ad48a1a6a3a8910f5a7aed106552b6a7fca6f612d71ae2bb9",
+      "source": "src/scanner.c",
+      "beforeSHA256": "9609a2f92dbb7c32bc056fd8fb94e5478428f04496696aa08b048a9b66caf283",
+      "afterSHA256": "08a8d78b29268e30745c739c57ac4ded197f343e128ec59fead980b2a7a7b762",
+      "upstreamReport": "https://github.com/tree-sitter/tree-sitter-rust/issues/315"
+    }
+  ],
   "grammarGeneration": {
-    "patches": null,
+    "patches": [
+      {
+        "file": "patches/rust/0001-block-comment-code-points.patch",
+        "sha256": "55482130e86ed22ad48a1a6a3a8910f5a7aed106552b6a7fca6f612d71ae2bb9",
+        "source": "src/scanner.c",
+        "beforeSHA256": "9609a2f92dbb7c32bc056fd8fb94e5478428f04496696aa08b048a9b66caf283",
+        "afterSHA256": "08a8d78b29268e30745c739c57ac4ded197f343e128ec59fead980b2a7a7b762",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-rust/issues/315"
+      }
+    ],
     "cli": "0.27.2",
     "jsRuntime": "native",
     "inputSHA256": "80e78fe29ed33f741ad1367e11ae7709163b5010a9f66cbcfd801f15d3f9929f",
@@ -8,7 +27,7 @@
       "grammar.json": "b0f58f41f5461fa141bb98d81fe8abece3056cff979c4068a2e6cddee5aa0663",
       "node-types.json": "a5d2f343145e7d59cb1b257b4700c0888aef74544b862b0382f00cd8b899d045",
       "parser.c": "c9baf72693238834d551f41713a773565e265eea387aa5a753948223eadde2a2",
-      "scanner.c": "9609a2f92dbb7c32bc056fd8fb94e5478428f04496696aa08b048a9b66caf283",
+      "scanner.c": "08a8d78b29268e30745c739c57ac4ded197f343e128ec59fead980b2a7a7b762",
       "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
       "tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
       "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
@@ -34,15 +53,16 @@
       "patched.grammar.grammar.json": "b0f58f41f5461fa141bb98d81fe8abece3056cff979c4068a2e6cddee5aa0663",
       "patched.grammar.node-types.json": "a5d2f343145e7d59cb1b257b4700c0888aef74544b862b0382f00cd8b899d045",
       "patched.grammar.parser.c": "c9baf72693238834d551f41713a773565e265eea387aa5a753948223eadde2a2",
-      "patched.grammar.scanner.c": "9609a2f92dbb7c32bc056fd8fb94e5478428f04496696aa08b048a9b66caf283",
+      "patched.grammar.scanner.c": "08a8d78b29268e30745c739c57ac4ded197f343e128ec59fead980b2a7a7b762",
       "patched.grammar.tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
       "patched.grammar.tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
       "patched.grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
+      "patches.1": "55482130e86ed22ad48a1a6a3a8910f5a7aed106552b6a7fca6f612d71ae2bb9",
       "patches.inputs": "80e78fe29ed33f741ad1367e11ae7709163b5010a9f66cbcfd801f15d3f9929f",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
       "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
     },
-    "RecipeSHA256": "d7c1cd166496df7355eebd24d2fc8218b9ec61db22247c4927d4e361e30f2de2",
+    "RecipeSHA256": "c54f36dc2b7488b778bc730b584bd93ea89b103e46e67913442d5ac264c5a80f",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -65,8 +85,8 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "d22985f9156f15418f20f3ca1b9a26fb1538311e2597762691ea6e307b8a4f02",
-    "engine_gen.go": "f421a65741b9a71162b464007d309c618287163cdd3ed58c1e4b12b221aa2143",
-    "wasm": "67ffc7af0b8e890897819a4b1e3c7d89f356daf58e6f81f7ce99a6b22daae448",
-    "wasm.clang": "47f88255f608c86a563b97f58b89a63195ba7edfdd3c111ad690fc7714228366"
+    "engine_gen.go": "a9647e316567bfc02e692255a17e40b850d1b4c933469bfd2239b983e394e90b",
+    "wasm": "c58a3070968765931bdfd4b1baeb55586bf3304de1c0b1d70448992f550cda4d",
+    "wasm.clang": "3c1f670d2b55da344d4f7f60bd41efc4747b38efc3eb6c59b63aa61e64f9f152"
   }
 }

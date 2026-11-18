@@ -28388,16 +28388,16 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 						goto l0
 					}
 					t5 := int32(load32(m.memory, uint64(uint32(v1))))
-					v0 = t5 << 24
+					v0 = t5
 					goto l3
 				}
 			l1:
 				t6 := int32(load32(m.memory, uint64(uint32(v1))))
-				v0 = t6 << 24
+				v0 = t6
 				if (v5^i32(-1)|v4)&i32(1) == 0 {
 					goto l3
 				}
-				if v0 != i32(0x21000000) {
+				if v0 != i32(33) {
 					goto l3
 				}
 				store16(m.memory, uint64(uint32(v1))+4, uint16(i32(7)))
@@ -28414,7 +28414,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 				if v4 != i32(1) {
 					goto l33
 				}
-				if v0 != i32(0x2a000000) {
+				if v0 != i32(42) {
 					goto l33
 				}
 				t110 := int32(load32(m.memory, uint64(uint32(v1))+12))
@@ -28438,7 +28438,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 				goto l0
 			}
 			v2 = i32(0)
-			switch v0>>24 - i32(42) {
+			switch v0 - i32(42) {
 			case 5:
 				goto l37
 			case 0:
@@ -28457,12 +28457,12 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 			if t115 != 0 {
 				goto l38
 			}
-			t116 := int32(m.memory[uint64(uint32(v1))])
+			t116 := int32(load32(m.memory, uint64(uint32(v1))))
 			v3 = t116
 			v0 = i32(1)
 			switch v2 - i32(1) {
 			case 0:
-				p0 = i32(1)
+				p0 = i32(2)
 				goto l42
 			case 1:
 				goto l40
@@ -28474,106 +28474,101 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 	l0:
 		return v3
 	l40:
-		p0 = i32(2)
+		p0 = i32(1)
 	l42:
 		v4 = p0
-	l51:
+	l49:
 		{
 			{
 				switch v4 {
 				case 0:
 					t117 := v0
 					var p118 int32
-					if v3&i32(255) == i32(42) {
+					if v3 == i32(42) {
 						p118 = 1
 					}
 					v2 = t117 + p118
 					goto l46
 				case 1:
-					switch v3 - i32(42) {
-					default:
-						goto l46
-					case 0:
-						t119 := int32(load32(m.memory, uint64(uint32(v1))+12))
-						m.t0[uint(t119)].(func(int32))(v1)
-						v0 = v2
-						goto l49
-					case 5:
-						v2 = v2 - i32(1)
-						goto l46
-					}
-				default:
-					t120 := int32(load32(m.memory, uint64(uint32(v1))+12))
-					m.t0[uint(t120)].(func(int32))(v1)
+					t119 := int32(load32(m.memory, uint64(uint32(v1))+12))
+					m.t0[uint(t119)].(func(int32))(v1)
 					v2 = v0
 					switch v3 - i32(42) {
 					case 0:
-						goto l49
+						goto l47
+					default:
+						goto l46
 					case 5:
-						t131 := int32(load32(m.memory, uint64(uint32(v1))+8))
-						m.t0[uint(t131)].(func(int32, int32))(v1, i32(0))
-						if v3 == i32(47) {
-							t132 := int32(load32(m.memory, uint64(uint32(v1))+12))
-							m.t0[uint(t132)].(func(int32))(v1)
-						}
-						t133 := int32(load32(m.memory, uint64(uint32(v1))+24))
-						t134 := m.t0[uint(t133)].(func(int32) int32)(v1)
-						if t134 != 0 {
+						t120 := int32(load32(m.memory, uint64(uint32(v1))+8))
+						m.t0[uint(t120)].(func(int32, int32))(v1, i32(0))
+						t121 := int32(load32(m.memory, uint64(uint32(v1))+12))
+						m.t0[uint(t121)].(func(int32))(v1)
+						t122 := int32(load32(m.memory, uint64(uint32(v1))+24))
+						t123 := m.t0[uint(t122)].(func(int32) int32)(v1)
+						if t123 != 0 {
 							goto l38
 						}
-						t135 := int32(m.memory[uint64(uint32(v1))])
-						v3 = t135
+						t124 := int32(load32(m.memory, uint64(uint32(v1))))
+						v3 = t124
 						v4 = i32(0)
+						goto l49
+					}
+				default:
+					switch v3 - i32(42) {
+					case 5:
 						goto l51
 					default:
 						goto l46
+					case 0:
+						t125 := int32(load32(m.memory, uint64(uint32(v1))+12))
+						m.t0[uint(t125)].(func(int32))(v1)
+						v0 = v2
 					}
 				}
-			l49:
-				t121 := int32(load32(m.memory, uint64(uint32(v1))+8))
-				m.t0[uint(t121)].(func(int32, int32))(v1, i32(0))
-				if v3&i32(255) == i32(47) {
-					t122 := int32(load32(m.memory, uint64(uint32(v1))+12))
-					m.t0[uint(t122)].(func(int32))(v1)
-				}
-				t123 := int32(load32(m.memory, uint64(uint32(v1))+24))
-				t124 := m.t0[uint(t123)].(func(int32) int32)(v1)
-				if t124 != 0 {
+			l47:
+				t126 := int32(load32(m.memory, uint64(uint32(v1))+8))
+				m.t0[uint(t126)].(func(int32, int32))(v1, i32(0))
+				t127 := int32(load32(m.memory, uint64(uint32(v1))+24))
+				t128 := m.t0[uint(t127)].(func(int32) int32)(v1)
+				if t128 != 0 {
 					goto l38
 				}
-				t125 := int32(m.memory[uint64(uint32(v1))])
-				v3 = t125
+				t129 := int32(load32(m.memory, uint64(uint32(v1))))
+				v3 = t129
 				v2 = v0
-				v4 = i32(1)
-				goto l51
+				v4 = i32(2)
+				goto l49
 			}
+		l51:
+			v2 = v2 - i32(1)
+			v3 = i32(47)
 		l46:
-			t126 := int32(load32(m.memory, uint64(uint32(v1))+8))
-			m.t0[uint(t126)].(func(int32, int32))(v1, i32(0))
+			t130 := int32(load32(m.memory, uint64(uint32(v1))+8))
+			m.t0[uint(t130)].(func(int32, int32))(v1, i32(0))
 			{
-				if v3&i32(255) != i32(47) {
+				if v3 != i32(47) {
 					goto l52
 				}
 				if v2 == 0 {
 					goto l52
 				}
-				t127 := int32(load32(m.memory, uint64(uint32(v1))+12))
-				m.t0[uint(t127)].(func(int32))(v1)
+				t131 := int32(load32(m.memory, uint64(uint32(v1))+12))
+				m.t0[uint(t131)].(func(int32))(v1)
 			}
 		l52:
-			t128 := int32(load32(m.memory, uint64(uint32(v1))+24))
-			t129 := m.t0[uint(t128)].(func(int32) int32)(v1)
-			if t129 != 0 {
+			t132 := int32(load32(m.memory, uint64(uint32(v1))+24))
+			t133 := m.t0[uint(t132)].(func(int32) int32)(v1)
+			if t133 != 0 {
 				goto l38
 			}
 			if v2 == 0 {
 				goto l38
 			}
-			t130 := int32(m.memory[uint64(uint32(v1))])
-			v3 = t130
+			t134 := int32(load32(m.memory, uint64(uint32(v1))))
+			v3 = t134
 			v0 = v2
-			v4 = i32(2)
-			goto l51
+			v4 = i32(1)
+			goto l49
 		}
 	}
 l38:

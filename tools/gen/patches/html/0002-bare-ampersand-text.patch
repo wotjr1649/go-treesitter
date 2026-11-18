@@ -1,0 +1,10 @@
+--- a/grammar.js
++++ b/grammar.js
+@@ -136,6 +136,6 @@
+       seq('"', optional(alias(/[^"]+/, $.attribute_value)), '"'),
+     ),
+ 
+-    text: _ => /[^<&\s]([^<&]*[^<&\s])?/,
++    text: _ => token(choice(/(?:&\s+)*[^<&\s](([^<&]|&\s+)*[^<&\s])?/, '&')),
+   },
+ });

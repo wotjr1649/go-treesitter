@@ -1,0 +1,69 @@
+--- a/src/scanner.c
++++ b/src/scanner.c
+@@ -146,18 +146,19 @@
+ #endif
+ 
+ typedef struct {
+-    int16_t row;
++    // shortcut: rows past INT32_MAX (over 2 GiB of line breaks) still overflow; widen to int64_t if such inputs must parse.
++    int32_t row;
+     int16_t col;
+-    int16_t blk_imp_row;
++    int32_t blk_imp_row;
+     int16_t blk_imp_col;
+     int16_t blk_imp_tab;
+     Array(int16_t) ind_typ_stk;
+     Array(int16_t) ind_len_stk;
+ 
+     // temp
+-    int16_t end_row;
++    int32_t end_row;
+     int16_t end_col;
+-    int16_t cur_row;
++    int32_t cur_row;
+     int16_t cur_col;
+     int32_t cur_chr;
+     int8_t sch_stt;
+@@ -166,11 +167,15 @@
+ 
+ static unsigned serialize(Scanner *scanner, char *buffer) {
+     size_t size = 0;
+-    *(int16_t *)&buffer[size] = scanner->row;
+-    size += sizeof(int16_t);
++    *(int32_t *)&buffer[size] = scanner->row;
++    size += sizeof(int32_t);
+     *(int16_t *)&buffer[size] = scanner->col;
+     size += sizeof(int16_t);
+-    *(int16_t *)&buffer[size] = scanner->blk_imp_row;
++    // blk_imp_row is only compared with later rows: store row - blk_imp_row, saturated at INT16_MAX, to keep the header at 12 bytes.
++    // shortcut: a blk_imp_row numerically greater than row by more than 32768 would not round-trip; unreached, as blk_imp_row
++    // is a token's start row and row is the end row of that token or a later one. Serialize it exactly if a scan path breaks that.
++    int32_t blk_imp_dist = scanner->row - scanner->blk_imp_row;
++    *(int16_t *)&buffer[size] = blk_imp_dist > INT16_MAX ? INT16_MAX : blk_imp_dist;
+     size += sizeof(int16_t);
+     *(int16_t *)&buffer[size] = scanner->blk_imp_col;
+     size += sizeof(int16_t);
+@@ -200,11 +205,11 @@
+     array_push(&scanner->ind_len_stk, -1);
+     if (length > 0) {
+         size_t size = 0;
+-        scanner->row = *(int16_t *)&buffer[size];
+-        size += sizeof(int16_t);
++        scanner->row = *(int32_t *)&buffer[size];
++        size += sizeof(int32_t);
+         scanner->col = *(int16_t *)&buffer[size];
+         size += sizeof(int16_t);
+-        scanner->blk_imp_row = *(int16_t *)&buffer[size];
++        scanner->blk_imp_row = scanner->row - *(int16_t *)&buffer[size];
+         size += sizeof(int16_t);
+         scanner->blk_imp_col = *(int16_t *)&buffer[size];
+         size += sizeof(int16_t);
+@@ -887,7 +892,7 @@
+         return false;
+     }
+ 
+-    int16_t bgn_row = scanner->cur_row;
++    int32_t bgn_row = scanner->cur_row;
+     int16_t bgn_col = scanner->cur_col;
+     int32_t bgn_chr = lexer->lookahead;
+ 

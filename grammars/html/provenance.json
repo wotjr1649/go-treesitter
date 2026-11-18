@@ -1,13 +1,48 @@
 {
+  "patches": [
+    {
+      "file": "patches/html/0001-greater-than-text.patch",
+      "sha256": "86ee370403144f075dde01d282b58ff9eb400c64267ba7d8290ea53797d0492a",
+      "source": "grammar.js",
+      "beforeSHA256": "c139ccf784d7f2c377cbf702e0fe1daaa8e9ac2d76a7a8c0f81bfdb387b45ee2",
+      "afterSHA256": "bc5ab3338e45a35baae69ea42f4ff31cc36fc3659bc460b3fc080f4302ec2f1d",
+      "upstreamReport": "https://github.com/tree-sitter/tree-sitter-html/pull/141"
+    },
+    {
+      "file": "patches/html/0002-bare-ampersand-text.patch",
+      "sha256": "958e575866f75523227727d7b0aecd1ba542ce5b798731f375ba624c0f2aa4da",
+      "source": "grammar.js",
+      "beforeSHA256": "bc5ab3338e45a35baae69ea42f4ff31cc36fc3659bc460b3fc080f4302ec2f1d",
+      "afterSHA256": "e86cbaa83d22c48499c41647eb404d19693ffe0a882f50583bdf23f3621a6910",
+      "upstreamReport": "https://github.com/tree-sitter/tree-sitter-html/issues/143"
+    }
+  ],
   "grammarGeneration": {
-    "patches": null,
+    "patches": [
+      {
+        "file": "patches/html/0001-greater-than-text.patch",
+        "sha256": "86ee370403144f075dde01d282b58ff9eb400c64267ba7d8290ea53797d0492a",
+        "source": "grammar.js",
+        "beforeSHA256": "c139ccf784d7f2c377cbf702e0fe1daaa8e9ac2d76a7a8c0f81bfdb387b45ee2",
+        "afterSHA256": "bc5ab3338e45a35baae69ea42f4ff31cc36fc3659bc460b3fc080f4302ec2f1d",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-html/pull/141"
+      },
+      {
+        "file": "patches/html/0002-bare-ampersand-text.patch",
+        "sha256": "958e575866f75523227727d7b0aecd1ba542ce5b798731f375ba624c0f2aa4da",
+        "source": "grammar.js",
+        "beforeSHA256": "bc5ab3338e45a35baae69ea42f4ff31cc36fc3659bc460b3fc080f4302ec2f1d",
+        "afterSHA256": "e86cbaa83d22c48499c41647eb404d19693ffe0a882f50583bdf23f3621a6910",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-html/issues/143"
+      }
+    ],
     "cli": "0.27.2",
     "jsRuntime": "native",
-    "inputSHA256": "a2452204acbc0208985f18754ce0045f456f2f6f053c8b9a2d35a160c79f0329",
+    "inputSHA256": "07888b05b53be5be6e7ff6c2e5f2f7163250b96940dcfef0c50c98e8d41a71bf",
     "outputs": {
-      "grammar.json": "cd561d3ea2d9725fa1933d1daf5c4e83e1269a27a4ffe8bc4f1efc96d2d3af37",
+      "grammar.json": "6beafb7c7d17f4d2cc2dad57c337f53786f1aeeb934b30ed5433b9c988a31b11",
       "node-types.json": "50956d14821e11b12cf43301deb0350239161f0e63111afa35c79eda581faefe",
-      "parser.c": "4648a49ceb3c3febb804c189b86c199f92869cdd447c28ca8552c32c39f8976e",
+      "parser.c": "2c165de3af4cc96697f317fb7acb4ae9931413ae427c2daa1a2f54bbe8480a3f",
       "scanner.c": "5c0a0567e010277b81fe63be0acd04f6b44c3ef3063ac01429b910c1d22f0dca",
       "tag.h": "aaf1a10c8a2f685ef51a4aa6c01a2cbe166bff67eeccf6b9501a625b71f9ab70",
       "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
@@ -33,19 +68,21 @@
       "grammar.tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
       "grammar.tree_sitter/array.h": "4ff743903dc46f5db6aa54f31c6b4d160a8a9779e5b2ab1ee59ae7ebcd850ea1",
       "grammar.tree_sitter/parser.h": "a1f6ef161fbaf48a0e10fca90ef5290a062462b307b3898aa562993853b9f80a",
-      "patched.grammar.grammar.json": "cd561d3ea2d9725fa1933d1daf5c4e83e1269a27a4ffe8bc4f1efc96d2d3af37",
+      "patched.grammar.grammar.json": "6beafb7c7d17f4d2cc2dad57c337f53786f1aeeb934b30ed5433b9c988a31b11",
       "patched.grammar.node-types.json": "50956d14821e11b12cf43301deb0350239161f0e63111afa35c79eda581faefe",
-      "patched.grammar.parser.c": "4648a49ceb3c3febb804c189b86c199f92869cdd447c28ca8552c32c39f8976e",
+      "patched.grammar.parser.c": "2c165de3af4cc96697f317fb7acb4ae9931413ae427c2daa1a2f54bbe8480a3f",
       "patched.grammar.scanner.c": "5c0a0567e010277b81fe63be0acd04f6b44c3ef3063ac01429b910c1d22f0dca",
       "patched.grammar.tag.h": "aaf1a10c8a2f685ef51a4aa6c01a2cbe166bff67eeccf6b9501a625b71f9ab70",
       "patched.grammar.tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
       "patched.grammar.tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
       "patched.grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
-      "patches.inputs": "a2452204acbc0208985f18754ce0045f456f2f6f053c8b9a2d35a160c79f0329",
+      "patches.1": "86ee370403144f075dde01d282b58ff9eb400c64267ba7d8290ea53797d0492a",
+      "patches.2": "958e575866f75523227727d7b0aecd1ba542ce5b798731f375ba624c0f2aa4da",
+      "patches.inputs": "07888b05b53be5be6e7ff6c2e5f2f7163250b96940dcfef0c50c98e8d41a71bf",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
       "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
     },
-    "RecipeSHA256": "36fc36eeebca5acfafeda6b5125d7ef156825ee1e9c3459abb40318fc2a888c1",
+    "RecipeSHA256": "c7f3929f2bd358533c91f57e227f33e0a8d04abfd1211b2d3609cd371850e556",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -67,9 +104,9 @@
     "LICENSES/wasi-libc/cloudlibc-LICENSE": "c8b789cf5a746611e6300a0cc7750dbf92b61912a709d04e639245f7290656d0",
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
-    "engine_gen.dat": "be5210f4fd126abe7efb486b75d5f32300e44d9f02473ad43ea30424c206e5ea",
-    "engine_gen.go": "58292e1b332b260b5ea5df1fef2c38ad18a66d34d684158e4d5c9eb0fe31343c",
-    "wasm": "439df55138aa66861ba635f1377cd1eb862de09070f658b3f1a94dc2b3946c78",
-    "wasm.clang": "78fb41ad35a64bad023c61c2e1f84efe50b9b100dd79b41be3dc0a8c2df25e20"
+    "engine_gen.dat": "9b4cf5fb03b95bee87278a232446a838a890bd7c101c209bf597f11d55b870a4",
+    "engine_gen.go": "02d303817e1ca05c75323c035607191bacaa07c3497236d67a96acad8af59f15",
+    "wasm": "75e10f3a70765b51d6be1e1d9e59e1d550860aa0585b9ee39e992067e397b935",
+    "wasm.clang": "a21affcc96b76348ce32b3062d75cbb53d7a865e14903c820cd44654fbcbfc13"
   }
 }

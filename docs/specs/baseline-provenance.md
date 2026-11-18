@@ -17,8 +17,9 @@ Every grammar module is generated, never hand-edited, from:
 
 The runtime stays unmodified. Grammar changes require the recorded, hash-checked patch and retirement mechanism
 of ADR-0023; grammar-input changes regenerate C with the pinned CLI, identically for the engine and native reference.
-The YAML early-EOF fix, Bash/Ruby heredoc comparisons and YAML/Python serialization bounds are C-only patches;
-original/result source hashes and each patch identity are recorded in the pins and generated provenance.
+The YAML early-EOF fix, Bash/Ruby heredoc comparisons, YAML/Python serialization bounds, YAML scanner row widening, Rust block comment
+code-point fix and JavaScript JSX ampersand fix are C-only patches. HTML patches `grammar.js` to accept `>` and
+bare `&` in text. The pins and generated provenance record original and result source hashes and each patch identity.
 The PostgreSQL Korean-support exception (owner decision 2026-11-17) records a grammar-input
 identifier patch and a scanner code-point patch; see its [patch record](../../tools/gen/patches/postgres/README.md).
 The unpatched native comparison is separate from the product comparison.

@@ -350,6 +350,15 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 			if len(g.Patches) > 1 {
 				result += "\nYAML patch 0002 bounds serialized indentation by bytes written, preventing deep-nesting buffer overruns (upstream PR #47).\n"
 			}
+			if len(g.Patches) > 2 {
+				result += "\nYAML patch 0003 widens scanner rows to 32 bits, so documents past 32,767 line breaks parse, counting CR and LF separately: line 16,385 is the boundary with CRLF line ends (adapted from upstream PR #35: the block implicit key row is serialized as a saturating 16-bit distance, keeping 253 indentation levels within the 0002 bound).\n"
+			}
+		case "rust":
+			result += "\nThe block comment patch compares full code points for comment delimiters and documentation markers (upstream PR #316). The unpatched scanner read a code point whose low byte is `/`, `*` or `!` as that character, so previously error-free trees change: ordinary comments lose a false `inner`/`outer` marker and `doc` child; after a false nested opening is removed, the comment ends at the `*/` that closes every opening the scanner counts, and the rest is parsed as code (the scanner still does not count a `/*` that directly follows `/`, for example `//*`, an unchanged upstream limitation; where a false opening used to offset it, valid Rust such as `/* 是个 //* */ */` followed by code was error-free before and now ends the comment at the first `*/` with an `ERROR` over the second); after a false nested closing is removed or a previously hidden real `/*` is recognized, the block comment can extend to a later real `*/` and absorb nodes and query captures even in an error-free tree. When real closes run out, the tree can contain a `MISSING` `*/` or an `ERROR` that absorbs the following code. A documentation comment's `doc_comment` range can also change (see MIGRATING.md).\n"
+		case "javascript":
+			result += "\nThe JSX text patch accepts a bare `&` in JSX text; character references still produce `html_character_reference` (upstream PR #388). TSX has the same defect and is not patched.\n"
+		case "html":
+			result += "\nPatch 0001 accepts `>` in element text (upstream PR #141). Patch 0002 is this project's own fix for upstream issue #143, which has no upstream pull request. The upstream `entity` token matches bounded prefixes with an optional `;`. The forms are `&` followed by 1–30 ASCII letters, `&#` followed by 1–5 decimal digits, and `&#x` or `&#X` followed by 1–6 hexadecimal digits. For example, `R&D` gives `text R` and `entity &D`, and `&#x26x` gives `entity &#x26` and `text x`. Other `&` characters are text. A bare `&` followed by whitespace can join a `text` token when text continues after the whitespace (`Users & roles` is one `text`). If a tag, an entity or end of input follows the whitespace, the `&` can be a separate `text` node.\n"
 		case "postgres":
 			result += "\nOwner-approved exception (2026-11-17) to ADR-0023 decision 1 for Korean support; this gap does not block a release gate. Unquoted identifiers accept all non-ASCII code points, and dollar-quote tags compare complete code points. The upstream 63-code-point tag cap remains.\n"
 		case "python":

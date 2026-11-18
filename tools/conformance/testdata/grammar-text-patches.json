@@ -1,0 +1,49 @@
+{
+  "rust": [
+    {"name":"hangul-delimiters","source":"/* 갪갯 */","nodes":["block_comment /* 갪갯 */"]},
+    {"name":"han-delimiters","source":"/*是个*/","nodes":["block_comment /*是个*/"]},
+    {"name":"astral-delimiters","source":"/* 😪😯 */","nodes":["block_comment /* 😪😯 */"]},
+    {"name":"nested-hangul-delimiters","source":"/* /* 갪갯 */ */","nodes":["block_comment /* /* 갪갯 */ */"]},
+    {"name":"false-inner-doc-marker","source":"/*ġ foo */","nodes":["block_comment /*ġ foo */"]},
+    {"name":"false-outer-doc-marker","source":"/*Ī foo */","nodes":["block_comment /*Ī foo */"]},
+    {"name":"astral-false-outer-doc-marker","source":"/*😪 foo */","nodes":["block_comment /*😪 foo */"]},
+    {"name":"han-false-nesting-then-outer-close","source":"/* 是个 */ */","nodes":["block_comment /* 是个 */"],"errors":["ERROR */"]},
+    {"name":"false-nesting-low-byte-star-then-outer-close","source":"/* a/Ī b */ */","nodes":["block_comment /* a/Ī b */"],"errors":["ERROR */"]},
+    {"name":"hangul-false-nesting-then-outer-close","source":"/* a/갪 b */ */","nodes":["block_comment /* a/갪 b */"],"errors":["ERROR */"]},
+    {"name":"han-false-close-leaves-nested-comment-open","source":"/* /* 个是 */","nodes":["block_comment /* /* 个是 */"],"missing":["*/"]},
+    {"name":"hangul-false-close-leaves-nested-comment-open","source":"/* /* a*갯 */","nodes":["block_comment /* /* a*갯 */"],"missing":["*/"]},
+    {"name":"han-false-close-extends-through-line-comment","source":"/* /* 个是 */ // */\nfn f() {}","nodes":["block_comment /* /* 个是 */ // */","function_item fn f() {}"]},
+    {"name":"han-false-close-extends-through-code","source":"/* /* 个是 */ let x = 1; // */\nfn f() {}","nodes":["block_comment /* /* 个是 */ let x = 1; // */","function_item fn f() {}"]},
+    {"name":"slash-before-star-uncounted-ends-valid-comment-early","source":"/* 是个 //* */ */\nfn f() {}","nodes":["block_comment /* 是个 //* */","function_item fn f() {}"],"errors":["ERROR */"]},
+    {"name":"hangul-false-close-then-code","source":"/* /* a*갯 */\nfn f() {}","nodes":[],"errors":["ERROR /* /* a*갯 */\nfn f() {}"]},
+    {"name":"hangul-low-slash-before-real-nesting","source":"/* 갯/* x */","nodes":["block_comment /* 갯/* x */"],"missing":["*/"]},
+    {"name":"hangul-false-nesting-hid-next-comment","source":"/*갯*//*/ */","nodes":["block_comment /*갯*/","block_comment /*/ */"]},
+    {"name":"hangul-false-close-in-doc-comment","source":"/**갪갯 */","nodes":["block_comment /**갪갯 */","outer_doc_comment_marker *","doc_comment 갪갯 "]},
+    {"name":"real-inner-doc-marker","source":"/*! 한 */","nodes":["block_comment /*! 한 */","inner_doc_comment_marker !","doc_comment  한 "]},
+    {"name":"real-outer-doc-marker","source":"/** 갪갯 */","nodes":["block_comment /** 갪갯 */","outer_doc_comment_marker *","doc_comment  갪갯 "]}
+  ],
+  "javascript": [
+    {"name":"bare-ampersand","source":"<p>&</p>","nodes":["jsx_text &"]},
+    {"name":"leading-ampersand","source":"<p>& a</p>","nodes":["jsx_text & a"]},
+    {"name":"embedded-ampersand","source":"<p>a & b</p>","nodes":["jsx_text a & b"]},
+    {"name":"trailing-ampersand","source":"<p>a &</p>","nodes":["jsx_text a &"]},
+    {"name":"hangul-after-ampersand","source":"<p>&한글</p>","nodes":["jsx_text &한글"]},
+    {"name":"no-semicolon","source":"<p>&foo</p>","nodes":["jsx_text &foo"]},
+    {"name":"nested-text-and-entity","source":"<p>&<b>한 &amp; 글 &</b>&</p>","nodes":["jsx_text &","jsx_text 한 ","html_character_reference &amp;","jsx_text  글 &","jsx_text &"]},
+    {"name":"adjacent-ampersands-and-entity","source":"<p>&&amp;&</p>","nodes":["jsx_text &","html_character_reference &amp;","jsx_text &"]},
+    {"name":"entities-attribute-and-expression","source":"<p title=\"한 > & &amp;\">{a & b}a&#65;b&#x41;c</p>","nodes":["string \"한 > & &amp;\"","html_character_reference &amp;","binary_expression a & b","jsx_text a","html_character_reference &#65;","jsx_text b","html_character_reference &#x41;","jsx_text c"]}
+  ],
+  "html": [
+    {"name":"greater-than-text","source":"<pre>x => y</pre>","nodes":["text x => y"]},
+    {"name":"ampersand-text","source":"<p>Users & roles</p>","nodes":["text Users & roles"]},
+    {"name":"hangul-text","source":"<p>한글 > 본문 & 끝</p>","nodes":["text 한글 > 본문 & 끝"]},
+    {"name":"bare-ampersand","source":"<p>&</p>","nodes":["text &"]},
+    {"name":"leading-ampersand","source":"<p>& roles</p>","nodes":["text & roles"]},
+    {"name":"trailing-ampersand","source":"<p>users &</p>","nodes":["text users","text &"]},
+    {"name":"hangul-after-ampersand","source":"<p>&한글</p>","nodes":["text &","text 한글"]},
+    {"name":"entity-before-greater-than","source":"<p>&amp;>b</p>","nodes":["entity &amp;","text >b"]},
+    {"name":"adjacent-ampersands-and-entity","source":"<p>&&amp;&</p>","nodes":["text &","entity &amp;","text &"]},
+    {"name":"ampersand-letters-without-semicolon-is-entity","source":"<p>R&D</p>","nodes":["text R","entity &D"]},
+    {"name":"entities-and-attributes","source":"<p title=\"한 > & &amp;\" data-x=a&b data-y=a&gt;>a&amp;b&#65;c&#x41;d</p>","nodes":["attribute_value 한 > & &amp;","attribute_value a&b","attribute_value a&gt;","text a","entity &amp;","text b","entity &#65;","text c","entity &#x41;","text d"]}
+  ]
+}

@@ -105,6 +105,47 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
 
 ## Unreleased (after v0.5.0)
 
+- **Rust block comments:** the scanner compares full Unicode code points when recognizing block comment
+  delimiters and documentation markers. The unpatched scanner read a code point whose low byte is `/`, `*`
+  or `!` (for example `是`, `갯`, `个`, `갪`, `Ī`, `😪`, `ġ`) as that ASCII character. Previously error-free
+  trees can change when this low-byte misreading is corrected.
+  - False documentation markers disappear. Ordinary comments such as `/*ġ foo */`, `/*Ī foo */` and
+    `/*😪 foo */` retain their `block_comment` node and lose the spurious `inner` or `outer` marker field and
+    `doc` child. Queries for `(block_comment)` still match these comments. Queries for their documentation
+    children, including the upstream `@comment.documentation` highlight, stop matching them.
+  - With a false nested opening removed, the comment ends at the `*/` that closes every opening the scanner
+    counts. The rest is parsed as code: `/* 是个 */ */`, `/* a/Ī b */ */` and `/* a/갪 b */ */` now end with an `ERROR`
+    over the stray outer `*/`, and `/*갯*//*/ */` is now two `block_comment` nodes. The scanner still does not
+    count a `/*` that directly follows `/` (for example `//*`), an unchanged upstream limitation; where a false
+    opening used to offset it, valid Rust such as `/* 是个 //* */ */` followed by code was error-free before and
+    now ends the comment at the first `*/` with an `ERROR` over the second.
+  - Removing a false nested closing or recognizing a previously hidden real `/*` can extend the block
+    comment to a later real `*/`. With `fn f() {}` on the next line, both `/* /* 个是 */ // */` and
+    `/* /* 个是 */ let x = 1; // */` still parse without errors. The block comment absorbs the separate
+    `line_comment` and, in the second case, the `let_declaration`. In the upstream highlights query, the
+    block comment's `@comment` range grows, the separate line comment's `@comment` disappears, and every
+    capture inside the absorbed code disappears (here `@keyword` for `let`, `@constant.builtin` for `1` and
+    `@punctuation.delimiter` for `;`). When real closes run out, `/* /* 个是 */`, `/* /* a*갯 */` and `/* 갯/* x */` end with a
+    `MISSING` `*/`. With code after such a comment (`/* /* a*갯 */` followed by `fn f() {}` on the next line)
+    the whole input is now one `ERROR`, and neither the `block_comment` nor the following item appears.
+  - In a genuine documentation comment the `doc_comment` range can change: in `/**갪갯 */` it now also covers
+    the space before `*/`.
+
+  ASCII `/*!` and `/**` documentation markers and the static node-type schema are preserved. On Windows amd64,
+  the decision 4 comparison used 195 fixed inputs (151 pinned upstream corpus cases, 16 fuzz seeds and edits,
+  21 retained regressions, and 7 Korean corpus cases). A separate native enumeration covered 16,441 short
+  comment inputs. See the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-rust-javascript-and-html-patches)
+  for the input scope and results. Other inputs can change in the same ways.
+  [Upstream issue #315](https://github.com/tree-sitter/tree-sitter-rust/issues/315)
+
+- **YAML documents past 32,767 line breaks:** the scanner counts rows in 32 bits. It counts CR and LF
+  separately, so row 32,768 is line 32,769 with LF (or CR) line ends and line 16,385 with CRLF line ends.
+  Block mappings at or past that row no longer produce `ERROR` nodes from the row overflow. Some explicit
+  keys (`? a`) whose `:` is at or past that row previously parsed without errors as a `block_mapping_pair` whose key held a nested
+  `block_mapping`; they now parse as one `block_mapping_pair` with `flow_node` key and value. Queries on such
+  keys and values see the new shape; node types, fields and the static node-type schema are unchanged.
+  [Upstream issue #49](https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/49)
+
 - **T-SQL v2.1.0:** `grammars/tsql` moves to the owner's `wotjr1649/tree-sitter-mssql`
   at `80037156b044543a8248299205a90552687c0c40`, with CLI 0.27.2 and no grammar patches.
   The Go signatures and engine ABI are unchanged. The schema diff's seven `CHILDREN_TYPE_REMOVED`

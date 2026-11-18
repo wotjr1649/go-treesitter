@@ -42,9 +42,9 @@
     "html": {
       "Name": "HTML",
       "Commit": "73a3947324f6efddf9e17c0ea58d454843590cc0",
-      "PinSHA256": "7779ebc983293964f36db015ba0d3899633512e43f793df325e96af59d7998e6",
-      "ProvenanceSHA256": "6f76108a55d89c60b1a5700a184651725aed3a5e5d74e90cbbe5534519e6b84f",
-      "PatchCount": 0
+      "PinSHA256": "ff08eeb173be1f3df2ba3c4d3d831556de49cfaa77059d8823a91a97bbc860f0",
+      "ProvenanceSHA256": "303c74c70a576f1c76ca6aa6ceb317a457acd2a7adf5b7004161072b7df60f8f",
+      "PatchCount": 2
     },
     "ruby": {
       "Name": "Ruby",

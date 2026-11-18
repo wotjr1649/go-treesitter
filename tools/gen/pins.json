@@ -300,7 +300,17 @@
       },
       "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
       "cSymbol": "tree_sitter_javascript",
-      "regenerate": true
+      "regenerate": true,
+      "patches": [
+        {
+          "file": "patches/javascript/0001-jsx-bare-ampersand.patch",
+          "source": "src/scanner.c",
+          "sha256": "8b891aae18c637e087743a7f03493bcbf929bff2e5e88f0ada943963a63d1096",
+          "beforeSHA256": "b3d3f64284d97bf80749c026862427782cf7ecc0b7dc094e6698ab311c9a42c7",
+          "afterSHA256": "93e911221e1db427450e4735491e7d03beb3b9c83be3b1a1863a76c91e10f313",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-javascript/pull/388"
+        }
+      ]
     },
     "html": {
       "repo": "https://github.com/tree-sitter/tree-sitter-html",
@@ -324,7 +334,25 @@
       },
       "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
       "cSymbol": "tree_sitter_html",
-      "regenerate": true
+      "regenerate": true,
+      "patches": [
+        {
+          "file": "patches/html/0001-greater-than-text.patch",
+          "source": "grammar.js",
+          "sha256": "86ee370403144f075dde01d282b58ff9eb400c64267ba7d8290ea53797d0492a",
+          "beforeSHA256": "c139ccf784d7f2c377cbf702e0fe1daaa8e9ac2d76a7a8c0f81bfdb387b45ee2",
+          "afterSHA256": "bc5ab3338e45a35baae69ea42f4ff31cc36fc3659bc460b3fc080f4302ec2f1d",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-html/pull/141"
+        },
+        {
+          "file": "patches/html/0002-bare-ampersand-text.patch",
+          "source": "grammar.js",
+          "sha256": "958e575866f75523227727d7b0aecd1ba542ce5b798731f375ba624c0f2aa4da",
+          "beforeSHA256": "bc5ab3338e45a35baae69ea42f4ff31cc36fc3659bc460b3fc080f4302ec2f1d",
+          "afterSHA256": "e86cbaa83d22c48499c41647eb404d19693ffe0a882f50583bdf23f3621a6910",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-html/issues/143"
+        }
+      ]
     },
     "css": {
       "repo": "https://github.com/tree-sitter/tree-sitter-css",
@@ -414,7 +442,17 @@
       },
       "licenseSHA256": "31d5b6f4243d5c7c6e1c4ebbbb9f6407bd1457a08bcc4f706521710341acba36",
       "cSymbol": "tree_sitter_rust",
-      "regenerate": true
+      "regenerate": true,
+      "patches": [
+        {
+          "file": "patches/rust/0001-block-comment-code-points.patch",
+          "source": "src/scanner.c",
+          "sha256": "55482130e86ed22ad48a1a6a3a8910f5a7aed106552b6a7fca6f612d71ae2bb9",
+          "beforeSHA256": "9609a2f92dbb7c32bc056fd8fb94e5478428f04496696aa08b048a9b66caf283",
+          "afterSHA256": "08a8d78b29268e30745c739c57ac4ded197f343e128ec59fead980b2a7a7b762",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-rust/issues/315"
+        }
+      ]
     },
     "bash": {
       "repo": "https://github.com/tree-sitter/tree-sitter-bash",
@@ -667,6 +705,14 @@
           "beforeSHA256": "a510c0ca699cf3853bd2192bf103e11132414bc002fe952a88a7106ffb5d44e9",
           "afterSHA256": "c1177bf7a0ecf12160807a86a61c874101f81d764512f6bca3b8e4a03fccde32",
           "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/48"
+        },
+        {
+          "file": "patches/yaml/0003-widen-scanner-rows.patch",
+          "sha256": "4f86acec8c084af292d697b3a1ea872d8337a57f5972d56020313111448d45f4",
+          "source": "src/scanner.c",
+          "beforeSHA256": "c1177bf7a0ecf12160807a86a61c874101f81d764512f6bca3b8e4a03fccde32",
+          "afterSHA256": "6e053c70d6e3f150cd7157d4ac59b321f1c086a06c0b1529669c965a2dd23602",
+          "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/49"
         }
       ],
       "regenerate": true
