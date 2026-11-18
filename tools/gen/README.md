@@ -275,7 +275,8 @@ awk -F '\t' '$4 == "source"' release-assets.tsv > release-source-assets.tsv
 The command lists 34 rows for the current pins: 26 `source` archives and eight `toolchain` archives. The immutable v0.4.0 release
 contains its original 24 source archives plus `SHA256SUMS`; the new C and PostgreSQL archives have no fallback there.
 The v0.5.0 release mirrors the 25 rows with column 4 equal to `source` that existed then, plus `SHA256SUMS`.
-The Swift archive and the T-SQL v2.1.0 archive `tree-sitter-mssql-80037156b044.tar.gz`, added afterwards,
+The Swift archive, the T-SQL v2.1.0 archive `tree-sitter-mssql-80037156b044.tar.gz` and the Java v1.0.0 archive
+`tree-sitter-java-a241253570b2.tar.gz`, added afterwards,
 have no mirror fallback until a release carrying them is published and its base is configured. Check their filenames against `runtime.archive`,
 `wasiLibc.archive`, and each grammar's `archive` in `pins.json`, deduplicating TypeScript/TSX's shared archive;
 the [publication procedure](../../docs/specs/publication.md#pinned-archive-release-assets) specifies the inventory

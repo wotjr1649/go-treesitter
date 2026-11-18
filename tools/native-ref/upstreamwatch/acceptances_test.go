@@ -67,8 +67,11 @@ func TestCheckedInAcceptances(t *testing.T) {
 		t.Fatalf("checked-in list: %d entries, %v", len(entries), err)
 	}
 	for _, a := range entries {
-		if a.Accepted != "2026-11-16" || a.Expires != "2027-05-16" {
-			t.Fatalf("unexpected initial dates: %+v", a)
+		switch {
+		case a.Kind == "tier review (>12 months)" && a.Accepted == "2026-11-16" && a.Expires == "2027-05-16":
+		case a.Component == "java" && a.Kind == "nvim-treesitter: **different repository**" && a.Accepted == "2026-11-18" && a.Expires == "2027-05-18":
+		default:
+			t.Fatalf("unexpected acceptance: %+v", a)
 		}
 	}
 	for _, name := range []string{"component", "kind", "accepted", "expires", "reason", "duplicate", "unknown", "trailing"} {
@@ -155,12 +158,16 @@ func TestWatchReportWithAcceptances(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	tiers := 0 // the fixture's grammars all have old commits, so only tier-review acceptances apply
 	for _, a := range api.acceptances {
-		p.Grammars[a.Component] = struct{ Repo, Commit string }{"https://github.com/fixture/" + a.Component, "grammar-pin"}
+		if a.Kind == "tier review (>12 months)" {
+			p.Grammars[a.Component] = struct{ Repo, Commit string }{"https://github.com/fixture/" + a.Component, "grammar-pin"}
+			tiers++
+		}
 	}
 	var out, summary bytes.Buffer
 	stale, failed := report(&p, &out, api)
-	if stale || failed || len(api.findings) != 8 || warningSummary(&summary, api) != 0 {
+	if stale || failed || tiers != 7 || len(api.findings) != tiers || warningSummary(&summary, api) != 0 {
 		t.Fatalf("stale=%v failed=%v findings=%v\n%s\n%s", stale, failed, api.findings, &out, &summary)
 	}
 	path := filepath.Join(t.TempDir(), "body.md")
@@ -171,7 +178,7 @@ func TestWatchReportWithAcceptances(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Logf("Offline fixture: 8 current warnings accepted, 0 unaccepted; auto-close eligible.\n%s", body)
+	t.Logf("Offline fixture: 7 current warnings accepted, 0 unaccepted; auto-close eligible.\n%s", body)
 	api.warn(&out, "tsql", "repository archived", "repository archived")
 	summary.Reset()
 	if warningSummary(&summary, api) != 1 {
