@@ -54,12 +54,5 @@
     "accepted": "2026-11-16",
     "expires": "2027-05-16",
     "reason": "[ADR-0024 tier review](https://github.com/wotjr1649/go-treesitter/blob/main/docs/design/decisions/ADR-0024-grammar-source-tiers.md#amendment-2026-11-16-tier-review-of-tier-1-sources-without-a-commit-in-12-months): no maintained fork under rule 6; retain the tier-1 source."
-  },
-  {
-    "component": "tsql",
-    "kind": "newer stable release v1.0.0 than pin",
-    "accepted": "2026-11-16",
-    "expires": "2027-05-16",
-    "reason": "Owner decision 2026-11-16: keep [the current pin](https://github.com/wotjr1649/go-treesitter/blob/main/tools/gen/pins.json); a v1.0.0 move showed no improvement in the owner's measurement."
   }
 ]

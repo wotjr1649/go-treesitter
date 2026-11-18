@@ -152,7 +152,7 @@ produce `ERROR` nodes even though the language allows it. The table says what wa
 | `ruby` | partly: local variable names parse; fails on symbols, global variables ([Ruby](../known-gaps/ruby.md)) | yes | yes |
 | `rust` | yes | yes | yes |
 | `swift` | partly: variable, function, parameter, type and field names parse; fails on statement labels ([Swift](../known-gaps/swift.md)) | yes | yes |
-| `tsql` | partly: bracketed and double-quoted identifiers parse; fails on regular identifiers ([T-SQL](../known-gaps/tsql.md)) | yes | yes |
+| `tsql` | yes on the retained bracketed, double-quoted and regular identifiers, variables and label cases (development v2.1.0; v0.5.0 rejects regular identifiers) | yes | yes |
 | `tsx` | yes (includes JSX element names) | yes (includes JSX text) | yes |
 | `typescript` | yes | yes | yes |
 | `xml` | partly: element names (`Name`) parse; fails on attribute names, namespace prefixes ([XML](../known-gaps/xml.md))<sup>1</sup> | yes | yes |

@@ -127,6 +127,25 @@ the override does not grant pin-change or release authority.
 per-grammar schemas/results, inputs, dumps and logs; extracted sources, executable binaries and download caches
 are excluded. This is native-before/native-after evidence, not Go/native C agreement or release readiness.
 
+### Later T-SQL releases
+
+A later release from `wotjr1649/tree-sitter-mssql` (for example, v2.2.0) can use one T-SQL-only pin-move PR:
+resolve its full commit, download and hash its archive, update only the `tsql` pin with the new archive/tree/file/
+licence/notice hashes (`go run . -hash -lang tsql -src <sources> -dl <archives>` from `tools/gen`), then run the
+schema checks and `bash tools/gen/regen.sh <new-empty-work-dir> tsql`. Keep the CLI/runtime pins unchanged.
+If the upstream corpus changes, compute the T-SQL `large.json` hash with `benchci fetch -print -langs tsql`
+over `ciconf -inputs-only` data from that corpus, without the optional kit inputs. Run the generator gate,
+fresh native/product conformance (including the repository's queries and Korean fixtures), and the commit-bound
+pin-move replay above. The generator gate compares generated C with committed C; it does not replace product
+conformance for T-SQL.
+
+The PR updates `grammars/tsql`, the schema register, migration notes for node-kind changes, and any affected
+Korean expectations or known-gap identities/entries; regenerate known-gap documents rather than editing them.
+Do not refresh a changed gap signature without investigating it. Document the new archive's mirror status here;
+repository/tier documents need another amendment only if that assignment changes. An ok-to-error result still
+requires the owner's input-specific decision. Grammar-module versioning and publication remain separate decisions
+under [publication.md](../../docs/specs/publication.md).
+
 ## Pins (`pins.json`)
 
 Everything a generation consumes is pinned, and the identity of a generated module never depends on the host:
@@ -251,7 +270,9 @@ awk -F '\t' '$4 == "source"' release-assets.tsv > release-source-assets.tsv
 
 The command lists 34 rows for the current pins: 26 `source` archives and eight `toolchain` archives. The immutable v0.4.0 release
 contains its original 24 source archives plus `SHA256SUMS`; the new C and PostgreSQL archives have no fallback there.
-The v0.5.0 release mirrors the 25 rows with column 4 equal to `source` that existed then, plus `SHA256SUMS`; the Swift archive added afterwards has no mirror fallback until a release carrying it is published. Check their filenames against `runtime.archive`,
+The v0.5.0 release mirrors the 25 rows with column 4 equal to `source` that existed then, plus `SHA256SUMS`.
+The Swift archive and the T-SQL v2.1.0 archive `tree-sitter-mssql-80037156b044.tar.gz`, added afterwards,
+have no mirror fallback until a release carrying them is published and its base is configured. Check their filenames against `runtime.archive`,
 `wasiLibc.archive`, and each grammar's `archive` in `pins.json`, deduplicating TypeScript/TSX's shared archive;
 the [publication procedure](../../docs/specs/publication.md#pinned-archive-release-assets) specifies the inventory
 and digest checks. The eight SDK/binaryen/CLI host archives are excluded until complete bundled notices can be

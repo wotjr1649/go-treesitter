@@ -467,3 +467,13 @@ The grammar corpus and queries are extracted from the SHA-pinned upstream archiv
 line endings. The generator gate adds its `SELECT 한글;` input to both native variants and derives three seed-1
 edits. It exercises ADR-0023's non-ASCII unquoted identifier fix without changing the upstream corpus or its tests.
 Corpus-format file: 520 bytes, SHA-256 `5ddf7ad1aafcf144351bab7ffef3352897b01cc51ef5e4378d148d57048ad0f3`.
+
+## T-SQL v2.1.0 Korean regression inputs (development tree)
+
+The Korean [manifest](../../tools/conformance/testdata/korean/manifest.csv) retains 11 T-SQL inputs,
+all requiring clean trees and explicit node-span expectations. Five former known-gap rows become clean;
+`tsql/id-non-ascii-regression.in` preserves the exact 67-byte former register input (SHA-256
+`c472521c07e5373fcf69a734e9a3acc72b6e1efa4a9552b2bb56f399eb384aa3`, final LF).
+These original repository MIT inputs exercise aliases, variables, columns and a statement label;
+`TestCorpusKorean` checks the product and, when configured, a fresh native reference.
+The fixed T-SQL entry and obsolete strict-failure dump/document are retired rather than accepting a changed wrong tree.

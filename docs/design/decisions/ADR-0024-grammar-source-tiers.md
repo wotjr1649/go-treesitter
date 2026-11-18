@@ -27,14 +27,14 @@ distributions such as nvim-treesitter pick one per language.
    the same release gates. The tier is shown in the README grammar list, the module README and `limitations.md`.
    Defects are carried only under ADR-0023 and reported upstream. A tier is re-checked when a pin moves.
 
-## Current assignment (checked 2026-11-15)
+## Current assignment (checked 2026-11-15; T-SQL updated 2026-11-18)
 
 | Tier | Language → repository |
 |---|---|
 | 1 | bash, cpp, c-sharp, css, go, html, java, javascript (+jsx), json, php, python, ruby, rust, typescript/tsx → `tree-sitter/tree-sitter-<lang>`; c → `tree-sitter-grammars/tree-sitter-c` (maintained fork, rule 6, since 2026-11-16) |
 | 2 | yaml → `tree-sitter-grammars/tree-sitter-yaml`; xml → `tree-sitter-grammars/tree-sitter-xml` |
 | 3 | kotlin → `fwcd/tree-sitter-kotlin` (replaces the kit's `tree-sitter-grammars/tree-sitter-kotlin`); powershell → `airbus-cert/tree-sitter-powershell`; r → `r-lib/tree-sitter-r`; dart → `UserNobody14/tree-sitter-dart`; swift → `alex-pinkus/tree-sitter-swift` |
-| owner-designated | T-SQL → `alfpricot/tree-sitter-mssql` (formerly `meloncholera/tree-sitter-mssql`; released since v0.1.0; nvim-treesitter has no T-SQL grammar); PostgreSQL → `gmr/tree-sitter-postgres` (nvim-treesitter has none; generated from PostgreSQL's own grammar) |
+| owner-designated | T-SQL → `wotjr1649/tree-sitter-mssql` (owner's repository, v2.1.0; continues the `alfpricot` history, formerly `meloncholera`; nvim-treesitter has no T-SQL grammar); PostgreSQL → `gmr/tree-sitter-postgres` (nvim-treesitter has none; generated from PostgreSQL's own grammar) |
 
 ## Consequences
 
@@ -87,3 +87,12 @@ An accepted watch warning is recorded with an expiry of six months and reported 
 new warnings stay at the top of the watch report. When an acceptance expires, the warning returns as new and the
 tier is reviewed again. The accepted warnings and their expiry dates are kept in the upstream-watch tool
 (`tools/native-ref/upstreamwatch`).
+
+## Amendment (2026-11-18): owner-designated T-SQL source
+
+The owner designates `wotjr1649/tree-sitter-mssql` v2.1.0 at
+`80037156b044543a8248299205a90552687c0c40` for the development tree after v0.5.0. This is the owner's
+repository and continues the `alfpricot/tree-sitter-mssql` history: it contains the previous pinned commit
+`2e34d86ec58f3d1a771efc0ca1e71c536690a0b7` (239 commits ahead, none behind). The owner maintains the next
+versions there so later releases can use the same T-SQL-only pin-move procedure. The owner-designated tier
+and the existing pin-move gates remain; this source decision does not approve a merge or a grammar-module release.

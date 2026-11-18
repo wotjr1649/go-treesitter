@@ -63,7 +63,7 @@ func TestAcceptedWarnings(t *testing.T) {
 
 func TestCheckedInAcceptances(t *testing.T) {
 	entries, err := loadAcceptances(acceptedWarningsJSON)
-	if err != nil || len(entries) != 9 {
+	if err != nil || len(entries) != 8 {
 		t.Fatalf("checked-in list: %d entries, %v", len(entries), err)
 	}
 	for _, a := range entries {
@@ -111,7 +111,7 @@ func TestAcceptedWarningIssueBody(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, want := range []string{"**0 warning(s)**", "## Accepted warnings", "| css | last commit 2025-09-28;", "| 2026-11-16 | 2027-05-16 |", "## Stale acceptances", "| tsql | newer stable release v1.0.0 than pin |"} {
+	for _, want := range []string{"**0 warning(s)**", "## Accepted warnings", "| css | last commit 2025-09-28;", "| 2026-11-16 | 2027-05-16 |", "## Stale acceptances", "| golang | tier review (>12 months) |"} {
 		if !bytes.Contains(body, []byte(want)) {
 			t.Errorf("issue body lacks %q: %s", want, body)
 		}
@@ -160,7 +160,7 @@ func TestWatchReportWithAcceptances(t *testing.T) {
 	}
 	var out, summary bytes.Buffer
 	stale, failed := report(&p, &out, api)
-	if stale || failed || len(api.findings) != 9 || warningSummary(&summary, api) != 0 {
+	if stale || failed || len(api.findings) != 8 || warningSummary(&summary, api) != 0 {
 		t.Fatalf("stale=%v failed=%v findings=%v\n%s\n%s", stale, failed, api.findings, &out, &summary)
 	}
 	path := filepath.Join(t.TempDir(), "body.md")
@@ -171,7 +171,7 @@ func TestWatchReportWithAcceptances(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Logf("Offline fixture: 9 current warnings accepted, 0 unaccepted; auto-close eligible.\n%s", body)
+	t.Logf("Offline fixture: 8 current warnings accepted, 0 unaccepted; auto-close eligible.\n%s", body)
 	api.warn(&out, "tsql", "repository archived", "repository archived")
 	summary.Reset()
 	if warningSummary(&summary, api) != 1 {
