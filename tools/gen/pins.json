@@ -260,22 +260,22 @@
       }
     },
     "tsql": {
-      "repo": "https://github.com/alfpricot/tree-sitter-mssql",
-      "commit": "2e34d86ec58f3d1a771efc0ca1e71c536690a0b7",
-      "extractDir": "tree-sitter-mssql-2e34d86ec58f",
-      "archive": "tree-sitter-mssql-2e34d86ec58f.tar.gz",
-      "archiveSHA256": "82476f5880f6b46c83198ae24b4a4eca30941893dbee4d05ec9748fb55ee3b7b",
+      "repo": "https://github.com/wotjr1649/tree-sitter-mssql",
+      "commit": "80037156b044543a8248299205a90552687c0c40",
+      "extractDir": "tree-sitter-mssql-80037156b044",
+      "archive": "tree-sitter-mssql-80037156b044.tar.gz",
+      "archiveSHA256": "53284180a1547312b4c2553b4ce2e5a7ce04407f1e9b28336552625896e55de5",
       "grammarDir": "src",
       "dirs": [
         "src"
       ],
-      "treeSHA256": "4f1dd72a101035d88532d13aa228edacb2e18e09ae6cd0dec2e5b6ae7eb9907c",
+      "treeSHA256": "84041e6542c370949b61ad828822cc826ad4c99a11ca8c9251c0235b10087a66",
       "files": {
-        "parser.c": "869b54a39e38e73da254cece5085e497063e699d30e689e0d20b93e5fb3bc2a2",
-        "scanner.c": "392bf26c2295e8ee3dd584dbea619d39573495244b4bbd2b59dab387a8494aec"
+        "parser.c": "8e95b7d39b7f282e255bcd6062aaeebd57ee2528e1064c5388ad7ae20b1cb2ab",
+        "scanner.c": "26eabb43eba50f3c636f7d54856e0ad5ae05ed3374d395ef87677d32df96a64f"
       },
-      "licenseSHA256": "cffa335b2bf899b98e49d14a7f96464b6823a98f9a5d544bef5c6d3b5e46d42c",
-      "noticeSHA256": "fe7b7e195134b018606dc3d40250c240f2bb9e1f5bbadb6542c169c49b21dcb1",
+      "licenseSHA256": "5ab20d8bf3e6083815bbf8a84400824b7ce5d9198e61efa05cfbd68ecc561dea",
+      "noticeSHA256": "24c63240eb2d8b2dc903001b86f1a88abdf67e2b9e16989583fc9aa185ecfe0d",
       "cSymbol": "tree_sitter_mssql",
       "regenerate": true
     },

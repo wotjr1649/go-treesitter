@@ -7,3 +7,9 @@ window functions, and the surrounding tooling scaffold) derives from that projec
 The T-SQL-specific surface — the SSMS header, bracketed parameterized types, IF/WHILE
 control flow, TRY/CATCH, cursors, table hints, and the rest of T-SQL's distinguishing
 constructs — is original work added on top of that base.
+
+This repository continues tree-sitter-mssql from alfpricot/tree-sitter-mssql
+(https://github.com/alfpricot/tree-sitter-mssql) at v1.0.0, commit 852cbd2
+(852cbd20d7dc8078bdea0ebbcbb621e78c86f0cf), from 2026-11-15 onward, with the
+upstream history preserved. That work is copyright (c) 2026 M. Reifschneider and
+licensed under the MIT License; see LICENSE.
