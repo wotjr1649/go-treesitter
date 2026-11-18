@@ -45,40 +45,48 @@ type pins struct {
 	Grammars map[string]struct{ Repo, Commit string } `json:"grammars"`
 }
 
-func main() {
-	file := flag.String("pins", filepath.Join("tools", "gen", "pins.json"), "pins file")
-	nvimURL := flag.String("nvim", nvimParsersURL, "nvim-treesitter parsers.lua URL (empty: skip the comparison)")
-	issue := flag.String("issue", "", "write the tracking-issue body here when the report is complete")
-	state := flag.String("state", "", "write warn, clean or error for the tracking-issue workflow")
-	flag.Parse()
+func main() { os.Exit(run(os.Args[1:], os.Stdout, newAPI())) }
+
+// run is main with its dependencies injected; it returns the exit code.
+func run(args []string, stdout io.Writer, api *githubAPI) int {
+	fs := flag.NewFlagSet("upstreamwatch", flag.ExitOnError)
+	file := fs.String("pins", filepath.Join("tools", "gen", "pins.json"), "pins file")
+	nvimURL := fs.String("nvim", nvimParsersURL, "nvim-treesitter parsers.lua URL (empty: skip the comparison)")
+	issue := fs.String("issue", "", "write the tracking-issue body here when the report is complete")
+	state := fs.String("state", "", "write warn, clean or error for the tracking-issue workflow")
+	fs.Parse(args)
+	fail := func(err error) int { fmt.Fprintln(os.Stderr, "upstreamwatch:", err); return 2 }
 	raw, err := os.ReadFile(*file)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "upstreamwatch:", err)
-		os.Exit(2)
+		return fail(err)
 	}
 	var p pins
 	if err := json.Unmarshal(raw, &p); err != nil {
-		fmt.Fprintln(os.Stderr, "upstreamwatch:", err)
-		os.Exit(2)
+		return fail(err)
 	}
 	var out bytes.Buffer
-	api := newAPI()
 	api.acceptances, err = loadAcceptances(acceptedWarningsJSON)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "upstreamwatch:", err)
-		os.Exit(2)
+		return fail(err)
 	}
-	both := io.MultiWriter(os.Stdout, &out)
+	both := io.MultiWriter(stdout, &out)
 	stale, failed := report(&p, both, api)
 	if *nvimURL != "" {
 		entries, err := fetchNvim(api.client, *nvimURL)
 		nvimSection(&p, both, api, entries, err)
 	}
-	warnings := warningSummary(os.Stdout, api)
+	patches, metaErr := loadPatches(raw) // optional metadata: a defect is a diagnostic, never a new exit 2
+	var added func(string) (time.Time, error)
+	var historyErr error
+	if len(patches) > 0 {
+		added, historyErr = gitFirstOnMain(*file)
+	}
+	patchSection(both, api, patches, metaErr, added, historyErr)
+	activitySection(&p, both, api) // last and bounded: it cannot keep the issue body or state from being written
+	warnings := warningSummary(stdout, api)
 	if *issue != "" {
 		if err := writeIssue(*issue, &out, api, failed); err != nil {
-			fmt.Fprintln(os.Stderr, "upstreamwatch:", err)
-			os.Exit(2)
+			return fail(err)
 		}
 	}
 	if *state != "" {
@@ -89,16 +97,16 @@ func main() {
 			value = "warn"
 		}
 		if err := os.WriteFile(*state, []byte(value+"\n"), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "upstreamwatch:", err)
-			os.Exit(2)
+			return fail(err)
 		}
 	}
 	if failed {
-		os.Exit(2)
+		return 2
 	}
 	if stale {
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 func repoOf(url string) string { return strings.TrimPrefix(url, "https://github.com/") }
@@ -300,20 +308,22 @@ type apiReply struct {
 	err  error
 }
 type githubAPI struct {
-	base        string
-	client      *http.Client
-	token       string
-	now         time.Time
-	cache       map[string]apiReply
-	redirected  map[string]bool
-	acceptances []acceptance
-	findings    []finding
-	requests    int
-	remaining   string
+	base           string
+	client         *http.Client
+	token          string
+	now            time.Time
+	cache          map[string]apiReply
+	redirected     map[string]bool
+	acceptances    []acceptance
+	findings       []finding
+	requests       int
+	remaining      string
+	gqlStop        string        // set once a GraphQL limit is reached (separate from the REST remaining)
+	activityBudget time.Duration // time budget of the whole activity section
 }
 
 func newAPI() *githubAPI {
-	return &githubAPI{base: "https://api.github.com/", client: &http.Client{Timeout: time.Minute}, token: os.Getenv("GITHUB_TOKEN"), now: time.Now().UTC(), cache: map[string]apiReply{}, redirected: map[string]bool{}, remaining: "unknown"}
+	return &githubAPI{base: "https://api.github.com/", client: &http.Client{Timeout: time.Minute}, token: os.Getenv("GITHUB_TOKEN"), now: time.Now().UTC(), cache: map[string]apiReply{}, redirected: map[string]bool{}, remaining: "unknown", activityBudget: 2 * time.Minute}
 }
 func (a *githubAPI) get(path string, v any) error {
 	if reply, ok := a.cache[path]; ok {

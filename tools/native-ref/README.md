@@ -119,6 +119,21 @@ can exceed the anonymous 60-request quota. The report records request count and 
 when it reaches zero. It reads `pins.json`, the checked-in acceptance list and public API answers; it never changes pins.
 Run by `.github/workflows/upstream-watch.yml` with its read-only token.
 
+Two sections follow the health table and the nvim comparison. **Patch-carrying grammars** (ADR-0023) lists
+each `pins.json` patch with its `upstreamReport` and the date that report first reached the first-parent history of HEAD
+(main in the workflow; `git log -S` on `pins.json`, so renaming or rewriting the patch file does not restart it). Over
+12 months is a warning per report (kind `patch older than 12 months: <report URL>`, so accepting one report does not hide
+another); more than 3 patches (`-patch-alert`) or 5 (the ADR limit) is flagged in the table only. Unreadable `patches`
+metadata or unusable git history (no repository, shallow checkout; the workflow uses `fetch-depth: 0`) is a diagnostic in
+that section, never a warning or a failure. Bundled reports listed only in READMEs are not tracked (a pins schema
+change, an owner decision). **Upstream activity** (one GraphQL query per grammar repository, so it needs `GITHUB_TOKEN`
+and is skipped without it) comes last: merged pull requests in the last 12 months and how many of the 20 newest issues
+have a comment by an OWNER, MEMBER or COLLABORATOR among their first 20 comments (`>=` when more comments were not
+read; `?` for data the response lacked). It never warns, runs inside a 2-minute budget and stops at the first GraphQL
+rate limit or `Retry-After`, marking the remaining rows `unavailable`, so it cannot keep the issue body or state file
+from being written. Errors print as a fixed kind (and HTTP status), never as remote text. The workflow updates the
+tracking issue only for runs on the default branch.
+
 Owner-accepted warnings live in [upstreamwatch/accepted-warnings.json](upstreamwatch/accepted-warnings.json),
 embedded at build time. Each entry matches a component and exact warning kind (a newer release kind includes its
 version), with an accepted date, exclusive UTC expiry date and a linked reason. Active matches appear in **Accepted
