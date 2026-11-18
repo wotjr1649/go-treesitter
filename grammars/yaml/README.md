@@ -6,7 +6,7 @@ Generated tree-sitter grammar module for go-treesitter. **Do not edit**: `engine
 - upstream grammar: https://github.com/tree-sitter-grammars/tree-sitter-yaml at `a1c4812a73ec5e089de8e441fdea3a921e8d5079`
 - tree-sitter runtime: v0.27.2 (unmodified)
 - engine ABI: 3
-- recipe sha256: `861ca788eca852e873cad60a9c86712f1a9b9c86a1bd2d38d4f392b56d41b920`
+- recipe sha256: `2909e4b8974da4cacb0b9e33cc9e890accdc27e529436acbbf9ac2f30b17939c`
 - identity and output hashes: `provenance.json` (equals the compiled `engine.Identity`; `go test` checks it)
 
 `LICENSE` is the upstream grammar's license. `LICENSES/tree-sitter.txt` is the license of the tree-sitter runtime C translated into `engine_gen.go`. `LICENSES/wasi-libc/` holds the license texts of the wasi-libc code translated into `engine_gen.go` (wasi-libc `2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13`;
@@ -21,6 +21,10 @@ YAML patch 0001 prevents premature end-of-input acceptance and silent source tru
 
 YAML patch 0002 bounds serialized indentation by bytes written, preventing deep-nesting buffer overruns (upstream PR #47).
 
+YAML patch 0003 widens scanner rows to 32 bits, so documents past 32,767 line breaks parse, counting CR and LF separately: line 16,385 is the boundary with CRLF line ends (adapted from upstream PR #35: the block implicit key row is serialized as a saturating 16-bit distance, keeping 253 indentation levels within the 0002 bound).
+
 - `patches/yaml/0001-no-early-eof.patch` changes `src/parser.c`; upstream defect report: https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/14.
 
 - `patches/yaml/0002-bound-serialized-indent-bytes.patch` changes `src/scanner.c`; upstream defect report: https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/48.
+
+- `patches/yaml/0003-widen-scanner-rows.patch` changes `src/scanner.c`; upstream defect report: https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/49.

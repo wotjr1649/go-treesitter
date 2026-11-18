@@ -17,6 +17,14 @@
       "beforeSHA256": "a510c0ca699cf3853bd2192bf103e11132414bc002fe952a88a7106ffb5d44e9",
       "afterSHA256": "c1177bf7a0ecf12160807a86a61c874101f81d764512f6bca3b8e4a03fccde32",
       "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/48"
+    },
+    {
+      "file": "patches/yaml/0003-widen-scanner-rows.patch",
+      "sha256": "4f86acec8c084af292d697b3a1ea872d8337a57f5972d56020313111448d45f4",
+      "source": "src/scanner.c",
+      "beforeSHA256": "c1177bf7a0ecf12160807a86a61c874101f81d764512f6bca3b8e4a03fccde32",
+      "afterSHA256": "6e053c70d6e3f150cd7157d4ac59b321f1c086a06c0b1529669c965a2dd23602",
+      "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/49"
     }
   ],
   "grammarGeneration": {
@@ -38,6 +46,14 @@
         "beforeSHA256": "a510c0ca699cf3853bd2192bf103e11132414bc002fe952a88a7106ffb5d44e9",
         "afterSHA256": "c1177bf7a0ecf12160807a86a61c874101f81d764512f6bca3b8e4a03fccde32",
         "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/48"
+      },
+      {
+        "file": "patches/yaml/0003-widen-scanner-rows.patch",
+        "sha256": "4f86acec8c084af292d697b3a1ea872d8337a57f5972d56020313111448d45f4",
+        "source": "src/scanner.c",
+        "beforeSHA256": "c1177bf7a0ecf12160807a86a61c874101f81d764512f6bca3b8e4a03fccde32",
+        "afterSHA256": "6e053c70d6e3f150cd7157d4ac59b321f1c086a06c0b1529669c965a2dd23602",
+        "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/49"
       }
     ],
     "cli": "0.27.2",
@@ -47,7 +63,7 @@
       "grammar.json": "a2c03fcc9bd9b7843780854f5e8264c9d465a34172b530d9511d6e89c5d2630e",
       "node-types.json": "1238b6c89fc6afb9723b6463a365843aa87e478025490660e5acfc9adaaf809b",
       "parser.c": "f73a21c19edce96d26011221ff1cae8cf636d98c54472815a0051a868a8d37f8",
-      "scanner.c": "c1177bf7a0ecf12160807a86a61c874101f81d764512f6bca3b8e4a03fccde32",
+      "scanner.c": "6e053c70d6e3f150cd7157d4ac59b321f1c086a06c0b1529669c965a2dd23602",
       "schema.core.c": "91e56c3f3ae6fad1803b739ce4eb4568a782a9aec710f733db2f3e38d407a4d5",
       "schema.json.c": "3a18e4406aa8cdaea2806483e11c50e1a392fd72cf8f54ab7f189b3728836949",
       "schema.legacy.c": "4f7ca12361e848214beceaa95ae615048317039ea4736c6eec956e3e8da4694c",
@@ -79,7 +95,7 @@
       "patched.grammar.grammar.json": "a2c03fcc9bd9b7843780854f5e8264c9d465a34172b530d9511d6e89c5d2630e",
       "patched.grammar.node-types.json": "1238b6c89fc6afb9723b6463a365843aa87e478025490660e5acfc9adaaf809b",
       "patched.grammar.parser.c": "f73a21c19edce96d26011221ff1cae8cf636d98c54472815a0051a868a8d37f8",
-      "patched.grammar.scanner.c": "c1177bf7a0ecf12160807a86a61c874101f81d764512f6bca3b8e4a03fccde32",
+      "patched.grammar.scanner.c": "6e053c70d6e3f150cd7157d4ac59b321f1c086a06c0b1529669c965a2dd23602",
       "patched.grammar.schema.core.c": "91e56c3f3ae6fad1803b739ce4eb4568a782a9aec710f733db2f3e38d407a4d5",
       "patched.grammar.schema.json.c": "3a18e4406aa8cdaea2806483e11c50e1a392fd72cf8f54ab7f189b3728836949",
       "patched.grammar.schema.legacy.c": "4f7ca12361e848214beceaa95ae615048317039ea4736c6eec956e3e8da4694c",
@@ -88,11 +104,12 @@
       "patched.grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
       "patches.1": "f505f72705387aa9eed400fae2fb3b04d59a04820131df83c5059dfb179ba1fb",
       "patches.2": "b36738e2cc1d30273d02f0e55daba26e77459eea3c210138ba4d84085dd39535",
+      "patches.3": "4f86acec8c084af292d697b3a1ea872d8337a57f5972d56020313111448d45f4",
       "patches.inputs": "23edf6290c52084edc5ff238628376f2f49cb0d87a774d528804d86b1eb010c5",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
       "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
     },
-    "RecipeSHA256": "861ca788eca852e873cad60a9c86712f1a9b9c86a1bd2d38d4f392b56d41b920",
+    "RecipeSHA256": "2909e4b8974da4cacb0b9e33cc9e890accdc27e529436acbbf9ac2f30b17939c",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -115,8 +132,8 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "5014038967de4a9bcfd6dc8f726adab932af0783d765d034a529de9747554fa2",
-    "engine_gen.go": "01817f63dd5c7786d5fc83b263c79bfdd463296b408b588adbd54b1ad131d12f",
-    "wasm": "45d69094dc0444f4d19e17087e9c7d85f30ee54c6a1301292443b4fa5fe4e0f8",
-    "wasm.clang": "45b74d8312b1cf6f384c401bcd4cb8925ddc6e93f41122264e297131d05b171f"
+    "engine_gen.go": "f065410d0becaabf88fb9ae6cdf303fc714c51c24a6bc50ecb96a5c22f954438",
+    "wasm": "70d3bde9c90c1168cb83a5b73bda51e3dd39c734538dbf29af06cb1489902102",
+    "wasm.clang": "9960934e7d2ab31430a6dd1a585e53681f60cc17bbf100c966a17e539dae4c00"
   }
 }

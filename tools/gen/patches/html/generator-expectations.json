@@ -1,0 +1,230 @@
+{
+  "identity": {
+    "grammarCommit": "73a3947324f6efddf9e17c0ea58d454843590cc0",
+    "seed": 1,
+    "corpusManifestSHA256": "2d76b8a6c394a6df3a8be2b7f1561809485f75a22ebe8025272befae0263b7b0",
+    "editsManifestSHA256": "f16afd63426d7b18dbe66fd52400e220bdbd5be001fe1a32ff175c4bce34ed86",
+    "largeEntries": [
+      {
+        "lang": "html",
+        "file": "dom_sort.html",
+        "kind": "url",
+        "url": "https://raw.githubusercontent.com/DataTables/DataTables/f60c41290255c3fcab38999161f9529226b655c9/examples/plug-ins/dom_sort.html",
+        "sha256": "8eed4937dc497a478d12199dfbe0fa2aa070ae5104ccc5f18e92c4d5235c9c53",
+        "license_spdx": "MIT",
+        "license_url": "https://raw.githubusercontent.com/DataTables/DataTables/f60c41290255c3fcab38999161f9529226b655c9/license.txt",
+        "license_sha256": "5cd1e7bc146fbb6189184cbd0dced6853dc6b5a049c5ea3d8052d235e549a644"
+      }
+    ],
+    "patchCorpusFilesSHA256": {
+      "text-greater-than-ampersand.txt": "ce69b98423353bfdf998b031454bc16c2c9f9e101f576d305d7ec3ff2fded80f"
+    },
+    "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "cli": "0.27.2",
+    "grammarArchiveSHA256": "892f6b732e08bcb90918a985fdee58d6a0fd7a90326af601a2536a5d477583fa",
+    "patches": [
+      {
+        "file": "patches/html/0001-greater-than-text.patch",
+        "source": "grammar.js",
+        "sha256": "86ee370403144f075dde01d282b58ff9eb400c64267ba7d8290ea53797d0492a",
+        "beforeSHA256": "c139ccf784d7f2c377cbf702e0fe1daaa8e9ac2d76a7a8c0f81bfdb387b45ee2",
+        "afterSHA256": "bc5ab3338e45a35baae69ea42f4ff31cc36fc3659bc460b3fc080f4302ec2f1d",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-html/pull/141"
+      },
+      {
+        "file": "patches/html/0002-bare-ampersand-text.patch",
+        "source": "grammar.js",
+        "sha256": "958e575866f75523227727d7b0aecd1ba542ce5b798731f375ba624c0f2aa4da",
+        "beforeSHA256": "bc5ab3338e45a35baae69ea42f4ff31cc36fc3659bc460b3fc080f4302ec2f1d",
+        "afterSHA256": "e86cbaa83d22c48499c41647eb404d19693ffe0a882f50583bdf23f3621a6910",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-html/issues/143"
+      }
+    ]
+  },
+  "reason": "HTML PR #141 and issue #143: allow greater-than signs in data text, and treat bare ampersands as text while preserving existing entity and attribute tokens. The patch corpus fixtures and listed seeded edits exercise those changes; original corpus, upstream tests and pinned large input are unchanged.",
+  "retireWhen": "Retire with the matching patch when the upstream pin incorporates the fix; review anew for any identity, fixture or result change.",
+  "differences": [
+    {
+      "id": "corpus/html/grammar-patch-text-greater-than-ampersand-001",
+      "kind": "corpus",
+      "inputSHA256": "2b52eaab779921853a02f6bc71c09d5a2779dd2a8e9f22024e6191d151693500",
+      "referenceDumpSHA256": "af84b7c530241075c423db8c90f912cdf4d0a050c72efdf7e62eb572c299ed45",
+      "candidateDumpSHA256": "e405a119be793c446b1369b917985e73a079d3357fd87b1db1eb6c6d954f65c3"
+    },
+    {
+      "id": "corpus/html/grammar-patch-text-greater-than-ampersand-002",
+      "kind": "corpus",
+      "inputSHA256": "4747887d4c733691775a3f9c12fa592524912c54ec723dc112c8ef89e00efff2",
+      "referenceDumpSHA256": "3900f43361fc3876c6500d2bb0d3d521ac0b32f5280e0e7a38ca115e024f80a4",
+      "candidateDumpSHA256": "6535d0db0973387e617eb03af5061bb7078911727f65bdf7c1a1bcde9878b421"
+    },
+    {
+      "id": "edits/html/grammar-patch-text-greater-than-ampersand-001-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "2b52eaab779921853a02f6bc71c09d5a2779dd2a8e9f22024e6191d151693500",
+      "newSHA256": "829e9ccccc011f99a17a8c8cd9ca057fc354b32a78de8ea3e65e436413ac054e",
+      "referenceDumpSHA256": "7c7724c5c1b59f807bfdcfe6dc86aeca627aadcff1791aa4dfbaabdd2a8286f2",
+      "candidateDumpSHA256": "b8068a6436fc044873e5d1f896b5b3c2804efda0747c251d4fb43f230fa1bc03"
+    },
+    {
+      "id": "edits/html/grammar-patch-text-greater-than-ampersand-001-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "2b52eaab779921853a02f6bc71c09d5a2779dd2a8e9f22024e6191d151693500",
+      "newSHA256": "ff26b62c2be3fa5cf9426057109a929d27001eb0937f8eb03f099b0eb7b25b23",
+      "referenceDumpSHA256": "ae4b1db36ff896af14259bb46fbaf6c2ff8e0dc03e041b2ca6b1dd11dc2bfc3e",
+      "candidateDumpSHA256": "e64d3ff2969d45d051c9e7db511c82df2846952a4909f23288f94cd4b435d222"
+    },
+    {
+      "id": "edits/html/grammar-patch-text-greater-than-ampersand-001-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "2b52eaab779921853a02f6bc71c09d5a2779dd2a8e9f22024e6191d151693500",
+      "newSHA256": "06a163509a1ae7abfa788078b0a011d45ce4830642241fb28fa34c8db40d1998",
+      "referenceDumpSHA256": "8d1e2460f05e382226f33e6c0620c4895bd64e10a4ce118e0ec0afcc862e6161",
+      "candidateDumpSHA256": "cfa3ca1f62c1bd1c5b883c651fdc9be4451a1c2ec5ed7877c866e8d47bc4fefc"
+    },
+    {
+      "id": "edits/html/grammar-patch-text-greater-than-ampersand-002-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "4747887d4c733691775a3f9c12fa592524912c54ec723dc112c8ef89e00efff2",
+      "newSHA256": "3983645856a3c6f438136829945b458a7dd84b0f573e229b032dbcc5d397e82b",
+      "referenceDumpSHA256": "b1e7a0b26458b35afc697b47402af267c8ea615038cc76822e5a47a51083c619",
+      "candidateDumpSHA256": "ee8b3d247963be4f728eb22e2c212fdeb336e3f2d8a9aab48358b64882e792e2"
+    },
+    {
+      "id": "edits/html/grammar-patch-text-greater-than-ampersand-002-e2",
+      "kind": "edit",
+      "changed": [
+        "ranges"
+      ],
+      "oldSHA256": "4747887d4c733691775a3f9c12fa592524912c54ec723dc112c8ef89e00efff2",
+      "newSHA256": "c25456dd90c216c42cb6659901ed7033850e49fd1ac0e6708b73f396ddb4cd71",
+      "referenceDumpSHA256": "6387d5e816ac0b775c37d0dfa39a498d3a6b5a2ac709d6a1772b11fb44c9dbbe",
+      "candidateDumpSHA256": "747a3b9ed4452b8b8ffbd1ecfd509507875a8eda3dce63e32d9450e334caa3f0"
+    },
+    {
+      "id": "edits/html/grammar-patch-text-greater-than-ampersand-002-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "4747887d4c733691775a3f9c12fa592524912c54ec723dc112c8ef89e00efff2",
+      "newSHA256": "9ea340284f2ea4801733277b777e0ba73159f70edc7ddb092d062f1fb6fafe5e",
+      "referenceDumpSHA256": "ac70ed487b1f6716854bd786e9afcd6b864402c5f0ed5b8175bc03c754d205eb",
+      "candidateDumpSHA256": "5d816e40c763bd0478745e3a6fb9e56c21ae6653a1e4808c6a31488619b29e2b"
+    },
+    {
+      "id": "edits/html/main-003-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "9f3892a4a23e970bfa906e4e1f66a8a775581b478f6b41ff564e67f148502bc2",
+      "newSHA256": "0abf36aa05ed2ce64fcc48702e5f149a99db0d5a3890a12ebdd4a0d0e0fb3969",
+      "referenceDumpSHA256": "589db3ec595723ee406920451f1b86f556f7d14cb69eaa03576a2fea70ceb8d8",
+      "candidateDumpSHA256": "0f13d50e1b5ba2970551486f2274bf999fbe119830c667154eac3cd223689286"
+    },
+    {
+      "id": "edits/html/main-007-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "43114f8358a77ad34cf36c27f82765b60c1bbfc3f611cdf3b5a2f68439fadb61",
+      "newSHA256": "667ee90794446aa730b1e4ab7b6f1d41fc298b49e01d06fce96ba2e597c2f8c7",
+      "referenceDumpSHA256": "f47ffd046aee6e782ccf1effd37b285c8fe2afb98f514dd945ba0f123a97a2e0",
+      "candidateDumpSHA256": "e430b9f8382832a773ee01b2dff62b1dd75e0ff781f3c2808c5c0b04fe5a577f"
+    },
+    {
+      "id": "edits/html/main-011-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "7207ca875418fcf79297ad8a32f480e32fc3c8dc1c4a1cacc6a81e35d5f5cb05",
+      "newSHA256": "f6c2ba44ad97d80aff708743c2ae3cc690b3ac8f8ea15df4d297d7620a6acbe7",
+      "referenceDumpSHA256": "f8a7eb9ab9bc0b24d4c0a1fd04fd39cc347f1a176a22effa18f491b65f13aee4",
+      "candidateDumpSHA256": "e7a06bb8990c9ee2c6c5bb2946dee6e1b989d021eb9782616350278df00197a8"
+    },
+    {
+      "id": "edits/html/main-016-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "bad3e7326c02ff765cc276601523fda1ccc3bec789cce349a55d6145321cc509",
+      "newSHA256": "2c5283f3cbd0c21d7bbdf0e27dc640d17e55b7d9529c259df4bb6d7f1fa66de7",
+      "referenceDumpSHA256": "ab99e98ef5232ef8d879912d872b5e943cd4741b5914cb90c6079b1d86238ec6",
+      "candidateDumpSHA256": "9d274608d56158bd1341ef43e2456ee395fadb88a4e8bc27c1a20a8ccb1aeaf5"
+    },
+    {
+      "id": "edits/html/main-017-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "7998fe7ba259646f24a05cc569d30a3ff6f0a05c6ab0aa220280053379ef168d",
+      "newSHA256": "6e1526697067826232a764a745d537df70f6367db3cff0bc02f68efd3a886b45",
+      "referenceDumpSHA256": "501b3fe74a3cc375c9c17fea93ab5e60cb91e706209acbd91102567dc1e63fb5",
+      "candidateDumpSHA256": "d2e50d71c81f8a6ea7211f6b02bc6eada1649c64a147dcb8becf9bc7159f3ddf"
+    },
+    {
+      "id": "edits/html/main-018-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "2f4e35c543b940fd34bcc5f98522255a7ed1007628b560e4cb40525984376f62",
+      "newSHA256": "74992652ab4c13d2f5f5e050364321b780fddfb0dfed9a7b55461ef827bcbd12",
+      "referenceDumpSHA256": "f86ee98a738cb74f71298ce9dbc2d5e8204bdf39bfc8a91e3b269273921eb211",
+      "candidateDumpSHA256": "9fce15587ea8da7549298c4f7e50f19fcd223727866471fa38f36379ba4a2809"
+    }
+  ]
+}

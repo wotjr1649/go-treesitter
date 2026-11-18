@@ -10,12 +10,12 @@ Initial E5 evidence: Windows native reference differential (windows/amd64), base
 Only the exact inputs below are covered. `TestKnownGaps` rechecks engine dumps (E3) and, with a freshly built
 `TSG_NATIVE_EXE_DIR`, compares them byte-for-byte with native C (E5). CI requires that comparison.
 
-Identity: grammar `73a3947324f6efddf9e17c0ea58d454843590cc0`; runtime `v0.27.2`; grammar patches: 0.
+Identity: grammar `73a3947324f6efddf9e17c0ea58d454843590cc0`; runtime `v0.27.2`; grammar patches: 2.
 The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`pins.json`](../../tools/gen/pins.json),
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/html/provenance.json).
 
-- Source identity SHA-256: `7779ebc983293964f36db015ba0d3899633512e43f793df325e96af59d7998e6`
-- Module provenance SHA-256: `6f76108a55d89c60b1a5700a184651725aed3a5e5d74e90cbbe5534519e6b84f`
+- Source identity SHA-256: `ff08eeb173be1f3df2ba3c4d3d831556de49cfaa77059d8823a91a97bbc860f0`
+- Module provenance SHA-256: `303c74c70a576f1c76ca6aa6ceb317a457acd2a7adf5b7004161072b7df60f8f`
 
 ## html-hangul-tag-low-byte-mismatch
 

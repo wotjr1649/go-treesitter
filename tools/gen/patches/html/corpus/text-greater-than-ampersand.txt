@@ -1,0 +1,17 @@
+==================
+HTML greater-than and raw ampersand in text
+==================
+<p>한글 > Users & roles &amp;</p>
+
+---
+
+(document (element (start_tag (tag_name)) (text) (entity) (end_tag (tag_name))))
+
+==================
+HTML bare ampersand before a space in text
+==================
+<p>Users & roles</p>
+
+---
+
+(document (element (start_tag (tag_name)) (text) (end_tag (tag_name))))

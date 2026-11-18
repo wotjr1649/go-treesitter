@@ -29,6 +29,8 @@ func TestScannerPatches(t *testing.T) {
 			}
 			cases := map[string]string{}
 			topLevel := map[string]int{} // cases whose heredoc must swallow every body line
+			clean := map[string]bool{}   // cases that must parse without ERROR or MISSING nodes
+			pairs := map[string]int{}    // cases with an exact block_mapping_pair count
 			switch lang {
 			case "bash", "ruby":
 				// An ASCII delimiter closes only on ASCII: the body line shares the low bytes of the delimiter.
@@ -49,6 +51,42 @@ func TestScannerPatches(t *testing.T) {
 			case "yaml":
 				for _, depth := range []int{253, 254, 300, 600} {
 					cases[fmt.Sprint(depth)] = strings.Repeat("- ", depth) + "x\n"
+				}
+				clean["253"] = true // the 0002 bound; deeper inputs are a documented ERROR
+				// 0003: rows past 32,767 and 65,535 (int16_t overflow), the 12-byte header at the 0002 bound,
+				// and a blk_imp_row more than 32,767 rows behind (saturated serialized distance).
+				blank := func(n int) string { return strings.Repeat("\n", n) }
+				var flat, deep strings.Builder
+				for i := 0; i < 32769; i++ {
+					fmt.Fprintf(&flat, "k%d: v\n", i)
+				}
+				for i := 0; i < 252; i++ {
+					fmt.Fprintf(&deep, "%sk%d:\n", strings.Repeat("  ", i), i)
+				}
+				deep.WriteString(strings.Repeat("  ", 252) + "leaf: 1\n")
+				for name, src := range map[string]string{
+					"late-pair-32769":          "first: 0\n" + blank(32767) + "last: 1\n",
+					"key-then-blank-gap-40000": "a:\n" + blank(40000) + "  b: 1\n  c: 2\n",
+					"alias-after-32768":        "a: &x 1\n" + blank(32768) + "b: *x\n",
+					"pair-gap-65535-blank":     "a: 1\n" + blank(65535) + "b: 2\n", // one scan jumps exactly 65,536 rows
+					"explicit-key-gap-32768":   "? a\n" + blank(32768) + ": v\n",   // error-free misparse before 0003
+					"explicit-key-gap-40000":   "? a\n" + blank(40000) + ": v\n",
+					"explicit-key-gap-70000":   "? a\n" + blank(70000) + ": v\n", // control: the int16 wrap already gave the right tree
+					// CR and LF each count as a row, so ":" on line 16,385 is scanner row 32,768: an error-free misparse before 0003.
+					"crlf-explicit-key-gap-16383": "? a\r\n" + strings.Repeat("\r\n", 16383) + ": v\r\n",
+					// The next three pin the serialized blk_imp_row: each differs from the native dump (or fails) if the saturated distance
+					// is wrapped, stored as 0, or if the row is serialized as an absolute int16.
+					"explicit-seq-gap-40000":    "? a\n" + blank(40000) + ": - x: 1\n",
+					"saturated-dist-wrap-65536": "? a\n" + blank(40000) + ": -\n" + blank(25534) + "    x: 1\n",
+					"anchored-keys-row-40000":   blank(40000) + "&a b: c\n&d e: f\n",
+					"flat-32769":                flat.String(), // upstream issue #49
+					"deep-mapping-252":          deep.String(), // 253 indent pairs: the 12-byte header still fits them
+					"deep-seq-253-late":         blank(40000) + strings.Repeat("- ", 253) + "x\n",
+				} {
+					cases[name], clean[name] = src, true
+				}
+				for _, name := range []string{"explicit-key-gap-32768", "explicit-key-gap-40000", "explicit-key-gap-70000", "crlf-explicit-key-gap-16383"} {
+					pairs[name] = 1 // before 0003, 32768, 40000 and the CRLF case gave a nested block_mapping with a second pair; 70000 was already right
 				}
 			case "python":
 				for _, depth := range []int{510, 511, 520, 600} {
@@ -73,6 +111,21 @@ func TestScannerPatches(t *testing.T) {
 					}
 					if (lang == "bash" || lang == "ruby") && snap.Root().HasError() {
 						t.Fatal("heredoc did not close cleanly")
+					}
+					if clean[name] && snap.Root().HasError() {
+						t.Fatal("error-free input produced an ERROR tree")
+					}
+					if want, ok := pairs[name]; ok {
+						got := 0
+						snap.Walk(func(n treesitter.Node, _ int) treesitter.WalkAction {
+							if n.Kind() == "block_mapping_pair" {
+								got++
+							}
+							return treesitter.Continue
+						})
+						if got != want {
+							t.Fatalf("%d block_mapping_pair nodes, want %d", got, want)
+						}
 					}
 					if n, ok := topLevel[name]; ok && snap.Root().NamedChildCount() != n {
 						t.Fatalf("heredoc closed early: %d top-level nodes, want %d", snap.Root().NamedChildCount(), n)

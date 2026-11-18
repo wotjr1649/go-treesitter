@@ -213,7 +213,10 @@ go run ./patchcompare -before <unpatched-yaml-exe> -after <patched-yaml-exe> \
 
 The report lists changed inputs and binds input/executable hashes. Error-free unpatched trees must remain identical;
 YAML's documented NUL-truncation exception must become a full-length error tree. Mismatches retain both dumps and
-fail the command. The `-allow-nul-truncation` exception is only for this recorded YAML fix.
+fail the command. The `-allow-nul-truncation` exception is only for this recorded YAML fix. YAML patch 0003 changes
+no corpus or fuzz-seed input, so this comparison passes; its documented fix (error-free explicit-key trees past row
+32,767 becoming correct) appears only in the retained inputs of `tools/conformance/scanner_patches_test.go`, which this
+command reports as `pass=false` when given them as a corpus. The PR description records those rows.
 
 `go test -run '^TestQueryIndexInvalidation$' .` also exercises the retained `query_index` invalidation probe
 against the current shim and pinned JSON/runtime C. It asserts cache invalidation directly and checks a negative

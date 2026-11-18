@@ -219,9 +219,12 @@ Each grammar's optional `patches` list keeps the existing single-file records: `
 Only owner-approved patches may be added. C-only patches keep their existing identities and disclosure format.
 No real grammar patch is introduced by the regeneration mechanism itself.
 Recorded C-only patches exist for bash and ruby (`0001-heredoc-utf8`), yaml (`0001-no-early-eof`,
-`0002-bound-serialized-indent-bytes`) and python (`0001-bound-serialized-indent-bytes`); `gen -patch-status` lists the
-counts. Retire each with an approved pin move when upstream fixes it; `native-ref -unpatched` supplies the required
-corpus/fuzz baseline.
+`0002-bound-serialized-indent-bytes`, `0003-widen-scanner-rows`), python (`0001-bound-serialized-indent-bytes`), rust
+(`0001-block-comment-code-points`) and javascript (`0001-jsx-bare-ampersand`). HTML applies
+`0001-greater-than-text` and `0002-bare-ampersand-text` before generation. PostgreSQL applies
+`0001-non-ascii-identifiers` before generation and `0002-dollar-tag-code-points` after it.
+`gen -patch-status` lists the counts. Retire each with an approved pin move when upstream fixes it.
+`native-ref -unpatched` supplies the required corpus, fuzz-seed and patch-regression baseline.
 
 ADR-0027 sets `regenerate: true` for every grammar except entries with a recorded `generatorException`
 (reason and exact failing input IDs). An exception retains the committed reference C. The original archive,
