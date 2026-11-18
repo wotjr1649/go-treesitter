@@ -30,18 +30,19 @@ distributions such as nvim-treesitter pick one per language.
    permits an owner-maintained source and fixes adopted through its approved pin moves. The one-source requirement and
    the same release gates still apply.
 
-## Current assignment (checked 2026-11-15; T-SQL moved to rule 7 on 2026-11-18)
+## Current assignment (checked 2026-11-15, with rule 7 moves on 2026-11-18)
 
 | Tier | Language → repository |
 |---|---|
-| 1 | bash, cpp, c-sharp, css, go, html, java, javascript (+jsx), json, php, python, ruby, rust, typescript/tsx → `tree-sitter/tree-sitter-<lang>`; c → `tree-sitter-grammars/tree-sitter-c` (maintained fork, rule 6, since 2026-11-16) |
+| 1 | bash, cpp, c-sharp, css, go, html, javascript (+jsx), json, php, python, ruby, rust, typescript/tsx → `tree-sitter/tree-sitter-<lang>`; c → `tree-sitter-grammars/tree-sitter-c` (maintained fork, rule 6, since 2026-11-16) |
 | 2 | yaml → `tree-sitter-grammars/tree-sitter-yaml`; xml → `tree-sitter-grammars/tree-sitter-xml` |
 | 3 | kotlin → `fwcd/tree-sitter-kotlin` (replaces the kit's `tree-sitter-grammars/tree-sitter-kotlin`); powershell → `airbus-cert/tree-sitter-powershell`; r → `r-lib/tree-sitter-r`; dart → `UserNobody14/tree-sitter-dart`; swift → `alex-pinkus/tree-sitter-swift` |
 | owner-designated | PostgreSQL → `gmr/tree-sitter-postgres` (nvim-treesitter has none; generated from PostgreSQL's own grammar) |
 | 7 (owner-maintained) | T-SQL → `wotjr1649/tree-sitter-mssql` (owner's repository, v2.1.0; continues the `alfpricot` history, formerly `meloncholera`; nvim-treesitter has no T-SQL grammar) |
+| 7 (owner-maintained) | Java → `wotjr1649/tree-sitter-java` v1.0.0 `a241253`, based on `tree-sitter/tree-sitter-java` v0.23.5 `94703d5` |
 
-The first-wave languages of rule 7 (typescript and tsx, javascript, java) stay in tier 1 above until their pin moves are
-approved and merged; each then moves to the rule 7 row in that PR.
+The remaining first-wave modules (typescript, tsx and javascript) stay in tier 1 until their pin moves are
+approved and merged: TypeScript and TSX move together in one PR (7.7), JavaScript in its own.
 
 ## Consequences
 
@@ -207,7 +208,7 @@ languages.
 | JavaScript | `wotjr1649/tree-sitter-javascript` (new, not a GitHub fork) | `tree-sitter/tree-sitter-javascript` v0.25.0 `44c892e` |
 | Java | `wotjr1649/tree-sitter-java` (new, not a GitHub fork) | `tree-sitter/tree-sitter-java` v0.23.5 `94703d5` |
 
-A GitHub compare (2026-11-18) shows the current pins (`75b3874`, `58404d8`, `e10607b`) ahead of these tags, 0 behind.
+A GitHub compare (2026-11-18) showed the tier-1 pins at designation (`75b3874`, `58404d8`, `e10607b`) ahead of these tags, 0 behind.
 They differ only in `.github/*`, `Cargo.toml` and README. This relates the origin tags to the old pins; 7.5 still
 compares the actual owner v1.0.0 with the old pin. HTML, Rust, YAML, XML and PostgreSQL stay on their sources with
 ADR-0023 patches. Other languages are unchanged.
