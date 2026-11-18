@@ -14,8 +14,9 @@ own `LICENSE`.
 | tree-sitter | Runtime C inside every grammar module; native C reference builds | [MIT](LICENSES/tree-sitter.txt) |
 | tree-sitter-go | `grammars/golang` | [MIT](LICENSES/tree-sitter-go.txt) |
 | tree-sitter-python | `grammars/python` | [MIT](LICENSES/tree-sitter-python.txt) |
-| tree-sitter-javascript | `grammars/javascript` (including JSX); base grammar of TypeScript and TSX | [MIT](LICENSES/tree-sitter-javascript.txt) |
-| tree-sitter-typescript | `grammars/typescript`, `grammars/tsx` | [MIT](LICENSES/tree-sitter-typescript.txt) |
+| tree-sitter-javascript | `grammars/javascript` (including JSX) | [MIT](LICENSES/tree-sitter-javascript.txt) |
+| tree-sitter-javascript v0.23.1 (`3a837b6`) | Vendored `grammar.js` used to generate TypeScript and TSX in the development tree after v0.5.0 | [MIT](LICENSES/tree-sitter-javascript.txt), [TypeScript NOTICE](grammars/typescript/NOTICE), [TSX NOTICE](grammars/tsx/NOTICE) |
+| tree-sitter-typescript | `grammars/typescript` and `grammars/tsx` from `wotjr1649/tree-sitter-typescript` v1.0.0 in the development tree after v0.5.0 | MIT with continuation copyright ([TypeScript LICENSE](grammars/typescript/LICENSE), [TSX LICENSE](grammars/tsx/LICENSE)), [TypeScript NOTICE](grammars/typescript/NOTICE), [TSX NOTICE](grammars/tsx/NOTICE), [original license](LICENSES/tree-sitter-typescript.txt) |
 | tree-sitter-c-sharp | `grammars/csharp` | [MIT](LICENSES/tree-sitter-c-sharp.txt) |
 | tree-sitter-json | `grammars/json` | MIT, [grammars/json/LICENSE](grammars/json/LICENSE) |
 | tree-sitter-postgres | `grammars/postgres` (SQL only) | [BSD-3-Clause](LICENSES/tree-sitter-postgres.txt) |
