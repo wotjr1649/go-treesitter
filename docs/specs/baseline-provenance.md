@@ -10,13 +10,14 @@ Every grammar module is generated, never hand-edited, from:
 | Input | Rule |
 |---|---|
 | tree-sitter runtime C (`lib/src/lib.c` tree) | an upstream **release**, unmodified |
-| grammar inputs, `scanner.c`, headers | upstream grammar repository at a full commit; `parser.c` is regenerated with the single pinned CLI under ADR-0027, except recorded behaviour-gate exceptions; owner-approved temporary source patches follow ADR-0023 |
+| grammar inputs, `scanner.c`, headers | upstream grammar repository at a full commit (a bounded exception: the owner-maintained repository designated under [ADR-0024 rule 7](../design/decisions/ADR-0024-grammar-source-tiers.md#amendment-2026-11-18-rule-7-owner-maintained-repositories)); `parser.c` is regenerated with the single pinned CLI under ADR-0027, except recorded behaviour-gate exceptions; owner-approved temporary source patches follow ADR-0023 |
 | `tools/gen/shim/tsg_abi.c` | this repository's own C, versioned by the engine ABI |
 | toolchain | wasi-sdk (clang) and binaryen `wasm-opt` pinned by upstream release archive sha256 per platform; wasm2go pinned by module version + `go.sum` hash and built with `go install -trimpath`; versions and the recipe name recorded per generation (host binary hashes are not identity) |
 | post-processing | the hash-checked `memory_grow` replacement of `tools/gen` (ADR-0020 §8) |
 
-The runtime stays unmodified. Grammar changes require the recorded, hash-checked patch and retirement mechanism
-of ADR-0023; grammar-input changes regenerate C with the pinned CLI, identically for the engine and native reference.
+The runtime stays unmodified. Temporary grammar patches carried by go-treesitter follow the recorded, hash-checked patch
+and retirement mechanism of ADR-0023. Fixes released by a designated owner repository arrive through an approved
+ADR-0024 rule 7 pin move. Grammar-input changes regenerate C with the pinned CLI, identically for the engine and native reference.
 The YAML early-EOF fix, Bash/Ruby heredoc comparisons, YAML/Python serialization bounds, YAML scanner row widening, Rust block comment
 code-point fix and JavaScript JSX ampersand fix are C-only patches. HTML patches `grammar.js` to accept `>` and
 bare `&` in text. The pins and generated provenance record original and result source hashes and each patch identity.
