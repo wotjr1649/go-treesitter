@@ -114,7 +114,10 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   child traversal is unchanged by this field assignment, and `ChildByFieldName` now finds them.
   For this schema change, only consumers relying on the node-types `children` list must change:
   inspect `fields` as well. This is not a node removal or a general traversal/query compatibility break.
-  Other additions and intended syntax rejections in v2.1.0 can still change parse results; review the
+  Other additions and intended syntax rejections in v2.1.0 can still change parse results. Input that SQL Server
+  rejects and the old grammar accepted now yields an error tree, for example `SELECT 1 WHERE;`, a variable as an
+  alias (`SELECT 1 AS @a;`), `BACKUP ... WITH ENCRYPTION;` without options, an unterminated `/*` comment, and
+  sqlcmd commands run into their argument (`:rfile.sql`). Review the
   [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-t-sql-v210).
   The recorded Hangul alias, variable, column and label cases now parse cleanly and remain Korean regression inputs.
   This development change does not choose a module release version or authorize publication.

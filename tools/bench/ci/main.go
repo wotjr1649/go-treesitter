@@ -197,6 +197,10 @@ func produce(e entry, data string) ([]byte, string, error) {
 		sort.Strings(files)
 		var parts [][]byte
 		for _, f := range files {
+			// errors.txt cases are invalid on purpose; an unterminated comment there would swallow the rest of the file.
+			if strings.HasPrefix(filepath.Base(f), "errors-") {
+				continue
+			}
 			b, err := os.ReadFile(f)
 			if err != nil {
 				return nil, "", err
