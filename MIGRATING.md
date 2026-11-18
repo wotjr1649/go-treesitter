@@ -105,6 +105,23 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
 
 ## Unreleased (after v0.5.0)
 
+- **T-SQL v2.1.0:** `grammars/tsql` moves to the owner's `wotjr1649/tree-sitter-mssql`
+  at `80037156b044543a8248299205a90552687c0c40`, with CLI 0.27.2 and no grammar patches.
+  The Go signatures and engine ABI are unchanged. The schema diff's seven `CHILDREN_TYPE_REMOVED`
+  entries describe existing nodes gaining named fields: function/procedure bodies move to `body`,
+  the CTE identifier to `name`, and trigger object references to `name`/`target`.
+  These fields were already present in alfpricot v1.0.0 (`852cbd20d7dc`); the nodes remain children,
+  child traversal is unchanged by this field assignment, and `ChildByFieldName` now finds them.
+  For this schema change, only consumers relying on the node-types `children` list must change:
+  inspect `fields` as well. This is not a node removal or a general traversal/query compatibility break.
+  Other additions and intended syntax rejections in v2.1.0 can still change parse results. Input that SQL Server
+  rejects and the old grammar accepted now yields an error tree, for example `SELECT 1 WHERE;`, a variable as an
+  alias (`SELECT 1 AS @a;`), `BACKUP ... WITH ENCRYPTION;` without options, an unterminated `/*` comment, and
+  sqlcmd commands run into their argument (`:rfile.sql`). Review the
+  [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-t-sql-v210).
+  The recorded Hangul alias, variable, column and label cases now parse cleanly and remain Korean regression inputs.
+  This development change does not choose a module release version or authorize publication.
+
 - **PostgreSQL Korean support (development tree after v0.5.0):** unquoted identifiers now accept every
   non-ASCII code point, including Hangul, NFD combining characters and supplementary characters, matching
   PostgreSQL's high-bit-byte lexical rule for UTF-8. ASCII identifier rules are unchanged. Adjacent names

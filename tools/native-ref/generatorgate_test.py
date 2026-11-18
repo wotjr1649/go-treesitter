@@ -26,7 +26,7 @@ class GeneratorGateTest(unittest.TestCase):
                 {"source": "grammar.js", "sha256": "patch"}]}
             pins = {"runtime": {"commit": "runtime"}, "tools": {"treeSitterCLI": "0.27.2"}}
             report = {"grammar": "tiny", "seed": 1, "corpusManifestSHA256": "corpus",
-                      "editsManifestSHA256": "edits", "largeManifestSHA256": "large", "patchCorpusFilesSHA256": {}, "differences": [
+                      "editsManifestSHA256": "edits", "largeEntries": [{"lang": "tiny", "sha256": "large"}], "patchCorpusFilesSHA256": {}, "differences": [
                 {"id": "corpus/tiny/korean", "kind": "corpus", "inputSHA256": "input",
                  "referenceDumpSHA256": "a" * 64, "candidateDumpSHA256": "b" * 64}]}
             self.assertFalse(gate.check_patch_expectations(repo, pins, grammar, report))
@@ -34,7 +34,7 @@ class GeneratorGateTest(unittest.TestCase):
             identity = {"grammarCommit": "rev", "grammarArchiveSHA256": "archive",
                         "runtimeCommit": "runtime", "cli": "0.27.2", "seed": 1,
                         "patches": grammar["patches"], "corpusManifestSHA256": "corpus",
-                        "editsManifestSHA256": "edits", "largeManifestSHA256": "large", "patchCorpusFilesSHA256": {}}
+                        "editsManifestSHA256": "edits", "largeEntries": [{"lang": "tiny", "sha256": "large"}], "patchCorpusFilesSHA256": {}}
             expected = {"identity": identity, "reason": "recorded fix", "retireWhen": "upstream fix",
                         "differences": copy.deepcopy(report["differences"])}
             path = repo / "tools/gen/patches/tiny/generator-expectations.json"

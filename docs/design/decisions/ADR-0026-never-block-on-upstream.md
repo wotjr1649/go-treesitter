@@ -19,7 +19,9 @@ the Go module proxy. Our development pipeline does: regeneration, the native ref
 pinned archives from upstream, and most grammar defects need a `grammar.js` change that only upstream can release.
 Both risks have occurred: the T-SQL repository moved (`meloncholera` → `alfpricot`) and its former pinned commit became
 unreachable from any branch (the owner-approved 2026-11-15 pin move selects a tree-identical reachable commit);
-the kit's Kotlin repository stopped merging changes.
+the kit's Kotlin repository stopped merging changes. The development T-SQL source is now the owner's
+`wotjr1649/tree-sitter-mssql` repository, continuing the alfpricot history under the
+[2026-11-18 ADR-0024 amendment](ADR-0024-grammar-source-tiers.md#amendment-2026-11-18-owner-designated-t-sql-source).
 
 ## Decision
 

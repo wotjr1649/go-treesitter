@@ -4,7 +4,18 @@
     "seed": 1,
     "corpusManifestSHA256": "d83283169a3aef023108f1980a459e7324cc81fbc1c825813e485ca140bc7089",
     "editsManifestSHA256": "5ad03207dd95fa20edde19e42776590a9ff389dfbbcde54d729575bdd043030e",
-    "largeManifestSHA256": "7072bab52eba33d03aa21963ab7ddef0376c5564acd0311047afa24ba49094fe",
+    "largeEntries": [
+      {
+        "lang": "postgres",
+        "file": "pagila-insert-data.sql",
+        "kind": "url",
+        "url": "https://raw.githubusercontent.com/devrimgunduz/pagila/6ea53f812254c91a602f61c0ef62beca3fa676b1/pagila-insert-data.sql",
+        "sha256": "14c39f6e24822177d4cf8b09390fd1bec35c95ded626d7a71c083f429d73182a",
+        "license_spdx": "PostgreSQL",
+        "license_url": "https://raw.githubusercontent.com/devrimgunduz/pagila/6ea53f812254c91a602f61c0ef62beca3fa676b1/LICENSE.txt",
+        "license_sha256": "dcc10ac50b94172e627f7a5ec9c08f9e4568e6dd51a952f96ec09506f70163fb"
+      }
+    ],
     "patchCorpusFilesSHA256": {
       "korean-identifiers.txt": "5ddf7ad1aafcf144351bab7ffef3352897b01cc51ef5e4378d148d57048ad0f3"
     },

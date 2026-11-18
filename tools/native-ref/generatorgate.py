@@ -165,7 +165,7 @@ def check_patch_expectations(repo, pins, grammar, report):
                 "grammarArchiveSHA256": grammar["archiveSHA256"],
                 "corpusManifestSHA256": report["corpusManifestSHA256"],
                 "editsManifestSHA256": report["editsManifestSHA256"],
-                "largeManifestSHA256": report["largeManifestSHA256"],
+                "largeEntries": report["largeEntries"],
                 "patchCorpusFilesSHA256": report["patchCorpusFilesSHA256"],
                 "patches": grammar["patches"]}
     if expected.get("identity") != identity or not expected.get("reason") or not expected.get("retireWhen"):
@@ -522,6 +522,9 @@ def run(args):
         execute(["git", "rev-parse", "HEAD"], repo, out / "commit.log", env, timeout=10)
         report["commit"] = (out / "commit.log").read_text(encoding="utf-8").strip()
         report["largeManifestSHA256"] = text_sha(repo / "tools/bench/ci/large.json")
+        # Expectations bind only this grammar's large inputs, so another grammar's entry cannot stale them.
+        report["largeEntries"] = [item for item in json.loads((repo / "tools/bench/ci/large.json").read_text(encoding="utf-8"))
+                                  if item["lang"] == args.lang]
         report["largeDumpTimeoutSeconds"] = args.large_dump_timeout
         reference = out / "reference"
         # The candidate supplies verified lockfile dependencies for both upstream test variants.
