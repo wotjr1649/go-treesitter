@@ -1,6 +1,6 @@
 # ADR-0024 — Grammar source tiers: one upstream per language
 
-**Status:** Accepted by the owner · 2026-11-15; rule 6 added 2026-11-16 · refines ADR-0020 §4 (which grammars) and ADR-0023 (how defects
+**Status:** Accepted by the owner · 2026-11-15; rule 6 added 2026-11-16; rule 7 added 2026-11-18 · refines ADR-0020 §4 (which grammars) and ADR-0023 (how defects
 are carried). The runtime upstream is `tree-sitter/tree-sitter` only, unmodified.
 
 ## Context
@@ -25,16 +25,23 @@ distributions such as nvim-treesitter pick one per language.
    the reason here.
 5. Exactly one repository per language; no mixing of grammars or features from several repositories. Every tier gets
    the same release gates. The tier is shown in the README grammar list, the module README and `limitations.md`.
-   Defects are carried only under ADR-0023 and reported upstream. A tier is re-checked when a pin moves.
+   Temporary grammar patches carried here follow ADR-0023, including its upstream-report requirements. A tier is
+   re-checked when a pin moves. Rule 7 (see [its amendment](#amendment-2026-11-18-rule-7-owner-maintained-repositories))
+   permits an owner-maintained source and fixes adopted through its approved pin moves. The one-source requirement and
+   the same release gates still apply.
 
-## Current assignment (checked 2026-11-15; T-SQL updated 2026-11-18)
+## Current assignment (checked 2026-11-15; T-SQL moved to rule 7 on 2026-11-18)
 
 | Tier | Language → repository |
 |---|---|
 | 1 | bash, cpp, c-sharp, css, go, html, java, javascript (+jsx), json, php, python, ruby, rust, typescript/tsx → `tree-sitter/tree-sitter-<lang>`; c → `tree-sitter-grammars/tree-sitter-c` (maintained fork, rule 6, since 2026-11-16) |
 | 2 | yaml → `tree-sitter-grammars/tree-sitter-yaml`; xml → `tree-sitter-grammars/tree-sitter-xml` |
 | 3 | kotlin → `fwcd/tree-sitter-kotlin` (replaces the kit's `tree-sitter-grammars/tree-sitter-kotlin`); powershell → `airbus-cert/tree-sitter-powershell`; r → `r-lib/tree-sitter-r`; dart → `UserNobody14/tree-sitter-dart`; swift → `alex-pinkus/tree-sitter-swift` |
-| owner-designated | T-SQL → `wotjr1649/tree-sitter-mssql` (owner's repository, v2.1.0; continues the `alfpricot` history, formerly `meloncholera`; nvim-treesitter has no T-SQL grammar); PostgreSQL → `gmr/tree-sitter-postgres` (nvim-treesitter has none; generated from PostgreSQL's own grammar) |
+| owner-designated | PostgreSQL → `gmr/tree-sitter-postgres` (nvim-treesitter has none; generated from PostgreSQL's own grammar) |
+| 7 (owner-maintained) | T-SQL → `wotjr1649/tree-sitter-mssql` (owner's repository, v2.1.0; continues the `alfpricot` history, formerly `meloncholera`; nvim-treesitter has no T-SQL grammar) |
+
+The first-wave languages of rule 7 (typescript and tsx, javascript, java) stay in tier 1 above until their pin moves are
+approved and merged; each then moves to the rule 7 row in that PR.
 
 ## Consequences
 
@@ -96,3 +103,114 @@ repository and continues the `alfpricot/tree-sitter-mssql` history: it contains 
 `2e34d86ec58f3d1a771efc0ca1e71c536690a0b7` (239 commits ahead, none behind). The owner maintains the next
 versions there so later releases can use the same T-SQL-only pin-move procedure. The owner-designated tier
 and the existing pin-move gates remain; this source decision does not approve a merge or a grammar-module release.
+
+## Amendment (2026-11-18): rule 7, owner-maintained repositories
+
+### Context
+
+Some tier-1 upstreams have stopped while needed fixes exceed what ADR-0023 patches can carry. TypeScript, for example,
+needs a newer JavaScript grammar as a generation input. T-SQL already uses the alternative: `wotjr1649/tree-sitter-mssql`
+is an independent repository. It merged `alfpricot/tree-sitter-mssql` v1.0.0 (`852cbd2`) with its full history and keeps
+that tag as `refs/upstream/v1.0.0`. Its own releases started at v2.0.0. This rule makes that model available to other
+languages.
+
+### Decision
+
+7. **Owner-maintained repository.**
+
+   7.1 **Scope and precedence.** For a grammar pinned under rule 7, the dated owner designation below governs source
+   selection under rules 1–4 and 6. Rule 5 still requires one external grammar archive per language and the same
+   release gates. A declared grammar input committed inside that archive is part of that source. The runtime remains
+   unmodified. T-SQL is classified under rule 7 from this amendment onward. Its v2.1.0 pin and the 2026-11-18 approval
+   record stand as recorded. The source-only requirement (7.5) applies to first owner-source moves under this
+   amendment. PostgreSQL stays under rule 4.
+
+   7.2 **Designation.** The owner's 2026-11-18 decision selects the first wave: TypeScript and TSX in one repository,
+   JavaScript, and Java. Go, Python, CSS, Bash and Ruby stay on their current sources until the owner records a
+   concrete trigger and a separate designation. Later designations are made case by case by the owner, who records the
+   trigger; no entry numbers or thresholds apply. Maintained alternatives, upstream activity, patch burden and ADR-0023
+   reviews are signals only. A watch result only prompts review.
+
+   7.3 **The repository.** Each new owner-maintained grammar repository is created independently under the owner's
+   account, without a GitHub fork relationship. The first-wave repository names are recorded in the Designations table.
+   Each repository starts by merging the named upstream release with its full history. The origin's tags stay out of `refs/tags`. Its v1.0.0
+   preserves the baseline grammar behaviour and records the origin. `LICENSE` keeps the origin's copyright and permission notices; the owner may add a copyright line. `NOTICE` names
+   the origin repository, the release tag and commit, the copyright holders and any vendored input. The grammar name, C
+   symbol, node kinds and fields of the baseline stay unless a release declares a breaking change. The repository
+   maintains its own versions, changelog, tests and ADRs. Later origin changes may be adopted deliberately; nothing is
+   synchronized automatically.
+
+   7.4 **Pin.** Use the existing pin schema with `repo` set to the selected owner repository and `regenerate` set to
+   `true`, as for T-SQL. Record the release tag and its full commit in the PR. Pin the archive, source tree, files,
+   `LICENSE` and `NOTICE` through the existing fields (`repo`, `commit`, `extractDir`, `archive`, `archiveSHA256`, `grammarDir`, `dirs`, `treeSHA256`, `files`,
+   `licenseSHA256`, `noticeSHA256`, `cSymbol`, `regenerate`). Remove an `archiveURL` that points at the origin. The
+   top-level README grammar list and `limitations.md` identify the owner source and its origin. The generated module
+   README identifies the pinned repository and commit. The copied `NOTICE` records the origin and any vendored input.
+
+   7.5 **First move: source only.** The first move pins the owner repository's v1.0.0 commit. Every pin move under
+   rule 7 uses the evidence and documentation procedure in rule 6. The first move also keeps the existing Go module
+   path, grammar name, C symbol, corpus inputs and queries unchanged and meets the following zero-difference
+   requirements. The PR records the old
+   and new full repository and archive identities, the exact go-treesitter comparison commits and pins, and the
+   runtime, CLI, platform and input manifest identities. Compare both pins under the same runtime, tools and
+   applicable patch records. After preparation, the generated `parser.c`, `grammar.json` and `node-types.json` and
+   every scanner and header byte used by the builds must be equal. The schema diff of the generated `node-types.json`
+   must be empty. The native dump result must be IDENTICAL for every compared input from both pinned corpora and the
+   pinned large-input manifest. Record the input hashes, counts and ordinary exclusions. Any differing, missing or
+   failed comparison, and any ok-to-error override, blocks the first move. The PR changes no runtime, CLI, patch
+   effect or input scope. Run the generator, conformance and bench gates required for the move.
+
+   7.6 **Later moves and ADR-0023 patches.** A source-only move carries the base pin's patch records unchanged: report
+   URLs, the dates from which ADR-0023 reviews count, and regression inputs. The PR checks every applicable before and
+   after hash against the new archive and generated C, and revalidates any generator expectations against the new pin.
+   The PR that pins a release containing a fix cites that release commit. It retires the matching record, or reduces a
+   bundled patch to its remaining reports, under ADR-0023. Each tree change of an input that parsed without errors
+   under the old pin must map to a specific documented fix and a retained regression input. Apply ADR-0023's evidence
+   and retirement rules whenever a carried patch is added, changed or retired. For later owner-release moves, record
+   schema changes in the schema register and document breaking and query-visible changes in `MIGRATING.md` as
+   applicable. Fixes are made in the owner repository and arrive with the next approved pin move.
+
+   7.7 **TypeScript and TSX.** Move both pins in one separately approved PR, to the same owner release commit and
+   archive. At v1.0.0 both read a vendored `grammar.js` copied from `tree-sitter/tree-sitter-javascript` v0.23.1
+   (`3a837b6`), in place of `require('tree-sitter-javascript/grammar')` in `common/define-grammar.js`. The copy must
+   match the `grammar.js` of the integrity-checked npm input of the old pins (SHA-256
+   `230e330dd914d94297e5e58d53942cd5debf9c069852da93b6a6b1daae1967dc`). When a later TypeScript release switches to the
+   owner JavaScript grammar, vendor `grammar.js` from a named 0.25-based owner JavaScript v1.x tag containing the
+   `using` and reserved-word fixes. `NOTICE` records the source
+   repository, tag, commit and file SHA-256, and the owner repository's CI checks that hash. Omit `npmDependencies`
+   from both pins. The npm rules of ADR-0027 decision 4 stay unchanged for other pins.
+
+   7.8 **Mirror and watch.** Mirror the actual pinned owner archives with the go-treesitter release (ADR-0026). Existing
+   mirror bases hold only the assets already published there. The upstream watch monitors the pinned owner repository.
+   It reports any difference from nvim-treesitter's repository as a review signal. A warning acceptance recorded for
+   the previous source is reviewed again, with its expiry, for the new one. A watch result never moves a pin.
+
+   7.9 **Leaving.** The owner repository does not follow its origin, so leaving is a new source decision under this
+   ADR, made by a pin move with rule 6 evidence. The PR resolves each behaviour that only the owner repository has. It
+   may be present in the new source, carried as an ADR-0023 patch, recorded as a known gap, or described in
+   `MIGRATING.md`, alone or in combination.
+
+   7.10 **Authority.** The owner controls repository creation and publication. The owner creates each repository after
+   a separate decision. Before creating the first owner tag, disable every inherited publication trigger (for example
+   a tag-triggered registry publish) whose effects the owner has not separately approved. Each pin-move PR needs its own owner approval. Upstream contributions follow
+   ADR-0025 decision 5 and its 2026-11-16 amendment: where that amendment applies, the owner writes and posts and
+   discloses AI use. In the owner repositories agents work under the same rules as in go-treesitter: they may prepare
+   branches, commits and pull requests. Every merge, tag, release, publication, repository-setting change and deletion
+   needs the owner's separate approval.
+
+### Designations (owner, 2026-11-18)
+
+| Language | Repository | Origin baseline |
+|---|---|---|
+| T-SQL | `wotjr1649/tree-sitter-mssql`, pinned v2.1.0 `8003715` as recorded on 2026-11-18 | `alfpricot/tree-sitter-mssql` v1.0.0 `852cbd2` |
+| TypeScript, TSX | `wotjr1649/tree-sitter-typescript` (one repository, new, not a GitHub fork) | `tree-sitter/tree-sitter-typescript` v0.23.2 `f975a62` |
+| JavaScript | `wotjr1649/tree-sitter-javascript` (new, not a GitHub fork) | `tree-sitter/tree-sitter-javascript` v0.25.0 `44c892e` |
+| Java | `wotjr1649/tree-sitter-java` (new, not a GitHub fork) | `tree-sitter/tree-sitter-java` v0.23.5 `94703d5` |
+
+A GitHub compare (2026-11-18) shows the current pins (`75b3874`, `58404d8`, `e10607b`) ahead of these tags, 0 behind.
+They differ only in `.github/*`, `Cargo.toml` and README. This relates the origin tags to the old pins; 7.5 still
+compares the actual owner v1.0.0 with the old pin. HTML, Rust, YAML, XML and PostgreSQL stay on their sources with
+ADR-0023 patches. Other languages are unchanged.
+
+The owner decided this on 2026-11-18; merging the pull request carrying this amendment records the owner's approval of
+its text. It approves no repository creation and no pin move.

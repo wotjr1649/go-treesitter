@@ -105,7 +105,7 @@ SHA-256-pinned large benchmark input from `tools/bench/ci/large.json`. The drive
 dumps and per-input classifications: identical, changed, ok→error and error→ok. Existing error trees are retained
 and reported; they are not successful clean parses. Corpus extraction uses `ciconf -inputs-only`; upstream `:skip`
 and other-language exclusions are listed with reasons in the report and counted in the summary. A changed grammar
-without a large manifest entry fails (currently TSX needs a baseline added before a move). A grammar whose large input is a corpus concatenation (T-SQL)
+without a large manifest entry fails. A grammar whose large input is a corpus concatenation (T-SQL)
 also needs that input's `sha256` in `tools/bench/ci/large.json` updated by the same PR whenever the move changes the
 corpus, otherwise the hash check fails and cannot be overridden. The concatenation skips the corpus's `errors-*` inputs
 (invalid on purpose; T-SQL v2.1.0's unterminated comment would otherwise turn 88% of the file into one ERROR node). A missing baseline/input, extraction/schema failure, process

@@ -31,7 +31,9 @@ tree-sitter), which keeps builds pure Go and needs no compiler on the consumer s
 1. **Engine (W2 first, measured gate).** Build the unmodified tree-sitter runtime and each grammar's
    unmodified `parser.c`/`scanner.c` to wasm32 with wasi-sdk and translate it to Go source. Code this
    repository adds in C (for example a progress-callback shim for cancellation, or a tree export helper) is
-   a separate, named file of our own; upstream files are never edited. A wazero-hosted build of the same
+   a separate, named file of our own; upstream files are never edited. A grammar pinned under
+   [ADR-0024 rule 7](ADR-0024-grammar-source-tiers.md#amendment-2026-11-18-rule-7-owner-maintained-repositories) takes its
+   sources from an owner-maintained repository, a bounded exception; the runtime stays unmodified. A wazero-hosted build of the same
    wasm is the fallback if the W2 gates fail. The gates and thresholds are pre-declared in the session plan
    before measurement and confirmed by the owner.
 2. **Versions.** The runtime follows the latest stable tree-sitter release: a new release is adopted when the
@@ -42,7 +44,9 @@ tree-sitter), which keeps builds pure Go and needs no compiler on the consumer s
 4. **Grammars.** Start from the grammar-kit's 26 routes (25 parsers; all MIT or BSD-3). Wave 1 (engine gate):
    C#, T-SQL, TypeScript/TSX, Python, Go, JSON. Wave 2: the remaining routes. Each grammar is its own Go
    module. Upstream grammar sources are used unmodified; grammar-kit's fixes go upstream as contributions,
-   and remaining gaps are published as measured known gaps.
+   and remaining gaps are published as measured known gaps. ADR-0024 rule 7 allows an owner-maintained repository
+   as the source of a designated grammar (a bounded exception; see
+   [the amendment](ADR-0024-grammar-source-tiers.md#amendment-2026-11-18-rule-7-owner-maintained-repositories)).
 5. **Original work this repository owns.** An idiomatic Go API (context cancellation, resource limits,
    explicit lifetimes) and a one-call export of a parse tree into an immutable Go snapshot that many
    goroutines can read; the reproducible build recipe and update pipeline are means, not the product.

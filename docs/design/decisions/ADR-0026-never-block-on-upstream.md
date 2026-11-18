@@ -31,11 +31,15 @@ the kit's Kotlin repository stopped merging changes. The development T-SQL sourc
 2. **Grammar patches (S2).** ADR-0023 patches may also target `grammar.js` and related grammar sources; the patched
    grammar is regenerated to `parser.c` with the pinned tree-sitter CLI, deterministically, and both engine and native
    reference use that C. Disclosure, the unpatched comparison and retirement rules of ADR-0023 apply. Each grammar's
-   patch count is reported; crossing the alert threshold triggers an owner review of the source tier.
+   patch count is reported; crossing the alert threshold triggers an owner review of the source tier. For a grammar under
+   [ADR-0024 rule 7](ADR-0024-grammar-source-tiers.md#amendment-2026-11-18-rule-7-owner-maintained-repositories), fixes
+   are developed in the owner repository. Carried patches remain subject to ADR-0023 under rule 7.6.
 3. **Health watch (S3).** The weekly upstream watch reports rename/transfer, archival, deletion, pin reachability from
    the default branch, inactivity over 12 months and new releases; an unreachable pin or a missing repository fails it.
 4. **Principle (S4).** Work never waits for upstream: a needed fix is carried as a recorded patch, reported upstream in
-   parallel, and removed when upstream releases it. The tree-sitter runtime itself remains unmodified.
+   parallel, and removed when upstream releases it. The tree-sitter runtime itself remains unmodified. For a grammar
+   under [ADR-0024 rule 7](ADR-0024-grammar-source-tiers.md#amendment-2026-11-18-rule-7-owner-maintained-repositories)
+   the needed fix is made in the owner repository and arrives with the next approved pin move.
 
 ## Consequences
 
