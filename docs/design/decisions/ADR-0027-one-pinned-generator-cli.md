@@ -90,7 +90,7 @@ Candidate sharing still requires no patches and identical C/header inputs.
 Deliberate grammar-input fixes record their reviewed behaviour differences beside the patch in
 `tools/gen/patches/<grammar>/generator-expectations.json`, rather than in `pins.json`: pins identify build inputs;
 this sidecar identifies the exact permitted comparison results. It binds the grammar archive/commit, runtime
-commit, CLI, complete patch records, seed, corpus/edit manifests, patch-corpus files and pinned large-input manifest. Each difference
+commit, CLI, complete patch records, seed, corpus/edit manifests, patch-corpus files and that grammar's own entries in the pinned large-input manifest. Each difference
 records its input ID/identity and both result SHA-256 signatures. Corpus/large signatures hash the dump bytes;
 edit signatures hash canonical JSON of the result row (excluding `edit_ms`) plus ranges/fields hashes, including
 the incremental/fresh dump hashes. Upstream signatures hash canonical JSON of each changed outcome or complete
