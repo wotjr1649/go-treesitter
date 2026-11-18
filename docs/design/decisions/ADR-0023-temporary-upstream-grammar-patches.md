@@ -25,6 +25,9 @@ Waiting for upstream leaves these grammars unavailable indefinitely; relaxing ou
 1. A grammar may carry a **temporary patch** to its upstream C (`parser.c`, `scanner.c`, headers) or `grammar.js`
    and related grammar inputs when an upstream
    defect blocks a release gate and the defect is reported upstream. The runtime is never patched.
+   The [2026-11-17](#amendment-2026-11-17-decision-1-postgresql-korean-support) and
+   [2026-11-18](#amendment-2026-11-18-decision-1-scope-patch-limit-and-review) amendments widen which defects
+   qualify; the 2026-11-18 amendment also limits the patches per grammar and adds a 12-month review.
 2. Patches live in `tools/gen/patches/<grammar>/NNNN-<topic>.patch`. `pins.json` records, per patch, the upstream
    file's sha256 before and after, the patch's sha256, and the upstream report URL. `tools/gen` applies them after the pinned source is
    verified and before compiling; a patch that does not apply to the pinned bytes is an error.
@@ -48,6 +51,7 @@ Waiting for upstream leaves these grammars unavailable indefinitely; relaxing ou
 8. **Patch burden.** `gen -patch-status` reports every grammar's patch count, including zero. Generation and native
    reference builds print the selected grammar's count and warn above `-patch-alert` (default 3; shell entry points
    accept `PATCH_ALERT_THRESHOLD`). This warning is a review signal, never an approval for another patch.
+   The 2026-11-18 amendment (item 3) caps a grammar at five patch records.
 
 ## Amendment (2026-11-17): decision 1, PostgreSQL Korean support
 
@@ -63,6 +67,52 @@ is not patched.
 
 The owner approved this exception on 2026-11-17; merging the pull request carrying this amendment records the
 owner's approval of its text.
+
+## Amendment (2026-11-18): decision 1, scope, patch limit and review
+
+Several pinned upstreams have had no commit for a year or more while known defects and their fixes wait in open
+issues and pull requests. The owner extends decision 1 so that such fixes are carried without waiting for upstream
+(ADR-0026 S4), within a bounded burden.
+
+1. **Qualifying defects.** Besides a defect that blocks a release gate, a temporary patch may fix an error-free
+   misparse (a tree without `ERROR` or `MISSING` nodes whose structure is wrong), Korean or other non-ASCII input
+   the grammar rejects or mis-scans, common input of the language that the grammar rejects (`ERROR` or `MISSING`
+   nodes), or newer language syntax that the grammar does not accept. The pull request states why the input is
+   common (for example the language's documentation or widely used code) and, for a misparse, the specification or
+   reference behaviour it follows.
+2. **Upstream report.** When a new patch is added, an open upstream issue or pull request, by any author, must
+   describe the defect; its HTTPS URL is the patch record's `upstreamReport`. If none exists, a report is posted
+   first (decision 6: separate publication approval). The patch may carry an upstream pull request's change adapted
+   to the pinned source or, when no such pull request exists, our own fix.
+3. **Limit.** A grammar carries at most five patch records, as `gen -patch-status` counts them. Each record changes
+   exactly one file; by default it addresses one upstream report. Bundling several reports that change the same
+   file into one patch needs the owner's explicit approval of the bundling, stated in that patch's pull request. A
+   bundled patch records one of its reports as `upstreamReport`; `tools/gen/patches/<grammar>/README.md` and the
+   grammar's `docs/reports/limitations.md` row list every bundled report URL, and decision 5 and item 4 apply to
+   each of them (when upstream incorporates one, the pin move reduces the patch to the remaining reports). The
+   `-patch-alert` default stays 3: adding a fourth or fifth patch record requires the owner's source-tier review
+   (ADR-0026 S2), recorded in the pull request that adds the record. More than five requires amending this ADR.
+4. **Review.** A patch that upstream has not incorporated within 12 months after a patch for its upstream report
+   first reached `main` is re-decided by the owner, for example removing it and recording the defect as a known
+   gap or moving the grammar's source (ADR-0024); if the owner keeps it, the next review is 12 months later.
+   Renaming, rewriting or replacing the patch file does not restart the period. Decision 5 still applies when
+   upstream releases a fix or closes the report without one.
+5. **Breaking changes.** Adding, changing or removing a patch (including retirement) so that node types or fields,
+   or the trees of inputs that parsed without errors, change is a breaking change for users. Besides decision 4, its
+   pull request updates the schema register (`docs/validation/grammar-schemas.md`) and `MIGRATING.md`, and checks
+   that the upstream queries the conformance lane uses still compile and pass that lane with the patched grammar;
+   that lane does not show unchanged captures, so `MIGRATING.md` describes query-visible changes.
+6. **Evidence.** Decisions 2–4 and 7 apply unchanged. The ADR-0027 generator gate applies a C or header patch to
+   both of its sides and so does not test the patch's effect; that evidence is the decision 4 unpatched comparison,
+   also run over regression inputs that exercise the fix (the patch corpus or retained conformance tests) so that
+   the documented fix appears among the changed inputs, and native agreement on those inputs. A grammar-input patch
+   also runs the generator gate; its reviewed differences, if any, are recorded in
+   `tools/gen/patches/<grammar>/generator-expectations.json` (ADR-0027).
+7. **Approval.** This amendment approves no individual patch; decision 6 applies to each. The 2026-11-17 PostgreSQL
+   amendment remains the record of those two patches, which also meet items 1–3 of this amendment.
+
+The owner set this direction and the limit on 2026-11-18; merging the pull request carrying this amendment records
+the owner's approval of its text.
 
 ## Consequences
 
