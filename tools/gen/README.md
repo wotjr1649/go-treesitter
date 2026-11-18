@@ -237,8 +237,10 @@ hash-checked patch bytes apply to each variant (YAML `0001-no-early-eof` uses th
 
 Selected `npmDependencies` are unpacked from the upstream `package-lock.json` tarball after SHA-512 integrity
 verification; npm and install scripts never run. QuickJS resolves these packages from the grammar working
-directory's `node_modules`, including TypeScript/TSX imports through `../common`. No host Node participates.
-The tarballs are cached in `<dl>/npm` by integrity identity. Direct `gen` calls require explicit `-fetch-npm`
+directory's `node_modules`. TypeScript and TSX load `third_party/tree-sitter-javascript/grammar.js` from their
+shared owner archive via `common/define-grammar.js`. The vendored directory is covered by each pin's tree hash.
+The pinned CLI uses its native JavaScript runtime for both forms.
+npm tarballs are cached in `<dl>/npm` by integrity identity. Direct `gen` calls require explicit `-fetch-npm`
 for a missing tarball; `native-ref` requires `-fetch`. `regen.sh` and `balance-probe.sh` opt in with `-fetch-npm`.
 Without that flag, generation uses only verified cached tarballs and fails if one is missing. npm inputs are selected
 from the verified upstream lockfile after source extraction, outside `-plan`; this explicit opt-in keeps generation
@@ -275,8 +277,9 @@ awk -F '\t' '$4 == "source"' release-assets.tsv > release-source-assets.tsv
 The command lists 34 rows for the current pins: 26 `source` archives and eight `toolchain` archives. The immutable v0.4.0 release
 contains its original 24 source archives plus `SHA256SUMS`; the new C and PostgreSQL archives have no fallback there.
 The v0.5.0 release mirrors the 25 rows with column 4 equal to `source` that existed then, plus `SHA256SUMS`.
-The Swift archive, the T-SQL v2.1.0 archive `tree-sitter-mssql-80037156b044.tar.gz` and the Java v1.0.0 archive
-`tree-sitter-java-a241253570b2.tar.gz`, added afterwards,
+The Swift archive, the T-SQL v2.1.0 archive `tree-sitter-mssql-80037156b044.tar.gz`, the Java v1.0.0 archive
+`tree-sitter-java-a241253570b2.tar.gz`, and the shared TypeScript/TSX v1.0.0 archive
+`tree-sitter-typescript-59fc4edb0c0b.tar.gz` were added afterwards and
 have no mirror fallback until a release carrying them is published and its base is configured. Check their filenames against `runtime.archive`,
 `wasiLibc.archive`, and each grammar's `archive` in `pins.json`, deduplicating TypeScript/TSX's shared archive;
 the [publication procedure](../../docs/specs/publication.md#pinned-archive-release-assets) specifies the inventory

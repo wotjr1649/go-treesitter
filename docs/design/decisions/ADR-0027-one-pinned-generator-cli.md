@@ -50,8 +50,10 @@ have none.
 ## Consequences
 
 - `tools/gen` regenerates non-exception grammars with the pinned native QuickJS runtime. npm grammar inputs from
-  upstream lockfiles are supplied in each grammar's working-directory `node_modules`, which also resolves
-  TypeScript/TSX imports. Input patches precede generation; C patches follow it. The native behaviour gate is
+  upstream lockfiles are supplied in each grammar's working-directory `node_modules`. From the first owner-source
+  move, TypeScript and TSX read their JavaScript grammar from the shared archive under
+  [ADR-0024 rule 7.7](ADR-0024-grammar-source-tiers.md#amendment-2026-11-18-rule-7-owner-maintained-repositories).
+  Input patches precede generation, and C patches follow it. The native behaviour gate is
   `tools/native-ref/generatorgate.py`; regeneration CI runs it and retains its reports and timing/RSS receipts.
   Adoption remains subject to the recorded validation gates, including hosted drift and resource measurements.
 - Moving the CLI becomes a reviewed event with a gate, comparable to a grammar pin move; regeneration CI time grows

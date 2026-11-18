@@ -186,50 +186,48 @@
       "regenerate": true
     },
     "typescript": {
-      "repo": "https://github.com/tree-sitter/tree-sitter-typescript",
-      "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f",
-      "extractDir": "tree-sitter-typescript-75b3874edb2d",
-      "archive": "tree-sitter-typescript-75b3874edb2d.tar.gz",
-      "archiveSHA256": "891d088a997537a44d61e7d7f67737b5ba4ba25a415d3a7b7e7e3c7cde3d4a5c",
+      "repo": "https://github.com/wotjr1649/tree-sitter-typescript",
+      "commit": "59fc4edb0c0bcec96a4c52e34b401de22a905b46",
+      "extractDir": "tree-sitter-typescript-59fc4edb0c0b",
+      "archive": "tree-sitter-typescript-59fc4edb0c0b.tar.gz",
+      "archiveSHA256": "f53457ec5d60df85508e8189f53a825d4dfc96d9393c92822f9b47d989e2846f",
       "grammarDir": "typescript/src",
       "dirs": [
         "typescript/src",
-        "common"
+        "common",
+        "third_party/tree-sitter-javascript"
       ],
-      "treeSHA256": "b5748a3b788124e0e09a269a16bb52e39971a14b0740049cdabec7fc94178ccc",
+      "treeSHA256": "5ed0b79d0a93fd56f8d38c4fca782ae4de8983cb430aec66af0bf5436aeae2ab",
       "files": {
-        "parser.c": "74fe453edd70f4eae9af0a1050cbd7943d8971d59165b6aaebbaa0a0b716d1aa",
+        "parser.c": "f719065cac4af87cc1f22c1b55cca6813f7dfb82a794c4b93dc971e20673c7d6",
         "scanner.c": "9125013b42cb888379d9be909f1d73dfb75a37626c2cdbf4122718a2b431a6d3"
       },
-      "licenseSHA256": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
+      "licenseSHA256": "3597a4375c71aee9366e300a40c49e9a21473e85b4b1cc33fdb5719669eb854c",
+      "noticeSHA256": "dd498a12be68e333e22858b45b4ac1e7caa0def035e3ec225e0b0dcf30ec64b4",
       "cSymbol": "tree_sitter_typescript",
-      "regenerate": true,
-      "npmDependencies": [
-        "tree-sitter-javascript"
-      ]
+      "regenerate": true
     },
     "tsx": {
-      "repo": "https://github.com/tree-sitter/tree-sitter-typescript",
-      "commit": "75b3874edb2dc714fb1fd77a32013d0f8699989f",
-      "extractDir": "tree-sitter-typescript-75b3874edb2d",
-      "archive": "tree-sitter-typescript-75b3874edb2d.tar.gz",
-      "archiveSHA256": "891d088a997537a44d61e7d7f67737b5ba4ba25a415d3a7b7e7e3c7cde3d4a5c",
+      "repo": "https://github.com/wotjr1649/tree-sitter-typescript",
+      "commit": "59fc4edb0c0bcec96a4c52e34b401de22a905b46",
+      "extractDir": "tree-sitter-typescript-59fc4edb0c0b",
+      "archive": "tree-sitter-typescript-59fc4edb0c0b.tar.gz",
+      "archiveSHA256": "f53457ec5d60df85508e8189f53a825d4dfc96d9393c92822f9b47d989e2846f",
       "grammarDir": "tsx/src",
       "dirs": [
         "tsx/src",
-        "common"
+        "common",
+        "third_party/tree-sitter-javascript"
       ],
-      "treeSHA256": "9668ab33b56aa4e64f6a2cc704040bf1d78c0beb2900586c693cbd93254d75af",
+      "treeSHA256": "f5ac71797bd2ea1b518264741b72f20d50f6f4acce88a2272c8116bd5665f542",
       "files": {
-        "parser.c": "1902cb53fa7ff5179df89b2eea863165e84c8cc866226419dc26921d8c055885",
+        "parser.c": "b068b83c1416c24725aa9013e29408b72833c6722f8fe14a3e9bafb212aa53c0",
         "scanner.c": "d563cd30b2f39718c9ae4292795c5ce03a2ad01954ba3a86ef84c2781a736673"
       },
-      "licenseSHA256": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
+      "licenseSHA256": "3597a4375c71aee9366e300a40c49e9a21473e85b4b1cc33fdb5719669eb854c",
+      "noticeSHA256": "dd498a12be68e333e22858b45b4ac1e7caa0def035e3ec225e0b0dcf30ec64b4",
       "cSymbol": "tree_sitter_tsx",
-      "regenerate": true,
-      "npmDependencies": [
-        "tree-sitter-javascript"
-      ]
+      "regenerate": true
     },
     "csharp": {
       "repo": "https://github.com/tree-sitter/tree-sitter-c-sharp",

@@ -1,0 +1,21 @@
+This repository continues tree-sitter-typescript from tree-sitter/tree-sitter-typescript
+(https://github.com/tree-sitter/tree-sitter-typescript) at v0.23.2, commit f975a62
+(f975a621f4e7f532fe322e13c4f79495e0a7b2e7), from 2026-11-18 onward, with the
+upstream history preserved. That work is copyright (c) 2017 Max Brunsfeld and
+licensed under the MIT License; see LICENSE.
+
+The following files under third_party/tree-sitter-javascript/ are copied unchanged
+from tree-sitter/tree-sitter-javascript
+(https://github.com/tree-sitter/tree-sitter-javascript) at v0.23.1, commit 3a837b6
+(3a837b6f3658ca3618f2022f8707e29739c91364). They are copyright (c) 2014 Max
+Brunsfeld and licensed under the MIT License; see
+third_party/tree-sitter-javascript/LICENSE. SHA-256:
+
+2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1  LICENSE
+230e330dd914d94297e5e58d53942cd5debf9c069852da93b6a6b1daae1967dc  grammar.js
+0cad1712acaf40804bc5dc7c8476858752c1f549cdf7d8c63c747317be0f8fa6  queries/highlights-jsx.scm
+bbe7a58cacfb1c954cb0eab44779fd80421ed59b762b975723447207635de50d  queries/highlights-params.scm
+d3630ae6dc9b2b27b230b5f8bb92b05cd491fb12bff353dae62a0a6d780461ee  queries/highlights.scm
+bea345407ce1f24bccf2b3c1a128acc14e19301327074285368586e793dcb86d  queries/injections.scm
+c1dd2cfa1400d397fa974208fc9edfe817be4a3c8b42bb99af5c8d193b1bb753  queries/locals.scm
+6ef988cce5a428a15b5460e3ee96f1478705f965fc6e848a91a18bfa6c6f0212  queries/tags.scm

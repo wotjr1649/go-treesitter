@@ -293,6 +293,27 @@ go-treesitter already generated from the origin pin (the same 27 changes appear 
 The generated schemas are byte-identical and pass strict checks with an empty diff (E1, Windows amd64). Go modules
 at both pins use the same generated schema.
 
+## Unreleased (after v0.5.0) TypeScript and TSX v1.0.0
+
+Under ADR-0024 rules 7.5 and 7.7, TypeScript and TSX move together from
+`tree-sitter/tree-sitter-typescript` at `75b3874edb2dc714fb1fd77a32013d0f8699989f`
+to `wotjr1649/tree-sitter-typescript` v1.0.0 at `59fc4edb0c0bcec96a4c52e34b401de22a905b46`,
+based on the original v0.23.2 at `f975a621f4e7f532fe322e13c4f79495e0a7b2e7`.
+The shared archive SHA-256 changes from `891d088a997537a44d61e7d7f67737b5ba4ba25a415d3a7b7e7e3c7cde3d4a5c`
+to `f53457ec5d60df85508e8189f53a825d4dfc96d9393c92822f9b47d989e2846f`.
+
+| Grammar | Input | Schema bytes | Schema SHA-256 |
+|---|---|---:|---|
+| TypeScript | Original archive | 108583 | `c790a733fc756b54d4e54dceeb7d2d51e40d8b57136e70277753a75804cce3e3` |
+| TypeScript | Owner archive and both prepared pins | 108621 | `10fc80f3b49f46aa6a64c805372359c08540fc8232934ef0f75f84a5cf91e000` |
+| TSX | Original archive | 113345 | `78b5789145286799a27a0a7ecc36cc1bcb151f94ec7fa631b248459867010c8c` |
+| TSX | Owner archive and both prepared pins | 113383 | `9a6b3b2c79875a36f9591627e33d5b2376b2b25352b38d5368efcc7b2fa4e01f` |
+
+All schemas pass strict checks. Comparing the archived schemas gives two `EXTRA_CHANGED` entries per
+grammar for `comment` and `html_comment`, matching the CLI 0.27.2 changes recorded in the ADR-0027 table
+above. The owner archive contains the schema already produced by go-treesitter's pinned CLI. Preparing
+both pins with CLI 0.27.2 gives byte-identical schemas and an empty diff for each grammar (E1, Windows amd64).
+
 ## Unreleased (after v0.5.0) Rust, JavaScript and HTML patches
 
 The temporary ADR-0023 patches keep the grammar pins fixed. Strict schema checks pass, and the
