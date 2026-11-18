@@ -34,15 +34,14 @@ distributions such as nvim-treesitter pick one per language.
 
 | Tier | Language → repository |
 |---|---|
-| 1 | bash, cpp, c-sharp, css, go, html, javascript (+jsx), json, php, python, ruby, rust → `tree-sitter/tree-sitter-<lang>`; c → `tree-sitter-grammars/tree-sitter-c` (maintained fork, rule 6, since 2026-11-16) |
+| 1 | bash, cpp, c-sharp, css, go, html, json, php, python, ruby, rust → `tree-sitter/tree-sitter-<lang>`; c → `tree-sitter-grammars/tree-sitter-c` (maintained fork, rule 6, since 2026-11-16) |
 | 2 | yaml → `tree-sitter-grammars/tree-sitter-yaml`; xml → `tree-sitter-grammars/tree-sitter-xml` |
 | 3 | kotlin → `fwcd/tree-sitter-kotlin` (replaces the kit's `tree-sitter-grammars/tree-sitter-kotlin`); powershell → `airbus-cert/tree-sitter-powershell`; r → `r-lib/tree-sitter-r`; dart → `UserNobody14/tree-sitter-dart`; swift → `alex-pinkus/tree-sitter-swift` |
 | owner-designated | PostgreSQL → `gmr/tree-sitter-postgres` (nvim-treesitter has none; generated from PostgreSQL's own grammar) |
 | 7 (owner-maintained) | T-SQL → `wotjr1649/tree-sitter-mssql` (owner's repository, v2.1.0; continues the `alfpricot` history, formerly `meloncholera`; nvim-treesitter has no T-SQL grammar) |
 | 7 (owner-maintained) | Java → `wotjr1649/tree-sitter-java` v1.0.0 `a241253`, based on `tree-sitter/tree-sitter-java` v0.23.5 `94703d5` |
 | 7 (owner-maintained) | TypeScript and TSX → `wotjr1649/tree-sitter-typescript` v1.0.0 `59fc4ed`, based on `tree-sitter/tree-sitter-typescript` v0.23.2 `f975a62` |
-
-JavaScript stays in tier 1 until its own pin-move PR is approved and merged.
+| 7 (owner-maintained) | JavaScript (+JSX) → `wotjr1649/tree-sitter-javascript` v1.0.0 `d6501de`, based on `tree-sitter/tree-sitter-javascript` v0.25.0 `44c892e` |
 
 ## Consequences
 

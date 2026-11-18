@@ -87,7 +87,7 @@ func TestPatchSectionDiagnostics(t *testing.T) {
 }
 
 // gitFirstOnMain on a real repository: the first-parent merge that first added a report wins, a later rewrite of the
-// patch does not restart it, and r/35 does not match r/350.
+// patch or source repository does not restart it, and /388 does not match /3880.
 func TestGitFirstOnMain(t *testing.T) {
 	if _, err := exec.LookPath("git"); err != nil {
 		t.Skip("git not available")
@@ -104,26 +104,38 @@ func TestGitFirstOnMain(t *testing.T) {
 	}
 	pins := filepath.Join(dir, "pins.json")
 	write := func(s string) {
+		t.Helper()
 		if err := os.WriteFile(pins, []byte(s), 0o644); err != nil {
 			t.Fatal(err)
 		}
 	}
+	const report = "https://github.com/tree-sitter/tree-sitter-javascript/pull/388"
+	const origin = "https://github.com/tree-sitter/tree-sitter-javascript"
+	const owner = "https://github.com/wotjr1649/tree-sitter-javascript"
+	const onFeature = `{"grammars":{"javascript":{"repo":"` + origin + `","patches":[{"file":"old.patch","upstreamReport":"` + report + `"}]}}}`
 	git("2025-01-01T00:00:00Z", "init", "-b", "main")
-	write(`{"a":"https://r/350"}`)
+	write(`{"a":"` + report + `0"}`)
 	git("2025-01-01T00:00:00Z", "add", ".")
 	git("2025-01-01T00:00:00Z", "commit", "-m", "one")
 	git("2025-02-01T00:00:00Z", "checkout", "-b", "feature")
-	write(`{"a":"https://r/350","b":"https://r/35"}`)
+	write(onFeature)
 	git("2025-02-02T00:00:00Z", "commit", "-am", "branch work")
 	git("2025-03-01T00:00:00Z", "checkout", "main")
 	git("2025-03-01T00:00:00Z", "merge", "--no-ff", "-m", "merge", "feature")
-	write(`{"a":"https://r/350","c":"https://r/35"}`) // the patch is replaced; its report stays
-	git("2025-04-01T00:00:00Z", "commit", "-am", "rewrite")
+	write(strings.Replace(onFeature, origin+`"`, owner+`"`, 1))
+	git("2025-04-01T00:00:00Z", "commit", "-am", "move source")
+	current := strings.Replace(strings.Replace(onFeature, origin+`"`, owner+`"`, 1), "old.patch", "new.patch", 1)
+	write(current)
+	git("2025-05-01T00:00:00Z", "commit", "-am", "rewrite")
+	patches, err := loadPatches([]byte(current))
+	if got := patches["javascript"]; err != nil || len(got) != 1 || got[0] != (patchRec{"new.patch", report}) {
+		t.Fatalf("owner pin patch = %v, %v", got, err)
+	}
 	added, err := gitFirstOnMain(pins)
 	if err != nil {
 		t.Fatal(err)
 	}
-	for report, want := range map[string]string{"https://r/350": "2025-01-01", "https://r/35": "2025-03-01"} {
+	for report, want := range map[string]string{report + "0": "2025-01-01", report: "2025-03-01"} {
 		if got, err := added(report); err != nil || got.Format(time.DateOnly) != want {
 			t.Errorf("%s: %v, %v; want %s", report, got, err, want)
 		}

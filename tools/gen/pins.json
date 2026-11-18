@@ -278,25 +278,25 @@
       "regenerate": true
     },
     "javascript": {
-      "repo": "https://github.com/tree-sitter/tree-sitter-javascript",
-      "commit": "58404d8cf191d69f2674a8fd507bd5776f46cb11",
-      "extractDir": "javascript",
-      "archive": "javascript-58404d8cf191.tar.gz",
-      "archiveSHA256": "f3e51e9f7b129f62a817551ae22a878dac5c18d71c456d5ad73e9c82d687f33d",
-      "archiveURL": "https://codeload.github.com/tree-sitter/tree-sitter-javascript/tar.gz/58404d8cf191d69f2674a8fd507bd5776f46cb11",
+      "repo": "https://github.com/wotjr1649/tree-sitter-javascript",
+      "commit": "d6501de34e9aabad1f49b860fcfcc23066766223",
+      "extractDir": "tree-sitter-javascript-d6501de34e9a",
+      "archive": "tree-sitter-javascript-d6501de34e9a.tar.gz",
+      "archiveSHA256": "28678c9e5bd2260218bada6c446766c6eee2fc9a10ef8344def61d59bf523cfa",
       "grammarDir": "src",
       "dirs": [
         "src"
       ],
-      "treeSHA256": "1d8476efdf88ebb8b8ceb4a5eb8ff7baa6dae6c8ba9eef944a3877d38c9c9627",
+      "treeSHA256": "6b705fc394fae294a8859f240f99661752ed829cf2108ce47ff1df30364b6e99",
       "files": {
-        "parser.c": "67209ca7ef6e1a4f74e29e48b5928455f892fe1821a3960fbcd62f4e972f7384",
+        "parser.c": "dd77f92c8894a0ff67451ab3fbd9ef042f95ef2d274f2b85e28386e25975ee04",
         "scanner.c": "b3d3f64284d97bf80749c026862427782cf7ecc0b7dc094e6698ab311c9a42c7",
         "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
-        "tree_sitter/array.h": "5bdf6ed1a78e3409fd443e085ca967a64c188a5d082aaf7f819bccd53a471c94",
+        "tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
         "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
       },
-      "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+      "licenseSHA256": "8ef024c7b005dca2d72127f359ed3ef59755d2513308cb2a2b0df99007f4d47b",
+      "noticeSHA256": "9b853f74b5d68a37b0ec99f5d0bfed12f97d50ba97de2b7cc3c66ad3673a1745",
       "cSymbol": "tree_sitter_javascript",
       "regenerate": true,
       "patches": [
