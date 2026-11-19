@@ -124,8 +124,14 @@ Rust-only forms are query errors) is owned by [limitations, row 5](../reports/li
 A grammar is a pinned upstream grammar, and some match names with ASCII-only or Latin-1 patterns, so a Hangul name can
 produce `ERROR` nodes even though the language allows it. The table says what was shown, per grammar and kind of text.
 
-- **yes**: every retained input of that kind parses with no `ERROR` or `MISSING` node, and each Hangul run sits in the
-  node kind the manifest records.
+- **yes**: every retained input of that kind parses with no `ERROR` or `MISSING` node. For each Hangul run, and each
+  other non-ASCII run such as an emoji, the deepest covering named node has the kind the manifest records; when that
+  node is wider than the run, its extent is recorded too. This describes the recorded tree of each input, not whether
+  the tree matches the language's own parser. Two recorded trees are known to differ from it: in
+  `powershell/str-here-string`, `$값` inside the expandable here-string is not a separate variable node (PowerShell's
+  parser reads a `VariableExpressionAst`), and in `ruby/str-heredoc-hangul-delimiter-eof-no-newline` the closing `끝`
+  at end of file without a newline is part of `heredoc_content` (Ruby ends the heredoc there). The same EOF boundary
+  occurs with an ASCII end word.
 - **no** / **partly**: a pinned upstream defect, reproduced by the engine and by native C. The linked page has the exact
   input and the observed wrong tree. A tree is still returned; check `HasError()`.
 - **not recorded**: there is no retained input for it, so nothing is claimed either way.
@@ -173,9 +179,9 @@ inputs listed in [`manifest.csv`](../../tools/conformance/testdata/korean/manife
 product lane it is a retained test (`E3`): "parses these recorded inputs cleanly". In the CI conformance shards (Linux
 amd64 and arm64, with a freshly built native reference) it also compares each dump byte for byte with native C (`E5`),
 for those inputs, on those platforms and the pinned grammar identity. A "no" row is an expected failure: the test passes
-only while the recorded wrong tree is unchanged. Only Hangul was examined and only the recorded inputs are covered; other
-scripts, and other positions of the same upstream patterns, are expected to fail the same way but are not recorded
-([limitations, rows 18, 20 and 21](../reports/limitations.md)). Do not read the table as "this grammar fully supports
+only while the recorded wrong tree is unchanged. For clean inputs, the test checks every Hangul and other non-ASCII run,
+including emoji in the edge rows. The result applies to the recorded inputs and pinned grammar versions; other positions
+of the same upstream patterns are not recorded ([limitations, rows 18, 20 and 21](../reports/limitations.md)). Do not read the table as "this grammar fully supports
 Korean": "yes" means "these inputs".
 
 ## Heredocs with Korean end words (Bash and Ruby)
