@@ -2,8 +2,8 @@
   "identity": {
     "grammarCommit": "2346a3ab1bb3857b48b29d779a1ef9799a248cd7",
     "seed": 1,
-    "corpusManifestSHA256": "03cd58c0fafb2844581190e36595981441b609edde574497160fcfd070def30f",
-    "editsManifestSHA256": "7cf784c77200f2d802e465da834cd33de6c528598726fdc9e72542c8305b8e2c",
+    "corpusManifestSHA256": "9db53d19a83d2118fd447a020e421a9e320f2daf575a030f7f38fd010c75bffa",
+    "editsManifestSHA256": "1e6b708b56c5dc7058ef1563bc1055359e2e29c0be316af777fb2189da2e5c63",
     "largeEntries": [
       {
         "lang": "golang",
@@ -28,7 +28,7 @@
       }
     ],
     "patchCorpusFilesSHA256": {
-      "p111.txt": "ae059f104cf6df7d564eaa9c2793f6b948fc6a93656d1ce07e9c7a572579654e"
+      "new-expression-argument.txt": "2959a14c1c550bb3140299b13f44b3b48dc6b5b79fb4cb2213757a8d00cfea9f"
     },
     "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
     "cli": "0.27.2",
@@ -48,7 +48,7 @@
   "retireWhen": "Retire with the patch on an approved pin that supports new(expr) and preserves the type-only make behavior. Review again if the upstream issue closes without a fix or any gate identity or result changes.",
   "differences": [
     {
-      "id": "corpus/go/grammar-patch-p111-001",
+      "id": "corpus/go/grammar-patch-new-expression-argument-001",
       "kind": "corpus",
       "inputSHA256": "e56b7b73dfb4281bbb251368ca1e8aac158189b3a908ee2714f1f406771de29b",
       "referenceDumpSHA256": "6f0b39d9f7ad24a5a941e440c1359ac7eb173fb896a09d9be35361a25828f8d3",
@@ -92,7 +92,35 @@
       "candidateDumpSHA256": "735fd52e1928cad1ee6983c7499fba6e0ac1a0418f9e54746e537488ff10dc70"
     },
     {
-      "id": "edits/go/grammar-patch-p111-001-e1",
+      "id": "edits/go/grammar-patch-new-expression-argument-001-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "e56b7b73dfb4281bbb251368ca1e8aac158189b3a908ee2714f1f406771de29b",
+      "newSHA256": "0a1991cc3a6f2a476e445ae866e2caad822b06de053eb374dff8a2ff9d73912d",
+      "referenceDumpSHA256": "e50e0b636f918e617c816d0e37c2194671f86d0a256254499be4e5c76a3f6791",
+      "candidateDumpSHA256": "f8e95d393c2e795f57c92b41ee5ca67133370472b1660ab78e3c72398df97adf"
+    },
+    {
+      "id": "edits/go/grammar-patch-new-expression-argument-001-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "e56b7b73dfb4281bbb251368ca1e8aac158189b3a908ee2714f1f406771de29b",
+      "newSHA256": "5338c5a588dde86f2222498dbd113f08a9ce22be1b712a1a32e09d1544118042",
+      "referenceDumpSHA256": "a1872c71cb5fa14eab52a4a4b36cb603d84d120088a933b867489a25882c17e4",
+      "candidateDumpSHA256": "cbd358e878a113d507fb5abc0695c8326ff6d4a72f2b4e5ec6d078a2410fa32d"
+    },
+    {
+      "id": "edits/go/grammar-patch-new-expression-argument-001-e3",
       "kind": "edit",
       "changed": [
         "edit_sha256",
@@ -102,37 +130,9 @@
         "fields"
       ],
       "oldSHA256": "e56b7b73dfb4281bbb251368ca1e8aac158189b3a908ee2714f1f406771de29b",
-      "newSHA256": "9094170b2c4e404587dfaac9cd27a2a802f2c66efb5aca544beaa0d01f2d76bc",
-      "referenceDumpSHA256": "02e2d98b835d9f39789f48fe96051b88c6917fdd68848abaee23db448c08f473",
-      "candidateDumpSHA256": "888a26bdf0ceb69b01dc9b27c4f476bb5a2b7c63b20055aad6002d5177e98af7"
-    },
-    {
-      "id": "edits/go/grammar-patch-p111-001-e2",
-      "kind": "edit",
-      "changed": [
-        "edit_sha256",
-        "fresh_sha256",
-        "edit_fields_sha256",
-        "fields"
-      ],
-      "oldSHA256": "e56b7b73dfb4281bbb251368ca1e8aac158189b3a908ee2714f1f406771de29b",
-      "newSHA256": "91afcd2ae9d2fc9966ff209b3d9a1f9fd4fdb5e83005e63d8e5dc2cd75b93877",
-      "referenceDumpSHA256": "88598636302d499a5fc4c37d1e74a769ae375684c7dd1e0818f6217cd16de414",
-      "candidateDumpSHA256": "990878212a2cd88b0f0bdf7ed2bd778f6d83600596ff6438380e9393613aa7da"
-    },
-    {
-      "id": "edits/go/grammar-patch-p111-001-e3",
-      "kind": "edit",
-      "changed": [
-        "edit_sha256",
-        "fresh_sha256",
-        "edit_fields_sha256",
-        "fields"
-      ],
-      "oldSHA256": "e56b7b73dfb4281bbb251368ca1e8aac158189b3a908ee2714f1f406771de29b",
-      "newSHA256": "288e791e4eef0ef23376d0782b7728e482bddf23d9e77011ddc43bac1bb5492d",
-      "referenceDumpSHA256": "87c4b4e5f24b29b2bd99081d54fb85572638b32bd5b21fa546faa1fd3a593ed7",
-      "candidateDumpSHA256": "fd8ef8e9ee7a3c8936358cb67d77f43dc425f3678c9fbb31c3be6e2897a4a596"
+      "newSHA256": "5564ef95eef20414db763d76de7322b6823aedccc6927e4e7e75e0d9e5306487",
+      "referenceDumpSHA256": "746395cbd18262ef43d7bcbe780cbb3c3035ed6020aa57dfd147ba4d89416987",
+      "candidateDumpSHA256": "70d6400f4a07d3bdaae879298a4f6aafa2d54e62fb4ae8e12f6c636962c5a837"
     },
     {
       "id": "edits/go/statements-008-e3",

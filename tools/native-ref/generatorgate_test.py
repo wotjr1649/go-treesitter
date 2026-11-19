@@ -1,4 +1,5 @@
 import csv
+from contextlib import redirect_stderr
 import importlib.util
 import io
 import json
@@ -44,9 +45,17 @@ class GeneratorGateTest(unittest.TestCase):
                 changed = copy.deepcopy(report)
                 changed["differences"][0][key] = "c" * 64
                 self.assertFalse(gate.check_patch_expectations(repo, pins, grammar, changed))
+                if key == "candidateDumpSHA256":
+                    with redirect_stderr(io.StringIO()) as stderr:
+                        gate.log_failure(changed)
+                    self.assertEqual(stderr.getvalue(),
+                                     "generator gate tiny: data/native/dumps/tiny/korean.dump (corpus/tiny/korean): "
+                                     f"candidateDumpSHA256 differs (recorded {'b' * 64!r}, actual {'c' * 64!r})\n")
             for diffs in ([], report["differences"] * 2):
                 changed = report | {"differences": diffs}
                 self.assertFalse(gate.check_patch_expectations(repo, pins, grammar, changed))
+                self.assertIn("unexpected difference" if diffs else "recorded difference is missing",
+                              changed["mismatch"])
             for key in identity:
                 stale = copy.deepcopy(expected)
                 stale["identity"][key] = None

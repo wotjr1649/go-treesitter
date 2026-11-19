@@ -9,6 +9,7 @@ import argparse
 import csv
 import gzip
 import hashlib
+from itertools import zip_longest
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -151,6 +152,33 @@ def grammar_input_patches(grammar):
             if PurePosixPath(patch["source"]).suffix not in (".c", ".h")]
 
 
+def mismatch_message(actual, expected=None):
+    if actual is None or (expected is not None and expected["id"] < actual["id"]):
+        item, reason = expected, "recorded difference is missing"
+    elif expected is None or actual["id"] < expected["id"]:
+        item, reason = actual, "unexpected difference"
+        if "referenceDumpSHA256" in actual:
+            reason += (f" (reference SHA-256 {actual['referenceDumpSHA256']}, "
+                       f"candidate SHA-256 {actual['candidateDumpSHA256']})")
+        else:
+            reason += " (upstream test result changed)"
+    else:
+        item = actual
+        key = next(key for key in sorted(actual.keys() | expected.keys())
+                   if key not in actual or key not in expected or actual[key] != expected[key])
+        reason = f"{key} differs (recorded {expected.get(key, '<missing>')!r}, actual {actual.get(key, '<missing>')!r})"
+    identity = item["id"]
+    kind, _, name = identity.partition("/")
+    file = {"corpus": f"data/native/dumps/{name}.dump", "large": f"large-{name}.dump",
+            "edits": "data/edits/results-native.csv", "upstream": "upstream.log"}.get(kind, identity)
+    if kind == "edits":
+        for suffix in ("ranges", "fields"):
+            if suffix in item.get("changed", []):
+                file = f"data/edits/{name}.{suffix}"
+                break
+    return f"{file} ({identity}): {reason}"
+
+
 def check_patch_expectations(repo, pins, grammar, report):
     path = repo / "tools/gen/patches" / report["grammar"] / "generator-expectations.json"
     expected = json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
@@ -177,9 +205,22 @@ def check_patch_expectations(repo, pins, grammar, report):
             for item in recorded for key in ("referenceDumpSHA256", "candidateDumpSHA256")):
         raise ValueError("invalid grammar-patch expectation signatures")
     report["patchExpectationsSHA256"] = text_sha(path)
-    report["patchExpectationsMatch"] = sorted(recorded, key=lambda x: x["id"]) == sorted(
-        report["differences"], key=lambda x: x["id"])
-    return report["patchExpectationsMatch"]
+    for actual, expected_item in zip_longest(sorted(report["differences"], key=lambda x: x["id"]),
+                                             sorted(recorded, key=lambda x: x["id"])):
+        if actual != expected_item:
+            report["patchExpectationsMatch"] = False
+            report["mismatch"] = mismatch_message(actual, expected_item)
+            return False
+    report["patchExpectationsMatch"] = True
+    return True
+
+
+def log_failure(report):
+    message = report.get("error") or report.get("mismatch")
+    if not message and report["differences"]:
+        message = mismatch_message(report["differences"][0])
+    if message:
+        print(f"generator gate {report['grammar']}: {message}", file=sys.stderr)
 
 
 def add_patch_corpus(repo, corpus, grammar, lang):
@@ -664,6 +705,8 @@ def run(args):
         return False
     finally:
         save(out / "report.json", report)
+        if not report["pass"]:
+            log_failure(report)
 
 
 def main():
