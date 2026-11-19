@@ -154,7 +154,17 @@
       },
       "licenseSHA256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
       "cSymbol": "tree_sitter_go",
-      "regenerate": true
+      "regenerate": true,
+      "patches": [
+        {
+          "file": "patches/golang/0001-new-value-argument.patch",
+          "source": "grammar.js",
+          "sha256": "f056aa1e32ea6da46d223f9ce16b9c04d1c5eee3d0bd86f7316d9a187879ab3b",
+          "beforeSHA256": "53e114833c6769d8a86b9e2dfab8bb68b0aaf185e7008a5c572bfa21b77aff1b",
+          "afterSHA256": "de8c1a2c4fc8cd0db68b6aa9a2361a75a2e871f72eb8b5d580427b67d23bd7c5",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-go/issues/201"
+        }
+      ]
     },
     "python": {
       "repo": "https://github.com/tree-sitter/tree-sitter-python",

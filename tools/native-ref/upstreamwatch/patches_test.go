@@ -67,6 +67,27 @@ func TestPatchSection(t *testing.T) {
 	}
 }
 
+func TestGoPatchTracking(t *testing.T) {
+	raw, err := os.ReadFile("../../gen/pins.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	patches, err := loadPatches(raw)
+	if err != nil || len(patches["golang"]) != 1 {
+		t.Fatalf("Go patches: %v, err %v", patches["golang"], err)
+	}
+	api := newAPI()
+	api.now = time.Date(2026, 11, 19, 0, 0, 0, 0, time.UTC)
+	var out bytes.Buffer
+	patchSection(&out, api, map[string][]patchRec{"golang": patches["golang"]}, nil, func(report string) (time.Time, error) {
+		return api.now, nil
+	}, nil)
+	const want = "| golang | 1 | patches/golang/0001-new-value-argument.patch | https://github.com/tree-sitter/tree-sitter-go/issues/201 | 2026-11-19 | ok |"
+	if !strings.Contains(out.String(), want) || len(api.findings) != 0 {
+		t.Fatalf("Go patch row missing or warned:\n%s", &out)
+	}
+}
+
 func TestPatchSectionDiagnostics(t *testing.T) {
 	api := newAPI()
 	var out bytes.Buffer

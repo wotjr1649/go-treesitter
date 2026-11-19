@@ -105,6 +105,12 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
 
 ## Unreleased (after v0.5.0)
 
+- **Go 1.26 `new(expr)`** accepts `new(42)` with an `int_literal` under `argument_list` in place of an
+  error. The Go parser also assigns new numeric IDs to some existing symbols. For example, the public
+  `argument_list` symbol moves from 174 to 175. Resolve symbols against the active grammar and recompute
+  cached subtree hashes after upgrading. The node-type names and named fields are the same.
+  [Schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-go-new-expression-patch)
+
 - **Rust block comments:** the scanner compares full Unicode code points when recognizing block comment
   delimiters and documentation markers. The unpatched scanner read a code point whose low byte is `/`, `*`
   or `!` (for example `是`, `갯`, `个`, `갪`, `Ī`, `😪`, `ġ`) as that ASCII character. Previously error-free

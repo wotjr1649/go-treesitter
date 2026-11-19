@@ -359,6 +359,8 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 			result += "\nThe JSX text patch accepts a bare `&` in JSX text; character references still produce `html_character_reference` (upstream PR #388). TSX has the same defect and is not patched.\n"
 		case "html":
 			result += "\nPatch 0001 accepts `>` in element text (upstream PR #141). Patch 0002 is this project's own fix for upstream issue #143, which has no upstream pull request. The upstream `entity` token matches bounded prefixes with an optional `;`. The forms are `&` followed by 1–30 ASCII letters, `&#` followed by 1–5 decimal digits, and `&#x` or `&#X` followed by 1–6 hexadecimal digits. For example, `R&D` gives `text R` and `entity &D`, and `&#x26x` gives `entity &#x26` and `text x`. Other `&` characters are text. A bare `&` followed by whitespace can join a `text` token when text continues after the whitespace (`Users & roles` is one `text`). If a tag, an entity or end of input follows the whitespace, the `&` can be a separate `text` node.\n"
+		case "golang":
+			result += "\nThe Go 1.26 patch accepts expressions as the first argument to `new` and prefers the type interpretation when ambiguous. The first argument to `make` still uses the type rule (adapted from upstream PR #202).\n"
 		case "postgres":
 			result += "\nOwner-approved exception (2026-11-17) to ADR-0023 decision 1 for Korean support; this gap does not block a release gate. Unquoted identifiers accept all non-ASCII code points, and dollar-quote tags compare complete code points. The upstream 63-code-point tag cap remains.\n"
 		case "python":

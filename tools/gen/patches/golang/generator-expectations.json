@@ -1,0 +1,167 @@
+{
+  "identity": {
+    "grammarCommit": "2346a3ab1bb3857b48b29d779a1ef9799a248cd7",
+    "seed": 1,
+    "corpusManifestSHA256": "03cd58c0fafb2844581190e36595981441b609edde574497160fcfd070def30f",
+    "editsManifestSHA256": "7cf784c77200f2d802e465da834cd33de6c528598726fdc9e72542c8305b8e2c",
+    "largeEntries": [
+      {
+        "lang": "golang",
+        "file": "opGen.go",
+        "kind": "url",
+        "url": "https://raw.githubusercontent.com/golang/go/go1.26.0/src/cmd/compile/internal/ssa/opGen.go",
+        "sha256": "fd9bb20543045745f38417ac47439685c3b35bf71af65858ce8392f9eb2c5dc8"
+      },
+      {
+        "lang": "golang",
+        "file": "rewriteAMD64.go",
+        "kind": "url",
+        "url": "https://raw.githubusercontent.com/golang/go/go1.26.0/src/cmd/compile/internal/ssa/rewriteAMD64.go",
+        "sha256": "045fc7a8d20edabd72411ce735675f4c07b69470fe68e50a999730004a226cee"
+      },
+      {
+        "lang": "golang",
+        "file": "rewriteARM64.go",
+        "kind": "url",
+        "url": "https://raw.githubusercontent.com/golang/go/go1.26.0/src/cmd/compile/internal/ssa/rewriteARM64.go",
+        "sha256": "ef456764c90d82399931fc2794dd05d4878aee17eec9d534a2da0759511673ab"
+      }
+    ],
+    "patchCorpusFilesSHA256": {
+      "p111.txt": "ae059f104cf6df7d564eaa9c2793f6b948fc6a93656d1ce07e9c7a572579654e"
+    },
+    "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "cli": "0.27.2",
+    "grammarArchiveSHA256": "7e12d9859417baca2e61b7ade4a29380416fa400b85d93b7a98fa30d5f8b8a50",
+    "patches": [
+      {
+        "file": "patches/golang/0001-new-value-argument.patch",
+        "source": "grammar.js",
+        "sha256": "f056aa1e32ea6da46d223f9ce16b9c04d1c5eee3d0bd86f7316d9a187879ab3b",
+        "beforeSHA256": "53e114833c6769d8a86b9e2dfab8bb68b0aaf185e7008a5c572bfa21b77aff1b",
+        "afterSHA256": "de8c1a2c4fc8cd0db68b6aa9a2361a75a2e871f72eb8b5d580427b67d23bd7c5",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-go/issues/201"
+      }
+    ]
+  },
+  "reason": "Go 1.26 accepts expression arguments to new (upstream issue #201). The patch adapts PR #202 with a dedicated argument list that prefers types and leaves make type-only. Four differences exercise the fix in the patch corpus and its seeded edits. Five differences reproduce the same error recovery as PR #202 on already erroneous inputs, including four without new or make.",
+  "retireWhen": "Retire with the patch on an approved pin that supports new(expr) and preserves the type-only make behavior. Review again if the upstream issue closes without a fix or any gate identity or result changes.",
+  "differences": [
+    {
+      "id": "corpus/go/grammar-patch-p111-001",
+      "kind": "corpus",
+      "inputSHA256": "e56b7b73dfb4281bbb251368ca1e8aac158189b3a908ee2714f1f406771de29b",
+      "referenceDumpSHA256": "6f0b39d9f7ad24a5a941e440c1359ac7eb173fb896a09d9be35361a25828f8d3",
+      "candidateDumpSHA256": "3b8267e059df955edac777e2087da68b422a2484c363cda957683f5f4a040afa"
+    },
+    {
+      "id": "corpus/go/kit-f3a3f102e1ad3c5d5e33a4c95e2ac76ccf288effdd347d02ee90c3fe0e95624e",
+      "kind": "corpus",
+      "inputSHA256": "f3a3f102e1ad3c5d5e33a4c95e2ac76ccf288effdd347d02ee90c3fe0e95624e",
+      "referenceDumpSHA256": "fa9f4daa70fdcb5c9b51302cb118aaa8b747dae504acc28877cd7648050ae1dc",
+      "candidateDumpSHA256": "d22f17800184cae208d724c0d23a73055167075b9e19822b9e9d31faaf11d87e"
+    },
+    {
+      "id": "edits/go/expressions-003-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "316d68f9df873702366341862fc89c8e60082ed24f0487bcb8f71a5eddd001c8",
+      "newSHA256": "27130fda670d2531f6b3f258d5fa24905da1408de36383144e77641052bd4b73",
+      "referenceDumpSHA256": "3d85f916732f97192be5cec2ef4e50de209d71f01776a43598e0fad10c3c21b5",
+      "candidateDumpSHA256": "40b6146d077bf222a19cbf6ba70e86adb679da0b411b72c3f24c5ba30a4351b7"
+    },
+    {
+      "id": "edits/go/expressions-004-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "752bd97d24ca1b0c225fb22d69f34898a2185c0a2c2ab0db1c3a91c8fd527553",
+      "newSHA256": "9f8842bab6a6b8f7a3998486761e89c49e8a7dc21db0072dfec3810a8f9abba7",
+      "referenceDumpSHA256": "0096945fdd8f16db9ffda4889acea0ec99fa3a681539c28c38fd480cbeecc3d5",
+      "candidateDumpSHA256": "735fd52e1928cad1ee6983c7499fba6e0ac1a0418f9e54746e537488ff10dc70"
+    },
+    {
+      "id": "edits/go/grammar-patch-p111-001-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "e56b7b73dfb4281bbb251368ca1e8aac158189b3a908ee2714f1f406771de29b",
+      "newSHA256": "9094170b2c4e404587dfaac9cd27a2a802f2c66efb5aca544beaa0d01f2d76bc",
+      "referenceDumpSHA256": "02e2d98b835d9f39789f48fe96051b88c6917fdd68848abaee23db448c08f473",
+      "candidateDumpSHA256": "888a26bdf0ceb69b01dc9b27c4f476bb5a2b7c63b20055aad6002d5177e98af7"
+    },
+    {
+      "id": "edits/go/grammar-patch-p111-001-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "e56b7b73dfb4281bbb251368ca1e8aac158189b3a908ee2714f1f406771de29b",
+      "newSHA256": "91afcd2ae9d2fc9966ff209b3d9a1f9fd4fdb5e83005e63d8e5dc2cd75b93877",
+      "referenceDumpSHA256": "88598636302d499a5fc4c37d1e74a769ae375684c7dd1e0818f6217cd16de414",
+      "candidateDumpSHA256": "990878212a2cd88b0f0bdf7ed2bd778f6d83600596ff6438380e9393613aa7da"
+    },
+    {
+      "id": "edits/go/grammar-patch-p111-001-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "e56b7b73dfb4281bbb251368ca1e8aac158189b3a908ee2714f1f406771de29b",
+      "newSHA256": "288e791e4eef0ef23376d0782b7728e482bddf23d9e77011ddc43bac1bb5492d",
+      "referenceDumpSHA256": "87c4b4e5f24b29b2bd99081d54fb85572638b32bd5b21fa546faa1fd3a593ed7",
+      "candidateDumpSHA256": "fd8ef8e9ee7a3c8936358cb67d77f43dc425f3678c9fbb31c3be6e2897a4a596"
+    },
+    {
+      "id": "edits/go/statements-008-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "a964c96c46f1b57057ae69076889b20c7abb8a154380353544b342f393856b76",
+      "newSHA256": "33217bbb1f0f7355c197080905a11dd39ae78063d6362334a70b81b34a5daf17",
+      "referenceDumpSHA256": "cb0b393774b67325c0823847f9042ae3b64c487a337e65b4a6373d76a20978a5",
+      "candidateDumpSHA256": "63c31cd2d9f413c7c9da8ef81ffbf6889a7e23d33035a28e2d7e48a0f9ea88aa"
+    },
+    {
+      "id": "edits/go/kit-05d386595d3dceb3914177e815e25604f560a1806f05e4a5bac4d224afa7365a",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "8b7b405cbee68496cb066f590e2b03a4b4a6688002f25628476ecb5f25805c89",
+      "newSHA256": "f3a3f102e1ad3c5d5e33a4c95e2ac76ccf288effdd347d02ee90c3fe0e95624e",
+      "referenceDumpSHA256": "74f7144b290fcb410cd1e85f735ae871f769a66435b4b58070d597aa51ee2651",
+      "candidateDumpSHA256": "6e35bedf8a6721f408ac600588dc8d16730548f73ab18c6e3a14e1f41c8a475a"
+    }
+  ]
+}
