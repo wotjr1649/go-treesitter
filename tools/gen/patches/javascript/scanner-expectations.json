@@ -1,0 +1,221 @@
+{
+  "version": 1,
+  "grammar": "javascript",
+  "identity": {
+    "cSymbol": "tree_sitter_javascript",
+    "cli": "0.27.2",
+    "cliArchivesSHA256": {
+      "darwin-arm64": "5a08b66e5713b0c69691611250b2191d07139647a3c6e39ba85954284b634d2d",
+      "linux-amd64": "7ed56d152c52437397b9fcaa43cf341f49933cecc1ca291843f0d347c6e2cb3a",
+      "linux-arm64": "34fcc5c4fa7bdd2058a2a45a03b6eb9a49b03a93b6d52ec750f99b1516d98d33",
+      "windows-amd64": "230779ee4a729e3044d4a8ed57490b776ea1bac0671d12afbd6f5b4d1878f1d0"
+    },
+    "compileFlags": [
+      "-std=c11",
+      "-fsigned-char",
+      "-DNDEBUG",
+      "-O2"
+    ],
+    "generateFrom": "",
+    "grammarArchiveSHA256": "28678c9e5bd2260218bada6c446766c6eee2fc9a10ef8344def61d59bf523cfa",
+    "grammarCommit": "d6501de34e9aabad1f49b860fcfcc23066766223",
+    "grammarDir": "src",
+    "nativeDriverSourcesSHA256": "a1c9a3aaa1637e554c16285d8b9710de162bb2ba8440d4e20ecaec3c1d47fdca",
+    "npmDependencies": null,
+    "patches": [
+      {
+        "afterSHA256": "93e911221e1db427450e4735491e7d03beb3b9c83be3b1a1863a76c91e10f313",
+        "beforeSHA256": "b3d3f64284d97bf80749c026862427782cf7ecc0b7dc094e6698ab311c9a42c7",
+        "file": "patches/javascript/0001-jsx-bare-ampersand.patch",
+        "sha256": "8b891aae18c637e087743a7f03493bcbf929bff2e5e88f0ada943963a63d1096",
+        "source": "src/scanner.c",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-javascript/pull/388"
+      }
+    ],
+    "runtimeArchiveSHA256": "9f33b10babb69ef84ac700731a11795b13a4b404dafaa8064e7acbf005fd0732",
+    "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "wasiLibcArchiveSHA256": "2b3e2dca9825487e35a5ed6867c3e226eb021d948c3288b5dbff112b7d362517",
+    "wasiLibcCommit": "2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13"
+  },
+  "inputsSHA256": "eb5b989db24c2dd4fc3bede87f6abd63cfe6cd553419aafdac7279498c4a9937",
+  "comparisons": [
+    {
+      "patch": "patches/javascript/0001-jsx-bare-ampersand.patch",
+      "beforeSourcesSHA256": "c9d8dbbece30b5fb93946b1499cb8813a59f07b2ef7630092f128224ad0ed164",
+      "afterSourcesSHA256": "b1de8b616fec23ad96d77725e57f6b0d4432681e8843dea5157ec913b5f714da",
+      "resultsSHA256": "ab9cee04bbe706188a52771622068e752023deeb414971c77f06afc51c445aa8",
+      "reason": "Accept a bare ampersand in JSX text as text instead of an error, keeping entities and expressions unchanged.",
+      "retireWhen": "The grammar pin includes tree-sitter-javascript pull request 388 or an equivalent fix and passes the retained JSX text cases.",
+      "differences": [
+        {
+          "id": "regression/adjacent-ampersands-and-entity",
+          "bytes": 14,
+          "sha256": "5610f17be11dc8eb3ec8793b98ee53041f86cf9a01fb4c11f187678dc7ac21f7",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 14,
+              "dump_sha256": "c5b3411c16ff4213406882f4f52641be1c71ed82d86725c61b61841222d4f0de"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 14,
+              "dump_sha256": "b46850957bbf4c7ae9c3f7cad859474d9770ea6e69889794c5181b1498fd4c1f"
+            }
+          }
+        },
+        {
+          "id": "regression/bare-ampersand",
+          "bytes": 8,
+          "sha256": "d50f2a78a30419d6631ed70fdd918a63daf7a243a1fe55fc1cc1cebae39360ed",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 8,
+              "dump_sha256": "79b538df061a7d3911d473b391359afb274e8a2f41ee3be0496ca5e23b751e71"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 8,
+              "dump_sha256": "699d8f1d56d4ca4a2e2861a5e931bd9e83b364266492ea196121ddba5244d5e5"
+            }
+          }
+        },
+        {
+          "id": "regression/embedded-ampersand",
+          "bytes": 12,
+          "sha256": "a47ca84b5587983a57a3e45c5572bb0a6bdcc4459a03ff3b0d8cf3070844ba0a",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 12,
+              "dump_sha256": "368486cd7d5bf9ad3d329459031484321c718b04ccfdc784528d809c59852867"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 12,
+              "dump_sha256": "f878e5f48b11aa0c99c35704aa6e7c70091b628365506bb7e18bea5b7d13c574"
+            }
+          }
+        },
+        {
+          "id": "regression/hangul-after-ampersand",
+          "bytes": 14,
+          "sha256": "f6c73743dbadf97452fc737058c0fa8235748e97d7ac133a0e2f02c789237d05",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 14,
+              "dump_sha256": "8df0c91a88c7ad057239110765df7d9662f613c9afc31b739e3a3834343803fc"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 14,
+              "dump_sha256": "19f2601ebd84ba61a929afecb0a69e7b3df372008173c542921995a777160f37"
+            }
+          }
+        },
+        {
+          "id": "regression/leading-ampersand",
+          "bytes": 10,
+          "sha256": "bdc98f14f2656f4b13b14f909704b0790e429d45f5ab1e3556ab0e2719eacff2",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 10,
+              "dump_sha256": "7612a0cc98cfec5c96a83c284b5f293c5997a2e0aa20d8eee90c89328c453ded"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 10,
+              "dump_sha256": "b9ffc949e9cc992fd64b9bbe95c417cec46ffb612daba802ef2ca1208bbe57bb"
+            }
+          }
+        },
+        {
+          "id": "regression/nested-text-and-entity",
+          "bytes": 31,
+          "sha256": "428e3b4302569c8d5ff110e888ec1ee02d4fe725840d3a615f92dd5ae442059f",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 31,
+              "dump_sha256": "3980dcb0709636cda2caa31977cc463520fe536cf096cbb1bcf74df3ee83d5e3"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 31,
+              "dump_sha256": "ceab15b55a2f5c45dc4515e1bc55b500484d1400edfc5db1eb1097e4ac6b0135"
+            }
+          }
+        },
+        {
+          "id": "regression/no-semicolon",
+          "bytes": 11,
+          "sha256": "54aae1ba2bcdf11322b4c80e09a3538408ceab27a38a4f937d1a36fa9a4f2018",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 11,
+              "dump_sha256": "aac1c02083d329eeb146a35ea84896c7e210a2956a8415b42123d0f00a15a192"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 11,
+              "dump_sha256": "7c99d6a2e700da72df3311f15a75da2da829f0388ff4a203c1c8a9c237ce99ac"
+            }
+          }
+        },
+        {
+          "id": "regression/trailing-ampersand",
+          "bytes": 10,
+          "sha256": "7411c60de1b0c04889a6ba631eda93ffced7e1b8cc759305b8ed7b7aa991ebfa",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 10,
+              "dump_sha256": "b0352423f7cfca7aae54699725fe03f642174076f82f16b34e1012485c233115"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 10,
+              "dump_sha256": "b9ffc949e9cc992fd64b9bbe95c417cec46ffb612daba802ef2ca1208bbe57bb"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

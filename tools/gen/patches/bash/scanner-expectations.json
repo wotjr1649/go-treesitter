@@ -1,0 +1,770 @@
+{
+  "version": 1,
+  "grammar": "bash",
+  "identity": {
+    "cSymbol": "tree_sitter_bash",
+    "cli": "0.27.2",
+    "cliArchivesSHA256": {
+      "darwin-arm64": "5a08b66e5713b0c69691611250b2191d07139647a3c6e39ba85954284b634d2d",
+      "linux-amd64": "7ed56d152c52437397b9fcaa43cf341f49933cecc1ca291843f0d347c6e2cb3a",
+      "linux-arm64": "34fcc5c4fa7bdd2058a2a45a03b6eb9a49b03a93b6d52ec750f99b1516d98d33",
+      "windows-amd64": "230779ee4a729e3044d4a8ed57490b776ea1bac0671d12afbd6f5b4d1878f1d0"
+    },
+    "compileFlags": [
+      "-std=c11",
+      "-fsigned-char",
+      "-DNDEBUG",
+      "-O2"
+    ],
+    "generateFrom": "",
+    "grammarArchiveSHA256": "879e8951ea2cc82455407e3eda0293319657ec53e83191e0fb5a67430d10d804",
+    "grammarCommit": "a06c2e4415e9bc0346c6b86d401879ffb44058f7",
+    "grammarDir": "src",
+    "nativeDriverSourcesSHA256": "a1c9a3aaa1637e554c16285d8b9710de162bb2ba8440d4e20ecaec3c1d47fdca",
+    "npmDependencies": null,
+    "patches": [
+      {
+        "afterSHA256": "3758afba8e38a77232d850b562be824729eaf548a65b106a2a48ba62cb920cb3",
+        "beforeSHA256": "7cc25d70626f8939b35ecd504bf724e2001b817412aa29bceb4c4955a91558a9",
+        "file": "patches/bash/0001-heredoc-utf8.patch",
+        "sha256": "e5d01591adc75c082be73e7aeab9d67eed389259399ff808813495f31ebd831a",
+        "source": "src/scanner.c",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-bash/issues/370"
+      }
+    ],
+    "runtimeArchiveSHA256": "9f33b10babb69ef84ac700731a11795b13a4b404dafaa8064e7acbf005fd0732",
+    "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "wasiLibcArchiveSHA256": "2b3e2dca9825487e35a5ed6867c3e226eb021d948c3288b5dbff112b7d362517",
+    "wasiLibcCommit": "2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13"
+  },
+  "inputsSHA256": "fadf1edf7f8f4c3f252e9d8159333123d7e95715bb73b63290876f7326635500",
+  "comparisons": [
+    {
+      "patch": "patches/bash/0001-heredoc-utf8.patch",
+      "beforeSourcesSHA256": "74bd68e75f12a42a7135eace9bda37f17946e51841272cfd9be7e1b03feb2c23",
+      "afterSourcesSHA256": "a9145a0c5fac5ade4875b23105938bbfa14099ee99792dfbf434bcd35c13ae7c",
+      "resultsSHA256": "d2ddca818f81c7fcb9c0665ca06379fc47c39414f5e54ebca15690183df9dc94",
+      "reason": "Match complete UTF-8 heredoc end words and require an exact Bash closing line, including CRLF and EOF.",
+      "retireWhen": "The grammar pin contains the equivalent of Bash issue 370 and passes the UTF-8 and exact-line regression inputs.",
+      "differences": [
+        {
+          "id": "corpus/commands-021",
+          "bytes": 156,
+          "sha256": "c7dffa7d5556d3f5d2ebc1469d292bdb390a0c7303b8476fbefd555333f92bfc",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 156,
+              "dump_sha256": "ca5e51fab5770dc99bd5a047e510982ff800622939ee6402d687d866f681de3b"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 156,
+              "dump_sha256": "3609d06688a96ae3942b148c6d85ff347990e4ac8561fa6117d24c4f73b6e5ca"
+            }
+          },
+          "review": "A nested heredoc can no longer close on INNER). The missing exact INNER line is now reported as an error, as documented for Bash issue 370."
+        },
+        {
+          "id": "heredoc/crlf",
+          "bytes": 36,
+          "sha256": "1de11eed7c8f8778f0a000a08d6f532356bbf590ca1fb9827a3213ab6242f3fb",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 36,
+              "dump_sha256": "077dae6db188bea1c13d5888a3f1914c58f98e3b6bdeb0d520c67a05888219bc"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 36,
+              "dump_sha256": "7bd60250139cb2d87f6a9b4be1715530ef89436be720a9d2f4e9094b18acb3e7"
+            }
+          }
+        },
+        {
+          "id": "heredoc/crlf-prefix-454f46",
+          "bytes": 42,
+          "sha256": "bf8a6891b9a6ed525eb5d9dc28ef9ff03c08990bb13df9c8c46199beb9fa5ca3",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 42,
+              "dump_sha256": "91264c4ce116082296a9c1826b9cbc4b8b8f65507ff7a856745a719d566d85f0"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 42,
+              "dump_sha256": "d97c2e89c00b2f884403715ca8a642919eaccc9cc5d502c8f29b67904aff3b91"
+            }
+          }
+        },
+        {
+          "id": "heredoc/crlf-prefix-eb819d",
+          "bytes": 42,
+          "sha256": "f12ad8d43ab27e4dfd5cad666507973214285a115be9ba138a3f083ffc41a624",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 42,
+              "dump_sha256": "e511fbcbab8c44ecfa3cab42bbbc42a5745bdc481a2808d376584d3ef8f62ef1"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 42,
+              "dump_sha256": "d97c2e89c00b2f884403715ca8a642919eaccc9cc5d502c8f29b67904aff3b91"
+            }
+          }
+        },
+        {
+          "id": "heredoc/dash",
+          "bytes": 47,
+          "sha256": "945577a1fe8563ab44fff2e291ee57ab2f4ead43ce1a160c1a3ae3a4482d0136",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 47,
+              "dump_sha256": "a5b99b734996bfac6abffbeecb21f71b409cfb72201f5f67f471749025163ae5"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 47,
+              "dump_sha256": "c989db32ff9aa18051e08ef8d293a198403d59673dc43caf23a06a0da1de42d0"
+            }
+          }
+        },
+        {
+          "id": "heredoc/dash-wide-space",
+          "bytes": 40,
+          "sha256": "22fbd3f70cba38bf4ec7d9ef9bde3c758dff55a52089f1a4e608df01fc592fdf",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 40,
+              "dump_sha256": "f6608bf18d6b6fca173ab616ab0ae97799a86a3f5f3c84acea18306b0fc5a2be"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 40,
+              "dump_sha256": "e7514d157420f6a97f80e8122c2fb4e8aa17c5fbeae4e951057eb5f4de2f918f"
+            }
+          }
+        },
+        {
+          "id": "heredoc/double-quoted",
+          "bytes": 38,
+          "sha256": "a7a9f2acab8a0eddf9b7e618e53ed56f97b961c75d69f374ca287726448da7ce",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 38,
+              "dump_sha256": "c2533c1376d955d523eb5989141f6d6bac881cf71216a28c62c3747e59e0ab95"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 38,
+              "dump_sha256": "814a3169c1e830fbd9e23fbf9c8e637da962e3f027b7a61820dd1edc06f507ed"
+            }
+          }
+        },
+        {
+          "id": "heredoc/embedded-cr-prefix",
+          "bytes": 38,
+          "sha256": "e7fe7324b5a32d1722866db9d4ad93ab267ab7eb269f1ee0f8fb5b845fcb7fbf",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 38,
+              "dump_sha256": "1587a01fff16ed8273ae87f0a9a16238afbe119326417e94338fb261599257ad"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 38,
+              "dump_sha256": "a942a505c3165fe4b079e1d0e1ece043d1b801de3155dd669fa0cafa36aa1eaf"
+            }
+          }
+        },
+        {
+          "id": "heredoc/exact-line-454f46-<<\"EOF\"",
+          "bytes": 54,
+          "sha256": "d484d2df0b85feaffdde74b3a8dbbdc2e1ddcc099646b33fb60fb01f2a2d2229",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 54,
+              "dump_sha256": "183fa9115d3c2e74b1ecbd54f29db5a452a950233d96674ced326138bdfa3ec8"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 54,
+              "dump_sha256": "226c54ea3ab1307ab15cb083376e7cd409788bb68f4a72cf7501b9274bddecd6"
+            }
+          }
+        },
+        {
+          "id": "heredoc/exact-line-454f46-<<'EOF'",
+          "bytes": 54,
+          "sha256": "f053b10aa5c55331bf225436a3ec16fc641b6a6465b4164c605defd31a99fb85",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 54,
+              "dump_sha256": "183fa9115d3c2e74b1ecbd54f29db5a452a950233d96674ced326138bdfa3ec8"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 54,
+              "dump_sha256": "226c54ea3ab1307ab15cb083376e7cd409788bb68f4a72cf7501b9274bddecd6"
+            }
+          }
+        },
+        {
+          "id": "heredoc/exact-line-454f46-<<-EOF",
+          "bytes": 58,
+          "sha256": "b531bf24ede8319be7d7bc9cb6b657daff70aa7778c72558f0731f1f6dcf1244",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 58,
+              "dump_sha256": "77acf7db9430ce534e17ed8ca880418d281c98010171946279a2804dc2df53a1"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 58,
+              "dump_sha256": "5004c304f2ace464178bd4e48e94802643e54709a38a9c4320eadb53beb42d11"
+            }
+          }
+        },
+        {
+          "id": "heredoc/exact-line-454f46-<<EOF",
+          "bytes": 52,
+          "sha256": "57232cb9387404caac0e6ecc283740dc5ad5c168d7180fd3f9dcbac34e711d5a",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 52,
+              "dump_sha256": "97e7d0bdae3cd736599cee09d86e73591cc592057ee04e00db48476f52143385"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 52,
+              "dump_sha256": "bad92ad27e10aa8f7fade1401ebe9aff7a575019407ee8e822e934edb3952817"
+            }
+          }
+        },
+        {
+          "id": "heredoc/exact-line-eb819d-<<\"끝\"",
+          "bytes": 54,
+          "sha256": "8e5b2e52a42c0e523d95190242d33324a81239d108a54afa4c2eee4413b696ec",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 54,
+              "dump_sha256": "9585ba7957cd047afda686eeef209e9675c017653e98a005db295d96826bd9b3"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 54,
+              "dump_sha256": "226c54ea3ab1307ab15cb083376e7cd409788bb68f4a72cf7501b9274bddecd6"
+            }
+          }
+        },
+        {
+          "id": "heredoc/exact-line-eb819d-<<'끝'",
+          "bytes": 54,
+          "sha256": "0dbfdafa03b8850d4d81bd8964b2fc13fbd1fd0a05241f5c283aac7437518425",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 54,
+              "dump_sha256": "9585ba7957cd047afda686eeef209e9675c017653e98a005db295d96826bd9b3"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 54,
+              "dump_sha256": "226c54ea3ab1307ab15cb083376e7cd409788bb68f4a72cf7501b9274bddecd6"
+            }
+          }
+        },
+        {
+          "id": "heredoc/exact-line-eb819d-<<-끝",
+          "bytes": 58,
+          "sha256": "6efc96be940c9681f15bc65efb1f5489911a3caeeb93510f90e053996da695c5",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 58,
+              "dump_sha256": "2a8c2686f3fbd24164ca7a30ea51004981c346dee18c3cef97259c63a4dbd138"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 58,
+              "dump_sha256": "5004c304f2ace464178bd4e48e94802643e54709a38a9c4320eadb53beb42d11"
+            }
+          }
+        },
+        {
+          "id": "heredoc/exact-line-eb819d-<<끝",
+          "bytes": 52,
+          "sha256": "f42512357d285cd886cce823e67b022909d132d66a47c0141f27f0ceda2ded47",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 52,
+              "dump_sha256": "d9483353a73477ddb5244102aeaeb2880840c3ff607dd6862731922a12f4de03"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 52,
+              "dump_sha256": "bad92ad27e10aa8f7fade1401ebe9aff7a575019407ee8e822e934edb3952817"
+            }
+          }
+        },
+        {
+          "id": "heredoc/no-final-newline",
+          "bytes": 23,
+          "sha256": "fd513cfbe807888fbeb07054e8b6162079cbbbec0bee3320c7279fcd342329bb",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 23,
+              "dump_sha256": "dc273c0e66bc7f2b09591cab67990090b3d8958ec5d3cd653812df2ca1797380"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 23,
+              "dump_sha256": "8ce476cc2ed13fd094da1b8f8679db9e7f3ddbbcab507e2090f7823e151e2d6d"
+            }
+          }
+        },
+        {
+          "id": "heredoc/prefix-before-expansions",
+          "bytes": 64,
+          "sha256": "1aa1d3bf281d71bc347d02063a55145207b25f91d603607dab1e4cafdc8141b4",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 64,
+              "dump_sha256": "01ee3ef503aad2d035ca36f83958efbb81c59ef14bbcf05e152edb40ab5fbef6"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 64,
+              "dump_sha256": "10f489aacd28664b56683ac6a6659268f3cdd8702b52c1154babaf2e92af4328"
+            }
+          }
+        },
+        {
+          "id": "heredoc/prefix-line-exact",
+          "bytes": 42,
+          "sha256": "acd301e250624c07c79978e9cedb6f1a967ebb6370b9e6ada4e9fff40183c178",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 42,
+              "dump_sha256": "f8c609f24efe85cc5054e5e327ebd34c527e5c19403352b6cc30092b2d5de59d"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 42,
+              "dump_sha256": "d0b085339f1b74667e920d35d6014d866ec2645fa8495d544050dd3d4c8cf745"
+            }
+          }
+        },
+        {
+          "id": "heredoc/quoted-454e44ed959ceab88039",
+          "bytes": 52,
+          "sha256": "38e53882afb28202e5ab59e6ced24f09232ad528a585465342934a23c7e73ede",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 52,
+              "dump_sha256": "a55a5abfd89ae98524469df80b054fc56463731e900f3d06c24eacc5866f5c69"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 52,
+              "dump_sha256": "7615e2060adec8aba3cac47213fbc5ef4d78be1826f03edf6dbfe3d4c23de4b9"
+            }
+          }
+        },
+        {
+          "id": "heredoc/quoted-c3a9",
+          "bytes": 36,
+          "sha256": "595ed6951a5754f3075d0caabbb4105cb73ad0d0af36eb5421a8de26f4cda116",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 36,
+              "dump_sha256": "07263e54b013ede6bfa8c798ace16a2154e49841406d487bfff8dcbfad07c3d7"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 36,
+              "dump_sha256": "ba0b4f88244648e2d8f45fc642f727d99c7ea47665e189775ed0bdf67c805f4e"
+            }
+          }
+        },
+        {
+          "id": "heredoc/quoted-c480",
+          "bytes": 36,
+          "sha256": "2f0c12a1bbc3db777cc56e5b3211425e9df34c1988df47b3f93fe26d3df26b32",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 36,
+              "dump_sha256": "89b9a1eef77103fce93bb8827768352499266aae1b643884771b79cca3aaab0c"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 36,
+              "dump_sha256": "ba0b4f88244648e2d8f45fc642f727d99c7ea47665e189775ed0bdf67c805f4e"
+            }
+          }
+        },
+        {
+          "id": "heredoc/quoted-eab080",
+          "bytes": 38,
+          "sha256": "ac1d6055d87c7e94ce9cf323cde2831b216f4ef96e562d6e362e82a57925eb86",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 38,
+              "dump_sha256": "8e70c44c8446324ff730b8c53da04d938b57efa0c4e40320b5c8c29092ff75be"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 38,
+              "dump_sha256": "6e8487f80be050233500d5e0143e731711c08003f53f8cfd9676cd5bdf8936a7"
+            }
+          }
+        },
+        {
+          "id": "heredoc/quoted-eab181",
+          "bytes": 38,
+          "sha256": "0e0c590944e844bdc8c5d856a0e376f4e0a6a90de570dd0186f30ab2a5355a18",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 38,
+              "dump_sha256": "34a79dac51d148458a11e92f49dd2423bb673cf75a490543198e4083556d6e30"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 38,
+              "dump_sha256": "6e8487f80be050233500d5e0143e731711c08003f53f8cfd9676cd5bdf8936a7"
+            }
+          },
+          "review": "An ASCII line matching only the low byte of the Unicode end word stays in the body. The actual end word closes the heredoc."
+        },
+        {
+          "id": "heredoc/quoted-eb819d",
+          "bytes": 38,
+          "sha256": "e2c974461aa5576e02d9acd5826db7a19ff7dd2be1463b1e2eeee4aa50326ca5",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 38,
+              "dump_sha256": "0055611d82d5af25278f2061385d4eb089ef888c69d274f3f78b8155456d0c06"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 38,
+              "dump_sha256": "6e8487f80be050233500d5e0143e731711c08003f53f8cfd9676cd5bdf8936a7"
+            }
+          }
+        },
+        {
+          "id": "heredoc/quoted-eca285eba38c",
+          "bytes": 44,
+          "sha256": "0eb54ad69c826643f4132d56c8462ba51c478fe018b01549401a1f1305c95e7c",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 44,
+              "dump_sha256": "9bee4e3a4849816cad0453b420156d352d65ea74ad33805d367d73cda1c062b5"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 44,
+              "dump_sha256": "d4c8f506f0693be831b6874b752305fac1a7d53fbfaba91d5871a2221194f81f"
+            }
+          }
+        },
+        {
+          "id": "heredoc/quoted-ed959ceab880eb819d",
+          "bytes": 50,
+          "sha256": "ffe8c6c85f1e6172a294d21ea4073938363481c0d90855d1719044209d2f5eda",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 50,
+              "dump_sha256": "ee4799bfd0059ba62882a20f73511d534f7597cbea6452bece2dec73f93062f3"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 50,
+              "dump_sha256": "1e3ed3f171b41a706f1305bbbdacc291b2852b232e23e05343b9e6151cacc93e"
+            }
+          }
+        },
+        {
+          "id": "heredoc/quoted-f09f9880",
+          "bytes": 40,
+          "sha256": "791dc91d130bda7cfef94094bf5f4991fdccbc1ab29ee4287bde057886bfee44",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 40,
+              "dump_sha256": "ed16a3d7954d3fd44ff1b56203a7fd3529878a2d7de0d9a696c82aa4118574e2"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 40,
+              "dump_sha256": "435b625bacff6fc7d1a23a68b9e5c44adba04c15bee6ba59187194e5a1ee3aa0"
+            }
+          }
+        },
+        {
+          "id": "heredoc/replacement-is-valid",
+          "bytes": 34,
+          "sha256": "9d625862f6b78948866de7aff9d166acbf9bb6a55b503b85a56b8fc711724eee",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 34,
+              "dump_sha256": "a05831d1fe49a26add35b58eca4a1a4631413bb188d508173dc94732faf6ae49"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 34,
+              "dump_sha256": "b299e85effee1e29b880c2f43ca8aaa364aaea1484fa7216f785e1cb1793206e"
+            }
+          }
+        },
+        {
+          "id": "heredoc/serialization-last-fitting-word",
+          "bytes": 2048,
+          "sha256": "0626c6522128ec9588692c3b0ee28333e6e64e574cbd5fed00f190fd2c153bd5",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 2048,
+              "dump_sha256": "d8d25738128d279abee6fbaf70cea42c8559b1ae3c3f4e1a30de4bad569e64b1"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 2048,
+              "dump_sha256": "4c1ee1e8668816201fb7e1cce2a3cb2cfea53173560695886f4f40334668d3c4"
+            }
+          }
+        },
+        {
+          "id": "heredoc/suffix-after-substitution",
+          "bytes": 45,
+          "sha256": "7712469a09072fbd65da76201d0e908330df09f83263c737f06e6a4da25ffcf9",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 45,
+              "dump_sha256": "40cce45015d2228039bfa7521b2fb45882d4adf0714bcf4bab40eab89db0a6de"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 45,
+              "dump_sha256": "ce23d852827ec3735bf1f8259d89ed07c2e86f9735a194eb858350232dd71828"
+            }
+          },
+          "review": "A line combining a command substitution and EOF stays in the body. The standalone EOF line closes the heredoc."
+        },
+        {
+          "id": "heredoc/unquoted",
+          "bytes": 30,
+          "sha256": "d9fb6147c8c827c4f3b87d0f08fe80488d2deb7bb00aa96464f7710b57c7756f",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 30,
+              "dump_sha256": "ff185e9307ca1fadd5804925aff05cd33a5aacdfc27600e1dba9f011e0e0c564"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 30,
+              "dump_sha256": "bd255cc9a0750ab27e1c238ae79eeb7255fedff65ab2845d3fa2611eddbb6de0"
+            }
+          }
+        },
+        {
+          "id": "regression/delimiter-c3a9",
+          "bytes": 23,
+          "sha256": "ae39ece491a5a8736e65bb879771a54f829d9fe852f13c0fa4d9725484971d67",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 23,
+              "dump_sha256": "c58dacb338468af49e756ceb02e2fe942a8f83091298fea7400098f2933fd1bd"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 23,
+              "dump_sha256": "49683622b3fb8114f4537222222216d33459dbfbbe318b51cc6020a67d72b7bc"
+            }
+          }
+        },
+        {
+          "id": "regression/delimiter-e282ac",
+          "bytes": 25,
+          "sha256": "30026682998e822198f2ef3d318c42f3efe0f5740caf60a6ee8b4a453ee0e7f8",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 25,
+              "dump_sha256": "b430c1e9d5f2414c19fae8926b951e54ded8dd8bfecc3099ca15f2ccc9014b72"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 25,
+              "dump_sha256": "e431053cabb1353b015cf4aa2761d9d014e0700cc9c195fa2baca77726bbd1ea"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

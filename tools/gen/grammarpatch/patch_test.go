@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -24,7 +25,7 @@ func fixture(t *testing.T, source bool) Config {
 		before = "module.exports = grammar({name: 'tiny', rules: {source_file: $ => repeat('a')}});\n"
 		after = "module.exports = grammar({name: 'tiny', rules: {source_file: $ => repeat(choice('a', 'b'))}});\n"
 	}
-	files := map[string]string{"src/parser.c": "int a;\n", name: before,
+	files := map[string]string{"src/parser.c": "int a;\n", "src/scanner.c": "int s0;\n", name: before,
 		"src/grammar.json": `{"name":"tiny","rules":{"source_file":{"type":"REPEAT","content":{"type":"STRING","value":"b"}}}}`,
 		"tree-sitter.json": `{"grammars":[{"name":"tiny","scope":"source.tiny","path":".","file-types":["tiny"]}],"metadata":{"version":"0.0.1","license":"MIT"}}`}
 	var b bytes.Buffer
@@ -153,6 +154,29 @@ func testGrammarRegeneration(t *testing.T, patched, fromJSON bool) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// Two generated C patches on scanner.c: the hook must see each one before it is applied, in pin order.
+	var hooked []int
+	if patched {
+		for i := range 2 {
+			before, after := fmt.Sprintf("int s%d;\n", i), fmt.Sprintf("int s%d;\n", i+1)
+			patch := "diff --git a/src/scanner.c b/src/scanner.c\n--- a/src/scanner.c\n+++ b/src/scanner.c\n@@ -1 +1 @@\n-" + before + "+" + after
+			file := fmt.Sprintf("patches/tiny/%04d-scanner.patch", i+2)
+			if err := os.WriteFile(filepath.Join(c.PatchRoot, filepath.FromSlash(file)), []byte(patch), 0o644); err != nil {
+				t.Fatal(err)
+			}
+			c.Patches = append(c.Patches, patches.Pin{File: file, SHA256: hash([]byte(patch)), UpstreamReport: "https://example.invalid/synthetic-test",
+				Source: "src/scanner.c", BeforeSHA256: hash([]byte(before)), AfterSHA256: hash([]byte(after))})
+		}
+		c.BeforeGeneratedPatch = func(root string, i int) error {
+			scanner, err := os.ReadFile(filepath.Join(root, "src", "scanner.c"))
+			parser, _ := os.ReadFile(filepath.Join(root, "src", "parser.c"))
+			if want := fmt.Sprintf("int s%d;\n", i); err != nil || string(scanner) != want || !bytes.Contains(parser, []byte("tree_sitter_tiny")) {
+				t.Errorf("hook %d saw scanner.c %q (%v), want %q after regeneration", i, scanner, err, want)
+			}
+			hooked = append(hooked, i)
+			return nil
+		}
+	}
 	c.CLI = filepath.Join(t.TempDir(), "tree-sitter")
 	if runtime.GOOS == "windows" {
 		c.CLI += ".exe"
@@ -163,6 +187,9 @@ func testGrammarRegeneration(t *testing.T, patched, fromJSON bool) {
 	root, prov, err := Prepare(c)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if scanner, err := os.ReadFile(filepath.Join(root, "src", "scanner.c")); patched && (err != nil || fmt.Sprint(hooked) != "[0 1]" || string(scanner) != "int s2;\n") {
+		t.Fatalf("BeforeGeneratedPatch calls %v, final scanner.c %q (%v); want [0 1] and int s2", hooked, scanner, err)
 	}
 	parser, err := os.ReadFile(filepath.Join(root, "src", "parser.c"))
 	if err != nil || !bytes.Contains(parser, []byte("tree_sitter_tiny")) || (bytes.Contains(parser, []byte("anon_sym_b")) != (patched || fromJSON)) {

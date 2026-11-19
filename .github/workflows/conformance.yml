@@ -56,7 +56,7 @@ jobs:
           done
           echo "GOFLAGS=-tags=$tags" >> "$GITHUB_ENV"
       # Archives are fetched from the pinned commits and their sha256 checked against tools/gen/pins.json before use.
-      - name: Fetch pinned sources, build one native executable, extract its corpus and queries
+      - name: Fetch pinned sources, build native references, extract corpus and queries
         working-directory: tools/native-ref
         env:
           CGO_ENABLED: "0"
@@ -67,8 +67,10 @@ jobs:
           go build -o "$RUNNER_TEMP/ciconf" ./ciconf
           cd "$GITHUB_WORKSPACE"
           "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -fetch -cc gcc \
-            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" -queries "$RUNNER_TEMP/queries" "${{ matrix.lang }}"
+            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" -queries "$RUNNER_TEMP/queries" \
+            -scanner-stages "$RUNNER_TEMP/scanner-stages" "${{ matrix.lang }}"
       - name: Extract inputs and edits, record native results
+        id: native-inputs
         env:
           CGO_ENABLED: "0"
         run: |
@@ -120,6 +122,29 @@ jobs:
         env:
           CGO_ENABLED: "0"
         run: go test -count=1 -timeout 1800s -run Fuzz .
+      - name: Check reviewed native scanner patch differences (ADR-0023)
+        if: ${{ !cancelled() && steps.native-inputs.outcome == 'success' }}
+        working-directory: tools/native-ref
+        env:
+          CGO_ENABLED: "0"
+          PATCH_GRAMMAR: ${{ matrix.lang }}
+        run: |
+          ulimit -c 0
+          go run ./patchcompare -scanner-build "$RUNNER_TEMP/scanner-stages/$PATCH_GRAMMAR.json" \
+            -expectations "../gen/patches/$PATCH_GRAMMAR/scanner-expectations.json" \
+            -corpus "$RUNNER_TEMP/data/corpus/$TSG_S15_LANGS" -fuzz-source ../conformance/fuzz_test.go \
+            -regressions ../conformance/testdata -out "$RUNNER_TEMP/scanner-comparison"
+      - name: Upload native scanner patch comparison
+        if: ${{ !cancelled() && steps.native-inputs.outcome == 'success' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: scanner-patch-comparison-${{ matrix.runner }}-${{ matrix.lang }}
+          path: |
+            ${{ runner.temp }}/scanner-comparison
+            ${{ runner.temp }}/data/corpus/manifest.csv
+            ${{ runner.temp }}/data/corpus/skipped.csv
+          if-no-files-found: ignore
+          retention-days: 90
 
   conformance:
     name: conformance (${{ matrix.runner }})

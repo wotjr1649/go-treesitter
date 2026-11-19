@@ -16,7 +16,7 @@ import (
 )
 
 func TestUnpatchedRegenerationRequiresPinnedCLI(t *testing.T) {
-	_, err := prepareGrammarPatches("pins.json", pins{}, source{Regenerate: true}, t.TempDir(), t.TempDir(), "tiny", false)
+	_, err := prepareGrammarPatches("pins.json", pins{}, source{Regenerate: true}, t.TempDir(), t.TempDir(), "tiny", false, nil)
 	if err == nil || !strings.Contains(err.Error(), "no tree-sitter CLI archive") {
 		t.Fatalf("unpatched regeneration skipped CLI validation: %v", err)
 	}
@@ -31,7 +31,7 @@ func TestNoCommittedParserReferenceFailsBeforePreparingInputs(t *testing.T) {
 				t.Fatal(err)
 			}
 			dl, work, out := filepath.Join(root, "dl"), filepath.Join(root, "work"), filepath.Join(root, "out")
-			err := runMode(pinsFile, dl, work, out, "missing-compiler", "-O2", "", "", false, false, false, true, false, langs)
+			err := runMode(pinsFile, dl, work, out, "missing-compiler", "-O2", "", "", false, false, false, true, false, "", langs)
 			if err == nil || !strings.Contains(err.Error(), "swift: reference none: NOT_APPLICABLE_NO_COMMITTED_PARSER") {
 				t.Fatalf("missing reference silently accepted or attempted build: %v", err)
 			}
@@ -110,7 +110,7 @@ func TestCommittedReferenceSkipsGrammarPatchAndKeepsScannerPatch(t *testing.T) {
 	pinsFile := filepath.Join(root, "pins.json")
 	write(pinsFile, data)
 	work := filepath.Join(root, "reference")
-	if err := runMode(pinsFile, dl, work, "", "missing-compiler", "-O2", "", "", false, true, false, true, false, []string{"tiny"}); err != nil {
+	if err := runMode(pinsFile, dl, work, "", "missing-compiler", "-O2", "", "", false, true, false, true, false, "", []string{"tiny"}); err != nil {
 		t.Fatal(err)
 	}
 	for name, want := range map[string]string{"parser.c": files["src/parser.c"], "grammar.js": files["src/grammar.js"], "scanner.c": "new scanner\n"} {

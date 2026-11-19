@@ -15,7 +15,7 @@ import (
 	"github.com/wotjr1649/go-treesitter/tools/gen/patches"
 )
 
-func prepareGrammarPatches(pinsFile string, p pins, g source, dl, work, lang string, fetch bool) (string, error) {
+func prepareGrammarPatches(pinsFile string, p pins, g source, dl, work, lang string, fetch bool, beforePatch func(string, int) error) (string, error) {
 	if err := grammarpatch.Validate(g.Patches, g.Regenerate, g.GenerateFrom); err != nil {
 		return "", err
 	}
@@ -25,7 +25,8 @@ func prepareGrammarPatches(pinsFile string, p pins, g source, dl, work, lang str
 	}
 	c := grammarpatch.Config{Archive: filepath.Join(dl, g.Archive), ArchiveSHA256: g.ArchiveSHA256,
 		PatchRoot: filepath.Dir(pinsFile), Work: filepath.Join(work, "patches-"+lang), GrammarDir: g.GrammarDir, Patches: g.Patches, Regenerate: true,
-		GenerateFrom: g.GenerateFrom, NPMDependencies: g.NPMDependencies, FetchNPM: fetch, NPMCache: filepath.Join(dl, "npm")}
+		GenerateFrom: g.GenerateFrom, NPMDependencies: g.NPMDependencies, FetchNPM: fetch, NPMCache: filepath.Join(dl, "npm"),
+		BeforeGeneratedPatch: beforePatch}
 	if g.Regenerate {
 		cli, ok := p.Tools.TreeSitterCLIArchives[runtime.GOOS+"-"+runtime.GOARCH]
 		if !ok {

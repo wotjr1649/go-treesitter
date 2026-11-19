@@ -2,8 +2,11 @@ package conformance
 
 import (
 	"bytes"
+	"compress/gzip"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"slices"
@@ -16,6 +19,44 @@ import (
 	proc "github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
+// JSON stores byte slices as base64, preserving malformed UTF-8 and line endings.
+func scannerPatchInputs(t *testing.T, group string) map[string][]byte {
+	t.Helper()
+	path := filepath.Join("testdata", "scanner-patches", group+".json")
+	var data []byte
+	if group == "yaml" || group == "python" {
+		path += ".gz"
+		z, err := gzip.NewReader(bytes.NewReader(readFile(t, path)))
+		if err != nil {
+			t.Fatalf("%s: %v", path, err)
+		}
+		defer z.Close()
+		data, err = io.ReadAll(z)
+		if err != nil {
+			t.Fatalf("%s: %v", path, err)
+		}
+	} else {
+		data = readFile(t, path)
+	}
+	var cases map[string][]byte
+	if err := json.Unmarshal(data, &cases); err != nil {
+		t.Fatalf("%s: %v", path, err)
+	}
+	if len(cases) == 0 {
+		t.Fatalf("%s: no scanner patch inputs", path)
+	}
+	return cases
+}
+
+func scannerPatchInput(t *testing.T, cases map[string][]byte, name string) []byte {
+	t.Helper()
+	src, ok := cases[name]
+	if !ok {
+		t.Fatalf("missing scanner patch input %q", name)
+	}
+	return src
+}
+
 // Keep the ADR-0023 scanner fixes exercised beyond the upstream corpora.
 func TestScannerPatches(t *testing.T) {
 	for _, lang := range langs(t) {
@@ -27,82 +68,48 @@ func TestScannerPatches(t *testing.T) {
 			if !ok {
 				t.Skip("no native executable for " + lang)
 			}
-			cases := map[string]string{}
+			cases := scannerPatchInputs(t, lang)
 			topLevel := map[string]int{} // cases whose heredoc must swallow every body line
 			clean := map[string]bool{}   // cases that must parse without ERROR or MISSING nodes
 			pairs := map[string]int{}    // cases with an exact block_mapping_pair count
 			switch lang {
-			case "bash", "ruby":
+			case "bash":
 				// An ASCII delimiter closes only on ASCII: the body line shares the low bytes of the delimiter.
-				if lang == "bash" {
-					topLevel["ascii-delimiter-alias-line"] = 2 // redirected_statement, echo
-					cases["ascii-delimiter-alias-line"] = "cat <<EOF\nline1\nŅŏņ\nline3 still body\nEOF\necho after\n"
-				} else {
-					topLevel["ascii-delimiter-alias-line"] = 3 // assignment, heredoc_body, puts
-					cases["ascii-delimiter-alias-line"] = "x = <<~EOS\n  line1\n  Ņŏœ\n  line3 still body\nEOS\nputs 1\n"
-				}
-				for _, delimiter := range []string{"EOF", "é", "€", "\xba"} {
-					if lang == "bash" {
-						cases[fmt.Sprintf("delimiter-%x", delimiter)] = "cat <<'" + delimiter + "'\nhello\n" + delimiter + "\nls\n"
-					} else {
-						cases[fmt.Sprintf("delimiter-%x", delimiter)] = "x = <<~'" + delimiter + "'\n  hello\n" + delimiter + "\ny = 1\n"
-					}
-				}
+				topLevel["ascii-delimiter-alias-line"] = 2 // redirected_statement, echo
+			case "ruby":
+				topLevel["ascii-delimiter-alias-line"] = 3 // assignment, heredoc_body, puts
 			case "yaml":
-				for _, depth := range []int{253, 254, 300, 600} {
-					cases[fmt.Sprint(depth)] = strings.Repeat("- ", depth) + "x\n"
-				}
 				clean["253"] = true // the 0002 bound; deeper inputs are a documented ERROR
 				// 0003: rows past 32,767 and 65,535 (int16_t overflow), the 12-byte header at the 0002 bound,
 				// and a blk_imp_row more than 32,767 rows behind (saturated serialized distance).
-				blank := func(n int) string { return strings.Repeat("\n", n) }
-				var flat, deep strings.Builder
-				for i := 0; i < 32769; i++ {
-					fmt.Fprintf(&flat, "k%d: v\n", i)
-				}
-				for i := 0; i < 252; i++ {
-					fmt.Fprintf(&deep, "%sk%d:\n", strings.Repeat("  ", i), i)
-				}
-				deep.WriteString(strings.Repeat("  ", 252) + "leaf: 1\n")
-				for name, src := range map[string]string{
-					"late-pair-32769":          "first: 0\n" + blank(32767) + "last: 1\n",
-					"key-then-blank-gap-40000": "a:\n" + blank(40000) + "  b: 1\n  c: 2\n",
-					"alias-after-32768":        "a: &x 1\n" + blank(32768) + "b: *x\n",
-					"pair-gap-65535-blank":     "a: 1\n" + blank(65535) + "b: 2\n", // one scan jumps exactly 65,536 rows
-					"explicit-key-gap-32768":   "? a\n" + blank(32768) + ": v\n",   // error-free misparse before 0003
-					"explicit-key-gap-40000":   "? a\n" + blank(40000) + ": v\n",
-					"explicit-key-gap-70000":   "? a\n" + blank(70000) + ": v\n", // control: the int16 wrap already gave the right tree
-					// CR and LF each count as a row, so ":" on line 16,385 is scanner row 32,768: an error-free misparse before 0003.
-					"crlf-explicit-key-gap-16383": "? a\r\n" + strings.Repeat("\r\n", 16383) + ": v\r\n",
-					// The next three pin the serialized blk_imp_row: each differs from the native dump (or fails) if the saturated distance
-					// is wrapped, stored as 0, or if the row is serialized as an absolute int16.
-					"explicit-seq-gap-40000":    "? a\n" + blank(40000) + ": - x: 1\n",
-					"saturated-dist-wrap-65536": "? a\n" + blank(40000) + ": -\n" + blank(25534) + "    x: 1\n",
-					"anchored-keys-row-40000":   blank(40000) + "&a b: c\n&d e: f\n",
-					"flat-32769":                flat.String(), // upstream issue #49
-					"deep-mapping-252":          deep.String(), // 253 indent pairs: the 12-byte header still fits them
-					"deep-seq-253-late":         blank(40000) + strings.Repeat("- ", 253) + "x\n",
+				for _, name := range []string{
+					"late-pair-32769",
+					"key-then-blank-gap-40000",
+					"alias-after-32768",
+					"pair-gap-65535-blank", // one scan jumps exactly 65,536 rows
+					"explicit-key-gap-32768",
+					"explicit-key-gap-40000",
+					"explicit-key-gap-70000", // control: the int16 wrap already gave the right tree
+					// CR and LF each count as a row, so ":" on line 16,385 is scanner row 32,768.
+					"crlf-explicit-key-gap-16383",
+					// These three pin the serialized blk_imp_row against wrap, zero and absolute int16 encoding.
+					"explicit-seq-gap-40000",
+					"saturated-dist-wrap-65536",
+					"anchored-keys-row-40000",
+					"flat-32769",       // upstream issue #49
+					"deep-mapping-252", // 253 indent pairs: the 12-byte header still fits them
+					"deep-seq-253-late",
 				} {
-					cases[name], clean[name] = src, true
+					clean[name] = true
 				}
 				for _, name := range []string{"explicit-key-gap-32768", "explicit-key-gap-40000", "explicit-key-gap-70000", "crlf-explicit-key-gap-16383"} {
 					pairs[name] = 1 // before 0003, 32768, 40000 and the CRLF case gave a nested block_mapping with a second pair; 70000 was already right
-				}
-			case "python":
-				for _, depth := range []int{510, 511, 520, 600} {
-					var prefix strings.Builder
-					for i := 0; i < depth; i++ {
-						prefix.WriteString(strings.Repeat(" ", i) + "if True:\n")
-					}
-					for _, literal := range []string{"'a'", `"a"`, `b"a"`, `f"a"`, `"""a"""`, "1"} {
-						cases[fmt.Sprintf("%d-%s", depth, literal)] = prefix.String() + strings.Repeat(" ", depth) + "y = " + literal + "\n"
-					}
 				}
 			}
 			p := newParser(t, lang)
 			for name, src := range cases {
 				t.Run(name, func(t *testing.T) {
-					snap, err := p.ParseSnapshot(bg, []byte(src))
+					snap, err := p.ParseSnapshot(bg, src)
 					if err != nil {
 						t.Fatal(err)
 					}
@@ -131,7 +138,7 @@ func TestScannerPatches(t *testing.T) {
 						t.Fatalf("heredoc closed early: %d top-level nodes, want %d", snap.Root().NamedChildCount(), n)
 					}
 					file := filepath.Join(t.TempDir(), "input")
-					if err := os.WriteFile(file, []byte(src), 0600); err != nil {
+					if err := os.WriteFile(file, src, 0600); err != nil {
 						t.Fatal(err)
 					}
 					ctx, cancel := context.WithTimeout(bg, 30*time.Second)
@@ -164,55 +171,45 @@ func TestHeredocUTF8(t *testing.T) {
 			var cases []heredocCase
 			expectedEnds := map[string][]uint32{}
 			expectedError := map[string]bool{}
-			add := func(name, opening, body, closing, word string) {
-				prefix, suffix := "cat ", "echo after\n"
-				if lang == "ruby" {
-					prefix, suffix = "x = ", "puts 1\n"
-				}
-				cases = append(cases, heredocCase{name, prefix + opening + "\n" + body + closing + "\n" + suffix, []string{word}})
+			inputs := scannerPatchInputs(t, lang+"-heredoc")
+			add := func(name string, words ...string) {
+				cases = append(cases, heredocCase{name, string(scannerPatchInput(t, inputs, name)), words})
 			}
 			for _, word := range []string{"끝", "종료", "한글끝", "END한글9", "가", "걁", "é", "Ā", "😀"} {
-				add(fmt.Sprintf("quoted-%x", word), "<<'"+word+"'", "A\n굁\nbody\n", word, word)
+				add(fmt.Sprintf("quoted-%x", word), word)
 			}
-			add("unquoted", "<<끝", "body\n", "끝", "끝")
-			add("double-quoted", `<<"종료"`, "body\n", "종료", "종료")
-			add("dash", "<<-'한글끝'", "\tbody\n", "\t한글끝", "한글끝")
-			add("ascii-alias", "<<'A'", "걁\nbody\n", "A", "A")
-			add("invalid-alias", "<<'\xff'", "�\nbody\n", "\xfe", "\xfe")
-			add("replacement-is-valid", "<<'�'", "\xff\nbody\n", "�", "�")
-			add("invalid-error-counts-short-line", "<<'\xff\xfe'", "\xfd\nbody\n", "\xfe\xff", "\xfe\xff")
-			add("prefix-line-exact", "<<'끝'", "끝났다\nbody\n", "끝", "끝")
+			add("unquoted", "끝")
+			add("double-quoted", "종료")
+			add("dash", "한글끝")
+			add("ascii-alias", "A")
+			add("invalid-alias", "\xfe")
+			add("replacement-is-valid", "�")
+			add("invalid-error-counts-short-line", "\xfe\xff")
+			add("prefix-line-exact", "끝")
 			if lang == "bash" {
 				for _, word := range []string{"EOF", "끝"} {
-					for _, opening := range []string{"<<" + word, "<<'" + word + "'", `<<"` + word + `"`, "<<-" + word} {
-						indent := ""
-						if strings.HasPrefix(opening, "<<-") {
-							indent = "\t"
-						}
-						add(fmt.Sprintf("exact-line-%x-%s", word, opening), opening,
-							indent+word+"X\n"+indent+word+" \n"+indent+word+"\t\n"+indent+word+word+"\nbody\n", indent+word, word)
+					for _, opening := range []string{"<<" + word, "<<'" + word + "'", "<<\"" + word + "\"", "<<-" + word} {
+						add(fmt.Sprintf("exact-line-%x-%s", word, opening), word)
 					}
 				}
 				// Existing upstream limit: plain <<EOF ignores leading spaces/tabs, unlike Bash.
 				for _, indent := range []string{" ", "\t"} {
 					name := fmt.Sprintf("plain-leading-whitespace-known-close-%x", indent)
-					add(name, "<<EOF", "body\n"+indent+"EOF\n", "EOF", "EOF")
+					add(name, "EOF")
 					expectedEnds[name] = []uint32{uint32(strings.Index(cases[len(cases)-1].src, "\n"+indent+"EOF") + 1 + len(indent+"EOF"))}
 				}
-				add("prefix-before-expansions", "<<EOF", "EOF$value\nEOF$(printf X)\nEO$(printf Y)\n", "EOF", "EOF")
-				add("suffix-after-substitution", "<<EOF", "$(printf X)EOF\nbody\n", "EOF", "EOF")
-				add("embedded-cr-prefix", "<<'EOF'", "EOF\rX\nbody\n", "EOF", "EOF")
+				add("prefix-before-expansions", "EOF")
+				add("suffix-after-substitution", "EOF")
+				add("embedded-cr-prefix", "EOF")
 				for _, word := range []string{"EOF", "끝"} {
 					name := fmt.Sprintf("crlf-prefix-%x", word)
-					add(name, "<<'"+word+"'", word+"X\nbody\n", word, word)
+					add(name, word)
 					c := &cases[len(cases)-1]
-					c.src = strings.ReplaceAll(c.src, "\n", "\r\n")
 					expectedEnds[name] = []uint32{uint32(strings.LastIndex(c.src, word) + len(word) + 1)}
 				}
-				add("no-final-newline", "<<EOF", "EOFX\nbody\n", "EOF", "EOF")
-				cases[len(cases)-1].src = strings.TrimSuffix(cases[len(cases)-1].src, "\necho after\n")
+				add("no-final-newline", "EOF")
 			}
-			add("dash-wide-space", "<<-'끝'", "　끝\nbody\n", "끝", "끝")
+			add("dash-wide-space", "끝")
 			if lang == "bash" {
 				// Existing upstream bug: <<- strips iswspace, although Bash permits only tabs.
 				expectedEnds["dash-wide-space"] = []uint32{uint32(strings.Index(cases[len(cases)-1].src, "　끝") + len("　끝"))}
@@ -222,28 +219,26 @@ func TestHeredocUTF8(t *testing.T) {
 				lastFit = 338
 			}
 			word := strings.Repeat("끝", lastFit)
-			add("serialization-last-fitting-word", "<<'"+word+"'", "body\n", word, word)
+			add("serialization-last-fitting-word", word)
 			word += "끝"
-			add("serialization-overflow-known-state-loss", "<<'"+word+"'", "body\n", word, word)
+			add("serialization-overflow-known-state-loss", word)
 			// Overflow also loses state on fresh parses; Ruby can still report HasError=false.
 			expectedEnds["serialization-overflow-known-state-loss"] = nil
 			if lang == "bash" {
 				expectedError["serialization-overflow-known-state-loss"] = true
 				expectedEnds["serialization-overflow-known-state-loss"] = []uint32{uint32(len(cases[len(cases)-1].src))} // missing end at EOF
 			}
-			add("crlf", "<<'끝'", "body\n", "끝", "끝")
-			// The complete input uses CRLF, including the opening and following statement.
-			cases[len(cases)-1].src = strings.ReplaceAll(cases[len(cases)-1].src, "\n", "\r\n")
+			add("crlf", "끝")
 			if lang == "bash" {
 				// The exact-line lookahead consumes CR before accepting LF.
 				expectedEnds["crlf"] = []uint32{uint32(strings.LastIndex(cases[len(cases)-1].src, "끝") + len("끝\r"))}
 			}
 			if lang == "ruby" {
-				add("squiggly", "<<~'끝'", "  body\n", "  끝", "끝")
-				add("repeated-word-known-ruby-close", "<<'끝'", "끝끝\nbody\n", "끝", "끝")
+				add("squiggly", "끝")
+				add("repeated-word-known-ruby-close", "끝")
 				// Existing upstream bug: Ruby accepts repeated complete end words on one line.
 				expectedEnds["repeated-word-known-ruby-close"] = []uint32{uint32(strings.Index(cases[len(cases)-1].src, "\n끝끝") + 1 + len("끝끝"))}
-				cases = append(cases, heredocCase{"multiple", "x = [<<'끝', <<~'종료']\nfirst\n끝\n  second\n  종료\nputs 1\n", []string{"끝", "종료"}})
+				add("multiple", "끝", "종료")
 			}
 			for _, c := range cases {
 				t.Run(c.name, func(t *testing.T) {

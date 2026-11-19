@@ -30,7 +30,10 @@ type Config struct {
 	NPMDependencies                                     []string
 	NPMCache                                            string
 	FetchNPM                                            bool
-	Patches                                             []patches.Pin
+	// BeforeGeneratedPatch observes the first generated tree before patch index i.
+	// The callback must leave the source tree unchanged.
+	BeforeGeneratedPatch func(root string, i int) error
+	Patches              []patches.Pin
 }
 
 // Provenance excludes host paths and binary hashes; per-platform archives are verified against pins.json.
@@ -129,8 +132,19 @@ func Prepare(c Config) (string, *Provenance, error) {
 			if err := generate(c, d); err != nil {
 				return "", nil, err
 			}
-			if err := patches.ApplyGenerated(c.PatchRoot, d, after); err != nil {
-				return "", nil, err
+			if c.BeforeGeneratedPatch == nil || d != root {
+				if err := patches.ApplyGenerated(c.PatchRoot, d, after); err != nil {
+					return "", nil, err
+				}
+				continue
+			}
+			for i, patch := range after {
+				if err := c.BeforeGeneratedPatch(d, i); err != nil {
+					return "", nil, err
+				}
+				if err := patches.ApplyGenerated(c.PatchRoot, d, []patches.Pin{patch}); err != nil {
+					return "", nil, err
+				}
 			}
 		}
 		a, err := snapshot(root)

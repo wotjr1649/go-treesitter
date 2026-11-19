@@ -1,0 +1,354 @@
+{
+  "version": 1,
+  "grammar": "yaml",
+  "identity": {
+    "cSymbol": "tree_sitter_yaml",
+    "cli": "0.27.2",
+    "cliArchivesSHA256": {
+      "darwin-arm64": "5a08b66e5713b0c69691611250b2191d07139647a3c6e39ba85954284b634d2d",
+      "linux-amd64": "7ed56d152c52437397b9fcaa43cf341f49933cecc1ca291843f0d347c6e2cb3a",
+      "linux-arm64": "34fcc5c4fa7bdd2058a2a45a03b6eb9a49b03a93b6d52ec750f99b1516d98d33",
+      "windows-amd64": "230779ee4a729e3044d4a8ed57490b776ea1bac0671d12afbd6f5b4d1878f1d0"
+    },
+    "compileFlags": [
+      "-std=c11",
+      "-fsigned-char",
+      "-DNDEBUG",
+      "-O2"
+    ],
+    "generateFrom": "",
+    "grammarArchiveSHA256": "6548cd059983e8073dfa39f102641f71d045b37f3a05b7ebd799ad17df8471d1",
+    "grammarCommit": "a1c4812a73ec5e089de8e441fdea3a921e8d5079",
+    "grammarDir": "src",
+    "nativeDriverSourcesSHA256": "a1c9a3aaa1637e554c16285d8b9710de162bb2ba8440d4e20ecaec3c1d47fdca",
+    "npmDependencies": null,
+    "patches": [
+      {
+        "afterSHA256": "91564e108b65d2dd9487cf5b419d4d161e339b41c3e7ad462da91971ee52383f",
+        "beforeSHA256": "02c5d32e95fa018a3c3ba7d7134d84bb7d5595c8874aa7ae6582745d9b40dede",
+        "file": "patches/yaml/0001-no-early-eof.patch",
+        "generatedAfterSHA256": "f73a21c19edce96d26011221ff1cae8cf636d98c54472815a0051a868a8d37f8",
+        "generatedBeforeSHA256": "02dc8c5f297936b198d1371874b8f5226f8dd35b75f6a82894d12a2cbc219eba",
+        "sha256": "f505f72705387aa9eed400fae2fb3b04d59a04820131df83c5059dfb179ba1fb",
+        "source": "src/parser.c",
+        "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/14"
+      },
+      {
+        "afterSHA256": "c1177bf7a0ecf12160807a86a61c874101f81d764512f6bca3b8e4a03fccde32",
+        "beforeSHA256": "a510c0ca699cf3853bd2192bf103e11132414bc002fe952a88a7106ffb5d44e9",
+        "file": "patches/yaml/0002-bound-serialized-indent-bytes.patch",
+        "sha256": "b36738e2cc1d30273d02f0e55daba26e77459eea3c210138ba4d84085dd39535",
+        "source": "src/scanner.c",
+        "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/48"
+      },
+      {
+        "afterSHA256": "6e053c70d6e3f150cd7157d4ac59b321f1c086a06c0b1529669c965a2dd23602",
+        "beforeSHA256": "c1177bf7a0ecf12160807a86a61c874101f81d764512f6bca3b8e4a03fccde32",
+        "file": "patches/yaml/0003-widen-scanner-rows.patch",
+        "sha256": "4f86acec8c084af292d697b3a1ea872d8337a57f5972d56020313111448d45f4",
+        "source": "src/scanner.c",
+        "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/49"
+      }
+    ],
+    "runtimeArchiveSHA256": "9f33b10babb69ef84ac700731a11795b13a4b404dafaa8064e7acbf005fd0732",
+    "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "wasiLibcArchiveSHA256": "2b3e2dca9825487e35a5ed6867c3e226eb021d948c3288b5dbff112b7d362517",
+    "wasiLibcCommit": "2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13"
+  },
+  "inputsSHA256": "30779af41cda98a55e37fcdc1d654a8f102fa1082282b1825310980aa59ee6af",
+  "comparisons": [
+    {
+      "patch": "patches/yaml/0002-bound-serialized-indent-bytes.patch",
+      "beforeSourcesSHA256": "1b30aeb3abe6c4bbe45452447958d9505b93e02ed983f271b2df5fab8bb5ad2d",
+      "afterSourcesSHA256": "e38d7c684570d85e9f09ae65c239f43dea0de4dbeca00418a28a3052decadeac",
+      "resultsSHA256": "9ba735e8d2a28bb6a849152a61b40db8eff53936dd66af392810069bd219a9b6",
+      "reason": "Bound the serialized indent stack to the external scanner buffer so deep block sequences cannot overflow it.",
+      "retireWhen": "The grammar pin includes the fix for tree-sitter-yaml issue 48 and passes the retained depth cases.",
+      "differences": [
+        {
+          "id": "regression/254",
+          "bytes": 510,
+          "sha256": "b7eb42908e599377e8e3d9c2808266a0addaad5487f4eb78951d7b867166b615",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 510,
+              "dump_sha256": "e6bc7e8ec1790cb260f88aaa417685ddcd20d360f45feac8c334b9d4803c4979"
+            }
+          },
+          "baselineCrashes": {
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes at this depth (recorded crash class, tree-sitter-yaml issue 48). With serialized indent bytes bounded, the patched scanner returns the documented full-length ERROR tree."
+        },
+        {
+          "id": "regression/300",
+          "bytes": 602,
+          "sha256": "be4743965974fc38b0a0bcd2e95b26e5978c8dd0e66b9d3d996dc9d00a895f94",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 602,
+              "dump_sha256": "99102cfb44953ad9f45f6c0c367ad086aaa98af24e00510e36f86c5c93d78076"
+            }
+          },
+          "baselineCrashes": {
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes at this depth (recorded crash class, tree-sitter-yaml issue 48). With serialized indent bytes bounded, the patched scanner returns the documented full-length ERROR tree."
+        },
+        {
+          "id": "regression/600",
+          "bytes": 1202,
+          "sha256": "593f3906ea7ad7bd8b00a3205824c8dba6e00202a8c9b46bc833a3233f4f8c73",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 1202,
+              "dump_sha256": "18878b90f7ea9daf8229fd3db3d5d223e319a8794ffdf6a66e8fb279997657b0"
+            }
+          },
+          "baselineCrashes": {
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes at this depth (recorded crash class, tree-sitter-yaml issue 48). With serialized indent bytes bounded, the patched scanner returns the documented full-length ERROR tree."
+        }
+      ]
+    },
+    {
+      "patch": "patches/yaml/0003-widen-scanner-rows.patch",
+      "beforeSourcesSHA256": "e38d7c684570d85e9f09ae65c239f43dea0de4dbeca00418a28a3052decadeac",
+      "afterSourcesSHA256": "f8f3d0d202ca5a05e63c0c50f2c3fec82f2a904f42ee07e1cbe3145fd0ce4408",
+      "resultsSHA256": "cf639f2598b83a3be1090df7331d2f11bf369937e8b45909e1cb4fa3b8e205bc",
+      "reason": "Track scanner rows beyond 32,767 and saturate the serialized row distance so long YAML documents keep their structure.",
+      "retireWhen": "The grammar pin includes an upstream fix for tree-sitter-yaml issue 49 and passes the retained long-input cases.",
+      "differences": [
+        {
+          "id": "regression/alias-after-32768",
+          "bytes": 32782,
+          "sha256": "2a85f3b39cc8da77c6993cfb83f7d3b17b80f36bf900fea178a025c8cc14edc5",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 32782,
+              "dump_sha256": "ba56fe5d7852061cbd90ac4a64fb9fe405de0b7c6c7146a82bbd752489900320"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 32782,
+              "dump_sha256": "236ee1011ac9bad73bd10cf66b52cc9a94331d0a760c222a6ba658bce0955f31"
+            }
+          }
+        },
+        {
+          "id": "regression/crlf-explicit-key-gap-16383",
+          "bytes": 32776,
+          "sha256": "604f7e102d019a6e69f3ff70bc3f084a06aa8ec665b3c8e45f0e35ef5b2cfd89",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 32776,
+              "dump_sha256": "3bc70f73643b99cea104faf40401f96afd4edb0e11c0dfa42355f7a0452dae04"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 32776,
+              "dump_sha256": "183a75df4cd0bff4befa530278fc636ed0a3024298a921fdf051e871e8e7962e"
+            }
+          },
+          "review": "Before 0003 the 16-bit row wrapped, so `a` and the value after the gap formed a pair of a block_mapping nested inside the explicit key (two block_mapping_pair nodes); the value now belongs to the explicit key's single pair, as P108 and P131 recorded."
+        },
+        {
+          "id": "regression/explicit-key-gap-32768",
+          "bytes": 32776,
+          "sha256": "9e12f1064f609bd1afb5a45b40acf99787efb7a40ffc310fb04509fff059a002",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 32776,
+              "dump_sha256": "cafded4365059fd0d4c246a47ade89cd9ec0bfc8bea8112d81cbda087d1ab4a7"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 32776,
+              "dump_sha256": "4319a9228e650a9d661d02552bf0638af8e6d4ee2db46c3cc090a53b897dcda8"
+            }
+          },
+          "review": "Before 0003 the 16-bit row wrapped, so `a` and the value after the gap formed a pair of a block_mapping nested inside the explicit key (two block_mapping_pair nodes); the value now belongs to the explicit key's single pair, as P108 and P131 recorded."
+        },
+        {
+          "id": "regression/explicit-key-gap-40000",
+          "bytes": 40008,
+          "sha256": "f980f0f5aa45ae22575a3521aa827e84b17d3806a4830ba6ec4591e6d62502cc",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 40008,
+              "dump_sha256": "3c72b3696c805dd75f31b4e0ff3a3608a73e85e5d531d8b03fa82432759ba82d"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 40008,
+              "dump_sha256": "e908c3bb97738b84f2de7b54e9beeffbdb5d98a2c0858e6fba78fd881dd7a99c"
+            }
+          },
+          "review": "Before 0003 the 16-bit row wrapped, so `a` and the value after the gap formed a pair of a block_mapping nested inside the explicit key (two block_mapping_pair nodes); the value now belongs to the explicit key's single pair, as P108 and P131 recorded."
+        },
+        {
+          "id": "regression/explicit-seq-gap-40000",
+          "bytes": 40013,
+          "sha256": "d16d548bec58a793e63e93ce250a0f725209072e8cc58ae13673f50ea1ea0c20",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 40013,
+              "dump_sha256": "b48a7e8859b45441eff872cbe98da70fc7010bc067c9ab196bbfdc4a96a9972a"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 40013,
+              "dump_sha256": "fae27f0a6e23c4f5d74361e94cae6b92322977406697c4d8826ad00f66cb536f"
+            }
+          }
+        },
+        {
+          "id": "regression/flat-32769",
+          "bytes": 316580,
+          "sha256": "7e937a72a1b154542cbb65dc7d5144c6383193121fa48d877d2b89ec531b8ced",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 316580,
+              "dump_sha256": "48431ade015fe4a9fc4f5e8ed7c44e87ca0b0f61f10b6f691fd4399f9e78e77c"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 316580,
+              "dump_sha256": "2fb2dfd29fdad83aa2c1f55c001d7fccc3c46f879d16bf4d04b6d8a27c193ac6"
+            }
+          }
+        },
+        {
+          "id": "regression/key-then-blank-gap-40000",
+          "bytes": 40017,
+          "sha256": "b172bfd1656f0c1927ffb084d1d31c6d8ed3d06f03def2a14f3bf9e33298d385",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 40017,
+              "dump_sha256": "c23dcc440c257b575356e635b9e795ee4341c18a9f9d774c82ed902d8ac647f6"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 40017,
+              "dump_sha256": "8b67dbe30eadd577de8cebecdf05461e25022f06e0eaf11ef4794a8fdc4c7b7e"
+            }
+          }
+        },
+        {
+          "id": "regression/late-pair-32769",
+          "bytes": 32784,
+          "sha256": "ea4e377f0197e6842e6aed7f20f06a21f437e84e918025560b7bef60414ee3f5",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 32784,
+              "dump_sha256": "b428908cd589f5907b0a41b75274dc2fefd839bc5ab33495d75e13d0b065ea9b"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 32784,
+              "dump_sha256": "26017de544fc6a59a946082a2c3cf3d1b9d99c717d18dc118842db0ed7d25c90"
+            }
+          }
+        },
+        {
+          "id": "regression/pair-gap-65535-blank",
+          "bytes": 65545,
+          "sha256": "b0ca34cb0fe0e96095fd98c003d918b40ba022dd5aca362db14b24221566261b",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 65545,
+              "dump_sha256": "c1adfa74c798fa02b37d6a50c866e3b5f11876a460d252af12943f7f6f524e3a"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 65545,
+              "dump_sha256": "2e4789131f348918d87c6526c74518806e16136f13c734513d62910c75e82f41"
+            }
+          }
+        },
+        {
+          "id": "regression/saturated-dist-wrap-65536",
+          "bytes": 65551,
+          "sha256": "e93c8e908116f21107d348f76d751eb404cdc629c48f9a4f6db8d2bd9fc18a31",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 65551,
+              "dump_sha256": "2a61362bb936e9f6a06603ba8bbd6c7adfc43269b27c901a265d684cfcfe3a7e"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 65551,
+              "dump_sha256": "fd1435d3427f660c3e1028f5e6d67d67d6b9efbbd2251b2a629842b9d0abf0ac"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

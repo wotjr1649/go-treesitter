@@ -1,0 +1,488 @@
+{
+  "version": 1,
+  "grammar": "rust",
+  "identity": {
+    "cSymbol": "tree_sitter_rust",
+    "cli": "0.27.2",
+    "cliArchivesSHA256": {
+      "darwin-arm64": "5a08b66e5713b0c69691611250b2191d07139647a3c6e39ba85954284b634d2d",
+      "linux-amd64": "7ed56d152c52437397b9fcaa43cf341f49933cecc1ca291843f0d347c6e2cb3a",
+      "linux-arm64": "34fcc5c4fa7bdd2058a2a45a03b6eb9a49b03a93b6d52ec750f99b1516d98d33",
+      "windows-amd64": "230779ee4a729e3044d4a8ed57490b776ea1bac0671d12afbd6f5b4d1878f1d0"
+    },
+    "compileFlags": [
+      "-std=c11",
+      "-fsigned-char",
+      "-DNDEBUG",
+      "-O2"
+    ],
+    "generateFrom": "",
+    "grammarArchiveSHA256": "dee82ddfd01bfc3a8ed201cc03b56448107d3217a4b3a7a8fc7fa6bc32b2405b",
+    "grammarCommit": "77a3747266f4d621d0757825e6b11edcbf991ca5",
+    "grammarDir": "src",
+    "nativeDriverSourcesSHA256": "a1c9a3aaa1637e554c16285d8b9710de162bb2ba8440d4e20ecaec3c1d47fdca",
+    "npmDependencies": null,
+    "patches": [
+      {
+        "afterSHA256": "08a8d78b29268e30745c739c57ac4ded197f343e128ec59fead980b2a7a7b762",
+        "beforeSHA256": "9609a2f92dbb7c32bc056fd8fb94e5478428f04496696aa08b048a9b66caf283",
+        "file": "patches/rust/0001-block-comment-code-points.patch",
+        "sha256": "55482130e86ed22ad48a1a6a3a8910f5a7aed106552b6a7fca6f612d71ae2bb9",
+        "source": "src/scanner.c",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-rust/issues/315"
+      }
+    ],
+    "runtimeArchiveSHA256": "9f33b10babb69ef84ac700731a11795b13a4b404dafaa8064e7acbf005fd0732",
+    "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "wasiLibcArchiveSHA256": "2b3e2dca9825487e35a5ed6867c3e226eb021d948c3288b5dbff112b7d362517",
+    "wasiLibcCommit": "2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13"
+  },
+  "inputsSHA256": "d10ce4ff36f063a463044eec1fb08554e292a6b341074fb7069102cecab31622",
+  "comparisons": [
+    {
+      "patch": "patches/rust/0001-block-comment-code-points.patch",
+      "beforeSourcesSHA256": "dd7ff13e18bb3f97a4745790de7d4821cac5525050327c11c9a825525c6e0ed3",
+      "afterSourcesSHA256": "38c6797af9a9083b0f6916d3bf8e6b96701605462311cb0e5605a6edeac9a5ea",
+      "resultsSHA256": "f30d2b0c22b1ddd29bb9bbaa54da69d4970d4974c8c230893792e5eefe5b429c",
+      "reason": "Compare full Unicode code points for Rust block comment delimiters and documentation markers, including documented changes to error-free trees.",
+      "retireWhen": "The grammar pin includes the upstream fix for tree-sitter-rust issue 315 and passes the retained comment cases.",
+      "differences": [
+        {
+          "id": "regression/astral-delimiters",
+          "bytes": 14,
+          "sha256": "399922ef8cdd6d153ec5bb93b709963bfe54873998488d14a1d31eeb5c2a277c",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 14,
+              "dump_sha256": "a2f8518a06ee3a7d5eb44a2ef872c4d468401bb3ea03c9c5b5ef6f6ab048029b"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 14,
+              "dump_sha256": "5b2941023b8d42872295276de3aa040399cb042f14a6559a7581d5c1477adedb"
+            }
+          }
+        },
+        {
+          "id": "regression/astral-false-outer-doc-marker",
+          "bytes": 13,
+          "sha256": "d2e187bdb203c7d5906cd4b13b6b763aa6371774f3ed654f6afc950d14424941",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 13,
+              "dump_sha256": "7260cc22898f7809ae03eba814b6dbfad2a1889381a514a8f49cc89cb3b24b43"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 13,
+              "dump_sha256": "72519b2ea129ccd213e89afeb4d89b1ff5b8d0c5cc638c01c5f1cb1a175869e8"
+            }
+          },
+          "review": "A non-ASCII lookahead no longer creates a false documentation marker."
+        },
+        {
+          "id": "regression/false-inner-doc-marker",
+          "bytes": 11,
+          "sha256": "7e70cf42c7f03721c766c442a1a8b8b65ee7a85cb6d5e6990d8e7a57c6fd8a5a",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 11,
+              "dump_sha256": "139bffe8a84565dd4e07ce16b0d5e9948fdf11741f2bd1d318a99ff046566826"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 11,
+              "dump_sha256": "14d4e7baa692348b35b8a9ab85c704fa99d70663391ae1370663ca4ebd82d61c"
+            }
+          },
+          "review": "A non-ASCII lookahead no longer creates a false documentation marker."
+        },
+        {
+          "id": "regression/false-nesting-low-byte-star-then-outer-close",
+          "bytes": 15,
+          "sha256": "defab3445136b73bc52743c652b240bc12c12d10c140722048ca3d7a3c6279d9",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 15,
+              "dump_sha256": "2c855e79fd51d98b1a1279ea7ebd09c3b50a80db984caa3862359e70b8f423a7"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 15,
+              "dump_sha256": "a275d6432d355053bd65d8a8d611d4009a1a88f900eb5af84d74c85c063b6649"
+            }
+          },
+          "review": "Removing a false nested opening makes the surplus closing delimiter an error."
+        },
+        {
+          "id": "regression/false-outer-doc-marker",
+          "bytes": 11,
+          "sha256": "c6095902b6a5ba974fd3615f04ecac6d3c26a9f96b9e6a1110dcf201cf12230b",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 11,
+              "dump_sha256": "bc95ee18c47d7de50010bf1718d1d238ada615513f180912990fb0ce56cc094a"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 11,
+              "dump_sha256": "14d4e7baa692348b35b8a9ab85c704fa99d70663391ae1370663ca4ebd82d61c"
+            }
+          },
+          "review": "A non-ASCII lookahead no longer creates a false documentation marker."
+        },
+        {
+          "id": "regression/han-delimiters",
+          "bytes": 10,
+          "sha256": "02af8607c6cc05ef7073c2eaafe91e78b209667c8a8da50e0d9fc4ec02723875",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 10,
+              "dump_sha256": "e66699c4d60e685ad04f6d11f8d11a8ddd7c8e2d55ee13e98964bbf76610a1d3"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 10,
+              "dump_sha256": "f3ea8029c14a1da5b7d74a077cf1e8ce0b308ba979baf69a6bca197b2f340bc5"
+            }
+          }
+        },
+        {
+          "id": "regression/han-false-close-extends-through-code",
+          "bytes": 42,
+          "sha256": "56bc75853dcd8d6c82dc257e59fce61e502f9433e545dcb7d06372e7762c3d71",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 42,
+              "dump_sha256": "7c348e527a56659e8008638fb079ef317eb19e8737c51a78b64ffb5598671dc7"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 42,
+              "dump_sha256": "db9449911c2758c7ff1164591c53194b1d6c2ab33e1acc5226ab25e4ed3e67b0"
+            }
+          },
+          "review": "The comment extends past a false closing delimiter and includes the following code."
+        },
+        {
+          "id": "regression/han-false-close-extends-through-line-comment",
+          "bytes": 31,
+          "sha256": "4c8956babb471b8cd1c2dc11c9a61c4cdfc5c16787b91bb639e965531e238b48",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 31,
+              "dump_sha256": "cb9e7f3c3f08c8f2f29740bf2a9e268b35b217fab2fe43c9d59bf7621a173803"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 31,
+              "dump_sha256": "ae8f131ea484f519ebb584bdea8378d620a1272a1a274c1e2b1e7c30225294ef"
+            }
+          },
+          "review": "The comment extends past a false closing delimiter and includes the following line comment."
+        },
+        {
+          "id": "regression/han-false-close-leaves-nested-comment-open",
+          "bytes": 15,
+          "sha256": "e221b6af8aec133874ebd04f82acbadc92f999d8cccc2044fdcc8204439010ba",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 15,
+              "dump_sha256": "2c855e79fd51d98b1a1279ea7ebd09c3b50a80db984caa3862359e70b8f423a7"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 15,
+              "dump_sha256": "ede87181addf7e943329c070b7f4248723aa8a233c0af589461721c92015e5c7"
+            }
+          },
+          "review": "Removing the false nested closing delimiter leaves the actual comment unclosed."
+        },
+        {
+          "id": "regression/han-false-nesting-then-outer-close",
+          "bytes": 15,
+          "sha256": "524e75357244325dfbc007c0c779fe7e47cfdb653e95d32d2157de614a4f0aa8",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 15,
+              "dump_sha256": "2c855e79fd51d98b1a1279ea7ebd09c3b50a80db984caa3862359e70b8f423a7"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 15,
+              "dump_sha256": "a275d6432d355053bd65d8a8d611d4009a1a88f900eb5af84d74c85c063b6649"
+            }
+          },
+          "review": "Removing a false nested opening makes the surplus closing delimiter an error."
+        },
+        {
+          "id": "regression/hangul-delimiters",
+          "bytes": 12,
+          "sha256": "5e959f783dcb0da51011e360886a764dc98c53dfa8b37aab1e79222a9b240bfb",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 12,
+              "dump_sha256": "c378b5a8058e795f3de67457606bfa43b82e91d2f9246c41a01d9d3fbe4e713c"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 12,
+              "dump_sha256": "57b3434aafe2040791fff7e04c2901021f8ab99a9f84a777f4615dab8bcc456a"
+            }
+          }
+        },
+        {
+          "id": "regression/hangul-false-close-in-doc-comment",
+          "bytes": 12,
+          "sha256": "1bd6f61f8e20ef31fb092b75f416d10cb9c59c45ea95de6a0c09b028c8210a02",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 12,
+              "dump_sha256": "7db640da23885e0376f2167305491218d96bb23cedff7efbf2b6300e1ad51790"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 12,
+              "dump_sha256": "cc72f5bb83bd2479beb784a0b33d45ed6f2e6f1df7df6c1e3efa26fdab4111a1"
+            }
+          },
+          "review": "The end of the actual documentation comment changes after the false close is removed."
+        },
+        {
+          "id": "regression/hangul-false-close-leaves-nested-comment-open",
+          "bytes": 14,
+          "sha256": "372ad48b994c6ddff26cb410a452d3f86c3b331889915a33a279db076a77bdbe",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 14,
+              "dump_sha256": "5b2941023b8d42872295276de3aa040399cb042f14a6559a7581d5c1477adedb"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 14,
+              "dump_sha256": "0295dc2dca2790143b67b732e2de6039c3c4161fdf2aa6122434238d07b1cb59"
+            }
+          },
+          "review": "Removing the false nested closing delimiter leaves the actual comment unclosed."
+        },
+        {
+          "id": "regression/hangul-false-close-then-code",
+          "bytes": 24,
+          "sha256": "0b48afcdd43af69fa2a6289330213f77e47a7fdfb5184ec20f4a081680d497ce",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 24,
+              "dump_sha256": "6c63d36af63b51ccf11a53400ee756cdfd67675100c0740544b3b893bb9ae372"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 24,
+              "dump_sha256": "f913190dfb5fe17c187be15d2dd6606eb044f86583bf2b6b2bdcc5332934ed2b"
+            }
+          },
+          "review": "Removing the false nested closing delimiter leaves the actual comment unclosed."
+        },
+        {
+          "id": "regression/hangul-false-nesting-hid-next-comment",
+          "bytes": 13,
+          "sha256": "d70287a9f8819fbd5d1330ac6e6caed092b27376fe42236c95837217cafb3aac",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 13,
+              "dump_sha256": "72519b2ea129ccd213e89afeb4d89b1ff5b8d0c5cc638c01c5f1cb1a175869e8"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 13,
+              "dump_sha256": "05374cd6def25d4b2bb3de1ea92fc1a1cd8aaefd0f3f01810d976fe8c2f86369"
+            }
+          },
+          "review": "Removing the false nested opening reveals a separate following block comment."
+        },
+        {
+          "id": "regression/hangul-false-nesting-then-outer-close",
+          "bytes": 16,
+          "sha256": "4e0700ca56cc71b20ff708c79b9df8f2393d9de8aedabf24c2d8ed8d1d606b7b",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 16,
+              "dump_sha256": "40b65ebe24bd9837cd3243f46a88c9f43296dc68329f48afc1f472267bd519ff"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 16,
+              "dump_sha256": "77c78cd2894c087b931031d8e3a669a362f38c0919a8dd6e398672fc0fbb85d6"
+            }
+          },
+          "review": "Removing a false nested opening makes the surplus closing delimiter an error."
+        },
+        {
+          "id": "regression/hangul-low-slash-before-real-nesting",
+          "bytes": 13,
+          "sha256": "9feb269885274803b6169f7cd3b16c1c3e88dd22a5151c600b30ffe454e63f15",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 13,
+              "dump_sha256": "72519b2ea129ccd213e89afeb4d89b1ff5b8d0c5cc638c01c5f1cb1a175869e8"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 13,
+              "dump_sha256": "7e8603863bc756b34cf3498d5a54235d4df4cd7050a60d215dd2b0801810f9ed"
+            }
+          },
+          "review": "Full code-point scanning recognizes the real nested opening, leaving a missing closing delimiter."
+        },
+        {
+          "id": "regression/nested-hangul-delimiters",
+          "bytes": 18,
+          "sha256": "407459e716e07e31dd12f0b06683cba3c0b6388f29f68da25a09495ff9e93893",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 18,
+              "dump_sha256": "97b0797ac289bfaa510e647eb864654be790b51ba53b34bbb5c951f6c1253262"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 18,
+              "dump_sha256": "4a1f748d27ee8cb6879f609bf66fe48067a7010c7b54cf653308bd2a0fa99e41"
+            }
+          }
+        },
+        {
+          "id": "regression/real-outer-doc-marker",
+          "bytes": 13,
+          "sha256": "4fffcc0e859b0630a16ad5d84523d9c71f61be9ed462425c71eb4361e42d1c5d",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 13,
+              "dump_sha256": "35ae769cb08d651f382bda0155b928d1f93a777cb48d8499bb361945997fc1a4"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 13,
+              "dump_sha256": "fc39da7eda8068a108ed7b475dbb40e487ae0b2facd10d6a7f86dd2115f4ac38"
+            }
+          }
+        },
+        {
+          "id": "regression/slash-before-star-uncounted-ends-valid-comment-early",
+          "bytes": 29,
+          "sha256": "d46eff52757c4387a5b304cdf93d04a64be34db537278a135ee1f678067af6b7",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 29,
+              "dump_sha256": "29573f0b5c85828758c5b7f7995b932158899d9cb01607265859437ae8a8260d"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 29,
+              "dump_sha256": "975f779851b1f670ae4fead625980bf657efe2de6edca3cc7e535d88122891da"
+            }
+          },
+          "review": "Removing the false opening exposes the existing upstream limitation on a real nested opening immediately after a slash."
+        }
+      ]
+    }
+  ]
+}
