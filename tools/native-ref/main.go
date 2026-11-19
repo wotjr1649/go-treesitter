@@ -62,6 +62,23 @@ type pins struct {
 	Grammars map[string]source `json:"grammars"`
 }
 
+func readPins(path string) (pins, error) {
+	var p pins
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return p, err
+	}
+	if err := json.Unmarshal(raw, &p); err != nil {
+		return p, err
+	}
+	p.Runtime.Mirrors, p.WasiLibc.Mirrors = p.Mirrors, p.Mirrors
+	for name, g := range p.Grammars {
+		g.Mirrors = p.Mirrors
+		p.Grammars[name] = g
+	}
+	return p, nil
+}
+
 func main() {
 	log := flag.String("pins", filepath.Join("tools", "gen", "pins.json"), "pins file")
 	dl := flag.String("dl", "", "directory holding (or receiving, with -fetch) the pinned archives")
@@ -109,18 +126,9 @@ func runMode(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, no
 	if threshold < 0 {
 		return fmt.Errorf("-patch-alert must not be negative")
 	}
-	raw, err := os.ReadFile(pinsFile)
+	p, err := readPins(pinsFile)
 	if err != nil {
 		return err
-	}
-	var p pins
-	if err := json.Unmarshal(raw, &p); err != nil {
-		return err
-	}
-	p.Runtime.Mirrors, p.WasiLibc.Mirrors = p.Mirrors, p.Mirrors
-	for name, g := range p.Grammars {
-		g.Mirrors = p.Mirrors
-		p.Grammars[name] = g
 	}
 	if len(langs) == 0 {
 		for l := range p.Grammars {
