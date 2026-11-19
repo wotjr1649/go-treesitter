@@ -7,6 +7,18 @@
     {"name":"make-literal","source":"package p\nvar v = make(42)\n","nodes":["call_expression make(42)","int_literal 42"],"errors":["ERROR 42"]},
     {"name":"make-binary","source":"package p\nvar v = make(x+1)\n","nodes":["binary_expression make(x+1","call_expression make(x","type_identifier x","int_literal 1"],"errors":["ERROR var v = make(x+1)"],"missing":[")"]}
   ],
+  "ruby": [
+    {"name":"hangul-global","source":"$전역 = 1\n","nodes":["assignment $전역 = 1","global_variable $전역"]},
+    {"name":"hangul-global-upstream-repro","source":"$한글 = 1\n","nodes":["assignment $한글 = 1","global_variable $한글"]},
+    {"name":"other-non-ascii-globals","source":"$é += $日本語\n","nodes":["global_variable $é","global_variable $日本語"]},
+    {"name":"dash-non-ascii-global","source":"p $-한\n","nodes":["global_variable $-한"]},
+    {"name":"underscore-prefix","source":"$_한글 = 1\n","nodes":["assignment $_한글 = 1","global_variable $_한글"]},
+    {"name":"ascii-letter-prefix","source":"$a한 = 1\n","nodes":["assignment $a한 = 1","global_variable $a한"]},
+    {"name":"short-interpolation","source":"puts \"#$한글\"\n","nodes":["global_variable $한글"]},
+    {"name":"ascii-prefix-expression","source":"x = $a한\n","nodes":["assignment x = $a한","global_variable $a한"]},
+    {"name":"ascii-prefix-short-interpolation","source":"x = \"#$a한\"\n","nodes":["assignment x = \"#$a한\"","global_variable $a한"]},
+    {"name":"special-globals","source":"p $0, $1, $10, $!, $~, $-w, $stdout\n","nodes":["global_variable $0","global_variable $1","global_variable $10","global_variable $!","global_variable $~","global_variable $-w","global_variable $stdout"]}
+  ],
   "rust": [
     {"name":"hangul-delimiters","source":"/* 갪갯 */","nodes":["block_comment /* 갪갯 */"]},
     {"name":"han-delimiters","source":"/*是个*/","nodes":["block_comment /*是个*/"]},

@@ -667,6 +667,14 @@
           "beforeSHA256": "88c1c036d5af7c22a1bc9cc5e50411d414ac9624afed676d42957c566ac4083d",
           "afterSHA256": "387e6c2306b49962b93d6b571936169e2f1f372a374b48f7548bfa97e0ad508f",
           "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/305"
+        },
+        {
+          "file": "patches/ruby/0002-global-variable-non-ascii.patch",
+          "sha256": "fb68546f8a63f2f7abd685b05fa8d1d949c35d170b0fffc34bc05177fc16f7c8",
+          "source": "grammar.js",
+          "beforeSHA256": "3b5a0afa4ad836b2579c6d836450a373c6736bb0da3d7e030a9d4e66b94fbc7a",
+          "afterSHA256": "f5da18f1fd401eef7f98db5512b9f5de682ff3c03fcad9e143e875ec46e39182",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/306"
         }
       ],
       "regenerate": true

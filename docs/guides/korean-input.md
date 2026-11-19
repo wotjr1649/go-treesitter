@@ -149,7 +149,7 @@ produce `ERROR` nodes even though the language allows it. The table says what wa
 | `powershell` | no: fails on variable, parameter, hash key, member name, type name ([PowerShell](../known-gaps/powershell.md)) | yes | yes |
 | `python` | yes | yes | yes |
 | `r` | yes | yes | yes |
-| `ruby` | partly: local variable names parse; fails on symbols, global variables ([Ruby](../known-gaps/ruby.md)) | yes | yes |
+| `ruby` | partly: local, instance and global variable names parse (global names in the development tree after v0.5.0); fails on symbols ([Ruby](../known-gaps/ruby.md)) | yes | yes |
 | `rust` | yes | yes | yes |
 | `swift` | partly: variable, function, parameter, type and field names parse; fails on statement labels ([Swift](../known-gaps/swift.md)) | yes | yes |
 | `tsql` | yes on the retained bracketed, double-quoted and regular identifiers, variables and label cases (development v2.1.0; v0.5.0 rejects regular identifiers) | yes | yes |

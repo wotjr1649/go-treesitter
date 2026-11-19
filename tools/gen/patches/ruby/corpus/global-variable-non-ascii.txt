@@ -1,0 +1,80 @@
+================================================================================
+P121 non-ASCII global variables
+================================================================================
+
+$한글 = 1
+$é += $日本語
+puts $_한글, $a한1
+x = "#{$한글}"
+alias $새 $한글
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    (global_variable)
+    (integer))
+  (operator_assignment
+    (global_variable)
+    (global_variable))
+  (call
+    (identifier)
+    (argument_list
+      (global_variable)
+      (global_variable)))
+  (assignment
+    (identifier)
+    (string
+      (interpolation
+        (global_variable))))
+  (alias
+    (global_variable)
+    (global_variable)))
+
+================================================================================
+P121 special global variables are unchanged
+================================================================================
+
+x = [$0, $1, $10, $!, $@, $~, $*, $$, $?, $/, $\, $;, $,, $., $=, $:, $<, $>, $", $_, $-w, $-0, $-_]
+y = [$stdout, $PROGRAM_NAME, $_foo, $a1]
+alias $MATCH $~
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    (identifier)
+    (array
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)))
+  (assignment
+    (identifier)
+    (array
+      (global_variable)
+      (global_variable)
+      (global_variable)
+      (global_variable)))
+  (alias
+    (global_variable)
+    (global_variable)))

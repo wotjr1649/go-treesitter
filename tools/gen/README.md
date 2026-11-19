@@ -224,7 +224,8 @@ Recorded C-only patches exist for bash and ruby (`0001-heredoc-utf8`), yaml (`00
 `0001-greater-than-text` and `0002-bare-ampersand-text` before generation. PostgreSQL applies
 `0001-non-ascii-identifiers` before generation and `0002-dollar-tag-code-points` after it.
 Go applies `0001-new-value-argument` before generation to accept Go 1.26 expression arguments to `new`.
-`gen -patch-status` lists the counts. Retire each with an approved pin move to a source that contains the fix (for an owner-maintained repository, an owner release; ADR-0024 rule 7.6).
+Ruby applies `0002-global-variable-non-ascii` before generation to accept non-ASCII global-variable names.
+`gen -patch-status` lists 14 records in total, including two for Ruby. Retire each with an approved pin move to a source that contains the fix (for an owner-maintained repository, an owner release; ADR-0024 rule 7.6).
 `native-ref -unpatched` supplies the required corpus, fuzz-seed and patch-regression baseline.
 
 ADR-0027 sets `regenerate: true` for every grammar except entries with a recorded `generatorException`

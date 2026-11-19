@@ -367,6 +367,12 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 			result += "\nThe indentation patch bounds serialization by bytes written, preventing the state-buffer overrun that deep indentation causes when an odd number of string delimiters is open, e.g. inside one string literal (upstream PR #351).\n"
 		}
 		for _, p := range g.Patches {
+			if p.File == "patches/ruby/0002-global-variable-non-ascii.patch" {
+				result += "\nThe global-variable patch accepts non-ASCII names such as `$한글`. Previously error-free trees change where an ASCII global name is directly followed by non-ASCII characters (for example `$a한 = 1` or `\"#$a한\"`): the whole name becomes one `global_variable` (see MIGRATING.md).\n"
+				break
+			}
+		}
+		for _, p := range g.Patches {
 			result += fmt.Sprintf("\n- `%s` changes `%s`; upstream defect report: %s.\n", p.File, p.Source, p.UpstreamReport)
 		}
 	}

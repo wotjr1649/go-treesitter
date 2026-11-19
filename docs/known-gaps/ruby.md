@@ -10,12 +10,12 @@ Initial E5 evidence: Windows native reference differential (windows/amd64), base
 Only the exact inputs below are covered. `TestKnownGaps` rechecks engine dumps (E3) and, with a freshly built
 `TSG_NATIVE_EXE_DIR`, compares them byte-for-byte with native C (E5). CI requires that comparison.
 
-Identity: grammar `ad907a69da0c8a4f7a943a7fe012712208da6dee`; runtime `v0.27.2`; grammar patches: 1.
+Identity: grammar `ad907a69da0c8a4f7a943a7fe012712208da6dee`; runtime `v0.27.2`; grammar patches: 2.
 The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`pins.json`](../../tools/gen/pins.json),
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/ruby/provenance.json).
 
-- Source identity SHA-256: `5bade487c23b69aa12c533a7f99c3f0cd0f5353f713672995fa40b03ecca877f`
-- Module provenance SHA-256: `5e35a40f7732dd36521090e57f56be114a4f99a42972c6623c7e3ad432418bce`
+- Source identity SHA-256: `8c67c012322d65abd4403f24cadf09059134e86faf91e6d17f1c5066555b6670`
+- Module provenance SHA-256: `20b8b709d917d978da59acc13963d689b63f34df2f7cff72d235bfb6d9d27ce9`
 
 ## ruby-non-ascii-symbol
 
@@ -33,20 +33,3 @@ Expected rule: A simple_symbol :한글 on the right of the assignment.
 - [Upstream issue](https://github.com/tree-sitter/tree-sitter-ruby/issues/292)
 - Input SHA-256: `ab172f39384a073ea728126cdf4c99a6abcea56ea9d597046ce156aa5fa9a0c3`
 - [Recorded native dump](../../tools/conformance/testdata/known-gaps/ruby-non-ascii-symbol.dump), SHA-256: `3e1608561ae0e0f94fd804caed90a3774f5e586c37cb93afdb85a1ebdd425b36`
-
-## ruby-non-ascii-global-variable
-
-Input (JSON string; escapes and final newline are significant):
-
-```json
-"$전역 = 1\n"
-```
-
-Observed: The root has errors: the dollar sign [0,1) is an ERROR node (nested ERROR) and the Hangul name [1,7) starts a separate assignment with an identifier on its left. $abc = 1 parses as a global_variable assignment; @필드 and @@클래스 parse.
-
-Expected rule: A global_variable $전역 assigned 1.
-
-- Specification: [Ruby syntax: Assignment (Global variables)](https://docs.ruby-lang.org/en/3.3/syntax/assignment_rdoc.html#label-Global+Variables)
-- Upstream issue: none recorded.
-- Input SHA-256: `9f198f0b9205eae6a2276ed454de726e3823017f9f451141782a85ead409fa0b`
-- [Recorded native dump](../../tools/conformance/testdata/known-gaps/ruby-non-ascii-global-variable.dump), SHA-256: `3d49ee51af0fbdff6eec0d5903c9a85a18305cc4ceabf6d828f9abb3014c69e4`

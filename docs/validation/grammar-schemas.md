@@ -384,3 +384,17 @@ field table (E1). The new `new_argument_list` rule is aliased to `argument_list`
 and shifts the numeric IDs of 22 visible kinds, including `argument_list` (174 to 175). This is not an ADR-0023
 breaking tree change: no previously error-free tree changed among the 95 decision 4 inputs (E4, Windows amd64).
 [Migration](../../MIGRATING.md#unreleased-after-v050)
+
+## Unreleased (after v0.5.0) Ruby global-variable patch
+
+At Ruby pin `ad907a69da0c`, the generated `node-types.json` before and after the patch has SHA-256
+`a95d2f382017895771063837dbb959c4e5fde829fc185a2967695c770cc297bf` (E1, CLI 0.27.2).
+The static node types and fields are identical. In the decision 4 comparison against the heredoc-only baseline,
+the previously error-free inputs that changed all have a regular global whose ASCII start is directly followed by
+non-ASCII characters: as code they change from a `call` of the ASCII prefix (such as `$_` or `$a`) to one
+`global_variable`, and in short interpolation the trailing `string_content` (`heredoc_content` in heredocs) becomes
+part of the `global_variable` (E4, Windows amd64).
+This is a breaking tree change under ADR-0023 amendment item 5. The comparison contains 429 rows, with 21 changed
+rows (17 distinct inputs) whose original trees were error-free. The pinned upstream queries compiled and the query
+lane matched the patched native reference on 3,809 raw query/input pairs (E5, Windows amd64).
+[Query and migration impact](../../MIGRATING.md#unreleased-after-v050)

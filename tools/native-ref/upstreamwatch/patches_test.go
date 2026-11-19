@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -67,24 +68,33 @@ func TestPatchSection(t *testing.T) {
 	}
 }
 
-func TestGoPatchTracking(t *testing.T) {
+func TestPinnedPatchTracking(t *testing.T) {
 	raw, err := os.ReadFile("../../gen/pins.json")
 	if err != nil {
 		t.Fatal(err)
 	}
 	patches, err := loadPatches(raw)
-	if err != nil || len(patches["golang"]) != 1 {
-		t.Fatalf("Go patches: %v, err %v", patches["golang"], err)
+	if err != nil {
+		t.Fatal(err)
 	}
 	api := newAPI()
 	api.now = time.Date(2026, 11, 19, 0, 0, 0, 0, time.UTC)
 	var out bytes.Buffer
-	patchSection(&out, api, map[string][]patchRec{"golang": patches["golang"]}, nil, func(report string) (time.Time, error) {
+	patchSection(&out, api, map[string][]patchRec{"golang": patches["golang"], "ruby": patches["ruby"]}, nil, func(report string) (time.Time, error) {
 		return api.now, nil
 	}, nil)
-	const want = "| golang | 1 | patches/golang/0001-new-value-argument.patch | https://github.com/tree-sitter/tree-sitter-go/issues/201 | 2026-11-19 | ok |"
-	if !strings.Contains(out.String(), want) || len(api.findings) != 0 {
-		t.Fatalf("Go patch row missing or warned:\n%s", &out)
+	for _, tc := range []struct{ lang, file, report string }{
+		{"golang", "0001-new-value-argument.patch", "https://github.com/tree-sitter/tree-sitter-go/issues/201"},
+		{"ruby", "0001-heredoc-utf8.patch", "https://github.com/tree-sitter/tree-sitter-ruby/issues/305"},
+		{"ruby", "0002-global-variable-non-ascii.patch", "https://github.com/tree-sitter/tree-sitter-ruby/issues/306"},
+	} {
+		want := fmt.Sprintf("| %s | %d | patches/%s/%s | %s | 2026-11-19 | ok |", tc.lang, len(patches[tc.lang]), tc.lang, tc.file, tc.report)
+		if !strings.Contains(out.String(), want) {
+			t.Errorf("missing %q:\n%s", want, &out)
+		}
+	}
+	if len(api.findings) != 0 {
+		t.Fatalf("unexpected patch warnings: %v", api.findings)
 	}
 }
 

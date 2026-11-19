@@ -1,8 +1,0 @@
-#tsg-dump/1 root_has_error=1 nodes=7
-0	-	program	1	0	0	0	1	0	12	0:0	1:0
-1	-	ERROR	1	1	0	1	1	0	1	0:0	0:1
-2	-	ERROR	1	0	0	1	1	0	1	0:0	0:1
-1	-	assignment	1	0	0	0	0	1	11	0:1	0:11
-2	left	identifier	1	0	0	0	0	1	7	0:1	0:7
-2	-	=	0	0	0	0	0	8	9	0:8	0:9
-2	right	integer	1	0	0	0	0	10	11	0:10	0:11
