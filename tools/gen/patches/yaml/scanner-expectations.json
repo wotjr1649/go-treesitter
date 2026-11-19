@@ -81,6 +81,8 @@
             }
           },
           "baselineCrashes": {
+            "linux/amd64": "access-violation",
+            "linux/arm64": "access-violation",
             "windows/amd64": "access-violation"
           },
           "review": "The original scanner crashes at this depth (recorded crash class, tree-sitter-yaml issue 48). With serialized indent bytes bounded, the patched scanner returns the documented full-length ERROR tree."
@@ -101,6 +103,8 @@
             }
           },
           "baselineCrashes": {
+            "linux/amd64": "access-violation",
+            "linux/arm64": "access-violation",
             "windows/amd64": "access-violation"
           },
           "review": "The original scanner crashes at this depth (recorded crash class, tree-sitter-yaml issue 48). With serialized indent bytes bounded, the patched scanner returns the documented full-length ERROR tree."
@@ -121,6 +125,8 @@
             }
           },
           "baselineCrashes": {
+            "linux/amd64": "access-violation",
+            "linux/arm64": "access-violation",
             "windows/amd64": "access-violation"
           },
           "review": "The original scanner crashes at this depth (recorded crash class, tree-sitter-yaml issue 48). With serialized indent bytes bounded, the patched scanner returns the documented full-length ERROR tree."
