@@ -1,4 +1,12 @@
 {
+  "go": [
+    {"name":"new-literal","source":"package p\nvar v = new(42)\n","nodes":["call_expression new(42)","int_literal 42"]},
+    {"name":"new-binary","source":"package p\nvar v = new(x+1)\n","nodes":["call_expression new(x+1)","binary_expression x+1","int_literal 1"]},
+    {"name":"new-call","source":"package p\nvar v = new(f())\n","nodes":["call_expression new(f())","call_expression f()"]},
+    {"name":"new-type","source":"package p\nvar v = new(T)\n","nodes":["call_expression new(T)","type_identifier T"]},
+    {"name":"make-literal","source":"package p\nvar v = make(42)\n","nodes":["call_expression make(42)","int_literal 42"],"errors":["ERROR 42"]},
+    {"name":"make-binary","source":"package p\nvar v = make(x+1)\n","nodes":["binary_expression make(x+1","call_expression make(x","type_identifier x","int_literal 1"],"errors":["ERROR var v = make(x+1)"],"missing":[")"]}
+  ],
   "rust": [
     {"name":"hangul-delimiters","source":"/* 갪갯 */","nodes":["block_comment /* 갪갯 */"]},
     {"name":"han-delimiters","source":"/*是个*/","nodes":["block_comment /*是个*/"]},

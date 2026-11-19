@@ -27,6 +27,7 @@ func TestScannerPatchesGrammarText(t *testing.T) {
 		t.Fatal(err)
 	}
 	kinds := map[string][]string{
+		"go":         {"call_expression", "type_identifier", "int_literal", "binary_expression"},
 		"rust":       {"block_comment", "inner_doc_comment_marker", "outer_doc_comment_marker", "doc_comment", "line_comment", "let_declaration", "function_item"},
 		"javascript": {"jsx_text", "html_character_reference", "string", "binary_expression"},
 		"html":       {"text", "entity", "attribute_value"},

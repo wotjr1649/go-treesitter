@@ -374,3 +374,13 @@ unpatched and patched CLI 0.27.2 `node-types.json` files are 9026 bytes with SHA
 `1238b6c89fc6afb9723b6463a365843aa87e478025490660e5acfc9adaaf809b` (E1, recorded `node-types.json` hashes), and
 `gen schema diff` reports `PASS` (E2, one-off run on Windows amd64). It is an ADR-0023 breaking tree change: some explicit keys whose `:` is on line 32,769 or
 later (line 16,385 with CRLF line ends; the scanner counts CR and LF separately) lose an error-free nested `block_mapping`. [Query and migration impact](../../MIGRATING.md#unreleased-after-v050)
+
+## Unreleased (after v0.5.0) Go `new` expression patch
+
+At Go grammar pin `2346a3ab1bb3`, the unpatched and patched CLI 0.27.2 `node-types.json` share SHA-256
+`24d2fd2597d4eab4afb35ddf3c542901b1a4feb26b90e9bb886874191ae82f27` (E1, recorded hashes), and `gen schema diff`
+reports no change (E2, Windows amd64). The generated modules have the same 187 distinct visible kinds and the same
+field table (E1). The new `new_argument_list` rule is aliased to `argument_list`; it adds one symbol ID (219 to 220)
+and shifts the numeric IDs of 22 visible kinds, including `argument_list` (174 to 175). This is not an ADR-0023
+breaking tree change: no previously error-free tree changed among the 95 decision 4 inputs (E4, Windows amd64).
+[Migration](../../MIGRATING.md#unreleased-after-v050)

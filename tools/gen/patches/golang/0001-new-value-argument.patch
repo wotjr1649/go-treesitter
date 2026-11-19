@@ -1,0 +1,35 @@
+--- a/grammar.js
++++ b/grammar.js
+@@ -691,7 +691,11 @@
+ 
+     call_expression: $ => prec(PREC.primary, choice(
+       seq(
+-        field('function', alias(choice('new', 'make'), $.identifier)),
++        field('function', alias('new', $.identifier)),
++        field('arguments', alias($.new_argument_list, $.argument_list)),
++      ),
++      seq(
++        field('function', alias('make', $.identifier)),
+         field('arguments', alias($.special_argument_list, $.argument_list)),
+       ),
+       seq(
+@@ -705,6 +709,19 @@
+       $._expression,
+       '...',
+     )),
++
++    // Go 1.26: `new` takes a value as well as a type. The type reading is
++    // preferred (dynamic precedence) so `new(int)` / `new(T)` are unchanged;
++    // `make` keeps special_argument_list and still requires a type.
++    new_argument_list: $ => seq(
++      '(',
++      optional(seq(
++        choice(prec.dynamic(2, $._type), $._expression),
++        repeat(seq(',', $._expression)),
++        optional(','),
++      )),
++      ')',
++    ),
+ 
+     special_argument_list: $ => seq(
+       '(',
