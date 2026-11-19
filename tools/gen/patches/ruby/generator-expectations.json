@@ -1,0 +1,98 @@
+{
+  "identity": {
+    "grammarCommit": "ad907a69da0c8a4f7a943a7fe012712208da6dee",
+    "seed": 1,
+    "corpusManifestSHA256": "da54008ee3d01d9ccd6ffac7650f2b868637ba05ce9716475b7a1489cdf07ef9",
+    "editsManifestSHA256": "d9a1c80d6f088ba9d2bf6454f507871cc0a4c90f0e6e0b536429595c88aa074b",
+    "largeEntries": [
+      {
+        "lang": "ruby",
+        "file": "gb18030-tbl.rb",
+        "kind": "url",
+        "url": "https://raw.githubusercontent.com/ruby/ruby/b7e8fad02273da0947e45fee172b26c6f49e694e/enc/trans/gb18030-tbl.rb",
+        "sha256": "2755eb2a433e528b1f51213c4b5905a139ceff3d1d2ef5349dbb1f15bc77201f",
+        "license_spdx": "BSD-2-Clause",
+        "license_url": "https://raw.githubusercontent.com/ruby/ruby/b7e8fad02273da0947e45fee172b26c6f49e694e/BSDL",
+        "license_sha256": "36a9a6e7347214bbba599a412617204e65bff065dcbe5c46f5cb454c80de9eb0"
+      }
+    ],
+    "patchCorpusFilesSHA256": {
+      "global-variable-non-ascii.txt": "a487c96c4bb809c9501d44083633428f037c029cadee3d932ddb6942bc02f0ef"
+    },
+    "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "cli": "0.27.2",
+    "grammarArchiveSHA256": "f7aa2408f1b39922f85add38cacd60b59828a8222c609a240f08779d46d079d9",
+    "patches": [
+      {
+        "file": "patches/ruby/0001-heredoc-utf8.patch",
+        "sha256": "e6b78632eb084a0438584d6e38cd53d8aaf141592db2f75e08c0f583507c6368",
+        "source": "src/scanner.c",
+        "beforeSHA256": "88c1c036d5af7c22a1bc9cc5e50411d414ac9624afed676d42957c566ac4083d",
+        "afterSHA256": "387e6c2306b49962b93d6b571936169e2f1f372a374b48f7548bfa97e0ad508f",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/305"
+      },
+      {
+        "file": "patches/ruby/0002-global-variable-non-ascii.patch",
+        "sha256": "fb68546f8a63f2f7abd685b05fa8d1d949c35d170b0fffc34bc05177fc16f7c8",
+        "source": "grammar.js",
+        "beforeSHA256": "3b5a0afa4ad836b2579c6d836450a373c6736bb0da3d7e030a9d4e66b94fbc7a",
+        "afterSHA256": "f5da18f1fd401eef7f98db5512b9f5de682ff3c03fcad9e143e875ec46e39182",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/306"
+      }
+    ]
+  },
+  "reason": "Ruby #306: global_variable names follow instance_variable and class_variable (ALPHA_CHAR + IDENTIFIER_CHARS), as the Ruby syntax documentation states, so non-ASCII names such as $한글 parse; special globals keep their original alternatives. Rule text from Magikdidi24/tree-sitter-ruby bef45e6 (in PR #282). Each listed difference is a P121 patch-corpus input or its seeded edit in which a non-ASCII global variable now parses.",
+  "retireWhen": "Retire with the matching patch when the upstream pin incorporates the fix; review anew for any identity, fixture or result change.",
+  "differences": [
+    {
+      "id": "corpus/ruby/grammar-patch-global-variable-non-ascii-001",
+      "kind": "corpus",
+      "inputSHA256": "09d9a2a4a7e4e1b13332b94b94a3c1fdffc41b29f69f8906058df24befc18da1",
+      "referenceDumpSHA256": "b6c229e6d0484a11e9559eb7bc2007ad29d4646a00bebe60b296d2d9f5103ad5",
+      "candidateDumpSHA256": "8ee8aec12e68cadd639e880a4d70f17fe24a5a5f5f42f8526b1902cc95096836"
+    },
+    {
+      "id": "edits/ruby/grammar-patch-global-variable-non-ascii-001-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "09d9a2a4a7e4e1b13332b94b94a3c1fdffc41b29f69f8906058df24befc18da1",
+      "newSHA256": "2ba842c91ba1c6754a1e9131662240c5a9d4a9db8071f0a30287c258c5dcff55",
+      "referenceDumpSHA256": "d23c6c4b51acaa527d480e442c7146df01ce7fce684b946743edd53b39a42cbd",
+      "candidateDumpSHA256": "266786351fab8cc280b473383fc274ab964aee48a044ba142c58e189b0a8128f"
+    },
+    {
+      "id": "edits/ruby/grammar-patch-global-variable-non-ascii-001-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "09d9a2a4a7e4e1b13332b94b94a3c1fdffc41b29f69f8906058df24befc18da1",
+      "newSHA256": "d5b2e46833792f3db80f81b622bb4418516fa8bf8885a0b5ed86230d924ce736",
+      "referenceDumpSHA256": "a20085fd644c97c85a59550ff8fb98379e530a4fdde1d7772ab8bdc450929bbb",
+      "candidateDumpSHA256": "de1d0da0dc1ec8ba0f1551c2fb1ccf0b4559c0eae0aeb796f8b12fae0c526023"
+    },
+    {
+      "id": "edits/ruby/grammar-patch-global-variable-non-ascii-001-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "09d9a2a4a7e4e1b13332b94b94a3c1fdffc41b29f69f8906058df24befc18da1",
+      "newSHA256": "484b1676707a5e4b0a59b3bc0ac273625357ab91285ce745b0097fff9ecae541",
+      "referenceDumpSHA256": "5bed04da07b099861572fcb2b09ce42e5893ae451ba72d6675f07258045a6bdb",
+      "candidateDumpSHA256": "940281e61666b7cad0eff220cae240738d070dc83da16c42920201a065aa8cfb"
+    }
+  ]
+}

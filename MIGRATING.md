@@ -105,6 +105,16 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
 
 ## Unreleased (after v0.5.0)
 
+- **Ruby non-ASCII global variables.** Forms such as `$한글 = 1` now parse as assignments. A regular global name
+  whose ASCII start (`$_`, `$a`, …) is directly followed by non-ASCII characters is now one `global_variable`
+  spanning the whole name including `$`, wherever it appears. Such input used to parse without errors in two ways.
+  In code (`$a한 = 1`, `x = $a한`, `puts $a한`, `$a한.foo`, `$a한 += 1`, `defined?($a한)`), the tree had a `call`
+  whose `method` was `$a`, with the non-ASCII rest as an `identifier`, assignment or call in its arguments. In short
+  interpolation (`"#$a한"`, also in heredocs and regular expressions), the `interpolation` covered only `$a` and the
+  rest was `string_content` (`heredoc_content` in heredocs). Queries matching `(call method: (global_variable))`, the
+  nested nodes or that string content lose those matches; `(global_variable) @global` captures the full name.
+  [Schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-ruby-global-variable-patch)
+
 - **Go 1.26 `new(expr)`** accepts `new(42)` with an `int_literal` under `argument_list` in place of an
   error. The Go parser also assigns new numeric IDs to some existing symbols. For example, the public
   `argument_list` symbol moves from 174 to 175. Resolve symbols against the active grammar and recompute

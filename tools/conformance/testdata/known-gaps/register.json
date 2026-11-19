@@ -49,9 +49,9 @@
     "ruby": {
       "Name": "Ruby",
       "Commit": "ad907a69da0c8a4f7a943a7fe012712208da6dee",
-      "PinSHA256": "5bade487c23b69aa12c533a7f99c3f0cd0f5353f713672995fa40b03ecca877f",
-      "ProvenanceSHA256": "5e35a40f7732dd36521090e57f56be114a4f99a42972c6623c7e3ad432418bce",
-      "PatchCount": 1
+      "PinSHA256": "8c67c012322d65abd4403f24cadf09059134e86faf91e6d17f1c5066555b6670",
+      "ProvenanceSHA256": "20b8b709d917d978da59acc13963d689b63f34df2f7cff72d235bfb6d9d27ce9",
+      "PatchCount": 2
     },
     "swift": {
       "Name": "Swift",
@@ -369,22 +369,6 @@
         }
       ],
       "Upstream": "https://github.com/tree-sitter/tree-sitter-ruby/issues/292"
-    },
-    {
-      "ID": "ruby-non-ascii-global-variable",
-      "Grammar": "ruby",
-      "Input": "$전역 = 1\n",
-      "InputSHA256": "9f198f0b9205eae6a2276ed454de726e3823017f9f451141782a85ead409fa0b",
-      "DumpSHA256": "3d49ee51af0fbdff6eec0d5903c9a85a18305cc4ceabf6d828f9abb3014c69e4",
-      "Observed": "The root has errors: the dollar sign [0,1) is an ERROR node (nested ERROR) and the Hangul name [1,7) starts a separate assignment with an identifier on its left. $abc = 1 parses as a global_variable assignment; @필드 and @@클래스 parse.",
-      "Expected": "A global_variable $전역 assigned 1.",
-      "Specs": [
-        {
-          "Title": "Ruby syntax: Assignment (Global variables)",
-          "URL": "https://docs.ruby-lang.org/en/3.3/syntax/assignment_rdoc.html#label-Global+Variables"
-        }
-      ],
-      "Upstream": ""
     },
     {
       "ID": "swift-non-ascii-statement-label",
