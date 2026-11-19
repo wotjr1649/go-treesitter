@@ -197,6 +197,34 @@ func TestSymbolForName(t *testing.T) {
 	}
 }
 
+func TestSymbolForNamePublicAlias(t *testing.T) {
+	l := newFakeLang(nil).lang
+	m := &l.g.Meta
+	m.Symbols = append(m.Symbols, "word", "word")
+	m.SymbolFlags = append(m.SymbolFlags, 3, 3)
+	m.PublicSymbols = []uint16{0, 1, 7, 3, 4, 5, 6, 7, 8}
+	if got, ok := l.SymbolForName("word", true); !ok || got != 7 || l.SymbolName(got) != "word" {
+		t.Fatalf("named word = %d,%v, want public ID 7", got, ok)
+	}
+	if got, ok := l.SymbolForName("word", false); !ok || got != 6 {
+		t.Fatalf("anonymous word = %d,%v, want public ID 6", got, ok)
+	}
+	s := sampleSnapshot(t)
+	s.lang = l
+	s.symbol[2], s.symbol[4], s.symbol[5], s.symbol[6] = 7, 8, 7, 7
+	var bySymbol, byType []int
+	id, _ := l.SymbolForName("word", true)
+	for n := range s.Index().OfSymbol(id) {
+		bySymbol = append(bySymbol, n.Index())
+	}
+	for n := range s.Index().OfType("word") {
+		byType = append(byType, n.Index())
+	}
+	if !slices.Equal(bySymbol, []int{2, 5, 6}) || !slices.Equal(byType, []int{2, 4, 5, 6}) {
+		t.Fatalf("word nodes by public symbol = %v, by type = %v", bySymbol, byType)
+	}
+}
+
 func TestDescendantForRange(t *testing.T) {
 	s := sampleSnapshot(t)
 	idx := func(n Node) int { return n.Index() }

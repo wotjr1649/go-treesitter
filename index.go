@@ -57,7 +57,7 @@ func (s *Snapshot) Index() *Index {
 	return s.index
 }
 
-// OfSymbol yields the nodes with symbol sym in preorder, without allocating a result slice. An unknown symbol yields
+// OfSymbol yields the nodes with public symbol sym in preorder, without allocating a result slice. An unknown symbol yields
 // nothing.
 func (x *Index) OfSymbol(sym Symbol) iter.Seq[Node] {
 	return func(yield func(Node) bool) {

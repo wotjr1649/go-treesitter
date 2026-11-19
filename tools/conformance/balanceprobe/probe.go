@@ -95,7 +95,7 @@ func (e *env) readMeta() {
 	p := e.m.Xtsg_lang_meta()
 	b := e.block(p, 24)
 	u := func(off int) int { return int(binary.LittleEndian.Uint32(b[off:])) }
-	if string(b[:4]) != "TSGM" || u(4) != 1 {
+	if string(b[:4]) != "TSGM" || u(4) != 2 {
 		e.t.Fatal("bad language metadata header")
 	}
 	ns, nf, pool := u(12), u(16), u(20)
@@ -103,7 +103,7 @@ func (e *env) readMeta() {
 		e.t.Fatal("invalid language metadata dimensions")
 	}
 	syms, fields := 24, 24+4*(ns+1)
-	poolAt := fields + 4*(nf+1) + ns
+	poolAt := fields + 4*(nf+1) + 3*ns
 	b = e.block(p, poolAt+pool)
 	name := func(tab, i int) string {
 		a, z := u(tab+4*i), u(tab+4*(i+1))
@@ -348,7 +348,7 @@ func Run(t *testing.T, m Module, h *Host, lang string) {
 	}
 	write("identities.json", mustJSON(t, hashes))
 	m.X_initialize()
-	if m.Xtsg_abi_version() != 3 || m.Xtsg_init() != 0 {
+	if m.Xtsg_abi_version() != 4 || m.Xtsg_init() != 0 {
 		t.Fatal("probe initialization/ABI")
 	}
 	e := &env{t: t, m: m, h: h}

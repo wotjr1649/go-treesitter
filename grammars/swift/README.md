@@ -5,8 +5,8 @@ Generated tree-sitter grammar module for go-treesitter. **Do not edit**: `engine
 
 - upstream grammar: https://github.com/alex-pinkus/tree-sitter-swift at `a1d4a7b80260bf960f9e25198cddecbe5e6c46aa`
 - tree-sitter runtime: v0.27.2 (unmodified)
-- engine ABI: 3
-- recipe sha256: `ef809bf7914c28d75910aa45be55e7a9e66490542b8f91604eb012d0719e1220`
+- engine ABI: 4
+- recipe sha256: `cc7ed87cbfb7574c13e85fc7b553c3021dd998cf040c7a036d3fdfa77dd95f4f`
 - identity and output hashes: `provenance.json` (equals the compiled `engine.Identity`; `go test` checks it)
 
 `LICENSE` is the upstream grammar's license. `LICENSES/tree-sitter.txt` is the license of the tree-sitter runtime C translated into `engine_gen.go`. `LICENSES/wasi-libc/` holds the license texts of the wasi-libc code translated into `engine_gen.go` (wasi-libc `2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13`;

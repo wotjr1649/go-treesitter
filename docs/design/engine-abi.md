@@ -1,7 +1,7 @@
-# Engine ABI v3 (session 15 field lookup)
+# Engine ABI v4
 
-Status: ABI 1 parsing contract, ABI 2 queries (2026-11-14), and ABI 3 snapshot field-lookup exceptions
-(owner decision 2026-11-15).
+Status: ABI 1 parsing contract, ABI 2 queries, ABI 3 snapshot field-lookup exceptions, and ABI 4 public symbol IDs
+in language metadata (#77).
 Inputs: ADR-0020, ADR-0021, `docs/design/api-v2.md`, `docs/design/query-abi.md`, the session-15 spike
 (`.scratch/s15/w2/mem/combo`, maintainer-local archive 2026-11-16-s17-cleanup; shims `tsg_ext.c` and
 `tsg_export_s2.c`, archive 2026-11-13-session-15 spike/).
@@ -14,9 +14,10 @@ The ABI is the contract between three parts that are versioned separately:
 | Go side of the ABI, memory provider, trap capture | `internal/engine` (root module) | engine |
 | Per-grammar generated module | `grammars/<lang>/` (one Go module each) | generator output |
 
-`ABIVersion = 3`. The root accepts ABI 1 for parsing and ABI 2/3 for parsing and queries. ABI 3 adds single-child
-field-lookup exceptions through snapshot format 2; ABI 1/2 retain snapshot format 1 and their direct-child lookup for
-alias-inherited fields. Any change to an export signature or semantics, the chunk layout or the meta block bumps it.
+`ABIVersion = 4`. The root accepts ABI 1 for parsing and ABI 2–4 for parsing and queries. ABI 3/4 use snapshot format
+2 for single-child field-lookup exceptions. ABI 1/2 use snapshot format 1 and direct-child lookup for alias-inherited
+fields. ABI 4 adds language meta format 2. Any change to an export signature or semantics, the chunk layout or the
+meta block bumps the engine ABI.
 
 ## 1. C exports (wasm reactor, one instance = one `TSParser`)
 
@@ -25,7 +26,7 @@ All pointers are wasm32 offsets (`int32` in Go). `TSTree*` handles are opaque. O
 
 | Export | Semantics |
 |---|---|
-| `uint32_t tsg_abi_version(void)` | returns `3` (legacy modules return `1` or `2`) |
+| `uint32_t tsg_abi_version(void)` | returns `4` (legacy modules return `1`, `2` or `3`) |
 | `int32_t tsg_init(void)` | create the parser, set the language, allocate the export chunk buffer and write its header (section 2); `0` ok, `-1` the runtime rejected the language (language ABI) or allocation failed |
 | `TSTree *tsg_parse(const char *src, uint32_t len, TSTree *old)` | `ts_parser_parse_with_options`, UTF-8 input, progress callback = host `should_stop`; `old` may be `0`. **If the result is `NULL` the shim calls `ts_parser_reset` before returning.** |
 | `void tsg_parser_reset(void)` | `ts_parser_reset` (host calls it on any no-tree path it creates itself) |
@@ -51,12 +52,9 @@ calls `exit(1)`), instance discarded and recreated; no code path reaches `os.Exi
 gives it (`lib/src/wasm_store.c` links `proc_exit`, `abort` and `__assert_fail` to a trap). The generator fails if a
 grammar needs an import outside `internal/engine`'s stub set (`checkImports`; `proc_exit` is in it).
 
-Compatibility: the engine ABI number does not change. It versions the exports, chunk layout and meta block a module
-offers the root; a stub-set addition changes none of them, and the root accepts every ABI 1/2/3 module as before. Existing
-modules do not import `proc_exit`, so their bytes are unchanged. A future module that imports it declares the method in
-its generated import interface and fails to compile against a root without `Host.Xproc_exit`; ADR-0022 already pins
-each module to the exact root version (`require` of that tag), so such a module is released with a root that has it,
-and no run-time mismatch exists to detect with a number.
+Adding a host stub leaves the engine ABI unchanged. A module that imports `proc_exit` declares the method in its
+generated import interface and requires a root with `Host.Xproc_exit` at compile time. ADR-0022 pins each released
+module to the exact root version that supplies its imports.
 
 Build flags (from the spike, fixed): `clang --target=wasm32-wasip1 -mexec-model=reactor -O2 -DNDEBUG
 -Wl,--gc-sections -Wl,--no-entry -Wl,--strip-all` + `--export=` for the table above; then `wasm-opt -O3` (binaryen, explicit feature flags) and `wasm2go -unsafe -embed`
@@ -65,7 +63,7 @@ pre-declared size round of 2026-11-14 (76.0 -> 25.6 MB raw, same conformance, sp
 
 ## 2. Export chunk buffer (snapshot block formats 1 and 2)
 
-Header, 16 bytes: `magic = "TSGX"` (4 bytes), `u16 format` (`1` for ABI 1/2, `2` for ABI 3), `u16 reserved = 0`,
+Header, 16 bytes: `magic = "TSGX"` (4 bytes), `u16 format` (`1` for ABI 1/2, `2` for ABI 3/4), `u16 reserved = 0`,
 `u32 KC` (chunk capacity, a multiple of 4), `u32 fieldExceptions` (reserved in format 1; see below for format 2).
 Columns follow the header (offsets relative to `buf+16`), as validated in the spike:
 `symbol u16[KC] @0`, `field u16[KC] @2KC`, `flags u8[KC] @4KC`, `startByte @5KC`, `endByte @9KC`, `startRow @13KC`,
@@ -74,7 +72,7 @@ Columns follow the header (offsets relative to `buf+16`), as validated in the sp
 The header is written by `tsg_init`; `NewParser` checks magic and format once (mismatch = `ErrIncompatibleLanguage`) and the Go side checks them again after every `tsg_export_begin` and nonempty chunk, and derives `descendantEnd`/`childCount`/siblings.
 
 The Go snapshot retains 25 B/node (previously 41 B/node), plus its owned source and sparse field exceptions.
-It skips the four exported point columns without changing either block format or engine ABI 1/2/3.
+It skips the four exported point columns without changing either block format or engine ABI 1-4.
 Node points and point-range lookups derive LF-counted rows and byte columns from byte offsets. The snapshot's
 existing `Lines()` index builds once with `sync.Once`, on first use: `[]uint32` line starts occupy exactly
 `4 * (LF count + 1)` bytes, excluding slice/object/allocator overhead; there are at most `len(source) + 1` entries.
@@ -161,17 +159,20 @@ the native driver and executable hashes, and the delivered patch/index tree. The
 results, missing data and zero selected edit cases fail. Older local data may use the native `edit-fields` command
 directly; new `ciconf` data records each `.fields` result's exit code and SHA-256 in `edits/results-native.csv`.
 
-## 3. Language meta block (format 1)
+## 3. Language meta block (formats 1 and 2)
 
-`magic "TSGM"`, `u32 format = 1`, `u32 language_abi` (`ts_language_abi_version`), `u32 nSym`, `u32 nField` (ids
+`magic "TSGM"`, `u32 format = 2`, `u32 language_abi` (`ts_language_abi_version`), `u32 nSym`, `u32 nField` (ids
 `0..field_count`, id 0 = ""), `u32 poolBytes`; then `symOff u32[nSym+1]`, `fldOff u32[nField+1]`,
-`symFlags u8[nSym]` (`1` named, `2` visible, `4` supertype), then the name pool. The generator turns it into static
-Go data; nothing at run time needs an instance to read names.
+`publicSymbols u16[nSym]`, `symFlags u8[nSym]` (`1` named, `2` visible, `4` supertype), then the name pool.
+Each public symbol entry is `ts_language_public_symbol(lang, rawID)`. The flags are the underlying
+`ts_language_symbol_metadata` bits. The generator emits these tables as static Go data. ABI 1–3 used format 1,
+which has no public symbol column. Their Go metadata leaves `PublicSymbols` nil, so the root retains raw ID lookup
+for those modules.
 
 ## 4. Go side (`internal/engine`)
 
 ```go
-const ABIVersion = 3
+const ABIVersion = 4
 
 type Memory = interface{ Slice() *[]byte; Grow(delta, max int64) int64 } // alias: identical to wasm2go's type
 
@@ -211,7 +212,7 @@ Memory provider: reserve-then-commit, `VirtualAlloc` on Windows, `mmap` on Unix 
 recorded in the generator; mismatch = generation failure).
 
 Instance sequence (the `treesitter` package): `m := g.New(h)` → `SetLimit(m.Xmemory().Slice(), limit)` →
-`engine.Call(m.X_initialize)` → `Xtsg_abi_version() == g.ABI` (accepted: 1, 2 or 3) → `Xtsg_init() == 0` → export header magic/format (format 1 for ABI 1/2, format 2 for ABI 3); any failure =
+`engine.Call(m.X_initialize)` → `Xtsg_abi_version() == g.ABI` (accepted: 1–4) → `Xtsg_init() == 0` → export header magic/format (format 1 for ABI 1/2, format 2 for ABI 3/4); any failure =
 `ErrIncompatibleLanguage` (version) or `EngineFault`. A trap with `Refused` set maps to `ResourceLimit`; any other trap
 to `EngineFault`; both discard the instance (`Release`) and create a new one.
 
@@ -228,8 +229,8 @@ internal, so other modules cannot construct one).
 ## 6. Query additions (ABI 2)
 
 ABI 1's `Module` interface stays unchanged. ABI 2 additionally implements `engine.QueryModule`, an interface
-embedding `Module`; ABI 3 uses the same query extension. Instance creation rejects ABI 2/3 without these exports.
-Query block formats remain unchanged in ABI 3; its snapshot format change is described in section 2.
+embedding `Module`. Instance creation rejects ABI 2–4 modules without these exports. ABI 2–4 use the same query
+block formats.
 This separate extension is required so old grammar modules still compile against the new root.
 
 | C export (wasm32 opaque handles) | Go method | Meaning |

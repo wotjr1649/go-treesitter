@@ -8,7 +8,7 @@ var _ engine.Module = (*Module)(nil)
 
 // grammar is the static description handed to treesitter.NewLanguage; its Identity equals provenance.json.
 var grammar = engine.Grammar{
-	ABI:  3,
+	ABI:  4,
 	Name: "html",
 	New:  func(h *engine.Host) engine.Module { return New(h, h) },
 	Meta: engine.LangMeta{
@@ -57,8 +57,12 @@ var grammar = engine.Grammar{
 			"start_tag_repeat1",
 		},
 		SymbolFlags: []uint8{
-			0, 2, 0, 2, 2, 2, 2, 2, 2, 3, 3, 3, 2, 3, 2, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 3, 0, 3, 3, 3, 3,
+			1, 2, 0, 2, 2, 2, 2, 2, 2, 3, 3, 3, 2, 3, 2, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 1, 3, 3, 3, 3,
 			3, 3, 3, 3, 3, 3, 3, 0, 0,
+		},
+		PublicSymbols: []uint16{
+			0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 10, 14, 10, 16, 17, 17, 17, 17, 21, 22, 23,
+			24, 25, 26, 27, 28, 29, 30, 31, 31, 31, 34, 35, 36, 37, 38, 39, 40,
 		},
 		Fields: []string{
 			"",
@@ -89,9 +93,9 @@ var grammar = engine.Grammar{
 			"patches.2":                            "958e575866f75523227727d7b0aecd1ba542ce5b798731f375ba624c0f2aa4da",
 			"patches.inputs":                       "07888b05b53be5be6e7ff6c2e5f2f7163250b96940dcfef0c50c98e8d41a71bf",
 			"runtime.tree":                         "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-			"shim.tsg_abi.c":                       "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05",
+			"shim.tsg_abi.c":                       "fd567c8fc616aeb97b5db0331a15243912c6ba27f6b73d1c512738b68d087816",
 		},
-		RecipeSHA256: "c7f3929f2bd358533c91f57e227f33e0a8d04abfd1211b2d3609cd371850e556",
+		RecipeSHA256: "186066f60a6a0514e34b8ab830bbe77e95aa08387fad2578148d3d1484ccbb90",
 		Tools: map[string]string{
 			"binaryen":        "133",
 			"clang":           "23.1.0",

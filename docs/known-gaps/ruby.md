@@ -15,7 +15,7 @@ The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/ruby/provenance.json).
 
 - Source identity SHA-256: `8c67c012322d65abd4403f24cadf09059134e86faf91e6d17f1c5066555b6670`
-- Module provenance SHA-256: `20b8b709d917d978da59acc13963d689b63f34df2f7cff72d235bfb6d9d27ce9`
+- Module provenance SHA-256: `3206a00307c08752240d79a2dfabd61efeae269271bcfa21294e01766675a8a7`
 
 ## ruby-non-ascii-symbol
 

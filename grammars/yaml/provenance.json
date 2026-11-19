@@ -74,7 +74,7 @@
     "deterministic": true
   },
   "schema": 1,
-  "abi": 3,
+  "abi": 4,
   "name": "yaml",
   "module": "github.com/wotjr1649/go-treesitter/grammars/yaml",
   "identity": {
@@ -107,9 +107,9 @@
       "patches.3": "4f86acec8c084af292d697b3a1ea872d8337a57f5972d56020313111448d45f4",
       "patches.inputs": "23edf6290c52084edc5ff238628376f2f49cb0d87a774d528804d86b1eb010c5",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-      "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
+      "shim.tsg_abi.c": "fd567c8fc616aeb97b5db0331a15243912c6ba27f6b73d1c512738b68d087816"
     },
-    "RecipeSHA256": "2909e4b8974da4cacb0b9e33cc9e890accdc27e529436acbbf9ac2f30b17939c",
+    "RecipeSHA256": "808e6ffbde860a20ab78798e143b833a00bbff233040e63c3899595c6bb5c14f",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -132,8 +132,8 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "5014038967de4a9bcfd6dc8f726adab932af0783d765d034a529de9747554fa2",
-    "engine_gen.go": "f065410d0becaabf88fb9ae6cdf303fc714c51c24a6bc50ecb96a5c22f954438",
-    "wasm": "70d3bde9c90c1168cb83a5b73bda51e3dd39c734538dbf29af06cb1489902102",
-    "wasm.clang": "9960934e7d2ab31430a6dd1a585e53681f60cc17bbf100c966a17e539dae4c00"
+    "engine_gen.go": "01f2bea613bb112e2a751c6782aec4577afe370eee1cc73ec2aa391286624870",
+    "wasm": "15c189cef3b762fa74e93f99b1a8dbdad507eb228ddeeaed96bdd954a044f9a0",
+    "wasm.clang": "7d68a6a3a9484fcc67c659b0aa22cc7eb474dde4c3e254cfd9ef164727951861"
   }
 }

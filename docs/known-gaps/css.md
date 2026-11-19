@@ -15,7 +15,7 @@ The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/css/provenance.json).
 
 - Source identity SHA-256: `b9a0f4f0a51a022cf9c5dbb58c3a53b812db256ef13e389c253021fade559c07`
-- Module provenance SHA-256: `de2242a5f97018c57fe02d80134d61038a81c106713459f756e41fff3d34628d`
+- Module provenance SHA-256: `ab58ffc15e92df2b6f9efb5633085657f6de894e2cf8edfeb33ffdd5e9426432`
 
 ## css-non-latin1-identifier
 

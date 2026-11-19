@@ -16,7 +16,7 @@
     "deterministic": true
   },
   "schema": 1,
-  "abi": 3,
+  "abi": 4,
   "name": "kotlin",
   "module": "github.com/wotjr1649/go-treesitter/grammars/kotlin",
   "identity": {
@@ -40,9 +40,9 @@
       "patched.grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
       "patches.inputs": "d226542aef3fa6f7f771b5bd3fc8a10f6ee3a3b1d41d8c53fae6a4bd710313c1",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-      "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
+      "shim.tsg_abi.c": "fd567c8fc616aeb97b5db0331a15243912c6ba27f6b73d1c512738b68d087816"
     },
-    "RecipeSHA256": "de836bc8db5637d7751a119feb68b7dd70744fc69703c057dd225266fefa57f5",
+    "RecipeSHA256": "e4ea9931ef0e35a8603022da4aea9b407417bc0a9e3bde8548fefc5c3ea69885",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -65,8 +65,8 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "3ef89e401f6affea82f4d596071f7dfddea24d1c8325c523bc59f85ccb0d5faa",
-    "engine_gen.go": "648d76de85d8b2f6ad406e32a0265589b837841e857c4ebc51ce6f25f3032f5b",
-    "wasm": "3183f773e5c2c46f5b64369131877b361ed9732fc761d46e52c46158eda4b8ce",
-    "wasm.clang": "33bc1d68d7c3c80e1d4c4ebd0f2dbc74d640ae23bbb66037ec95a0e3385edc3c"
+    "engine_gen.go": "623ad946db1fe868d6e51acd2625b3dcbde6aff442444137f550425ff017680b",
+    "wasm": "59f126471c248cdc40ff0c8db9883adead283eb80827f694ef44bc13cb150fae",
+    "wasm.clang": "c7ac2259e5c1324fbbead6b4bc0d7142a96f5081ebb9d108e7dde3672ad6bc35"
   }
 }

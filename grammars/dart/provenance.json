@@ -16,7 +16,7 @@
     "deterministic": true
   },
   "schema": 1,
-  "abi": 3,
+  "abi": 4,
   "name": "dart",
   "module": "github.com/wotjr1649/go-treesitter/grammars/dart",
   "identity": {
@@ -40,9 +40,9 @@
       "patched.grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
       "patches.inputs": "af4ee8540a114ab373535f7e642e7221e8feeabcf6d5174f42f3b20503bb73c5",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-      "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
+      "shim.tsg_abi.c": "fd567c8fc616aeb97b5db0331a15243912c6ba27f6b73d1c512738b68d087816"
     },
-    "RecipeSHA256": "9576b5b3f7bbc88de91a28acb8815f61e45b7e39596d59c15451bb0c1290526a",
+    "RecipeSHA256": "eb7631ca96b0d0781e81bc12a11e07286635f2a2e6c065a5c1ccc638515cdb27",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -65,8 +65,8 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "f2234b8e689746f418a13e627ac032cf21bf892e6ff9aaa97bec46e5ec8bf517",
-    "engine_gen.go": "9be22ca604af9d1fc1cdb9855fcb74ce1557980dec8fcf96f8132c6ffc207ccf",
-    "wasm": "582b3886321325f212051d4b6bfc5d6899eb5bddd90b9da44d37170a340588a0",
-    "wasm.clang": "2b01399914af38fdef1b2ddb638eba2fbbb292ecc0e85d852f69734aa0b3ea05"
+    "engine_gen.go": "2b34cc96f746ce2418dcfda0e619766a6d0b10b7cfaf7862d70becfb38bcaa79",
+    "wasm": "e4dbf1e13efa7def3f7ed69010e321d4ef8d17f059610825fe34755f8626622e",
+    "wasm.clang": "b562cca4a134da7466bddeab077d30dce5a5e9c77424f9c4d2bcc460e04c2df1"
   }
 }

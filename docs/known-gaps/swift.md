@@ -15,7 +15,7 @@ The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/swift/provenance.json).
 
 - Source identity SHA-256: `40352a892de6474434464c097d8fac4a30c1851a238faa20a870c534993c65b0`
-- Module provenance SHA-256: `fd8e84edbd3d53e70006ad44084e8403e912728e22c0839a5f92e9dc9cbaa280`
+- Module provenance SHA-256: `81cacc75d8f1cf8fe73560965db551448f6dc549ca8931cc6563a92b0b9edcf2`
 
 ## swift-non-ascii-statement-label
 

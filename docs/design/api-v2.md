@@ -33,9 +33,9 @@ engine ABI version and snapshot block magic/version and returns `ErrIncompatible
 module against the newest root. Language metadata (symbol/field names, identity) is static Go data; no instance is
 needed to read it.
 
-The root accepts engine ABI 1, 2 and 3 grammar modules. ABI 1 supports parsing; ABI 2 adds queries; ABI 3 adds
-single-child field-lookup exceptions through snapshot format 2. ABI 1/2 modules keep their older direct-child field lookup
-for alias-inherited fields; upgrading the root alone cannot supply the missing snapshot exceptions.
+The root accepts engine ABI 1–4 grammar modules. ABI 1 supports parsing. ABI 2 adds queries. ABI 3 adds
+single-child field-lookup exceptions through snapshot format 2. ABI 4 adds public symbol IDs to language metadata.
+ABI 1/2 modules keep direct-child field lookup for alias-inherited fields.
 
 ## 3. Parsing
 
@@ -109,7 +109,7 @@ func EditFor(old, new []byte, start, oldEnd, newEnd uint32) InputEdit  // O(n); 
 
 The snapshot owns the source: by default one copy (about 0.07 ms per MB; +5–22 % of the snapshot's own memory, no
 disk use); with `ParseOwned` no copy. Struct-of-arrays, 25 B/node (previously 41) including `descendantEnd` and `childCount`
-for O(1) subtree skips and child counts, plus sparse field-lookup exceptions in ABI 3 snapshots.
+for O(1) subtree skips and child counts, plus sparse field-lookup exceptions in ABI 3/4 snapshots.
 `StartPoint`, `EndPoint` and point-range lookups derive LF rows and byte columns from the byte offsets using the
 snapshot's shared `Lines()` index: O(source bytes) on first use, O(log lines) per point. Its lazy `[]uint32` line
 starts cost `4 * (LF count + 1)` bytes (at most `len(source) + 1` entries), plus fixed object/allocator overhead;
@@ -136,9 +136,13 @@ func (Node) AppendText(dst []byte) []byte
 func (Node) String() string        // S-expression, for tests and debugging
 func (*Language) SymbolForName(name string, named bool) (Symbol, bool)
 ```
-`Index` (ADR-0011) remains for repeated position/kind lookups and gains `OfSymbol`.
+`SymbolForName` selects the first visible or supertype raw symbol in raw ID order with the requested name and
+namedness. With ABI 4 grammar modules it returns that symbol's public ID, in the same ID space as `Node.Symbol()`,
+`SymbolName` and `Index.OfSymbol` (ADR-0011). Named `ERROR` resolves to `ErrorSymbol`. ABI 1–3 grammar modules
+retain the raw ID lookup. A name can have multiple public IDs or be shared by named and anonymous nodes.
+`Index.OfType` yields all nodes with the requested `Kind()`, in preorder.
 
-With an ABI 3 grammar module, `ChildByFieldName` follows C's `ts_node_child_by_field_id`: an inherited field may
+With an ABI 3 or 4 grammar module, `ChildByFieldName` follows C's `ts_node_child_by_field_id`: an inherited field may
 refer to a descendant inside a visible alias rather than a direct child. The snapshot stores only the exceptions
 to selecting the first direct child with the matching cursor field. ABI 1/2 snapshots have no exception table and
 retain that direct-child rule, so they can differ from C on alias-inherited fields. `Node.Field()` continues to

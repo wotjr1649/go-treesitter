@@ -15,7 +15,7 @@
     "deterministic": true
   },
   "schema": 1,
-  "abi": 3,
+  "abi": 4,
   "name": "java",
   "module": "github.com/wotjr1649/go-treesitter/grammars/java",
   "identity": {
@@ -38,9 +38,9 @@
       "patched.grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
       "patches.inputs": "52beb944920d9db509b15241b71cad41d5e3573181be3c7cd336859fcc370dbf",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-      "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
+      "shim.tsg_abi.c": "fd567c8fc616aeb97b5db0331a15243912c6ba27f6b73d1c512738b68d087816"
     },
-    "RecipeSHA256": "3fab46aee9b4ae83b35757a04b2eacc9da17db5214f2c55bb8b8acff3ab512c7",
+    "RecipeSHA256": "7616990f368f0da01760c91a5f393e8f423a308840ede2a49c5c66de666ae842",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -63,8 +63,8 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "474eb84e784c5888ca715a0cb308b203a062b3f6b82ff419658d26a41aea9611",
-    "engine_gen.go": "4f1902f252110b3733cf26f6d663db34d7c520d942caed10ce8c5ae428cc06cc",
-    "wasm": "b6694a3c3fa91eee538910379b84b079abe1b17120ee29bec77a6698e1d75eab",
-    "wasm.clang": "16958f325dfc0ebfb5c424301d9dd99751dceee36ad2db4ecdc91e6c2aa6c4c1"
+    "engine_gen.go": "7a4118b6b5cf0499637cf36ac9935d1ec29b86173e4e2ca53e1780215da94b09",
+    "wasm": "617a41aa10d1e45897a309343ac0231a7e08d6f6b9c918d693ed30bb7486e156",
+    "wasm.clang": "f158fa485977bdc547349fd95da43d21823d809229b874f64cc32ea3766638fd"
   }
 }

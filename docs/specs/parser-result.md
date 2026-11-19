@@ -80,8 +80,8 @@ UTF-8 source is not converted and both return the offset unchanged (clamped). Se
 
 ## Field lookup and grammar compatibility
 
-The root accepts engine ABI 1, 2 and 3 grammar modules. ABI 1 supports parsing, ABI 2 adds queries and ABI 3 adds
-snapshot field-lookup exceptions. With ABI 3, `Node.ChildByFieldName` follows C's `ts_node_child_by_field_id`,
+The root accepts engine ABI 1-4 grammar modules. ABI 1 supports parsing, ABI 2 adds queries, ABI 3 adds snapshot
+field-lookup exceptions and ABI 4 adds public symbol IDs to language metadata (`SymbolForName`). With ABI 3 or 4, `Node.ChildByFieldName` follows C's `ts_node_child_by_field_id`,
 including inherited fields whose result is inside a visible alias rather than a direct child. The snapshot owns
 the exception table; lookup remains valid after parser closure and never calls into the engine.
 

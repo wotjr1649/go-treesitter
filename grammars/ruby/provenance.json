@@ -51,7 +51,7 @@
     "deterministic": true
   },
   "schema": 1,
-  "abi": 3,
+  "abi": 4,
   "name": "ruby",
   "module": "github.com/wotjr1649/go-treesitter/grammars/ruby",
   "identity": {
@@ -77,9 +77,9 @@
       "patches.2": "fb68546f8a63f2f7abd685b05fa8d1d949c35d170b0fffc34bc05177fc16f7c8",
       "patches.inputs": "2a44fcedaadb61ef7e32c64ffc70fa483ee007dcfbcb6cf004182f601cb5e959",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-      "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
+      "shim.tsg_abi.c": "fd567c8fc616aeb97b5db0331a15243912c6ba27f6b73d1c512738b68d087816"
     },
-    "RecipeSHA256": "f1c997b326b456d1599b6111ebb27a606aa32a91698f3f2e64d093a1f4300eec",
+    "RecipeSHA256": "f9fd17fc81aca9a7dc69e54e02b55b0bdd4fb1801eed8c992fedaeac2e465d49",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -102,8 +102,8 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "78a47f48e7c066c303e5f4e67c4ba1f8633cd129f935852aaf9f77978f459c27",
-    "engine_gen.go": "da1c075d1626f74f90f3f890a22d3fc9615bde4a83f9f0d6d49330e1e474532f",
-    "wasm": "565c7a855bb75da787b6600ae9be22451fe4be2317dd5fab223f7939388fb362",
-    "wasm.clang": "0f80e0cf65d9e90bfb9838d3be4724e0a889c6c9a8f0ac143a5d65fb24b520e4"
+    "engine_gen.go": "0aac55009bfdb2e688fcf7791bf4bf49aa02b60dbcd0b25531da74327bd34f9e",
+    "wasm": "7941b7a97ca8ffffd202e32adf2cd298f92b46ba226bf82ed299e91f80d9c5d5",
+    "wasm.clang": "f217223cf002e65ada37bba3781b1b5c32d3e9cd36632386835175ec654001a0"
   }
 }
