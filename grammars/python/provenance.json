@@ -35,7 +35,7 @@
     "deterministic": true
   },
   "schema": 1,
-  "abi": 3,
+  "abi": 4,
   "name": "python",
   "module": "github.com/wotjr1649/go-treesitter/grammars/python",
   "identity": {
@@ -57,9 +57,9 @@
       "patches.1": "00163049bb971eb8a24d1f6a3bb9445259dffb68202992676a84b792d379c598",
       "patches.inputs": "6c9863e01abaacfc69eb80d254b11cd647d26331768d32b7163427ac0592857a",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-      "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
+      "shim.tsg_abi.c": "fd567c8fc616aeb97b5db0331a15243912c6ba27f6b73d1c512738b68d087816"
     },
-    "RecipeSHA256": "bb042b517c44265f6ef072d04768957b8266e0bbf0b16960194db640a237f418",
+    "RecipeSHA256": "1e7dc91b9465ef88622ac88bd1759c915ae9c053e954e8c1b725660cb792fcc3",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -82,8 +82,8 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "38e3846f5ca08b8e51baba61f6980d1fe6655c7369b947f126c6cbff80efaaab",
-    "engine_gen.go": "94e03b2ca61d2b17dfc3e7eb247cbed199da5d20fa3488b2f518d98d77d3d02d",
-    "wasm": "9bca9ac95e7e93756efa7a9f2bca11a79b13eb775fc9181d0c75d2ad387bddf4",
-    "wasm.clang": "04606d455292ee4cb3e7ab98a0b7f5b57799c455acb74b8962e58a15d7407da7"
+    "engine_gen.go": "318e05419ae1a957ac4cc1f8d703b68588eba915ee1713fbcd5f7232d52bd3d3",
+    "wasm": "334a6ac71858f8c6045b7b8452f7307048deb3b9cb6234063811de6227d69182",
+    "wasm.clang": "9900e2c58bcd97269f3eff7284cfb31ddd2414934f21aa1dccd5932ea49cca25"
   }
 }

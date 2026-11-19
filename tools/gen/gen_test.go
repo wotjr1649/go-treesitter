@@ -58,18 +58,27 @@ func TestParseMeta(t *testing.T) {
 		return
 	}
 	// symbols "end" and "a" (pool "enda"), fields "" and ""
-	blk := append([]byte("TSGM"), u(1, 14, 2, 2, 4)...)
+	blk := append([]byte("TSGM"), u(2, 14, 2, 2, 4)...)
 	blk = append(blk, u(0, 3, 4)...) // symOff
 	blk = append(blk, u(4, 4, 4)...) // fldOff
+	blk = append(blk, 1, 0, 1, 0)    // publicSymbols
 	blk = append(blk, 3, 7)          // symFlags
 	blk = append(blk, "enda"...)
-	if _, err := parseMeta(blk); err != nil {
+	m, err := parseMeta(blk)
+	if err != nil {
 		t.Fatal(err)
 	}
-	m, err := parseMeta(append(append([]byte{}, blk...), 0))
-	if err == nil {
-		t.Fatalf("trailing byte accepted: %+v", m)
+	if len(m.PublicSymbols) != 2 || m.PublicSymbols[0] != 1 || m.PublicSymbols[1] != 1 || m.Symbols[1] != "a" {
+		t.Fatalf("bad public symbol metadata: %+v", m)
 	}
+	if _, err := parseMeta(append(append([]byte{}, blk...), 0)); err == nil {
+		t.Fatal("trailing byte accepted")
+	}
+	blk[48] = 2
+	if _, err := parseMeta(blk); err == nil {
+		t.Fatal("out-of-range public symbol accepted")
+	}
+	blk[48] = 1
 	blk[0] = 'X'
 	if _, err := parseMeta(blk); err == nil {
 		t.Fatal("bad magic accepted")

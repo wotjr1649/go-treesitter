@@ -13,6 +13,7 @@
  *                                                      never does): "#tsg-query/1 patterns=<n> captures=<n>", then per match "m\t<pattern>\t<n>"
  *                                                      and per capture "c\t<capture>\t<node preorder index>\t<symbol>\t<start>\t<end>";
  *                                                      a rejected query prints "#tsg-query/1 error offset=<o> type=<t>" (exit 0)
+ *   <exe> symbols                                      visible/supertype symbol rows: raw ID, public ID, lookup ID, named, hex name
  *   <exe> fields <file>                                ts_node_child_by_field_name for every visible node (cursor preorder) and every
  *                                                      field name of the language: "#tsg-fields/1 nodes=<n> fields=<f>", then one line per
  *                                                      non-null result "<node index>\t<field>\t<result>" in node, then field-id order; result is
@@ -39,6 +40,7 @@
 #include <time.h>
 #endif
 #include "tree_sitter/api.h"
+#include "language.h"
 
 // Scanners store lookahead in plain char (bash/ruby heredoc delimiters); the engine is wasm32 clang, where char is
 // signed. Hosts with unsigned char (AArch64 Linux) must build with -fsigned-char or the reference diverges.
@@ -347,6 +349,29 @@ static int fields_cmd(const char *spath) {
   return emit(out);
 }
 
+static int symbols_cmd(void) {
+  const TSLanguage *lang = TSG_LANG_FN();
+  Buf out = {0};
+  str(&out, "#tsg-symbols/1\n");
+  uint32_t count = ts_language_symbol_count(lang);
+  for (uint32_t i = 0; i < count; i++) {
+    TSSymbolMetadata meta = ts_language_symbol_metadata(lang, (TSSymbol)i);
+    if (!meta.visible && !meta.supertype) continue;
+    const char *name = ts_language_symbol_name(lang, (TSSymbol)i);
+    TSSymbol found = ts_language_symbol_for_name(lang, name, (uint32_t)strlen(name), meta.named);
+    u32(&out, i); str(&out, "\t");
+    u32(&out, ts_language_public_symbol(lang, (TSSymbol)i)); str(&out, "\t");
+    u32(&out, found); str(&out, meta.named ? "\t1\t" : "\t0\t");
+    for (const unsigned char *p = (const unsigned char *)name; *p; p++) {
+      const char *hex = "0123456789abcdef";
+      char pair[] = {hex[*p >> 4], hex[*p & 15]};
+      put(&out, pair, 2);
+    }
+    str(&out, "\n");
+  }
+  return emit(out);
+}
+
 int main(int argc, char **argv) {
 #ifdef _WIN32
   _setmode(_fileno(stdout), _O_BINARY);
@@ -359,9 +384,10 @@ int main(int argc, char **argv) {
   }
   if (argc == 4 && !strcmp(cmd, "query")) return query_cmd(argv[2], argv[3]);
   if (argc == 3 && !strcmp(cmd, "fields")) return fields_cmd(argv[2]);
+  if (argc == 2 && !strcmp(cmd, "symbols")) return symbols_cmd();
   int edit = !strcmp(cmd, "edit"), cr = !strcmp(cmd, "changed-ranges"), ef = !strcmp(cmd, "edit-fields");
   if (!((argc == 3 && !strcmp(cmd, "dump")) || (argc == 7 && (edit || cr || ef)))) {
-    fputs("usage: <exe> dump <file> | edit|changed-ranges|edit-fields <old> <new> <start> <old_end> <new_end> | speed <file> <reps> | corpus <list> <reps> | query <query-file> <source> | fields <file>\n", stderr);
+    fputs("usage: <exe> dump <file> | edit|changed-ranges|edit-fields <old> <new> <start> <old_end> <new_end> | speed <file> <reps> | corpus <list> <reps> | query <query-file> <source> | fields <file> | symbols\n", stderr);
     return 2;
   }
   uint32_t n1, n2 = 0;

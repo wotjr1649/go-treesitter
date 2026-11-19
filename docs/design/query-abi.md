@@ -1,4 +1,4 @@
-# Queries (v0.1): engine ABI 2/3 and Go API — design draft
+# Queries (v0.1): engine ABI 2–4 and Go API — design draft
 
 Status: draft by the main session, 2026-11-14. Inputs: `docs/design/api-v2.md` §8 (signatures fixed), `engine-abi.md`
 (current ABI), tree-sitter v0.27.2 `api.h` (query and query-cursor API, `ts_query_cursor_exec_with_options` progress
@@ -10,9 +10,8 @@ callback, `ts_tree_cursor_current_descendant_index`).
 - Non-goals for v0.1: query-level caching across parsers, `#set!`/`#is?` semantics beyond exposing them as properties.
 
 ## ABI v2 (additions only; every v1 export keeps its meaning)
-`ABIVersion = 3`. The root accepts grammar modules built for ABI 1, 2 and 3; queries need ABI 2 or 3
-(`ErrQueryUnsupported` for ABI 1). ABI 3 retains these query exports and block formats while adding snapshot
-format 2 field exceptions, so grammar `v0.1.0` modules keep parsing with a newer root.
+The root accepts grammar modules built for ABI 1–4. Queries need ABI 2 or later (`ErrQueryUnsupported` for ABI 1).
+ABI 3/4 retain these query exports and block formats and use snapshot format 2 for field exceptions.
 
 | Export | Semantics |
 |---|---|

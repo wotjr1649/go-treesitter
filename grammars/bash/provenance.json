@@ -35,7 +35,7 @@
     "deterministic": true
   },
   "schema": 1,
-  "abi": 3,
+  "abi": 4,
   "name": "bash",
   "module": "github.com/wotjr1649/go-treesitter/grammars/bash",
   "identity": {
@@ -60,9 +60,9 @@
       "patches.1": "e5d01591adc75c082be73e7aeab9d67eed389259399ff808813495f31ebd831a",
       "patches.inputs": "985d8b7815b518389349ae20c68023fa045e127d9f4a587588af0525320b249b",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-      "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
+      "shim.tsg_abi.c": "fd567c8fc616aeb97b5db0331a15243912c6ba27f6b73d1c512738b68d087816"
     },
-    "RecipeSHA256": "8c64ec9d8cff268df40f291b2214c59f17559aa60697dfc7d0cfc06eb8937beb",
+    "RecipeSHA256": "40bcc77edc8008af6f54ed43ae87de2827adaadb25e06ae9e9214007096dbcdb",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -85,8 +85,8 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "bb9d7ba57a2794ffac2a811518ac53a0b89c79f05e3e13eb228d04166d6c9852",
-    "engine_gen.go": "ef0b9493218c65195c1693e215e787303475c91ffc46ac6539dbce4fc0e1d48d",
-    "wasm": "0d9fee6504718aa421e354956dcb5e3f8abd54bcdcef5ccad6cf9e8054b4cc02",
-    "wasm.clang": "be288f9a7bcb8da63aab099bcc2af6c0f8261be2ae3c9e1cc557e0f322f1f0d5"
+    "engine_gen.go": "51870e211d4126a4165afe2e1480cff1fdcf433459a75f8fb10c9da12868257b",
+    "wasm": "fc6efa16e59eab3f8fb0fba5ff7e3050d37cba294722af489c3bd784bf23c30a",
+    "wasm.clang": "74ed5f74a3853f775465d9322211f093f64403527c0168bb3868cb455a03308c"
   }
 }

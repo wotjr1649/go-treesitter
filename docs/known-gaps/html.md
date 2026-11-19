@@ -15,7 +15,7 @@ The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/html/provenance.json).
 
 - Source identity SHA-256: `ff08eeb173be1f3df2ba3c4d3d831556de49cfaa77059d8823a91a97bbc860f0`
-- Module provenance SHA-256: `303c74c70a576f1c76ca6aa6ceb317a457acd2a7adf5b7004161072b7df60f8f`
+- Module provenance SHA-256: `73c2914d5605bf0c7a537c440136ea752face8aa1f98daab1391235b061fddb7`
 
 ## html-hangul-tag-low-byte-mismatch
 

@@ -105,6 +105,13 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
 
 ## Unreleased (after v0.5.0)
 
+- **Public symbol IDs (#77, engine ABI 4).** Upgrade the root and the grammar modules you use. With the newer
+  grammars, `SymbolForName(name, named)` returns the same kind of ID as `Node.Symbol()` and `Index.OfSymbol`.
+  Refresh cached IDs from the active grammar using the original name and namedness. Rebuild caches that store
+  only numeric IDs. Previous releases could return a raw ID that had no matching nodes for an aliased kind.
+  Use `Index.OfType(name)` for every node with that name, including kinds with multiple public IDs. ABI 1–3 grammar modules still
+  load with the new root and retain their raw ID lookup.
+
 - **Ruby non-ASCII global variables.** Forms such as `$한글 = 1` now parse as assignments. A regular global name
   whose ASCII start (`$_`, `$a`, …) is directly followed by non-ASCII characters is now one `global_variable`
   spanning the whole name including `$`, wherever it appears. Such input used to parse without errors in two ways.
@@ -117,8 +124,8 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
 
 - **Go 1.26 `new(expr)`** accepts `new(42)` with an `int_literal` under `argument_list` in place of an
   error. The Go parser also assigns new numeric IDs to some existing symbols. For example, the public
-  `argument_list` symbol moves from 174 to 175. Resolve symbols against the active grammar and recompute
-  cached subtree hashes after upgrading. The node-type names and named fields are the same.
+  `argument_list` symbol moves from 174 to 175. Use `SymbolForName` with the updated Go grammar (ABI 4) to refresh
+  cached symbol IDs, and recompute cached subtree hashes after upgrading. The node-type names and named fields are the same.
   [Schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-go-new-expression-patch)
 
 - **Rust block comments:** the scanner compares full Unicode code points when recognizing block comment

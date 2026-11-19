@@ -11,7 +11,7 @@
 #include "language.h"
 #include "subtree.h"
 
-#define TSG_ABI_VERSION 3u
+#define TSG_ABI_VERSION 4u
 
 #ifndef TSG_LANG_FN
 #error "define TSG_LANG_FN"
@@ -352,23 +352,25 @@ out:
   return k;
 }
 
-// ---- language meta block (format 1), read once by the generator ----
-// "TSGM", u32 format=1, u32 language_abi, u32 nSym, u32 nField (ids 0..field_count, id 0 = ""), u32 poolBytes;
-// symOff u32[nSym+1], fldOff u32[nField+1], symFlags u8[nSym] (1 named, 2 visible, 4 supertype), then the name pool.
+// ---- language meta block (format 2), read once by the generator ----
+// "TSGM", u32 format=2, u32 language_abi, u32 nSym, u32 nField (ids 0..field_count, id 0 = ""), u32 poolBytes;
+// symOff u32[nSym+1], fldOff u32[nField+1], publicSymbols u16[nSym],
+// symFlags u8[nSym] (1 named, 2 visible, 4 supertype), then the name pool.
 uint8_t *tsg_lang_meta(void) {
   const TSLanguage *lang = TSG_LANG_FN();
   uint32_t nSym = ts_language_symbol_count(lang), nField = ts_language_field_count(lang) + 1;
   uint32_t pool = 0;
   for (uint32_t i = 0; i < nSym; i++) { const char *s = ts_language_symbol_name(lang, (TSSymbol)i); pool += s ? (uint32_t)strlen(s) : 0; }
   for (uint32_t i = 1; i < nField; i++) { const char *s = ts_language_field_name_for_id(lang, (TSFieldId)i); pool += s ? (uint32_t)strlen(s) : 0; }
-  uint32_t total = 24 + 4 * (nSym + 1) + 4 * (nField + 1) + nSym + pool;
+  uint32_t total = 24 + 4 * (nSym + 1) + 4 * (nField + 1) + 3 * nSym + pool;
   uint8_t *blk = (uint8_t *)malloc(total);
   if (!blk) return NULL;
   memcpy(blk, "TSGM", 4);
   uint32_t *h = (uint32_t *)(blk + 4);
-  h[0] = 1; h[1] = ts_language_abi_version(lang); h[2] = nSym; h[3] = nField; h[4] = pool;
+  h[0] = 2; h[1] = ts_language_abi_version(lang); h[2] = nSym; h[3] = nField; h[4] = pool;
   uint32_t *symOff = (uint32_t *)(blk + 24), *fldOff = symOff + nSym + 1;
-  uint8_t *flags = (uint8_t *)(fldOff + nField + 1);
+  uint16_t *publicSymbols = (uint16_t *)(fldOff + nField + 1);
+  uint8_t *flags = (uint8_t *)(publicSymbols + nSym);
   char *poolp = (char *)(flags + nSym);
   uint32_t pp = 0;
   for (uint32_t k = 0; k < nSym; k++) {
@@ -376,8 +378,9 @@ uint8_t *tsg_lang_meta(void) {
     const char *s = ts_language_symbol_name(lang, (TSSymbol)k);
     uint32_t l = s ? (uint32_t)strlen(s) : 0;
     memcpy(poolp + pp, s ? s : "", l); pp += l;
-    TSSymbolType ty = ts_language_symbol_type(lang, (TSSymbol)k);
-    flags[k] = ty == TSSymbolTypeRegular ? 3 : ty == TSSymbolTypeAnonymous ? 2 : ty == TSSymbolTypeSupertype ? 7 : 0;
+    TSSymbolMetadata meta = ts_language_symbol_metadata(lang, (TSSymbol)k);
+    publicSymbols[k] = ts_language_public_symbol(lang, (TSSymbol)k);
+    flags[k] = (meta.named ? 1 : 0) | (meta.visible ? 2 : 0) | (meta.supertype ? 4 : 0);
   }
   symOff[nSym] = pp;
   fldOff[0] = pp;

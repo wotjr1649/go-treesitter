@@ -34,7 +34,7 @@
     "deterministic": true
   },
   "schema": 1,
-  "abi": 3,
+  "abi": 4,
   "name": "golang",
   "module": "github.com/wotjr1649/go-treesitter/grammars/golang",
   "identity": {
@@ -54,9 +54,9 @@
       "patches.1": "f056aa1e32ea6da46d223f9ce16b9c04d1c5eee3d0bd86f7316d9a187879ab3b",
       "patches.inputs": "59faf0c6cf5d67f9774c6d2800fa8b0142ba9c33237ca62355c59602aed27572",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-      "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
+      "shim.tsg_abi.c": "fd567c8fc616aeb97b5db0331a15243912c6ba27f6b73d1c512738b68d087816"
     },
-    "RecipeSHA256": "bb49b3aa0a93195a2f1806331415a3d435c8871607b8a5806ba4c0cdf6689c30",
+    "RecipeSHA256": "079c59ccfbcdd611f5a38b9ff9c701cea440e87bf83deb8f76c74244c90c6587",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -79,8 +79,8 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "27771176f1fded86d89af5ffeea7317bee4ada740dd26164b37e757294268f3f",
-    "engine_gen.go": "da42c75dd54b39b7022fdf288e453f8142d12773fb1a7b1595dfc46b102aecbe",
-    "wasm": "4c3061f1685a4cc36dfa94d446f5baaf837c669f31e35f8c5d75feb787a8c6e0",
-    "wasm.clang": "ebbbac71ce2159897d2f17615bf73c2638040259d7362a35624943f3aba3f978"
+    "engine_gen.go": "61983631d420f1dad1a4e1ef5f3fa56f7463f8b7120ae9d5b472e9b30cbd233e",
+    "wasm": "25c089def41244c5d12f8fd55ed302ed65905f930d6b2db4166c6fd73c90f462",
+    "wasm.clang": "42cd4e5b9e1e646bae4511a1b0d4a04f7fd01fcc8cc1fd6d6094040f0ffb1166"
   }
 }

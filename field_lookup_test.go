@@ -99,7 +99,7 @@ func TestFieldLookupDifferentDirectTarget(t *testing.T) {
 }
 
 func TestErrorFieldLookup(t *testing.T) {
-	for _, abi := range []uint32{1, 2, engine.ABIVersion} {
+	for _, abi := range []uint32{1, 2, 3, engine.ABIVersion} {
 		t.Run(string(rune('0'+abi)), func(t *testing.T) {
 			fl := newFakeLang(func(_ *fakeLang, f *fakeModule) {
 				f.abi = int32(abi)
@@ -198,12 +198,12 @@ func TestFieldLookupLegacyABI(t *testing.T) {
 	}
 }
 
-func TestFieldLookupABI3RejectsFormat1(t *testing.T) {
+func TestFieldLookupCurrentABIRejectsFormat1(t *testing.T) {
 	fl := newFakeLang(func(_ *fakeLang, f *fakeModule) { f.exportFormat = 1 })
 	p, err := NewParser(fl.lang)
 	if p != nil {
 		p.Close()
-		t.Fatal("ABI 3 module with format 1 created a parser")
+		t.Fatalf("ABI %d module with format 1 created a parser", engine.ABIVersion)
 	}
 	wantPE(t, err, IncompatibleLanguage, false)
 }

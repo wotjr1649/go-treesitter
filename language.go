@@ -21,7 +21,7 @@ type Language struct {
 	g *engine.Grammar
 
 	once   sync.Once
-	named  map[string]Symbol // visible/supertype symbols by name, first id wins (C: ts_language_symbol_for_name)
+	named  map[string]Symbol // first visible/supertype raw ID determines the public ID
 	anon   map[string]Symbol
 	byName map[string][]Symbol // every symbol id carrying the name (named, anonymous, hidden)
 	fields map[string]FieldID
@@ -50,7 +50,11 @@ func (l *Language) index() {
 				set = l.named
 			}
 			if _, dup := set[name]; !dup {
-				set[name] = Symbol(i)
+				s := Symbol(i)
+				if m.PublicSymbols != nil {
+					s = Symbol(m.PublicSymbols[i])
+				}
+				set[name] = s
 			}
 		}
 		l.byName = make(map[string][]Symbol, len(m.Symbols)+1)
@@ -76,8 +80,10 @@ func (l *Language) SymbolCount() int { return len(l.g.Meta.Symbols) }
 // FieldCount is the number of field ids including the empty id 0.
 func (l *Language) FieldCount() int { return len(l.g.Meta.Fields) }
 
-// SymbolForName finds a visible symbol by name. Named and anonymous symbols may share a name, so the kind is part of
-// the key. "ERROR" with named=true is ErrorSymbol. The second result is false when there is no such symbol.
+// SymbolForName returns the public ID of the first visible or supertype symbol with the given name and namedness,
+// in raw ID order. Use the result with Node.Symbol and Index.OfSymbol. Use Index.OfType to find all nodes of a name
+// that has more than one public ID. "ERROR" with named=true is ErrorSymbol. The second result is false on no match.
+// Grammar modules with engine ABI 1–3 provide raw IDs for this lookup.
 func (l *Language) SymbolForName(name string, named bool) (Symbol, bool) {
 	if named && name == "ERROR" {
 		return ErrorSymbol, true
@@ -91,7 +97,7 @@ func (l *Language) SymbolForName(name string, named bool) (Symbol, bool) {
 	return s, ok
 }
 
-// SymbolName is the name of s ("" when s is not a symbol of this language).
+// SymbolName is the name of s (for example, a public ID from Node.Symbol). It returns "" for an unknown ID.
 func (l *Language) SymbolName(s Symbol) string {
 	if s == ErrorSymbol {
 		return "ERROR"

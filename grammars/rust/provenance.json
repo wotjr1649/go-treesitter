@@ -35,7 +35,7 @@
     "deterministic": true
   },
   "schema": 1,
-  "abi": 3,
+  "abi": 4,
   "name": "rust",
   "module": "github.com/wotjr1649/go-treesitter/grammars/rust",
   "identity": {
@@ -60,9 +60,9 @@
       "patches.1": "55482130e86ed22ad48a1a6a3a8910f5a7aed106552b6a7fca6f612d71ae2bb9",
       "patches.inputs": "80e78fe29ed33f741ad1367e11ae7709163b5010a9f66cbcfd801f15d3f9929f",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-      "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
+      "shim.tsg_abi.c": "fd567c8fc616aeb97b5db0331a15243912c6ba27f6b73d1c512738b68d087816"
     },
-    "RecipeSHA256": "c54f36dc2b7488b778bc730b584bd93ea89b103e46e67913442d5ac264c5a80f",
+    "RecipeSHA256": "9b80439957447ea462fa513c3fe65579555aec4a8b6f82fe7b2173c16ef5a8bd",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -85,8 +85,8 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "d22985f9156f15418f20f3ca1b9a26fb1538311e2597762691ea6e307b8a4f02",
-    "engine_gen.go": "a9647e316567bfc02e692255a17e40b850d1b4c933469bfd2239b983e394e90b",
-    "wasm": "c58a3070968765931bdfd4b1baeb55586bf3304de1c0b1d70448992f550cda4d",
-    "wasm.clang": "3c1f670d2b55da344d4f7f60bd41efc4747b38efc3eb6c59b63aa61e64f9f152"
+    "engine_gen.go": "bfe84aeb85a35daca99a9f983831e4dd4c2aec126ef0ba828c588170ec165262",
+    "wasm": "430a8a647e798e322870ab6aeba50cdeb1b85a7d7136433dad1e7eab49401e3c",
+    "wasm.clang": "d93e83e0f52c9e4f0a28b25a68cd1d6a777d46201fedac0235a5aff21b15c454"
   }
 }

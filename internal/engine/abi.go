@@ -7,15 +7,15 @@ import (
 	"sync/atomic"
 )
 
-// ABIVersion is the newest engine ABI. ABI 1 and 2 remain supported with their original snapshot format.
-const ABIVersion = 3
+// ABIVersion is the newest engine ABI. ABI 1 through 3 remain supported.
+const ABIVersion = 4
 
 // Export chunk buffer header (snapshot block format) and language meta block identifiers.
 const (
 	ExportMagic  = "TSGX"
 	ExportFormat = 2
 	MetaMagic    = "TSGM"
-	MetaFormat   = 1
+	MetaFormat   = 2
 )
 
 // Memory is an alias so that it is identical to the interface type wasm2go emits.
@@ -93,10 +93,11 @@ type Grammar struct {
 
 // LangMeta is the language's static name data (from the meta block at generation time).
 type LangMeta struct {
-	LanguageABI uint32
-	Symbols     []string
-	SymbolFlags []uint8  // MetaNamed | MetaVisible | MetaSupertype
-	Fields      []string // index 0 is ""
+	LanguageABI   uint32
+	Symbols       []string
+	SymbolFlags   []uint8  // MetaNamed | MetaVisible | MetaSupertype
+	PublicSymbols []uint16 // raw ID to public ID; nil in ABI 1–3
+	Fields        []string // index 0 is ""
 }
 
 const (

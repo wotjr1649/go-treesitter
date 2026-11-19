@@ -16,7 +16,7 @@
     "deterministic": true
   },
   "schema": 1,
-  "abi": 3,
+  "abi": 4,
   "name": "powershell",
   "module": "github.com/wotjr1649/go-treesitter/grammars/powershell",
   "identity": {
@@ -40,9 +40,9 @@
       "patched.grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
       "patches.inputs": "691e47a5c964a07d328974e110dc20665f8cd72e59e9912f40e34db9fa042455",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-      "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
+      "shim.tsg_abi.c": "fd567c8fc616aeb97b5db0331a15243912c6ba27f6b73d1c512738b68d087816"
     },
-    "RecipeSHA256": "ff9fc55da6dcc85c316dde276088aec3aaae350c8218d56fc159c4b0649ca419",
+    "RecipeSHA256": "f0b9d71a9a0618fae6f1bf1a066068e51085b5f16de3b2e56a45867e4c2d1455",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -65,8 +65,8 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "3bb226f021450329a794771446b3849f807bc4051bbb4addf71e86f7813a81cb",
-    "engine_gen.go": "adebdbd57fa610ab4cb13eb47433a22c9bd48934b8f2a2d10f65454f1ea15bf4",
-    "wasm": "c5edae24596546eccccffe9a3ba3f23d7ecd8931a049306400dfcf5fd68d81d5",
-    "wasm.clang": "25df1d6eca97f7a69697d6c23a8371c7ee5765f6e066fe08d4db53df7998104c"
+    "engine_gen.go": "5f6fda2069dce28f551af46385ed4f963dd832d27c7945498a6cfc7aa8a7d70a",
+    "wasm": "cebb9e1bc32cf0f7074003e8ded1069a0190c951fe04c040e08306c087ff7962",
+    "wasm.clang": "cd54c692650d30362b4ac8ea942421396f6071163950d563485027065ba600d6"
   }
 }

@@ -18,7 +18,7 @@
     "deterministic": true
   },
   "schema": 1,
-  "abi": 3,
+  "abi": 4,
   "name": "swift",
   "module": "github.com/wotjr1649/go-treesitter/grammars/swift",
   "identity": {
@@ -38,9 +38,9 @@
       "patched.grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
       "patches.inputs": "11e6df27e61c06487b2a40e4ed22ec1fe94024373bba6ccbb4911955ea176fa0",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
-      "shim.tsg_abi.c": "b8ee914f19412a811ee7f83cca555d6e95e2e84310bf02c3afb267d1fbe1ca05"
+      "shim.tsg_abi.c": "fd567c8fc616aeb97b5db0331a15243912c6ba27f6b73d1c512738b68d087816"
     },
-    "RecipeSHA256": "ef809bf7914c28d75910aa45be55e7a9e66490542b8f91604eb012d0719e1220",
+    "RecipeSHA256": "cc7ed87cbfb7574c13e85fc7b553c3021dd998cf040c7a036d3fdfa77dd95f4f",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -63,8 +63,8 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "4ce50b0d9e7d12a246e9c7dbabf98a9787f52c913cb47b370801c273e47406ea",
-    "engine_gen.go": "4401d091a210f5ab7acfeee4f46c8480baadd9fa844954c54fe0cb887507fa8e",
-    "wasm": "a918c4f74a06e5b9494f9349ae6250f8615e344256f270b3c2cbd6993eb7d011",
-    "wasm.clang": "ad9bafe9d0a02c7ca4ce6e2e5116431fee66a63f94a249a68009d664c04c8678"
+    "engine_gen.go": "63f9a5b6fbdaf8271d06e77219f8a5508e65cb8aec5f4bf9e96c00ed31b0dd18",
+    "wasm": "0305f71ab853350113cdd3e10c9489c940286baf9eaf300fdd6cf902505681b0",
+    "wasm.clang": "5d4af6c5846a26cd69695a2b91d7f9e17491b676608b4bbfa9c9443b9eaa3990"
   }
 }

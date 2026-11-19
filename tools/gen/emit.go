@@ -142,10 +142,11 @@ func rootGoSum(version string) (string, error) {
 // ---- language meta ----
 
 type langMeta struct {
-	ABI     uint32
-	Symbols []string
-	Flags   []uint8
-	Fields  []string
+	ABI           uint32
+	Symbols       []string
+	Flags         []uint8
+	PublicSymbols []uint16
+	Fields        []string
 }
 
 const metaRunner = `package main
@@ -180,7 +181,10 @@ func main() {
 	b := *mem
 	u := func(o int) int { return int(uint32(b[p+o]) | uint32(b[p+o+1])<<8 | uint32(b[p+o+2])<<16 | uint32(b[p+o+3])<<24) }
 	nSym, nField, pool := u(12), u(16), u(20)
-	total := 24 + 4*(nSym+1) + 4*(nField+1) + nSym + pool
+	if u(4) != engine.MetaFormat {
+		fail("meta format", u(4))
+	}
+	total := 24 + 4*(nSym+1) + 4*(nField+1) + 3*nSym + pool
 	fmt.Printf("%%x\n", b[p:p+total])
 	engine.Release(mem)
 }
@@ -224,25 +228,34 @@ func parseMeta(b []byte) (*langMeta, error) {
 	}
 	le := binary.LittleEndian
 	u := func(o int) int { return int(le.Uint32(b[o:])) }
-	if u(4) != 1 {
+	if u(4) != 2 {
 		return nil, fmt.Errorf("meta: format %d", u(4))
 	}
 	nSym, nField, pool := u(12), u(16), u(20)
+	if nSym < 1 || nSym > 65535 || nField < 1 || nField > 65536 || pool < 0 || pool > len(b) {
+		return nil, fmt.Errorf("meta: invalid symbol, field or pool size")
+	}
 	symOff, fldOff := 24, 24+4*(nSym+1)
-	flags := fldOff + 4*(nField+1)
+	publicAt := fldOff + 4*(nField+1)
+	flags := publicAt + 2*nSym
 	poolAt := flags + nSym
-	if poolAt+pool != len(b) {
-		return nil, fmt.Errorf("meta: length %d, header says %d", len(b), poolAt+pool)
+	if poolAt != len(b)-pool {
+		return nil, fmt.Errorf("meta: length %d does not match header", len(b))
 	}
 	name := func(tab, i int) (string, error) {
 		a, z := u(tab+4*i), u(tab+4*i+4)
-		if a > z || z > pool {
+		if a < 0 || a > z || z > pool {
 			return "", fmt.Errorf("meta: bad offsets %d..%d", a, z)
 		}
 		return string(b[poolAt+a : poolAt+z]), nil
 	}
 	m := &langMeta{ABI: uint32(u(8)), Flags: append([]uint8(nil), b[flags:flags+nSym]...)}
 	for i := 0; i < nSym; i++ {
+		public := le.Uint16(b[publicAt+2*i:])
+		if int(public) >= nSym {
+			return nil, fmt.Errorf("meta: public symbol %d for raw ID %d out of range", public, i)
+		}
+		m.PublicSymbols = append(m.PublicSymbols, public)
 		s, err := name(symOff, i)
 		if err != nil {
 			return nil, err
@@ -282,6 +295,15 @@ func emitLanguage(lang string, abi int, m *langMeta, id Identity) ([]byte, error
 			b.WriteString(" ")
 		}
 		fmt.Fprintf(&b, "%d,", f)
+	}
+	b.WriteString("\n\t\t},\n\t\tPublicSymbols: []uint16{")
+	for i, s := range m.PublicSymbols {
+		if i%24 == 0 {
+			b.WriteString("\n\t\t\t")
+		} else {
+			b.WriteString(" ")
+		}
+		fmt.Fprintf(&b, "%d,", s)
 	}
 	b.WriteString("\n\t\t},\n\t\tFields: []string{\n")
 	for _, s := range m.Fields {

@@ -15,7 +15,7 @@ The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/powershell/provenance.json).
 
 - Source identity SHA-256: `65eb15e64f6ee61fbb99ddf4ef30daf04969251c00e790c739fe94d63ae573d0`
-- Module provenance SHA-256: `88599b11c325f80c683a593cdbfb6fa989132fad357f2f1d1d91c2cb45b4a0a9`
+- Module provenance SHA-256: `f3b60d9456262b53ac0bcc202d150ceff725879e4b12b4e91e34a417a129891f`
 
 ## powershell-non-ascii-variable
 
