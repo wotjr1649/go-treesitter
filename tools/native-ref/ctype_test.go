@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -11,12 +10,8 @@ import (
 )
 
 func TestWasiCtype(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("..", "gen", "pins.json"))
+	p, err := readPins(filepath.Join("..", "gen", "pins.json"))
 	if err != nil {
-		t.Fatal(err)
-	}
-	var p pins
-	if err := json.Unmarshal(raw, &p); err != nil {
 		t.Fatal(err)
 	}
 	here, err := sourceDir()
