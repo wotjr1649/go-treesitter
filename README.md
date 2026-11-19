@@ -28,13 +28,14 @@ Each language has exactly one upstream repository, chosen by the tiers of
 
 | Tier | Modules | Upstream |
 |---|---|---|
-| 1 | `bash`, `cpp`, `csharp`, `css`, `golang`, `html`, `javascript`, `json`, `php`, `python`, `ruby`, `rust` | `tree-sitter` organisation (`golang` uses `tree-sitter-go`) |
+| 1 | `bash`, `cpp`, `csharp`, `css`, `golang`, `html`, `json`, `php`, `python`, `ruby`, `rust` | `tree-sitter` organisation (`golang` uses `tree-sitter-go`) |
 | 1 (maintained fork) | `c` | `tree-sitter-grammars/tree-sitter-c@f3202ac` (ADR-0024 rule 6) |
 | 2 | `xml`, `yaml` | `tree-sitter-grammars/tree-sitter-xml`, `tree-sitter-grammars/tree-sitter-yaml` |
 | 3 | `dart`, `kotlin`, `powershell`, `r`, `swift` | `UserNobody14/tree-sitter-dart`, `fwcd/tree-sitter-kotlin`, `airbus-cert/tree-sitter-powershell`, `r-lib/tree-sitter-r`, `alex-pinkus/tree-sitter-swift` (development tree after v0.5.0) |
 | Owner-designated | `postgres` | `gmr/tree-sitter-postgres` |
 | 7 (owner-maintained) | `tsql` | `wotjr1649/tree-sitter-mssql` (v2.1.0 in the development tree after v0.5.0; origin `alfpricot/tree-sitter-mssql` v1.0.0; ADR-0024 rule 7) |
 | 7 (owner-maintained) | `java` | `wotjr1649/tree-sitter-java` (v1.0.0 in the development tree after v0.5.0; origin `tree-sitter/tree-sitter-java` v0.23.5; ADR-0024 rule 7) |
+| 7 (owner-maintained) | `javascript` (including JSX) | `wotjr1649/tree-sitter-javascript` (v1.0.0 in the development tree after v0.5.0, based on `tree-sitter/tree-sitter-javascript` v0.25.0 under ADR-0024 rule 7) |
 | 7 (owner-maintained) | `typescript`, `tsx` | `wotjr1649/tree-sitter-typescript` (v1.0.0 in the development tree after v0.5.0, based on `tree-sitter/tree-sitter-typescript` v0.23.2 under ADR-0024 rule 7) |
 
 Exact revisions are in [pins.json](tools/gen/pins.json). Bash, Ruby, YAML and Python carry recorded temporary C-only patches

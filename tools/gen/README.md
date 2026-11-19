@@ -223,7 +223,7 @@ Recorded C-only patches exist for bash and ruby (`0001-heredoc-utf8`), yaml (`00
 (`0001-block-comment-code-points`) and javascript (`0001-jsx-bare-ampersand`). HTML applies
 `0001-greater-than-text` and `0002-bare-ampersand-text` before generation. PostgreSQL applies
 `0001-non-ascii-identifiers` before generation and `0002-dollar-tag-code-points` after it.
-`gen -patch-status` lists the counts. Retire each with an approved pin move when upstream fixes it.
+`gen -patch-status` lists the counts. Retire each with an approved pin move to a source that contains the fix (for an owner-maintained repository, an owner release; ADR-0024 rule 7.6).
 `native-ref -unpatched` supplies the required corpus, fuzz-seed and patch-regression baseline.
 
 ADR-0027 sets `regenerate: true` for every grammar except entries with a recorded `generatorException`
@@ -278,8 +278,9 @@ The command lists 34 rows for the current pins: 26 `source` archives and eight `
 contains its original 24 source archives plus `SHA256SUMS`; the new C and PostgreSQL archives have no fallback there.
 The v0.5.0 release mirrors the 25 rows with column 4 equal to `source` that existed then, plus `SHA256SUMS`.
 The Swift archive, the T-SQL v2.1.0 archive `tree-sitter-mssql-80037156b044.tar.gz`, the Java v1.0.0 archive
-`tree-sitter-java-a241253570b2.tar.gz`, and the shared TypeScript/TSX v1.0.0 archive
-`tree-sitter-typescript-59fc4edb0c0b.tar.gz` were added afterwards and
+`tree-sitter-java-a241253570b2.tar.gz`, the shared TypeScript/TSX v1.0.0 archive
+`tree-sitter-typescript-59fc4edb0c0b.tar.gz`, and the JavaScript v1.0.0 archive
+`tree-sitter-javascript-d6501de34e9a.tar.gz` were added afterwards and
 have no mirror fallback until a release carrying them is published and its base is configured. Check their filenames against `runtime.archive`,
 `wasiLibc.archive`, and each grammar's `archive` in `pins.json`, deduplicating TypeScript/TSX's shared archive;
 the [publication procedure](../../docs/specs/publication.md#pinned-archive-release-assets) specifies the inventory
@@ -287,10 +288,9 @@ and digest checks. The eight SDK/binaryen/CLI host archives are excluded until c
 established. Those tools are fetched from their official releases with pinned SHA-256 checks and have no assets
 in this release to provide mirror fallback, even if the fetch plan lists URLs at the configured bases.
 
-After publishing and checking all selected source rows at the new release base, update `mirrors` in a follow-up PR;
-for v0.5.0 that PR will set the ordered bases to v0.5.0 then v0.4.0 and restore the development module form. Until
-then, pins keep v0.4.0 then v0.3.0. A configured
-base can supply only the exact files already published there; a new source archive gains fallback coverage when a
+The pins use v0.5.0 and then v0.4.0 as mirror bases. After publishing and checking all selected source rows at a
+new release base, update `mirrors` in a follow-up PR. A configured base can supply only the exact files already
+published there. A new source archive gains fallback coverage when a
 carrying release is published and its base is configured. Published releases are immutable. This command does not
 upload anything. `wasm2go` remains a Go module installed through Go's checksum-verified module mechanism
 (`wasm2goSum`), not an archive in this list. The Go toolchain and system C compiler are host prerequisites, not

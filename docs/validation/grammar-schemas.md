@@ -314,6 +314,20 @@ grammar for `comment` and `html_comment`, matching the CLI 0.27.2 changes record
 above. The owner archive contains the schema already produced by go-treesitter's pinned CLI. Preparing
 both pins with CLI 0.27.2 gives byte-identical schemas and an empty diff for each grammar (E1, Windows amd64).
 
+## Unreleased (after v0.5.0) JavaScript v1.0.0
+
+Under ADR-0024 rule 7, JavaScript moves from `tree-sitter/tree-sitter-javascript`
+at `58404d8cf191d69f2674a8fd507bd5776f46cb11` to `wotjr1649/tree-sitter-javascript`
+v1.0.0 at `d6501de34e9aabad1f49b860fcfcc23066766223`, based on upstream v0.25.0
+at `44c892e0be055ac465d5eeddae6d3e194424e7de`. Archive SHA-256 changes from
+`f3e51e9f7b129f62a817551ae22a878dac5c18d71c456d5ad73e9c82d687f33d` to
+`28678c9e5bd2260218bada6c446766c6eee2fc9a10ef8344def61d59bf523cfa`.
+
+Both archived schemas and both CLI 0.27.2 prepared schemas with the retained JSX scanner patch
+are byte-identical at 64022 bytes, SHA-256
+`188a8baa97018edaf63bf7ece372c07bc0d74d1301004bc8f211eb7dee5a6e70`.
+The strict checks pass and the archived and prepared diffs are empty (E1, Windows amd64).
+
 ## Unreleased (after v0.5.0) Rust, JavaScript and HTML patches
 
 The temporary ADR-0023 patches keep the grammar pins fixed. Strict schema checks pass, and the

@@ -68,7 +68,7 @@ func TestCheckedInAcceptances(t *testing.T) {
 	}
 	for _, a := range entries {
 		switch {
-		case a.Component == "tsx" || a.Component == "typescript":
+		case a.Component == "javascript" || a.Component == "tsx" || a.Component == "typescript":
 			if a.Kind != "nvim-treesitter: **different repository**" || a.Accepted != "2026-11-19" || a.Expires != "2027-05-19" {
 				t.Fatalf("unexpected acceptance: %+v", a)
 			}
@@ -171,7 +171,7 @@ func TestWatchReportWithAcceptances(t *testing.T) {
 	}
 	var out, summary bytes.Buffer
 	stale, failed := report(&p, &out, api)
-	if stale || failed || tiers != 5 || len(api.findings) != tiers || warningSummary(&summary, api) != 0 {
+	if stale || failed || tiers != 4 || len(api.findings) != tiers || warningSummary(&summary, api) != 0 {
 		t.Fatalf("stale=%v failed=%v findings=%v\n%s\n%s", stale, failed, api.findings, &out, &summary)
 	}
 	path := filepath.Join(t.TempDir(), "body.md")
