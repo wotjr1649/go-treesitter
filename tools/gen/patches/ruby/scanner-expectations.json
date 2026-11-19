@@ -1,0 +1,567 @@
+{
+  "version": 1,
+  "grammar": "ruby",
+  "identity": {
+    "cSymbol": "tree_sitter_ruby",
+    "cli": "0.27.2",
+    "cliArchivesSHA256": {
+      "darwin-arm64": "5a08b66e5713b0c69691611250b2191d07139647a3c6e39ba85954284b634d2d",
+      "linux-amd64": "7ed56d152c52437397b9fcaa43cf341f49933cecc1ca291843f0d347c6e2cb3a",
+      "linux-arm64": "34fcc5c4fa7bdd2058a2a45a03b6eb9a49b03a93b6d52ec750f99b1516d98d33",
+      "windows-amd64": "230779ee4a729e3044d4a8ed57490b776ea1bac0671d12afbd6f5b4d1878f1d0"
+    },
+    "compileFlags": [
+      "-std=c11",
+      "-fsigned-char",
+      "-DNDEBUG",
+      "-O2"
+    ],
+    "generateFrom": "",
+    "grammarArchiveSHA256": "f7aa2408f1b39922f85add38cacd60b59828a8222c609a240f08779d46d079d9",
+    "grammarCommit": "ad907a69da0c8a4f7a943a7fe012712208da6dee",
+    "grammarDir": "src",
+    "nativeDriverSourcesSHA256": "a1c9a3aaa1637e554c16285d8b9710de162bb2ba8440d4e20ecaec3c1d47fdca",
+    "npmDependencies": null,
+    "patches": [
+      {
+        "afterSHA256": "387e6c2306b49962b93d6b571936169e2f1f372a374b48f7548bfa97e0ad508f",
+        "beforeSHA256": "88c1c036d5af7c22a1bc9cc5e50411d414ac9624afed676d42957c566ac4083d",
+        "file": "patches/ruby/0001-heredoc-utf8.patch",
+        "sha256": "e6b78632eb084a0438584d6e38cd53d8aaf141592db2f75e08c0f583507c6368",
+        "source": "src/scanner.c",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/305"
+      },
+      {
+        "afterSHA256": "f5da18f1fd401eef7f98db5512b9f5de682ff3c03fcad9e143e875ec46e39182",
+        "beforeSHA256": "3b5a0afa4ad836b2579c6d836450a373c6736bb0da3d7e030a9d4e66b94fbc7a",
+        "file": "patches/ruby/0002-global-variable-non-ascii.patch",
+        "sha256": "fb68546f8a63f2f7abd685b05fa8d1d949c35d170b0fffc34bc05177fc16f7c8",
+        "source": "grammar.js",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/306"
+      }
+    ],
+    "runtimeArchiveSHA256": "9f33b10babb69ef84ac700731a11795b13a4b404dafaa8064e7acbf005fd0732",
+    "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "wasiLibcArchiveSHA256": "2b3e2dca9825487e35a5ed6867c3e226eb021d948c3288b5dbff112b7d362517",
+    "wasiLibcCommit": "2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13"
+  },
+  "inputsSHA256": "1d1a86c64dd77802cc39774772067447dbf0ffc31d9c32ba8f9405a78511d2ea",
+  "comparisons": [
+    {
+      "patch": "patches/ruby/0001-heredoc-utf8.patch",
+      "beforeSourcesSHA256": "e750cb8d3dc245ad42920d6d39cca9ffd869692ecee2cacadf2227e951b6b597",
+      "afterSourcesSHA256": "130f157cc2601a963a26db4a4085a73a6bebebe68e3d099b4b08dcf990fb5ae7",
+      "resultsSHA256": "5cb83ae22f8e44adda1eab0612660e231cce2fa51f4bc5f4a6ae43d3e2e7b1cb",
+      "reason": "Preserve complete UTF-8 heredoc end words and avoid low-byte matches that swallow or end a Ruby heredoc early.",
+      "retireWhen": "The grammar pin includes the equivalent of tree-sitter-ruby issue 305 and passes the retained heredoc cases.",
+      "differences": [
+        {
+          "id": "heredoc/crlf",
+          "bytes": 32,
+          "sha256": "f20ed58b51ad143777822c726a6970e3a64bb3b5c48df5ec8ad7cf62b91a43e0",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 32,
+              "dump_sha256": "603627c2aa4eb7ebeecf1b5a74c7622810cb6d3bc339d3ed693d0c64cde0dcab"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 32,
+              "dump_sha256": "11bf5744e8df8e82cdbc9740215d26b581620e22b803c5807b38e98dd139d51c"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 19–22 and leaves the following text outside its body."
+        },
+        {
+          "id": "heredoc/dash",
+          "bytes": 43,
+          "sha256": "27d3a8a12293776be20ecbeec406985f27b89c0d003620cf354b8243f4af3286",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 43,
+              "dump_sha256": "fbe0ee12febc8b87ccc993e1fec4cdae15241ab21b055a3e955c5be6466e2a16"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 43,
+              "dump_sha256": "553018f5446bd57e43d7e539f69f38ed106fd783f6cb935f64486fe9c3d6d1b4"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 26–35 and leaves the following text outside its body."
+        },
+        {
+          "id": "heredoc/dash-wide-space",
+          "bytes": 36,
+          "sha256": "f150c79473004658e14732990b9345cb3b01d41f1c95925d499eb5a160e3ccd1",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 36,
+              "dump_sha256": "eafe3c3f90b7e38d8a9dcf13f6109a71813bcd9dd46563ff75a41a7a448df9eb"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 36,
+              "dump_sha256": "484fa3c08ba15da90b9b0425ca71bad46a4706592d847faea296b252dfb2c4b6"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 25–28 and leaves the following text outside its body."
+        },
+        {
+          "id": "heredoc/double-quoted",
+          "bytes": 34,
+          "sha256": "d0b657feb532edc9a2d3ee37a513ee4de59b55cfe0070f16ecf8b59cf6b6a29b",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 34,
+              "dump_sha256": "d2785ccd3d9f2d555abbe81f6ce291f123648079782ab9b7655628c9e648e69a"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 34,
+              "dump_sha256": "12bce5173126d9ab3a86a827519da5288abeaa20f3c9fb3c70249f2003ed9ae6"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 20–26 and leaves the following text outside its body."
+        },
+        {
+          "id": "heredoc/multiple",
+          "bytes": 62,
+          "sha256": "29f96e241b5cdce0310a828f2cd9d3df34018e17659a846667a07b4ec8358d24",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 62,
+              "dump_sha256": "b69c95c36d6807c033cd63d72865aa68d17ca488f45af06076c64528e95841fe"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 62,
+              "dump_sha256": "33e73f037ee687cd914d47f5da876d4d8edcaa594fb8d1ec76449ee0a341a802"
+            }
+          },
+          "review": "Both the plain and squiggly heredocs now close on their own Unicode end words."
+        },
+        {
+          "id": "heredoc/prefix-line-exact",
+          "bytes": 38,
+          "sha256": "0425e8bae56d835dac10f417677a56ebcb9a63c00436a489c2677b90122df3b7",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 38,
+              "dump_sha256": "ec97c61abbc80a373299af31f9824d00c5e3023a0d65b1ad210d36df621eb642"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 38,
+              "dump_sha256": "94efd9dbc3ee7a596ccb54119dd5adc2fb7bb881004f5ca955ec83abc1661aff"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 27–30 and leaves the following text outside its body."
+        },
+        {
+          "id": "heredoc/quoted-454e44ed959ceab88039",
+          "bytes": 48,
+          "sha256": "f08ac866c110e3182fca360238aa0b05b30cf875a18ade64c3d9cf2c947e08fa",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 48,
+              "dump_sha256": "e188f977b828e830e2fcd582ac2cf47415d5091ce6542e1a4cc93c7f82422e94"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 48,
+              "dump_sha256": "cedefffd262c19443e03e8e3e684aeb8814c07a215155bd0c1c05ae0e751098f"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 30–40 and leaves the following text outside its body."
+        },
+        {
+          "id": "heredoc/quoted-c3a9",
+          "bytes": 32,
+          "sha256": "bab79851947abd68130c24c1f112d55d0cf33ed331be22a2ace40399e893813d",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 32,
+              "dump_sha256": "de3235f2b16d18509d4423a6909a14e841749540b2f919e22823240a19146724"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 32,
+              "dump_sha256": "9df477fda9bdb1e48c555a032abfdcd4f5af0196ccec49e64560df040a29d0ae"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 22–24 and leaves the following text outside its body."
+        },
+        {
+          "id": "heredoc/quoted-c480",
+          "bytes": 32,
+          "sha256": "4d4d3214bd2f2225a95a76ba01cae507f612aa91720ef01c54c511f644bb6341",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 32,
+              "dump_sha256": "de3235f2b16d18509d4423a6909a14e841749540b2f919e22823240a19146724"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 32,
+              "dump_sha256": "9df477fda9bdb1e48c555a032abfdcd4f5af0196ccec49e64560df040a29d0ae"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 22–24 and leaves the following text outside its body."
+        },
+        {
+          "id": "heredoc/quoted-eab080",
+          "bytes": 34,
+          "sha256": "775ce583504f9c0f6e133adf3e18fd1e9357cbcfbe6d156eaafec797411bd9c7",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 34,
+              "dump_sha256": "e60ce590c1b1ff82e3f5237e87eee01af748cce490c5c90226f07dafe850fd73"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 34,
+              "dump_sha256": "5ab2a86063d67769f13cf338ab5919fc02f01b23457402cd33f0d551065291db"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 23–26 and leaves the following text outside its body."
+        },
+        {
+          "id": "heredoc/quoted-eab181",
+          "bytes": 34,
+          "sha256": "6a77ec89157c64c71650e9911c4a8a836ada5af624cb8a4078b586b0f30e90b7",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 34,
+              "dump_sha256": "042101e501ca2e1f197f3edadea47ddab3c1884191c77d75528e349fd949b98c"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 34,
+              "dump_sha256": "5ab2a86063d67769f13cf338ab5919fc02f01b23457402cd33f0d551065291db"
+            }
+          },
+          "review": "The ASCII low-byte alias no longer closes the heredoc before its Unicode end word."
+        },
+        {
+          "id": "heredoc/quoted-eb819d",
+          "bytes": 34,
+          "sha256": "6a4ed6fbe9bc2849c2cdad9be7313450ab1dc20bc3fcb86784d43a34b719548e",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 34,
+              "dump_sha256": "e60ce590c1b1ff82e3f5237e87eee01af748cce490c5c90226f07dafe850fd73"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 34,
+              "dump_sha256": "5ab2a86063d67769f13cf338ab5919fc02f01b23457402cd33f0d551065291db"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 23–26 and leaves the following text outside its body."
+        },
+        {
+          "id": "heredoc/quoted-eca285eba38c",
+          "bytes": 40,
+          "sha256": "813f7f0b8fbe3dd1b9723ec7f4c92ab4af6194baf1904c4b783fb63cb0ce9529",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 40,
+              "dump_sha256": "40f315edcb8fee371e24f8dff5d42f92e78de1af92f6bcae9a48ad3d81db43b4"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 40,
+              "dump_sha256": "bb7e10f38d4b21b11f15b9619ce7f20272c7b43d8bc5f67bdb86d79ba0a5ca55"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 26–32 and leaves the following text outside its body."
+        },
+        {
+          "id": "heredoc/quoted-ed959ceab880eb819d",
+          "bytes": 46,
+          "sha256": "d89ef6121716f97801363f59aaf201549d344fd5ac6063bbd9e48c1fad4d9c04",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 46,
+              "dump_sha256": "e47bb13d7131dd0e669f98526fc42644c7855f29d9ec111902dd0c2b9918e8ab"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 46,
+              "dump_sha256": "158eca52a14adce4f5cb554733f2adba7371f7ac1a77de50f58d529914d7e4ae"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 29–38 and leaves the following text outside its body."
+        },
+        {
+          "id": "heredoc/quoted-f09f9880",
+          "bytes": 36,
+          "sha256": "5cf32860e466016f90b1f6e21c9c4ea898656667d200ce74a6d8b06315a7da1c",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 36,
+              "dump_sha256": "18621fbace52a701e03e4a6bbd1fd61c1404981a830664769626f93ed2a1ba03"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 36,
+              "dump_sha256": "72b009e9d36bae4ce73da1bb0fb62b5c4ee4557990552186379ffcb2bd471536"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 24–28 and leaves the following text outside its body."
+        },
+        {
+          "id": "heredoc/repeated-word-known-ruby-close",
+          "bytes": 35,
+          "sha256": "1ace3f2c60f34c9cc6bfb3e74f7809a8337e130b620f5cf7717614503bf8733a",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 35,
+              "dump_sha256": "ff042894bfc6e1a368a0c50ba404a0bc71f66ab6803283687195e1e3fa8bd2ce"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 35,
+              "dump_sha256": "3cf661525a2b56cb12dc8a752e8c1b408035b17b442089b739de185f6468a0ff"
+            }
+          },
+          "review": "Full-code-point matching recognizes the Unicode end word. The upstream repeated-word closing behavior remains visible."
+        },
+        {
+          "id": "heredoc/replacement-is-valid",
+          "bytes": 30,
+          "sha256": "ab3be0e820204455a55507ae414c2473b07f35e1b223f67c35a7d6a6521668d9",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 30,
+              "dump_sha256": "8baa5f7877a4096f425928d27b956a4a50f36d8f51a7861f8c3331c5f5939eeb"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 30,
+              "dump_sha256": "1bb6ddb05d64002abf19d1df295b4e7db7337d83f3b5ff34db4640f4c1659aa8"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 19–22 and leaves the following text outside its body."
+        },
+        {
+          "id": "heredoc/serialization-last-fitting-word",
+          "bytes": 2050,
+          "sha256": "ca4d6548792e2c46c9aca3a2230c74877786fd9d3bffb8459f2fc5dc7980a5ce",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 2050,
+              "dump_sha256": "3aa71f853a47ab92a7cb56fcc3b5965125d1f6d82be3d284fa52693b369e1bd2"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 2050,
+              "dump_sha256": "8e6275d5be8387d45fd5c508b33a6db5e672c78c77c444816af67b17c0ce03b0"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 1028–2042 and leaves the following text outside its body."
+        },
+        {
+          "id": "heredoc/serialization-overflow-known-state-loss",
+          "bytes": 2056,
+          "sha256": "6bf29e51986f438a022f0ffa647bcaa26f30e0a373b6194bb97bc43102b9103d",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 2056,
+              "dump_sha256": "9140212d8df3abaa70d452d23d9ef179c009933d4f0c13cfb86744eb0f0e7229"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 2056,
+              "dump_sha256": "70453033cf2692f0072607965c4b12dcc6fe5bb949e5de9630d2cd7874415c68"
+            }
+          },
+          "review": "The UTF-8 word exceeds the serialized scanner state limit; the heredoc state is lost, so the body and end-word lines parse as Ruby identifiers instead of a heredoc body (the retained known limit)."
+        },
+        {
+          "id": "heredoc/squiggly",
+          "bytes": 33,
+          "sha256": "3b3eee896ad10c55427aa25bc6cc70a48c44c66b80e838aa9d4a6f65086d07ea",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 33,
+              "dump_sha256": "03c87b66fd2729075fdd8765504ed4814e11d622cf4cee6523a43879cef4490b"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 33,
+              "dump_sha256": "1c4d5ef2737b42955e899bc14b2780202601373a192cd2025ae18981d6f105fd"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 22–25 and leaves the following text outside its body."
+        },
+        {
+          "id": "heredoc/unquoted",
+          "bytes": 26,
+          "sha256": "fd38e2171e26d73458a8e140e7280c91f6b0f451d6e4bc0d7efd590a8e2ecfc5",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 26,
+              "dump_sha256": "a4a8ff5bd39ec48444dd332b44eed043317b5435986dc188cd5bad30f920425c"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 26,
+              "dump_sha256": "d673c15743b35831a90ef7d8d49ebce66c5ed841965bf8c906e5773a23f03bd2"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 15–18 and leaves the following text outside its body."
+        },
+        {
+          "id": "regression/delimiter-c3a9",
+          "bytes": 29,
+          "sha256": "8116a8b940b778ba0edd5093bfbf9272ae2d35db511b7db44695bdefe5f0b25e",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 29,
+              "dump_sha256": "97310c10fc89b6f6b113fdf3d7edb0ed6fb3fe59f493096030dfd88e637e957f"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 29,
+              "dump_sha256": "8a77e6488fc89fefa956006c437ba5e868a1f6e78763a32a7863180c4abecc4e"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 20–22 and leaves the following text outside its body."
+        },
+        {
+          "id": "regression/delimiter-e282ac",
+          "bytes": 31,
+          "sha256": "60ebf29009e66ba9e578d7da16e89afe61859d3d48dbe91e71d01a2e654d3a58",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 31,
+              "dump_sha256": "dec70b3c7f23ec1948550bccb2279a76d229cc03a793a380665a3c4ed5593de8"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 31,
+              "dump_sha256": "16c8a604afcf3df3a2b6be143613c35a0fb6921191a64d536ad4f72203f28a14"
+            }
+          },
+          "review": "The Unicode end word closes the heredoc at bytes 21–24 and leaves the following text outside its body."
+        }
+      ]
+    }
+  ]
+}

@@ -298,6 +298,39 @@ upload anything. `wasm2go` remains a Go module installed through Go's checksum-v
 (`wasm2goSum`), not an archive in this list. The Go toolchain and system C compiler are host prerequisites, not
 downloads managed by this pin file.
 
+## Reviewed scanner patch expectations
+
+The conformance matrix checks tracked `patches/<grammar>/scanner-expectations.json` files under ADR-0023.
+The comparison uses fresh native dumps for the pinned corpus and kit inputs, fixed fuzz inputs, and the
+same regression bytes used by the product tests. Native builds share the pinned generator run and C patch
+prefixes. The unchanged YAML early-EOF step runs the existing whole-stack comparison.
+
+When adding or changing a scanner patch, review a candidate file and its raw comparison before updating
+the tracked expectations. For example, with the pinned archives in an absolute `$dl` directory, set `$work`
+to a new absolute directory and run these commands from the repository root.
+
+```sh
+lang=yaml
+mkdir -p "$work"
+(cd tools/native-ref && go build -o "$work/native-ref" . && go build -o "$work/ciconf" ./ciconf && go build -o "$work/patchcompare" ./patchcompare)
+"$work/native-ref" -pins tools/gen/pins.json -dl "$dl" -work "$work/build" -out "$work/exe" \
+  -corpus "$work/corpus" -scanner-stages "$work/stages" "$lang"
+"$work/ciconf" -pins tools/gen/pins.json -corpus "$work/corpus" -out "$work/data" \
+  -lang "$lang" -kit tools/conformance/testdata/kit -inputs-only
+ulimit -c 0
+"$work/patchcompare" -scanner-build "$work/stages/$lang.json" -corpus "$work/data/corpus/$lang" \
+  -fuzz-source tools/conformance/fuzz_test.go -regressions tools/conformance/testdata \
+  -out "$work/evidence" -write-candidate "$work/candidate.json"
+```
+
+Match each changed case to the patch's documented effect. Fill in `reason` and `retireWhen` for each patch
+and `review` for every changed clean baseline and recorded baseline crash. A baseline crash row lists its
+class under `baselineCrashes` per `GOOS/GOARCH`; add each platform's class from that platform's run. Keep the candidate's exact
+signatures and preserve unexplained failures for investigation. Re-run with a fresh `-out` directory and
+`-expectations tools/gen/patches/$lang/scanner-expectations.json` in place of `-write-candidate`.
+Check the Linux amd64 and arm64 conformance results before accepting the update. CI never writes the
+sidecar. Pin changes require re-review and retirement deletes the affected entry.
+
 ## PostgreSQL regeneration cost
 
 `postgres` uses pinned `gmr/tree-sitter-postgres` grammar inputs with the temporary Korean-support

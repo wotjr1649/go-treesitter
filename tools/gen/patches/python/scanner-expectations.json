@@ -1,0 +1,383 @@
+{
+  "version": 1,
+  "grammar": "python",
+  "identity": {
+    "cSymbol": "tree_sitter_python",
+    "cli": "0.27.2",
+    "cliArchivesSHA256": {
+      "darwin-arm64": "5a08b66e5713b0c69691611250b2191d07139647a3c6e39ba85954284b634d2d",
+      "linux-amd64": "7ed56d152c52437397b9fcaa43cf341f49933cecc1ca291843f0d347c6e2cb3a",
+      "linux-arm64": "34fcc5c4fa7bdd2058a2a45a03b6eb9a49b03a93b6d52ec750f99b1516d98d33",
+      "windows-amd64": "230779ee4a729e3044d4a8ed57490b776ea1bac0671d12afbd6f5b4d1878f1d0"
+    },
+    "compileFlags": [
+      "-std=c11",
+      "-fsigned-char",
+      "-DNDEBUG",
+      "-O2"
+    ],
+    "generateFrom": "",
+    "grammarArchiveSHA256": "5b9c8cd9f184a016321b7b06135b189d66d7e71f6d8fcab114506900b3601819",
+    "grammarCommit": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64",
+    "grammarDir": "src",
+    "nativeDriverSourcesSHA256": "a1c9a3aaa1637e554c16285d8b9710de162bb2ba8440d4e20ecaec3c1d47fdca",
+    "npmDependencies": null,
+    "patches": [
+      {
+        "afterSHA256": "7a0c6bb9e0c121ff3e25f9180dd6625526725c2ddb62321ccc2cf35adaf488eb",
+        "beforeSHA256": "6db82134ac2d4c90a1a1475487a625cface02662ebda9b7478cad9c7147e9afe",
+        "file": "patches/python/0001-bound-serialized-indent-bytes.patch",
+        "sha256": "00163049bb971eb8a24d1f6a3bb9445259dffb68202992676a84b792d379c598",
+        "source": "src/scanner.c",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-python/issues/350"
+      }
+    ],
+    "runtimeArchiveSHA256": "9f33b10babb69ef84ac700731a11795b13a4b404dafaa8064e7acbf005fd0732",
+    "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "wasiLibcArchiveSHA256": "2b3e2dca9825487e35a5ed6867c3e226eb021d948c3288b5dbff112b7d362517",
+    "wasiLibcCommit": "2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13"
+  },
+  "inputsSHA256": "c08de5c7a2ba9571b3617004801e45b98047a2c877193ffac4ba9a7338eaf42c",
+  "comparisons": [
+    {
+      "patch": "patches/python/0001-bound-serialized-indent-bytes.patch",
+      "beforeSourcesSHA256": "96c2ebc7ca72afb092b4a6ea18199a11025aabd4fabcfc2ba1fa7dd9dd084918",
+      "afterSourcesSHA256": "31b6417c3337aa85cce91a5e0a270768a09ccb4e2f874fb864b49d789681330c",
+      "resultsSHA256": "c8bd15549eaca2fa7ba790e8c62c3de5cc25be1b2316c4d86e3bcdb52f6e2a90",
+      "reason": "Bound the serialized indent bytes to the external scanner buffer for deeply nested blocks.",
+      "retireWhen": "The grammar pin includes the fix for tree-sitter-python issue 350 and passes the retained depth cases.",
+      "differences": [
+        {
+          "id": "regression/511-\"\"\"a\"\"\"",
+          "bytes": 135427,
+          "sha256": "a3dd85be89988aefbe85876cc930b44b445e928386a6aaa541ffd4ff8099f4e3",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 135427,
+              "dump_sha256": "5d68895112677e6ba2728e7e64f3db20c981325333d896636ab5f9472fb726e2"
+            }
+          },
+          "baselineCrashes": {
+            "linux/amd64": "bus-error",
+            "linux/arm64": "access-violation",
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes beyond 510 indents with a string literal (recorded crash class, tree-sitter-python issue 350). With serialized indent bytes bounded, the patched scanner returns a full-length ERROR tree."
+        },
+        {
+          "id": "regression/511-\"a\"",
+          "bytes": 135423,
+          "sha256": "ea2b997e90ee1aacd5c0066c077a5bd84f034b959f7bf27546fd1c20e79b1ebf",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 135423,
+              "dump_sha256": "3ca32d7cb62fa91c90a702b985f228b240643a7ee074b847c545d2cceb9873a9"
+            }
+          },
+          "baselineCrashes": {
+            "linux/amd64": "bus-error",
+            "linux/arm64": "access-violation",
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes beyond 510 indents with a string literal (recorded crash class, tree-sitter-python issue 350). With serialized indent bytes bounded, the patched scanner returns a full-length ERROR tree."
+        },
+        {
+          "id": "regression/511-'a'",
+          "bytes": 135423,
+          "sha256": "40986485da9b730dff4ea26babe59b36205593a0fedf54c0672acce3d07b5acf",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 135423,
+              "dump_sha256": "3ca32d7cb62fa91c90a702b985f228b240643a7ee074b847c545d2cceb9873a9"
+            }
+          },
+          "baselineCrashes": {
+            "linux/amd64": "bus-error",
+            "linux/arm64": "access-violation",
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes beyond 510 indents with a string literal (recorded crash class, tree-sitter-python issue 350). With serialized indent bytes bounded, the patched scanner returns a full-length ERROR tree."
+        },
+        {
+          "id": "regression/511-b\"a\"",
+          "bytes": 135424,
+          "sha256": "fa7cf0c07dd667ae75dfc39f405f6bcb57b448b8ae7e1a16729ba60630c8ffb5",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 135424,
+              "dump_sha256": "d4ec639b237de3be4016450c09ea0ef2728736214132d896c51168560a69c249"
+            }
+          },
+          "baselineCrashes": {
+            "linux/amd64": "bus-error",
+            "linux/arm64": "access-violation",
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes beyond 510 indents with a string literal (recorded crash class, tree-sitter-python issue 350). With serialized indent bytes bounded, the patched scanner returns a full-length ERROR tree."
+        },
+        {
+          "id": "regression/511-f\"a\"",
+          "bytes": 135424,
+          "sha256": "5c0cafcff199baef586728f0d605ac801040b7302d9613af06a135f770767dc5",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 135424,
+              "dump_sha256": "d4ec639b237de3be4016450c09ea0ef2728736214132d896c51168560a69c249"
+            }
+          },
+          "baselineCrashes": {
+            "linux/amd64": "bus-error",
+            "linux/arm64": "access-violation",
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes beyond 510 indents with a string literal (recorded crash class, tree-sitter-python issue 350). With serialized indent bytes bounded, the patched scanner returns a full-length ERROR tree."
+        },
+        {
+          "id": "regression/520-\"\"\"a\"\"\"",
+          "bytes": 140152,
+          "sha256": "2b3f2ed23dfbfc6263ec8257b3370fa3d325e206c59b06815511be9840cb9749",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 140152,
+              "dump_sha256": "35be40d2c6a2a9b95e1a01f47eea7f1f5aaba7ef5b0394ec7b6397a6ff443e0a"
+            }
+          },
+          "baselineCrashes": {
+            "linux/amd64": "bus-error",
+            "linux/arm64": "access-violation",
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes beyond 510 indents with a string literal (recorded crash class, tree-sitter-python issue 350). With serialized indent bytes bounded, the patched scanner returns a full-length ERROR tree."
+        },
+        {
+          "id": "regression/520-\"a\"",
+          "bytes": 140148,
+          "sha256": "1d25a9f5264ae3f91f626eab48c2cf409d20c0908dad88f5b640b5c5e45f8083",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 140148,
+              "dump_sha256": "507fdb04b05defd125500b6c82274452c250d2a5cb51d7714b1186e25633f4ef"
+            }
+          },
+          "baselineCrashes": {
+            "linux/amd64": "bus-error",
+            "linux/arm64": "access-violation",
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes beyond 510 indents with a string literal (recorded crash class, tree-sitter-python issue 350). With serialized indent bytes bounded, the patched scanner returns a full-length ERROR tree."
+        },
+        {
+          "id": "regression/520-'a'",
+          "bytes": 140148,
+          "sha256": "58ec20dbea51896c7654ec628abdd1168d3bdc51598b94aba0003d04a891b173",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 140148,
+              "dump_sha256": "507fdb04b05defd125500b6c82274452c250d2a5cb51d7714b1186e25633f4ef"
+            }
+          },
+          "baselineCrashes": {
+            "linux/amd64": "bus-error",
+            "linux/arm64": "access-violation",
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes beyond 510 indents with a string literal (recorded crash class, tree-sitter-python issue 350). With serialized indent bytes bounded, the patched scanner returns a full-length ERROR tree."
+        },
+        {
+          "id": "regression/520-b\"a\"",
+          "bytes": 140149,
+          "sha256": "f9a61d72f4a7da3603041d6fe69f8592845d6f7ac97078878e92874c8576445a",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 140149,
+              "dump_sha256": "5596713123797fccc1b1a6b42b25c51d650324258814d5c02461ce185cd9dc9e"
+            }
+          },
+          "baselineCrashes": {
+            "linux/amd64": "bus-error",
+            "linux/arm64": "access-violation",
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes beyond 510 indents with a string literal (recorded crash class, tree-sitter-python issue 350). With serialized indent bytes bounded, the patched scanner returns a full-length ERROR tree."
+        },
+        {
+          "id": "regression/520-f\"a\"",
+          "bytes": 140149,
+          "sha256": "c4ab750312e3efbeb4e9886658db5793b924679e6b6ca1b84e8e07ba2941b436",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 140149,
+              "dump_sha256": "5596713123797fccc1b1a6b42b25c51d650324258814d5c02461ce185cd9dc9e"
+            }
+          },
+          "baselineCrashes": {
+            "linux/amd64": "bus-error",
+            "linux/arm64": "access-violation",
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes beyond 510 indents with a string literal (recorded crash class, tree-sitter-python issue 350). With serialized indent bytes bounded, the patched scanner returns a full-length ERROR tree."
+        },
+        {
+          "id": "regression/600-\"\"\"a\"\"\"",
+          "bytes": 185712,
+          "sha256": "0000bafb529dfd50644a84b6b642da803d63b3e860bf6c6fb75a12542871fbfc",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 185712,
+              "dump_sha256": "561f91a74f6174af1e67c8e2d576218c5d7af0d42eaa3ea9bde73d5c37d795a8"
+            }
+          },
+          "baselineCrashes": {
+            "linux/amd64": "bus-error",
+            "linux/arm64": "access-violation",
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes beyond 510 indents with a string literal (recorded crash class, tree-sitter-python issue 350). With serialized indent bytes bounded, the patched scanner returns a full-length ERROR tree."
+        },
+        {
+          "id": "regression/600-\"a\"",
+          "bytes": 185708,
+          "sha256": "f58a9f40fd857c7a013039b6923dc91f553178647ad60a2fe297055119a23201",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 185708,
+              "dump_sha256": "60cc87227798be440d1a3ad26778a244b89648c94697214280102bd1794321b8"
+            }
+          },
+          "baselineCrashes": {
+            "linux/amd64": "bus-error",
+            "linux/arm64": "access-violation",
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes beyond 510 indents with a string literal (recorded crash class, tree-sitter-python issue 350). With serialized indent bytes bounded, the patched scanner returns a full-length ERROR tree."
+        },
+        {
+          "id": "regression/600-'a'",
+          "bytes": 185708,
+          "sha256": "1fac1157a9137f77f30d70ce8f6018514ac33a9b044d24768cbb336baaeb35fd",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 185708,
+              "dump_sha256": "60cc87227798be440d1a3ad26778a244b89648c94697214280102bd1794321b8"
+            }
+          },
+          "baselineCrashes": {
+            "linux/amd64": "bus-error",
+            "linux/arm64": "access-violation",
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes beyond 510 indents with a string literal (recorded crash class, tree-sitter-python issue 350). With serialized indent bytes bounded, the patched scanner returns a full-length ERROR tree."
+        },
+        {
+          "id": "regression/600-b\"a\"",
+          "bytes": 185709,
+          "sha256": "191dd1bfbf76b0ad3a2ab503d92eb9fb650949252887c5b03cfd922619ba92d3",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 185709,
+              "dump_sha256": "1f5ef2f274a9376304f4a37217205b240fc3cfb4346684d346bf62aefa8615e3"
+            }
+          },
+          "baselineCrashes": {
+            "linux/amd64": "bus-error",
+            "linux/arm64": "access-violation",
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes beyond 510 indents with a string literal (recorded crash class, tree-sitter-python issue 350). With serialized indent bytes bounded, the patched scanner returns a full-length ERROR tree."
+        },
+        {
+          "id": "regression/600-f\"a\"",
+          "bytes": 185709,
+          "sha256": "1647d0617eb3c432a7cbd421fd8bd7ddd14e67585dc68c4c2df7465213c25233",
+          "before": {
+            "status": "baseline-crash"
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 185709,
+              "dump_sha256": "1f5ef2f274a9376304f4a37217205b240fc3cfb4346684d346bf62aefa8615e3"
+            }
+          },
+          "baselineCrashes": {
+            "linux/amd64": "bus-error",
+            "linux/arm64": "access-violation",
+            "windows/amd64": "access-violation"
+          },
+          "review": "The original scanner crashes beyond 510 indents with a string literal (recorded crash class, tree-sitter-python issue 350). With serialized indent bytes bounded, the patched scanner returns a full-length ERROR tree."
+        }
+      ]
+    }
+  ]
+}

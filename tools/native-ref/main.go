@@ -76,6 +76,7 @@ func main() {
 	candidate := flag.Bool("candidate", false, "comparison only: regenerate even a generator exception")
 	unpatched := flag.Bool("unpatched", false, "comparison only: compile the original pinned grammar without its ADR-0023 patches")
 	nobuild := flag.Bool("nobuild", false, "verify and extract only; do not compile (-out is then optional)")
+	scannerStages := flag.String("scanner-stages", "", "directory receiving scanner patch comparison builds and manifests")
 	patchAlert := flag.Int("patch-alert", 3, "warn when a grammar has more than this many patches")
 	flag.Parse()
 	if *dl == "" || *work == "" || (*out == "" && !*nobuild) {
@@ -86,17 +87,21 @@ func main() {
 		fmt.Fprintln(os.Stderr, "native-ref: -reference and -candidate are mutually exclusive")
 		os.Exit(2)
 	}
-	if err := runMode(*log, *dl, *work, *out, *cc, *opt, *corpus, *queries, *fetch, *nobuild, *unpatched, *reference, *candidate, flag.Args(), *patchAlert); err != nil {
+	if *scannerStages != "" && (*reference || *candidate || *unpatched || *nobuild) {
+		fmt.Fprintln(os.Stderr, "native-ref: -scanner-stages requires a normal native build")
+		os.Exit(2)
+	}
+	if err := runMode(*log, *dl, *work, *out, *cc, *opt, *corpus, *queries, *fetch, *nobuild, *unpatched, *reference, *candidate, *scannerStages, flag.Args(), *patchAlert); err != nil {
 		fmt.Fprintln(os.Stderr, "native-ref:", err)
 		os.Exit(1)
 	}
 }
 
 func run(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuild, unpatched bool, langs []string, patchAlert ...int) error {
-	return runMode(pinsFile, dl, work, out, cc, opt, corpus, queries, fetch, nobuild, unpatched, false, false, langs, patchAlert...)
+	return runMode(pinsFile, dl, work, out, cc, opt, corpus, queries, fetch, nobuild, unpatched, false, false, "", langs, patchAlert...)
 }
 
-func runMode(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuild, unpatched, reference, candidate bool, langs []string, patchAlert ...int) error {
+func runMode(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, nobuild, unpatched, reference, candidate bool, scannerDir string, langs []string, patchAlert ...int) error {
 	threshold := 3
 	if len(patchAlert) > 0 {
 		threshold = patchAlert[0]
@@ -211,11 +216,24 @@ func runMode(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, no
 			fmt.Fprint(os.Stderr, " WARNING: review temporary patch burden")
 		}
 		fmt.Fprintln(os.Stderr)
+		build := func(dir, exe string) error {
+			return buildNative(cc, opt, here, filepath.Join(work, p.Runtime.ExtractDir, "lib"), dir, exe, g, ctypeObjects)
+		}
+		scanner, err := newScannerBuild(scannerDir, l, cc, opt, here, p, g)
+		if err != nil {
+			return err
+		}
+		var beforePatch func(string, int) error
+		if scanner != nil && len(scanner.Comparisons) > 0 {
+			beforePatch = func(root string, i int) error {
+				return scanner.capture(i, filepath.Join(root, filepath.FromSlash(g.GrammarDir)), build)
+			}
+		}
 		if g.Regenerate || (!unpatched && len(g.Patches) > 0) {
 			if unpatched {
 				g.Patches = nil
 			}
-			patched, err := prepareGrammarPatches(pinsFile, p, g, dl, work, l, fetch)
+			patched, err := prepareGrammarPatches(pinsFile, p, g, dl, work, l, fetch, beforePatch)
 			if err != nil {
 				return fmt.Errorf("%s: patches: %w", l, err)
 			}
@@ -248,36 +266,54 @@ func runMode(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, no
 		if nobuild {
 			continue
 		}
-		lib := filepath.Join(work, p.Runtime.ExtractDir, "lib")
-		exe := filepath.Join(out, l)
-		if runtime.GOOS == "windows" {
-			exe += ".exe"
+		exe := nativeExePath(out, l)
+		if err := build(gdir, exe); err != nil {
+			return err
 		}
-		args := []string{"-std=c11", "-fsigned-char", "-DNDEBUG", opt, "-I" + filepath.Join(here, "shim"), "-I" + filepath.Join(lib, "include"), "-I" + filepath.Join(lib, "src"),
-			"-I" + gdir, "-DTSG_LANG_FN=" + g.CSymbol}
-		if runtime.GOOS == "windows" {
-			args = append(args, "-static") // runs without the MinGW runtime DLLs next to it
-		} else {
-			args = append(args, "-D_POSIX_C_SOURCE=200112L", "-D_DEFAULT_SOURCE") // upstream's own Makefile flags
-			if runtime.GOOS == "darwin" {
-				args = append(args, "-D_DARWIN_C_SOURCE") // likewise: without it _POSIX_C_SOURCE hides macOS extensions
+		if scanner != nil {
+			if err := scanner.finish(gdir, exe); err != nil {
+				return err
 			}
 		}
-		args = append(args, filepath.Join(lib, "src", "lib.c"), filepath.Join(gdir, "parser.c"))
-		if _, ok := g.Files["scanner.c"]; ok {
-			args = append(args, filepath.Join(gdir, "scanner.c"))
-		}
-		args = append(args, ctypeObjects...)
-		args = append(args, filepath.Join(here, "native_ref.c"), "-o", exe)
-		fmt.Println(cc, strings.Join(args, " "))
-		cmd := proc.Command(cc, args...)
-		cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("%s: compile: %w", l, err)
-		}
-		sum, _ := fileSHA(exe)
-		fmt.Printf("built %s sha256=%s\n", exe, sum)
 	}
+	return nil
+}
+
+func nativeExePath(dir, name string) string {
+	if runtime.GOOS == "windows" {
+		name += ".exe"
+	}
+	return filepath.Join(dir, name)
+}
+
+func buildNative(cc, opt, here, lib, gdir, exe string, g source, ctypeObjects []string) error {
+	args := []string{"-std=c11", "-fsigned-char", "-DNDEBUG", opt, "-I" + filepath.Join(here, "shim"), "-I" + filepath.Join(lib, "include"), "-I" + filepath.Join(lib, "src"),
+		"-I" + gdir, "-DTSG_LANG_FN=" + g.CSymbol}
+	if runtime.GOOS == "windows" {
+		args = append(args, "-static") // runs without the MinGW runtime DLLs next to it
+	} else {
+		args = append(args, "-D_POSIX_C_SOURCE=200112L", "-D_DEFAULT_SOURCE") // upstream's own Makefile flags
+		if runtime.GOOS == "darwin" {
+			args = append(args, "-D_DARWIN_C_SOURCE") // likewise: without it _POSIX_C_SOURCE hides macOS extensions
+		}
+	}
+	args = append(args, filepath.Join(lib, "src", "lib.c"), filepath.Join(gdir, "parser.c"))
+	if _, ok := g.Files["scanner.c"]; ok {
+		args = append(args, filepath.Join(gdir, "scanner.c"))
+	}
+	args = append(args, ctypeObjects...)
+	args = append(args, filepath.Join(here, "native_ref.c"), "-o", exe)
+	fmt.Println(cc, strings.Join(args, " "))
+	cmd := proc.Command(cc, args...)
+	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("compile %s: %w", exe, err)
+	}
+	sum, err := fileSHA(exe)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("built %s sha256=%s\n", exe, sum)
 	return nil
 }
 

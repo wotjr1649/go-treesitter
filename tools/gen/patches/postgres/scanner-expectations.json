@@ -1,0 +1,401 @@
+{
+  "version": 1,
+  "grammar": "postgres",
+  "identity": {
+    "cSymbol": "tree_sitter_postgres",
+    "cli": "0.27.2",
+    "cliArchivesSHA256": {
+      "darwin-arm64": "5a08b66e5713b0c69691611250b2191d07139647a3c6e39ba85954284b634d2d",
+      "linux-amd64": "7ed56d152c52437397b9fcaa43cf341f49933cecc1ca291843f0d347c6e2cb3a",
+      "linux-arm64": "34fcc5c4fa7bdd2058a2a45a03b6eb9a49b03a93b6d52ec750f99b1516d98d33",
+      "windows-amd64": "230779ee4a729e3044d4a8ed57490b776ea1bac0671d12afbd6f5b4d1878f1d0"
+    },
+    "compileFlags": [
+      "-std=c11",
+      "-fsigned-char",
+      "-DNDEBUG",
+      "-O2"
+    ],
+    "generateFrom": "",
+    "grammarArchiveSHA256": "f82ef824c0135805cbe23eb408721b41ff36373c4126052d178d7f5c22690da6",
+    "grammarCommit": "59d0d8cd7506d68de1229fb4bbce838c83b60c8a",
+    "grammarDir": "postgres/src",
+    "nativeDriverSourcesSHA256": "a1c9a3aaa1637e554c16285d8b9710de162bb2ba8440d4e20ecaec3c1d47fdca",
+    "npmDependencies": null,
+    "patches": [
+      {
+        "afterSHA256": "9640494432595d98462abaa7a3732d6682e01023947b2a9effdb56750c67c1c9",
+        "beforeSHA256": "4d26dfd2721cbc632c2d6c2bdf9bcb26eb50bcd1c5b6061269cbc08af12684c6",
+        "file": "patches/postgres/0001-non-ascii-identifiers.patch",
+        "sha256": "b69c8c7d92ce5f4fd24160a20ec54f413398a044d7caff7e640f2f46276e4c76",
+        "source": "postgres/grammar.js",
+        "upstreamReport": "https://github.com/gmr/tree-sitter-postgres/issues/101"
+      },
+      {
+        "afterSHA256": "597b11ba2c7f9e6843332236132806ea1cab116e18767c01a290bf316244b441",
+        "beforeSHA256": "4d7872a6bb2126e206a7aa0730b7f272b41d9e75c2d11af274fc4db2cd7c3352",
+        "file": "patches/postgres/0002-dollar-tag-code-points.patch",
+        "sha256": "f9756f730cc4d41f075986ed8afbd217c69d3adcc734d70ec306ce3831c83a59",
+        "source": "postgres/src/scanner.c",
+        "upstreamReport": "https://github.com/gmr/tree-sitter-postgres/issues/101"
+      }
+    ],
+    "runtimeArchiveSHA256": "9f33b10babb69ef84ac700731a11795b13a4b404dafaa8064e7acbf005fd0732",
+    "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "wasiLibcArchiveSHA256": "2b3e2dca9825487e35a5ed6867c3e226eb021d948c3288b5dbff112b7d362517",
+    "wasiLibcCommit": "2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13"
+  },
+  "inputsSHA256": "0e58a0c16704ef81aee4efa2306a462474d4d6d9c8a7b15c6495ce808b1ca7d8",
+  "comparisons": [
+    {
+      "patch": "patches/postgres/0002-dollar-tag-code-points.patch",
+      "beforeSourcesSHA256": "159f895e1e0c8debcd0252f40c0490861392927a4fcbcc49ca12e070f97d11ec",
+      "afterSourcesSHA256": "8477629583e463987cd1234d4b476d186a6c1d7f2cba355b7019f477ce40d5f7",
+      "resultsSHA256": "5dfd2b6bbf588710ca299f4eae9159b3a49dfdc673fc1868446fbde518143640",
+      "reason": "Compare complete code points in dollar-quote tags so non-ASCII tags neither close on low-byte aliases nor fail on themselves.",
+      "retireWhen": "The grammar pin includes the dollar-tag fix for tree-sitter-postgres issue 101 and passes the retained dollar-quote cases.",
+      "differences": [
+        {
+          "id": "fuzz/7",
+          "bytes": 25,
+          "sha256": "532f072045ccfa25329714f7036f904edc1d9ffc411f4c5716d9c55fa40c74a7",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 25,
+              "dump_sha256": "447413b4c961b2ae7336597a9cd3775cd5dd500ccc208614151df16452a86391"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 25,
+              "dump_sha256": "3175e8f692be9876eb69200c6caf59a7a0324cb95f3991c5b1aaa50afe85f7eb"
+            }
+          }
+        },
+        {
+          "id": "fuzz/7-edit-0",
+          "bytes": 26,
+          "sha256": "f2252a3e4e2f05da0737daef7fd9cf946d57945b3e3d35d7c0e074312a5a0a61",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 26,
+              "dump_sha256": "58d363c9b6fe3955ab6aecb0d276e405b29e87f53f6d90871bab85af87812ff3"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 26,
+              "dump_sha256": "b2cbbeb0d9e17c9c628b140bc13ae9cab32ad0a2796c800ecc1278207fb2a563"
+            }
+          }
+        },
+        {
+          "id": "fuzz/7-edit-1",
+          "bytes": 26,
+          "sha256": "7e927094b86832c3fe8183bd4cd097265ca5ea4d61d639e8a83c3340eb3f8ac8",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 26,
+              "dump_sha256": "9c75818093d06e31c4d65df39b23bbd90b39a4cf595397f9c96cf1ecae7c95f7"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 26,
+              "dump_sha256": "2da01e37b353b0afb42738af2c80e73d1fa4faa05a707c338faab092a16b6467"
+            }
+          }
+        },
+        {
+          "id": "fuzz/7-edit-2",
+          "bytes": 26,
+          "sha256": "68fe07ae6aaea5cb9e9e8641c3adab7abf4c807483da8ad4e8c5717380e6f2ae",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 26,
+              "dump_sha256": "504a231ace70b9f86ae7e6172f60d7ccc49559a9a68194d1b6585fa65b06860c"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 26,
+              "dump_sha256": "4b350657eca7707b6787da952cf4d4e795f5313225807e377145e56a28d2a1d4"
+            }
+          }
+        },
+        {
+          "id": "fuzz/8",
+          "bytes": 31,
+          "sha256": "5ab0e4397dfc0b87ffc8567146d835c0f2dcd67b71d6003e8b84f5c7161e33b1",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 31,
+              "dump_sha256": "35bbc8fe062cade16049af84f9c487c5eeabd704228a95bde489aa261dae5b79"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 31,
+              "dump_sha256": "bb545419508e527cc91b953fcd5530528845a4397d2e0b8b22cec4c169665f75"
+            }
+          },
+          "review": "The tag $걁$ no longer closes at $A$, which shares its low byte; the dollar-quoted string now ends at the real $걁$ instead of leaving still$걁$ as an identifier."
+        },
+        {
+          "id": "fuzz/8-edit-0",
+          "bytes": 32,
+          "sha256": "2dac25b4e2c5504099a511343eff371402112ddeda9c58751c28382fa29aefb2",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 32,
+              "dump_sha256": "9066c943433790035aaee6eb31744da572e319adcc4890a2630c75e8fff10023"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 32,
+              "dump_sha256": "56f115b34fbf76228fb35c8cc35fc824949f22ab714591b783bffc9e5b2473de"
+            }
+          }
+        },
+        {
+          "id": "fuzz/8-edit-1",
+          "bytes": 32,
+          "sha256": "d5d46226c21afc2ade7cd9a1497a4abf27cc45285b5741a11bd0c48f7011156b",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 32,
+              "dump_sha256": "ebc7b5d098422856266534c169782c966be35c5515a4f5828fa10eb072c74917"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 32,
+              "dump_sha256": "ad59abc70b800f04f1572bad7f7f3a4280e300569624ac1d7545d35396f9ec2b"
+            }
+          }
+        },
+        {
+          "id": "fuzz/8-edit-2",
+          "bytes": 32,
+          "sha256": "07c730bf90fe252b8754ddeec699d7a0c3f30c943a47c11b95d160adf5915acc",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 32,
+              "dump_sha256": "4a05a7a44b90944bb3ebe8b44c239954a0cd90ca1de100dfbd65dc258e03aab7"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 32,
+              "dump_sha256": "d483f357d1ca0de1e745f306cb9b5094a84778dbbc5a4e13d450116bbf5f0bdf"
+            }
+          },
+          "review": "The tag $걁$ no longer closes at $A$, which shares its low byte; the dollar-quoted string now ends at the real $걁$ instead of leaving still$걁$ as an identifier."
+        },
+        {
+          "id": "regression/dollar-63-code-points",
+          "bytes": 394,
+          "sha256": "254c65388ae37e3474c8b33446db8662fd2b2659810778b8662dcec0836a4b65",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 394,
+              "dump_sha256": "7263946e70bb552a4bc6504664c890dcdf24804cb1957aa3db02f93a98a02d89"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 394,
+              "dump_sha256": "912d9f37a4905d7367d635929cba86eb85aab6d7f5b97b06e5564baa2953f506"
+            }
+          }
+        },
+        {
+          "id": "regression/dollar-hangul",
+          "bytes": 24,
+          "sha256": "1b7de1a4886eb140c09b5c97b1ec733ad18953e721c2d9253cf426d76accb94b",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 24,
+              "dump_sha256": "438145a46a45908855ca85410632d78026ec2a817e4624f805e41540e1bce28f"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 24,
+              "dump_sha256": "f728cd33b7d14d9c4b03bfc0fa333d4fb779bd7d8e71adb3250b817f92e085dd"
+            }
+          }
+        },
+        {
+          "id": "regression/dollar-hangul-ascii-alias",
+          "bytes": 30,
+          "sha256": "232375836ade29625f9cf3d21bbeaf166af7a7fb317f4ed1fabb2702b21b3d2c",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 30,
+              "dump_sha256": "affb629967d7ab6a7e643c8927d3885f4a994cbf8ec4f0e7ad744e330b1b97e5"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 30,
+              "dump_sha256": "7e322280f4007897d48bc9196500b09229c044d6190d6697f04ef01cddb6f7c3"
+            }
+          },
+          "review": "The tag $걁$ no longer closes at $A$, which shares its low byte; the dollar-quoted string now ends at the real $걁$ instead of leaving still$걁$ as an identifier."
+        },
+        {
+          "id": "regression/dollar-hangul-hangul-alias",
+          "bytes": 32,
+          "sha256": "d0e2ca866df9ae9768cdff73eb4b159489e13ae7eb105bcf8e8edf15520b7c12",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 32,
+              "dump_sha256": "fba3c0ac59118ca55e971be09426cf38b32bff40c27b299056677d5290eed0fb"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 32,
+              "dump_sha256": "a754d26c32a68758077aa39204171086d738c6c2a2a8650595a097af54d4d248"
+            }
+          }
+        },
+        {
+          "id": "regression/dollar-low-byte-mismatch",
+          "bytes": 20,
+          "sha256": "5c14b2b3cfb038f955387e0ec854041305b5c626bd50c1043bb513c81e0e6ec5",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 20,
+              "dump_sha256": "0afb57677ac88c37edc1fd2f20340dfea923b7a9c5d7a60f00abafc1ea530159"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 20,
+              "dump_sha256": "c5640cb06d7b5e9d76060a43159f401487f8b32cf2e13a0a20ca544c58d4534e"
+            }
+          },
+          "review": "Without a matching $걁$ the string is unterminated; the false close at $A$ that made this tree error-free is gone, as the product test expects."
+        },
+        {
+          "id": "regression/dollar-mixed",
+          "bytes": 36,
+          "sha256": "a12eda69d0972f4ff2e2dc5b0300ed8a61e359208ab8c9f711d8d2e9277f8069",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 36,
+              "dump_sha256": "e15061bdd0352213fc491f37b883211c8281a03037ca2df3ce4c3e9d91500393"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 36,
+              "dump_sha256": "d720b28c07bcd8ea479288c9321e6de502bd1a1b5d1945e3cbe852a2ed1bdbc7"
+            }
+          }
+        },
+        {
+          "id": "regression/dollar-nfd",
+          "bytes": 28,
+          "sha256": "2a719c6783b71a80298eb41b1fe442cb7e1c9093061ce2178a9121d79169c76a",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 28,
+              "dump_sha256": "f00b510f616618166bd2aa5ee28cf22a50779bd3c82f330aad1281141249d568"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 28,
+              "dump_sha256": "bb9ff157873d2a5f419478327b246cd8cf31edd6e5a18d97150eb4a41f59b207"
+            }
+          }
+        },
+        {
+          "id": "regression/dollar-supplementary",
+          "bytes": 24,
+          "sha256": "dc67012af4402aae04613ae3521cb1c212b54141f40a814f50daa2f6e5a4f6b1",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 24,
+              "dump_sha256": "438145a46a45908855ca85410632d78026ec2a817e4624f805e41540e1bce28f"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 24,
+              "dump_sha256": "f728cd33b7d14d9c4b03bfc0fa333d4fb779bd7d8e71adb3250b817f92e085dd"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

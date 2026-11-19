@@ -1,6 +1,5 @@
 // Command patchcompare compares a pinned grammar's native dumps before and after
-// an ADR-0023 patch. It retains every input and both dumps; a clean tree may change
-// only under the explicitly selected documented NUL-truncation fix.
+// an ADR-0023 patch and retains every input and both dumps.
 package main
 
 import (
@@ -61,7 +60,23 @@ func main() {
 	target := flag.String("fuzz-target", "", "fuzz function (for example FuzzParseYAML)")
 	allowNUL := flag.Bool("allow-nul-truncation", false, "allow clean NUL-truncated trees to become full-length error trees (YAML 0001)")
 	out := flag.String("out", "", "new output directory retaining inputs, dumps and report.json")
+	build := flag.String("scanner-build", "", "native-ref manifest for scanner patch comparisons")
+	expectations := flag.String("expectations", "", "read-only scanner expectations sidecar")
+	regressions := flag.String("regressions", "", "conformance testdata directory containing shared scanner inputs")
+	candidate := flag.String("write-candidate", "", "write an unreviewed candidate sidecar to a new file")
 	flag.Parse()
+	if *build != "" {
+		if *before != "" || *after != "" || *target != "" || *allowNUL || flag.NArg() != 0 {
+			fail(fmt.Errorf("scanner mode and legacy comparison flags are mutually exclusive"))
+		}
+		if err := runScanner(*build, *expectations, *candidate, *corpus, *source, *regressions, *out); err != nil {
+			fail(err)
+		}
+		return
+	}
+	if *expectations != "" || *regressions != "" || *candidate != "" {
+		fail(fmt.Errorf("-expectations, -regressions and -write-candidate require -scanner-build"))
+	}
 	if *before == "" || *after == "" || *corpus == "" || *source == "" || *target == "" || *out == "" {
 		fail(fmt.Errorf("-before, -after, -corpus, -fuzz-source, -fuzz-target and -out are required"))
 	}
@@ -78,30 +93,9 @@ func run(before, after, corpus, source, target, out string, allowNUL bool) (bool
 	if _, err := os.Stat(out); !os.IsNotExist(err) {
 		return false, fmt.Errorf("output must not exist: %s", out)
 	}
-	var inputs []input
-	err := filepath.WalkDir(corpus, func(p string, d os.DirEntry, e error) error {
-		if e != nil {
-			return e
-		}
-		if !d.Type().IsRegular() || !strings.HasSuffix(p, ".in") {
-			return nil
-		}
-		b, e := os.ReadFile(p)
-		if e != nil {
-			return e
-		}
-		rel, e := filepath.Rel(corpus, p)
-		if e != nil {
-			return e
-		}
-		inputs = append(inputs, input{"corpus/" + filepath.ToSlash(strings.TrimSuffix(rel, ".in")), b})
-		return nil
-	})
+	inputs, err := corpusInputs(corpus)
 	if err != nil {
 		return false, err
-	}
-	if len(inputs) == 0 {
-		return false, fmt.Errorf("no corpus .in files in %s", corpus)
 	}
 	fuzz, e := os.ReadFile(source)
 	if e != nil {
@@ -111,18 +105,7 @@ func run(before, after, corpus, source, target, out string, allowNUL bool) (bool
 	if e != nil {
 		return false, e
 	}
-	for i, b := range seeds {
-		id := "fuzz/" + strconv.Itoa(i)
-		inputs = append(inputs, input{id, b})
-		for j, c := range []struct {
-			start, del int
-			repl       []byte
-		}{{0, 0, []byte("x")}, {len(b) / 2, 2, []byte(" 1 ")}, {len(b), 0, []byte("\n")}} {
-			oldEnd := c.start + c.del%(len(b)-c.start+1)
-			next := append(append(append([]byte{}, b[:c.start]...), c.repl...), b[oldEnd:]...)
-			inputs = append(inputs, input{fmt.Sprintf("%s-edit-%d", id, j), next})
-		}
-	}
+	inputs = appendFuzzInputs(inputs, seeds)
 	var r report
 	r.Pass = true
 	r.FuzzTarget = target
@@ -196,6 +179,47 @@ func write(p string, b []byte) error {
 	}
 	return os.WriteFile(p, b, 0644)
 }
+func corpusInputs(corpus string) ([]input, error) {
+	var inputs []input
+	err := filepath.WalkDir(corpus, func(p string, d os.DirEntry, e error) error {
+		if e != nil {
+			return e
+		}
+		if !d.Type().IsRegular() || !strings.HasSuffix(p, ".in") {
+			return nil
+		}
+		b, e := os.ReadFile(p)
+		if e != nil {
+			return e
+		}
+		rel, e := filepath.Rel(corpus, p)
+		if e != nil {
+			return e
+		}
+		inputs = append(inputs, input{"corpus/" + filepath.ToSlash(strings.TrimSuffix(rel, ".in")), b})
+		return nil
+	})
+	if err == nil && len(inputs) == 0 {
+		err = fmt.Errorf("no corpus .in files in %s", corpus)
+	}
+	return inputs, err
+}
+
+func appendFuzzInputs(inputs []input, seeds [][]byte) []input {
+	for i, b := range seeds {
+		id := "fuzz/" + strconv.Itoa(i)
+		inputs = append(inputs, input{id, b})
+		for j, c := range []struct {
+			start, del int
+			repl       []byte
+		}{{0, 0, []byte("x")}, {len(b) / 2, 2, []byte(" 1 ")}, {len(b), 0, []byte("\n")}} {
+			oldEnd := c.start + c.del%(len(b)-c.start+1)
+			next := append(append(append([]byte{}, b[:c.start]...), c.repl...), b[oldEnd:]...)
+			inputs = append(inputs, input{fmt.Sprintf("%s-edit-%d", id, j), next})
+		}
+	}
+	return inputs
+}
 func parseTree(b []byte) (tree, error) {
 	lines := bytes.Split(b, []byte{'\n'})
 	if len(lines) < 3 || !bytes.HasPrefix(lines[0], []byte("#tsg-dump/1 root_has_error=")) {
@@ -247,6 +271,10 @@ func fuzzSeeds(name string, b []byte, target string) ([][]byte, error) {
 			id, ok := c.Fun.(*ast.Ident)
 			if !ok || id.Name != "fuzzParse" {
 				return true
+			}
+			if len(c.Args) < 2 {
+				e = fmt.Errorf("%s uses an incomplete fuzzParse call", target)
+				return false
 			}
 			for _, a := range c.Args[2:] {
 				s, ok := a.(*ast.BasicLit)

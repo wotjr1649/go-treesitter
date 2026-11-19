@@ -37,6 +37,19 @@ Waiting for upstream leaves these grammars unavailable indefinitely; relaxing ou
    "same C as the engine". Each patched grammar also runs an **unpatched comparison** (native unpatched vs native
    patched) over its corpus and fuzz seeds; the report must show which inputs change. A patch must leave every
    error-free tree of the unpatched grammar unchanged unless the change is the documented fix.
+   For each post-generation scanner patch, the conformance lane checks a reviewed
+   `tools/gen/patches/<grammar>/scanner-expectations.json` entry. Both native builds use the same generated
+   parser, grammar-input patches, and preceding C patches. The comparison adds shared regression inputs to
+   the pinned corpus and fixed fuzz inputs, and requires exact input and fresh-dump signatures, including
+   the complete set of changed cases. A change to a previously error-free tree needs a reason tied to the
+   individual case. A crash of the original scanner is accepted only as a reviewed case recorded with its
+   platform and crash class, and the patched build must still match its signature. A candidate crash,
+   timeout, incomplete dump, or mismatched signature fails the check. The YAML early-EOF parser patch keeps
+   the existing whole-stack comparison. The scanner check covers fresh parsing; native edits retain their
+   conformance coverage.
+   Review expectation updates with the affected patch, pin, or fixture change. Pin moves rerun the comparison
+   for each affected patch. Remove the associated entry when the patch retires and review any remaining entries
+   whose build or inputs changed. CI reads the file and fails on stale or missing entries.
 5. **Retirement.** When upstream releases a fix, the pin moves to it and the patch file is deleted in the same
    change. A patch whose upstream report is closed without a fix is re-decided by the owner.
 6. Every new patch needs the owner's approval; posting the upstream report needs separate publication approval.
