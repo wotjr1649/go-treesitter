@@ -63,3 +63,36 @@ an agent from the owner's account without disclosure; the owner disclosed this o
   contributors do, and the pull request names the CLI used.
 - When testing several variants locally, give each its own `TREE_SITTER_LIBDIR`; a shared compiled-parser cache
   makes `tree-sitter test` run an older parser.
+
+## Amendment (2026-11-19): decision 5, how upstream posts are drafted, approved and recorded
+
+This amendment follows the 2026-11-16 one; where they differ ("agents prepare only; the owner writes every post"),
+this one governs: agents now draft, the owner still posts. It applies to every upstream organisation alike.
+
+Sessions 18–19 settled the practice below.
+
+- **Agents draft and prepare.** An agent may produce the reproduction, a branch in a local clone or on the owner's fork,
+  local runs of the upstream CI steps, a fact sheet (each claim with its source and whether it was reproduced) and the
+  full text of a post in English, with a Korean translation. Agents may read public upstream repositories (GitHub API,
+  GET only).
+- **One recorded owner decision per post.** Each issue, pull request or comment needs the owner's decision for that
+  post, recorded in the session notes before posting (date, target, draft path). A decision covers one post; a changed
+  draft needs a new decision.
+- **The owner reviews, edits as needed and posts** from the owner's account, for example with `gh` run by the owner.
+- **Disclosure.** Every post ends with this line, which the owner may extend: "I used an AI coding assistant to
+  reproduce the issue and draft this text; I checked the results and edited it." A pull request body also names the
+  generator CLI used for regenerated files (2026-11-16 amendment).
+- **Agents never** post, comment, react, open or edit issues or pull requests, or push to an upstream repository, and
+  never use a credential for that. Pushing to the owner's fork happens only when the owner asks.
+- **Records.** Drafts and fact sheets stay in the session's maintainer-local scratch directory; before it is cleaned, copy
+  them to `artifacts/handoff/` with hashes (AGENTS.md). Each posted URL is recorded with its date in the session notes
+  and in the "Upstream issue" line of the matching known-gap entry (or the `upstreamReport` of the patch record).
+
+### Relation to the tree-sitter AI policy
+
+The [policy](https://tree-sitter.github.io/tree-sitter/6-contributing.html) bans "copy-pasted LLM output in issues, PR
+descriptions or comments", asks for concise text from a person who understands the problem, allows translation tools,
+and requires disclosure of AI use. Posting an edited agent draft sits closer to that line than the 2026-11-16 wording
+did. The practice relies on the owner's edit and understanding and on the disclosure; the upstream maintainers decide
+whether a post follows their policy, and a post they close for that reason is recorded, not retried. If the owner
+cannot make a draft their own, it is not posted.
