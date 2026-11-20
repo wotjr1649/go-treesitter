@@ -37,10 +37,11 @@ import (
 
 var rehearsalKeyFiles = []string{"parser.c", "grammar.json", "node-types.json"}
 
-// Seams for tests: the real preparation needs both CLIs.
+// Seams for tests: the real preparation needs both CLIs, and the pinned CLI exists only for the platforms in pins.json.
 var (
 	prepareGrammar     = grammarpatch.Prepare
 	checkGrammarInputs = grammarpatch.CheckInputs
+	rehearsalPlatform  = hostPlatform
 )
 
 const nightlyAssetPrefix = "https://github.com/tree-sitter/tree-sitter/releases/download/nightly/"
@@ -406,9 +407,9 @@ func runRehearsalCommand(args []string, stdout io.Writer) error {
 	if err := os.MkdirAll(filepath.Join(absOut, "work"), 0o755); err != nil {
 		return err
 	}
-	cliArchive, ok := pins.Tools.TreeSitterCLIArchives[hostPlatform()]
+	cliArchive, ok := pins.Tools.TreeSitterCLIArchives[rehearsalPlatform()]
 	if !ok {
-		return fmt.Errorf("no pinned CLI for %s", hostPlatform())
+		return fmt.Errorf("no pinned CLI for %s", rehearsalPlatform())
 	}
 	langs := fs.Args()
 	if len(langs) == 0 {
@@ -426,7 +427,7 @@ func runRehearsalCommand(args []string, stdout io.Writer) error {
 	if r.pinnedBin, err = filepath.Abs(*pinnedCLI); err != nil {
 		return err
 	}
-	rep := &rehearsalReport{Kind: "nightly-rehearsal", ReportOnly: true, Platform: hostPlatform()}
+	rep := &rehearsalReport{Kind: "nightly-rehearsal", ReportOnly: true, Platform: rehearsalPlatform()}
 	rep.Pinned.Version, rep.Pinned.ArchiveSHA256 = pins.Tools.TreeSitterCLI, cliArchive.SHA256
 	rep.Nightly.Sandbox = "none"
 
@@ -551,7 +552,7 @@ func (r *rehearsal) config(g GrammarPin, work string, nightly bool) grammarpatch
 	if nightly {
 		c.CLI, c.Unpinned, c.CLIVersion = r.nightlyCLI, true, r.nightlyVersion
 	} else {
-		cli := r.pins.Tools.TreeSitterCLIArchives[hostPlatform()]
+		cli := r.pins.Tools.TreeSitterCLIArchives[rehearsalPlatform()]
 		c.CLI, c.CLIArchive, c.CLIArchiveSHA256, c.CLIVersion = r.pinnedBin, filepath.Join(r.dl, path.Base(cli.URL)), cli.SHA256, r.pins.Tools.TreeSitterCLI
 	}
 	return c

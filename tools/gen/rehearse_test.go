@@ -7,8 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -204,8 +206,47 @@ func TestRehearsalSchemaFromEntry(t *testing.T) {
 	}
 }
 
+// pinnedPlatform makes the rehearsal use the host platform if pins.json has a pinned CLI for it, else the first pinned
+// one (CI also runs these tests on hosts without a pinned CLI, such as windows-arm64). Only the pins lookup and the
+// report label change; the nightly test binary still runs natively.
+func pinnedPlatform(t *testing.T) string {
+	t.Helper()
+	pins, err := loadPins("pins.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	keys := slices.Sorted(maps.Keys(pins.Tools.TreeSitterCLIArchives))
+	if len(keys) == 0 {
+		t.Fatal("pins.json has no pinned CLI")
+	}
+	p := keys[0]
+	if _, ok := pins.Tools.TreeSitterCLIArchives[hostPlatform()]; ok {
+		p = hostPlatform()
+	}
+	orig := rehearsalPlatform
+	t.Cleanup(func() { rehearsalPlatform = orig })
+	rehearsalPlatform = func() string { return p }
+	return p
+}
+
+// A platform without a pinned CLI stops before anything runs, with the reason; it never compares against nothing.
+func TestRehearsalUnpinnedPlatform(t *testing.T) {
+	defer func(f func() string) { rehearsalPlatform = f }(rehearsalPlatform)
+	rehearsalPlatform = func() string { return "plan9-mips" }
+	dir := t.TempDir()
+	err := runRehearsalCommand([]string{"-root", ".", "-dl", dir, "-tree-sitter", "pinned", "-nightly-gz", filepath.Join(dir, "x.gz"),
+		"-nightly-unsandboxed", "-out", filepath.Join(dir, "out"), "json"}, io.Discard)
+	if err == nil || !strings.Contains(err.Error(), "no pinned CLI for plan9-mips") {
+		t.Fatalf("got %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(dir, "out", "report.json")); !os.IsNotExist(err) {
+		t.Fatal("a report was written for a platform without a pinned CLI")
+	}
+}
+
 // Unreadable or inconsistent nightly facts end in the same held report (no digest), before anything downloaded runs.
 func TestRehearsalHeldReports(t *testing.T) {
+	pinnedPlatform(t)
 	dir := t.TempDir()
 	gzOK := func() []byte {
 		var b bytes.Buffer
@@ -280,6 +321,7 @@ func TestMain(m *testing.M) {
 // The Go entry with the direct opt-in (-nightly-unsandboxed): the nightly --version child gets neither the caller's
 // GitHub token nor generate mount variables.
 func TestRehearsalUnsandboxedVersionEnvironment(t *testing.T) {
+	pinnedPlatform(t)
 	self, err := os.ReadFile(os.Args[0])
 	if err != nil {
 		t.Fatal(err)
