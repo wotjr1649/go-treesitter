@@ -147,6 +147,63 @@ repository/tier documents need another amendment only if that assignment changes
 requires the owner's input-specific decision. Grammar-module versioning and publication remain separate decisions
 under [publication.md](../../docs/specs/publication.md).
 
+## Nightly CLI rehearsal (report only)
+
+`.github/workflows/nightly-cli-rehearsal.yml` (weekly, Wednesday 04:23 UTC, and manual dispatch; Linux amd64 only) runs
+`tools/gen/nightly-rehearsal.sh`, which regenerates every grammar with the pinned CLI and with the CLI of the `nightly`
+release of `tree-sitter/tree-sitter` and compares the generated files. It is **not a gate**: nothing is written under
+`grammars/`, no pin changes, no PR is opened or blocked ([ADR-0027](../../docs/design/decisions/ADR-0027-one-pinned-generator-cli.md#nightly-rehearsal-2026-11-20-report-only),
+[validation.md](../../docs/specs/validation.md)). Locally (needs `gh`, `curl`, `gzip`; Linux amd64 or Windows amd64 with Git Bash;
+a heavy job under the machine's one-slot rule):
+
+```sh
+bash tools/gen/nightly-rehearsal.sh all <new-empty-work-dir> [lang ...]     # all 25 grammars by default; Linux needs bwrap
+NIGHTLY_REHEARSAL_UNSANDBOXED=1 bash tools/gen/nightly-rehearsal.sh all <dir> json   # Windows: explicit opt-in, no isolation
+```
+
+The workflow runs the phases as separate steps: `fetch` (pinned archives and CLI, fetched and SHA-256-verified exactly as
+`regen.sh` does), `nightly` (the only step with a token: release metadata and the asset download; nothing is executed)
+and `run`. The nightly CLI has no pin; its identity is recorded in `<work-dir>/nightly-meta.json` (asset URL, API size and
+`digest`, commit of the `nightly` tag before and after the download) and in `out/report.json` (SHA-256 of the asset and
+of the binary that ran, the `--version` line and its build commit), and cross-checked: API size and digest against the
+file before decompressing it, the tag unchanged, the build commit equal to the tag commit. Any mismatch, and any failure
+to read the asset or the metadata, to parse the metadata or to decompress the asset, makes `nightly.identity` `held`: the
+problems and whatever was observed are recorded, no grammar is compared, there is no `digest.txt` and the command fails.
+Without `-nightly-meta` the identity is `unchecked`.
+
+`gen nightly-rehearsal` (the Go side, `rehearse.go`) first runs every grammar's common input check,
+`grammarpatch.CheckInputs`: Prepare's own pre-generation steps (archive hash and extraction, input patches, npm inputs on
+the patched tree, fetched and verified, and the generation input: the explicit `grammar.json`, or by default
+`grammar.js` in the directory `generate` runs in). A failure there is `input-failed` and neither CLI runs. Then the same
+`grammarpatch.Prepare` runs for both sides independently; C patches on generated files stay with each side. The nightly
+side sets `Config.Unpinned`, which exists for this command only and refuses pin fields; it generates with `--output`
+into a fresh directory beside each tree, and Prepare imports only the files that mode generates (regular `parser.c`,
+`node-types.json`, `tree_sitter/{alloc,array,parser}.h`, and `grammar.json` only when generating from `grammar.js`; with
+`generateFrom: grammar.json` the input stays and an output `grammar.json` fails the run). An expected file the CLI did
+not write is removed, not left as the archive's copy, so a missing `node-types.json` reports as missing; a missing
+`parser.c` fails the generation. Then the C patches and hashes follow. The nightly `--version` and `generate` processes
+get the caller's environment without `GH_TOKEN`, `GITHUB_TOKEN`, `GH_ENTERPRISE_TOKEN`, `GITHUB_ENTERPRISE_TOKEN` and
+the mount variables; only `generate` gets the two trusted mount paths. On
+Linux every nightly execution goes through `nightly-sandbox.sh` (bubblewrap with unprivileged user namespaces: no network,
+empty environment, read-only `/usr`, that call's tree, including npm inputs and Swift's `grammar.json`, read-only, its
+output directory the only writable path, nothing else of the host mounted); the report records `"sandbox": "bwrap"`.
+Without the wrapper `gen` stops before running anything downloaded, unless `-nightly-unsandboxed` is given; the script
+passes it only with `NIGHTLY_REHEARSAL_UNSANDBOXED=1` (Windows has no sandbox), and the report then records
+`"sandbox": "none"`. The `run` phase also starts `gen` itself without those token variables, also in `all`.
+
+Output in `<work-dir>/out/`: `summary.md` (also the job summary and the issue comment), `report.json`, `digest.txt`, and gzipped copies
+of the differing `parser.c`/`grammar.json`/`node-types.json` under `files/<lang>/<side>/`, for each side that has the file. Per
+grammar the result is `identical`, `headers-only` (only other generated files such as `tree_sitter/*.h` differ), `differs`
+(one of the three main files differs), `pinned-failed`, `nightly-failed`, `both-failed`
+(each side's error and time are reported; files are compared only when both succeed) or `input-failed`. When both sides
+generated, the `node-types.json` schema verdict is always included, also when no file differs: `identical` only for equal
+hashes, `BLOCKED` with a reason when one or both sides lack it or it cannot be read. Unreadable files and failed copies
+are `artifactErrors` and fail the command. A grammar with a generator exception (csharp) is regenerated
+as well. The conformance corpus is not run: that needs the native build lane and belongs to the pin-move pull request.
+The digest covers the results (status, each differing file's change kind and both SHA-256s, the schema verdict and its
+per-code and per-risk counts) and not the CLI identity, error text or timings, so the weekly job comments on issue #67
+only when a result changed since the last comment.
+
 ## Pins (`pins.json`)
 
 Everything a generation consumes is pinned, and the identity of a generated module never depends on the host:
