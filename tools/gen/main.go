@@ -61,6 +61,13 @@ func main() {
 		}
 		return
 	}
+	if len(os.Args) > 1 && os.Args[1] == "nightly-rehearsal" {
+		if err := runRehearsalCommand(os.Args[2:], os.Stdout); err != nil {
+			fmt.Fprintln(os.Stderr, "gen nightly-rehearsal:", err)
+			os.Exit(1)
+		}
+		return
+	}
 	if len(os.Args) > 1 && os.Args[1] == "cp949" {
 		if err := runCP949Command(os.Args[2:], os.Stdout); err != nil {
 			fmt.Fprintln(os.Stderr, "gen cp949:", err)

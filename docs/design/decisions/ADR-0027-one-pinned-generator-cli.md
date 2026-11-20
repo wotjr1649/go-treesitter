@@ -111,3 +111,59 @@ replacing upstream files, then ciconf generates the same three seeded edits per 
 corpus remains the source for pinned concat large inputs. These original repository fixtures are separate
 from upstream test expectations and the pinned grammar-kit projection; their hashes are recorded in the sidecar
 identity and execution report. They ensure behaviour-changing fixes are exercised even when upstream seeds are ASCII.
+
+## Nightly rehearsal (2026-11-20, report only)
+
+The owner wants every grammar to be served with the latest tree-sitter CLI. Decision 1 and 2 stay: the CLI that builds
+the product is the pinned one and moves only in a pin-move pull request. To see early what a move would change,
+`.github/workflows/nightly-cli-rehearsal.yml` runs weekly (and on dispatch) on hosted Linux amd64 and regenerates every grammar
+a second time with the CLI of the `nightly` release of `tree-sitter/tree-sitter`, through the same preparation path as the
+pinned run (verified archive, grammar-input patches, double generation, C patches).
+
+- **Report only.** It reports, per grammar, whether generation succeeded and was deterministic, which of `parser.c`,
+  `grammar.json`, `node-types.json` and other generated files (the `tree_sitter/*.h` headers come from the CLI, so they
+  carry the nightly runtime's changes) differ from the pinned-CLI output, and the `node-types.json` schema diff summary
+  (codes and risks of `gen schema diff`). It never edits the repository, opens a PR, moves a pin or fails a PR. It is not
+  a gate and not parity evidence (`validation.md`, E2); it does not run the conformance corpus, which needs the native
+  build lane and belongs to the pin-move pull request. The csharp generator exception is regenerated too, so the
+  report shows whether nightly changes its generated C; its committed reference C is not touched.
+- **Identity instead of a pin.** The nightly assets have no fixed bytes. The run records the asset URL, the API size and
+  GitHub's own `digest` of the asset, the commit of the `nightly` tag read before and after the download, the SHA-256 of
+  the downloaded `.gz` and of the binary that ran, and its `--version` line. These are cross-checked, not pinned: the API
+  size and digest must match the downloaded file (checked before it is decompressed or run), the tag must not move
+  between the two lookups, and the build commit named by `--version` must be that tag commit. Missing or mismatched
+  identity, including an unreadable asset or metadata file, unparsable metadata or an asset that does not decompress, is
+  recorded and **holds** the comparison: no grammar is compared, the run is red and the tracking issue is not updated.
+  That identity is the only thing a result is bound to.
+- **Isolation.** The token only reads the release metadata, in its own step, before anything downloaded runs; the step
+  that runs `gen` has no token, also in the local `all` path. The pinned archives and npm inputs are fetched and verified
+  first by trusted code. Every nightly execution (`--version`, `generate`) runs through `tools/gen/nightly-sandbox.sh`
+  in bubblewrap: no network, an empty environment, no new privileges, its own PID namespace, and a filesystem of
+  read-only `/usr`, that call's prepared tree (grammar, patched inputs, npm inputs, Swift's `grammar.json`) read-only, and
+  a fresh `generate --output` directory as the one writable path; the other tree, the checkout, pins, patches, archives,
+  Go cache and runner files are not mounted. Trusted code imports only the files that generation mode writes (regular
+  files with the names `tree-sitter generate` writes; never `grammar.json` when it is the input) into the tree, removes
+  an expected file the CLI did not write instead of keeping the archive's copy, then applies C patches, hashes and
+  assembles the report. Independently of the sandbox, `gen` gives the nightly `--version` and `generate` processes no
+  GitHub token variables and no stale mount variables; only `generate` gets the two trusted mount paths. A workflow
+  self-check with the same mount layout proves the inputs are read-only, the other tree and runner files are absent, the
+  token and network are absent and the output is writable; each of its checks fails the step on its own. Without the
+  wrapper nothing downloaded runs, except with an explicit local opt-in (`-nightly-unsandboxed`, recorded as
+  `"sandbox": "none"`).
+- **Comparison.** The common input check is Prepare's own pre-generation part (archive, input patches, npm inputs,
+  generation input), plus `grammar.js` in the generate directory when no `generateFrom` is set; its failure is
+  `input-failed` and neither CLI runs. Then the pinned and the nightly preparation run
+  independently and each outcome is reported (`pinned-failed`, `nightly-failed`, `both-failed`); files are compared only
+  when both succeed. Copies of the differing main files are kept for the sides that have them; whenever both succeed the
+  schema verdict is given, `identical` only for equal hashes and `BLOCKED`, with its reason, when one or both sides lack
+  the file or it is unreadable.
+- **Separate code path.** The pinned path is unchanged: `grammarpatch.Config` verifies the pinned archive and binary
+  hash and the version unless `Config.Unpinned` is set, which only `gen nightly-rehearsal` does, and which refuses a
+  Config that also carries pin fields. `gen -lang`, `regen.sh` and `regen.yml` cannot reach it.
+- **Tracking issue.** One comment on #67 (the CLI/runtime move to 0.28.0) when the per-grammar results changed
+  since the last comment; the digest is kept in a hidden marker at the end of that comment and covers the results
+  (status, each differing file with its change kind and both SHA-256s, the schema verdict with its per-code and per-risk
+  counts), not the nightly identity, error text or timings. Only a successful rehearsal with a verified identity can
+  comment; only the workflow bot's own marked comments are read, and a failed lookup fails the issue job without
+  commenting. Nothing is posted once #67 is closed. A broken harness (for example an unreachable download) fails that
+  scheduled run only.

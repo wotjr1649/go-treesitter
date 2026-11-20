@@ -14,6 +14,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -34,6 +35,10 @@ type Config struct {
 	// The callback must leave the source tree unchanged.
 	BeforeGeneratedPatch func(root string, i int) error
 	Patches              []patches.Pin
+	// Unpinned is for the report-only nightly rehearsal (tools/gen nightly-rehearsal) and nothing else: the CLI is not
+	// verified against a pin, the caller records its identity, and CLIVersion is only copied into the provenance.
+	// It must not carry pin fields, so a pinned Config can never fall into this path by mistake.
+	Unpinned bool
 }
 
 // Provenance excludes host paths and binary hashes; per-platform archives are verified against pins.json.
@@ -74,54 +79,12 @@ func local(name string) bool {
 // Prepare verifies inputs, patches grammar inputs, generates twice, then applies recorded C patches.
 // It never modifies the caller's original extracted inputs.
 func Prepare(c Config) (string, *Provenance, error) {
-	if len(c.Patches) == 0 && !c.Regenerate {
-		return "", nil, fmt.Errorf("no patches")
-	}
-	if !local(c.GrammarDir) {
-		return "", nil, fmt.Errorf("invalid grammar directory %q", c.GrammarDir)
-	}
-	if err := checkFile(c.Archive, c.ArchiveSHA256); err != nil {
-		return "", nil, err
-	}
-	if err := os.Mkdir(c.Work, 0o755); err != nil {
-		return "", nil, err
-	}
-	root := filepath.Join(c.Work, "first")
-	if err := extract(c.Archive, root); err != nil {
-		return "", nil, err
-	}
-	if err := Validate(c.Patches, c.Regenerate, c.GenerateFrom); err != nil {
-		return "", nil, err
-	}
-	var before, after []patches.Pin
-	for _, p := range c.Patches {
-		if c.Regenerate && (path.Ext(p.Source) == ".c" || path.Ext(p.Source) == ".h") {
-			after = append(after, p)
-		} else {
-			before = append(before, p)
-		}
-	}
-	if err := patches.Apply(c.PatchRoot, root, before); err != nil {
-		return "", nil, err
-	}
-	npm, err := prepareNPM(c, root)
+	root, after, prov, err := prepareSources(c)
 	if err != nil {
 		return "", nil, err
-	}
-	inputs, err := snapshot(root)
-	if err != nil {
-		return "", nil, err
-	}
-	prov := &Provenance{Patches: c.Patches, NPM: npm, InputSHA256: treeHash(inputs)}
-	if c.GenerateFrom != "" {
-		prov.GenerateFrom = c.GenerateFrom
-		prov.GenerateFromSHA256 = inputs[path.Join(c.GrammarDir, c.GenerateFrom)]
-		if prov.GenerateFromSHA256 == "" {
-			return "", nil, fmt.Errorf("generation input %s missing", c.GenerateFrom)
-		}
 	}
 	if c.Regenerate {
-		if err := verifyCLI(c); err != nil {
+		if err := checkCLI(c); err != nil {
 			return "", nil, err
 		}
 		second := filepath.Join(c.Work, "second")
@@ -185,6 +148,93 @@ func Validate(ps []patches.Pin, regenerate bool, generateFrom string) error {
 	return nil
 }
 
+// prepareSources is every step of Prepare before generation: archive check and extraction into Work/first, input
+// patches, npm inputs on the patched tree, and the generation input. It returns that tree, the C patches that apply to
+// generated files, and the provenance so far.
+func prepareSources(c Config) (string, []patches.Pin, *Provenance, error) {
+	if len(c.Patches) == 0 && !c.Regenerate {
+		return "", nil, nil, fmt.Errorf("no patches")
+	}
+	if !local(c.GrammarDir) {
+		return "", nil, nil, fmt.Errorf("invalid grammar directory %q", c.GrammarDir)
+	}
+	if err := checkFile(c.Archive, c.ArchiveSHA256); err != nil {
+		return "", nil, nil, err
+	}
+	if err := os.Mkdir(c.Work, 0o755); err != nil {
+		return "", nil, nil, err
+	}
+	root := filepath.Join(c.Work, "first")
+	if err := extract(c.Archive, root); err != nil {
+		return "", nil, nil, err
+	}
+	if err := Validate(c.Patches, c.Regenerate, c.GenerateFrom); err != nil {
+		return "", nil, nil, err
+	}
+	var before, after []patches.Pin
+	for _, p := range c.Patches {
+		if c.Regenerate && (path.Ext(p.Source) == ".c" || path.Ext(p.Source) == ".h") {
+			after = append(after, p)
+		} else {
+			before = append(before, p)
+		}
+	}
+	if err := patches.Apply(c.PatchRoot, root, before); err != nil {
+		return "", nil, nil, err
+	}
+	npm, err := prepareNPM(c, root)
+	if err != nil {
+		return "", nil, nil, err
+	}
+	inputs, err := snapshot(root)
+	if err != nil {
+		return "", nil, nil, err
+	}
+	prov := &Provenance{Patches: c.Patches, NPM: npm, InputSHA256: treeHash(inputs)}
+	if c.GenerateFrom != "" {
+		prov.GenerateFrom = c.GenerateFrom
+		prov.GenerateFromSHA256 = inputs[path.Join(c.GrammarDir, c.GenerateFrom)]
+		if prov.GenerateFromSHA256 == "" {
+			return "", nil, nil, fmt.Errorf("generation input %s missing", c.GenerateFrom)
+		}
+	}
+	return root, after, prov, nil
+}
+
+// CheckInputs runs Prepare's pre-generation steps (prepareSources) in a scratch directory, fetching npm inputs when
+// c.FetchNPM, so that later Prepare calls run offline and a failure here is common to every CLI; without GenerateFrom it
+// also requires grammar.js where generate runs. The nightly rehearsal's common input check; C patches on generated files
+// stay with each CLI's Prepare.
+func CheckInputs(c Config) error {
+	tmp, err := os.MkdirTemp("", "grammar-inputs-*")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(tmp)
+	c.Work = filepath.Join(tmp, "work")
+	root, _, _, err := prepareSources(c)
+	if err != nil || !c.Regenerate || c.GenerateFrom != "" {
+		return err
+	}
+	// Default mode: generate reads grammar.js from its working directory (prepareSources checks only GenerateFrom).
+	js := filepath.Join(root, filepath.Dir(filepath.FromSlash(c.GrammarDir)), "grammar.js")
+	if fi, err := os.Lstat(js); err != nil || !fi.Mode().IsRegular() {
+		return fmt.Errorf("generation input grammar.js missing in the generate directory %s", path.Dir(c.GrammarDir))
+	}
+	return nil
+}
+
+// checkCLI is the only place that chooses between the pinned check and the rehearsal's unpinned one.
+func checkCLI(c Config) error {
+	if !c.Unpinned {
+		return verifyCLI(c)
+	}
+	if c.CLI == "" || c.CLIVersion == "" || c.CLIArchive != "" || c.CLIArchiveSHA256 != "" {
+		return fmt.Errorf("unpinned CLI needs a binary and a recorded version, and no pin fields")
+	}
+	return nil
+}
+
 func verifyCLI(c Config) error {
 	if c.CLIVersion == "" || c.CLI == "" || c.CLIArchive == "" {
 		return fmt.Errorf("pinned tree-sitter CLI and archive are required")
@@ -226,12 +276,102 @@ func generate(c Config, root string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
 	cmd := proc.CommandContext(ctx, c.CLI, "generate", "--abi", "15", "--js-runtime", "native")
+	var outDir string
+	if c.Unpinned {
+		// The unpinned CLI writes only to a fresh directory beside the tree; its sandbox wrapper mounts the tree read-only
+		// (TS_GENERATE_INPUT) and only that directory writable (TS_GENERATE_OUTPUT). importGenerated copies the files back.
+		outDir = root + ".out"
+		if err := os.Mkdir(outDir, 0o755); err != nil {
+			return err
+		}
+		cmd.Args = append(cmd.Args, "--output", outDir)
+		cmd.Env = UnpinnedEnv("TS_GENERATE_INPUT="+root, "TS_GENERATE_OUTPUT="+outDir)
+	}
 	if c.GenerateFrom != "" {
 		cmd.Args = append(cmd.Args, filepath.Join(filepath.Base(c.GrammarDir), c.GenerateFrom))
 	}
 	cmd.Dir = dir
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("tree-sitter generate: %w: %s", err, out)
+	}
+	if c.Unpinned {
+		return importGenerated(outDir, filepath.Join(root, filepath.FromSlash(c.GrammarDir)), c.GenerateFrom != "")
+	}
+	return nil
+}
+
+// UnpinnedEnv is the environment of every unpinned CLI process (rehearsal --version and generate): the caller's
+// environment without GitHub tokens and without the sandbox mount variables, plus extra.
+func UnpinnedEnv(extra ...string) []string {
+	var env []string
+	for _, kv := range os.Environ() {
+		name, _, _ := strings.Cut(kv, "=")
+		if !slices.ContainsFunc(unpinnedDropped, func(d string) bool { return strings.EqualFold(d, name) }) {
+			env = append(env, kv)
+		}
+	}
+	return append(env, extra...)
+}
+
+var unpinnedDropped = []string{"GH_TOKEN", "GITHUB_TOKEN", "GH_ENTERPRISE_TOKEN", "GITHUB_ENTERPRISE_TOKEN", "TS_GENERATE_INPUT", "TS_GENERATE_OUTPUT"}
+
+// generatedFiles is what `tree-sitter generate --output` writes; grammar.json only when generating from grammar.js
+// (with GenerateFrom it is the input and is never taken from the output).
+func generatedFiles(fromJSON bool) map[string]bool {
+	m := map[string]bool{"parser.c": true, "node-types.json": true,
+		"tree_sitter/alloc.h": true, "tree_sitter/array.h": true, "tree_sitter/parser.h": true}
+	if !fromJSON {
+		m["grammar.json"] = true
+	}
+	return m
+}
+
+// importGenerated replaces the generated files in the grammar directory with an untrusted CLI's output: only regular
+// files with an expected name are taken, any other entry fails the generation, and an expected file the CLI did not
+// write is removed rather than left as the archive's copy (a missing node-types.json then shows as missing).
+func importGenerated(out, dst string, fromJSON bool) error {
+	want := generatedFiles(fromJSON)
+	got := map[string][]byte{}
+	err := filepath.WalkDir(out, func(p string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, err := filepath.Rel(out, p)
+		if err != nil {
+			return err
+		}
+		rel = filepath.ToSlash(rel)
+		switch {
+		case d.IsDir() && (rel == "." || rel == "tree_sitter"):
+			return nil
+		case !d.Type().IsRegular() || !want[rel]:
+			return fmt.Errorf("unexpected generated entry %q (%s)", rel, d.Type())
+		}
+		b, err := os.ReadFile(p)
+		got[rel] = b
+		return err
+	})
+	if err != nil {
+		return err
+	}
+	if got["parser.c"] == nil {
+		return fmt.Errorf("generated parser.c missing")
+	}
+	for rel := range want {
+		p := filepath.Join(dst, filepath.FromSlash(rel))
+		b, ok := got[rel]
+		if !ok {
+			if err := os.Remove(p); err != nil && !os.IsNotExist(err) {
+				return err
+			}
+			continue
+		}
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			return err
+		}
+		if err := os.WriteFile(p, b, 0o644); err != nil {
+			return err
+		}
 	}
 	return nil
 }
