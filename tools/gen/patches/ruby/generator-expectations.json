@@ -2,7 +2,7 @@
   "identity": {
     "grammarCommit": "ad907a69da0c8a4f7a943a7fe012712208da6dee",
     "seed": 1,
-    "corpusManifestSHA256": "da54008ee3d01d9ccd6ffac7650f2b868637ba05ce9716475b7a1489cdf07ef9",
+    "corpusManifestSHA256": "a0e34492d936a28483606d3cc46f883e22e43baecb7e15f0b6057e84cf080ade",
     "editsManifestSHA256": "d9a1c80d6f088ba9d2bf6454f507871cc0a4c90f0e6e0b536429595c88aa074b",
     "largeEntries": [
       {
@@ -17,7 +17,7 @@
       }
     ],
     "patchCorpusFilesSHA256": {
-      "global-variable-non-ascii.txt": "a487c96c4bb809c9501d44083633428f037c029cadee3d932ddb6942bc02f0ef"
+      "global-variable-non-ascii.txt": "91cefabe1ebfdd29669c6252884db4d8d72fdec3bcb7d18e3ba9647521d71bc8"
     },
     "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
     "cli": "0.27.2",
@@ -41,7 +41,7 @@
       }
     ]
   },
-  "reason": "Ruby #306: global_variable names follow instance_variable and class_variable (ALPHA_CHAR + IDENTIFIER_CHARS), as the Ruby syntax documentation states, so non-ASCII names such as $한글 parse; special globals keep their original alternatives. Rule text from Magikdidi24/tree-sitter-ruby bef45e6 (in PR #282). Each listed difference is a P121 patch-corpus input or its seeded edit in which a non-ASCII global variable now parses.",
+  "reason": "Ruby #306: global_variable names follow instance_variable and class_variable (ALPHA_CHAR + IDENTIFIER_CHARS), as the Ruby syntax documentation states, so non-ASCII names such as $한글 parse; special globals keep their original alternatives. Rule text from Magikdidi24/tree-sitter-ruby bef45e6 (in PR #282). Each listed difference is a patch-corpus input or its seeded edit in which a non-ASCII global variable now parses.",
   "retireWhen": "Retire with the matching patch when the upstream pin incorporates the fix; review anew for any identity, fixture or result change.",
   "differences": [
     {
