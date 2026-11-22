@@ -1,6 +1,6 @@
 # ADR-0024 — Grammar source tiers: one upstream per language
 
-**Status:** Accepted by the owner · 2026-11-15; rule 6 added 2026-11-16; rule 7 added 2026-11-18 · refines ADR-0020 §4 (which grammars) and ADR-0023 (how defects
+**Status:** Accepted by the owner · 2026-11-15; rule 6 added 2026-11-16; rule 7 added 2026-11-18; rule 7.7 amended 2026-11-21 · refines ADR-0020 §4 (which grammars) and ADR-0023 (how defects
 are carried). The runtime upstream is `tree-sitter/tree-sitter` only, unmodified.
 
 ## Context
@@ -176,7 +176,7 @@ languages.
    match the `grammar.js` of the integrity-checked npm input of the old pins (SHA-256
    `230e330dd914d94297e5e58d53942cd5debf9c069852da93b6a6b1daae1967dc`). When a later TypeScript release switches to the
    owner JavaScript grammar, vendor `grammar.js` from a named 0.25-based owner JavaScript v1.x tag containing the
-   `using` and reserved-word fixes. `NOTICE` records the source
+   `using` and reserved-word fixes (sentence replaced by the 2026-11-21 amendment below). `NOTICE` records the source
    repository, tag, commit and file SHA-256, and the owner repository's CI checks that hash. Omit `npmDependencies`
    from both pins. The npm rules of ADR-0027 decision 4 stay unchanged for other pins.
 
@@ -214,3 +214,20 @@ ADR-0023 patches. Other languages are unchanged.
 
 The owner decided this on 2026-11-18; merging the pull request carrying this amendment records the owner's approval of
 its text. It approves no repository creation and no pin move.
+
+## Amendment (2026-11-21): rule 7.7, the owner JavaScript release TypeScript vendors
+
+The owner JavaScript repository has moved past v1.x (v4.4.0 was published on 2026-11-21), so "a named 0.25-based owner
+JavaScript v1.x tag" no longer names the intended input. In 7.7 the sentence beginning "When a later TypeScript release
+switches" is replaced by:
+
+   When a TypeScript release switches to the owner JavaScript grammar, vendor `grammar.js` from the owner JavaScript
+   release that is the latest published release when the port is made. That release must be 0.25-based and contain the
+   `using` and reserved-word fixes.
+
+The rest of 7.7 is unchanged: `NOTICE` records the source repository, tag, commit and file SHA-256, the owner
+repository's CI checks that hash, `npmDependencies` stays omitted from both pins, and the npm rules of ADR-0027
+decision 4 stay unchanged for other pins. Both pins still move together in one separately approved PR.
+
+The owner decided this on 2026-11-21; merging the pull request carrying this amendment records the owner's approval of
+its text. It approves no pin move.
