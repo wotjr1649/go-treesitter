@@ -297,3 +297,39 @@ The following additions and one behaviour change affect the root module; the eng
   `RuneCol` are now those of the character's start; before, each byte of the character was counted as a character, so the
   columns were not monotonic in the offset. `ByteCol` is unchanged. Offsets at character boundaries, and every node
   start and end of a valid UTF-8 source, give the same result as before.
+
+### Java grammar v3.0.3
+
+`github.com/wotjr1649/go-treesitter/grammars/java` uses owner grammar
+[v3.0.3](https://github.com/wotjr1649/tree-sitter-java/tree/v3.0.3), commit
+`358048c1c6f9f84335ca4a42141fd0798e6a36f2`. The Go import path stays the same.
+
+- **Service providers (K17).** In `provides S with A, B;`, both `A` and `B` carry the required,
+  repeatable `provider` field. Query with `(provides_module_directive provider: (_) @provider)`.
+  The first field lookup now returns `A`. Update tree walkers that read the first implementation as
+  an unfielded child.
+- **Query-visible trees.** A `default` in a switch label list is an anonymous token (K3).
+  Qualified record patterns such as `case T.R() ->` now match `record_pattern` and lose their
+  call captures (K4). The upstream highlights capture the type. A qualified generic `super` call
+  in a constructor body can now be an `explicit_constructor_invocation` (K2).
+  These changes affect captures and kind-based dispatch even when the query still compiles.
+- **Patterns, references and expressions.** Empty record patterns in lists and guarded labels are
+  `record_pattern` nodes (K11, K26). A qualified `TypeName.super::m` has a named `super` child (K20).
+  Postfix updates attach inside casts and unary expressions (K21), switch arrows delimit whole lambda
+  results (K22), and `yield (n) + k` forms a `yield_statement` (K27). Contextual type names can now
+  form `class_literal` nodes (K9, K29). Annotations on receiver parameters are represented within
+  `receiver_parameter` (K7).
+- **Literal and comment spans.** Encoded backslashes and text-block continuations change the
+  bounds and placement of `escape_sequence` and fragment nodes (K10, K18, K19). An encoded
+  backslash can leave a literal unterminated. An ordinary string with a raw backslash followed by
+  a line terminator can now contain an error. Line comments end before CR, LF or CRLF (K23).
+- **Reserved words and casts.** Phase 5 rejects Java's reserved words and literal spellings in
+  identifier positions previously accepted. Inputs that relied on those tolerances can contain `ERROR`
+  or `MISSING` nodes. Contextual names still work subject to the upstream `when` limits (K25 and K32).
+  For signed operands, K34 reads `(Name) + x` and `(Name) - x` as additive expressions and withdraws
+  tolerances such as `(@A Integer) -k` and `(void) -k`.
+
+The [upstream changelog](https://github.com/wotjr1649/tree-sitter-java/blob/358048c1c6f9f84335ca4a42141fd0798e6a36f2/CHANGELOG.md)
+records the 2.x and 3.x grammar changes and retained cases. See the
+[Java schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-java-v303)
+for the static contract changes.

@@ -293,6 +293,26 @@ go-treesitter already generated from the origin pin (the same 27 changes appear 
 The generated schemas are byte-identical and pass strict checks with an empty diff (E1, Windows amd64). Go modules
 at both pins use the same generated schema.
 
+## Unreleased (after v0.5.0) Java v3.0.3
+
+Under ADR-0024 rule 7, Java moves within `wotjr1649/tree-sitter-java` from
+v1.0.0 (`a241253570b20a5f83c9dde367a5a50f0116a978`) to the
+[v3.0.3 tag](https://github.com/wotjr1649/tree-sitter-java/tree/v3.0.3)
+(`358048c1c6f9f84335ca4a42141fd0798e6a36f2`).
+
+| Input | Schema bytes | Schema SHA-256 | Archive SHA-256 |
+|---|---:|---|---|
+| Owner v1.0.0 | 82217 | `eb6b0ace9dd94b23dca6fbcf17e53b28c48338afbec1b437d43857f0dee53c51` | `e7c8e95baf348a9c23579f4151869a84ac89a34af27b24518e69c91270010c24` |
+| Owner v3.0.3 | 82875 | `b525932ca8127826b6e0370d542bd3b76f1e4f147692f532271d67ea8da26183` | `bfe73b9961805bf1d04c11f97bd21288e9f12e7c40d2851aadae0ebbd4597465` |
+
+Both archived schemas pass the strict check with no findings. The strict diff reports 17 changes (E1,
+Windows amd64). K17 makes `provides_module_directive.provider` required and removes its unfielded implementation
+children. K7 replaces the `catch_type` child alternative `_unannotated_type` with `_type` to support annotations.
+The other additions cover parenthesized assignment targets, `instanceof` modifiers, scoped method-reference
+qualifiers, qualified record patterns and modifiers on type patterns and record pattern components.
+No node kind or field name is added, removed or renamed. Query and CST changes are in
+[the migration notes](../../MIGRATING.md#java-grammar-v303).
+
 ## Unreleased (after v0.5.0) TypeScript and TSX v1.0.0
 
 Under ADR-0024 rules 7.5 and 7.7, TypeScript and TSX move together from
