@@ -314,6 +314,24 @@ grammar for `comment` and `html_comment`, matching the CLI 0.27.2 changes record
 above. The owner archive contains the schema already produced by go-treesitter's pinned CLI. Preparing
 both pins with CLI 0.27.2 gives byte-identical schemas and an empty diff for each grammar (E1, Windows amd64).
 
+## Unreleased (after v0.5.0) JavaScript v4.4.0
+
+The JavaScript pin moves from the patched owner v1.0.0 (`d6501de34e9aabad1f49b860fcfcc23066766223`)
+to owner v4.4.0 (`e5ada307a6f1741a573d5c8d4dafee9234330b1f`). Both archived and prepared
+schemas pass strict validation (E1, CLI 0.27.2, Windows amd64).
+
+| Pin | Schema bytes | Schema SHA-256 |
+|---|---:|---|
+| v1.0.0 with scanner patch 0001 | 64022 | `188a8baa97018edaf63bf7ece372c07bc0d74d1301004bc8f211eb7dee5a6e70` |
+| v4.4.0 | 65413 | `7a2768fae33735e20402f5c6d55aea1813a7b51979801b9f122e7b96ea944729` |
+
+Eight of the 226 node definitions change. The diff records 17 additions, one `CARDINALITY_WIDENED`
+and one `CHILDREN_TYPE_REMOVED`. The last entry narrows the immediate child of `await_expression`
+from `expression` to a list of seven eligible kinds. The kind, field-name and supertype membership
+sets are preserved. The source now incorporates the JSX bare-ampersand fix; the retired C-only
+patch did not change the v1.0.0 schema.
+[Upstream changelog](https://github.com/wotjr1649/tree-sitter-javascript/blob/v4.4.0/CHANGELOG.md) · [Migration](../../MIGRATING.md#unreleased-after-v050)
+
 ## Unreleased (after v0.5.0) JavaScript v1.0.0
 
 Under ADR-0024 rule 7, JavaScript moves from `tree-sitter/tree-sitter-javascript`

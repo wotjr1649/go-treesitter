@@ -19,7 +19,7 @@ The runtime stays unmodified. Temporary grammar patches carried by go-treesitter
 and retirement mechanism of ADR-0023. Fixes released by a designated owner repository arrive through an approved
 ADR-0024 rule 7 pin move. Grammar-input changes regenerate C with the pinned CLI, identically for the engine and native reference.
 The YAML early-EOF fix, Bash/Ruby heredoc comparisons, YAML/Python serialization bounds, YAML scanner row widening, Rust block comment
-code-point fix and JavaScript JSX ampersand fix are C-only patches. HTML patches `grammar.js` to accept `>` and
+code-point fix are C-only patches. HTML patches `grammar.js` to accept `>` and
 bare `&` in text, Go patches it to accept Go 1.26 expression arguments to `new`, and Ruby patches it to accept
 non-ASCII global-variable names. The pins and generated provenance record original and result source hashes and each patch identity.
 The PostgreSQL Korean-support exception (owner decision 2026-11-17) records a grammar-input
