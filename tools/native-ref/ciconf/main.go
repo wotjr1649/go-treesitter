@@ -318,14 +318,25 @@ func selectedLanguages(selected string) ([]string, error) {
 	return slices.Compact(names), nil
 }
 
+// skipReason follows the tree-sitter CLI: :skip wins, and a case with :language(...) lines runs in every language it
+// names, so a case marked for both typescript and tsx runs in both.
 func skipReason(attrs []string, lang string) string {
+	var others []string
+	matched := false
 	for _, a := range attrs {
-		switch {
-		case a == ":skip":
+		if a == ":skip" {
 			return "skip (marked :skip upstream)"
-		case strings.HasPrefix(a, ":language(") && strings.TrimSuffix(strings.TrimPrefix(a, ":language("), ")") != lang:
-			return "other language (" + a + ")"
 		}
+		if l, ok := strings.CutPrefix(a, ":language("); ok {
+			if strings.TrimSuffix(l, ")") == lang {
+				matched = true
+			} else {
+				others = append(others, a)
+			}
+		}
+	}
+	if !matched && len(others) > 0 {
+		return "other language (" + strings.Join(others, " ") + ")"
 	}
 	return ""
 }
