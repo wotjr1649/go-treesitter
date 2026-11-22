@@ -22,6 +22,27 @@ func TestSelectedLanguages(t *testing.T) {
 	}
 }
 
+func TestSkipReasonLanguages(t *testing.T) {
+	both := []string{":language(typescript)", ":language(tsx)"}
+	for _, c := range []struct {
+		attrs []string
+		lang  string
+		skip  bool
+	}{
+		{nil, "tsx", false},
+		{both, "typescript", false},
+		{both, "tsx", false},
+		{both, "javascript", true},
+		{[]string{":language(tsx)"}, "typescript", true},
+		{[]string{":language(tsx)", ":skip"}, "tsx", true},
+		{[]string{":error"}, "tsx", false},
+	} {
+		if got := skipReason(c.attrs, c.lang); (got != "") != c.skip {
+			t.Errorf("skipReason(%v, %s) = %q, want skip %v", c.attrs, c.lang, got, c.skip)
+		}
+	}
+}
+
 func TestInputsOnlyDoesNotRunNative(t *testing.T) {
 	root := t.TempDir()
 	pins := filepath.Join(root, "pins.json")
