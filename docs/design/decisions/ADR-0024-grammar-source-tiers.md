@@ -225,6 +225,13 @@ switches" is replaced by:
    release that is the latest published release when the port is made. That release must be 0.25-based and contain the
    `using` and reserved-word fixes.
 
+"Latest published release" is the release GitHub marks Latest (`gh release view -R wotjr1649/tree-sitter-javascript`,
+i.e. `GET /releases/latest`). The port PR selects it once, when it first chooses the vendored input, and records the
+lookup time (UTC), tag, peeled commit and `grammar.js` SHA-256; a release published after that is a new selection,
+not an obligation to switch. "0.25-based" means the tagged commit descends from `tree-sitter/tree-sitter-javascript`
+v0.25.0 (`44c892e`). If the Latest release fails these conditions, the owner decides; there is no automatic fallback
+to an older tag.
+
 The rest of 7.7 is unchanged: `NOTICE` records the source repository, tag, commit and file SHA-256, the owner
 repository's CI checks that hash, `npmDependencies` stays omitted from both pins, and the npm rules of ADR-0027
 decision 4 stay unchanged for other pins. Both pins still move together in one separately approved PR.
