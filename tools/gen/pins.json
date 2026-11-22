@@ -377,23 +377,23 @@
     },
     "java": {
       "repo": "https://github.com/wotjr1649/tree-sitter-java",
-      "commit": "a241253570b20a5f83c9dde367a5a50f0116a978",
-      "extractDir": "tree-sitter-java-a241253570b2",
-      "archive": "tree-sitter-java-a241253570b2.tar.gz",
-      "archiveSHA256": "e7c8e95baf348a9c23579f4151869a84ac89a34af27b24518e69c91270010c24",
+      "commit": "358048c1c6f9f84335ca4a42141fd0798e6a36f2",
+      "extractDir": "tree-sitter-java-358048c1c6f9",
+      "archive": "tree-sitter-java-358048c1c6f9.tar.gz",
+      "archiveSHA256": "bfe73b9961805bf1d04c11f97bd21288e9f12e7c40d2851aadae0ebbd4597465",
       "grammarDir": "src",
       "dirs": [
         "src"
       ],
-      "treeSHA256": "bedcee6b2e9a129166976bb303fe1d35d2a68fb1cc3f887ccfeb247377df36f0",
+      "treeSHA256": "50807ff011ac08562636b9fff4614ee91ac6b9ed116d2207d464282d1e809de8",
       "files": {
-        "parser.c": "85977add5c0918e0991c2decf75ad7aa66539811786703653ee9c9f1ed4ef523",
+        "parser.c": "ab39942346363a8aafe5f361ab6347309739973ad83e72f78835024ef7e8c93e",
         "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
         "tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
         "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
       },
       "licenseSHA256": "a5bd935d59718b05d30f09eeaf0b31919e73549e37ec3c7aa4dd1f19cb99439a",
-      "noticeSHA256": "9cd9865fda2fc6055639488591a69dc51f106e282fd3f31d52b5fe736a907f63",
+      "noticeSHA256": "763ed8e8f9d14653346e50ec1cba8d8e034a2c61722d22d6d6afb876a20c6a52",
       "cSymbol": "tree_sitter_java",
       "regenerate": true
     },
