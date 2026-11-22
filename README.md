@@ -35,7 +35,7 @@ Each language has exactly one upstream repository, chosen by the tiers of
 | Owner-designated | `postgres` | `gmr/tree-sitter-postgres` |
 | 7 (owner-maintained) | `tsql` | `wotjr1649/tree-sitter-mssql` (v2.1.0 in the development tree after v0.5.0; origin `alfpricot/tree-sitter-mssql` v1.0.0; ADR-0024 rule 7) |
 | 7 (owner-maintained) | `java` | `wotjr1649/tree-sitter-java` (v1.0.0 in the development tree after v0.5.0; origin `tree-sitter/tree-sitter-java` v0.23.5; ADR-0024 rule 7) |
-| 7 (owner-maintained) | `javascript` (including JSX) | `wotjr1649/tree-sitter-javascript` (v1.0.0 in the development tree after v0.5.0, based on `tree-sitter/tree-sitter-javascript` v0.25.0 under ADR-0024 rule 7) |
+| 7 (owner-maintained) | `javascript` (including JSX) | `wotjr1649/tree-sitter-javascript` (v4.4.0 in the development tree after v0.5.0, based on `tree-sitter/tree-sitter-javascript` v0.25.0 under ADR-0024 rule 7) |
 | 7 (owner-maintained) | `typescript`, `tsx` | `wotjr1649/tree-sitter-typescript` (v1.0.0 in the development tree after v0.5.0, based on `tree-sitter/tree-sitter-typescript` v0.23.2 under ADR-0024 rule 7) |
 
 Exact revisions are in [pins.json](tools/gen/pins.json). Bash, Ruby, YAML and Python carry recorded temporary C-only patches

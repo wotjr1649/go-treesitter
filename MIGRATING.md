@@ -128,6 +128,19 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   cached symbol IDs, and recompute cached subtree hashes after upgrading. The node-type names and named fields are the same.
   [Schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-go-new-expression-patch)
 
+- **JavaScript v4.4.0:** `grammars/javascript` keeps the same Go API and moves from the patched owner
+  v1.0.0 pin to v4.4.0 (`e5ada307a6f1741a573d5c8d4dafee9234330b1f`). Regenerate tree snapshots and
+  rebuild cached numeric symbol IDs. The owner releases correct CSTs for `using` with a line break or
+  a subscript, labelled statement blocks, `await` operands, default exports, automatic semicolon
+  insertion, Annex B comments, and JSX quoted attributes. In queries, check immediate `await_expression`
+  children, `export_statement.value` and following `empty_statement` siblings, comment ranges and
+  attachment, and captures of JSX `string_fragment` and `html_character_reference`. The release also
+  accepts hyphenated first segments in JSX member tags and parenthesized decorators. It rejects some
+  inputs formerly accepted by v1.0.0, including `yield` expressions outside generators and JSX
+  attributes with empty expressions. The owner grammar carries the JSX bare-ampersand fix.
+  [Schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-javascript-v440) ·
+  [Upstream changelog](https://github.com/wotjr1649/tree-sitter-javascript/blob/v4.4.0/CHANGELOG.md)
+
 - **Rust block comments:** the scanner compares full Unicode code points when recognizing block comment
   delimiters and documentation markers. The unpatched scanner read a code point whose low byte is `/`, `*`
   or `!` (for example `是`, `갯`, `个`, `갪`, `Ī`, `😪`, `ġ`) as that ASCII character. Previously error-free

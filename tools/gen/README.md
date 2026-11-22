@@ -277,12 +277,15 @@ Only owner-approved patches may be added. C-only patches keep their existing ide
 No real grammar patch is introduced by the regeneration mechanism itself.
 Recorded C-only patches exist for bash and ruby (`0001-heredoc-utf8`), yaml (`0001-no-early-eof`,
 `0002-bound-serialized-indent-bytes`, `0003-widen-scanner-rows`), python (`0001-bound-serialized-indent-bytes`), rust
-(`0001-block-comment-code-points`) and javascript (`0001-jsx-bare-ampersand`). HTML applies
+(`0001-block-comment-code-points`). HTML applies
 `0001-greater-than-text` and `0002-bare-ampersand-text` before generation. PostgreSQL applies
 `0001-non-ascii-identifiers` before generation and `0002-dollar-tag-code-points` after it.
 Go applies `0001-new-value-argument` before generation to accept Go 1.26 expression arguments to `new`.
 Ruby applies `0002-global-variable-non-ascii` before generation to accept non-ASCII global-variable names.
-`gen -patch-status` lists 14 records in total, including two for Ruby. Retire each with an approved pin move to a source that contains the fix (for an owner-maintained repository, an owner release; ADR-0024 rule 7.6).
+`gen -patch-status` lists 13 records in total, including two for Ruby. Retire each with an approved pin move to a source that contains the fix (for an owner-maintained repository, an owner release; ADR-0024 rule 7.6).
+JavaScript retired `0001-jsx-bare-ampersand` with its owner v4.4.0 pin (`e5ada307a6f1741a573d5c8d4dafee9234330b1f`).
+The fix first shipped in [owner v2.0.0](https://github.com/wotjr1649/tree-sitter-javascript/releases/tag/v2.0.0)
+([fix commit](https://github.com/wotjr1649/tree-sitter-javascript/commit/4765cd79603fa478da221da50500162757859e20)).
 `native-ref -unpatched` supplies the required corpus, fuzz-seed and patch-regression baseline.
 
 ADR-0027 sets `regenerate: true` for every grammar except entries with a recorded `generatorException`
@@ -338,8 +341,8 @@ contains its original 24 source archives plus `SHA256SUMS`; the new C and Postgr
 The v0.5.0 release mirrors the 25 rows with column 4 equal to `source` that existed then, plus `SHA256SUMS`.
 The Swift archive, the T-SQL v2.1.0 archive `tree-sitter-mssql-80037156b044.tar.gz`, the Java v1.0.0 archive
 `tree-sitter-java-a241253570b2.tar.gz`, the shared TypeScript/TSX v1.0.0 archive
-`tree-sitter-typescript-59fc4edb0c0b.tar.gz`, and the JavaScript v1.0.0 archive
-`tree-sitter-javascript-d6501de34e9a.tar.gz` were added afterwards and
+`tree-sitter-typescript-59fc4edb0c0b.tar.gz`, and the JavaScript v4.4.0 archive
+`tree-sitter-javascript-e5ada307a6f1.tar.gz` were added afterwards and
 have no mirror fallback until a release carrying them is published and its base is configured. Check their filenames against `runtime.archive`,
 `wasiLibc.archive`, and each grammar's `archive` in `pins.json`, deduplicating TypeScript/TSX's shared archive;
 the [publication procedure](../../docs/specs/publication.md#pinned-archive-release-assets) specifies the inventory

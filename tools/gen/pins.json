@@ -289,18 +289,18 @@
     },
     "javascript": {
       "repo": "https://github.com/wotjr1649/tree-sitter-javascript",
-      "commit": "d6501de34e9aabad1f49b860fcfcc23066766223",
-      "extractDir": "tree-sitter-javascript-d6501de34e9a",
-      "archive": "tree-sitter-javascript-d6501de34e9a.tar.gz",
-      "archiveSHA256": "28678c9e5bd2260218bada6c446766c6eee2fc9a10ef8344def61d59bf523cfa",
+      "commit": "e5ada307a6f1741a573d5c8d4dafee9234330b1f",
+      "extractDir": "tree-sitter-javascript-e5ada307a6f1",
+      "archive": "tree-sitter-javascript-e5ada307a6f1.tar.gz",
+      "archiveSHA256": "68f51687b103875eb0fe11e0278a7ffbcdfdb3b1ec571f7bbeafc4967ed28140",
       "grammarDir": "src",
       "dirs": [
         "src"
       ],
-      "treeSHA256": "6b705fc394fae294a8859f240f99661752ed829cf2108ce47ff1df30364b6e99",
+      "treeSHA256": "6b4ddeef175e8dfc0840d374453f0112618990365a37e3b945cae6def0ae4e90",
       "files": {
-        "parser.c": "dd77f92c8894a0ff67451ab3fbd9ef042f95ef2d274f2b85e28386e25975ee04",
-        "scanner.c": "b3d3f64284d97bf80749c026862427782cf7ecc0b7dc094e6698ab311c9a42c7",
+        "parser.c": "3b87fa0117add856e19c9112e8a1e8ce40553598191da6798841bdf2bc25e2f8",
+        "scanner.c": "5dbf217560ae084fba0412616fb40985c534110b5b0f611d62ccc458e43aecad",
         "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
         "tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
         "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
@@ -308,17 +308,7 @@
       "licenseSHA256": "8ef024c7b005dca2d72127f359ed3ef59755d2513308cb2a2b0df99007f4d47b",
       "noticeSHA256": "9b853f74b5d68a37b0ec99f5d0bfed12f97d50ba97de2b7cc3c66ad3673a1745",
       "cSymbol": "tree_sitter_javascript",
-      "regenerate": true,
-      "patches": [
-        {
-          "file": "patches/javascript/0001-jsx-bare-ampersand.patch",
-          "source": "src/scanner.c",
-          "sha256": "8b891aae18c637e087743a7f03493bcbf929bff2e5e88f0ada943963a63d1096",
-          "beforeSHA256": "b3d3f64284d97bf80749c026862427782cf7ecc0b7dc094e6698ab311c9a42c7",
-          "afterSHA256": "93e911221e1db427450e4735491e7d03beb3b9c83be3b1a1863a76c91e10f313",
-          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-javascript/pull/388"
-        }
-      ]
+      "regenerate": true
     },
     "html": {
       "repo": "https://github.com/tree-sitter/tree-sitter-html",
