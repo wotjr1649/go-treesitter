@@ -312,7 +312,17 @@ The following additions and one behaviour change affect the root module; the eng
   Qualified record patterns such as `case T.R() ->` now match `record_pattern` and lose their
   call captures (K4). The upstream highlights capture the type. A qualified generic `super` call
   in a constructor body can now be an `explicit_constructor_invocation` (K2).
-  Review captures and kind-based dispatch even if the query still compiles.
+  These changes affect captures and kind-based dispatch even when the query still compiles.
+- **Patterns, references and expressions.** Empty record patterns in lists and guarded labels are
+  `record_pattern` nodes (K11, K26). A qualified `TypeName.super::m` has a named `super` child (K20).
+  Postfix updates attach inside casts and unary expressions (K21), switch arrows delimit whole lambda
+  results (K22), and `yield (n) + k` forms a `yield_statement` (K27). Contextual type names can now
+  form `class_literal` nodes (K9, K29). Annotations on receiver parameters are represented within
+  `receiver_parameter` (K7).
+- **Literal and comment spans.** Encoded backslashes and text-block continuations change the
+  bounds and placement of `escape_sequence` and fragment nodes (K10, K18, K19). An encoded
+  backslash can leave a literal unterminated. An ordinary string with a raw backslash followed by
+  a line terminator can now contain an error. Line comments end before CR, LF or CRLF (K23).
 - **Reserved words and casts.** Phase 5 rejects Java's reserved words and literal spellings in
   identifier positions previously accepted. Inputs that relied on those tolerances can contain `ERROR`
   or `MISSING` nodes. Contextual names still work subject to the upstream `when` limits (K25 and K32).
