@@ -227,7 +227,7 @@ switches" is replaced by:
 
 "Latest published release" is the release GitHub marks Latest (`gh release view -R wotjr1649/tree-sitter-javascript`,
 i.e. `GET /releases/latest`). The port PR selects it once, when it first chooses the vendored input, and records the
-lookup time (UTC), tag, peeled commit and `grammar.js` SHA-256; a release published after that is a new selection,
+lookup time (UTC), tag, peeled commit and `grammar.js` SHA-256 in the pull request (`NOTICE` keeps its fields above); a release published after that is a new selection,
 not an obligation to switch. "0.25-based" means the tagged commit descends from `tree-sitter/tree-sitter-javascript`
 v0.25.0 (`44c892e`). If the Latest release fails these conditions, the owner decides; there is no automatic fallback
 to an older tag.
