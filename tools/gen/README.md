@@ -278,15 +278,17 @@ No real grammar patch is introduced by the regeneration mechanism itself.
 Recorded C-only patches exist for bash and ruby (`0001-heredoc-utf8`), yaml (`0001-no-early-eof`,
 `0002-bound-serialized-indent-bytes`, `0003-widen-scanner-rows`), python (`0001-bound-serialized-indent-bytes`), rust
 (`0001-block-comment-code-points`). HTML applies
-`0001-greater-than-text` and `0002-bare-ampersand-text` before generation. PostgreSQL applies
-`0001-non-ascii-identifiers` before generation and `0002-dollar-tag-code-points` after it.
+`0001-greater-than-text` and `0002-bare-ampersand-text` before generation.
 Go applies `0001-new-value-argument` before generation to accept Go 1.26 expression arguments to `new`.
 Ruby applies `0002-global-variable-non-ascii` before generation to accept non-ASCII global-variable names.
-`gen -patch-status` lists 13 records in total, including two for Ruby. Retire each with an approved pin move to a source that contains the fix (for an owner-maintained repository, an owner release; ADR-0024 rule 7.6).
+`gen -patch-status` lists 11 records in total, including two for Ruby. Retire each with an approved pin move to a source that contains the fix (for an owner-maintained repository, an owner release; ADR-0024 rule 7.6).
 JavaScript retired `0001-jsx-bare-ampersand` with its owner v4.4.0 pin (`e5ada307a6f1741a573d5c8d4dafee9234330b1f`).
 The fix first shipped in [owner v2.0.0](https://github.com/wotjr1649/tree-sitter-javascript/releases/tag/v2.0.0)
 ([fix commit](https://github.com/wotjr1649/tree-sitter-javascript/commit/4765cd79603fa478da221da50500162757859e20)).
-`native-ref -unpatched` supplies the required corpus, fuzz-seed and patch-regression baseline.
+PostgreSQL retired `0001-non-ascii-identifiers` and `0002-dollar-tag-code-points` with upstream v19.0.0,
+which includes [upstream PR #102](https://github.com/gmr/tree-sitter-postgres/pull/102). See the
+[retirement record](patches/postgres/README.md).
+`native-ref -unpatched` supplies the required corpus, fuzz-seed and patch-regression baseline for active patches.
 
 ADR-0027 sets `regenerate: true` for every grammar except entries with a recorded `generatorException`
 (reason and exact failing input IDs). An exception retains the committed reference C. The original archive,
@@ -342,7 +344,8 @@ The v0.5.0 release mirrors the 25 rows with column 4 equal to `source` that exis
 The Swift archive, the T-SQL v2.1.0 archive `tree-sitter-mssql-80037156b044.tar.gz`, the Java v3.0.3 archive
 `tree-sitter-java-358048c1c6f9.tar.gz`, the shared TypeScript/TSX owner release v3.1.0 archive
 `tree-sitter-typescript-c37edc69610d.tar.gz`, and the JavaScript v4.4.0 archive
-`tree-sitter-javascript-e5ada307a6f1.tar.gz` were added afterwards and
+`tree-sitter-javascript-e5ada307a6f1.tar.gz` and the PostgreSQL upstream v19.0.0 archive
+`tree-sitter-postgres-83c0cc2f.tar.gz` were added afterwards and
 have no mirror fallback until a release carrying them is published and its base is configured. Check their filenames against `runtime.archive`,
 `wasiLibc.archive`, and each grammar's `archive` in `pins.json`, deduplicating TypeScript/TSX's shared archive;
 the [publication procedure](../../docs/specs/publication.md#pinned-archive-release-assets) specifies the inventory
@@ -393,8 +396,9 @@ sidecar. Pin changes require re-review and retirement deletes the affected entry
 
 ## PostgreSQL regeneration cost
 
-`postgres` uses pinned `gmr/tree-sitter-postgres` grammar inputs with the temporary Korean-support
-patches disclosed in [patches/postgres/README.md](patches/postgres/README.md). Its archived `postgres/src/parser.c` is an
+`postgres` uses the upstream v19.0.0 grammar inputs from `gmr/tree-sitter-postgres`. The generator gate retains the
+[Korean identifier corpus](patches/postgres/corpus/korean-identifiers.txt) after patch retirement.
+Its archived `postgres/src/parser.c` is an
 LFS pointer; the original pointer and input tree remain pinned, and both builders compile the twice-generated C.
 PL/pgSQL is excluded. The CLI is pinned for Windows x64, Linux x64/arm64 and macOS arm64.
 
