@@ -199,6 +199,12 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   The recorded Hangul alias, variable, column and label cases now parse cleanly and remain Korean regression inputs.
   This development change does not choose a module release version or authorize publication.
 
+- **PHP upstream v0.25.2 (development tree after v0.5.0).** Cast and clone operands can be general
+  expressions, including `match`. Cast precedence and tree nesting change around unary operators,
+  exponentiation and `instanceof`. Cast-type spellings can produce `name` nodes in expression and
+  constant positions. Review queries that match a direct cast operand, treat casts as variables, or count on
+  a keyword being unnamed. The [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-php-v0252)
+  lists the changed contracts. [Upstream v0.25.2](https://github.com/tree-sitter/tree-sitter-php/releases/tag/v0.25.2)
 - **PostgreSQL upstream v19.0.0 (development tree after v0.5.0):** the SQL module retires its two temporary
   Korean-support patches because [upstream PR #102](https://github.com/gmr/tree-sitter-postgres/pull/102) incorporated both fixes.
   Compared with published v0.5.0, unquoted identifiers now accept every

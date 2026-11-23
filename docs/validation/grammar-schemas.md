@@ -249,6 +249,24 @@ SHA-256 `7f9f350c2730fbddf36f096dbb27405f6ae29ba787b265f2bb494e6a887078d5`;
 `schema diff` passes with zero changes and no findings (E1 static schema comparison, Windows amd64).
 Equal schema bytes do not imply equal trees; the documented identifier and dollar-tag fixes change trees.
 
+## Unreleased (after v0.5.0): PHP v0.25.2
+
+`php/src/node-types.json` from `tree-sitter/tree-sitter-php` passes the strict check at both pins
+with zero findings (E2, Windows amd64). At v0.25.2 the archived schema and the two independent
+CLI 0.27.2 generations have the same bytes (E1).
+
+| Upstream release | Commit | Bytes | Schema SHA-256 | Archive SHA-256 |
+|---|---|---:|---|---|
+| v0.25.1 | `58d5643086ae60e93a3746cca648363ee97c8761` | 115891 | `45fddbaad542a86cf413ca204bb232ea4478f8d634dc3beac4b2c8d837ce49ff` | `139701b185691b6f82d81ef6387de5cfe23b7833a75fa1eeca9b80416aa58039` |
+| v0.25.2 | `c1e13490bd656b8869cd47e6f74997ed46750a08` | 114258 | `eb073869d28245cc9e6ec17551b0495fc8e3a80d80762d6ecfd3af8076326f8d` | `34a1f0ad8cd33dcc2dd87cb4cb585f5bdd6a71adbf759cde797c669f295e5a14` |
+
+Seventeen of 305 definitions change. The diff adds and removes no node kinds. It records 24 changes
+across immediate field and child alternatives and subtype membership. `cast_expression.value` and the
+clone operand now use `expression`. `cast_expression` leaves the declared `primary_expression`
+subtypes and the direct alternatives in variable contexts. The `name` schema gains a `cast_expression`
+child alternative.
+[Upstream PR #309](https://github.com/tree-sitter/tree-sitter-php/pull/309) · [Migration](../../MIGRATING.md#unreleased-after-v050)
+
 ## Unreleased (after v0.5.0): PostgreSQL v19.0.0
 
 The PostgreSQL SQL pin moves from the patched upstream `v19.0.0-beta.4.1` at
