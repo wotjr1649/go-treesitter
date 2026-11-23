@@ -269,17 +269,17 @@
     },
     "tsql": {
       "repo": "https://github.com/wotjr1649/tree-sitter-mssql",
-      "commit": "80037156b044543a8248299205a90552687c0c40",
-      "extractDir": "tree-sitter-mssql-80037156b044",
-      "archive": "tree-sitter-mssql-80037156b044.tar.gz",
-      "archiveSHA256": "53284180a1547312b4c2553b4ce2e5a7ce04407f1e9b28336552625896e55de5",
+      "commit": "3d42c1a55fb5a11927c3b0c65c2fd442457e28e8",
+      "extractDir": "tree-sitter-mssql-3d42c1a55fb5",
+      "archive": "tree-sitter-mssql-3d42c1a55fb5.tar.gz",
+      "archiveSHA256": "037f0d2414f3c61ed3b6419ca8dc6e9bd90d7a2f6d146398f76af6c352f61681",
       "grammarDir": "src",
       "dirs": [
         "src"
       ],
-      "treeSHA256": "84041e6542c370949b61ad828822cc826ad4c99a11ca8c9251c0235b10087a66",
+      "treeSHA256": "ba832ddcc32a59356773239a3295ca420fe5c29322c7bbb7fa9a6abe8454f5f2",
       "files": {
-        "parser.c": "8e95b7d39b7f282e255bcd6062aaeebd57ee2528e1064c5388ad7ae20b1cb2ab",
+        "parser.c": "32f089e45d51fc68bc89facc44c130282132f8d146d0c5c090be100589cc694d",
         "scanner.c": "26eabb43eba50f3c636f7d54856e0ad5ae05ed3374d395ef87677d32df96a64f"
       },
       "licenseSHA256": "5ab20d8bf3e6083815bbf8a84400824b7ce5d9198e61efa05cfbd68ecc561dea",

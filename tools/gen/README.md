@@ -130,7 +130,7 @@ are excluded. This is native-before/native-after evidence, not Go/native C agree
 
 ### Later T-SQL releases
 
-A later owner release from `wotjr1649/tree-sitter-mssql` (for example, v2.2.0) can use one T-SQL-only pin-move PR:
+A later owner release from `wotjr1649/tree-sitter-mssql` uses one T-SQL-only pin-move PR:
 resolve its full commit, download and hash its archive, update only the `tsql` pin with the new archive/tree/file/
 licence/notice hashes (`go run . -hash -lang tsql -src <sources> -dl <archives>` from `tools/gen`), then run the
 schema checks and `bash tools/gen/regen.sh <new-empty-work-dir> tsql`. Keep the CLI/runtime pins unchanged.
@@ -341,7 +341,7 @@ awk -F '\t' '$4 == "source"' release-assets.tsv > release-source-assets.tsv
 The command lists 34 rows for the current pins: 26 `source` archives and eight `toolchain` archives. The immutable v0.4.0 release
 contains its original 24 source archives plus `SHA256SUMS`; the new C and PostgreSQL archives have no fallback there.
 The v0.5.0 release mirrors the 25 rows with column 4 equal to `source` that existed then, plus `SHA256SUMS`.
-The Swift archive, the T-SQL v2.1.0 archive `tree-sitter-mssql-80037156b044.tar.gz`, the Java v3.0.3 archive
+The Swift archive, the T-SQL owner release v2.8.0 archive `tree-sitter-mssql-3d42c1a55fb5.tar.gz`, the Java v3.0.3 archive
 `tree-sitter-java-358048c1c6f9.tar.gz`, the shared TypeScript/TSX owner release v3.1.0 archive
 `tree-sitter-typescript-c37edc69610d.tar.gz`, and the JavaScript v4.4.0 archive
 `tree-sitter-javascript-e5ada307a6f1.tar.gz` and the PostgreSQL upstream v19.0.0 archive
@@ -349,7 +349,8 @@ The Swift archive, the T-SQL v2.1.0 archive `tree-sitter-mssql-80037156b044.tar.
 have no mirror fallback until a release carrying them is published and its base is configured. Check their filenames against `runtime.archive`,
 `wasiLibc.archive`, and each grammar's `archive` in `pins.json`, deduplicating TypeScript/TSX's shared archive;
 the [publication procedure](../../docs/specs/publication.md#pinned-archive-release-assets) specifies the inventory
-and digest checks. The eight SDK/binaryen/CLI host archives are excluded until complete bundled notices can be
+and digest checks. Both configured bases carry the historical T-SQL origin archive
+`tree-sitter-mssql-2e34d86ec58f.tar.gz`. The eight SDK/binaryen/CLI host archives are excluded until complete bundled notices can be
 established. Those tools are fetched from their official releases with pinned SHA-256 checks and have no assets
 in this release to provide mirror fallback, even if the fetch plan lists URLs at the configured bases.
 
