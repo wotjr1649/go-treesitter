@@ -20,7 +20,7 @@ observed. Reports are handled on a best-effort basis; there is no guaranteed res
 
 ## Out of scope
 
-- Wrong or incomplete syntax trees from an upstream grammar. Report them as ordinary issues or to the grammar's
+- Wrong or incomplete syntax trees from a pinned grammar. Report them as ordinary issues or to the grammar's
   repository; known ones are listed in [docs/known-gaps](docs/known-gaps).
 - The documented limits in [limitations](docs/reports/limitations.md), for example an external scanner that never
   returns and therefore cannot be cancelled.

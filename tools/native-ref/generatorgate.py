@@ -2,7 +2,7 @@
 """ADR-0027: compare one pinned generator candidate with its committed-C reference.
 
 Build native-ref, ciconf and benchci from this checkout first. Output must be new;
-all commands, identities, failing inputs, native dumps and upstream summaries remain there.
+all commands, identities, failing inputs, native dumps and grammar test summaries remain there.
 """
 
 import argparse
@@ -161,7 +161,7 @@ def mismatch_message(actual, expected=None):
             reason += (f" (reference SHA-256 {actual['referenceDumpSHA256']}, "
                        f"candidate SHA-256 {actual['candidateDumpSHA256']})")
         else:
-            reason += " (upstream test result changed)"
+            reason += " (grammar test result changed)"
     else:
         item = actual
         key = next(key for key in sorted(actual.keys() | expected.keys())
@@ -284,13 +284,13 @@ def outcomes(value, path=(), strict=False):
             if key in ("parse_results", "highlight_results", "tag_results", "query_results", "children"):
                 nested = outcomes(child, path + ((value["name"],) if "name" in value else (key,)), strict)
                 if strict and result.keys() & nested.keys():
-                    raise ValueError("duplicate upstream outcome identity")
+                    raise ValueError("duplicate grammar test outcome identity")
                 result.update(nested)
     elif isinstance(value, list):
         for child in value:
             nested = outcomes(child, path, strict)
             if strict and result.keys() & nested.keys():
-                raise ValueError("duplicate upstream outcome identity")
+                raise ValueError("duplicate grammar test outcome identity")
             result.update(nested)
     return result
 
@@ -303,7 +303,7 @@ def is_passed(outcome):
 def compare_upstream(before, after, strict=False):
     a, b = outcomes(before, strict=strict), outcomes(after, strict=strict)
     if a.keys() != b.keys():
-        raise ValueError("upstream test cases changed")
+        raise ValueError("grammar test cases changed")
     if strict:
         changed = []
         def record(identity, old, new):
@@ -343,7 +343,7 @@ def summary(raw):
             continue
         if isinstance(parsed, dict) and "parse_results" in parsed and "parse_stats" in parsed:
             return parsed
-    raise ValueError("upstream JSON summary missing (raw log retained)")
+    raise ValueError("grammar test JSON summary missing (raw log retained)")
 
 
 def exception_matches(expected, differences):
@@ -386,7 +386,7 @@ def complete_upstream(args, repo, out, side, grammar, report, env):
     report[side + "UpstreamSupplementExit"] = code
     report[side + "UpstreamExcludedCases"] = [case["name"] for case in failures]
     if code and all(is_passed(value) for value in outcomes(extra).values()):
-        raise ValueError("supplemental upstream command failed without a reported failing test")
+        raise ValueError("supplemental grammar test command failed without a reported failing test")
     # Keep every original corpus result and failure; only recover stages skipped after that failure.
     combined = original.copy()
     for category in ("highlight_results", "tag_results", "query_results"):
@@ -417,7 +417,7 @@ def check_upstream(code, result, report):
                 for name, value in cases.items() if not is_passed(value)]
     if code or not cases or result["parse_stats"]["total_parses"] <= 0:
         failures.append({"id": "upstream/command", "kind": "upstream", "exit": code,
-                         "error": "reference none requires a nonempty, passing upstream suite"})
+                         "error": "reference none requires a nonempty, passing grammar test suite"})
     report["differences"].extend(failures)
 
 
@@ -638,10 +638,10 @@ def run(args):
             if no_reference and not accepted:
                 check_upstream(code, report[side + "Upstream"], report)
             if code and not accepted and all(is_passed(value) for value in outcomes(report[side + "Upstream"]).values()):
-                raise ValueError("upstream command failed without a reported failing test")
+                raise ValueError("grammar test command failed without a reported failing test")
             if not outcomes(report[side + "Upstream"]):
                 if report[side + "Upstream"]["parse_stats"]["total_parses"] != 0:
-                    raise ValueError("upstream summary claims parses with no test outcomes")
+                    raise ValueError("grammar test summary claims parses with no test outcomes")
                 report[side + "UpstreamCoverage"] = "NOT_RUN_ZERO_CASES"
             else:
                 report[side + "UpstreamCoverage"] = len(outcomes(report[side + "Upstream"]))

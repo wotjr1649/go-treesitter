@@ -86,7 +86,7 @@ class GeneratorGateTest(unittest.TestCase):
         after["parse_failures"][0]["actual"] = "changed"
         self.assertEqual(len(gate.compare_upstream(before, after, strict=True)), 1)
         before["parse_results"] *= 2
-        with self.assertRaisesRegex(ValueError, "duplicate upstream"):
+        with self.assertRaisesRegex(ValueError, "duplicate grammar test outcome identity"):
             gate.compare_upstream(before, before, strict=True)
 
     def test_patch_corpus_is_additive_identical_and_cannot_overwrite_upstream(self):

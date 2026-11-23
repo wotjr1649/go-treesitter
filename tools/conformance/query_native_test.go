@@ -171,7 +171,7 @@ func queryFilesFor(t *testing.T, root, lang string) []queryFile {
 		t.Fatal(err)
 	}
 	if len(files) == 0 {
-		t.Fatalf("no pinned upstream queries for %s under %s (native-ref -queries, TSG_QUERY_DIR)", lang, queryDirFor(root))
+		t.Fatalf("no pinned grammar queries for %s under %s (native-ref -queries, TSG_QUERY_DIR)", lang, queryDirFor(root))
 	}
 	slices.Sort(files)
 	var out []queryFile

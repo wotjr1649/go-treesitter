@@ -325,7 +325,7 @@ func skipReason(attrs []string, lang string) string {
 	matched := false
 	for _, a := range attrs {
 		if a == ":skip" {
-			return "skip (marked :skip upstream)"
+			return "skip (marked :skip in the source corpus)"
 		}
 		if l, ok := strings.CutPrefix(a, ":language("); ok {
 			if strings.TrimSuffix(l, ")") == lang {

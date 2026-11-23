@@ -340,18 +340,23 @@ func languageAPI(lang string) string {
 }
 
 func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
-	files := "`LICENSE` is the upstream grammar's license."
+	source := "upstream grammar"
+	// ADR-0024 rule 7 identifies owner repositories through the canonical repository URL.
+	if strings.HasPrefix(g.Repo, "https://github.com/wotjr1649/") {
+		source = "owner repository"
+	}
+	files := "`LICENSE` is the " + source + "'s license."
 	if g.NoticeSHA256 != "" {
-		files = "`LICENSE` and `NOTICE` are the upstream grammar's license files."
+		files = "`LICENSE` and `NOTICE` are the " + source + "'s license files."
 	}
 	result := fmt.Sprintf("# %s%s\n\nGenerated tree-sitter grammar module for go-treesitter. **Do not edit**: `engine_gen.go` and `language.go` are output of\n"+
 		"`tools/gen` (docs/design/engine-abi.md, ADR-0020).\n\n"+
-		"- upstream grammar: %s at `%s`\n- tree-sitter runtime: %s (unmodified)\n- engine ABI: %d\n"+
+		"- %s: %s at `%s`\n- tree-sitter runtime: %s (unmodified)\n- engine ABI: %d\n"+
 		"- recipe sha256: `%s`\n- identity and output hashes: `provenance.json` (equals the compiled `engine.Identity`; `go test` checks it)\n\n"+
 		"%s `LICENSES/tree-sitter.txt` is the license of the tree-sitter runtime C translated into `engine_gen.go`. `LICENSES/wasi-libc/` holds the license texts of the wasi-libc code translated into `engine_gen.go` (wasi-libc `%s`;\n"+
 		"its `LICENSE` is the index: musl MIT, cloudlibc BSD-2-Clause, dlmalloc CC0, the rest Apache-2.0 WITH LLVM-exception, Apache-2.0 or MIT;\n"+
 		"every file's hash is in `provenance.json`). Regenerate with `tools/gen` (see its README); regenerating gives identical bytes.\n",
-		modulePrefix, lang, g.Repo, g.Commit, pins.Runtime.Release, pins.ABI, id.RecipeSHA256, files, pins.WasiLibc.Commit)
+		modulePrefix, lang, source, g.Repo, g.Commit, pins.Runtime.Release, pins.ABI, id.RecipeSHA256, files, pins.WasiLibc.Commit)
 	switch lang {
 	case "php", "ruby":
 		result += "\nSource tier: 1 (core), per ADR-0024.\n"

@@ -342,7 +342,7 @@ def summarize(report):
     for row in report["grammars"]:
         lines += ["", f"`{row['grammar']}` schema codes: `{row.get('schema_codes', {})}`; risks: `{row.get('schema_risks', {})}`."]
         if "old_skipped" in row:
-            lines += ["", f"Upstream corpus exclusions (ciconf attributes): old={len(row['old_skipped'])}, new={len(row['new_skipped'])}; reasons retained in report.json."]
+            lines += ["", f"Source corpus exclusions (ciconf attributes): old={len(row['old_skipped'])}, new={len(row['new_skipped'])}; reasons retained in report.json."]
         if row.get("error"):
             lines += ["", "Failure: " + row["error"]]
         for result in row.get("results", []):

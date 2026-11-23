@@ -3,8 +3,8 @@
 The public candidate contains the API and implementation, the engine ABI, generated
 grammar modules, pinned source identities (`tools/gen/pins.json`), licenses, retained
 tests and fixtures, reproducible tools (including the native C reference,
-`tools/native-ref`), CI, technical contracts and selected evidence. The runtime and
-grammar C are unmodified upstream. The seven-route C oracle gate and the 204-entry
+`tools/native-ref`), CI, technical contracts and selected evidence. The upstream runtime C is unmodified. Grammar C comes from the pinned grammar
+sources under the [baseline and provenance contract](baseline-provenance.md). The seven-route C oracle gate and the 204-entry
 basic catalog of ADR-0017 belonged to the removed carrier (ADR-0022; Git history at
 `9ad82eb`); the current gate is the conformance lane (`docs/specs/validation.md`).
 
@@ -110,7 +110,7 @@ Notes:
 Under the [2026-11-15 ADR-0026 amendment](../design/decisions/ADR-0026-never-block-on-upstream.md#amendment-2026-11-15),
 immutable releases mirror source archives plus `SHA256SUMS` (v0.4.0: 24 source archives; current pins: 26).
 `(cd tools/gen && CGO_ENABLED=0 go run . -mirror-assets)` lists the candidate rows for the current pins (34) as
-headerless TSV: filename, SHA-256, upstream URL, kind (`source`/`toolchain`). Select column 4 equal to `source`
+headerless TSV: filename, SHA-256, primary download URL, kind (`source`/`toolchain`). Select column 4 equal to `source`
 (for example, `awk -F '\t' '$4 == "source"' release-assets.tsv`), excluding the `toolchain` rows.
 Check the selected filenames equal `runtime.archive`, `wasiLibc.archive`, or a
 `grammars` entry's `archive` in the release `pins.json`, deduplicating shared filenames: one archive per grammar
@@ -123,7 +123,7 @@ toolchain fallback assets until the complete notices can be established, for exa
 archives. Preserve the collected upstream licence texts as maintainer-local evidence for that later work.
 
 Download each selected source row unchanged, check its listed SHA-256, and attach it with `SHA256SUMS` covering
-those source files. The command emits filenames, SHA-256 pins, upstream URLs and kinds; it does not publish or filter the
+those source files. The command emits filenames, SHA-256 pins, primary download URLs and kinds; it does not publish or filter the
 output to the release scope. Existing source notices remain in the repository and grammar modules; this policy
 adds no redistributed-toolchain licence bundle. Go modules (including wasm2go) continue to use Go's module checksum
 mechanism; host toolchains remain prerequisites.

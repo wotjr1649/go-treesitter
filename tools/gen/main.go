@@ -1,4 +1,4 @@
-// Command gen builds one grammar module (grammars/<lang>) from pinned upstream C sources:
+// Command gen builds one grammar module (grammars/<lang>) from pinned runtime and grammar sources:
 //
 //	clang (wasi-sdk) -> wasm -> wasm2go -unsafe -> hash-checked memory_grow replacement -> Go module
 //
@@ -78,8 +78,8 @@ func main() {
 	var o opts
 	flag.StringVar(&o.lang, "lang", "", "grammar module to generate (key in pins.json)")
 	flag.StringVar(&o.root, "root", ".", "tools/gen directory (pins.json, shim/)")
-	flag.StringVar(&o.src, "src", "", "directory holding the extracted upstream trees")
-	flag.StringVar(&o.dl, "dl", "", "optional directory holding the upstream archives (verifies their sha256)")
+	flag.StringVar(&o.src, "src", "", "directory holding the extracted source trees")
+	flag.StringVar(&o.dl, "dl", "", "optional directory holding the pinned source archives (verifies their sha256)")
 	flag.StringVar(&o.sdk, "sdk", "", "wasi-sdk directory")
 	flag.StringVar(&o.wasm2go, "wasm2go", "", "wasm2go binary")
 	flag.StringVar(&o.wasmOpt, "wasm-opt", "", "wasm-opt binary (binaryen; only for recipes that run it)")
@@ -93,7 +93,7 @@ func main() {
 	flag.BoolVar(&o.hash, "hash", false, "print the computed values of every pin and exit")
 	flag.BoolVar(&o.noAPI, "no-api", false, "do not emit language_api.go (Language() needs the root treesitter package)")
 	flag.BoolVar(&o.balanceProbe, "balance-probe", false, "TEST ONLY: add balancing/reset observations and a deterministic conformance test; output must be a new directory outside grammars/")
-	flag.BoolVar(&o.mirrorAssets, "mirror-assets", false, "list pinned archives for every platform: file, sha256, upstream URL, kind (source/toolchain)")
+	flag.BoolVar(&o.mirrorAssets, "mirror-assets", false, "list pinned archives for every platform: file, sha256, primary download URL, kind (source/toolchain)")
 	flag.BoolVar(&o.fetchNPM, "fetch-npm", false, "download missing lockfile-pinned npm grammar tarballs (no install scripts)")
 	flag.StringVar(&o.treeSitter, "tree-sitter", "", "pinned tree-sitter CLI (needed for regenerate: true)")
 	flag.IntVar(&o.patchAlert, "patch-alert", 3, "warn when a grammar has more than this many patches")
@@ -400,7 +400,7 @@ func verify(o opts, pins *Pins, g GrammarPin, rc recipe, tm map[string]float64) 
 		return id, err
 	}
 	id.SourceSHA256["grammar.LICENSE"] = got
-	// NOTICE is optional upstream; an unpinned NOTICE is a failure so a new one cannot be missed silently.
+	// NOTICE is optional in grammar sources; an unpinned NOTICE is a failure so a new one cannot be missed silently.
 	notice := filepath.Join(o.src, g.ExtractDir, "NOTICE")
 	if got, err = sumFile(notice); err == nil {
 		if err := expect("grammar NOTICE", got, g.NoticeSHA256); err != nil {
@@ -655,7 +655,7 @@ func printHashes(o opts, pins *Pins) error {
 	return json.NewEncoder(os.Stdout).Encode(res)
 }
 
-// patchedGrammar keeps the verified upstream tree intact, including for repeated generation.
+// patchedGrammar keeps the verified source tree intact, including for repeated generation.
 func patchedGrammar(o opts, g GrammarPin, work string, id *Identity) (string, error) {
 	dst, err := os.MkdirTemp(work, "patched-source-")
 	if err != nil {

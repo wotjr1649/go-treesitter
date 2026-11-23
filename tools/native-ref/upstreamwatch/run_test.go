@@ -66,10 +66,10 @@ func TestRunActivityCannotPreventOutputs(t *testing.T) {
 	} {
 		t.Run(name, func(t *testing.T) {
 			code, state, issue, stdout, _ := runWatch(t, fmt.Sprintf(runPins, ""), graphql)
-			if code != 0 || state != "clean" || !strings.Contains(issue, "Upstream activity") {
+			if code != 0 || state != "clean" || !strings.Contains(issue, "Grammar repository activity") {
 				t.Fatalf("code=%d state=%q issue=%q\n%s", code, state, issue, stdout)
 			}
-			if strings.Index(stdout, "Repository health") > strings.Index(stdout, "Upstream activity") {
+			if strings.Index(stdout, "Repository health") > strings.Index(stdout, "Grammar repository activity") {
 				t.Error("activity must come after the health checks")
 			}
 			if strings.Contains(stdout, "No grammar carries") == false {

@@ -139,7 +139,7 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   inputs formerly accepted by v1.0.0, including `yield` expressions outside generators and JSX
   attributes with empty expressions. The owner grammar carries the JSX bare-ampersand fix.
   [Schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-javascript-v440) ·
-  [Upstream changelog](https://github.com/wotjr1649/tree-sitter-javascript/blob/v4.4.0/CHANGELOG.md)
+  [Owner CHANGELOG](https://github.com/wotjr1649/tree-sitter-javascript/blob/v4.4.0/CHANGELOG.md)
 
 - **Rust block comments:** the scanner compares full Unicode code points when recognizing block comment
   delimiters and documentation markers. The unpatched scanner read a code point whose low byte is `/`, `*`
@@ -182,7 +182,7 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   keys and values see the new shape; node types, fields and the static node-type schema are unchanged.
   [Upstream issue #49](https://github.com/tree-sitter-grammars/tree-sitter-yaml/issues/49)
 
-- **T-SQL v2.1.0:** `grammars/tsql` moves to the owner's `wotjr1649/tree-sitter-mssql`
+- **T-SQL v2.1.0:** `grammars/tsql` moves to owner release v2.1.0 of `wotjr1649/tree-sitter-mssql`
   at `80037156b044543a8248299205a90552687c0c40`, with CLI 0.27.2 and no grammar patches.
   The Go signatures and engine ABI are unchanged. The schema diff's seven `CHILDREN_TYPE_REMOVED`
   entries describe existing nodes gaining named fields: function/procedure bodies move to `body`,
@@ -300,8 +300,8 @@ The following additions and one behaviour change affect the root module; the eng
 
 ### Java grammar v3.0.3
 
-`github.com/wotjr1649/go-treesitter/grammars/java` uses owner grammar
-[v3.0.3](https://github.com/wotjr1649/tree-sitter-java/tree/v3.0.3), commit
+`github.com/wotjr1649/go-treesitter/grammars/java` uses
+[owner release v3.0.3](https://github.com/wotjr1649/tree-sitter-java/tree/v3.0.3), commit
 `358048c1c6f9f84335ca4a42141fd0798e6a36f2`. The Go import path stays the same.
 
 - **Service providers (K17).** In `provides S with A, B;`, both `A` and `B` carry the required,
@@ -310,7 +310,7 @@ The following additions and one behaviour change affect the root module; the eng
   an unfielded child.
 - **Query-visible trees.** A `default` in a switch label list is an anonymous token (K3).
   Qualified record patterns such as `case T.R() ->` now match `record_pattern` and lose their
-  call captures (K4). The upstream highlights capture the type. A qualified generic `super` call
+  call captures (K4). The owner repository's highlights query captures the type. A qualified generic `super` call
   in a constructor body can now be an `explicit_constructor_invocation` (K2).
   These changes affect captures and kind-based dispatch even when the query still compiles.
 - **Patterns, references and expressions.** Empty record patterns in lists and guarded labels are
@@ -325,11 +325,11 @@ The following additions and one behaviour change affect the root module; the eng
   a line terminator can now contain an error. Line comments end before CR, LF or CRLF (K23).
 - **Reserved words and casts.** Phase 5 rejects Java's reserved words and literal spellings in
   identifier positions previously accepted. Inputs that relied on those tolerances can contain `ERROR`
-  or `MISSING` nodes. Contextual names still work subject to the upstream `when` limits (K25 and K32).
+  or `MISSING` nodes. Contextual names still work subject to the pinned grammar's `when` limits (K25 and K32).
   For signed operands, K34 reads `(Name) + x` and `(Name) - x` as additive expressions and withdraws
   tolerances such as `(@A Integer) -k` and `(void) -k`.
 
-The [upstream changelog](https://github.com/wotjr1649/tree-sitter-java/blob/358048c1c6f9f84335ca4a42141fd0798e6a36f2/CHANGELOG.md)
+The [owner CHANGELOG](https://github.com/wotjr1649/tree-sitter-java/blob/358048c1c6f9f84335ca4a42141fd0798e6a36f2/CHANGELOG.md)
 records the 2.x and 3.x grammar changes and retained cases. See the
 [Java schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-java-v303)
 for the static contract changes.
