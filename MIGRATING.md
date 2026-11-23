@@ -211,7 +211,8 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   Query files are unchanged. Queries that match affected kinds, fields or recovery nodes can return different
   captures. See the [owner CHANGELOG](https://github.com/wotjr1649/tree-sitter-mssql/blob/3d42c1a55fb5a11927c3b0c65c2fd442457e28e8/CHANGELOG.md)
   and the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-t-sql-v280).
-  A Go parse reports grammar errors. The owner repository's separate tree-check constraints and SQL Server's
+  A Go parse reports grammar errors as `ERROR` or `MISSING` nodes in an accepted tree (`AcceptedWithErrors`) with
+  a nil error. The owner repository's separate tree-check constraints and SQL Server's
   compatibility-level and session validation are outside that API.
 
 - **PostgreSQL upstream v19.0.0 (development tree after v0.5.0):** the SQL module retires its two temporary
