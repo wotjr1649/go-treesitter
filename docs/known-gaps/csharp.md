@@ -31,7 +31,8 @@ Expected rule: The default keyword is a primary constraint in its own right, not
 
 - Specification: [C# specification 15.2.5: Type parameter constraints](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/classes#1525-type-parameter-constraints)
 - Specification: [C# 9 specification: default constraint](https://github.com/dotnet/csharplang/blob/main/proposals/csharp-9.0/unconstrained-type-parameter-annotations.md#default-constraint)
-- Upstream issue: none recorded.
+- [Upstream pull request](https://github.com/tree-sitter/tree-sitter-c-sharp/pull/487)
+- A port of [#480](https://github.com/tree-sitter/tree-sitter-c-sharp/pull/480) merged into `dev` on 2026-11-20. The fix is absent from `v0.24.0`.
 - Input SHA-256: `e450432afe015af75c5a4af54439ce6ca792b177ffe4396304ae322f1e18cda1`
 - [Recorded native dump](../../tools/conformance/testdata/known-gaps/csharp-default-constraint.dump), SHA-256: `bb2cf264e2d5097bc483b0285a3e3ccafa53a1888bc862366b61a7407d72c442`
 
@@ -50,6 +51,7 @@ Expected rule: A nonempty compilation unit receives an implicit final line termi
 - Specification: [C# specification 6.3.2: Line terminators](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#632-line-terminators)
 - Specification: [C# specification 6.5.4: Definition directives](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#654-definition-directives)
 - [Upstream issue](https://github.com/tree-sitter/tree-sitter-c-sharp/issues/458)
+- The directive rewrite in [#483](https://github.com/tree-sitter/tree-sitter-c-sharp/pull/483) fixed this case on `dev`, and [#485](https://github.com/tree-sitter/tree-sitter-c-sharp/pull/485) added regression coverage. Issue #458 was closed as completed on 2026-11-20. The fix is absent from `v0.24.0`.
 - Input SHA-256: `e4342cebc1c4b162457213203ce862cac93c73b402f3ac7a004b6c2be418629c`
 - [Recorded native dump](../../tools/conformance/testdata/known-gaps/csharp-directive-eof.dump), SHA-256: `0422ba44c497c2475466bbbecc090af5aa3251adc3ec6e21963b4a02ff9fc33e`
 
