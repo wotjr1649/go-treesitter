@@ -747,41 +747,23 @@
       "regenerate": true
     },
     "postgres": {
-      "patches": [
-        {
-          "file": "patches/postgres/0001-non-ascii-identifiers.patch",
-          "source": "postgres/grammar.js",
-          "sha256": "b69c8c7d92ce5f4fd24160a20ec54f413398a044d7caff7e640f2f46276e4c76",
-          "beforeSHA256": "4d26dfd2721cbc632c2d6c2bdf9bcb26eb50bcd1c5b6061269cbc08af12684c6",
-          "afterSHA256": "9640494432595d98462abaa7a3732d6682e01023947b2a9effdb56750c67c1c9",
-          "upstreamReport": "https://github.com/gmr/tree-sitter-postgres/issues/101"
-        },
-        {
-          "file": "patches/postgres/0002-dollar-tag-code-points.patch",
-          "source": "postgres/src/scanner.c",
-          "sha256": "f9756f730cc4d41f075986ed8afbd217c69d3adcc734d70ec306ce3831c83a59",
-          "beforeSHA256": "4d7872a6bb2126e206a7aa0730b7f272b41d9e75c2d11af274fc4db2cd7c3352",
-          "afterSHA256": "597b11ba2c7f9e6843332236132806ea1cab116e18767c01a290bf316244b441",
-          "upstreamReport": "https://github.com/gmr/tree-sitter-postgres/issues/101"
-        }
-      ],
       "regenerate": true,
       "repo": "https://github.com/gmr/tree-sitter-postgres",
-      "commit": "59d0d8cd7506d68de1229fb4bbce838c83b60c8a",
-      "extractDir": "tree-sitter-postgres-59d0d8cd",
-      "archive": "tree-sitter-postgres-59d0d8cd.tar.gz",
-      "archiveSHA256": "f82ef824c0135805cbe23eb408721b41ff36373c4126052d178d7f5c22690da6",
-      "archiveURL": "https://codeload.github.com/gmr/tree-sitter-postgres/tar.gz/59d0d8cd7506d68de1229fb4bbce838c83b60c8a",
+      "commit": "83c0cc2f4401d5e5944834a09d3f8c24184398fa",
+      "extractDir": "tree-sitter-postgres-83c0cc2f",
+      "archive": "tree-sitter-postgres-83c0cc2f.tar.gz",
+      "archiveSHA256": "2c09914266ec89b719e88fad8c5b5026ce33a4f66abcd3cfc21d2f68dc5b1133",
+      "archiveURL": "https://codeload.github.com/gmr/tree-sitter-postgres/tar.gz/83c0cc2f4401d5e5944834a09d3f8c24184398fa",
       "grammarDir": "postgres/src",
       "dirs": [
         "postgres/src",
         "postgres/grammar.js",
         "tree-sitter.json"
       ],
-      "treeSHA256": "8818f7575126241416893bbc18134b4873bc3d92298afe7962ce911f580c1e1b",
+      "treeSHA256": "1ddfab38712012afb6b62a72c30adc32104951e922a99946ec2a248e356808a3",
       "files": {
-        "parser.c": "9b714c169bc14fb13b23374f344fe1bd20b7db4a07546b2b671d644fe374bcc3",
-        "scanner.c": "4d7872a6bb2126e206a7aa0730b7f272b41d9e75c2d11af274fc4db2cd7c3352"
+        "parser.c": "cc499d0d510c9f78d6b57a53810f1678d6bcabaccd8b1c5afc832514beb7fcc6",
+        "scanner.c": "3fa1faa9817ee1fbddc3ef3bb9c05b70ade6c4d2f57f3b666f24fb6c789d7cfe"
       },
       "licenseSHA256": "b336477d5469bf335e7d173814e1da57d4f13c23968959a71523668ac4a9a6c2",
       "cSymbol": "tree_sitter_postgres"

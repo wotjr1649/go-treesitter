@@ -170,8 +170,9 @@ produce `ERROR` nodes even though the language allows it. The table says what wa
    `<x-걁>body</x-굁>` parses without an error. This pinned upstream defect is not exercised by the recorded rows: see
    [HTML](../known-gaps/html.md#html-hangul-tag-low-byte-mismatch) and
    [XML](../known-gaps/xml.md#xml-hangul-tag-low-byte-mismatch). Both pages show that an ASCII mismatch is still an `ERROR`.
-2. Development tree only; the published v0.5.0 `postgres` fails on Hangul identifiers and dollar-quote tags. U+3000 and other
-   non-ASCII spaces are identifier characters, as in PostgreSQL: see
+2. The development tree uses upstream v19.0.0, which incorporates both Korean-support fixes. The published v0.5.0
+   `postgres` fails on Hangul identifiers and dollar-quote tags. The development scanner caps tags at 63 code points.
+   U+3000 and other non-ASCII spaces are identifier characters. See
    [limitations, PostgreSQL Korean support](../reports/limitations.md#postgresql-korean-support-development-tree-after-v050).
 
 **Evidence.** `TestCorpusKorean` in [`tools/conformance`](../../tools/conformance/korean_test.go) runs the retained

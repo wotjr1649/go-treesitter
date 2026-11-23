@@ -199,7 +199,9 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   The recorded Hangul alias, variable, column and label cases now parse cleanly and remain Korean regression inputs.
   This development change does not choose a module release version or authorize publication.
 
-- **PostgreSQL Korean support (development tree after v0.5.0):** unquoted identifiers now accept every
+- **PostgreSQL upstream v19.0.0 (development tree after v0.5.0):** the SQL module retires its two temporary
+  Korean-support patches because [upstream PR #102](https://github.com/gmr/tree-sitter-postgres/pull/102) incorporated both fixes.
+  Compared with published v0.5.0, unquoted identifiers now accept every
   non-ASCII code point, including Hangul, NFD combining characters and supplementary characters, matching
   PostgreSQL's high-bit-byte lexical rule for UTF-8. ASCII identifier rules are unchanged. Adjacent names
   such as `SELECT값` remain one identifier instead of a keyword plus an invalid suffix. Dollar-quote tags
@@ -208,9 +210,11 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   outside the original identifier range were lexing errors before and are identifier characters now, not SQL
   separators. The upstream 63-code-point dollar-tag cap remains, unlike
   PostgreSQL's unbounded dollar tags. PL/pgSQL and other upstream SQL grammar limits remain outside scope.
-  These two temporary patches are an owner-approved 2026-11-17 Korean-support exception to ADR-0023
-  decision 1, not a release-gate repair. See [upstream issue #101](https://github.com/gmr/tree-sitter-postgres/issues/101) and the
-  [patch record](tools/gen/patches/postgres/README.md).
+  The previous patched development pin already provided both fixes. [Upstream v19.0.0](https://github.com/gmr/tree-sitter-postgres/releases/tag/v19.0.0)
+  also refreshes the documentation SQL corpus for PostgreSQL 19.0 ([upstream PR #103](https://github.com/gmr/tree-sitter-postgres/pull/103)).
+  See [upstream issue #101](https://github.com/gmr/tree-sitter-postgres/issues/101), the
+  [retirement record](tools/gen/patches/postgres/README.md) and the
+  [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-postgresql-v1900).
   The existing grammar can still accept `SELECT 9값;` as an integer plus alias, and
   `SELECT $9끝$body$9끝$;` as a parameter plus alias; the analogous ASCII inputs were already accepted.
   PostgreSQL rejects such adjacent numeric/parameter junk. A clean tree does not validate SQL against a server.

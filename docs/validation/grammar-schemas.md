@@ -239,16 +239,29 @@ An earlier candidate revision (`35245fbfee2fccf16273c6f4299438fb76875970`) was n
 fails the strict check with two duplicate identities (`?` and `??`, each once with and once without an empty `fields`
 object). This pin's schema has none. This is a first baseline, not a pin move; no release approval is inferred.
 
-## PostgreSQL Korean support (development tree after v0.5.0)
+## PostgreSQL Korean support on the patched v19.0.0-beta.4.1 development pin
 
 The 2026-11-17 owner-approved Korean-support patches keep the upstream commit, archive, tree and source pins
-unchanged; their ordered identities are in `tools/gen/pins.json` and the
-[patch record](../../tools/gen/patches/postgres/README.md). The identifier grammar input changes before CLI 0.27.2
-regeneration and the dollar-tag scanner changes after it. The two independently generated source trees are
+unchanged at that pin. See the [retirement record](../../tools/gen/patches/postgres/README.md).
+The identifier grammar input changed before CLI 0.27.2 regeneration and the dollar-tag scanner changed after it. The two independently generated source trees are
 byte-identical. The original archived and patched generated node-type schemas are both 508227 bytes with
 SHA-256 `7f9f350c2730fbddf36f096dbb27405f6ae29ba787b265f2bb494e6a887078d5`;
 `schema diff` passes with zero changes and no findings (E1 static schema comparison, Windows amd64).
 Equal schema bytes do not imply equal trees; the documented identifier and dollar-tag fixes change trees.
+
+## Unreleased (after v0.5.0): PostgreSQL v19.0.0
+
+The PostgreSQL SQL pin moves from the patched upstream `v19.0.0-beta.4.1` at
+`59d0d8cd7506d68de1229fb4bbce838c83b60c8a` to [upstream v19.0.0](https://github.com/gmr/tree-sitter-postgres/releases/tag/v19.0.0).
+Both temporary patches retire with [upstream PR #102](https://github.com/gmr/tree-sitter-postgres/pull/102) in the new pin.
+
+| Grammar | Commit | Schema bytes | Schema SHA-256 | Archive SHA-256 |
+|---|---|---:|---|---|
+| postgres | `83c0cc2f4401d5e5944834a09d3f8c24184398fa` | 508227 | `7f9f350c2730fbddf36f096dbb27405f6ae29ba787b265f2bb494e6a887078d5` | `2c09914266ec89b719e88fad8c5b5026ce33a4f66abcd3cfc21d2f68dc5b1133` |
+
+Both archived schemas pass strict checks. The old-to-new diff has zero node-kind, field or cardinality changes
+(E1, static comparison). The pinned CLI 0.27.2 produces the same schema bytes. See the
+[migration notes](../../MIGRATING.md#unreleased-after-v050) for the lexical behavior and remaining limits.
 
 ## Unreleased (after v0.5.0): T-SQL v2.1.0
 

@@ -71,43 +71,28 @@ runner memory, time budgets and the uncached drift policy.
 
 ### PostgreSQL Korean support (development tree after v0.5.0)
 
-The owner approved two temporary patches on 2026-11-17 as an explicit exception to ADR-0023 decision 1
-for Korean support, although the gap does not block a release gate. The original grammar commit, archive,
-tree and source-file pins stay unchanged. The grammar-input patch admits all non-ASCII code points in
-unquoted identifiers, mapping PostgreSQL's high-bit-byte lexer rule to UTF-8 code points; ASCII start and
-continuation rules stay the same. This includes NFD combining marks, supplementary characters and U+3000,
-not only letters. `SELECT값` is one identifier, not a `SELECT` keyword plus a suffix. A standalone
-`SELECT값;` therefore remains a syntax error, while `SELECT SELECT값;` is clean.
+The development tree uses [upstream v19.0.0](https://github.com/gmr/tree-sitter-postgres/releases/tag/v19.0.0) of
+`gmr/tree-sitter-postgres` under ADR-0024 rule 4. [Upstream PR #102](https://github.com/gmr/tree-sitter-postgres/pull/102)
+fixed both defects from [upstream issue #101](https://github.com/gmr/tree-sitter-postgres/issues/101).
+The [retirement record](../../tools/gen/patches/postgres/README.md) identifies the two temporary patches
+that provided the same fixes at the previous development pin. [Upstream PR #103](https://github.com/gmr/tree-sitter-postgres/pull/103)
+refreshes the documentation SQL corpus for PostgreSQL 19.0.
 
-The scanner patch stores complete `int32_t` tag code points: `$끝$…$끝$` closes and `$걁$…$A$` does not.
-The existing 63-code-point dollar-tag cap remains; PostgreSQL's actual dollar tags are not subject to
-this cap. Other scanner/grammar algorithms, quoted identifiers and PL/pgSQL scope are unchanged.
-The grammar's `\s+` extras skip only ASCII whitespace. U+3000 and other non-ASCII spaces outside the
-original identifier range were lexing errors before and are identifier characters now. In the retained
-`SELECT 　;` and `SELECT 　값;` cases U+3000 belongs to the name, and `SELECT　값;` remains one invalid
-standalone name. `SELECT a　FROM t;` is clean but treats `a　FROM` as one identifier and `t` as its alias;
-a clean tree can therefore conceal an unintended separator typed with an IME.
-This is a lexical repair, not full PostgreSQL SQL validity or invalid-UTF-8 coverage.
-The existing grammar also accepts adjacent numeric/parameter aliases without PostgreSQL's `integer_junk` /
-`param_junk` checks: `SELECT 9name;` and `SELECT $9END$body$9END$;` are clean before and after this patch;
-the corrected identifier token exposes the same limitation for `SELECT 9값;` and
-`SELECT $9끝$body$9끝$;`. The latter is a parameter plus alias, not a valid dollar tag.
-PostgreSQL rejects these as trailing junk. They are retained observations of a separate upstream limit,
-not claims that the patch makes these inputs valid SQL.
+Unquoted identifiers accept all non-ASCII code points, including NFD combining marks, supplementary
+characters and U+3000, with the same ASCII start and continuation rules. `SELECT값` forms one identifier.
+A standalone `SELECT값;` has a syntax error, while `SELECT SELECT값;` is clean. Dollar-quote tags compare
+full code points. `$끝$…$끝$` closes and `$걁$…$A$` stays unmatched. The scanner caps tags at 63 code
+points, while PostgreSQL accepts longer tags.
 
-The [patch record](../../tools/gen/patches/postgres/README.md) and generated provenance disclose the reason,
-patch/source identities and [upstream issue #101](https://github.com/gmr/tree-sitter-postgres/issues/101), which covers both defects
-and the `script/codegen.js` identifier template. The dated [ADR-0023 amendment](../design/decisions/ADR-0023-temporary-upstream-grammar-patches.md#amendment-2026-11-17-decision-1-postgresql-korean-support)
-records the owner-approved exception.
+The grammar's `\s+` extras skip only ASCII whitespace. In `SELECT 　;` and `SELECT 　값;`, U+3000 belongs
+to the identifier. `SELECT　값;` remains an invalid standalone name. `SELECT a　FROM t;` is clean and
+treats `a　FROM` as one identifier with alias `t`, so a clean tree can conceal an unintended IME separator.
 
-Two complete product-module generations emit identical bytes, and the archived/patched node-type schema
-has zero static changes. Retained [fresh and incremental regression tests](../../tools/conformance/postgres_patches_test.go)
-use the existing `TestScannerPatches` CI filter. On Windows amd64 the product dumps equal fresh signed-char native dumps on 71 corpus inputs, 213 edits
-and changed-range comparisons, and 53 focused probes (E5 for those inputs). The same 53 probe dumps equal
-an unsigned-char grammar/runtime/ctype diagnostic, with the unchanged driver compiled separately as
-signed-char to retain its assertion. The unpatched/patched native comparison covers 107 corpus/fuzz inputs:
-15 changed, all existing error trees whose identifier or dollar-tag tokens are corrected; no clean baseline
-tree changes in that set (E4). These local inputs do not establish hosted-platform or release-gate coverage.
+The grammar accepts adjacent numeric or parameter aliases such as `SELECT 9name;`, `SELECT 9값;`,
+`SELECT $9END$body$9END$;` and `SELECT $9끝$body$9끝$;`. The last two examples parse as a parameter
+plus alias. PostgreSQL rejects these inputs as trailing junk. Coverage is limited to PostgreSQL SQL and
+the retained valid UTF-8 cases. The [fresh and incremental regression tests](../../tools/conformance/postgres_patches_test.go)
+run under the `TestScannerPatches` CI filter.
 
 ## Swift (development tree after v0.5.0)
 
