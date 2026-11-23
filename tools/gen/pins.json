@@ -260,17 +260,17 @@
     },
     "tsql": {
       "repo": "https://github.com/wotjr1649/tree-sitter-mssql",
-      "commit": "80037156b044543a8248299205a90552687c0c40",
-      "extractDir": "tree-sitter-mssql-80037156b044",
-      "archive": "tree-sitter-mssql-80037156b044.tar.gz",
-      "archiveSHA256": "53284180a1547312b4c2553b4ce2e5a7ce04407f1e9b28336552625896e55de5",
+      "commit": "3d42c1a55fb5a11927c3b0c65c2fd442457e28e8",
+      "extractDir": "tree-sitter-mssql-3d42c1a55fb5",
+      "archive": "tree-sitter-mssql-3d42c1a55fb5.tar.gz",
+      "archiveSHA256": "037f0d2414f3c61ed3b6419ca8dc6e9bd90d7a2f6d146398f76af6c352f61681",
       "grammarDir": "src",
       "dirs": [
         "src"
       ],
-      "treeSHA256": "84041e6542c370949b61ad828822cc826ad4c99a11ca8c9251c0235b10087a66",
+      "treeSHA256": "ba832ddcc32a59356773239a3295ca420fe5c29322c7bbb7fa9a6abe8454f5f2",
       "files": {
-        "parser.c": "8e95b7d39b7f282e255bcd6062aaeebd57ee2528e1064c5388ad7ae20b1cb2ab",
+        "parser.c": "32f089e45d51fc68bc89facc44c130282132f8d146d0c5c090be100589cc694d",
         "scanner.c": "26eabb43eba50f3c636f7d54856e0ad5ae05ed3374d395ef87677d32df96a64f"
       },
       "licenseSHA256": "5ab20d8bf3e6083815bbf8a84400824b7ce5d9198e61efa05cfbd68ecc561dea",
@@ -504,20 +504,19 @@
     },
     "php": {
       "repo": "https://github.com/tree-sitter/tree-sitter-php",
-      "commit": "58d5643086ae60e93a3746cca648363ee97c8761",
+      "commit": "c1e13490bd656b8869cd47e6f74997ed46750a08",
       "extractDir": "php",
-      "archive": "php-58d5643086ae.tar.gz",
-      "archiveSHA256": "139701b185691b6f82d81ef6387de5cfe23b7833a75fa1eeca9b80416aa58039",
-      "archiveURL": "https://codeload.github.com/tree-sitter/tree-sitter-php/tar.gz/58d5643086ae60e93a3746cca648363ee97c8761",
+      "archive": "php-c1e13490bd65.tar.gz",
+      "archiveSHA256": "34a1f0ad8cd33dcc2dd87cb4cb585f5bdd6a71adbf759cde797c669f295e5a14",
       "grammarDir": "php/src",
       "dirs": [
         "php/src",
         "common"
       ],
-      "treeSHA256": "6739b1121cf6dfb3c151d606fa70eb3f181b3e8bbb839e57e08ad2307c067987",
+      "treeSHA256": "8321265631b27205ae58f505580f48695372ee7ab95995b783ca8be5dbc50bea",
       "files": {
-        "parser.c": "8a42ccdbb0f18c934de610baab4cdf8f89086bc8f5a7dc89fb60350d61912e73",
-        "scanner.c": "58c92cafe4ebda509c3ad3864fa6fc0e9877bbac26e17a03d23ea2101c291ad5",
+        "parser.c": "1a3fe13dbccf54f13342d410d7cbbe351ae0e931c8bc475e8e2561c3f7e60ee0",
+        "scanner.c": "b35acefea3495f70c9f68226898e51bdd1cd970dcb4b32c00d96858776f79b0c",
         "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
         "tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
         "tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2"
