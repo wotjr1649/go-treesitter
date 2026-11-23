@@ -52,6 +52,14 @@ upstream tool availability remains a prerequisite until a complete bundled-notic
 See the [2026-11-15 ADR-0026 amendment](../design/decisions/ADR-0026-never-block-on-upstream.md#amendment-2026-11-15)
 and [source-row publication procedure](../specs/publication.md#pinned-archive-release-assets).
 
+## PHP (development tree after v0.5.0)
+
+The [upstream v0.25.2](https://github.com/tree-sitter/tree-sitter-php/releases/tag/v0.25.2) pin supplies the
+`php` dialect, which supports PHP embedded in text. The upstream `php_only` dialect has no Go module here.
+The cast and clone changes affect tree shape even for existing valid inputs. See the
+[migration notes](../../MIGRATING.md#unreleased-after-v050) and
+[schema register](../validation/grammar-schemas.md#unreleased-after-v050-php-v0252).
+
 ## PostgreSQL (v0.5.0 scope)
 
 `grammars/postgres` uses the owner-designated BSD-3-Clause `gmr/tree-sitter-postgres` pin

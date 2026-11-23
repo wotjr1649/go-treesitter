@@ -199,6 +199,13 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   The recorded Hangul alias, variable, column and label cases now parse cleanly and remain Korean regression inputs.
   This development change does not choose a module release version or authorize publication.
 
+- **PHP upstream v0.25.2 (development tree after v0.5.0).** Cast and clone operands can be general
+  expressions, including `match`. Cast precedence and tree nesting change around unary operators,
+  exponentiation and `instanceof`. Cast-type spellings can produce `name` nodes in expression and
+  constant positions. Review queries that match a direct cast operand, treat casts as variables, or count on
+  a keyword being unnamed. The [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-php-v0252)
+  lists the changed contracts. [Upstream v0.25.2](https://github.com/tree-sitter/tree-sitter-php/releases/tag/v0.25.2)
+
 - **T-SQL v2.8.0:** The development module uses [owner release v2.8.0](https://github.com/wotjr1649/tree-sitter-mssql/releases/tag/v2.8.0)
   at `3d42c1a55fb5a11927c3b0c65c2fd442457e28e8`. Go signatures and the engine ABI are unchanged.
   In `WRITETEXT BULK`, matches under `writetext_statement` now find a `keyword_bulk` child and the actual

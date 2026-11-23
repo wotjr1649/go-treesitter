@@ -29,7 +29,7 @@ own `LICENSE`.
 | tree-sitter-html | `grammars/html` | [MIT](LICENSES/tree-sitter-html.txt) |
 | tree-sitter-css | `grammars/css` | [MIT](LICENSES/tree-sitter-css.txt) |
 | tree-sitter-yaml | `grammars/yaml` | [MIT](LICENSES/tree-sitter-yaml.txt) |
-| tree-sitter-php | `grammars/php` | [MIT](LICENSES/tree-sitter-php.txt) |
+| tree-sitter-php | `grammars/php` from upstream v0.25.2 in the development tree after v0.5.0 | [MIT](LICENSES/tree-sitter-php.txt) |
 | tree-sitter-powershell | `grammars/powershell` | [MIT](LICENSES/tree-sitter-powershell.txt) |
 | tree-sitter-r | `grammars/r` | [MIT](LICENSES/tree-sitter-r.txt) |
 | tree-sitter-dart | `grammars/dart` | [MIT](LICENSES/tree-sitter-dart.txt) |
