@@ -198,8 +198,8 @@ grammar the result is `identical`, `headers-only` (only other generated files su
 (each side's error and time are reported; files are compared only when both succeed) or `input-failed`. When both sides
 generated, the `node-types.json` schema verdict is always included, also when no file differs: `identical` only for equal
 hashes, `BLOCKED` with a reason when one or both sides lack it or it cannot be read. Unreadable files and failed copies
-are `artifactErrors` and fail the command. A grammar with a generator exception (csharp) is regenerated
-as well. The conformance corpus is not run: that needs the native build lane and belongs to the pin-move pull request.
+are `artifactErrors` and fail the command. The rehearsal also regenerates grammars with a recorded generator
+exception. The conformance corpus runs in the native build lane for the pin-move pull request.
 The digest covers the results (status, each differing file's change kind and both SHA-256s, the schema verdict and its
 per-code and per-risk counts) and not the CLI identity, error text or timings, so the weekly job comments on issue #67
 only when a result changed since the last comment.
@@ -291,8 +291,10 @@ which includes [upstream PR #102](https://github.com/gmr/tree-sitter-postgres/pu
 `native-ref -unpatched` supplies the required corpus, fuzz-seed and patch-regression baseline for active patches.
 
 ADR-0027 sets `regenerate: true` for every grammar except entries with a recorded `generatorException`
-(reason and exact failing input IDs). An exception retains the committed reference C. The original archive,
-tree and file pins always identify bytes from the pinned source; generation adds identities instead of replacing them.
+(reason and exact failing input IDs). An exception retains the committed reference C. C# v0.24.0
+retires the initial exception. Its two independent generations match upstream's committed sources, and
+`regen.yml` runs the full behaviour gate in the C# shard. The original archive, tree and file pins
+identify bytes from the pinned source. Generation adds identities for the generated files.
 `gen` and `native-ref` share one implementation: verify the full archive, extract a private copy, apply grammar-input
 patches, then run the pinned CLI twice on independent trees using `generate --abi 15 --js-runtime native`.
 C/header patches apply after generation. Every resulting file must match. When generated C differs from committed C,

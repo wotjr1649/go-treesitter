@@ -566,7 +566,7 @@ func (r *rehearsal) grammar(lang string, g GrammarPin, inputErr error) rehearsal
 		res.Status, res.Error = "input-failed", oneLine(inputErr.Error(), 600)
 		return res
 	}
-	// A grammar with a generator exception (csharp) is regenerated too: the rehearsal compares CLI against CLI, never with the committed reference C.
+	// A grammar with a generator exception is regenerated too: the rehearsal compares CLI against CLI, never with the committed reference C.
 	scratch := filepath.Join(r.out, "work", lang)
 	defer os.RemoveAll(scratch)
 	if err := os.MkdirAll(scratch, 0o755); err != nil {

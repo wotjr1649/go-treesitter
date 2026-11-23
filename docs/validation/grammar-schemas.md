@@ -473,3 +473,19 @@ This is a breaking tree change under ADR-0023 amendment item 5. The comparison c
 rows (17 distinct inputs) whose original trees were error-free. The pinned upstream queries compiled and the query
 lane matched the patched native reference on 3,809 raw query/input pairs (E5, Windows amd64).
 [Query and migration impact](../../MIGRATING.md#unreleased-after-v050)
+
+## Unreleased (after v0.5.0): C# v0.24.0
+
+Tier-1 [tree-sitter-c-sharp v0.24.0](https://github.com/tree-sitter/tree-sitter-c-sharp/releases/tag/v0.24.0)
+moves C# from `9150f7d56bb4` to `d4bbe18103c3380c6454085e589d2610938da142`. The API archive SHA-256 is
+`392a56a27c344807913c0c467e45fdd116c351aa1ad1e9fd41292aa61dfb4147`.
+
+| Source | Bytes | Schema SHA-256 |
+|---|---:|---|
+| Previous archived `src/node-types.json` | 133257 | `54bf9fa925bac6fcdc05e0221ae8d4a62c155eb43ccd72b5bc2a4bdbebb7997e` |
+| v0.24.0 archived and regenerated `src/node-types.json` | 137058 | `751122d8f09a8fbff4cf0c69b18c78e7b8055b9b8ef336ea3f09a9fffa97b9fc` |
+
+The strict diff records 30 additions. The six new kinds are `#:`, `directive_kind`, `directive_name`,
+`directive_separator`, `directive_value` and `ignored_directive`. Preprocessor branches gain
+`body` fields and additional child and field alternatives. The previous pin already included
+`extension_declaration`, `receiver_parameter` and `slice_pattern`.

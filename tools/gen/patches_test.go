@@ -115,7 +115,7 @@ func TestGeneratorExceptionPins(t *testing.T) {
 		{"missing", false, nil},
 		{"reason", false, &GeneratorException{FailingInputs: []string{"input"}}},
 		{"inputs", false, &GeneratorException{Reason: "why"}},
-		{"regenerated-exception", true, g.GeneratorException},
+		{"regenerated-exception", true, &GeneratorException{Reason: "why", FailingInputs: []string{"input"}}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			clone := *p
