@@ -127,7 +127,7 @@ each `pins.json` patch with its `upstreamReport` and the date that report first 
 another); more than 3 patches (`-patch-alert`) or 5 (the ADR limit) is flagged in the table only. Unreadable `patches`
 metadata or unusable git history (no repository, shallow checkout; the workflow uses `fetch-depth: 0`) is a diagnostic in
 that section, never a warning or a failure. Bundled reports listed only in READMEs are not tracked (a pins schema
-change, an owner decision). **Upstream activity** (one GraphQL query per grammar repository, so it needs `GITHUB_TOKEN`
+change, an owner decision). **Grammar repository activity** (one GraphQL query per grammar repository, so it needs `GITHUB_TOKEN`
 and is skipped without it) comes last: merged pull requests in the last 12 months and how many of the 20 newest issues
 have a comment by an OWNER, MEMBER or COLLABORATOR among their first 20 comments (`>=` when more comments were not
 read; `?` for data the response lacked). It never warns, runs inside a 2-minute budget and stops at the first GraphQL
@@ -179,20 +179,20 @@ This exception does not waive parser correctness or constitute release approval.
 
 The tool builds committed-C (`native-ref -reference`) and regenerated-C (`-candidate`) variants independently,
 compares native corpus dumps, seeded incremental/fresh trees, changed ranges and field lookups, and compares
-the SHA-256-pinned large inputs in `tools/bench/ci/large.json`. It runs the upstream repository's own tests once
+the SHA-256-pinned large inputs in `tools/bench/ci/large.json`. It runs the pinned grammar repository's own tests once
 per variant, with separate `TREE_SITTER_LIBDIR` directories; existing failures must keep their output signature.
 If a corpus failure prevents the CLI from reaching auxiliary tests, a declared supplemental invocation excludes
 exactly those failing corpus names and collects the remaining stages; the original failures remain in the comparison.
-Repositories with no upstream cases record `NOT_RUN_ZERO_CASES`. A committed LFS pointer is a reference only
+Grammar repositories with no test cases record `NOT_RUN_ZERO_CASES`. A committed LFS pointer is a reference only
 when regeneration reproduces its recorded SHA-256 OID. When that OID equals the candidate parser, there are no
 patches, and all other grammar C/header inputs are byte-identical, the reference shares the candidate's native
-build, data and upstream test results. The report explicitly records `LFS_OID_IDENTICAL_TO_CANDIDATE` and the OID;
+build, data and grammar test results. The report explicitly records `LFS_OID_IDENTICAL_TO_CANDIDATE` and the OID;
 this avoids regenerating and compiling PostgreSQL a second time rather than claiming an independent comparison.
 The PostgreSQL shard budgets 30 minutes locally (generation plus one native build and tests), with a 90-minute
 hosted limit allowing a 2x slowdown plus 30 minutes of margin. This is an estimate, not a hosted measurement.
 Initial generator exceptions still exercise the candidate
 and must match exactly the `generatorException.failingInputs` IDs; a disappearing or expanding exception fails.
-The new output directory retains source/build identities, commands, input bytes, native results and upstream
+The new output directory retains source/build identities, commands, input bytes, native results and grammar test
 summaries. CI uploads these results and GNU `time -v` wall-time/max-RSS records; hosted measurements describe
 the runner that ran them, not a local estimate. No pin is changed by the gate.
 Text identities for pins, the gate script and the large-input manifest hash CRLF-normalized-to-LF bytes; binary
@@ -234,8 +234,9 @@ ADR-0027 regenerates every grammar except the recorded `generatorException` entr
 `grammar.js` patches apply before generation; recorded C patches apply afterwards, using generated
 before/after hashes where necessary. Selected `npmDependencies` are unpacked directly from the upstream
 `package-lock.json` tarball after SHA-512 integrity verification; install scripts never run.
-QuickJS receives these packages in the grammar working directory's `node_modules` (including TypeScript/TSX);
-no host Node installation participates. Lockfile, tarball and dependency identities are recorded in provenance.
+QuickJS receives these packages in the grammar working directory's `node_modules`. TypeScript and TSX use
+`grammar.js` vendored in their shared owner archive. No host Node installation participates. Lockfile, tarball
+and dependency identities are recorded in provenance when npm inputs are used.
 
 
 Grammar-input patches are omitted only for the gate's `-reference` build. Its C/header patches remain common

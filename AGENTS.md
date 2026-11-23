@@ -6,8 +6,9 @@ the ones your task touches.
 
 ## Rules
 
+- Use **owner repository**, **owner release** and **owner CHANGELOG** for ADR-0024 rule 7, **origin** for its source history and licensing, and **upstream** for third-party sources.
 - Product code builds with `CGO_ENABLED=0`. A C compiler is used only by `tools/native-ref` and the race lane.
-- Never edit upstream C (except through a recorded patch under ADR-0023) or generated grammar modules by hand;
+- Never edit pinned source C (except through a recorded patch under ADR-0023) or generated grammar modules by hand;
   change `tools/gen` and regenerate (CI requires the committed bytes). `tools/gen/README.md` has the procedures
   (`Pins`, `Regenerate`, `Pin-move CI evidence`).
 - Pins in `tools/gen/pins.json` (grammar commits and the CLI pin `treeSitterCLI`) change only with explicit authority,
@@ -27,4 +28,4 @@ the ones your task touches.
   large files (`docs/specs/publication.md`).
 - Merge pull requests with a merge commit (documents cite branch commit hashes). Released tags are immutable: retract,
   never move (`docs/specs/publication.md`).
-- Upstream (other repositories): agents only draft; the owner posts, with the AI disclosure (ADR-0025 decision 5).
+- Third-party upstream repositories: agents only draft; the owner posts, with the AI disclosure (ADR-0025 decision 5).

@@ -38,10 +38,10 @@ distributions such as nvim-treesitter pick one per language.
 | 2 | yaml → `tree-sitter-grammars/tree-sitter-yaml`; xml → `tree-sitter-grammars/tree-sitter-xml` |
 | 3 | kotlin → `fwcd/tree-sitter-kotlin` (replaces the kit's `tree-sitter-grammars/tree-sitter-kotlin`); powershell → `airbus-cert/tree-sitter-powershell`; r → `r-lib/tree-sitter-r`; dart → `UserNobody14/tree-sitter-dart`; swift → `alex-pinkus/tree-sitter-swift` |
 | owner-designated | PostgreSQL → `gmr/tree-sitter-postgres` (nvim-treesitter has none; generated from PostgreSQL's own grammar) |
-| 7 (owner-maintained) | T-SQL → `wotjr1649/tree-sitter-mssql` (owner's repository, v2.1.0; continues the `alfpricot` history, formerly `meloncholera`; nvim-treesitter has no T-SQL grammar) |
-| 7 (owner-maintained) | Java → `wotjr1649/tree-sitter-java` v3.0.3 `358048c`, based on `tree-sitter/tree-sitter-java` v0.23.5 `94703d5` |
+| 7 (owner-maintained) | T-SQL → `wotjr1649/tree-sitter-mssql` (owner release v2.1.0; origin `alfpricot/tree-sitter-mssql` v1.0.0, formerly `meloncholera`; nvim-treesitter has no T-SQL grammar) |
+| 7 (owner-maintained) | Java → `wotjr1649/tree-sitter-java` owner release v3.0.3 `358048c`; origin `tree-sitter/tree-sitter-java` v0.23.5 `94703d5` |
 | 7 (owner-maintained) | TypeScript and TSX → `wotjr1649/tree-sitter-typescript` owner release v3.1.0 `c37edc6` (2026-11-23); origin `tree-sitter/tree-sitter-typescript` v0.23.2 `f975a62` |
-| 7 (owner-maintained) | JavaScript (+JSX) → `wotjr1649/tree-sitter-javascript` v4.4.0 `e5ada30`, based on `tree-sitter/tree-sitter-javascript` v0.25.0 `44c892e` |
+| 7 (owner-maintained) | JavaScript (+JSX) → `wotjr1649/tree-sitter-javascript` owner release v4.4.0 `e5ada30`; origin `tree-sitter/tree-sitter-javascript` v0.25.0 `44c892e` |
 
 ## Consequences
 

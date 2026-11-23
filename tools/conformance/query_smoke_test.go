@@ -37,7 +37,7 @@ func TestQuerySmoke(t *testing.T) {
 				t.Fatal(err)
 			}
 			if len(files) == 0 {
-				t.Fatal("no pinned upstream queries found")
+				t.Fatal("no pinned grammar queries found")
 			}
 			queries := make([]*treesitter.Query, 0, len(files)+1)
 			for _, file := range files {

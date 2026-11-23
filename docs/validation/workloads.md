@@ -417,7 +417,7 @@ Kit native incremental/fresh differences are counted separately in
 `kitNativeIncrementalDiffersFromFresh`; every engine/native difference still
 fails. `ci.json`/`inputs.json` record `kitManifestSHA256`; nightly summaries, the
 job summary table and repro JSON include that identity plus `inputSetSHA256` (the
-complete generated corpus manifest hash, including upstream seeds). `ciconf`
+complete generated corpus manifest hash, including seeds from the pinned grammar corpus). `ciconf`
 rejects an empty `-kit` value, and in the seven kit grammars' shards
 `TestCorpusKitInputs` (also the nightly test) fails when the manifest identity,
 kit fresh inputs or (for full CI data) kit pair edits are missing.

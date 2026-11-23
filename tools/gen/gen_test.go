@@ -364,3 +364,17 @@ func TestReadmeSourceTiers(t *testing.T) {
 		}
 	}
 }
+
+func TestReadmeGrammarSource(t *testing.T) {
+	for _, tc := range []struct {
+		repo, notice, label, license string
+	}{
+		{"https://github.com/wotjr1649/tree-sitter-example", "notice", "owner repository", "`LICENSE` and `NOTICE` are the owner repository's license files."},
+		{"https://github.com/wotjr1649-other/tree-sitter-example", "", "upstream grammar", "`LICENSE` is the upstream grammar's license."},
+	} {
+		got := readme("example", &Pins{}, GrammarPin{Repo: tc.repo, NoticeSHA256: tc.notice}, Identity{})
+		if !strings.Contains(got, "- "+tc.label+": "+tc.repo+" at ") || !strings.Contains(got, tc.license) {
+			t.Errorf("README for %s uses the wrong source terminology:\n%s", tc.repo, got)
+		}
+	}
+}

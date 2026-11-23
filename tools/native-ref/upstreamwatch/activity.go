@@ -1,6 +1,6 @@
 package main
 
-// Upstream activity of every pinned grammar repository (information only: nothing here is a warning or a failure).
+// Activity of every pinned grammar repository (information only: nothing here is a warning or a failure).
 // One GraphQL query per repository returns the merged pull requests of the last 12 months and the maintainer
 // response on the 20 newest issues. GraphQL requires a token, so without GITHUB_TOKEN the section is skipped.
 // It runs after every other check, inside a short time budget and stops at the first GraphQL limit, so it can
@@ -152,7 +152,7 @@ func fetchActivity(ctx context.Context, api *githubAPI, repo string) (activity, 
 // activitySection prints one row per distinct grammar repository. Low values are not warnings: an inactive
 // repository already gets the 12-month commit warning, and a reply share over 20 issues is too noisy to alert on.
 func activitySection(p *pins, w io.Writer, api *githubAPI) {
-	fmt.Fprintln(w, "\n## Upstream activity (information only; no warning or failure)")
+	fmt.Fprintln(w, "\n## Grammar repository activity (information only; no warning or failure)")
 	fmt.Fprintln(w)
 	if api.token == "" {
 		fmt.Fprintln(w, "Skipped: the GraphQL API needs GITHUB_TOKEN.")

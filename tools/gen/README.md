@@ -1,6 +1,6 @@
 # tools/gen
 
-Generates one grammar module (`grammars/<lang>`) from pinned upstream C: clang (wasi-sdk) → wasm → wasm-opt
+Generates one grammar module (`grammars/<lang>`) from pinned runtime and grammar sources: clang (wasi-sdk) → wasm → wasm-opt
 (recipe-dependent) → `wasm2go` → patched `memory_grow` → Go module. Design: `docs/design/engine-abi.md`, ADR-0020, ADR-0022.
 
 ## CP949 decode table
@@ -103,7 +103,7 @@ The current native driver is used on both sides; this compares grammar sources, 
 Each native executable dumps every extracted old corpus input, every new corpus input and each selected grammar's
 SHA-256-pinned large benchmark input from `tools/bench/ci/large.json`. The driver retains input hashes, both
 dumps and per-input classifications: identical, changed, ok→error and error→ok. Existing error trees are retained
-and reported; they are not successful clean parses. Corpus extraction uses `ciconf -inputs-only`; upstream `:skip`
+and reported; they are not successful clean parses. Corpus extraction uses `ciconf -inputs-only`; `:skip` annotations in the source corpus
 and other-language exclusions are listed with reasons in the report and counted in the summary. A changed grammar
 without a large manifest entry fails. A grammar whose large input is a corpus concatenation (T-SQL)
 also needs that input's `sha256` in `tools/bench/ci/large.json` updated by the same PR whenever the move changes the
@@ -130,11 +130,11 @@ are excluded. This is native-before/native-after evidence, not Go/native C agree
 
 ### Later T-SQL releases
 
-A later release from `wotjr1649/tree-sitter-mssql` (for example, v2.2.0) can use one T-SQL-only pin-move PR:
+A later owner release from `wotjr1649/tree-sitter-mssql` (for example, v2.2.0) can use one T-SQL-only pin-move PR:
 resolve its full commit, download and hash its archive, update only the `tsql` pin with the new archive/tree/file/
 licence/notice hashes (`go run . -hash -lang tsql -src <sources> -dl <archives>` from `tools/gen`), then run the
 schema checks and `bash tools/gen/regen.sh <new-empty-work-dir> tsql`. Keep the CLI/runtime pins unchanged.
-If the upstream corpus changes, compute the T-SQL `large.json` hash with `benchci fetch -print -langs tsql`
+If the owner repository's corpus changes, compute the T-SQL `large.json` hash with `benchci fetch -print -langs tsql`
 over `ciconf -inputs-only` data from that corpus, without the optional kit inputs. Run the generator gate,
 fresh native/product conformance (including the repository's queries and Korean fixtures), and the commit-bound
 pin-move replay above. The generator gate compares generated C with committed C; it does not replace product
@@ -234,7 +234,7 @@ Without `ROOT_VERSION`, `regen.sh` derives the go.mod form from the committed `g
 The modules are `bash`, `c`, `cpp`, `csharp`, `css`, `dart`, `golang`, `html`, `java`, `javascript` (including JSX), `json`,
 `kotlin`, `php`, `postgres`, `powershell`, `python`, `r`, `ruby`, `rust`, `swift`, `tsql`, `tsx`, `typescript`, `xml`, and `yaml`. Each has a grammar-specific generated smoke-test sample.
 Downloads allow three attempts with 1s/2s backoff only for transient transport failures. HTTP, certificate and local
-write errors end that URL attempt; transient HTTP 408/429/5xx responses also receive bounded retries. A failed upstream download or hash check then tries each configured mirror; sha256 verification remains mandatory before extraction. The retry self-check is
+write errors end that URL attempt; transient HTTP 408/429/5xx responses also receive bounded retries. A failed primary download or hash check then tries each configured mirror; sha256 verification remains mandatory before extraction. The retry self-check is
 `bash tools/gen/fetch_test.sh`.
 
 Compare raw format-2 field-exception records with `python tools/gen/check-field-export.py --before BEFORE_TREE --after AFTER_TREE --jobs JOBS_JSON --out NEW_DIR`; exact arguments of the 2026-11-15 field-export-cost run (`q13/run.py`, `differential-final`), input hashes (`differential-jobs.json`) and results (`differential-final/receipt.json`) are kept in the maintainer-local evidence archive. The source and result identities are recorded in [engine-abi.md](../../docs/design/engine-abi.md#field-lookup-evidence).
@@ -290,7 +290,7 @@ The fix first shipped in [owner v2.0.0](https://github.com/wotjr1649/tree-sitter
 
 ADR-0027 sets `regenerate: true` for every grammar except entries with a recorded `generatorException`
 (reason and exact failing input IDs). An exception retains the committed reference C. The original archive,
-tree and file pins always identify upstream bytes; generation adds identities instead of replacing them.
+tree and file pins always identify bytes from the pinned source; generation adds identities instead of replacing them.
 `gen` and `native-ref` share one implementation: verify the full archive, extract a private copy, apply grammar-input
 patches, then run the pinned CLI twice on independent trees using `generate --abi 15 --js-runtime native`.
 C/header patches apply after generation. Every resulting file must match. When generated C differs from committed C,
@@ -323,12 +323,12 @@ entry points; `native-ref` accepts `-patch-alert N`. The synthetic integration t
 ## Immutable release source mirror
 
 `pins.json` has an ordered `mirrors` array of release-asset base URLs. The fetch plan's sixth TSV column contains
-those bases with the exact archive filename appended (comma-separated; `-` means none). Upstream always runs first;
+those bases with the exact archive filename appended (comma-separated; `-` means none). The primary URL is tried first;
 transport/HTTP failure or a wrong SHA-256 tries the next mirror. Both `regen.sh` and `balance-probe.sh` check the original
 archive hash before extraction. `native-ref -fetch` follows the same rule. Existing cached native archives are still
 checked and a corrupt cache fails, rather than being silently replaced.
 
-List the pinned archive candidates from all platforms (deduplicated TSV: filename, SHA-256, upstream URL,
+List the pinned archive candidates from all platforms (deduplicated TSV: filename, SHA-256, primary download URL,
 kind `source`/`toolchain`; no header):
 
 ```sh

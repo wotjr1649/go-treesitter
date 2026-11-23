@@ -82,11 +82,11 @@ Every claim carries a level. Do not state a claim above the level you actually p
 
 ## Gates
 
-| Gate | Passes when | Known upstream blockers allowed? |
+| Gate | Passes when | Known blockers in pinned sources allowed? |
 |---|---|---|
 | **Development** | Product lane builds; focused tests for changed behavior pass; every known-regression signature still matches its record. | **yes**, if ratcheted |
 | **Integration** | Development gate, plus the result contract is exercised end to end and a consumer can depend on the API shape. | yes, if documented in the consumer-facing limitations |
-| **Release-Critical** | For each language *claimed in scope*: zero unresolved correctness blockers; conformance (fresh and edit cases) agrees with the native reference; every `incremental != fresh` case is an upstream-attributed ratchet. | **no** |
+| **Release-Critical** | For each language *claimed in scope*: zero unresolved correctness blockers; conformance (fresh and edit cases) agrees with the native reference; every `incremental != fresh` case is a ratchet attributed to the pinned source. | **no** |
 | **Release** | Release-Critical for the claimed scope, plus platform validation, reproducible generation, resource budgets (large-input parse geomean <= 2.5x native; small files <= 1 ms or <= 2.5x native, where a file failing the first pass gets one paired confirmation pass and fails only if both fail, with both passes recorded; peak <= 100 x input + 64 MB; after `Close` every engine region returned and private bytes within start + 16 MB, ADR-0022; on macOS the footprint delta is net of the growth of the runtime's released heap bytes and a snapshot case must have been collected, ADR-0022 macOS amendment), packaging, and an explicit limitations list. | **no** |
 
 A language with an open known regression keeps the **Development gate green** and the
@@ -96,7 +96,7 @@ A language with an open known regression keeps the **Development gate green** an
 
 ## Known-regression ratchet
 
-Not an `xfail`. A loose skip hides both "upstream fixed it" and "upstream made it worse".
+Not an `xfail`. A loose skip hides both fixes and regressions in the pinned source.
 
 Record format and current entries: `docs/validation/known-regressions.md`.
 

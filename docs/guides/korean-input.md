@@ -121,7 +121,7 @@ Rust-only forms are query errors) is owned by [limitations, row 5](../reports/li
 
 ## Which grammars take Korean
 
-A grammar is a pinned upstream grammar, and some match names with ASCII-only or Latin-1 patterns, so a Hangul name can
+Some pinned grammars match names with ASCII-only or Latin-1 patterns, so a Hangul name can
 produce `ERROR` nodes even though the language allows it. The table says what was shown, per grammar and kind of text.
 
 - **yes**: every retained input of that kind parses with no `ERROR` or `MISSING` node. For each Hangul run, and each
@@ -132,7 +132,7 @@ produce `ERROR` nodes even though the language allows it. The table says what wa
   parser reads a `VariableExpressionAst`), and in `ruby/str-heredoc-hangul-delimiter-eof-no-newline` the closing `끝`
   at end of file without a newline is part of `heredoc_content` (Ruby ends the heredoc there). The same EOF boundary
   occurs with an ASCII end word.
-- **no** / **partly**: a pinned upstream defect, reproduced by the engine and by native C. The linked page has the exact
+- **no** / **partly**: a defect in the pinned grammar, reproduced by the engine and by native C. The linked page has the exact
   input and the observed wrong tree. A tree is still returned; check `HasError()`.
 - **not recorded**: there is no retained input for it, so nothing is claimed either way.
 

@@ -1,6 +1,6 @@
 # Baseline and provenance contract
 
-Normative. Owns which upstream sources and tools the product is built from and how that identity is bound.
+Normative. Owns which sources and tools the product is built from and how that identity is bound.
 No other document may restate these values; link here instead. Engine and policy: ADR-0020. ABI: `docs/design/engine-abi.md`.
 
 ## What the product is built from
@@ -10,7 +10,7 @@ Every grammar module is generated, never hand-edited, from:
 | Input | Rule |
 |---|---|
 | tree-sitter runtime C (`lib/src/lib.c` tree) | an upstream **release**, unmodified |
-| grammar inputs, `scanner.c`, headers | upstream grammar repository at a full commit (a bounded exception: the owner-maintained repository designated under [ADR-0024 rule 7](../design/decisions/ADR-0024-grammar-source-tiers.md#amendment-2026-11-18-rule-7-owner-maintained-repositories)); `parser.c` is regenerated with the single pinned CLI under ADR-0027, except recorded behaviour-gate exceptions; owner-approved temporary source patches follow ADR-0023 |
+| grammar inputs, `scanner.c`, headers | full commit in an upstream grammar repository or in an owner repository designated under [ADR-0024 rule 7](../design/decisions/ADR-0024-grammar-source-tiers.md#amendment-2026-11-18-rule-7-owner-maintained-repositories); `parser.c` is regenerated with the single pinned CLI under ADR-0027, except recorded behaviour-gate exceptions; owner-approved temporary source patches follow ADR-0023 |
 | `tools/gen/shim/tsg_abi.c` | this repository's own C, versioned by the engine ABI |
 | toolchain | wasi-sdk (clang) and binaryen `wasm-opt` pinned by upstream release archive sha256 per platform; wasm2go pinned by module version + `go.sum` hash and built with `go install -trimpath`; versions and the recipe name recorded per generation (host binary hashes are not identity) |
 | post-processing | the hash-checked `memory_grow` replacement of `tools/gen` (ADR-0020 §8) |
@@ -35,7 +35,7 @@ Grammar-input patches apply before generation and C/header patches after it.
 External npm grammar inputs come from the upstream lockfile, are integrity-checked and extracted without install
 scripts, and are recorded in provenance. The original archive/tree/file pins continue to identify the archived
 bytes; generated C hashes are additional identities. CLI or grammar moves require the ADR-0027 native behaviour
-gate, including upstream tests with isolated compiled-language caches; schema changes enter the schema register.
+gate, including the grammar repository's own tests with isolated compiled-language caches; schema changes enter the schema register.
 
 ## Machine-readable source of truth
 
