@@ -96,3 +96,21 @@ and requires disclosure of AI use. Posting an edited agent draft sits closer to 
 did. The practice relies on the owner's edit and understanding and on the disclosure; the upstream maintainers decide
 whether a post follows their policy, and a post they close for that reason is recorded, not retried. If the owner
 cannot make a draft their own, it is not posted.
+
+## Amendment (2026-11-23): decision 5, disclosure follows the target's policy
+
+This amendment changes only the **Disclosure** item of the 2026-11-19 amendment; the rest of it still governs.
+
+- **Disclosure follows the target project's own policy.** Where that policy requires disclosure of AI use, every post
+  ends with a short disclosure in the owner's own words; the 2026-11-19 line stays the default wording. This covers
+  every repository of the `tree-sitter` organisation: the
+  [AI policy](https://tree-sitter.github.io/tree-sitter/6-contributing.html) lives in `tree-sitter/tree-sitter`, the
+  grammar repositories have no contributing guide of their own, and their maintainers overlap. Where the target has no
+  such policy, disclosure is the owner's choice.
+- Before a draft is posted, the agent states whether the target's policy requires disclosure, with the source it read.
+
+On 2026-11-23 four replies were posted without disclosure. At the owner's direction, an agent appended the line
+"I used an AI coding assistant to draft this comment; I checked it before posting." to the three in the `tree-sitter`
+organisation (tree-sitter-c-sharp#480, tree-sitter-c-sharp#458, tree-sitter-ruby#306). This edit was a one-time
+exception, made at the owner's direction, to "agents never edit". The reply on gmr/tree-sitter-postgres#101 stays as
+posted, because that repository's `CONTRIBUTING.md` has no AI clause.

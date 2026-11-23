@@ -28,4 +28,4 @@ the ones your task touches.
   large files (`docs/specs/publication.md`).
 - Merge pull requests with a merge commit (documents cite branch commit hashes). Released tags are immutable: retract,
   never move (`docs/specs/publication.md`).
-- Third-party upstream repositories: agents only draft; the owner posts, with the AI disclosure (ADR-0025 decision 5).
+- Third-party upstream repositories: agents only draft; the owner posts, with an AI disclosure where the target's policy requires one (ADR-0025 decision 5).
