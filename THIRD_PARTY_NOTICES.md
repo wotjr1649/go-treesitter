@@ -20,7 +20,7 @@ own `LICENSE`.
 | tree-sitter-c-sharp | `grammars/csharp` | [MIT](LICENSES/tree-sitter-c-sharp.txt) |
 | tree-sitter-json | `grammars/json` | MIT, [grammars/json/LICENSE](grammars/json/LICENSE) |
 | tree-sitter-postgres | `grammars/postgres` (SQL only) | [BSD-3-Clause](LICENSES/tree-sitter-postgres.txt) |
-| tree-sitter-tsql | `grammars/tsql` from `wotjr1649/tree-sitter-mssql` owner release v2.1.0 in the development tree after v0.5.0 | MIT, [grammars/tsql/LICENSE](grammars/tsql/LICENSE) |
+| tree-sitter-tsql | `grammars/tsql` from `wotjr1649/tree-sitter-mssql` owner release v2.8.0 in the development tree after v0.5.0 | MIT, [grammars/tsql/LICENSE](grammars/tsql/LICENSE) |
 | tree-sitter-java | `grammars/java`, from `wotjr1649/tree-sitter-java` owner release v3.0.3 in the development tree after v0.5.0 | [MIT with continuation copyright](grammars/java/LICENSE), [origin NOTICE](grammars/java/NOTICE), [original license](LICENSES/tree-sitter-java.txt) |
 | tree-sitter-c | `grammars/c` | [MIT](LICENSES/tree-sitter-c.txt) |
 | tree-sitter-cpp | `grammars/cpp` | [MIT](LICENSES/tree-sitter-cpp.txt) |

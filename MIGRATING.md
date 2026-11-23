@@ -199,6 +199,21 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   The recorded Hangul alias, variable, column and label cases now parse cleanly and remain Korean regression inputs.
   This development change does not choose a module release version or authorize publication.
 
+- **T-SQL v2.8.0:** The development module uses [owner release v2.8.0](https://github.com/wotjr1649/tree-sitter-mssql/releases/tag/v2.8.0)
+  at `3d42c1a55fb5a11927c3b0c65c2fd442457e28e8`. Go signatures and the engine ABI are unchanged.
+  In `WRITETEXT BULK`, matches under `writetext_statement` now find a `keyword_bulk` child and the actual
+  target as an `object_reference`. `WITH LOG` is accepted for the data-less BULK form. Inline data with `BULK`
+  and a plain `WRITETEXT` with no data produce error trees.
+  `property_access` represents CLR property reads after calls and other supported receivers. A parenthesized
+  variable such as `(@g).STX` keeps its `field` tree. The type synonyms `char varying`, `binary varying`,
+  `nchar varying` and `national text` parse in supported type positions. For length-less columns,
+  `char varying` and `binary varying` now produce `varchar` and `varbinary` type trees, respectively.
+  Query files are unchanged. Queries that match affected kinds, fields or recovery nodes can return different
+  captures. See the [owner CHANGELOG](https://github.com/wotjr1649/tree-sitter-mssql/blob/3d42c1a55fb5a11927c3b0c65c2fd442457e28e8/CHANGELOG.md)
+  and the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-t-sql-v280).
+  A Go parse reports grammar errors. The owner repository's separate tree-check constraints and SQL Server's
+  compatibility-level and session validation are outside that API.
+
 - **PostgreSQL upstream v19.0.0 (development tree after v0.5.0):** the SQL module retires its two temporary
   Korean-support patches because [upstream PR #102](https://github.com/gmr/tree-sitter-postgres/pull/102) incorporated both fixes.
   Compared with published v0.5.0, unquoted identifiers now accept every
