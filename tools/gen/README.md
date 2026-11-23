@@ -340,8 +340,8 @@ The command lists 34 rows for the current pins: 26 `source` archives and eight `
 contains its original 24 source archives plus `SHA256SUMS`; the new C and PostgreSQL archives have no fallback there.
 The v0.5.0 release mirrors the 25 rows with column 4 equal to `source` that existed then, plus `SHA256SUMS`.
 The Swift archive, the T-SQL v2.1.0 archive `tree-sitter-mssql-80037156b044.tar.gz`, the Java v3.0.3 archive
-`tree-sitter-java-358048c1c6f9.tar.gz`, the shared TypeScript/TSX v1.0.0 archive
-`tree-sitter-typescript-59fc4edb0c0b.tar.gz`, and the JavaScript v4.4.0 archive
+`tree-sitter-java-358048c1c6f9.tar.gz`, the shared TypeScript/TSX v3.1.0 archive
+`tree-sitter-typescript-c37edc69610d.tar.gz`, and the JavaScript v4.4.0 archive
 `tree-sitter-javascript-e5ada307a6f1.tar.gz` were added afterwards and
 have no mirror fallback until a release carrying them is published and its base is configured. Check their filenames against `runtime.archive`,
 `wasiLibc.archive`, and each grammar's `archive` in `pins.json`, deduplicating TypeScript/TSX's shared archive;

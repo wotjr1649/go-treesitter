@@ -5,14 +5,15 @@ upstream history preserved. That work is copyright (c) 2017 Max Brunsfeld and
 licensed under the MIT License; see LICENSE.
 
 The following files under third_party/tree-sitter-javascript/ are copied unchanged
-from tree-sitter/tree-sitter-javascript
-(https://github.com/tree-sitter/tree-sitter-javascript) at v0.23.1, commit 3a837b6
-(3a837b6f3658ca3618f2022f8707e29739c91364). They are copyright (c) 2014 Max
-Brunsfeld and licensed under the MIT License; see
-third_party/tree-sitter-javascript/LICENSE. SHA-256:
+from wotjr1649/tree-sitter-javascript
+(https://github.com/wotjr1649/tree-sitter-javascript) at v4.4.0, tag object a907252
+(a907252716fc966fca43409ca0cec3afd4191587), commit e5ada30
+(e5ada307a6f1741a573d5c8d4dafee9234330b1f). They are licensed under the MIT
+License; see third_party/tree-sitter-javascript/LICENSE for their copyright
+notices. SHA-256:
 
-2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1  LICENSE
-230e330dd914d94297e5e58d53942cd5debf9c069852da93b6a6b1daae1967dc  grammar.js
+8ef024c7b005dca2d72127f359ed3ef59755d2513308cb2a2b0df99007f4d47b  LICENSE
+20d273016a55db8bc0d4b585534e38eee591717df060b828a3695ba324b223db  grammar.js
 0cad1712acaf40804bc5dc7c8476858752c1f549cdf7d8c63c747317be0f8fa6  queries/highlights-jsx.scm
 bbe7a58cacfb1c954cb0eab44779fd80421ed59b762b975723447207635de50d  queries/highlights-params.scm
 d3630ae6dc9b2b27b230b5f8bb92b05cd491fb12bff353dae62a0a6d780461ee  queries/highlights.scm
