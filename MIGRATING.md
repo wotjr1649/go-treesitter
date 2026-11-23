@@ -361,7 +361,9 @@ This move from v1.0.0 includes the CST changes in v2.0.0 and v3.0.0.
 - **Known gap for newline arrays after import types.** Both grammars in owner release v3.1.0 produce an error
   when `[a + b];` starts on the line after `const x = v as import('x').Y`. Both parsed this example
   without errors in owner release v1.0.0. The [owner record](https://github.com/wotjr1649/tree-sitter-typescript/pull/31)
-  also covers the `satisfies` variant and records that `tsc` 7.0.2 accepts both forms. As of
+  also covers the `satisfies` variant and records that `tsc` 7.0.2 accepts both forms. The owner repository
+  traces the error to fix N1 in owner release v2.0.0, which lets an import type take index access; other
+  types after `as` or `satisfies`, such as `v as Foo`, already produced it in v1.0.0. As of
   2026-11-23, the owner has put the fix on hold with no release planned. The owner reports that the
   local fix adds about 13% more LR states.
 - **TSX text and quoted attributes.** Bare `&` in JSX text or a quoted attribute parses as text.
