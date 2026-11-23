@@ -313,6 +313,30 @@ qualifiers, qualified record patterns and modifiers on type patterns and record 
 No node kind or field name is added, removed or renamed. Query and CST changes are in
 [the migration notes](../../MIGRATING.md#java-grammar-v303).
 
+## Unreleased (after v0.5.0) TypeScript and TSX v3.1.0
+
+Under ADR-0024 rules 7.5–7.7, TypeScript and TSX move together within the owner repository
+`wotjr1649/tree-sitter-typescript` from v1.0.0 (`59fc4edb0c0bcec96a4c52e34b401de22a905b46`)
+to [v3.1.0](https://github.com/wotjr1649/tree-sitter-typescript/releases/tag/v3.1.0)
+(`c37edc69610d304fb2a11005ca9c4e52ad1f4863`).
+The shared archive SHA-256 changes from `f53457ec5d60df85508e8189f53a825d4dfc96d9393c92822f9b47d989e2846f`
+to `a33ff5842ab7ab551ada6b21c76af50eaf9aba067dc235597eb3194327e4a7b0`.
+
+| Grammar | Input | Schema bytes | Schema SHA-256 |
+|---|---|---:|---|
+| TypeScript | Owner v1.0.0 | 108621 | `10fc80f3b49f46aa6a64c805372359c08540fc8232934ef0f75f84a5cf91e000` |
+| TypeScript | Owner v3.1.0 | 111155 | `2e228c4a1a60e70ee6c46de442de0a3dc0d6381df8ab2a390d818ac3f622aafd` |
+| TSX | Owner v1.0.0 | 113383 | `9a6b3b2c79875a36f9591627e33d5b2376b2b25352b38d5368efcc7b2fa4e01f` |
+| TSX | Owner v3.1.0 | 116343 | `f3f34a04510da65b5ceb298a18839cfab84426323681a9d67874a4b5d1d95586` |
+
+All four strict checks pass (E1, Windows amd64). The strict diff reports 40 changes for TypeScript
+and 45 for TSX. Both add the anonymous `out` token and named `using_declaration`; neither removes a
+node kind or field. Both have six child-alternative removals: `await_expression`, `instantiation_expression`
+and `non_null_expression` replace `expression` with more specific alternatives, while
+`parenthesized_expression` covers calls, identifiers and member expressions through `expression`.
+Both widen child cardinality for exports and type parameters and the `kind` field for `for_in_statement`.
+See [the migration notes](../../MIGRATING.md#typescript-and-tsx-grammar-v310) for CST and query effects.
+
 ## Unreleased (after v0.5.0) TypeScript and TSX v1.0.0
 
 Under ADR-0024 rules 7.5 and 7.7, TypeScript and TSX move together from

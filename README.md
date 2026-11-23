@@ -20,10 +20,10 @@ under `grammars/`: `bash`, `c`, `cpp`, `csharp`, `css`, `dart`, `golang`, `html`
 `json`, `kotlin`, `postgres` (PostgreSQL SQL only; PL/pgSQL excluded), `php` (PHP parser only), `powershell`, `python`, `r`, `ruby`, `rust`, `tsql`, `tsx`, `typescript`,
 `xml` (XML parser only), and `yaml`. The development tree after v0.5.0 also has `swift` (not part of any release).
 
-Use `typescript` for `.ts` and `tsx` for `.tsx`: the same upstream repository provides two grammars.
+Use `typescript` for `.ts` and `tsx` for `.tsx`: the same owner repository provides both grammars.
 `<T>expr` type assertions are TypeScript-only; JSX is TSX-only.
 
-Each language has exactly one upstream repository, chosen by the tiers of
+Each language has exactly one grammar source repository, chosen by the tiers of
 [ADR-0024](docs/design/decisions/ADR-0024-grammar-source-tiers.md):
 
 | Tier | Modules | Upstream |
@@ -36,7 +36,7 @@ Each language has exactly one upstream repository, chosen by the tiers of
 | 7 (owner-maintained) | `tsql` | `wotjr1649/tree-sitter-mssql` (v2.1.0 in the development tree after v0.5.0; origin `alfpricot/tree-sitter-mssql` v1.0.0; ADR-0024 rule 7) |
 | 7 (owner-maintained) | `java` | `wotjr1649/tree-sitter-java` (v3.0.3 in the development tree after v0.5.0; origin `tree-sitter/tree-sitter-java` v0.23.5; ADR-0024 rule 7) |
 | 7 (owner-maintained) | `javascript` (including JSX) | `wotjr1649/tree-sitter-javascript` (v4.4.0 in the development tree after v0.5.0, based on `tree-sitter/tree-sitter-javascript` v0.25.0 under ADR-0024 rule 7) |
-| 7 (owner-maintained) | `typescript`, `tsx` | `wotjr1649/tree-sitter-typescript` (v1.0.0 in the development tree after v0.5.0, based on `tree-sitter/tree-sitter-typescript` v0.23.2 under ADR-0024 rule 7) |
+| 7 (owner-maintained) | `typescript`, `tsx` | `wotjr1649/tree-sitter-typescript` (owner release v3.1.0 in the development tree after v0.5.0; origin `tree-sitter/tree-sitter-typescript` v0.23.2; ADR-0024 rule 7) |
 
 Exact revisions are in [pins.json](tools/gen/pins.json). Bash, Ruby, YAML and Python carry recorded temporary C-only patches
 ([ADR-0023](docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md); each module's README lists them).
