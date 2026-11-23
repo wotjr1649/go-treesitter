@@ -336,8 +336,8 @@ for the static contract changes.
 
 ### TypeScript and TSX grammar v3.1.0
 
-The `grammars/typescript` and `grammars/tsx` Go modules use the shared owner
-[grammar release v3.1.0](https://github.com/wotjr1649/tree-sitter-typescript/releases/tag/v3.1.0),
+The `grammars/typescript` and `grammars/tsx` Go modules use the shared
+[owner release v3.1.0](https://github.com/wotjr1649/tree-sitter-typescript/releases/tag/v3.1.0),
 commit `c37edc69610d304fb2a11005ca9c4e52ad1f4863`. Their Go import paths stay the same.
 This move from v1.0.0 includes the CST changes in v2.0.0 and v3.0.0.
 
@@ -354,13 +354,17 @@ This move from v1.0.0 includes the CST changes in v2.0.0 and v3.0.0.
   and line-breaking comments. Comments at the end of a body or declaration can attach at a different level,
   and a hashbang ends before its terminating CR. v3.1.0 repairs member declarations named `in` or
   `instanceof` and fresh and incremental parsing around these operators after `async` or `await`.
-  A newline-starting array after an `as import('x').Y` or `satisfies import('x').Y` expression
-  remains a [known gap](https://github.com/wotjr1649/tree-sitter-typescript/pull/31).
+- **Known gap for newline arrays after import types.** Both grammars in owner release v3.1.0 produce an error
+  when `[a + b];` starts on the line after `const x = v as import('x').Y`. Both parsed this example
+  without errors in owner release v1.0.0. The [owner record](https://github.com/wotjr1649/tree-sitter-typescript/pull/31)
+  also covers the `satisfies` variant and records that `tsc` 7.0.2 accepts both forms. As of
+  2026-11-23, the owner has put the fix on hold with no release planned. The owner reports that the
+  local fix adds about 13% more LR states.
 - **TSX text and quoted attributes.** Bare `&` in JSX text or a quoted attribute parses as text.
   A bare or incomplete reference can change the number or byte ranges of `string_fragment` nodes.
   `<this.C/>` now has a `this` member object and JSX keyword names can carry type arguments.
 
 The repository's highlights, locals and tags query files retain their bytes. CST changes can alter
 captures and byte spans. See the
-[owner changelog](https://github.com/wotjr1649/tree-sitter-typescript/blob/c37edc69610d304fb2a11005ca9c4e52ad1f4863/CHANGELOG.md)
+[owner CHANGELOG](https://github.com/wotjr1649/tree-sitter-typescript/blob/c37edc69610d304fb2a11005ca9c4e52ad1f4863/CHANGELOG.md)
 and the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-typescript-and-tsx-v310).

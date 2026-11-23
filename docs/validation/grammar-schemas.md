@@ -315,7 +315,7 @@ No node kind or field name is added, removed or renamed. Query and CST changes a
 
 ## Unreleased (after v0.5.0) TypeScript and TSX v3.1.0
 
-Under ADR-0024 rules 7.5–7.7, TypeScript and TSX move together within
+Under ADR-0024 rules 7.5–7.7, TypeScript and TSX move together within the owner repository
 `wotjr1649/tree-sitter-typescript` from v1.0.0 (`59fc4edb0c0bcec96a4c52e34b401de22a905b46`)
 to [v3.1.0](https://github.com/wotjr1649/tree-sitter-typescript/releases/tag/v3.1.0)
 (`c37edc69610d304fb2a11005ca9c4e52ad1f4863`).
