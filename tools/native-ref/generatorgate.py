@@ -276,22 +276,27 @@ def compare_data(before, after):
 
 
 def outcomes(value, path=(), strict=False):
+    found = []
+    def collect(node, path):
+        if isinstance(node, dict):
+            if "outcome" in node:
+                found.append(("/".join(path + (node.get("name", ""),)), node.get("test_num"), node["outcome"]))
+                return
+            for key, child in node.items():
+                if key in ("parse_results", "highlight_results", "tag_results", "query_results", "children"):
+                    collect(child, path + ((node["name"],) if "name" in node else (key,)))
+        elif isinstance(node, list):
+            for child in node:
+                collect(child, path)
+    collect(value, path)
+    names = [name for name, _, _ in found]
     result = {}
-    if isinstance(value, dict):
-        if "outcome" in value:
-            return {"/".join(path + (value.get("name", ""),)): value["outcome"]}
-        for key, child in value.items():
-            if key in ("parse_results", "highlight_results", "tag_results", "query_results", "children"):
-                nested = outcomes(child, path + ((value["name"],) if "name" in value else (key,)), strict)
-                if strict and result.keys() & nested.keys():
-                    raise ValueError("duplicate grammar test outcome identity")
-                result.update(nested)
-    elif isinstance(value, list):
-        for child in value:
-            nested = outcomes(child, path, strict)
-            if strict and result.keys() & nested.keys():
-                raise ValueError("duplicate grammar test outcome identity")
-            result.update(nested)
+    for name, number, outcome in found:
+        # Strict mode keeps repeated upstream names apart by test_num; unique names keep their identity.
+        identity = f"{name}#{number}" if strict and names.count(name) > 1 else name
+        if strict and identity in result:
+            raise ValueError("duplicate grammar test outcome identity")
+        result[identity] = outcome
     return result
 
 

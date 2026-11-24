@@ -89,6 +89,21 @@ class GeneratorGateTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "duplicate grammar test outcome identity"):
             gate.compare_upstream(before, before, strict=True)
 
+    def test_strict_upstream_separates_repeated_names_by_test_num(self):
+        def side(outcome):
+            return {"parse_results": [{"name": "g", "children": [
+                {"name": "case", "test_num": 1, "outcome": "Passed"},
+                {"name": "case", "test_num": 2, "outcome": outcome},
+                {"name": "unique", "test_num": 3, "outcome": "Passed"}]}]}
+        self.assertEqual(sorted(gate.outcomes(side("Passed"), strict=True)), ["parse_results/g/case#1", "parse_results/g/case#2", "parse_results/g/unique"])
+        self.assertEqual(gate.compare_upstream(side("Passed"), side("Passed"), strict=True), [])
+        changed = gate.compare_upstream(side("Passed"), side("Failed"), strict=True)
+        self.assertEqual([x["id"] for x in changed], ["upstream/parse_results/g/case#2"])
+        repeated = side("Passed")
+        repeated["parse_results"][0]["children"][1]["test_num"] = 1
+        with self.assertRaisesRegex(ValueError, "duplicate grammar test outcome identity"):
+            gate.outcomes(repeated, strict=True)
+
     def test_patch_corpus_is_additive_identical_and_cannot_overwrite_upstream(self):
         with tempfile.TemporaryDirectory() as tmp:
             repo = Path(tmp)
