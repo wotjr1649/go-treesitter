@@ -1,6 +1,6 @@
 # Release-Critical status board
 
-Updated 2026-11-24 for v0.6.0 Preview (25 grammar modules, engine ABI 4).
+Updated 2026-11-24 for the v0.6.0 Preview release (25 grammar modules, engine ABI 4).
 Historical gate tables retain their original commits, pins and scope.
 The previous board for the `gotreesitter` carrier is in Git history at main `9ad82eb`.
 
@@ -32,8 +32,8 @@ runtime and CLI 0.27.2, pins schema 3, recipe `v2-O3` and engine ABI 4. Product 
 | Nightly diff | PASS, E5 for sampled cases, 50/50 jobs | All 25 grammars on Linux amd64/arm64. Seed `20261124`, four minutes per grammar, 30 seconds per Go fuzz target and a 30-second watchdog per Go case/native operation. [45318813099](https://github.com/wotjr1649/go-treesitter/actions/runs/45318813099) |
 | Upstream watch | PASS, E1, 2/2 jobs | One Swift warning, accepted in this PR until 2027-02-24 ([#109](https://github.com/wotjr1649/go-treesitter/issues/109)), with existing tier-review notices for CSS, Go, HTML and Python. Bash was below the age threshold in this run. [45318817150](https://github.com/wotjr1649/go-treesitter/actions/runs/45318817150) |
 | Candidate module ZIP rehearsal | PASS, local E3 packaging | Windows amd64, Go 1.27.4, file `GOPROXY`, empty module cache and no `replace`. The root and all 25 grammar ZIPs resolved at v0.6.0, all 25 samples parsed cleanly with `CGO_ENABLED=0`, and the consumer linked for `linux/arm64`. |
-| Candidate source-row inventory | PASS, local E1 | 34 fetch-plan rows: all 26 selected source archives matched their pins after download and eight toolchain rows were excluded. Draft upload inventory is the 26 source archives plus `SHA256SUMS`. |
-| Tag/proxy resolution and published mirror assets | Pending | Root and grammar tags, direct/public proxy resolution, draft asset digests, attestation and published download hashes are publication steps. |
+| Candidate source-row inventory | PASS, local E1 | 34 fetch-plan rows: all 26 selected source archives matched their pins after download and eight toolchain rows were excluded. The draft upload included the 26 source archives plus `SHA256SUMS`. |
+| Tag/proxy resolution and published mirror assets | PASS, read-only publication checks | Both Go download routes resolved all 26 modules. All 27 draft asset digests matched. `gh release verify v0.6.0` passed, and all 26 anonymous source archive downloads matched their pinned SHA-256 hashes. See [Released](#released). |
 
 - **Regeneration attempt 1.** Twenty-four grammar shards passed. The C shard stopped before comparing generated
   bytes after the official WASI SDK 34 Linux x86-64 URL and the v0.5.0 and v0.4.0 mirror requests each
@@ -62,9 +62,8 @@ runtime and CLI 0.27.2, pins schema 3, recipe `v2-O3` and engine ABI 4. Product 
   no age warning on 2026-11-24. [Watch run](https://github.com/wotjr1649/go-treesitter/actions/runs/45318817150) ·
   [Bash follow-up #107](https://github.com/wotjr1649/go-treesitter/issues/107)
 
-The local rehearsal packaged the tested candidate tree. The publication procedure calls for a rehearsal of the
-final release commit so the root ZIP includes the final document bytes. The release decision includes owner
-review of the [known limitations](limitations.md).
+The local rehearsal above packaged the tested candidate tree. The public module checks under [Released](#released)
+used the tagged root and grammar modules. The [known limitations](limitations.md) describe the scope of this Preview.
 
 ## v0.5.0 release scope
 
@@ -166,6 +165,14 @@ filenames and hashes; it does not establish uploaded/downloaded asset digests or
 
 ## Released
 
+- **v0.6.0 Preview** (2026-11-24 06:44:40 UTC, immutable GitHub pre-release). Root tag
+  `v0.6.0` points to `f723d8e`. All 25 grammar tags `grammars/<lang>/v0.6.0`, including Swift's first module release,
+  point to `a8af436`. `GOPROXY=direct` and `GOPROXY=https://proxy.golang.org` returned the same root ZIP
+  `h1:bNNFnhjblXsISqfDNS9yjqvuV+edaepfVl8mlDglAFg=` and `go.mod` `h1:KJIvMYLvodmn4BQJCoD6xv78V+az/OFejtkmaybKoGk=`.
+  On each route an empty-cache consumer on Windows amd64 (Go 1.27.4) installed the root and all 25 grammar modules
+  without `replace`, built with `CGO_ENABLED=0`, parsed all 25 samples cleanly and cross-built for `linux/arm64`.
+  The release includes 26 pinned source archives and `SHA256SUMS`. The configured mirror order is v0.6.0, then v0.5.0.
+  [GitHub release](https://github.com/wotjr1649/go-treesitter/releases/tag/v0.6.0)
 - **v0.5.0 preview** (2026-11-16, immutable GitHub pre-release, attestation verified): twenty-four grammars, engine
   ABI 3. Root tag `v0.5.0` on `a53a506` (root ZIP `h1:JYGKNCLcI4vGNR9UBjjPfd7J/86hKcnWGy91hcv2348=`, equal to the
   step-1 rehearsal ZIP), grammar tags `grammars/<lang>/v0.5.0` on `84c20bd`. Verified after tagging: `GOPROXY=direct`
@@ -173,8 +180,7 @@ filenames and hashes; it does not establish uploaded/downloaded asset digests or
   installs root + all twenty-four grammars without `replace`, parses each grammar's sample cleanly with
   `CGO_ENABLED=0` and cross-builds linux/arm64 (Windows amd64 host, Go 1.27.4). The release carries its twenty-five
   pinned source archives with `SHA256SUMS`; uploaded digests matched before publication and all twenty-five
-  downloaded from the published release match their pins. `tools/gen/pins.json` now lists the mirror bases
-  `v0.5.0`, `v0.4.0`.
+  downloaded from the published release match their pins. The post-v0.5.0 mirror bases were `v0.5.0`, `v0.4.0`.
 - **v0.4.0 preview** (2026-11-15, immutable GitHub pre-release, attestation verified): twenty-three grammars, engine
   ABI 3. Root tag `v0.4.0` on `09f4c2f` (root ZIP `h1:swsqEf42qDrpBltRaE1rQ7cTxuQqrWDJcpLJAAZABs0=`, precomputed),
   grammar tags `grammars/<lang>/v0.4.0` on `eb1fbd5`. Verified after tagging: `GOPROXY=direct` and proxy.golang.org,
@@ -182,8 +188,8 @@ filenames and hashes; it does not establish uploaded/downloaded asset digests or
   external module installs root + all twenty-three grammars, parses with each, runs six queries and cross-builds
   linux/arm64 without `replace`. The release carries its twenty-four pinned source archives (grammars, runtime,
   wasi-libc) with `SHA256SUMS`; uploaded digests matched before publication and all twenty-four downloaded from the
-  published release match their pins. Toolchain archives are not mirrored (ADR-0026 amendment). `tools/gen/pins.json`
-  now lists the mirror bases `v0.4.0`, `v0.3.0`.
+  published release match their pins. Toolchain archives are not mirrored (ADR-0026 amendment). The post-v0.4.0
+  mirror bases were `v0.4.0`, `v0.3.0`.
 
 - **v0.3.0 preview** (2026-11-15, immutable GitHub pre-release, attestation verified): fifteen grammars. Root tag
   `v0.3.0` on `60f1d33`, grammar tags `grammars/<lang>/v0.3.0` on `ee25291`. Verified after tagging: `GOPROXY=direct`
