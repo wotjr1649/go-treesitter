@@ -1,6 +1,7 @@
 # go-treesitter
 
-**Preview (v0.6.0).** A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
+**[Preview v0.6.0](https://github.com/wotjr1649/go-treesitter/releases/tag/v0.6.0)** (GitHub pre-release).
+A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
 module is generated from the unmodified upstream tree-sitter runtime and pinned grammar C (wasm translated to Go by
 `tools/gen`). Grammar C may carry recorded temporary
 [ADR-0023 patches](docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md); each patched module discloses them.
@@ -40,8 +41,8 @@ Each language has exactly one grammar source repository, chosen by the tiers of
 
 Exact revisions are in [pins.json](tools/gen/pins.json). Bash, Go, HTML, Python, Ruby, Rust and YAML carry recorded temporary patches
 ([ADR-0023](docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md); each module's README lists them).
-See the [status board](docs/reports/release-critical-status.md) for measured scopes and pending release gates, and
-[limitations](docs/reports/limitations.md).
+See the [status board](docs/reports/release-critical-status.md) for gate results and publication evidence, and
+[limitations](docs/reports/limitations.md) for the scope of this Preview.
 
 Install the root and the grammar modules you use. For example,
 

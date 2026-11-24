@@ -1,7 +1,7 @@
 # Preview limitations (v0.6.0)
 
 What the preview does not do or has not shown. Gate results and their evidence levels are on the
-[status board](release-critical-status.md); this page lists the edges of them. Nothing here is release-approved.
+[status board](release-critical-status.md), alongside the publication record for v0.6.0.
 
 | # | Limitation | Evidence |
 |---|---|---|
@@ -47,10 +47,11 @@ Release authority, tags and publication are separate from this list: see
 
 ## Release source mirror scope
 
-The v0.6.0 candidate inventory is 26 source archives (24 distinct grammar archives, tree-sitter runtime and wasi-libc)
-plus `SHA256SUMS`. TypeScript and TSX share one archive. `tools/gen/pins.json` lists the published mirror bases v0.5.0
-and v0.4.0. Source archives added since those releases gain fallback coverage after v0.6.0 is published, its
-published downloads pass the hash checks and its mirror base is configured.
+The v0.6.0 release mirrors 26 source archives (24 distinct grammar archives, tree-sitter runtime and wasi-libc)
+plus `SHA256SUMS`. TypeScript and TSX share one archive. Before publication, all 27 uploaded asset digests
+matched the local files. All 26 source archives downloaded anonymously from the published release matched
+their pinned SHA-256 hashes. `tools/gen/pins.json` lists v0.6.0 first and v0.5.0 second. The v0.5.0 base
+can serve only the exact archives published with that release.
 Toolchain archives (wasi-sdk, binaryen and tree-sitter CLI, including Linux arm64 and macOS arm64 CLI) are fetched
 from their official releases with pinned SHA-256 checks. This release provides no toolchain mirror fallback;
 upstream tool availability remains a prerequisite until a complete bundled-notice inventory permits mirroring.

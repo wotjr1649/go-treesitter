@@ -11,7 +11,7 @@ The historical v0.5.0 candidate pin set contained 24 grammars, including the 202
 tree-identical T-SQL pin move and the C maintained-fork move below; `tools/gen/pins.json` SHA-256 is
 `5467afce00a76529acf5dd13243a51d8218fa164c595ce171fc7fe6d78ea9913`. All 24 archived schemas passed the
 strict check at that pin set (Windows amd64, Go 1.27.4).
-The current 25-grammar candidate additionally includes Swift; its first baseline is recorded below.
+The 25-grammar v0.6.0 release adds Swift. Its first baseline is recorded below.
 The tables below record each schema once, grouped by the release that first recorded it; archive SHA-256
 values identify the pinned source inputs. `tsx` and `typescript` share one archive. Schema bytes come from
 `<grammarDir>/node-types.json` in that archive, after checking its digest, and match the generator's extracted input.
