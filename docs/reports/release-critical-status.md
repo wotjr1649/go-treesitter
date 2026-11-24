@@ -30,7 +30,7 @@ runtime and CLI 0.27.2, pins schema 3, recipe `v2-O3` and engine ABI 4. Product 
 | Speed / memory bench | PASS, E4, 75/75 grammar/platform jobs | Paired product/native speed and memory on hashed large inputs and the pinned small corpora, on Linux amd64/arm64 and macOS arm64. macOS uses the ADR-0022 private-byte adjustment and reports engine-region counts as `NOT_RUN`. [45318803258](https://github.com/wotjr1649/go-treesitter/actions/runs/45318803258) |
 | Balancing cancellation | PASS, E5 probe builds, 25/25 jobs | Linux amd64. Across the pinned big and follow-up inputs, 6,175 stops landed in balancing and all 8,618 next parses matched the native reference. The JSON no-reset control disagreed in all three comparisons. [45318808525](https://github.com/wotjr1649/go-treesitter/actions/runs/45318808525) |
 | Nightly diff | PASS, E5 for sampled cases, 50/50 jobs | All 25 grammars on Linux amd64/arm64. Seed `20261124`, four minutes per grammar, 30 seconds per Go fuzz target and a 30-second watchdog per Go case/native operation. [45318813099](https://github.com/wotjr1649/go-treesitter/actions/runs/45318813099) |
-| Upstream watch | PASS, E1, 2/2 jobs | One unaccepted warning (Swift), with existing tier-review notices for CSS, Go, HTML and Python. Bash was below the age threshold in this run. [45318817150](https://github.com/wotjr1649/go-treesitter/actions/runs/45318817150) |
+| Upstream watch | PASS, E1, 2/2 jobs | One Swift warning, accepted in this PR until 2027-02-24 ([#109](https://github.com/wotjr1649/go-treesitter/issues/109)), with existing tier-review notices for CSS, Go, HTML and Python. Bash was below the age threshold in this run. [45318817150](https://github.com/wotjr1649/go-treesitter/actions/runs/45318817150) |
 | Candidate module ZIP rehearsal | PASS, local E3 packaging | Windows amd64, Go 1.27.4, file `GOPROXY`, empty module cache and no `replace`. The root and all 25 grammar ZIPs resolved at v0.6.0, all 25 samples parsed cleanly with `CGO_ENABLED=0`, and the consumer linked for `linux/arm64`. |
 | Candidate source-row inventory | PASS, local E1 | 34 fetch-plan rows: all 26 selected source archives matched their pins after download and eight toolchain rows were excluded. Draft upload inventory is the 26 source archives plus `SHA256SUMS`. |
 | Tag/proxy resolution and published mirror assets | Pending | Root and grammar tags, direct/public proxy resolution, draft asset digests, attestation and published download hashes are publication steps. |
@@ -55,15 +55,16 @@ runtime and CLI 0.27.2, pins schema 3, recipe `v2-O3` and engine ABI 4. Product 
   `2e694d893c5cfd74cbb46f2c9b1837bccd75c8da101cac7f2da9491e82afed8c`. Under seed `20261124`, the
   summaries report 670,491 cases on Linux amd64 and 563,508 on Linux arm64 with zero mismatches.
   [Nightly run](https://github.com/wotjr1649/go-treesitter/actions/runs/45318813099)
-- **Source watch.** nvim-treesitter is ahead of the Swift pin at `fef1236022cc`. The successful watch run still
-  records that warning as unaccepted. CSS, Go (`golang`), HTML and Python have source-age tier-review notices
+- **Source watch.** nvim-treesitter is ahead of the Swift pin at `fef1236022cc`, two commits that add
+  multi-pattern catch clauses. The owner accepted the warning until 2027-02-24: v0.6.0 ships the gated pin, and the
+  pin moves after the release ([#109](https://github.com/wotjr1649/go-treesitter/issues/109)). CSS, Go (`golang`), HTML and Python have source-age tier-review notices
   covered by existing acceptances expiring 2027-05-16 UTC (exclusive). Bash matched the reference pin and had
   no age warning on 2026-11-24. [Watch run](https://github.com/wotjr1649/go-treesitter/actions/runs/45318817150) ·
   [Bash follow-up #107](https://github.com/wotjr1649/go-treesitter/issues/107)
 
 The local rehearsal packaged the tested candidate tree. The publication procedure calls for a rehearsal of the
 final release commit so the root ZIP includes the final document bytes. The release decision includes owner
-review of the [known limitations](limitations.md) and the Swift watch warning.
+review of the [known limitations](limitations.md).
 
 ## v0.5.0 release scope
 
