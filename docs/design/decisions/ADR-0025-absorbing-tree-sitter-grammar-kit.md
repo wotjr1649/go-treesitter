@@ -96,3 +96,33 @@ and requires disclosure of AI use. Posting an edited agent draft sits closer to 
 did. The practice relies on the owner's edit and understanding and on the disclosure; the upstream maintainers decide
 whether a post follows their policy, and a post they close for that reason is recorded, not retried. If the owner
 cannot make a draft their own, it is not posted.
+
+## Amendment (2026-11-23): decision 5, agents post; disclosure follows the target's policy
+
+This amendment replaces the **owner posts**, **Disclosure** and **Agents never** items of the 2026-11-19 amendment and
+adds a policy check before posting. Its other items still govern, and a pull request with regenerated files still names
+the generator CLI used (2026-11-16 amendment).
+
+- **Agents post.** An agent posts, comments and edits its own posts on third-party repositories from the owner's
+  account, under an owner decision that covers the post: a decision for that post, or an owner instruction naming
+  the target and purpose. The agent records the decision, the posted text's hash and the URL (2026-11-19 **Records**).
+  An agent still never pushes to an upstream repository. It opens a pull request from the owner's fork only when the
+  owner asks.
+- The tree-sitter AI policy's first rule forbids direct coding-agent interaction with its repositories. The owner
+  accepts this conflict for posts in the `tree-sitter` organisation. A post its maintainers close for that reason is
+  recorded, not retried.
+- **Disclosure follows the target's policy.** Where that policy requires disclosure of AI use, the post ends with a
+  short note on how AI was used and what the owner did, and says so when an agent posted it. The 2026-11-19 line is
+  an example, used only when it matches the work. The
+  [AI policy](https://tree-sitter.github.io/tree-sitter/6-contributing.html) is written for `tree-sitter/tree-sitter`.
+  The grammar repositories have no contributing guide of their own. The owner applies the policy to every repository
+  of the `tree-sitter` organisation. Where the target has no such policy, disclosure is the owner's choice.
+- Before posting, the agent states whether the target's policy requires disclosure, with the source it read.
+
+On 2026-11-23 four replies were posted without disclosure. At the owner's direction, an agent appended "I used an AI
+coding assistant to draft this comment; I checked it before posting." to
+[C# PR #480](https://github.com/tree-sitter/tree-sitter-c-sharp/pull/480#issuecomment-7097199986),
+[C# issue #458](https://github.com/tree-sitter/tree-sitter-c-sharp/issues/458#issuecomment-7097233761) and
+[Ruby issue #306](https://github.com/tree-sitter/tree-sitter-ruby/issues/306#issuecomment-7097259598). The
+[PostgreSQL issue #101 reply](https://github.com/gmr/tree-sitter-postgres/issues/101#issuecomment-7097251310) stays as
+posted. That repository's `CONTRIBUTING.md` has no AI clause.
