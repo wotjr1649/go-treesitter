@@ -364,7 +364,17 @@
       },
       "licenseSHA256": "c5cfb43042b6b72045f4ba997834d0a7786d2793d91680868b5815b39f14fc78",
       "cSymbol": "tree_sitter_css",
-      "regenerate": true
+      "regenerate": true,
+      "patches": [
+        {
+          "file": "patches/css/0001-non-latin1-names.patch",
+          "sha256": "1ddc7422b19aada7582e9d13a2dfaa822400ff0ca7d0517533e3c7afe1c5cd83",
+          "source": "grammar.js",
+          "beforeSHA256": "c6d9efdeaf3a4902f026849e08a103a6d1ec1f015c5f396d3fe92dc57ce034ae",
+          "afterSHA256": "6e8d8155551a1e4c1c94176c2cdc7d364543bfa7260db543ea412a2b6bcf3f59",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-css/pull/105"
+        }
+      ]
     },
     "java": {
       "repo": "https://github.com/wotjr1649/tree-sitter-java",

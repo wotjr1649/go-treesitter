@@ -21,9 +21,9 @@
     "css": {
       "Name": "CSS",
       "Commit": "dda5cfc5722c429eaba1c910ca32c2c0c5bb1a3f",
-      "PinSHA256": "b9a0f4f0a51a022cf9c5dbb58c3a53b812db256ef13e389c253021fade559c07",
-      "ProvenanceSHA256": "ab58ffc15e92df2b6f9efb5633085657f6de894e2cf8edfeb33ffdd5e9426432",
-      "PatchCount": 0
+      "PinSHA256": "7f6945cc71a28e0f89c6d49fe6acea2a1d20439d21efd055edd766d6a0825bea",
+      "ProvenanceSHA256": "1706314f4628be7effa4a329945550ef1e0ed4c69d1221b557ffd27b906067d0",
+      "PatchCount": 1
     },
     "powershell": {
       "Name": "PowerShell",
@@ -166,28 +166,12 @@
       "Upstream": ""
     },
     {
-      "ID": "css-non-latin1-identifier",
-      "Grammar": "css",
-      "Input": ".한글 { a: b }\n",
-      "InputSHA256": "c44e56c8e90aefcabb5524f92a06c1bd411fa417c98a5097f873bc68a28ffa6a",
-      "DumpSHA256": "72e0bc04a41301b1575bbd9466831ff1c2a0a3941c070cc5b4b40f85c9a07095",
-      "Observed": "The root has errors: the rule is an ERROR over [0,16) with nested ERROR nodes over the Hangul class name [1,7) and the declaration characters a [10,11) and b [13,14). The identifier regex accepts ASCII letters, _ and U+00A0-U+00FF only, so no Hangul syllable can start or continue an identifier; the ASCII twin .abc { a: b } parses without errors.",
-      "Expected": "The Hangul syllables in this input are in the allowed non-ASCII ident range U+3001-U+D7FF, so .한글 is a class selector and the rule parses without errors.",
-      "Specs": [
-        {
-          "Title": "CSS Syntax Module Level 3 (2026-10-01): ident-start code point",
-          "URL": "https://www.w3.org/TR/2026/CRD-css-syntax-3-20261001/#ident-start-code-point"
-        }
-      ],
-      "Upstream": ""
-    },
-    {
       "ID": "css-non-latin1-value",
       "Grammar": "css",
       "Input": "a { b: 한글 }\n",
       "InputSHA256": "9e72dd72130d55d7d5294e143ea1fbd1656ec0c3a7879e306db4fb46d9c730a1",
       "DumpSHA256": "1e2f75f20d41affef8fa61e82f8570e8b5432cabbd307af2b2b93048e5ea58f3",
-      "Observed": "The root has errors: the declaration is an ERROR over [4,13) and the Hangul value [7,13) is a nested ERROR. The value identifier uses the same Latin-1-limited regex as selectors; a { b: abc } parses without errors.",
+      "Observed": "The root has errors: the declaration is an ERROR over [4,13) and the Hangul value [7,13) is a nested ERROR. The value token for bare identifiers retains the pinned Latin-1 range; a { b: abc } parses without errors.",
       "Expected": "한글 is an identifier value (plain_value) of the declaration b, with no error.",
       "Specs": [
         {

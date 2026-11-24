@@ -393,6 +393,8 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 		switch lang {
 		case "bash", "ruby":
 			result += "\nThe heredoc patch stores and compares UTF-8 end words, preserving ASCII bytes and distinguishing code points that share a low byte. Invalid lookaheads all compare as 0xFF, distinct from U+FFFD. The 1024-byte scanner state buffer includes all open end words and metadata; overflow loses state (about 330 Hangul syllables total, fewer with other state).\n"
+		case "css":
+			result += "\nThe name patch accepts identifiers beyond Latin-1 in selectors, custom property names and references, and keyframe names. Bare Hangul declaration values still produce an error (see MIGRATING.md).\n"
 		case "xml":
 			result += "\nThe name patch lets Name tokens (attribute names including namespace declarations such as `xmlns:접두`, DOCTYPE, DTD and entity names) use the XML 1.0 NameStartChar and NameChar ranges instead of ASCII only; `:` still cannot start a name. The scanner patch compares complete UTF-8 tag names, so names that share a low byte stay distinct. Names are serialized as UTF-8 bytes in the 1024-byte scanner state with a 255-byte limit per name (85 Hangul syllables); beyond it, or with deeply nested tags, an end tag after an edit-time state restore can fail to match (see MIGRATING.md).\n"
 		case "yaml":

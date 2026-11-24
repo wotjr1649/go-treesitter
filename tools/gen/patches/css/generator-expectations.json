@@ -1,0 +1,192 @@
+{
+  "identity": {
+    "grammarCommit": "dda5cfc5722c429eaba1c910ca32c2c0c5bb1a3f",
+    "seed": 1,
+    "corpusManifestSHA256": "19bf4b6fb3a7f786859207d86e3d6c8dbb0803e36927e13dea6044da4298357d",
+    "editsManifestSHA256": "e18925635edb7f413d61f33e8ad9ce7a5ad1a8cae7c7f5753e12514acd2d335a",
+    "largeEntries": [
+      {
+        "lang": "css",
+        "file": "bootstrap.css",
+        "kind": "url",
+        "url": "https://raw.githubusercontent.com/twbs/bootstrap/f9a7a8941e7c1c91b0cae8a0c906537c26086ae2/dist/css/bootstrap.css",
+        "sha256": "ad0d5123040e043dad1451a6d4483dad4df4e2835e6687d6cf5af8a757283371",
+        "license_spdx": "MIT",
+        "license_url": "https://raw.githubusercontent.com/twbs/bootstrap/f9a7a8941e7c1c91b0cae8a0c906537c26086ae2/LICENSE",
+        "license_sha256": "bc0cd18d94c028f1c0b62ec9fdaddcb9921c1e07c29cf52dc7df8cca9daf2488"
+      }
+    ],
+    "patchCorpusFilesSHA256": {
+      "non-latin1-names.txt": "f5e71607f4098bd8e422c6fea228ea96ebf3d37013ab2ee4ef19e6b4c08df5fa"
+    },
+    "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "cli": "0.27.2",
+    "grammarArchiveSHA256": "c47392e483feb9137d8f0acf9ca6e916b820122c260324454a9980c75c98c3c5",
+    "patches": [
+      {
+        "file": "patches/css/0001-non-latin1-names.patch",
+        "sha256": "1ddc7422b19aada7582e9d13a2dfaa822400ff0ca7d0517533e3c7afe1c5cd83",
+        "source": "grammar.js",
+        "beforeSHA256": "c6d9efdeaf3a4902f026849e08a103a6d1ec1f015c5f396d3fe92dc57ce034ae",
+        "afterSHA256": "6e8d8155551a1e4c1c94176c2cdc7d364543bfa7260db543ea412a2b6bcf3f59",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-css/pull/105"
+      }
+    ]
+  },
+  "reason": "Accept non-Latin-1 selector, property and keyframe names and custom property references. The three changed patch corpus inputs and their seeded edits exercise these names. The previously error-free trees in this comparison are unchanged.",
+  "retireWhen": "An approved CSS pin contains the name fix reported in upstream PR #105.",
+  "differences": [
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-names-001",
+      "kind": "corpus",
+      "inputSHA256": "04fecdc5d52928700e9a435c6a9beb3cce7e6b416db5d45c7c251d7099a30069",
+      "referenceDumpSHA256": "193072eb4694f39cc3bc483650bdf04c5be8b267fb876ea47f1872d368a0e764",
+      "candidateDumpSHA256": "d75c34f9b681bbefe1b25ffff42dbe3b7cd4ecce7eb2fe4866ea8aa7fc2a86cd"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-names-002",
+      "kind": "corpus",
+      "inputSHA256": "21c1d4bcdfa54b01f8706f129bd955aa7f544afc974c8c49d1fc1254b40b1426",
+      "referenceDumpSHA256": "e5c9e4f22232a9b68505a9fc20845c78f2bd4b1a8f78c9082b77c995ae81e35d",
+      "candidateDumpSHA256": "38a10c33008ba03b3f1b78c3ae6aebfb78ad4c08cdf44748ef8b714ecd98e7dd"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-names-003",
+      "kind": "corpus",
+      "inputSHA256": "63f340c71d6596b727ee820947108a6936d75f1fa6d243d2ad4441f0041aab24",
+      "referenceDumpSHA256": "98d0baed8db93d422353cb4992d9a40a128bd4dc8da229c869082da6ec5de39b",
+      "candidateDumpSHA256": "7dff30363145aab3a595eaef79d4eebe1acf90446f453d491d6b0f145110f23a"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-001-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "04fecdc5d52928700e9a435c6a9beb3cce7e6b416db5d45c7c251d7099a30069",
+      "newSHA256": "59aa72045a7b32639dc019affcfecff456e8c51b5c31d7dc1a2e36e355610500",
+      "referenceDumpSHA256": "07ac82b7c08cc647988027888885cc5db4cf57be75288f5d6c66386dcb3dbc3b",
+      "candidateDumpSHA256": "5cec124fdd5643439f54be9c88288453df7be4be46dcd3470bd3f1f7a72c7fbf"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-001-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "04fecdc5d52928700e9a435c6a9beb3cce7e6b416db5d45c7c251d7099a30069",
+      "newSHA256": "a3f2b06d4890cc72f73570da7153f6e11d9c42ea10d0e22478652424bf01a0d8",
+      "referenceDumpSHA256": "84bc204542c07d0cc411a818f0f22bb1343de5d460f1b0c684222cc3166eedbf",
+      "candidateDumpSHA256": "31115b6762a71bc75ac5f15d9cf6dbff30328aaa55425cecbe391ae442a1633a"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-001-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "04fecdc5d52928700e9a435c6a9beb3cce7e6b416db5d45c7c251d7099a30069",
+      "newSHA256": "f76d2a25baf9723bfb2bcb96e24c5b170608c1aad8584d34065828898657e535",
+      "referenceDumpSHA256": "a8ebe3b12eebaee7996bb335140f7b67c9aff98404bb0cd277605a878d7f30f4",
+      "candidateDumpSHA256": "c1fe761d9fa7b0fdd82d13bc215e6b1dbde652540fa02db553c51fd7e1b09d71"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-002-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "21c1d4bcdfa54b01f8706f129bd955aa7f544afc974c8c49d1fc1254b40b1426",
+      "newSHA256": "a072bb06cc2980aa6ab38680c428bc2583cd218868e5fb6710f247482757aef6",
+      "referenceDumpSHA256": "3b869caa7545a350dad6828d50c46d2ff8488468db0d95f3884e5bb858844c44",
+      "candidateDumpSHA256": "be7d684b328f3e87aac703d825e7b10efced9d42aabf5c87e6b90f0a54533b13"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-002-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "21c1d4bcdfa54b01f8706f129bd955aa7f544afc974c8c49d1fc1254b40b1426",
+      "newSHA256": "e3d8c3b6d4506bbb135c28ba278a05a4f654d692c76de126393b826a98f0ff3c",
+      "referenceDumpSHA256": "383f9d7e863fc4eeead02a90ccabf2c8fc076123b38048a01a907c181afc3eb0",
+      "candidateDumpSHA256": "c85f4a6d47b79af11e288cdd3b529ef4e182d56da1b619007b3b01d2162ceebb"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-002-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "21c1d4bcdfa54b01f8706f129bd955aa7f544afc974c8c49d1fc1254b40b1426",
+      "newSHA256": "3564d26565aadb49b98fd9e2149694df52a1a00db1fdd47ec07e00b7c97e3e99",
+      "referenceDumpSHA256": "65098c3b77fa12009f4161ea02134419d133d3eb253b839d538d49acd0b2ae7f",
+      "candidateDumpSHA256": "9aa1f589bf236fc2da38679949c46c92bf862b67ebf872a2dbc5ce33bef6ffdf"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-003-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "63f340c71d6596b727ee820947108a6936d75f1fa6d243d2ad4441f0041aab24",
+      "newSHA256": "e07b808c960b935b896381ec1cd9fdda7b3eb1e12f6523683eb720d5b735572f",
+      "referenceDumpSHA256": "ddd7ae406b62758ace7e6ccc69479c5219d9ac82008cb9ed1c262d024171b572",
+      "candidateDumpSHA256": "941a6ecdb3a0559f2ab3bff8ceed92be487ba9699eacbf7960d09422d22a87fb"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-003-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "63f340c71d6596b727ee820947108a6936d75f1fa6d243d2ad4441f0041aab24",
+      "newSHA256": "475a4e813f524b79aad84771c97281c1738cb059322c7b0f044d1f1a3e6144d0",
+      "referenceDumpSHA256": "492350d9ce7557b15276ac8bf4e30aec75bb7cb2464cfb93d151e2cfe94b2dac",
+      "candidateDumpSHA256": "beb45c9de7d3dd2288d3732f49bc6edbd2e2dc0356ead6a4016dc7d34d995c9c"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-003-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "63f340c71d6596b727ee820947108a6936d75f1fa6d243d2ad4441f0041aab24",
+      "newSHA256": "60a94a479c4677ae1956e661c02ef2267538b0de90cd724dd40a7ab3a72f1453",
+      "referenceDumpSHA256": "ce787d0d29667c0f0c374deee99a68f1ddef2cc95138c6f35168ac8155b80bd3",
+      "candidateDumpSHA256": "0cf5557e4a8e4520ab853da361d94d6cfa9b753bbe1c1089a60ffcd72e5c337c"
+    }
+  ]
+}

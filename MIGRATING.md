@@ -435,3 +435,13 @@ Node types and fields are unchanged.
   can lose that state, and an end tag then reports an `ERROR`; before, such names used one byte per character.
 
 The pinned upstream XML queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-xml-name-patches)).
+
+### CSS non-Latin-1 names
+
+A temporary ADR-0023 patch follows [upstream PR #105](https://github.com/tree-sitter/tree-sitter-css/pull/105).
+`.한글 { a: b }` now contains a `class_selector` and an `identifier` spanning `한글`. The retained cases also
+exercise type, ID and attribute selectors, custom property names and `var(--변수)` references, and keyframe names.
+Node types and fields are unchanged. Queries for `class_name`, `identifier`, `tag_name`, `id_name`,
+`attribute_name`, `property_name` and `keyframes_name` can now capture these names on the repaired inputs.
+`a { b: 한글 }` remains a [known gap](docs/known-gaps/css.md#css-non-latin1-value).
+See the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-css-name-patch).

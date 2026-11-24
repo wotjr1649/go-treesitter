@@ -554,3 +554,17 @@ from a clean element to an `ERROR` (E4, Windows amd64). This is a breaking tree 
 item 5 for those inputs only. The pinned upstream `highlights.scm` compiled, and the query lane matched the patched
 native reference on 220 raw query/input comparisons with no mismatch (E5, Windows amd64).
 [Migration notes](../../MIGRATING.md#xml-names-and-tag-names)
+
+## Unreleased (after v0.6.0): CSS name patch
+
+The [temporary grammar-input patch](../../tools/gen/patches/css) carries the name fix from
+[upstream PR #105](https://github.com/tree-sitter/tree-sitter-css/pull/105) on the existing CSS commit
+`dda5cfc5722c429eaba1c910ca32c2c0c5bb1a3f`. Both node-type files produced with the pinned CLI pass the
+strict schema check. They are byte-identical (43,620 bytes, SHA-256
+`fbbf8d22d82608f6d2f61cfdb374e6758779754fb2f42643e9dc5af6ead0d5d2`), and the strict diff has zero changes.
+
+The Windows amd64 native A/B comparison (E4) found changes only in three patch-corpus trees and
+their nine seeded edits. No previously error-free tree in the comparison changed.
+The patched engine and pinned native reference agree on the corpus, seeded edits and raw query matches
+(E5, Windows amd64). The pinned `highlights.scm` compiles and runs on the repaired inputs.
+See the [migration notes](../../MIGRATING.md#css-non-latin-1-names) for the new captures.
