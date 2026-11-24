@@ -368,10 +368,10 @@
       "patches": [
         {
           "file": "patches/css/0001-non-latin1-names.patch",
-          "sha256": "1ddc7422b19aada7582e9d13a2dfaa822400ff0ca7d0517533e3c7afe1c5cd83",
+          "sha256": "d2965e054f530064b70a4977a570f7b91591fe86fbddbd01c96da4faee927e49",
           "source": "grammar.js",
           "beforeSHA256": "c6d9efdeaf3a4902f026849e08a103a6d1ec1f015c5f396d3fe92dc57ce034ae",
-          "afterSHA256": "6e8d8155551a1e4c1c94176c2cdc7d364543bfa7260db543ea412a2b6bcf3f59",
+          "afterSHA256": "8ae6785b70c26bb95ce59a9770cf9974e5c65346bc85744a8f45ca520e32cce1",
           "upstreamReport": "https://github.com/tree-sitter/tree-sitter-css/pull/105"
         }
       ]

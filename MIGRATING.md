@@ -438,10 +438,18 @@ The pinned upstream XML queries compile and match the patched native reference (
 
 ### CSS non-Latin-1 names
 
-A temporary ADR-0023 patch follows [upstream PR #105](https://github.com/tree-sitter/tree-sitter-css/pull/105).
+An independently implemented ADR-0023 patch addresses the name defect reported in
+[upstream PR #105](https://github.com/tree-sitter/tree-sitter-css/pull/105).
 `.한글 { a: b }` now contains a `class_selector` and an `identifier` spanning `한글`. The retained cases also
-exercise type, ID and attribute selectors, custom property names and `var(--변수)` references, and keyframe names.
+exercise type, ID, attribute and property names, `var(--변수)` references, keyframe names, combinators and nesting.
 Node types and fields are unchanged. Queries for `class_name`, `identifier`, `tag_name`, `id_name`,
 `attribute_name`, `property_name` and `keyframes_name` can now capture these names on the repaired inputs.
-`a { b: 한글 }` remains a [known gap](docs/known-gaps/css.md#css-non-latin1-value).
-See the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-css-name-patch).
+The patch leaves bare identifier attribute values, unquoted `url()` arguments, bare declaration values,
+units, and at-rule names and arguments outside its scope. `a { b: 한글 }` remains a
+[known gap](docs/known-gaps/css.md#css-non-latin1-value). An unprefixed type selector can still produce an
+error after whitespace when the pinned scanner does not recognize its first character. For example,
+`.a 🙂 {}` remains an error. Extended class names require adjacency, including at escapes.
+
+Retire the patch in the approved pin move to an upstream source containing a fix for the reported defect.
+That move reviews and updates affected known-gap entries and corpus expectations. See the
+[schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-css-name-patch).

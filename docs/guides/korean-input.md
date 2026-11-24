@@ -142,7 +142,7 @@ produce `ERROR` nodes even though the language allows it. The table says what wa
 | `c` | yes | yes | yes |
 | `cpp` | yes | yes | yes |
 | `csharp` | yes | yes | yes |
-| `css` | partly: class, ID, type and attribute selectors, custom properties and keyframe names parse in the development tree after v0.6.0. Bare identifier values still fail on the [recorded input](../known-gaps/css.md) | yes (a `content` string) | yes |
+| `css` | partly: class, ID, type, attribute and property names, custom property references and keyframe names parse in the development tree after v0.6.0. Bare identifier attribute and declaration values, unquoted `url()` arguments, units, and at-rule names and arguments remain outside the patch scope. See the [recorded bare value gap](../known-gaps/css.md) | yes (a `content` string) | yes |
 | `dart` | not recorded | yes | yes |
 | `go` | yes | yes | yes |
 | `html` | yes (tag and attribute names; see note 1) | yes | yes |

@@ -104,3 +104,109 @@ Pinned class name syntax
           (escape_sequence)
           (identifier))))
     (block)))
+
+================================================================================
+Hangul class descendant selector
+================================================================================
+
+.한 .글 {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (descendant_selector
+        (class_selector (class_name (identifier)))
+        (class_selector (class_name (identifier)))))
+    (block)))
+
+================================================================================
+Hangul type in child selector
+================================================================================
+
+a > 한글 {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors (child_selector (tag_name) (tag_name)))
+    (block)))
+
+================================================================================
+Hangul type in selector list
+================================================================================
+
+a, 한글 {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors (tag_name) (tag_name))
+    (block)))
+
+================================================================================
+Nested Hangul descendant selector
+================================================================================
+
+.a { 한글 .b {} }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors (class_selector (class_name (identifier))))
+    (block
+      (rule_set
+        (selectors
+          (descendant_selector
+            (tag_name)
+            (class_selector (class_name (identifier)))))
+        (block)))))
+
+================================================================================
+Emoji after descendant whitespace
+================================================================================
+
+.a 🙂 {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors (class_selector (class_name (identifier))))
+    (ERROR (ERROR))
+    (block)))
+
+================================================================================
+Connector punctuation after descendant whitespace
+================================================================================
+
+.a ‿x .b {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (descendant_selector
+        (class_selector (class_name (identifier)))
+        (ERROR (ERROR))
+        (class_selector (class_name (identifier)))))
+    (block)))
+
+================================================================================
+Join control after descendant whitespace
+================================================================================
+
+.a ‌x {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors (class_selector (class_name (identifier))))
+    (ERROR (ERROR))
+    (block)))

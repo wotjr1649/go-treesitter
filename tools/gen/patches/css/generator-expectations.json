@@ -2,8 +2,8 @@
   "identity": {
     "grammarCommit": "dda5cfc5722c429eaba1c910ca32c2c0c5bb1a3f",
     "seed": 1,
-    "corpusManifestSHA256": "19bf4b6fb3a7f786859207d86e3d6c8dbb0803e36927e13dea6044da4298357d",
-    "editsManifestSHA256": "e18925635edb7f413d61f33e8ad9ce7a5ad1a8cae7c7f5753e12514acd2d335a",
+    "corpusManifestSHA256": "49e4bd92c0f26b98f576ca84d2cb168d5808371cd33ae3c84a725f871458e82a",
+    "editsManifestSHA256": "43b17ff53b656704b04a3d859306f6efba71a825739c1545e83c368f98c52045",
     "largeEntries": [
       {
         "lang": "css",
@@ -17,7 +17,7 @@
       }
     ],
     "patchCorpusFilesSHA256": {
-      "non-latin1-names.txt": "f5e71607f4098bd8e422c6fea228ea96ebf3d37013ab2ee4ef19e6b4c08df5fa"
+      "non-latin1-names.txt": "1a1836720a9cb104b39bfaa437725ccdb39b71d30114c06c6baa35b51f537358"
     },
     "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
     "cli": "0.27.2",
@@ -25,16 +25,16 @@
     "patches": [
       {
         "file": "patches/css/0001-non-latin1-names.patch",
-        "sha256": "1ddc7422b19aada7582e9d13a2dfaa822400ff0ca7d0517533e3c7afe1c5cd83",
+        "sha256": "d2965e054f530064b70a4977a570f7b91591fe86fbddbd01c96da4faee927e49",
         "source": "grammar.js",
         "beforeSHA256": "c6d9efdeaf3a4902f026849e08a103a6d1ec1f015c5f396d3fe92dc57ce034ae",
-        "afterSHA256": "6e8d8155551a1e4c1c94176c2cdc7d364543bfa7260db543ea412a2b6bcf3f59",
+        "afterSHA256": "8ae6785b70c26bb95ce59a9770cf9974e5c65346bc85744a8f45ca520e32cce1",
         "upstreamReport": "https://github.com/tree-sitter/tree-sitter-css/pull/105"
       }
     ]
   },
-  "reason": "Accept non-Latin-1 selector, property and keyframe names and custom property references. The three changed patch corpus inputs and their seeded edits exercise these names. The previously error-free trees in this comparison are unchanged.",
-  "retireWhen": "An approved CSS pin contains the name fix reported in upstream PR #105.",
+  "reason": "Accept non-Latin-1 selector, property and keyframe names and custom property references. Seven patch corpus trees and eighteen of their seeded edits exercise the repaired names. Edit 011-e1 duplicates a ZWNJ-started segment immediately after a block, so the recovery tree changes and the descendant error remains. Every previously error-free tree in this comparison is unchanged.",
+  "retireWhen": "An approved CSS pin contains a fix for the name defect reported in upstream PR #105. The pin move updates affected corpus expectations and known-gap records.",
   "differences": [
     {
       "id": "corpus/css/grammar-patch-non-latin1-names-001",
@@ -56,6 +56,34 @@
       "inputSHA256": "63f340c71d6596b727ee820947108a6936d75f1fa6d243d2ad4441f0041aab24",
       "referenceDumpSHA256": "98d0baed8db93d422353cb4992d9a40a128bd4dc8da229c869082da6ec5de39b",
       "candidateDumpSHA256": "7dff30363145aab3a595eaef79d4eebe1acf90446f453d491d6b0f145110f23a"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-names-005",
+      "kind": "corpus",
+      "inputSHA256": "60c549edc0bc36cc670dec0075c322ec05e63f92b5b05f771d79efa6acbfa9a6",
+      "referenceDumpSHA256": "32463eaedbcde1ac117a81861db1039be5d24f1c4ba13fd5666a2acfe222fa06",
+      "candidateDumpSHA256": "4f8ee7ada0021c0a90e49c6270e522b4bfc2e92e10dd301bf7e21df22a518998"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-names-006",
+      "kind": "corpus",
+      "inputSHA256": "bdac7f741221a1c782ee5a1844b39ea17feee9f93ae625d65b045ead4d75e181",
+      "referenceDumpSHA256": "b87e994ea880bb90ec4aea56f99f381de6910b1744150688780339560f68cb95",
+      "candidateDumpSHA256": "b1fa593c6882c47ef70f2d1cc60709a123c82a57ec6a2c028656b6c162593d18"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-names-007",
+      "kind": "corpus",
+      "inputSHA256": "4d812c1dcbc94ba67550adda6228865b59294f9e2596d895c5ae634484e9356a",
+      "referenceDumpSHA256": "de65babdefd3d1ff2663cfa9898842b959c80dab250c80f51469e1e09a3b8dfb",
+      "candidateDumpSHA256": "ce01631b1b9580ccb315c41f834b7e50f6a9ca54663559827675b5f410fdd452"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-names-008",
+      "kind": "corpus",
+      "inputSHA256": "5ca4061eaaf5cdd47927984eedbdfe81657933a402acd56f4992a00ee65eba61",
+      "referenceDumpSHA256": "05ee71d06af18b21b550e10f21f2a7bc24c5b0f06e4f92f90a9ed5310606c44c",
+      "candidateDumpSHA256": "b9c2f993cc306351340308fd00decefc383a8320066d6308d459e1173552dd56"
     },
     {
       "id": "edits/css/grammar-patch-non-latin1-names-001-e1",
@@ -166,12 +194,13 @@
         "edit_sha256",
         "fresh_sha256",
         "edit_fields_sha256",
+        "ranges",
         "fields"
       ],
       "oldSHA256": "63f340c71d6596b727ee820947108a6936d75f1fa6d243d2ad4441f0041aab24",
       "newSHA256": "475a4e813f524b79aad84771c97281c1738cb059322c7b0f044d1f1a3e6144d0",
       "referenceDumpSHA256": "492350d9ce7557b15276ac8bf4e30aec75bb7cb2464cfb93d151e2cfe94b2dac",
-      "candidateDumpSHA256": "beb45c9de7d3dd2288d3732f49bc6edbd2e2dc0356ead6a4016dc7d34d995c9c"
+      "candidateDumpSHA256": "ed124f2eb840f1ffc629767798fdae639373b1daca55fe922487bf94bcdb0f45"
     },
     {
       "id": "edits/css/grammar-patch-non-latin1-names-003-e3",
@@ -187,6 +216,140 @@
       "newSHA256": "60a94a479c4677ae1956e661c02ef2267538b0de90cd724dd40a7ab3a72f1453",
       "referenceDumpSHA256": "ce787d0d29667c0f0c374deee99a68f1ddef2cc95138c6f35168ac8155b80bd3",
       "candidateDumpSHA256": "0cf5557e4a8e4520ab853da361d94d6cfa9b753bbe1c1089a60ffcd72e5c337c"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-005-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "60c549edc0bc36cc670dec0075c322ec05e63f92b5b05f771d79efa6acbfa9a6",
+      "newSHA256": "e2c38d4754b9474144381aa20d7fc76000f2cd7e6f80350868d4f05f779a2121",
+      "referenceDumpSHA256": "419dc0e6debc4c634384207367f475fe851b68799da4ae74e5ffeaffe1029032",
+      "candidateDumpSHA256": "d94df8c6253e2e010d7b12d6e590ee932584e37b6a2b1130accaddce634c370f"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-005-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "60c549edc0bc36cc670dec0075c322ec05e63f92b5b05f771d79efa6acbfa9a6",
+      "newSHA256": "98b82302c8634dec0ff9b24c79bacce0c1090b9041a43d9a983ccbbe3a92426b",
+      "referenceDumpSHA256": "04f2eba55037550806553012336496250f47ba28681fca4d6817073d73a03cce",
+      "candidateDumpSHA256": "3a88235977d5c4f79fc19115a3975aecf688f885722206976d8e7272ba693510"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-005-e3",
+      "kind": "edit",
+      "changed": [
+        "ranges"
+      ],
+      "oldSHA256": "60c549edc0bc36cc670dec0075c322ec05e63f92b5b05f771d79efa6acbfa9a6",
+      "newSHA256": "1acf8ad09d4a92ddc26f9b6c38314b0e7aa1b321b76975424fe4463cc34b3ab7",
+      "referenceDumpSHA256": "55b942e91d25355b9bf0654323c25cede2b0e0d656596d9003d7641549c49311",
+      "candidateDumpSHA256": "04a1960315eeca29f3582fa6d646b061999aad421587c4eb515f65fef7f55dc4"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-006-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256"
+      ],
+      "oldSHA256": "bdac7f741221a1c782ee5a1844b39ea17feee9f93ae625d65b045ead4d75e181",
+      "newSHA256": "02b7726f1777a8bbe1668d64d5675f44d4e25f87c886d1c995a46b1588d1f3bd",
+      "referenceDumpSHA256": "a8b8e4d2a0db5330f217c1828f2b48881beff8714637310918f83ed838be37af",
+      "candidateDumpSHA256": "c7d9c2e14ddc81ceb4b6215cb7b8b7049ec5954380ab60b77d4cc8aa2cc260dc"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-006-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "bdac7f741221a1c782ee5a1844b39ea17feee9f93ae625d65b045ead4d75e181",
+      "newSHA256": "4471bd998f48d6f51e6afea2b233856af985683be8457dc398c07cbb723f231e",
+      "referenceDumpSHA256": "40b047a051c9f88cad8f0373d3c6bae3e4d5dc0620f2a95e61f3a5bb91b43833",
+      "candidateDumpSHA256": "b2a17b64bb5ea33c71143ad5c77e6619fe1a95ff8e19fd48d90716d13001be5f"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-006-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "bdac7f741221a1c782ee5a1844b39ea17feee9f93ae625d65b045ead4d75e181",
+      "newSHA256": "9948851daaa9fc46a6a94638678036d6cf3c7f7091c7183313f416963ee2e861",
+      "referenceDumpSHA256": "41ab6e18d689e82a7111f262ce8c05ace3daf6f5f7bc24cc441c20710ed9e6e2",
+      "candidateDumpSHA256": "1efb8ec0583d65a5c86f60918969edca15ab908b077c62856de8d86c19039760"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-007-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "ranges"
+      ],
+      "oldSHA256": "4d812c1dcbc94ba67550adda6228865b59294f9e2596d895c5ae634484e9356a",
+      "newSHA256": "c8fe1c5aa58140b37bd217834bb634b4a28904226c96e5155a07eb6e92b4dc8c",
+      "referenceDumpSHA256": "208014f1481e3d5a7e9bc2b08784b5d0788064db0f94ab50722bd7034adce7c5",
+      "candidateDumpSHA256": "1aa8961ca03e9c3f84103478d346cf2c2858f2fe285c4404fd6acfc2306c627d"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-007-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "4d812c1dcbc94ba67550adda6228865b59294f9e2596d895c5ae634484e9356a",
+      "newSHA256": "f652872ad085f264e98d55631e4ca8182e4c21b09150f51704c2345331711f39",
+      "referenceDumpSHA256": "b4117ac38f3cd355b0c3da200f7259722fd1abb27830614492b3792c255c96d9",
+      "candidateDumpSHA256": "ebdeb04e307519620ad880abd764f46f6ada81d0ac03a30a9a55758b1a8ce51a"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-008-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256"
+      ],
+      "oldSHA256": "5ca4061eaaf5cdd47927984eedbdfe81657933a402acd56f4992a00ee65eba61",
+      "newSHA256": "af223ec2c6b6924dad2e02c4cc2a1a82cffaae034c71b04d09c1ef779a701913",
+      "referenceDumpSHA256": "cb8bb3d68ab0d585d7db86b9353c7eb47439becb0aad5e6c178dc8f6fe028df5",
+      "candidateDumpSHA256": "228b094382f7b95c0675144930253ea8dbd315d37d1b59400895c83ebaa62833"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-011-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256"
+      ],
+      "oldSHA256": "ba3acdf227d4c168908f7320c4c90f4b13a0f6013c57e329b6b92b799ad64b80",
+      "newSHA256": "9952feb6bb4b2848d4e3a34958d4c10be4d4b8a6371e5eae73a683f50ad1e923",
+      "referenceDumpSHA256": "7cea69038c55734c160eb807c41f9e3cd93968ef4b2b9d53ae20158fcbcc00fa",
+      "candidateDumpSHA256": "184c1fb32884f366af5f94d3a6ef5c35013dd4db834f2c58a62f666ecbac58f5"
     }
   ]
 }

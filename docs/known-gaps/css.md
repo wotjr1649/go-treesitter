@@ -14,8 +14,8 @@ Identity: grammar `dda5cfc5722c429eaba1c910ca32c2c0c5bb1a3f`; runtime `v0.27.2`;
 The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`pins.json`](../../tools/gen/pins.json),
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/css/provenance.json).
 
-- Source identity SHA-256: `7f6945cc71a28e0f89c6d49fe6acea2a1d20439d21efd055edd766d6a0825bea`
-- Module provenance SHA-256: `1706314f4628be7effa4a329945550ef1e0ed4c69d1221b557ffd27b906067d0`
+- Source identity SHA-256: `5396081629b52157f4813d97914bc1955341e8ed8dc277b2b2a3eeb63f0bac2e`
+- Module provenance SHA-256: `df7598196c394f7766c8ecd563bbf5823a22421d2362c3705ec44f8a2ce3c953`
 
 ## css-non-latin1-value
 

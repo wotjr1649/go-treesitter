@@ -81,19 +81,51 @@
        $.plain_value,
        $.color_value,
        $.integer_value,
-@@ -462,14 +469,23 @@
+@@ -407,13 +414,8 @@
+       ),
+     ),
+ 
+-    escape_sequence: _ => token(seq(
+-      '\\',
+-      choice(
+-        /[0-9a-fA-F]{1,6}\s?/,
+-        /[^0-9a-fA-F\n\r]/,
+-      ),
+-    )),
++    escape_sequence: _ => token(escapeSequence()),
++    _adjacent_escape_sequence: _ => token.immediate(escapeSequence()),
+ 
+     integer_value: $ => seq(
+       token(seq(
+@@ -462,14 +464,40 @@
      ),
  
      class_name: $ => seq(
 -      choice($.identifier, $.escape_sequence),
-+      choice($.identifier, nonLatin1Name($, $.identifier), $.escape_sequence),
++      choice(
++        seq(
++          choice(alias($._adjacent_class_identifier, $.identifier), $._class_name_escape),
++          repeat($._class_name_escape),
++        ),
++        $.identifier,
++        $.escape_sequence,
++      ),
        repeat(choice(
--        alias(/[a-zA-Z0-9-_\xA0-\xFF]+/, $.identifier),
-+        alias(new RegExp(`[${name_continue}]+`, 'u'), $.identifier),
+         alias(/[a-zA-Z0-9-_\xA0-\xFF]+/, $.identifier),
          $.escape_sequence,
        )),
      ),
  
++    _adjacent_class_identifier: _ => token.immediate(
++      new RegExp(`(?:--|-?[${latin1_start}${non_latin1}])[${name_continue}]*`, 'u'),
++    ),
++
++    // Only an adjacent escape can introduce a widened continuation.
++    _class_name_escape: $ => seq(
++      alias($._adjacent_escape_sequence, $.escape_sequence),
++      optional(alias(token.immediate(new RegExp(`[${name_continue}]+`, 'u')), $.identifier)),
++    ),
++
      identifier: _ => /(--|-?[a-zA-Z_\xA0-\xFF])[a-zA-Z0-9-_\xA0-\xFF]*/,
 +
 +    // Keep the existing identifier token when the whole name fits it.
@@ -107,10 +139,14 @@
  
      at_keyword: _ => /@[a-zA-Z-_]+/,
  
-@@ -500,6 +516,14 @@
+@@ -500,6 +528,18 @@
      )),
    },
  });
++
++function escapeSequence() {
++  return seq('\\', choice(/[0-9a-fA-F]{1,6}\s?/, /[^0-9a-fA-F\n\r]/));
++}
 +
 +function name($, kind) {
 +  return choice(alias($.identifier, kind), nonLatin1Name($, kind));
