@@ -783,7 +783,7 @@
       "upstreamTestException": {
         "cli": "0.27.2",
         "step": "tree-sitter test: queries/outline.scm -> test/outline/outline.swift",
-        "reason": "Owner-approved 2026-11-17: CLI query runner uses the Swift input path as the query path; corpus 312/312 and the explicit outline query must pass.",
+        "reason": "Owner-approved 2026-11-17: CLI query runner uses the Swift input path as the query path; corpus 313/313 and the explicit outline query must pass.",
         "retireWhen": "On a CLI pin move, rerun the full suite; remove this exception only after the fixed CLI runs the outline query correctly. Update the generator gate's failure signature when the Swift grammar pin moves."
       }
     }

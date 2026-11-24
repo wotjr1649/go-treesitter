@@ -172,7 +172,7 @@ strict generated-schema validation, product-vs-fresh-native corpus/seeded-edit/f
 comparisons, plus the upstream repository's own tests. Swift's `generateFrom: "grammar.json"` selects the same
 unmodified upstream `src/grammar.json` as the product generator, with the input hash in provenance.
 Its owner-approved `upstreamTestException` covers only CLI 0.27.2 passing the Swift input as the outline query path:
-all 312 corpus cases and eight highlight cases must pass, the full-suite exit 1 and exact query error remain in the
+all 313 corpus cases and eight highlight cases must pass, the full-suite exit 1 and exact query error remain in the
 report/log, and `tree-sitter query queries/outline.scm test/outline/outline.swift` must succeed. Any new failure or
 a disappearing signature fails. On a CLI pin move, recheck the full suite and retire the exception when fixed.
 This exception does not waive parser correctness or constitute release approval. Any other failed check fails the gate.

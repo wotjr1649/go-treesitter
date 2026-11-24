@@ -14,7 +14,7 @@ Identity: grammar `fef1236022ccde2d2bc5c32d4db8947c87a7f848`; runtime `v0.27.2`;
 The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`pins.json`](../../tools/gen/pins.json),
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/swift/provenance.json).
 
-- Source identity SHA-256: `c05381bf73e0cc73cb0258a21d871724bd1d956258680a8b1207946843867760`
+- Source identity SHA-256: `9b2bbb6f6acb4150147c21ccd2ddb2e38a4c24aaa189432f0ce1442b6ec2731f`
 - Module provenance SHA-256: `7bbd1af7cf6ff5a8df77af34dc94e6133620939eaea27b2e9e8ead6040dc66cb`
 
 ## swift-non-ascii-statement-label
