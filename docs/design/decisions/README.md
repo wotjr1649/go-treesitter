@@ -18,10 +18,12 @@ Numbers are allocated in order and never reused.
 
 ## Lifecycle
 
-- An ADR is **immutable once accepted**, except for its `Status` line and a `Superseded by` link.
+- An ADR is **immutable once accepted**, except for its `Status` line, a `Superseded by` link and dated amendment
+  sections appended at its end.
 - To change a decision, write a **new** ADR that says `Supersedes: ADR-NNNN`, and set the old one's
-  status to `Superseded by ADR-MMMM`. Never edit the old reasoning — the record of why we once
-  thought otherwise is the point.
+  status to `Superseded by ADR-MMMM`. A bounded change to one decision may instead be appended as
+  `## Amendment (YYYY-MM-DD): …`; it names what it replaces and what still governs, and the index row
+  lists it. Never edit the old reasoning — the record of why we once thought otherwise is the point.
 - `Status` is one of `Proposed`, `Accepted`, `Superseded by ADR-NNNN`, `Withdrawn`.
 
 ## Relationship to contracts
