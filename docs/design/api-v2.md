@@ -27,7 +27,9 @@ github.com/wotjr1649/go-treesitter/internal/engine  frozen engine ABI (versioned
 github.com/wotjr1649/go-treesitter/grammars/<lang>  one Go module per grammar: func Language() *treesitter.Language
 ```
 The `syntax` package and `internal/gtsadapter` are removed. Each grammar module carries its own translated runtime;
-`Language` stays opaque so a later shared runtime is not a breaking change. `NewParser` checks the grammar module's
+`Language` stays opaque so a later shared runtime is not a breaking change. Generated grammars use
+`NewLanguage(*engine.Grammar) *Language` to construct their `Language()` result. See the
+[root API inventory](api-stability.md) for the generated-code contract. `NewParser` checks the grammar module's
 engine ABI version and snapshot block magic/version and returns `ErrIncompatibleLanguage` on mismatch. Grammar
 `go.mod` files require the exact root version they were generated against; CI tests the oldest supported grammar
 module against the newest root. Language metadata (symbol/field names, identity) is static Go data; no instance is
@@ -208,10 +210,12 @@ func NewIndex(*Snapshot) *Index; (*Snapshot) Index() *Index  // OfType, OfSymbol
 
 ## 8. Queries (v0.1; signatures fixed now)
 
-`NewQuery(lang, pattern) (*Query, error)` compiles per instance on first use (cache invalidated by reset);
-`(*Tree).Matches(ctx, q, opts) iter.Seq2[Match, error]` runs the C engine and maps captures to snapshot nodes by
-preorder index (equal to C's descendant index); text predicates (`#eq?`, `#match?`, `#any-of?`) are evaluated in Go
-against the snapshot's owned source. A parser is busy while an iterator is open (`Parse` returns an error).
+`NewQuery(lang, pattern) (*Query, error)` validates the pattern in a scratch instance before returning.
+Each parser instance compiles the query on first use and discards its compiled cache on reset.
+`(*Tree).Matches(ctx, q, opts) iter.Seq2[QueryMatch, error]` runs the C engine and maps captures to snapshot
+nodes by preorder index (equal to C's descendant index). Text predicates (`#eq?`, `#match?`, `#any-of?`) are
+evaluated in Go against the snapshot's owned source. Iteration holds the parser busy until it ends or
+the caller breaks early.
 
 In v0.6.0, regex predicates default to Unicode 16.0.0 shorthand classes, word boundaries
 and simple case folding from CLI 0.27.2's pinned `regex-syntax` 0.8.11 tables. `\p{...}` categories/scripts instead
