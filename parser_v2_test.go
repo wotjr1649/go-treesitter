@@ -300,30 +300,39 @@ func TestOldTreeChecks(t *testing.T) {
 }
 
 func TestIncompatibleLanguage(t *testing.T) {
+	reject := func(fl *fakeLang, instances int) {
+		t.Helper()
+		p, err := NewParser(fl.lang)
+		if p != nil {
+			p.Close()
+			t.Fatal("incompatible language created a parser")
+		}
+		wantPE(t, err, IncompatibleLanguage, false)
+		if !errors.Is(err, ErrIncompatibleLanguage) {
+			t.Fatalf("NewParser: %v", err)
+		}
+		if len(fl.mods) != instances {
+			t.Fatalf("created %d instances, want %d", len(fl.mods), instances)
+		}
+		if instances == 1 && !fl.mods[0].released.Load() {
+			t.Fatal("rejected instance must be released")
+		}
+	}
+
 	fl := newFakeLang(nil)
 	fl.lang.g.ABI = engine.ABIVersion + 1
-	_, err := NewParser(fl.lang)
-	wantPE(t, err, IncompatibleLanguage, false)
-	if !errors.Is(err, ErrIncompatibleLanguage) || len(fl.mods) != 0 {
-		t.Fatalf("literal ABI mismatch must not create an instance: %v, %d", err, len(fl.mods))
-	}
+	reject(fl, 0)
 	fl = newFakeLang(func(_ *fakeLang, f *fakeModule) { f.abi = engine.ABIVersion + 1 })
-	_, err = NewParser(fl.lang)
-	wantPE(t, err, IncompatibleLanguage, false)
-	if !fl.mods[0].released.Load() {
-		t.Fatal("rejected instance must be released")
-	}
+	reject(fl, 1)
 	fl = newFakeLang(func(_ *fakeLang, f *fakeModule) { f.initRC = -1 })
-	_, err = NewParser(fl.lang)
-	wantPE(t, err, IncompatibleLanguage, false)
+	reject(fl, 1)
 	fl = newFakeLang(func(_ *fakeLang, f *fakeModule) { f.badMagic = true }) // header wrong from tsg_init on
-	_, err = NewParser(fl.lang)
-	wantPE(t, err, IncompatibleLanguage, false)
-	if !fl.mods[0].released.Load() || fl.mods[0].count("export_begin") != 0 {
-		t.Fatal("NewParser must reject on the init-time header, before any export, and release the instance")
+	reject(fl, 1)
+	if fl.mods[0].count("export_begin") != 0 {
+		t.Fatal("NewParser must reject the init-time header before export")
 	}
 	fl = newFakeLang(func(_ *fakeLang, f *fakeModule) { f.kc = 3 }) // capacity not a multiple of 4
-	_, err = NewParser(fl.lang)
+	_, err := NewParser(fl.lang)
 	wantPE(t, err, EngineFault, false)
 	fl = newFakeLang(nil)
 	p := newP(t, fl)
