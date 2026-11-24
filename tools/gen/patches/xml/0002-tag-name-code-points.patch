@@ -1,0 +1,38 @@
+--- a/xml/src/scanner.c
++++ b/xml/src/scanner.c
+@@ -15,14 +15,33 @@
+     return memcmp(a->contents, b->contents, a->size) == 0;
+ }
+ 
++/// Append a code point as UTF-8, so names that differ only above the low byte stay distinct
++static void push_code_point(String *s, int32_t c) {
++    if (c < 0x80) {
++        array_push(s, (char)c);
++    } else if (c < 0x800) {
++        array_push(s, (char)(0xC0 | (c >> 6)));
++        array_push(s, (char)(0x80 | (c & 0x3F)));
++    } else if (c < 0x10000) {
++        array_push(s, (char)(0xE0 | (c >> 12)));
++        array_push(s, (char)(0x80 | ((c >> 6) & 0x3F)));
++        array_push(s, (char)(0x80 | (c & 0x3F)));
++    } else {
++        array_push(s, (char)(0xF0 | (c >> 18)));
++        array_push(s, (char)(0x80 | ((c >> 12) & 0x3F)));
++        array_push(s, (char)(0x80 | ((c >> 6) & 0x3F)));
++        array_push(s, (char)(0x80 | (c & 0x3F)));
++    }
++}
++
+ static String scan_tag_name(TSLexer *lexer) {
+     String tag_name = array_new();
+     if (is_valid_name_start_char(lexer->lookahead)) {
+-        array_push(&tag_name, (char)lexer->lookahead);
++        push_code_point(&tag_name, lexer->lookahead);
+         advance(lexer);
+     }
+     while (is_valid_name_char(lexer->lookahead)) {
+-        array_push(&tag_name, (char)lexer->lookahead);
++        push_code_point(&tag_name, lexer->lookahead);
+         advance(lexer);
+     }
+     return tag_name;

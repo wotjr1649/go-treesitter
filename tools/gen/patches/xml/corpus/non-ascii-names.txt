@@ -1,0 +1,119 @@
+================================================================================
+XML Hangul attribute names and namespace prefixes
+
+:language(xml)
+================================================================================
+
+<a 속성="1" xmlns:접두="u" 접두:속성='v'>값</a>
+
+--------------------------------------------------------------------------------
+
+(document
+  (element
+    (STag
+      (Name)
+      (Attribute
+        (Name)
+        (AttValue))
+      (Attribute
+        (Name)
+        (AttValue))
+      (Attribute
+        (Name)
+        (AttValue)))
+    (content
+      (CharData))
+    (ETag
+      (Name))))
+
+================================================================================
+XML other non-ASCII names
+
+:language(xml)
+================================================================================
+
+<?xml version="1.0"?>
+<!DOCTYPE 문서 [
+  <!ENTITY 이름 "값">
+]>
+<문서 é="1" 日本語="2" a·b="3" 𠀀="4">&이름;</문서>
+
+--------------------------------------------------------------------------------
+
+(document
+  (prolog
+    (XMLDecl
+      (VersionNum))
+    (doctypedecl
+      (Name)
+      (GEDecl
+        (Name)
+        (EntityValue))))
+  (element
+    (STag
+      (Name)
+      (Attribute
+        (Name)
+        (AttValue))
+      (Attribute
+        (Name)
+        (AttValue))
+      (Attribute
+        (Name)
+        (AttValue))
+      (Attribute
+        (Name)
+        (AttValue)))
+    (content
+      (EntityRef
+        (Name)))
+    (ETag
+      (Name))))
+
+================================================================================
+XML ASCII name characters are unchanged
+
+:language(xml)
+================================================================================
+
+<a b-c.d:e_f1="1" _g="2" h·i="3"/>
+
+--------------------------------------------------------------------------------
+
+(document
+  (element
+    (EmptyElemTag
+      (Name)
+      (Attribute
+        (Name)
+        (AttValue))
+      (Attribute
+        (Name)
+        (AttValue))
+      (Attribute
+        (Name)
+        (AttValue)))))
+
+================================================================================
+XML Hangul tag pair
+
+:language(xml)
+================================================================================
+
+<x걁><x굁 y="1"/></x걁>
+
+--------------------------------------------------------------------------------
+
+(document
+  (element
+    (STag
+      (Name))
+    (content
+      (element
+        (EmptyElemTag
+          (Name)
+          (Attribute
+            (Name)
+            (AttValue)))))
+    (ETag
+      (Name))))

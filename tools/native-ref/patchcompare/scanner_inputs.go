@@ -24,6 +24,8 @@ func scannerInputs(lang, corpus, source, regressions string) ([]input, error) {
 		target = "FuzzParseJavaScript"
 	case "yaml":
 		target = "FuzzParseYAML"
+	case "xml":
+		target = "FuzzParseXML"
 	}
 	seeds, err := fuzzSeeds(source, fuzz, target)
 	if err != nil {
@@ -31,7 +33,7 @@ func scannerInputs(lang, corpus, source, regressions string) ([]input, error) {
 	}
 	inputs = appendFuzzInputs(inputs, seeds)
 
-	if lang == "rust" || lang == "javascript" {
+	if lang == "rust" || lang == "javascript" || lang == "xml" {
 		path := filepath.Join(regressions, "grammar-text-patches.json")
 		var fixtures map[string][]struct{ Name, Source string }
 		b, err := os.ReadFile(path)

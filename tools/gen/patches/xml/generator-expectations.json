@@ -1,0 +1,150 @@
+{
+  "identity": {
+    "grammarCommit": "5000ae8f22d11fbe93939b05c1e37cf21117162d",
+    "seed": 1,
+    "corpusManifestSHA256": "48f734750b0470b65b574ac5b31be8fb058e7544e917b7f2d2abc7428a26cd6a",
+    "editsManifestSHA256": "6b86ac379ac7be8329643af5b22618fa904558294bec3715d8c8209d98d86b4e",
+    "largeEntries": [
+      {
+        "lang": "xml",
+        "file": "wayland.xml",
+        "kind": "url",
+        "url": "https://raw.githubusercontent.com/wayland-mirror/wayland/f2ecaa61a3a82944ae069de5413104ab7ba2109f/protocol/wayland.xml",
+        "sha256": "4831fd1cdbca6319037660bec5da0f3c5636fd81573cb61e01e4709570dac294",
+        "license_spdx": "MIT",
+        "license_url": "https://raw.githubusercontent.com/wayland-mirror/wayland/f2ecaa61a3a82944ae069de5413104ab7ba2109f/COPYING",
+        "license_sha256": "6eefcb023622a463168a5c20add95fd24a38c7482622a9254a23b99b7c153061"
+      }
+    ],
+    "patchCorpusFilesSHA256": {
+      "non-ascii-names.txt": "141eba235c9013f75d02b5c75214693d3df7ab6cade3671532b1fc9efef20d92"
+    },
+    "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "cli": "0.27.2",
+    "grammarArchiveSHA256": "1b7611ba3f2af55768acfbfbaf2fd2eb404ba61b14a85056d4f8d8326fc55146",
+    "patches": [
+      {
+        "file": "patches/xml/0001-non-ascii-names.patch",
+        "sha256": "1c33b03b78c8ba4d91583d0fed319665c1b197be928e6c378e1d3c1b3abd77a9",
+        "source": "common/common.mjs",
+        "beforeSHA256": "208d0786c7a105b19d1ff4949725f733808348902ad25aaeffa21a2400913b56",
+        "afterSHA256": "5773ce849dd6292d8094583c3ff86b5880b719b0b2a57bfcfb9c813c09472467",
+        "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-xml/issues/40"
+      },
+      {
+        "file": "patches/xml/0002-tag-name-code-points.patch",
+        "sha256": "c9a26eb27f0479bffa7367b1679c656815f922f7d99f18e5be8e81caf754b1fb",
+        "source": "xml/src/scanner.c",
+        "beforeSHA256": "c49be7a88f5bc0feee512ce704dc05b1fd53c20f2110a46fb987bd93509ef806",
+        "afterSHA256": "6df7868460a4d92a9ea47cccb03cb41426e275aee7db6ce0f577a72b43957f06",
+        "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-xml/issues/40"
+      }
+    ]
+  },
+  "reason": "tree-sitter-xml #40: Name (attribute, namespace-declaration, DOCTYPE, DTD and entity names) follows the XML 1.0 NameStartChar and NameChar ranges, so non-ASCII names such as 속성 and xmlns:접두 parse; ':' still cannot start a name and the ASCII set is unchanged. Each listed difference is a patch-corpus input (the Hangul/other-script attribute and entity names) or its seeded edit in which a non-ASCII name now parses; the upstream corpus, its edits and the pinned large input are unchanged.",
+  "retireWhen": "Retire with the matching patch when the upstream pin incorporates the fix; review anew for any identity, fixture or result change.",
+  "differences": [
+    {
+      "id": "corpus/xml/grammar-patch-non-ascii-names-001",
+      "kind": "corpus",
+      "inputSHA256": "5eccf4eb69dc0d72f4f5bc1f293421a865865c34df244b76379e345a11309179",
+      "referenceDumpSHA256": "2d8ddfd01fbc7504c8b7eb0ad1ca5a48ca592ab8eb084c650c148557fbddf88a",
+      "candidateDumpSHA256": "19b0501d029dd09cb014cc70da6e2c53fed897eb7e3f0f6e5c4fed3df98e5f1c"
+    },
+    {
+      "id": "corpus/xml/grammar-patch-non-ascii-names-002",
+      "kind": "corpus",
+      "inputSHA256": "d3a9558d1e7f26ab81a86caf54b5afc7bb3a6e3729c9e8064aaac6895952bbef",
+      "referenceDumpSHA256": "5f58999c7425d09df200f17f4bae0e3f1068e7897d7f2d974338508b30e76f4a",
+      "candidateDumpSHA256": "f98bd0d87d54ddc0744590ab01dd1e3076f88511c2ae888d9776df9ccd8e71c3"
+    },
+    {
+      "id": "edits/xml/grammar-patch-non-ascii-names-001-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "5eccf4eb69dc0d72f4f5bc1f293421a865865c34df244b76379e345a11309179",
+      "newSHA256": "e454a77d33947247038c8e5f237c843ce8e333a3f85d2330e77d3c247e7d8e00",
+      "referenceDumpSHA256": "8b8c4f5256ae951ecde8a24c3bac196cbc3ffaaaec2828a118e071a220e57540",
+      "candidateDumpSHA256": "dc3ac4288a7dc7a3ad42db284d87856dd16b318e94b7c91c9b9fd274e07a82a6"
+    },
+    {
+      "id": "edits/xml/grammar-patch-non-ascii-names-001-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "5eccf4eb69dc0d72f4f5bc1f293421a865865c34df244b76379e345a11309179",
+      "newSHA256": "88297343025ad28da7e3668538117ba87c8c23015e5f30e15e775c5b83e6e803",
+      "referenceDumpSHA256": "c0f1a7ed3ef7ac548b6573cfb67deaa8c050ccb58f342291d7c134ee0bc54337",
+      "candidateDumpSHA256": "992479e76e97a06be07346e2c697535d7e0cbd7f944fc4912a89bfdea57f691c"
+    },
+    {
+      "id": "edits/xml/grammar-patch-non-ascii-names-001-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "5eccf4eb69dc0d72f4f5bc1f293421a865865c34df244b76379e345a11309179",
+      "newSHA256": "9079e2d35f77191abe1e47f43d49968060835b6f72d600ff67bd03578ce816e4",
+      "referenceDumpSHA256": "72dfb487fbf0fb76e8431a679c6a2493b9c8f043e396bd1186dadbd2d1ef91fc",
+      "candidateDumpSHA256": "59381c991837384471a5b0dcc9072b91d9de83d89a04139e4e11e257f6e0c609"
+    },
+    {
+      "id": "edits/xml/grammar-patch-non-ascii-names-002-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "d3a9558d1e7f26ab81a86caf54b5afc7bb3a6e3729c9e8064aaac6895952bbef",
+      "newSHA256": "c7811c1486bca32b42abbcb17dead91bed54e8c64a039865a0f3626099224171",
+      "referenceDumpSHA256": "9516721093cf52841b8e821c8cd558858c052e072d58a4f39bbd55f511297029",
+      "candidateDumpSHA256": "b4fcf593d05539f4fa82b533d295583c3702dbbb5ccf33cd00a1d2f3482a4f12"
+    },
+    {
+      "id": "edits/xml/grammar-patch-non-ascii-names-002-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "d3a9558d1e7f26ab81a86caf54b5afc7bb3a6e3729c9e8064aaac6895952bbef",
+      "newSHA256": "190613f90b411f7220b053587c53a67a815a62e7239fac5e437c9efd24bdab70",
+      "referenceDumpSHA256": "c0843f75096a6f11058fb5856ec40da0c847a2f92f39382b586624f32a276420",
+      "candidateDumpSHA256": "34d47ed9925d92dda411dd0f7806b64474944f2bbe3397b43821b8e35da445bd"
+    },
+    {
+      "id": "edits/xml/grammar-patch-non-ascii-names-002-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "d3a9558d1e7f26ab81a86caf54b5afc7bb3a6e3729c9e8064aaac6895952bbef",
+      "newSHA256": "9734543242ce45bd72f15a38ef04885b6cc5f69f34a4627d172314694d51cef2",
+      "referenceDumpSHA256": "d825e0a4e3a9083dc82728e56dab7eb55908e1d39407978d715f78fae7a677c5",
+      "candidateDumpSHA256": "e7967c3c09e5f1f810697cdce5a37e3ef8dcf0ffcc9a4e14417a8e18ee5eb88d"
+    }
+  ]
+}

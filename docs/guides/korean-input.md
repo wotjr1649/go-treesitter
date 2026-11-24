@@ -161,15 +161,16 @@ produce `ERROR` nodes even though the language allows it. The table says what wa
 | `tsql` | yes on the retained bracketed, double-quoted and regular identifiers, variables and label cases (development tree, owner release v2.8.0, as since v2.1.0; v0.5.0 rejects regular identifiers) | yes | yes |
 | `tsx` | yes (includes JSX element names) | yes (includes JSX text) | yes |
 | `typescript` | yes | yes | yes |
-| `xml` | partly: element names (`Name`) parse; fails on attribute names, namespace prefixes ([XML](../known-gaps/xml.md))<sup>1</sup> | yes | yes |
+| `xml` | yes: element, attribute and namespace-prefix names (attribute names and prefixes in the development tree after v0.6.0; v0.6.0 fails on them)<sup>1</sup> | yes | yes |
 | `yaml` | yes | yes | yes |
 
 **Notes.**
 
-1. The scanner stores each tag-name character in one byte, so names whose characters share a low byte close each other:
+1. The HTML scanner stores each tag-name character in one byte, so names whose characters share a low byte close each other:
    `<x-걁>body</x-굁>` parses without an error. This pinned upstream defect is not exercised by the recorded rows: see
-   [HTML](../known-gaps/html.md#html-hangul-tag-low-byte-mismatch) and
-   [XML](../known-gaps/xml.md#xml-hangul-tag-low-byte-mismatch). Both pages show that an ASCII mismatch is still an `ERROR`.
+   [HTML](../known-gaps/html.md#html-hangul-tag-low-byte-mismatch), which shows that an ASCII mismatch is still an `ERROR`.
+   The XML scanner had the same defect; the development tree (after v0.6.0) compares complete tag names, so
+   `<x걁>body</x굁>` is an `ERROR` there ([limitations](../reports/limitations.md), row 30).
 2. The development tree uses upstream v19.0.0, which incorporates both Korean-support fixes. The published v0.5.0
    `postgres` fails on Hangul identifiers and dollar-quote tags. The development scanner caps tags at 63 code points.
    U+3000 and other non-ASCII spaces are identifier characters. See
