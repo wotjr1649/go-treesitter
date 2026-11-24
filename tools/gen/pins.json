@@ -546,6 +546,16 @@
       },
       "licenseSHA256": "1fca8454c0d77a73f9922a52d39e1f7c339f5da5d03f2766eff66b859fa19477",
       "cSymbol": "tree_sitter_powershell",
+      "patches": [
+        {
+          "file": "patches/powershell/0001-non-ascii-names.patch",
+          "sha256": "2eb78c58022a4dce1f8a4fafca66a93c8ef2bd54eddefa9cbe839615279b3b0d",
+          "source": "grammar.js",
+          "beforeSHA256": "bb3aad41587d910b1ce09fdee6ad326919a12a6fc3433f3902e874a0b852ca77",
+          "afterSHA256": "6de6d39aafd6e74400ee317661cfb8cdae7abfa52adeec195773bcc82c3bb14b",
+          "upstreamReport": "https://github.com/airbus-cert/tree-sitter-powershell/issues/70"
+        }
+      ],
       "regenerate": true
     },
     "r": {

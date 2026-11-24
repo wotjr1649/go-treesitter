@@ -32,6 +32,28 @@
     {"name":"hangul-mismatch","source":"<x한>body</x글>\n","nodes":[],"errors":["ERROR <x한>body</x글>\n"]},
     {"name":"ascii-mismatch","source":"<xa>body</xb>\n","nodes":[],"errors":["ERROR <xa>body</xb>\n"]}
   ],
+  "powershell": [
+    {"name":"hangul-variable","source":"$값 = 1\n","nodes":["variable $값"]},
+    {"name":"hangul-parameter","source":"Get-Item -이름 1\n","nodes":["command_parameter -이름"]},
+    {"name":"hangul-parameter-value","source":"git log -이름=값\n","nodes":["command_parameter -이름=값"]},
+    {"name":"hangul-hash-key","source":"@{ 키 = 1 }\n","nodes":["simple_name 키"]},
+    {"name":"hangul-member-name","source":"$a.속성\n","nodes":["variable $a","member_name 속성","simple_name 속성"]},
+    {"name":"hangul-method","source":"$a.메서드(1)\n","nodes":["variable $a","member_name 메서드","simple_name 메서드"]},
+    {"name":"hangul-type-name","source":"[한글]$a\n","nodes":["type_identifier 한글","variable $a"]},
+    {"name":"dotted-type-name","source":"[한.글]$a\n","nodes":["type_identifier 한","type_identifier 글","variable $a"]},
+    {"name":"static-member","source":"[한글]::값\n","nodes":["type_identifier 한글","member_name 값","simple_name 값"]},
+    {"name":"scoped-variables","source":"$env:값 = $script:한글\n","nodes":["variable $env:값","variable $script:한글"]},
+    {"name":"splat-variable","source":"@옵션\n","nodes":["variable @옵션"]},
+    {"name":"other-scripts","source":"$é = $日本語\n","nodes":["variable $é","variable $日本語"]},
+    {"name":"supplementary-letter-follows-specification","source":"$𠀀 = 1\n","nodes":["variable $𠀀"]},
+    {"name":"mixed-ascii-hangul","source":"$_이름 = $camel한글 = $한글camel\n","nodes":["variable $_이름","variable $camel한글","variable $한글camel"]},
+    {"name":"string-interpolation","source":"\"$a한글 $값\"\n","nodes":["variable $a한글","variable $값"]},
+    {"name":"statement-label","source":":루프 foreach ($i in 1..3) { break }\n","nodes":["label :루프","variable $i"]},
+    {"name":"decimal-digit","source":"$a٣ = 1\n","nodes":["variable $a٣"]},
+    {"name":"non-letter-symbol","source":"$a⑩ = 1\n","nodes":["variable $a"],"errors":["ERROR ⑩","ERROR ⑩"]},
+    {"name":"ascii-names","source":"$value = 1\nGet-Item -Name 1\n@{ abc = 1 }\n$a.abc\n[int]$a\n","nodes":["variable $value","command_parameter -Name","simple_name abc","variable $a","member_name abc","simple_name abc","type_identifier int","variable $a"]},
+    {"name":"braced-variable","source":"${한 글} = 1\n","nodes":["variable ${한 글}"]}
+  ],
   "rust": [
     {"name":"hangul-delimiters","source":"/* 갪갯 */","nodes":["block_comment /* 갪갯 */"]},
     {"name":"han-delimiters","source":"/*是个*/","nodes":["block_comment /*是个*/"]},

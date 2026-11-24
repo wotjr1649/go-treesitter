@@ -435,3 +435,25 @@ Node types and fields are unchanged.
   can lose that state, and an end tag then reports an `ERROR`; before, such names used one byte per character.
 
 The pinned upstream XML queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-xml-name-patches)).
+
+### PowerShell names
+
+One temporary ADR-0023 patch carries [upstream issue #70](https://github.com/airbus-cert/tree-sitter-powershell/issues/70).
+Node types and fields are unchanged (`node-types.json` is byte-identical to the archived upstream file).
+
+- **Non-ASCII names.** The name patterns of variables (including scope prefixes such as `$env:값` and splatted
+  `@옵션`), command parameters (`-이름`, `-이름=값`), `simple_name` (hash keys, member names, class and enum
+  names), `type_identifier` and statement labels (`:루프`) now accept Unicode letters (`\p{L}`), decimal digits
+  (`\p{Nd}`) and `_`, so `$값 = 1`, `Get-Item -이름 1`, `@{ 키 = 1 }`, `$a.속성` and `[한글]$a` parse without an
+  `ERROR`. Those inputs gave error trees before. A name still ends at any other character, for example `⑩` or a
+  combining mark, which is an `ERROR` as before.
+- **Variables in expandable strings change without an error.** A `$name` directly followed by a non-ASCII letter
+  or digit in an expandable string or here-string used to be the variable `$name` plus text. It is now one
+  `variable` covering the whole name, as PowerShell reads it: `"$name님 환영합니다"` refers to the variable
+  `$name님`, and `"$env:값"` to `$env:값`. Queries and code that matched the `variable` node's range, or the text
+  after it, see the new range. Write `"${name}님"` or `"$($name)님"` to separate them. The pinned upstream corpus and its seeded
+  edits parse as before.
+- **Supplementary-plane letters.** The grammar accepts letters outside the BMP (for example U+20000) as the
+  language specification says, but PowerShell 7.6.10 reads names by UTF-16 code unit and rejects them.
+
+The pinned upstream PowerShell queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-powershell-name-patch)).

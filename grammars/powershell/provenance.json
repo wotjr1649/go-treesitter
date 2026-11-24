@@ -1,13 +1,32 @@
 {
+  "patches": [
+    {
+      "file": "patches/powershell/0001-non-ascii-names.patch",
+      "sha256": "2eb78c58022a4dce1f8a4fafca66a93c8ef2bd54eddefa9cbe839615279b3b0d",
+      "source": "grammar.js",
+      "beforeSHA256": "bb3aad41587d910b1ce09fdee6ad326919a12a6fc3433f3902e874a0b852ca77",
+      "afterSHA256": "6de6d39aafd6e74400ee317661cfb8cdae7abfa52adeec195773bcc82c3bb14b",
+      "upstreamReport": "https://github.com/airbus-cert/tree-sitter-powershell/issues/70"
+    }
+  ],
   "grammarGeneration": {
-    "patches": null,
+    "patches": [
+      {
+        "file": "patches/powershell/0001-non-ascii-names.patch",
+        "sha256": "2eb78c58022a4dce1f8a4fafca66a93c8ef2bd54eddefa9cbe839615279b3b0d",
+        "source": "grammar.js",
+        "beforeSHA256": "bb3aad41587d910b1ce09fdee6ad326919a12a6fc3433f3902e874a0b852ca77",
+        "afterSHA256": "6de6d39aafd6e74400ee317661cfb8cdae7abfa52adeec195773bcc82c3bb14b",
+        "upstreamReport": "https://github.com/airbus-cert/tree-sitter-powershell/issues/70"
+      }
+    ],
     "cli": "0.27.2",
     "jsRuntime": "native",
-    "inputSHA256": "691e47a5c964a07d328974e110dc20665f8cd72e59e9912f40e34db9fa042455",
+    "inputSHA256": "ccfd96a4a8d7ef5de966bcaab49b05b7eb1fc3eab7fee56bb5ca51b4d9f419eb",
     "outputs": {
-      "grammar.json": "a7504b323a1730437b32d7f312f9ce16ede8b8d7c4d608fa3a98bdec309492f2",
+      "grammar.json": "430a4577b5d413e9e277a4fda2e449f038f9bb6d5d4315086f22646a244c5d7e",
       "node-types.json": "db02c7bdba010b518e4fa12b3ba045d0156d475f414b3ff4622eb30f51281c4e",
-      "parser.c": "ac011b830da6ecdea26fd3daca930b430f41a0a2df7d2f8286b6324593f7e412",
+      "parser.c": "91b76a1ac3721bfa4bcce06f6c08da6fbc5a8093e736c7d8c58f1ddce14877e6",
       "scanner.c": "dab03ff73a44495c72e6b51f43fd2f5128a1a29344a29974f12fba250328cf99",
       "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
       "tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
@@ -31,18 +50,19 @@
       "grammar.tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
       "grammar.tree_sitter/array.h": "31e60a1bff6f715afacce03b5b70efe42b58371b4f9595dd4af52a577ff9608c",
       "grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
-      "patched.grammar.grammar.json": "a7504b323a1730437b32d7f312f9ce16ede8b8d7c4d608fa3a98bdec309492f2",
+      "patched.grammar.grammar.json": "430a4577b5d413e9e277a4fda2e449f038f9bb6d5d4315086f22646a244c5d7e",
       "patched.grammar.node-types.json": "db02c7bdba010b518e4fa12b3ba045d0156d475f414b3ff4622eb30f51281c4e",
-      "patched.grammar.parser.c": "ac011b830da6ecdea26fd3daca930b430f41a0a2df7d2f8286b6324593f7e412",
+      "patched.grammar.parser.c": "91b76a1ac3721bfa4bcce06f6c08da6fbc5a8093e736c7d8c58f1ddce14877e6",
       "patched.grammar.scanner.c": "dab03ff73a44495c72e6b51f43fd2f5128a1a29344a29974f12fba250328cf99",
       "patched.grammar.tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
       "patched.grammar.tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
       "patched.grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
-      "patches.inputs": "691e47a5c964a07d328974e110dc20665f8cd72e59e9912f40e34db9fa042455",
+      "patches.1": "2eb78c58022a4dce1f8a4fafca66a93c8ef2bd54eddefa9cbe839615279b3b0d",
+      "patches.inputs": "ccfd96a4a8d7ef5de966bcaab49b05b7eb1fc3eab7fee56bb5ca51b4d9f419eb",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
       "shim.tsg_abi.c": "fd567c8fc616aeb97b5db0331a15243912c6ba27f6b73d1c512738b68d087816"
     },
-    "RecipeSHA256": "f0b9d71a9a0618fae6f1bf1a066068e51085b5f16de3b2e56a45867e4c2d1455",
+    "RecipeSHA256": "5e62396428c6501b437a60de6a27b4f51d3abdd498e599317c8c844dfc92137c",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -64,9 +84,9 @@
     "LICENSES/wasi-libc/cloudlibc-LICENSE": "c8b789cf5a746611e6300a0cc7750dbf92b61912a709d04e639245f7290656d0",
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
-    "engine_gen.dat": "3bb226f021450329a794771446b3849f807bc4051bbb4addf71e86f7813a81cb",
-    "engine_gen.go": "5f6fda2069dce28f551af46385ed4f963dd832d27c7945498a6cfc7aa8a7d70a",
-    "wasm": "cebb9e1bc32cf0f7074003e8ded1069a0190c951fe04c040e08306c087ff7962",
-    "wasm.clang": "cd54c692650d30362b4ac8ea942421396f6071163950d563485027065ba600d6"
+    "engine_gen.dat": "8a6ecc9a3e0736c49e9c0a97198c6f4acd8ba7d50e0e208e2372afd07ed68fb7",
+    "engine_gen.go": "a39e2daa1d70a52f5eae423dcf1daabe9d26747733a56ab94ac5fde9cc10c934",
+    "wasm": "8d318b1bdfda88bd2163d3c481ddeedf93120fb7f2e086d1114e84437e7cd824",
+    "wasm.clang": "12c58586742b395607ff8a3cf8d1359837fd358a56ca78379015eb523af449a9"
   }
 }

@@ -554,3 +554,20 @@ from a clean element to an `ERROR` (E4, Windows amd64). This is a breaking tree 
 item 5 for those inputs only. The pinned upstream `highlights.scm` compiled, and the query lane matched the patched
 native reference on 220 raw query/input comparisons with no mismatch (E5, Windows amd64).
 [Migration notes](../../MIGRATING.md#xml-names-and-tag-names)
+
+## Unreleased (after v0.6.0): PowerShell name patch
+
+At PowerShell pin `65ea6919e816`, the strict check of the regenerated `node-types.json` passes with zero findings, and
+it has the same 72778 bytes and SHA-256 `db02c7bdba010b518e4fa12b3ba045d0156d475f414b3ff4622eb30f51281c4e` as the
+archived upstream file (E1, CLI 0.27.2). The strict diff reports no changes. The patch changes name matching, not
+node types.
+Against the unpatched native build, the 165 pinned upstream corpus cases, 495 seeded edits, 16 fuzz seeds and the
+pinned large input (build.psm1) are byte-identical; six patch-corpus cases and their 18 edits are added, and five
+of them (Hangul and other non-ASCII variable, parameter, hash-key, member, type and label names) change from error
+trees to clean trees. Among the 36 retained regression inputs (patch corpus, grammar-text fixtures and Korean
+rows), the only ones whose trees change without a previous error are those with a variable followed by a non-ASCII
+letter inside an expandable string or here-string (`"$a한글 $값"`, `$가` in `powershell/str-here-string`), where the
+variable now spans the whole name (E4, Windows amd64). This is a breaking tree change under ADR-0023 amendment item 5
+for those inputs only. The pinned upstream `highlights.scm` and `folds.scm` compiled, and the query lane matched the
+patched native reference on 1980 raw query/input comparisons with no mismatch (E5, Windows amd64).
+[Migration notes](../../MIGRATING.md#powershell-names)
