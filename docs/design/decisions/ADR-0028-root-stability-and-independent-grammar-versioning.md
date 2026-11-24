@@ -1,6 +1,6 @@
 # ADR-0028 — Root 1.x stability and independent grammar versioning
 
-**Status:** Proposed · 2026-11-24
+**Status:** Accepted · 2026-11-24
 
 ## Context
 
