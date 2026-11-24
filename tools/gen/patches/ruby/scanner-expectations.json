@@ -38,6 +38,14 @@
         "sha256": "fb68546f8a63f2f7abd685b05fa8d1d949c35d170b0fffc34bc05177fc16f7c8",
         "source": "grammar.js",
         "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/306"
+      },
+      {
+        "afterSHA256": "b56156c6d706583bfafdf2424c8d7224aaba50b933c587ec0baa671f8190ca11",
+        "beforeSHA256": "387e6c2306b49962b93d6b571936169e2f1f372a374b48f7548bfa97e0ad508f",
+        "file": "patches/ruby/0003-non-ascii-symbol.patch",
+        "sha256": "01098b02462ff58ef8e7a56c5787cb48faa57fb36cebe8e047cbe4ef475e40dc",
+        "source": "src/scanner.c",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/292"
       }
     ],
     "runtimeArchiveSHA256": "9f33b10babb69ef84ac700731a11795b13a4b404dafaa8064e7acbf005fd0732",
@@ -45,13 +53,13 @@
     "wasiLibcArchiveSHA256": "2b3e2dca9825487e35a5ed6867c3e226eb021d948c3288b5dbff112b7d362517",
     "wasiLibcCommit": "2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13"
   },
-  "inputsSHA256": "1d1a86c64dd77802cc39774772067447dbf0ffc31d9c32ba8f9405a78511d2ea",
+  "inputsSHA256": "a9b9ae90869b86adef9c53a315ba7169e21cd18d1758ce0c84bb7d348c47c1d0",
   "comparisons": [
     {
       "patch": "patches/ruby/0001-heredoc-utf8.patch",
       "beforeSourcesSHA256": "e750cb8d3dc245ad42920d6d39cca9ffd869692ecee2cacadf2227e951b6b597",
       "afterSourcesSHA256": "130f157cc2601a963a26db4a4085a73a6bebebe68e3d099b4b08dcf990fb5ae7",
-      "resultsSHA256": "5cb83ae22f8e44adda1eab0612660e231cce2fa51f4bc5f4a6ae43d3e2e7b1cb",
+      "resultsSHA256": "f1c1882854948c26a68818165040807bed57904275184ef183f9ee5a312f2325",
       "reason": "Preserve complete UTF-8 heredoc end words and avoid low-byte matches that swallow or end a Ruby heredoc early.",
       "retireWhen": "The grammar pin includes the equivalent of tree-sitter-ruby issue 305 and passes the retained heredoc cases.",
       "differences": [
@@ -560,6 +568,185 @@
             }
           },
           "review": "The Unicode end word closes the heredoc at bytes 21–24 and leaves the following text outside its body."
+        }
+      ]
+    },
+    {
+      "patch": "patches/ruby/0003-non-ascii-symbol.patch",
+      "beforeSourcesSHA256": "130f157cc2601a963a26db4a4085a73a6bebebe68e3d099b4b08dcf990fb5ae7",
+      "afterSourcesSHA256": "a8e93886d52d8cf17eff67b62b0f9673e8383ffeba9ec6bee48161b328add141",
+      "resultsSHA256": "bb7a14e9d2c4a6b34d3e932467f9cd7a790f3c2ed8a32b85350125e4e302e454",
+      "reason": "Compare whole code points when the scanner reads a :symbol name or the name after #@ and #@@ in a string (upstream issue 292, adapted from PR 293). The scanner tested only the low byte of each code point, so :일 (U+C77C, low byte '|') and :言 (U+8A00, low byte NUL) ended the symbol early and parsed as an ERROR, and #@일 was not recognized as an interpolation. Every non-ASCII code point, including non-ASCII white space such as U+3000, now continues the name, as in Ruby. All changed inputs are the retained symbol regressions; no pinned corpus case, fuzz seed or kit input changes.",
+      "retireWhen": "The grammar pin includes the equivalent of tree-sitter-ruby issue 292's symbol scanning fix (PR 293) and passes the retained symbol regression cases.",
+      "differences": [
+        {
+          "id": "regression/hangul-symbol",
+          "bytes": 12,
+          "sha256": "ab172f39384a073ea728126cdf4c99a6abcea56ea9d597046ce156aa5fa9a0c3",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 12,
+              "dump_sha256": "3e1608561ae0e0f94fd804caed90a3774f5e586c37cb93afdb85a1ebdd425b36"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 12,
+              "dump_sha256": "06dcfa6b28151051aab30a6f76a55a8c171b7652431d645a8f105eb0063e89b5"
+            }
+          }
+        },
+        {
+          "id": "regression/hash-rocket-and-argument",
+          "bytes": 37,
+          "sha256": "48b7720560e86f29395ac664e58fe05b89010b9e1cc18a08d1785eb448d6e2bc",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 37,
+              "dump_sha256": "214cf2e4dd786385a35fd9ac16aed6a52a520770361d3808c8238a73be4f7370"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 37,
+              "dump_sha256": "3b665fcba9aa6956a4d5521eb9c3ab7b5039c4b0b1b61c2d824eba75620bdf3e"
+            }
+          }
+        },
+        {
+          "id": "regression/low-byte-pipe",
+          "bytes": 9,
+          "sha256": "8e926fccbe14175c40c38d8219f410958ba0f639aab9bde6ee7004003b393f3b",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 9,
+              "dump_sha256": "3740661f45be702c99ea9b99f9cba7766096cead678f8368e03ad65193dcd8a3"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 9,
+              "dump_sha256": "80de4426df3b3f1ea76244fdb5b1363b869d418e59305ac690e63ef73db98cc4"
+            }
+          }
+        },
+        {
+          "id": "regression/mid-and-suffix",
+          "bytes": 39,
+          "sha256": "7e6ca7ddb103d7ade5bfbb99ec5b8b753c6666455d46c2f19a3b572c1b84d4fd",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 39,
+              "dump_sha256": "baa76e392c1318325da25fcf2d39744343a97a47bcb089754f88127b7e86c112"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 39,
+              "dump_sha256": "eae016874b9c5a00452c6b82d2e5c520f97ec176ff131705cb588e4ee2ef579b"
+            }
+          }
+        },
+        {
+          "id": "regression/non-ascii-space-in-symbol",
+          "bytes": 11,
+          "sha256": "b22090fcd100560db869724a9fb2d0b1cd86be1017b833dd8ed561dec59723f6",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 11,
+              "dump_sha256": "028e0983092534ab4731e392b7434b69a6b4f56504cd741dd3c8f836e7a4eb34"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 11,
+              "dump_sha256": "8b11f54370867beb2b7ad73acb3a92b975ed47e6987db7d3978dbe3c131358a3"
+            }
+          }
+        },
+        {
+          "id": "regression/short-interpolation-names",
+          "bytes": 26,
+          "sha256": "b020c944a8df26056de47dbb1cd27d4e58706b00e7853d2bad2b8798e3f5c836",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 26,
+              "dump_sha256": "e8d6b22644181f18376a6083dc11b8c33f93f9bb925717983895beb0cd10ac55"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 26,
+              "dump_sha256": "bdea55d8511aeac15e4860042348ec66d97abe7e86a504930d1e35460f2dd742"
+            }
+          },
+          "review": "A clean baseline changes to another clean tree: #@일 and #@@한글 are now interpolations of an instance and a class variable, as Ruby evaluates them; the unpatched scanner read the low byte of 일 (U+C77C) and of 한 (U+D55C) as '|' and a backslash and kept the text as string_content."
+        },
+        {
+          "id": "regression/upstream-samples",
+          "bytes": 15,
+          "sha256": "64e1df59aaa8dd9a67b48ffd711b592a43338c90d1ac736770dcadcb0ed6d10b",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 15,
+              "dump_sha256": "e201b36dedbea5e0485efd090aa454461cb6e9dff6e3b4e55674d973eaa3be01"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 15,
+              "dump_sha256": "4c0bae6fe8e3976543f51baa0797e74d0efde47119d47494fcf5db0557b18423"
+            }
+          }
+        },
+        {
+          "id": "regression/variable-symbols",
+          "bytes": 33,
+          "sha256": "f6c3b26495b8ae4a27ad8e21a96aaab3a11c0378be93daa29ece344dba33762a",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 33,
+              "dump_sha256": "4294fa027d2f935c0a70b455f9242877d331f6b0fed0d0dfdba10a749f451369"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 33,
+              "dump_sha256": "92d830ada965bc10db48dee6a88823c9636e24510a6e24622f489272d631c0ac"
+            }
+          }
         }
       ]
     }

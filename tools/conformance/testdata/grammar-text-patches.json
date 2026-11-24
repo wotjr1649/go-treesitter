@@ -17,7 +17,17 @@
     {"name":"short-interpolation","source":"puts \"#$한글\"\n","nodes":["global_variable $한글"]},
     {"name":"ascii-prefix-expression","source":"x = $a한\n","nodes":["assignment x = $a한","global_variable $a한"]},
     {"name":"ascii-prefix-short-interpolation","source":"x = \"#$a한\"\n","nodes":["assignment x = \"#$a한\"","global_variable $a한"]},
-    {"name":"special-globals","source":"p $0, $1, $10, $!, $~, $-w, $stdout\n","nodes":["global_variable $0","global_variable $1","global_variable $10","global_variable $!","global_variable $~","global_variable $-w","global_variable $stdout"]}
+    {"name":"special-globals","source":"p $0, $1, $10, $!, $~, $-w, $stdout\n","nodes":["global_variable $0","global_variable $1","global_variable $10","global_variable $!","global_variable $~","global_variable $-w","global_variable $stdout"]},
+    {"name":"hangul-symbol","source":"a = :한글\n","nodes":["assignment a = :한글","simple_symbol :한글"]},
+    {"name":"upstream-samples","source":":言\n:你\n:일\n","nodes":["simple_symbol :言","simple_symbol :你","simple_symbol :일"]},
+    {"name":"low-byte-pipe","source":"a = :일\n","nodes":["assignment a = :일","simple_symbol :일"]},
+    {"name":"mid-and-suffix","source":"x = [:a한글, :한글=, :값?, :끝!]\n","nodes":["assignment x = [:a한글, :한글=, :값?, :끝!]","simple_symbol :a한글","simple_symbol :한글=","simple_symbol :값?","simple_symbol :끝!"]},
+    {"name":"hash-rocket-and-argument","source":"h = { :한글 => 1 }\np :일, :한글\n","nodes":["assignment h = { :한글 => 1 }","simple_symbol :한글","simple_symbol :일","simple_symbol :한글"]},
+    {"name":"variable-symbols","source":"x = [:@한글, :@@일, :$한글]\n","nodes":["assignment x = [:@한글, :@@일, :$한글]","simple_symbol :@한글","simple_symbol :@@일","simple_symbol :$한글"]},
+    {"name":"delimited-forms","source":"a = [:\"한글\", %s(한글)]\n","nodes":["assignment a = [:\"한글\", %s(한글)]"]},
+    {"name":"ascii-symbols","source":"x = [:abc, :a?, :b!, :c=, :+, :[], :@a, :$a, :@@a]\n","nodes":["assignment x = [:abc, :a?, :b!, :c=, :+, :[], :@a, :$a, :@@a]","simple_symbol :abc","simple_symbol :a?","simple_symbol :b!","simple_symbol :c=","simple_symbol :+","simple_symbol :[]","simple_symbol :@a","simple_symbol :$a","simple_symbol :@@a"]},
+    {"name":"short-interpolation-names","source":"x = \"#@일 #@@한글 #@a\"\n","nodes":["assignment x = \"#@일 #@@한글 #@a\"","instance_variable @일","class_variable @@한글","instance_variable @a"]},
+    {"name":"non-ascii-space-in-symbol","source":"x = :a　b\n","nodes":["assignment x = :a　b","simple_symbol :a　b"]}
   ],
   "xml": [
     {"name":"hangul-attribute","source":"<a 속성=\"1\"/>\n","nodes":["element <a 속성=\"1\"/>","Attribute 속성=\"1\""]},

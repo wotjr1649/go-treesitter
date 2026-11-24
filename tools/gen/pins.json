@@ -673,6 +673,14 @@
           "beforeSHA256": "3b5a0afa4ad836b2579c6d836450a373c6736bb0da3d7e030a9d4e66b94fbc7a",
           "afterSHA256": "f5da18f1fd401eef7f98db5512b9f5de682ff3c03fcad9e143e875ec46e39182",
           "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/306"
+        },
+        {
+          "file": "patches/ruby/0003-non-ascii-symbol.patch",
+          "sha256": "01098b02462ff58ef8e7a56c5787cb48faa57fb36cebe8e047cbe4ef475e40dc",
+          "source": "src/scanner.c",
+          "beforeSHA256": "387e6c2306b49962b93d6b571936169e2f1f372a374b48f7548bfa97e0ad508f",
+          "afterSHA256": "b56156c6d706583bfafdf2424c8d7224aaba50b933c587ec0baa671f8190ca11",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/292"
         }
       ],
       "regenerate": true

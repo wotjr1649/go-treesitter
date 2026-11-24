@@ -554,3 +554,17 @@ from a clean element to an `ERROR` (E4, Windows amd64). This is a breaking tree 
 item 5 for those inputs only. The pinned upstream `highlights.scm` compiled, and the query lane matched the patched
 native reference on 220 raw query/input comparisons with no mismatch (E5, Windows amd64).
 [Migration notes](../../MIGRATING.md#xml-names-and-tag-names)
+
+## Unreleased (after v0.6.0): Ruby symbol patch
+
+At Ruby pin `ad907a69da0c`, the strict check of the regenerated `node-types.json` passes with zero findings, and it has the
+same 69862 bytes and SHA-256 `a95d2f382017895771063837dbb959c4e5fde829fc185a2967695c770cc297bf` as before the patch
+(E1, CLI 0.27.2). The patch is a scanner change after generation, so the generated `parser.c` and node types are unchanged
+and a static diff against the previous generated file has nothing to report. Against the fully unpatched native build, the
+291 pinned upstream corpus and kit inputs, 873 seeded edits and the pinned large input (gb18030-tbl.rb) are byte-identical
+(E4, Windows amd64). In the scanner comparison over 356 inputs, only eight retained symbol and interpolation regressions
+change: seven from error trees to clean trees and one (`"#@일 #@@한글 #@a"`) between two clean trees, where `#@일` and `#@@한글`
+become an `interpolation` instead of `string_content` text (E4, Windows amd64). This is a breaking tree change under ADR-0023
+amendment item 5 for that kind of input only. The pinned upstream `highlights.scm`, `locals.scm` and `tags.scm` compiled, and
+the query lane matched the patched native reference on 3,783 raw query/input comparisons with no mismatch (E5, Windows amd64).
+[Migration notes](../../MIGRATING.md#ruby-symbol-and-interpolation-names)

@@ -283,9 +283,10 @@ Recorded C-only patches exist for bash and ruby (`0001-heredoc-utf8`), yaml (`00
 (`0001-block-comment-code-points`). HTML applies
 `0001-greater-than-text` and `0002-bare-ampersand-text` before generation.
 Go applies `0001-new-value-argument` before generation to accept Go 1.26 expression arguments to `new`.
-Ruby applies `0002-global-variable-non-ascii` before generation to accept non-ASCII global-variable names.
+Ruby applies `0002-global-variable-non-ascii` before generation to accept non-ASCII global-variable names, and
+`0003-non-ascii-symbol` (`src/scanner.c`, after generation) so the scanner compares whole code points in `:symbol` and `#@name` names.
 XML applies `0001-non-ascii-names` (`common/common.mjs`) before generation and `0002-tag-name-code-points` (`xml/src/scanner.c`) after it.
-`gen -patch-status` lists 13 records in total, including two each for Ruby and XML. Retire each with an approved pin move to a source that contains the fix (for an owner-maintained repository, an owner release; ADR-0024 rule 7.6).
+`gen -patch-status` lists 14 records in total, including three for Ruby and two for XML. Retire each with an approved pin move to a source that contains the fix (for an owner-maintained repository, an owner release; ADR-0024 rule 7.6).
 JavaScript retired `0001-jsx-bare-ampersand` with its owner v4.4.0 pin (`e5ada307a6f1741a573d5c8d4dafee9234330b1f`).
 The fix first shipped in [owner v2.0.0](https://github.com/wotjr1649/tree-sitter-javascript/releases/tag/v2.0.0)
 ([fix commit](https://github.com/wotjr1649/tree-sitter-javascript/commit/4765cd79603fa478da221da50500162757859e20)).

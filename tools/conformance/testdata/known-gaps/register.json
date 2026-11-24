@@ -39,13 +39,6 @@
       "ProvenanceSHA256": "73c2914d5605bf0c7a537c440136ea752face8aa1f98daab1391235b061fddb7",
       "PatchCount": 2
     },
-    "ruby": {
-      "Name": "Ruby",
-      "Commit": "ad907a69da0c8a4f7a943a7fe012712208da6dee",
-      "PinSHA256": "8c67c012322d65abd4403f24cadf09059134e86faf91e6d17f1c5066555b6670",
-      "ProvenanceSHA256": "3206a00307c08752240d79a2dfabd61efeae269271bcfa21294e01766675a8a7",
-      "PatchCount": 2
-    },
     "swift": {
       "Name": "Swift",
       "Commit": "fef1236022ccde2d2bc5c32d4db8947c87a7f848",
@@ -296,22 +289,6 @@
         }
       ],
       "Upstream": ""
-    },
-    {
-      "ID": "ruby-non-ascii-symbol",
-      "Grammar": "ruby",
-      "Input": "a = :한글\n",
-      "InputSHA256": "ab172f39384a073ea728126cdf4c99a6abcea56ea9d597046ce156aa5fa9a0c3",
-      "DumpSHA256": "3e1608561ae0e0f94fd804caed90a3774f5e586c37cb93afdb85a1ebdd425b36",
-      "Observed": "The root has errors: the colon [4,5) is an ERROR node and the Hangul word [5,11) is parsed as a separate identifier, so there is no simple_symbol. :abc parses as a simple_symbol; %s(한글) and { 한글: 1 } parse without errors.",
-      "Expected": "A simple_symbol :한글 on the right of the assignment.",
-      "Specs": [
-        {
-          "Title": "Ruby 3.3 syntax: Literals (Symbol Literals)",
-          "URL": "https://docs.ruby-lang.org/en/3.3/syntax/literals_rdoc.html#label-Symbol+Literals"
-        }
-      ],
-      "Upstream": "https://github.com/tree-sitter/tree-sitter-ruby/issues/292"
     },
     {
       "ID": "swift-non-ascii-statement-label",
