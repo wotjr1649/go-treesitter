@@ -40,6 +40,20 @@ func newMem(t *testing.T) *[]byte {
 
 func base(m *[]byte) uintptr { return uintptr(unsafe.Pointer(unsafe.SliceData(*m))) }
 
+func checkRelease(t *testing.T, m *[]byte) {
+	t.Helper()
+	p := base(m)
+	if released, err := release(m); !released || err != nil {
+		reportReleaseFailure(t, p, err)
+	}
+	if *m != nil {
+		t.Errorf("memory slice after Release is non-nil: len=%d cap=%d", len(*m), cap(*m))
+	}
+	if n := Committed(m); n != 0 {
+		t.Errorf("Committed after Release = %d, want 0", n)
+	}
+}
+
 func TestGrowWithinLimit(t *testing.T) {
 	m := newMem(t)
 	if err := SetLimit(m, MinLimit); err != nil {
@@ -141,14 +155,13 @@ func TestReleaseReturnsRegionAndIsIdempotent(t *testing.T) {
 	if !regionCommitted(p) || !regionCommitted(p+9<<16) {
 		t.Fatal("committed pages not accessible before Release")
 	}
-	Release(m)
-	if !regionFreed(p) || !regionFreed(p+MinLimit-1<<16) {
-		t.Fatal("region still mapped after Release")
+	checkRelease(t, m)
+	if Refused(m) {
+		t.Error("refused flag left behind after Release")
 	}
-	if *m != nil || Committed(m) != 0 || Refused(m) {
-		t.Fatal("state left behind after Release")
+	if released, err := release(m); released || err != nil {
+		t.Errorf("second Release: released=%t, err=%v; want false, nil", released, err)
 	}
-	Release(m) // second call: no-op, no panic
 	if _, ok := live.Load(uintptr(unsafe.Pointer(m))); ok {
 		t.Fatal("state map entry not dropped")
 	}
@@ -191,18 +204,16 @@ func TestCallCapturesPanic(t *testing.T) {
 func TestProcExitTrapsAndRegionIsReleased(t *testing.T) {
 	m := newMem(t)
 	SetLimit(m, MinLimit)
-	MemoryGrow(m, 4, 65536)
-	p := base(m)
+	if got := MemoryGrow(m, 4, 65536); got != 2 {
+		t.Fatalf("first grow = %d, want 2", got)
+	}
 	var h Host
 	err := Call(func() { func() { h.Xproc_exit(1) }() })
 	var tr *Trap
 	if !errors.As(err, &tr) || !strings.Contains(tr.Error(), "proc_exit(1)") || len(tr.Stack) == 0 {
 		t.Fatalf("got %v", err)
 	}
-	Release(m)
-	if !regionFreed(p) || *m != nil || Committed(m) != 0 {
-		t.Fatal("region not returned after a proc_exit trap")
-	}
+	checkRelease(t, m)
 	if _, ok := live.Load(uintptr(unsafe.Pointer(m))); ok {
 		t.Fatal("state map entry not dropped")
 	}

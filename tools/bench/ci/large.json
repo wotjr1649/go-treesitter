@@ -82,7 +82,7 @@
     "lang": "tsql",
     "file": "corpus_go_concat_1mb.sql",
     "kind": "concat",
-    "sha256": "4073c86280db3546e24cbabe1920a8639d4497f91244433e85df581a4f0c6e08"
+    "sha256": "f90deea671e78400194ff651252721754cca822d3597be772bdfa6a1267e5e49"
   },
   {
     "lang": "javascript",
