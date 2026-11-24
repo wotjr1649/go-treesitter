@@ -3,7 +3,7 @@ module github.com/wotjr1649/go-treesitter/tools/conformance
 go 1.26.0
 
 require (
-	github.com/wotjr1649/go-treesitter v0.5.0
+	github.com/wotjr1649/go-treesitter v0.6.0
 	github.com/wotjr1649/go-treesitter/grammars/bash v0.0.0
 	github.com/wotjr1649/go-treesitter/grammars/c v0.0.0
 	github.com/wotjr1649/go-treesitter/grammars/cpp v0.0.0
