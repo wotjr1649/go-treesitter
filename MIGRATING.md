@@ -397,3 +397,13 @@ The repository's highlights, locals and tags query files retain their bytes. CST
 captures and byte spans. See the
 [owner CHANGELOG](https://github.com/wotjr1649/tree-sitter-typescript/blob/c37edc69610d304fb2a11005ca9c4e52ad1f4863/CHANGELOG.md)
 and the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-typescript-and-tsx-v310).
+
+### C# grammar v0.24.0
+
+The development tree moves from `9150f7d56bb4` to `d4bbe18103c3` in the same tier-1 upstream.
+Review queries that depend on list-pattern precedence before logical operators or on how preprocessor branches
+hold declarations or expressions. File-based app directives such as `#:package` have dedicated directive
+nodes and highlight captures. `preproc_if`, `preproc_elif` and `preproc_else` gain a `body` field.
+The [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-c-v0240) records the additions,
+and [upstream's release notes](https://github.com/tree-sitter/tree-sitter-c-sharp/releases/tag/v0.24.0)
+list the parsing fixes. The four [C# known gaps](docs/known-gaps/csharp.md) still apply.

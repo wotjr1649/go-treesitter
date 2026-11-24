@@ -13,9 +13,9 @@
     },
     "csharp": {
       "Name": "C#",
-      "Commit": "9150f7d56bb47f1a809fa23623f1ba1413e93fa9",
-      "PinSHA256": "742374675380713a022e58e7c92055ca80095b454a2284ee77d20288fcf2807c",
-      "ProvenanceSHA256": "0327156c6ed33e05b7c5d9a282a2fa74f4f3d3feb15a508905e8e287898c162e",
+      "Commit": "d4bbe18103c3380c6454085e589d2610938da142",
+      "PinSHA256": "00d265b8a944364d2891b3b38c99498c04b857ce79304e4ed5bd613cdc4d1a27",
+      "ProvenanceSHA256": "d3aece8a0ae235e60b8435d0f7ec825074dd72f5f67f9c9edc821bb416eb8905",
       "PatchCount": 0
     },
     "css": {

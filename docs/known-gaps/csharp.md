@@ -10,12 +10,12 @@ Initial E5 evidence: Windows native reference differential (windows/amd64), base
 Only the exact inputs below are covered. `TestKnownGaps` rechecks engine dumps (E3) and, with a freshly built
 `TSG_NATIVE_EXE_DIR`, compares them byte-for-byte with native C (E5). CI requires that comparison.
 
-Identity: grammar `9150f7d56bb47f1a809fa23623f1ba1413e93fa9`; runtime `v0.27.2`; grammar patches: 0.
+Identity: grammar `d4bbe18103c3380c6454085e589d2610938da142`; runtime `v0.27.2`; grammar patches: 0.
 The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`pins.json`](../../tools/gen/pins.json),
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/csharp/provenance.json).
 
-- Source identity SHA-256: `742374675380713a022e58e7c92055ca80095b454a2284ee77d20288fcf2807c`
-- Module provenance SHA-256: `0327156c6ed33e05b7c5d9a282a2fa74f4f3d3feb15a508905e8e287898c162e`
+- Source identity SHA-256: `00d265b8a944364d2891b3b38c99498c04b857ce79304e4ed5bd613cdc4d1a27`
+- Module provenance SHA-256: `d3aece8a0ae235e60b8435d0f7ec825074dd72f5f67f9c9edc821bb416eb8905`
 
 ## csharp-default-constraint
 

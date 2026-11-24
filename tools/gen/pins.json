@@ -241,31 +241,22 @@
     },
     "csharp": {
       "repo": "https://github.com/tree-sitter/tree-sitter-c-sharp",
-      "commit": "9150f7d56bb47f1a809fa23623f1ba1413e93fa9",
-      "extractDir": "tree-sitter-c-sharp-9150f7d56bb4",
-      "archive": "tree-sitter-c-sharp-9150f7d56bb4.tar.gz",
-      "archiveSHA256": "2cda5e9e9731a58a7a4c29eaf64c71db052688f2b3fd43dd73cebe2da2be6197",
+      "commit": "d4bbe18103c3380c6454085e589d2610938da142",
+      "extractDir": "tree-sitter-c-sharp-d4bbe18103c3",
+      "archive": "tree-sitter-c-sharp-d4bbe18103c3.tar.gz",
+      "archiveSHA256": "392a56a27c344807913c0c467e45fdd116c351aa1ad1e9fd41292aa61dfb4147",
       "grammarDir": "src",
       "dirs": [
         "src"
       ],
-      "treeSHA256": "74dfd5925f30f5cf43d510481f24ec709fd4ed5496d02e2c62d1200f06bb0943",
+      "treeSHA256": "0a6c77d8be827317c229a0c2edf56668fb9bbce05aa56869aa92537657e959d0",
       "files": {
-        "parser.c": "2549deeed0c8aeb84f42f9ccd3cf9de047a0c609387075a97784fddb2d1770cd",
-        "scanner.c": "2ee1241a6a275e72a06838f5df927700bd405c16b48f986e2c33d1264cae4818"
+        "parser.c": "96ed4b0b304899bf8f9135d789ba4064451d3adb114fa3e6ff50f9398e689c45",
+        "scanner.c": "73fa56cec9d323a51636f02b6672848f6a301a1523d9e8b91a965792273abf33"
       },
       "licenseSHA256": "778fb7d63b8c1844da315648c02f325c4713a6f4a5d19644fd413421422776d3",
       "cSymbol": "tree_sitter_c_sharp",
-      "regenerate": false,
-      "generatorException": {
-        "reason": "ADR-0027: CLI 0.27.2 changes switch type-pattern parsing; retain reference C until owner accepts or upstream fixes it.",
-        "failingInputs": [
-          "corpus/csharp/statements-002",
-          "edits/csharp/statements-002-e1",
-          "edits/csharp/statements-002-e3",
-          "upstream/parse_results/statements/Switch statements"
-        ]
-      }
+      "regenerate": true
     },
     "tsql": {
       "repo": "https://github.com/wotjr1649/tree-sitter-mssql",

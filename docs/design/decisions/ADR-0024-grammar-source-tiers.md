@@ -34,7 +34,7 @@ distributions such as nvim-treesitter pick one per language.
 
 | Tier | Language → repository |
 |---|---|
-| 1 | bash, cpp, c-sharp, css, go, html, json, php, python, ruby, rust → `tree-sitter/tree-sitter-<lang>` (PHP upstream v0.25.2); c → `tree-sitter-grammars/tree-sitter-c` (maintained fork, rule 6, since 2026-11-16) |
+| 1 | bash, cpp, c-sharp, css, go, html, json, php, python, ruby, rust → `tree-sitter/tree-sitter-<lang>` (C# upstream v0.24.0, PHP upstream v0.25.2); c → `tree-sitter-grammars/tree-sitter-c` (maintained fork, rule 6, since 2026-11-16) |
 | 2 | yaml → `tree-sitter-grammars/tree-sitter-yaml`; xml → `tree-sitter-grammars/tree-sitter-xml` |
 | 3 | kotlin → `fwcd/tree-sitter-kotlin` (replaces the kit's `tree-sitter-grammars/tree-sitter-kotlin`); powershell → `airbus-cert/tree-sitter-powershell`; r → `r-lib/tree-sitter-r`; dart → `UserNobody14/tree-sitter-dart`; swift → `alex-pinkus/tree-sitter-swift` |
 | owner-designated | PostgreSQL → `gmr/tree-sitter-postgres` (upstream v19.0.0; nvim-treesitter has none; generated from PostgreSQL's own grammar) |

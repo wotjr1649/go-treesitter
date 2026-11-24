@@ -37,6 +37,11 @@ What the preview does not do or has not shown. Gate results and their evidence l
 
 Known upstream grammar defects with retained strict expected-failure tests and input-specific native C comparisons: [Python](../known-gaps/python.md), [C#](../known-gaps/csharp.md), [CSS](../known-gaps/css.md), [HTML](../known-gaps/html.md), [PowerShell](../known-gaps/powershell.md), [Ruby](../known-gaps/ruby.md), [Swift](../known-gaps/swift.md), [XML](../known-gaps/xml.md).
 
+The development C# module uses tier-1 upstream [v0.24.0](https://github.com/tree-sitter/tree-sitter-c-sharp/releases/tag/v0.24.0).
+It includes parsing fixes and file-based app directives. The four [C# known gaps](../known-gaps/csharp.md)
+still apply, including the split conditional in row 19. See the [C# migration notes](../../MIGRATING.md#c-grammar-v0240)
+for tree and query changes.
+
 Release authority, tags and publication are separate from this list: see
 [`publication.md`](../specs/publication.md).
 
