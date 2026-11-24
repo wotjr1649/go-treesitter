@@ -49,6 +49,7 @@ type opts struct {
 	patchAlert                                                                             int
 	lang, root, src, dl, sdk, wasm2go, wasmOpt, recipe, out, work, repo, rootVersion, plan string
 	hash, noAPI, verifyBinaries                                                            bool
+	keepModuleForm                                                                         bool
 	balanceProbe                                                                           bool
 	mirrorAssets                                                                           bool
 }
@@ -87,7 +88,8 @@ func main() {
 	flag.StringVar(&o.out, "out", "", "output module directory")
 	flag.StringVar(&o.work, "work", "", "scratch directory (wasm, meta runner)")
 	flag.StringVar(&o.repo, "repo", "../..", "repository root (only for the meta runner's replace directive)")
-	flag.StringVar(&o.rootVersion, "root-version", "", "release mode: emit go.mod requiring the root module at this exact version (vX.Y.Z), without replace; default is the local-development form")
+	flag.StringVar(&o.rootVersion, "root-version", "", "release mode: emit go.mod with this minimum root version (vX.Y.Z) and no replace; default is the local-development form")
+	flag.BoolVar(&o.keepModuleForm, "keep-module-form", false, "keep the development or release form and minimum root version from the output grammar's existing go.mod")
 	flag.StringVar(&o.plan, "plan", "", "print the fetch plan for this host platform (GOOS-GOARCH, or \"host\") and exit; tools/gen/regen.sh executes it")
 	flag.BoolVar(&o.verifyBinaries, "verify-binaries", false, "also check the host binary hashes pinned in localBinarySHA256 (optional local verification, not an identity)")
 	flag.BoolVar(&o.hash, "hash", false, "print the computed values of every pin and exit")
@@ -135,20 +137,11 @@ func run(o opts) error {
 		fmt.Println(strings.Join(lines, "\n"))
 		return nil
 	}
+	if o.keepModuleForm && o.rootVersion != "" {
+		return fmt.Errorf("-keep-module-form cannot be combined with -root-version")
+	}
 	if o.rootVersion != "" && !rootVersionRx.MatchString(o.rootVersion) {
 		return fmt.Errorf("-root-version %q is not a semantic version vX.Y.Z", o.rootVersion)
-	}
-	if o.balanceProbe {
-		if err := validateBalanceProbe(o); err != nil {
-			return err
-		}
-	}
-	goSum := "" // release mode only; dev mode writes none and removes a stale one
-	if o.rootVersion != "" {
-		var err error
-		if goSum, err = rootGoSum(o.rootVersion); err != nil {
-			return err
-		}
 	}
 	if o.src == "" {
 		return fmt.Errorf("-src is required")
@@ -162,6 +155,22 @@ func run(o opts) error {
 	}
 	if o.sdk == "" || o.wasm2go == "" || o.out == "" || o.work == "" {
 		return fmt.Errorf("-sdk, -wasm2go, -out and -work are required")
+	}
+	if o.keepModuleForm {
+		if o.rootVersion, err = moduleRootVersion(o.lang, filepath.Join(o.out, "go.mod")); err != nil {
+			return err
+		}
+	}
+	if o.balanceProbe {
+		if err := validateBalanceProbe(o); err != nil {
+			return err
+		}
+	}
+	goSum := "" // release mode only; dev mode writes none and removes a stale one
+	if o.rootVersion != "" {
+		if goSum, err = rootGoSum(o.rootVersion); err != nil {
+			return err
+		}
 	}
 	rname := pins.Recipe
 	if o.recipe != "" {

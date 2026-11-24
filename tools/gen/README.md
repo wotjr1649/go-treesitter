@@ -223,13 +223,16 @@ Everything a generation consumes is pinned, and the identity of a generated modu
 
 ```
 bash tools/gen/regen.sh <new-empty-work-dir> [lang ...]      # all 25 modules by default
-ROOT_VERSION=v0.1.0 bash tools/gen/regen.sh <work-dir>       # switch a development tree to the release go.mod form
+ROOT_VERSION=v0.6.0 bash tools/gen/regen.sh <new-empty-work-dir> json  # switch JSON to the release go.mod form
 ```
 
 `regen.sh` builds `gen`, prints the fetch plan (`gen -plan host`), downloads every archive into the new directory,
 verifies its sha256 **before** extracting, builds wasm2go from the pinned version, then runs `gen` per module into
 `grammars/<lang>`. `.github/workflows/regen.yml` runs it on Linux and requires `git diff --exit-code -- grammars/`.
-Without `ROOT_VERSION`, `regen.sh` derives the go.mod form from the committed `grammars/*/go.mod` (all 25 must be in the same form: development with `replace`, or release `require vX.Y.Z` without `replace`; otherwise it fails), so the drift check regenerates the committed form unchanged.
+Without `ROOT_VERSION`, `regen.sh` reads each selected grammar's existing `go.mod` (`gen -keep-module-form`). A
+development module keeps `replace ../..`. A release module keeps its minimum root and has no `replace`. The drift
+check therefore also works on a mixed tree. `ROOT_VERSION` (`gen -root-version`) applies to every grammar in that
+invocation. Pass an explicit language list for a subset and use a separate invocation for each minimum root version.
 
 The modules are `bash`, `c`, `cpp`, `csharp`, `css`, `dart`, `golang`, `html`, `java`, `javascript` (including JSX), `json`,
 `kotlin`, `php`, `postgres`, `powershell`, `python`, `r`, `ruby`, `rust`, `swift`, `tsql`, `tsx`, `typescript`, `xml`, and `yaml`. Each has a grammar-specific generated smoke-test sample.
