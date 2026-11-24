@@ -436,24 +436,24 @@ Node types and fields are unchanged.
 
 The pinned upstream XML queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-xml-name-patches)).
 
-### Ruby symbol and interpolation names
+### Ruby symbol names
 
 A temporary ADR-0023 scanner patch carries [upstream issue #292](https://github.com/tree-sitter/tree-sitter-ruby/issues/292)
 (adapted from [PR #293](https://github.com/tree-sitter/tree-sitter-ruby/pull/293)). Node types and fields are unchanged.
 
-- **Non-ASCII symbols.** `:한글`, `:일`, `:言`, `:값?`, `:a한글` and `:@한글` parse as one `simple_symbol`, in place of an
+- **Non-ASCII symbols.** `:한글`, `:일`, `:言`, `:값?` and `:a한글` parse as one `simple_symbol`, in place of an
   `ERROR` holding the colon followed by an `identifier`. The scanner tested only the low byte of each code point, so a code
   point whose low byte is ASCII punctuation, NUL or white space (U+C77C `일`: `|`; U+8A00 `言`: NUL) ended the name; a symbol
   whose code points have other low bytes (`:日`) parsed before and is unchanged. In the recorded inputs, every changed
-  symbol input was an error tree before.
-- **Short interpolation.** In a string, `#@일` and `#@@한글` are now an `interpolation` holding an `instance_variable` or
-  `class_variable`; before, the text stayed in `string_content` when the first code point's low byte was ASCII punctuation.
-  This changes error-free trees: queries that matched `string_content` there, or counted `interpolation` nodes, see a
-  different tree. `#@a`, `#@1` and `#$한글` are unchanged.
-- **Non-ASCII white space.** Every non-ASCII code point, including U+3000 and U+00A0, continues a symbol name or a short
-  interpolation name, as in Ruby: `:a　b` (U+3000) is one `simple_symbol`, where the NUL low byte of U+3000 ended it before
-  (an error tree). The `identifier` token of the grammar still stops at white space.
-- The character right after `#` in a string is still read by its low byte, so `"#Ĥ!"` can still be taken for a short
-  interpolation (see [limitations](docs/reports/limitations.md), rows 27 and 31).
+  input was an error tree before, so no error-free tree changes.
+- **Plain symbols only.** The change applies to a symbol name with no `@`, `@@` or `$` prefix and no operator before it.
+  Operator and variable symbols keep their earlier scanning: `:+일` and `:@일?` parse as before, `:@한글`, `:@@일` and `:$한글`
+  still give an `ERROR` before the variable, and `:"+일"` is a `delimited_symbol` as before.
+- **Non-ASCII white space.** Every non-ASCII code point, including U+3000 and U+00A0, continues a plain symbol name, as in
+  Ruby: `:a　b` (U+3000) is one `simple_symbol`, where the NUL low byte of U+3000 ended it before (an error tree). Checked
+  on that input only, against the patched native reference.
+- **Short interpolation is unchanged.** In a string, `#@일` and `#@@한글` stay `string_content` text, and `"#ŀ일"` (U+0140,
+  low byte `@`) stays a plain string. The character right after `#` is still read by its low byte, so `"#Ĥ!"` can still be
+  taken for a short interpolation (see [limitations](docs/reports/limitations.md), rows 27 and 31).
 
 The pinned upstream Ruby queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-ruby-symbol-patch)).

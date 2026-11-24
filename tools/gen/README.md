@@ -284,7 +284,7 @@ Recorded C-only patches exist for bash and ruby (`0001-heredoc-utf8`), yaml (`00
 `0001-greater-than-text` and `0002-bare-ampersand-text` before generation.
 Go applies `0001-new-value-argument` before generation to accept Go 1.26 expression arguments to `new`.
 Ruby applies `0002-global-variable-non-ascii` before generation to accept non-ASCII global-variable names, and
-`0003-non-ascii-symbol` (`src/scanner.c`, after generation) so the scanner compares whole code points in `:symbol` and `#@name` names.
+`0003-non-ascii-symbol` (`src/scanner.c`, after generation) so the scanner compares whole code points in plain `:symbol` names.
 XML applies `0001-non-ascii-names` (`common/common.mjs`) before generation and `0002-tag-name-code-points` (`xml/src/scanner.c`) after it.
 `gen -patch-status` lists 14 records in total, including three for Ruby and two for XML. Retire each with an approved pin move to a source that contains the fix (for an owner-maintained repository, an owner release; ADR-0024 rule 7.6).
 JavaScript retired `0001-jsx-bare-ampersand` with its owner v4.4.0 pin (`e5ada307a6f1741a573d5c8d4dafee9234330b1f`).

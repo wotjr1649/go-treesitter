@@ -2,8 +2,8 @@
   "identity": {
     "grammarCommit": "ad907a69da0c8a4f7a943a7fe012712208da6dee",
     "seed": 1,
-    "corpusManifestSHA256": "1e574bcd926112a5e92aad292ed73115c3675e6a8ed498ffd1c67a12cb0422d2",
-    "editsManifestSHA256": "1077b974f37c2d4b16a44c42fa55315fd1c2909aa5a1bb48ed8482572b70dc2a",
+    "corpusManifestSHA256": "a5095f00ae2fce0bfed112407bed5f0ecf24d919fb5a83222bec6c032146869e",
+    "editsManifestSHA256": "e5fa0e44d5c67210b3aa3b4fb73740e51537cf0fa3ddf9ef0e787a4e551a70b2",
     "largeEntries": [
       {
         "lang": "ruby",
@@ -18,7 +18,7 @@
     ],
     "patchCorpusFilesSHA256": {
       "global-variable-non-ascii.txt": "91cefabe1ebfdd29669c6252884db4d8d72fdec3bcb7d18e3ba9647521d71bc8",
-      "non-ascii-symbol.txt": "d50131d3606167310eba39711a42b2fd23151fea31f8134c45983fbcfff7d264"
+      "non-ascii-symbol.txt": "7143b2037c68013679d3e16acdee1bd8c6c5c1876a2bdc13fdf6afe5b01e8716"
     },
     "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
     "cli": "0.27.2",
@@ -42,10 +42,10 @@
       },
       {
         "file": "patches/ruby/0003-non-ascii-symbol.patch",
-        "sha256": "01098b02462ff58ef8e7a56c5787cb48faa57fb36cebe8e047cbe4ef475e40dc",
+        "sha256": "a5c4dd2d13fd31dcdafe6875e36c2f626081870b5f0f8533e05de7e6ea033650",
         "source": "src/scanner.c",
         "beforeSHA256": "387e6c2306b49962b93d6b571936169e2f1f372a374b48f7548bfa97e0ad508f",
-        "afterSHA256": "b56156c6d706583bfafdf2424c8d7224aaba50b933c587ec0baa671f8190ca11",
+        "afterSHA256": "c4ac893eedc0b57bb2aeac18f36b3b1c5bcbda2fdadb81f80caa3052822cdfbb",
         "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/292"
       }
     ]

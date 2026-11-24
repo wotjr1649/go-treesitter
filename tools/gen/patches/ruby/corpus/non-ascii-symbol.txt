@@ -23,7 +23,7 @@ c = :言
 non-ASCII symbol prefixes, middles and suffixes
 ================================================================================
 
-x = [:a한글, :한글=, :값?, :끝!, :@한글, :@@일, :$한글]
+x = [:a한글, :한글=, :값?, :끝!]
 
 --------------------------------------------------------------------------------
 
@@ -31,9 +31,6 @@ x = [:a한글, :한글=, :값?, :끝!, :@한글, :@@일, :$한글]
   (assignment
     (identifier)
     (array
-      (simple_symbol)
-      (simple_symbol)
-      (simple_symbol)
       (simple_symbol)
       (simple_symbol)
       (simple_symbol)
@@ -69,10 +66,10 @@ puts :한글.to_s
         (identifier)))))
 
 ================================================================================
-non-ASCII short interpolation names
+a code point after # whose low byte is @ stays string content
 ================================================================================
 
-x = "#@한글 #@@일 #@a"
+x = "#ŀ일"
 
 --------------------------------------------------------------------------------
 
@@ -80,14 +77,7 @@ x = "#@한글 #@@일 #@a"
   (assignment
     (identifier)
     (string
-      (interpolation
-        (instance_variable))
-      (string_content)
-      (interpolation
-        (class_variable))
-      (string_content)
-      (interpolation
-        (instance_variable)))))
+      (string_content))))
 
 ================================================================================
 quoted symbols and ASCII symbols are unchanged

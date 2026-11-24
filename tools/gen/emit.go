@@ -420,7 +420,7 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 		}
 		for _, p := range g.Patches {
 			if p.File == "patches/ruby/0003-non-ascii-symbol.patch" {
-				result += "\nThe symbol patch compares whole code points when the scanner reads a `:symbol` name or the name after `#@` and `#@@` in a string, so non-ASCII names such as `:한글` parse as `simple_symbol` and `\"#@한글\"` interpolates the instance variable. Every non-ASCII code point (including non-ASCII white space such as U+3000) is a name character there, as in Ruby; before, only its low byte was tested. Previously error-free trees change where that low byte was ASCII punctuation or white space (see MIGRATING.md). The character after `#` is still read by its low byte (for example `\"#Ĥ!\"`).\n"
+				result += "\nThe symbol patch compares whole code points when the scanner reads a plain `:symbol` name (no `@`, `@@` or `$` prefix and no operator), so non-ASCII names such as `:한글` parse as `simple_symbol`. Every non-ASCII code point (including non-ASCII white space such as U+3000) continues such a name, as in Ruby; before, only its low byte was tested. Variable and operator symbols and the name after `#@` in a string still use the low byte (for example `:@한글`, `\"#@일\"` and `\"#Ĥ!\"`).\n"
 				break
 			}
 		}

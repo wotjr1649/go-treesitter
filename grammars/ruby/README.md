@@ -6,7 +6,7 @@ Generated tree-sitter grammar module for go-treesitter. **Do not edit**: `engine
 - upstream grammar: https://github.com/tree-sitter/tree-sitter-ruby at `ad907a69da0c8a4f7a943a7fe012712208da6dee`
 - tree-sitter runtime: v0.27.2 (unmodified)
 - engine ABI: 4
-- recipe sha256: `e0fcb30ef5c6cf4463c81d3d7b628a3de1723e854bbad99885d72a7dc5dba06e`
+- recipe sha256: `caf980d3e59d4b9f23ab52f2d8ba636f1e33fe012ef24d75f498994b5660876f`
 - identity and output hashes: `provenance.json` (equals the compiled `engine.Identity`; `go test` checks it)
 
 `LICENSE` is the upstream grammar's license. `LICENSES/tree-sitter.txt` is the license of the tree-sitter runtime C translated into `engine_gen.go`. `LICENSES/wasi-libc/` holds the license texts of the wasi-libc code translated into `engine_gen.go` (wasi-libc `2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13`;
@@ -20,6 +20,8 @@ This grammar differs temporarily from upstream under ADR-0023. Applied patches (
 The heredoc patch stores and compares UTF-8 end words, preserving ASCII bytes and distinguishing code points that share a low byte. Invalid lookaheads all compare as 0xFF, distinct from U+FFFD. The 1024-byte scanner state buffer includes all open end words and metadata; overflow loses state (about 330 Hangul syllables total, fewer with other state).
 
 The global-variable patch accepts non-ASCII names such as `$한글`. Previously error-free trees change where an ASCII global name is directly followed by non-ASCII characters (for example `$a한 = 1` or `"#$a한"`): the whole name becomes one `global_variable` (see MIGRATING.md).
+
+The symbol patch compares whole code points when the scanner reads a plain `:symbol` name (no `@`, `@@` or `$` prefix and no operator), so non-ASCII names such as `:한글` parse as `simple_symbol`. Every non-ASCII code point (including non-ASCII white space such as U+3000) continues such a name, as in Ruby; before, only its low byte was tested. Variable and operator symbols and the name after `#@` in a string still use the low byte (for example `:@한글`, `"#@일"` and `"#Ĥ!"`).
 
 - `patches/ruby/0001-heredoc-utf8.patch` changes `src/scanner.c`; upstream defect report: https://github.com/tree-sitter/tree-sitter-ruby/issues/305.
 

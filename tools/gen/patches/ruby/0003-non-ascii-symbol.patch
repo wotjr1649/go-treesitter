@@ -1,40 +1,39 @@
 --- a/src/scanner.c
 +++ b/src/scanner.c
-@@ -346,8 +346,10 @@ static inline bool scan_operator(TSLexer *lexer) {
-     }
+@@ -350,23 +350,34 @@
+     return memchr(&NON_IDENTIFIER_CHARS, c, sizeof(NON_IDENTIFIER_CHARS)) == NULL;
  }
  
--static inline bool is_iden_char(char c) {
--    return memchr(&NON_IDENTIFIER_CHARS, c, sizeof(NON_IDENTIFIER_CHARS)) == NULL;
-+// Compare the whole code point: a non-ASCII one is an identifier character, as in Ruby, never its low byte.
-+static inline bool is_iden_char(int32_t c) {
-+    if (c > 0x7F) return true;
-+    return memchr(&NON_IDENTIFIER_CHARS, (char)c, sizeof(NON_IDENTIFIER_CHARS)) == NULL;
- }
- 
++// A non-ASCII code point continues a plain :symbol name, as in Ruby, instead of its low byte deciding.
++static inline bool is_symbol_name_char(int32_t c, bool plain) {
++    return (plain && c > 0x7F) || is_iden_char((char)c);
++}
++
  static inline bool scan_symbol_identifier(TSLexer *lexer) {
-@@ -360,13 +362,13 @@ static inline bool scan_symbol_identifier(TSLexer *lexer) {
++    // Plain: no @, @@ or $ prefix and no operator. The other forms keep the low-byte test.
++    bool plain = true;
+     if (lexer->lookahead == '@') {
          advance(lexer);
++        plain = false;
+         if (lexer->lookahead == '@') {
+             advance(lexer);
+         }
+     } else if (lexer->lookahead == '$') {
+         advance(lexer);
++        plain = false;
      }
  
 -    if (is_iden_char((char)lexer->lookahead)) {
-+    if (is_iden_char(lexer->lookahead)) {
++    if (is_symbol_name_char(lexer->lookahead, plain)) {
          advance(lexer);
      } else if (!scan_operator(lexer)) {
          return false;
++    } else {
++        plain = false;
      }
  
 -    while (is_iden_char((char)lexer->lookahead)) {
-+    while (is_iden_char(lexer->lookahead)) {
++    while (is_symbol_name_char(lexer->lookahead, plain)) {
          advance(lexer);
      }
  
-@@ -669,7 +671,7 @@ static inline bool scan_short_interpolation(TSLexer *lexer, const bool has_conte
-             if (lexer->lookahead == '@') {
-                 advance(lexer);
-             }
--            is_short_interpolation = is_iden_char((char)lexer->lookahead) && !iswdigit(lexer->lookahead);
-+            is_short_interpolation = is_iden_char(lexer->lookahead) && !iswdigit(lexer->lookahead);
-         }
- 
-         if (is_short_interpolation) {

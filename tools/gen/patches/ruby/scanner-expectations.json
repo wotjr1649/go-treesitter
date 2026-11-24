@@ -40,10 +40,10 @@
         "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/306"
       },
       {
-        "afterSHA256": "b56156c6d706583bfafdf2424c8d7224aaba50b933c587ec0baa671f8190ca11",
+        "afterSHA256": "c4ac893eedc0b57bb2aeac18f36b3b1c5bcbda2fdadb81f80caa3052822cdfbb",
         "beforeSHA256": "387e6c2306b49962b93d6b571936169e2f1f372a374b48f7548bfa97e0ad508f",
         "file": "patches/ruby/0003-non-ascii-symbol.patch",
-        "sha256": "01098b02462ff58ef8e7a56c5787cb48faa57fb36cebe8e047cbe4ef475e40dc",
+        "sha256": "a5c4dd2d13fd31dcdafe6875e36c2f626081870b5f0f8533e05de7e6ea033650",
         "source": "src/scanner.c",
         "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/292"
       }
@@ -53,13 +53,13 @@
     "wasiLibcArchiveSHA256": "2b3e2dca9825487e35a5ed6867c3e226eb021d948c3288b5dbff112b7d362517",
     "wasiLibcCommit": "2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13"
   },
-  "inputsSHA256": "a9b9ae90869b86adef9c53a315ba7169e21cd18d1758ce0c84bb7d348c47c1d0",
+  "inputsSHA256": "b1e28392938a82770b659e7501da28216c3e6c7a4ad265853ccab2ac28235855",
   "comparisons": [
     {
       "patch": "patches/ruby/0001-heredoc-utf8.patch",
       "beforeSourcesSHA256": "e750cb8d3dc245ad42920d6d39cca9ffd869692ecee2cacadf2227e951b6b597",
       "afterSourcesSHA256": "130f157cc2601a963a26db4a4085a73a6bebebe68e3d099b4b08dcf990fb5ae7",
-      "resultsSHA256": "f1c1882854948c26a68818165040807bed57904275184ef183f9ee5a312f2325",
+      "resultsSHA256": "5b0566f86fa760218d90bd1dbab36969d86149a4f64dd3b7308197d45d48d61b",
       "reason": "Preserve complete UTF-8 heredoc end words and avoid low-byte matches that swallow or end a Ruby heredoc early.",
       "retireWhen": "The grammar pin includes the equivalent of tree-sitter-ruby issue 305 and passes the retained heredoc cases.",
       "differences": [
@@ -574,9 +574,9 @@
     {
       "patch": "patches/ruby/0003-non-ascii-symbol.patch",
       "beforeSourcesSHA256": "130f157cc2601a963a26db4a4085a73a6bebebe68e3d099b4b08dcf990fb5ae7",
-      "afterSourcesSHA256": "a8e93886d52d8cf17eff67b62b0f9673e8383ffeba9ec6bee48161b328add141",
-      "resultsSHA256": "bb7a14e9d2c4a6b34d3e932467f9cd7a790f3c2ed8a32b85350125e4e302e454",
-      "reason": "Compare whole code points when the scanner reads a :symbol name or the name after #@ and #@@ in a string (upstream issue 292, adapted from PR 293). The scanner tested only the low byte of each code point, so :일 (U+C77C, low byte '|') and :言 (U+8A00, low byte NUL) ended the symbol early and parsed as an ERROR, and #@일 was not recognized as an interpolation. Every non-ASCII code point, including non-ASCII white space such as U+3000, now continues the name, as in Ruby. All changed inputs are the retained symbol regressions; no pinned corpus case, fuzz seed or kit input changes.",
+      "afterSourcesSHA256": "a4815e0941e4323050e94ee960d3e478b13f57a962ee9ba19b537cd12e872b44",
+      "resultsSHA256": "c90083de86acf846f262f46c0ba030669e2bae74b44904f66066485b77841589",
+      "reason": "Compare whole code points when the scanner reads a plain :symbol name, one with no @, @@ or $ prefix and no operator (upstream issue 292, adapted from PR 293). The scanner tested only the low byte of each code point, so :일 (U+C77C, low byte '|') and :言 (U+8A00, low byte NUL) ended the symbol early and parsed as an ERROR. Every non-ASCII code point, including non-ASCII white space such as U+3000, now continues such a name, as in Ruby. Operator and variable symbols (:+일, :@일?, :@한글) and the name after #@ in a string keep the low-byte test, so the retained negative regressions stay unchanged. All changed inputs are retained symbol regressions that were error trees before; no pinned corpus case, fuzz seed, kit input or clean tree changes.",
       "retireWhen": "The grammar pin includes the equivalent of tree-sitter-ruby issue 292's symbol scanning fix (PR 293) and passes the retained symbol regression cases.",
       "differences": [
         {
@@ -685,28 +685,6 @@
           }
         },
         {
-          "id": "regression/short-interpolation-names",
-          "bytes": 26,
-          "sha256": "b020c944a8df26056de47dbb1cd27d4e58706b00e7853d2bad2b8798e3f5c836",
-          "before": {
-            "status": "tree",
-            "tree": {
-              "has_error": false,
-              "root_end": 26,
-              "dump_sha256": "e8d6b22644181f18376a6083dc11b8c33f93f9bb925717983895beb0cd10ac55"
-            }
-          },
-          "after": {
-            "status": "tree",
-            "tree": {
-              "has_error": false,
-              "root_end": 26,
-              "dump_sha256": "bdea55d8511aeac15e4860042348ec66d97abe7e86a504930d1e35460f2dd742"
-            }
-          },
-          "review": "A clean baseline changes to another clean tree: #@일 and #@@한글 are now interpolations of an instance and a class variable, as Ruby evaluates them; the unpatched scanner read the low byte of 일 (U+C77C) and of 한 (U+D55C) as '|' and a backslash and kept the text as string_content."
-        },
-        {
           "id": "regression/upstream-samples",
           "bytes": 15,
           "sha256": "64e1df59aaa8dd9a67b48ffd711b592a43338c90d1ac736770dcadcb0ed6d10b",
@@ -724,27 +702,6 @@
               "has_error": false,
               "root_end": 15,
               "dump_sha256": "4c0bae6fe8e3976543f51baa0797e74d0efde47119d47494fcf5db0557b18423"
-            }
-          }
-        },
-        {
-          "id": "regression/variable-symbols",
-          "bytes": 33,
-          "sha256": "f6c3b26495b8ae4a27ad8e21a96aaab3a11c0378be93daa29ece344dba33762a",
-          "before": {
-            "status": "tree",
-            "tree": {
-              "has_error": true,
-              "root_end": 33,
-              "dump_sha256": "4294fa027d2f935c0a70b455f9242877d331f6b0fed0d0dfdba10a749f451369"
-            }
-          },
-          "after": {
-            "status": "tree",
-            "tree": {
-              "has_error": false,
-              "root_end": 33,
-              "dump_sha256": "92d830ada965bc10db48dee6a88823c9636e24510a6e24622f489272d631c0ac"
             }
           }
         }
