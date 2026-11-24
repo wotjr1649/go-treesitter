@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "grammar": "xml",
+  "identity": {
+    "cSymbol": "tree_sitter_xml",
+    "cli": "0.27.2",
+    "cliArchivesSHA256": {
+      "darwin-arm64": "5a08b66e5713b0c69691611250b2191d07139647a3c6e39ba85954284b634d2d",
+      "linux-amd64": "7ed56d152c52437397b9fcaa43cf341f49933cecc1ca291843f0d347c6e2cb3a",
+      "linux-arm64": "34fcc5c4fa7bdd2058a2a45a03b6eb9a49b03a93b6d52ec750f99b1516d98d33",
+      "windows-amd64": "230779ee4a729e3044d4a8ed57490b776ea1bac0671d12afbd6f5b4d1878f1d0"
+    },
+    "compileFlags": [
+      "-std=c11",
+      "-fsigned-char",
+      "-DNDEBUG",
+      "-O2"
+    ],
+    "generateFrom": "",
+    "grammarArchiveSHA256": "1b7611ba3f2af55768acfbfbaf2fd2eb404ba61b14a85056d4f8d8326fc55146",
+    "grammarCommit": "5000ae8f22d11fbe93939b05c1e37cf21117162d",
+    "grammarDir": "xml/src",
+    "nativeDriverSourcesSHA256": "a1c9a3aaa1637e554c16285d8b9710de162bb2ba8440d4e20ecaec3c1d47fdca",
+    "npmDependencies": null,
+    "patches": [
+      {
+        "afterSHA256": "5773ce849dd6292d8094583c3ff86b5880b719b0b2a57bfcfb9c813c09472467",
+        "beforeSHA256": "208d0786c7a105b19d1ff4949725f733808348902ad25aaeffa21a2400913b56",
+        "file": "patches/xml/0001-non-ascii-names.patch",
+        "sha256": "1c33b03b78c8ba4d91583d0fed319665c1b197be928e6c378e1d3c1b3abd77a9",
+        "source": "common/common.mjs",
+        "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-xml/issues/40"
+      },
+      {
+        "afterSHA256": "6df7868460a4d92a9ea47cccb03cb41426e275aee7db6ce0f577a72b43957f06",
+        "beforeSHA256": "c49be7a88f5bc0feee512ce704dc05b1fd53c20f2110a46fb987bd93509ef806",
+        "file": "patches/xml/0002-tag-name-code-points.patch",
+        "sha256": "c9a26eb27f0479bffa7367b1679c656815f922f7d99f18e5be8e81caf754b1fb",
+        "source": "xml/src/scanner.c",
+        "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-xml/issues/40"
+      }
+    ],
+    "runtimeArchiveSHA256": "9f33b10babb69ef84ac700731a11795b13a4b404dafaa8064e7acbf005fd0732",
+    "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "wasiLibcArchiveSHA256": "2b3e2dca9825487e35a5ed6867c3e226eb021d948c3288b5dbff112b7d362517",
+    "wasiLibcCommit": "2e6fb9d8ee0cdf9e431fbcabe8af3115de000a13"
+  },
+  "inputsSHA256": "a3a92226f6e655ad37681970bbdeeb0338e94f646b6ea3995f133af4b85fb221",
+  "comparisons": [
+    {
+      "patch": "patches/xml/0002-tag-name-code-points.patch",
+      "beforeSourcesSHA256": "bf03b2d4fb46f4de62dc94fc5846fbe8d9f52f595169a796bd32959f5a457119",
+      "afterSourcesSHA256": "86b71e66aaf37a88e918672f35119df0e60bb532e55a406ab9d9d1a3111dd320",
+      "resultsSHA256": "c8d5107ee37aa6d312d73b477eb430b78de9ca9510137e9cc063440a9e9f7cb1",
+      "reason": "Compare complete tag names. The scanner stored each name code point as one byte, so an end tag whose name shares the low byte of every start-tag code point (for example U+AD41 against U+AC41, or ASCII A against U+AC41) closed the element without an error; UTF-8 bytes keep such names distinct, and identical names, including all-ASCII ones, compare as before.",
+      "retireWhen": "The grammar pin includes the equivalent of tree-sitter-xml issue 40's tag-name comparison fix and passes the retained low-byte mismatch cases.",
+      "differences": [
+        {
+          "id": "regression/low-byte-mismatch",
+          "bytes": 18,
+          "sha256": "b6c286fbc013a3b8c3158dd57033888565e62ac4856bcf97cc21ff2eb0f42c94",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 18,
+              "dump_sha256": "45328da4fb016cacd52269648048f6e555e633b8686405f1768013d6de5a7c72"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 18,
+              "dump_sha256": "0ca3027dfc02a60cca79f103c0ad897f3df3c9bd28b9be3148c5eadcc3e203f1"
+            }
+          },
+          "review": "The end tag </x굁> (U+AD41) no longer closes <x걁> (U+AC41), so the mismatched pair is an ERROR instead of a clean element, as the ASCII twin <xa>body</xb> already is."
+        },
+        {
+          "id": "regression/low-byte-mismatch-ascii",
+          "bytes": 16,
+          "sha256": "68367d9f0dbeb5e5bd161bce4fe1841ecc82f81fb20542514ba19c3f14888ec3",
+          "before": {
+            "status": "tree",
+            "tree": {
+              "has_error": false,
+              "root_end": 16,
+              "dump_sha256": "530fa93d68053518079a2192503039bd0d12bbb19f05373680bf074f632755c4"
+            }
+          },
+          "after": {
+            "status": "tree",
+            "tree": {
+              "has_error": true,
+              "root_end": 16,
+              "dump_sha256": "dab503dbf837ac6503c0bbf5dd72be003f6a1b2ed40498281d1bbc5b9765715e"
+            }
+          },
+          "review": "The ASCII end tag </xA> no longer closes <x걁> (U+AC41), so the mismatched pair is an ERROR instead of a clean element, as the ASCII twin <xa>body</xb> already is."
+        }
+      ]
+    }
+  ]
+}

@@ -416,3 +416,22 @@ The development tree moves from `a1d4a7b` to `fef1236` in the same tier-3 upstre
 and code that assume at most one `error` field on `catch_block`; use `ChildrenByFieldName("error")`
 when collecting the patterns. See the [upstream change](https://github.com/alex-pinkus/tree-sitter-swift/commit/fef1236022ccde2d2bc5c32d4db8947c87a7f848)
 and the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-swift-fef1236).
+
+### XML names and tag names
+
+Two temporary ADR-0023 patches carry [upstream issue #40](https://github.com/tree-sitter-grammars/tree-sitter-xml/issues/40).
+Node types and fields are unchanged.
+
+- **Non-ASCII names.** The `Name` token now follows the XML 1.0 NameStartChar and NameChar ranges, so `<a 속성="1"/>`
+  and `<a xmlns:접두="u"/>` parse with an `Attribute` whose `Name` is the whole attribute name, in place of an
+  `ERROR`. The same token serves DOCTYPE, DTD and entity names (`&이름;` is an `EntityRef`). A name still cannot
+  start with `:`. These inputs gave error trees before, so no previously error-free tree changes here.
+- **Tag-name comparison.** The scanner now compares complete tag names. An end tag whose name differs from the start
+  tag only above the low byte of each code point (`<x걁>body</x굁>`, `<x걁>body</xA>`) used to close the element
+  and parse without an error; it is now an `ERROR`, like `<xa>body</xb>`. Queries and code that matched the
+  `element` of such a mismatched pair no longer see it. Matching pairs, including all-ASCII ones, are unchanged.
+  Tag names are kept as UTF-8 bytes in the scanner's 1024-byte state with a 255-byte limit per name. After an
+  incremental edit, a name longer than 85 Hangul syllables or about 63 open elements with five-syllable Hangul names
+  can lose that state, and an end tag then reports an `ERROR`; before, such names used one byte per character.
+
+The pinned upstream XML queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-xml-name-patches)).

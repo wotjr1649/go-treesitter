@@ -616,6 +616,24 @@
       },
       "licenseSHA256": "3297073719030b7261afd78b7267931ccc03a27f7a65ca6fc644316180f71bf6",
       "cSymbol": "tree_sitter_xml",
+      "patches": [
+        {
+          "file": "patches/xml/0001-non-ascii-names.patch",
+          "sha256": "1c33b03b78c8ba4d91583d0fed319665c1b197be928e6c378e1d3c1b3abd77a9",
+          "source": "common/common.mjs",
+          "beforeSHA256": "208d0786c7a105b19d1ff4949725f733808348902ad25aaeffa21a2400913b56",
+          "afterSHA256": "5773ce849dd6292d8094583c3ff86b5880b719b0b2a57bfcfb9c813c09472467",
+          "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-xml/issues/40"
+        },
+        {
+          "file": "patches/xml/0002-tag-name-code-points.patch",
+          "sha256": "c9a26eb27f0479bffa7367b1679c656815f922f7d99f18e5be8e81caf754b1fb",
+          "source": "xml/src/scanner.c",
+          "beforeSHA256": "c49be7a88f5bc0feee512ce704dc05b1fd53c20f2110a46fb987bd93509ef806",
+          "afterSHA256": "6df7868460a4d92a9ea47cccb03cb41426e275aee7db6ce0f577a72b43957f06",
+          "upstreamReport": "https://github.com/tree-sitter-grammars/tree-sitter-xml/issues/40"
+        }
+      ],
       "regenerate": true
     },
     "ruby": {

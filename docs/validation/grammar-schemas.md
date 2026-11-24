@@ -539,3 +539,18 @@ from the archived `src/grammar.json`. The candidate's archived and generated sch
 Both schemas pass the strict check with zero findings. The static diff records one
 `FIELD_MULTIPLE_CHANGED` / `CARDINALITY_WIDENED` change. The `catch_block.error` field changes from
 `multiple: false` to `multiple: true`. See the [Swift migration notes](../../MIGRATING.md#swift-grammar-fef1236).
+
+## Unreleased (after v0.6.0): XML name patches
+
+At XML pin `5000ae8f22d1`, the strict check of the regenerated `node-types.json` passes with zero findings, and
+it has the same 17444 bytes and SHA-256 `3b63e111187a0f9b2282e1748db2dd6b10e968f0cdb3676772def93bf89f2a7b` as the
+archived upstream file (E1, CLI 0.27.2). The strict diff reports no changes. The patches change `Name` matching and
+tag-name comparison, not node types.
+Against the unpatched native build, the 16 pinned upstream corpus cases, 60 seeded edits and the pinned large input
+(wayland.xml) are byte-identical; four patch-corpus cases and their edits are added, and two of them (Hangul and other
+non-ASCII attribute, namespace and entity names) change from error trees to clean trees. In the
+scanner comparison over 43 inputs, only the two regression inputs `<x걁>body</x굁>` and `<x걁>body</xA>` change,
+from a clean element to an `ERROR` (E4, Windows amd64). This is a breaking tree change under ADR-0023 amendment
+item 5 for those inputs only. The pinned upstream `highlights.scm` compiled, and the query lane matched the patched
+native reference on 220 raw query/input comparisons with no mismatch (E5, Windows amd64).
+[Migration notes](../../MIGRATING.md#xml-names-and-tag-names)

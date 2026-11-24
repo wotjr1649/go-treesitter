@@ -143,7 +143,7 @@ func TestScannerJSONAndInputs(t *testing.T) {
 	corpus := t.TempDir()
 	scannerTestWrite(t, filepath.Join(corpus, "test.in"), []byte("é\r\n"))
 	conformance := filepath.Join("..", "..", "conformance")
-	for _, lang := range []string{"rust", "javascript", "bash", "ruby", "postgres", "yaml", "python"} {
+	for _, lang := range []string{"rust", "javascript", "xml", "bash", "ruby", "postgres", "yaml", "python"} {
 		t.Run(lang, func(t *testing.T) {
 			inputs, err := scannerInputs(lang, corpus, filepath.Join(conformance, "fuzz_test.go"), filepath.Join(conformance, "testdata"))
 			if err != nil {

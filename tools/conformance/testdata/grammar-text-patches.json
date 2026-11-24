@@ -19,6 +19,19 @@
     {"name":"ascii-prefix-short-interpolation","source":"x = \"#$a한\"\n","nodes":["assignment x = \"#$a한\"","global_variable $a한"]},
     {"name":"special-globals","source":"p $0, $1, $10, $!, $~, $-w, $stdout\n","nodes":["global_variable $0","global_variable $1","global_variable $10","global_variable $!","global_variable $~","global_variable $-w","global_variable $stdout"]}
   ],
+  "xml": [
+    {"name":"hangul-attribute","source":"<a 속성=\"1\"/>\n","nodes":["element <a 속성=\"1\"/>","Attribute 속성=\"1\""]},
+    {"name":"hangul-xmlns-prefix","source":"<a xmlns:접두=\"u\"/>\n","nodes":["element <a xmlns:접두=\"u\"/>","Attribute xmlns:접두=\"u\""]},
+    {"name":"prefixed-names","source":"<접두:a 접두:속성='v'>값</접두:a>\n","nodes":["element <접두:a 접두:속성='v'>값</접두:a>","Attribute 접두:속성='v'"]},
+    {"name":"other-scripts","source":"<a é=\"1\" 日本語=\"2\" 𠀀=\"3\"/>\n","nodes":["element <a é=\"1\" 日本語=\"2\" 𠀀=\"3\"/>","Attribute é=\"1\"","Attribute 日本語=\"2\"","Attribute 𠀀=\"3\""]},
+    {"name":"entity-name","source":"<!DOCTYPE 문서 [\n<!ENTITY 이름 \"값\">\n]>\n<문서>&이름;</문서>\n","nodes":["element <문서>&이름;</문서>","EntityRef &이름;"]},
+    {"name":"ascii-attribute-names","source":"<a b-c.d:e_f1=\"1\" _g=\"2\" h·i=\"3\"/>\n","nodes":["element <a b-c.d:e_f1=\"1\" _g=\"2\" h·i=\"3\"/>","Attribute b-c.d:e_f1=\"1\"","Attribute _g=\"2\"","Attribute h·i=\"3\""]},
+    {"name":"hangul-tag-pair","source":"<x걁>body</x걁>\n","nodes":["element <x걁>body</x걁>"]},
+    {"name":"low-byte-mismatch","source":"<x걁>body</x굁>\n","nodes":[],"errors":["ERROR <x걁>body</x굁>\n"]},
+    {"name":"low-byte-mismatch-ascii","source":"<x걁>body</xA>\n","nodes":[],"errors":["ERROR <x걁>body</xA>\n"]},
+    {"name":"hangul-mismatch","source":"<x한>body</x글>\n","nodes":[],"errors":["ERROR <x한>body</x글>\n"]},
+    {"name":"ascii-mismatch","source":"<xa>body</xb>\n","nodes":[],"errors":["ERROR <xa>body</xb>\n"]}
+  ],
   "rust": [
     {"name":"hangul-delimiters","source":"/* 갪갯 */","nodes":["block_comment /* 갪갯 */"]},
     {"name":"han-delimiters","source":"/*是个*/","nodes":["block_comment /*是个*/"]},

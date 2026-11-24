@@ -32,6 +32,7 @@ func TestScannerPatchesGrammarText(t *testing.T) {
 		"rust":       {"block_comment", "inner_doc_comment_marker", "outer_doc_comment_marker", "doc_comment", "line_comment", "let_declaration", "function_item"},
 		"javascript": {"jsx_text", "html_character_reference", "string", "binary_expression"},
 		"html":       {"text", "entity", "attribute_value"},
+		"xml":        {"element", "Attribute", "EntityRef"},
 	}
 	for _, lang := range langs(t) {
 		if len(kinds[lang]) == 0 {

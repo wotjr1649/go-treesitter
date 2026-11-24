@@ -32,13 +32,6 @@
       "ProvenanceSHA256": "f3b60d9456262b53ac0bcc202d150ceff725879e4b12b4e91e34a417a129891f",
       "PatchCount": 0
     },
-    "xml": {
-      "Name": "XML",
-      "Commit": "5000ae8f22d11fbe93939b05c1e37cf21117162d",
-      "PinSHA256": "0367e2b839cccbb01756ff178acf69b44f6d7cda95ce8f91f8799726d65095bb",
-      "ProvenanceSHA256": "f5e7357dbd13bc4a377bfff038a17794cb3b7ca69fc7d16eea8a97d8df0f7833",
-      "PatchCount": 0
-    },
     "html": {
       "Name": "HTML",
       "Commit": "73a3947324f6efddf9e17c0ea58d454843590cc0",
@@ -283,58 +276,6 @@
         }
       ],
       "Upstream": "https://github.com/airbus-cert/tree-sitter-powershell/issues/70"
-    },
-    {
-      "ID": "xml-non-ascii-attribute-name",
-      "Grammar": "xml",
-      "Input": "<a 속성=\"1\"/>\n",
-      "InputSHA256": "139be011e1c15c050238fa61f3dec2db1ddcb0203211c724545850540e6d92e3",
-      "DumpSHA256": "4eb87bb3ff40d1b9dd8e8e84a4bfd34fc20ab6fd5e17fb1e87e3747e80baf849",
-      "Observed": "The root has errors: an ERROR over the attribute [3,13) replaces the Attribute node. The Name regex is [a-zA-Z_][a-zA-Z0-9_:.·-]*; element names with Hangul parse because the external scanner reads them, attribute names do not.",
-      "Expected": "An Attribute whose Name is 속성: NameStartChar includes U+3001-U+D7FF and NameChar continues with the same ranges.",
-      "Specs": [
-        {
-          "Title": "XML 1.0 (Fifth Edition): Names and Tokens",
-          "URL": "https://www.w3.org/TR/xml/#NT-NameStartChar"
-        }
-      ],
-      "Upstream": "https://github.com/tree-sitter-grammars/tree-sitter-xml/issues/40"
-    },
-    {
-      "ID": "xml-non-ascii-namespace-prefix",
-      "Grammar": "xml",
-      "Input": "<a xmlns:접두=\"u\"/>\n",
-      "InputSHA256": "fc57295ceda51575cf2bd7a888411a60d7ed9cdb4ee414cb5021760f5889596e",
-      "DumpSHA256": "fa9d64054a422ab64209949368e3b2a2efb1a08412b8e52bed029f9c1762530e",
-      "Observed": "The root has errors: an ERROR over the namespace declaration [9,15) replaces the prefix after xmlns:. The prefix is matched by the ASCII-only Name regex.",
-      "Expected": "A namespace declaration attribute xmlns:접두: a prefix is an NCName, whose first character may be any NameStartChar except the colon, including Hangul.",
-      "Specs": [
-        {
-          "Title": "Namespaces in XML 1.0: Attribute Names for Namespace Declaration",
-          "URL": "https://www.w3.org/TR/xml-names/#NT-NSAttName"
-        },
-        {
-          "Title": "Namespaces in XML 1.0: NCName",
-          "URL": "https://www.w3.org/TR/xml-names/#NT-NCName"
-        }
-      ],
-      "Upstream": "https://github.com/tree-sitter-grammars/tree-sitter-xml/issues/40"
-    },
-    {
-      "ID": "xml-hangul-tag-low-byte-mismatch",
-      "Grammar": "xml",
-      "Input": "<x걁>body</x굁>\n",
-      "InputSHA256": "b6c286fbc013a3b8c3158dd57033888565e62ac4856bcf97cc21ff2eb0f42c94",
-      "DumpSHA256": "45328da4fb016cacd52269648048f6e555e633b8686405f1768013d6de5a7c72",
-      "Observed": "The root has no error: </x굁> (U+AD41) closes <x걁> (U+AC41) and the document parses as one element. The scanner stores each tag-name code point as one signed byte, so names whose code points share the low byte 0x41 compare equal; </xA> closes <x걁> as well. The ASCII twin <xa>body</xb> is an ERROR, as is <x한>body</x글>.",
-      "Expected": "An end-tag name must equal the name in the start tag. </x굁> does not match <x걁>, so the input is not well-formed and must produce an error, as the ASCII twin does.",
-      "Specs": [
-        {
-          "Title": "XML 1.0 (Fifth Edition): Element Type Match",
-          "URL": "https://www.w3.org/TR/xml/#GIMatch"
-        }
-      ],
-      "Upstream": "https://github.com/tree-sitter-grammars/tree-sitter-xml/issues/40"
     },
     {
       "ID": "html-hangul-tag-low-byte-mismatch",
