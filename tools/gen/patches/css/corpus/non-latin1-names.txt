@@ -1,0 +1,212 @@
+================================================================================
+Hangul class selector
+================================================================================
+
+.한글 { a: b }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier))))
+    (block
+      (declaration
+        (property_name)
+        (plain_value)))))
+
+================================================================================
+Names in selectors and custom properties
+================================================================================
+
+한글태그#아이디[data-한글="값"] {
+  --변수: 1px;
+  width: var(--변수);
+}
+@keyframes 이름 { from { a: b } }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (attribute_selector
+        (id_selector
+          (tag_name)
+          (id_name))
+        (attribute_name)
+        (string_value
+          (string_content))))
+    (block
+      (declaration
+        (property_name)
+        (integer_value
+          (unit)))
+      (declaration
+        (property_name)
+        (call_expression
+          (function_name)
+          (arguments
+            (plain_value))))))
+  (keyframes_statement
+    (keyframes_name)
+    (keyframe_block_list
+      (keyframe_block
+        (from)
+        (block
+          (declaration
+            (property_name)
+            (plain_value)))))))
+
+================================================================================
+Mixed scripts and an escape in a class name
+================================================================================
+
+.기본𠀀-état\+한글2, .ascii_2 {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier)
+          (escape_sequence)
+          (identifier)))
+      (class_selector
+        (class_name
+          (identifier))))
+    (block)))
+
+================================================================================
+Pinned class name syntax
+================================================================================
+
+.ascii_2, .café, .a\+b {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (class_selector
+        (class_name
+          (identifier)))
+      (class_selector
+        (class_name
+          (identifier)))
+      (class_selector
+        (class_name
+          (identifier)
+          (escape_sequence)
+          (identifier))))
+    (block)))
+
+================================================================================
+Hangul class descendant selector
+================================================================================
+
+.한 .글 {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (descendant_selector
+        (class_selector (class_name (identifier)))
+        (class_selector (class_name (identifier)))))
+    (block)))
+
+================================================================================
+Hangul type in child selector
+================================================================================
+
+a > 한글 {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors (child_selector (tag_name) (tag_name)))
+    (block)))
+
+================================================================================
+Hangul type in selector list
+================================================================================
+
+a, 한글 {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors (tag_name) (tag_name))
+    (block)))
+
+================================================================================
+Nested Hangul descendant selector
+================================================================================
+
+.a { 한글 .b {} }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors (class_selector (class_name (identifier))))
+    (block
+      (rule_set
+        (selectors
+          (descendant_selector
+            (tag_name)
+            (class_selector (class_name (identifier)))))
+        (block)))))
+
+================================================================================
+Emoji after descendant whitespace
+================================================================================
+
+.a 🙂 {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors (class_selector (class_name (identifier))))
+    (ERROR (ERROR))
+    (block)))
+
+================================================================================
+Connector punctuation after descendant whitespace
+================================================================================
+
+.a ‿x .b {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors
+      (descendant_selector
+        (class_selector (class_name (identifier)))
+        (ERROR (ERROR))
+        (class_selector (class_name (identifier)))))
+    (block)))
+
+================================================================================
+Join control after descendant whitespace
+================================================================================
+
+.a ‌x {}
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors (class_selector (class_name (identifier))))
+    (ERROR (ERROR))
+    (block)))
