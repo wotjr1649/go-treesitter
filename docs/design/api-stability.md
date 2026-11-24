@@ -274,9 +274,10 @@ The package documentation already marks this API experimental.
 
 ## Decisions before RC
 
-- Confirm the classification of the full inventory and whether to deprecate any exports before 1.0.
-  The current inventory assigns every consumer export in the root package to STABLE and has no
-  DEPRECATE-BEFORE-1.0 candidates.
+- **Decided 2026-11-25.** The inventory classification stands: every consumer export in the root
+  package is STABLE, with no DEPRECATE-BEFORE-1.0 candidates. The five `experimental/match` exports
+  stay EXPERIMENTAL after 1.0, outside the 1.x compatibility promise, until their nil and zero-snapshot
+  handling, snapshot direction rules and match semantics are specified.
 - **Decided 2026-11-25.** The contract covers documented hash equality and comparison scope,
   error classification, and diagnostic fields. Numeric subtree hashes and message text may change
   in any release. [Compatibility rules](#compatibility-rules) · [Go guidance on error APIs](https://go.dev/blog/go1.13-errors#errors-and-package-apis)
