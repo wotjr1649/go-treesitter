@@ -127,8 +127,8 @@ class GeneratorGateTest(unittest.TestCase):
         grammar = {"upstreamTestException": {
             "cli": "0.27.2", "step": "tree-sitter test: queries/outline.scm -> test/outline/outline.swift",
             "reason": "owner approved", "retireWhen": "CLI pin move"}}
-        result = {"parse_results": [{"name": str(n), "outcome": "Passed"} for n in range(312)],
-                  "parse_stats": {"successful_parses": 312, "total_parses": 312}, "parse_failures": [],
+        result = {"parse_results": [{"name": str(n), "outcome": "Passed"} for n in range(313)],
+                  "parse_stats": {"successful_parses": 313, "total_parses": 313}, "parse_failures": [],
                   "highlight_results": [{"name": str(n), "outcome": {"AssertionPassed": {}}} for n in range(8)],
                   "query_results": [{"name": "outline", "children": []}]}
         raw = "Error: Query compilation failed\n\nCaused by:\n    Query error at 1:1. Invalid syntax:\n    import Foundation\n    ^\n"
@@ -142,7 +142,7 @@ class GeneratorGateTest(unittest.TestCase):
                 self.assertTrue(gate.swift_query_exception(args, pins, grammar, 1, result, raw, root, root, report, {}))
                 self.assertTrue(report["upstreamTestExceptionMatches"])
                 self.assertEqual(report["upstreamOutlineQueryExit"], 0)
-            for label in ("fixed", "new-cli", "signature", "extra-error", "corpus", "skip", "highlight", "query"):
+            for label in ("fixed", "new-cli", "signature", "extra-error", "old-corpus-count", "corpus", "skip", "highlight", "query"):
                 changed = copy.deepcopy(result)
                 changed_pins = copy.deepcopy(pins)
                 code, log = 1, raw
@@ -150,6 +150,9 @@ class GeneratorGateTest(unittest.TestCase):
                 if label == "new-cli": changed_pins["tools"]["treeSitterCLI"] = "0.27.3"
                 if label == "signature": log = raw.replace("Foundation", "NewFailure")
                 if label == "extra-error": log += "new failure"
+                if label == "old-corpus-count":
+                    changed["parse_results"].pop()
+                    changed["parse_stats"] = {"successful_parses": 312, "total_parses": 312}
                 if label == "corpus": changed["parse_failures"] = [{"name": "emoji"}]
                 if label == "skip": changed["parse_results"][0]["outcome"] = "Skipped"
                 if label == "highlight": changed["highlight_results"][0]["outcome"] = "Failed"

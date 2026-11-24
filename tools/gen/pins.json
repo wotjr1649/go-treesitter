@@ -762,18 +762,18 @@
       "reference": "none",
       "regenerate": true,
       "repo": "https://github.com/alex-pinkus/tree-sitter-swift",
-      "commit": "a1d4a7b80260bf960f9e25198cddecbe5e6c46aa",
-      "extractDir": "tree-sitter-swift-a1d4a7b8",
-      "archive": "tree-sitter-swift-a1d4a7b8.tar.gz",
-      "archiveSHA256": "6c6850eb5a98cd81f223f07bf0a19ee616e73226d66ab5267d90c006781cacb9",
-      "archiveURL": "https://codeload.github.com/alex-pinkus/tree-sitter-swift/tar.gz/a1d4a7b80260bf960f9e25198cddecbe5e6c46aa",
+      "commit": "fef1236022ccde2d2bc5c32d4db8947c87a7f848",
+      "extractDir": "tree-sitter-swift-fef12360",
+      "archive": "tree-sitter-swift-fef12360.tar.gz",
+      "archiveSHA256": "121cddea55b524c2a6dc4b29efe56ccea756d42a52dee88d9700e4377c077d48",
+      "archiveURL": "https://codeload.github.com/alex-pinkus/tree-sitter-swift/tar.gz/fef1236022ccde2d2bc5c32d4db8947c87a7f848",
       "grammarDir": "src",
       "dirs": [
         "src",
         "grammar.js",
         "tree-sitter.json"
       ],
-      "treeSHA256": "772c7ca85ce72b53a22e9547d3321bd91197867d5b4c6263e8e6689b9e61b323",
+      "treeSHA256": "6828413c9d97505cd262c8bcd33589873567ad32cfa59e1646e3d024835aed5a",
       "files": {
         "scanner.c": "f054430c6a1eb29ef2ca779a9c2103466236a1fc0f44bc64f82d353ddd723946"
       },
@@ -783,7 +783,7 @@
       "upstreamTestException": {
         "cli": "0.27.2",
         "step": "tree-sitter test: queries/outline.scm -> test/outline/outline.swift",
-        "reason": "Owner-approved 2026-11-17: CLI query runner uses the Swift input path as the query path; corpus 312/312 and the explicit outline query must pass.",
+        "reason": "Owner-approved 2026-11-17: CLI query runner uses the Swift input path as the query path; corpus 313/313 and the explicit outline query must pass.",
         "retireWhen": "On a CLI pin move, rerun the full suite; remove this exception only after the fixed CLI runs the outline query correctly. Update the generator gate's failure signature when the Swift grammar pin moves."
       }
     }

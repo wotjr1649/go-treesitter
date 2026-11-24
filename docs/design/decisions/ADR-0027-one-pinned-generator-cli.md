@@ -78,8 +78,9 @@ fallback under native QuickJS, which omits the emoji patterns when evaluating th
 
 The owner accepts one upstream-test exception: CLI 0.27.2's
 `tree-sitter test` query runner uses `test/outline/outline.swift` as the query path instead of `queries/outline.scm`.
-The gate retains full-suite exit 1 and `Query compilation failed` / `Invalid syntax: import Foundation`, requires
-312/312 corpus cases and all eight highlight cases to pass, and additionally runs the correct command:
+The v0.6.0 gate retained full-suite exit 1 and `Query compilation failed` / `Invalid syntax: import Foundation`,
+with 312/312 corpus cases and all eight highlight cases passing. On a Swift pin move, update the exact signature
+using a run in which the entire pinned corpus and highlight suite pass. The gate also runs:
 `tree-sitter query queries/outline.scm test/outline/outline.swift`. That command must succeed. No corpus exclusion,
 expected-tree change or grammar patch is accepted. A new failure, stale signature or CLI pin change fails the
 exception check. When the CLI pin moves to a fixed version, rerun the full suite and remove this exception after

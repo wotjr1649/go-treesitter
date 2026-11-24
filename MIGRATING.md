@@ -406,3 +406,13 @@ nodes and highlight captures. `preproc_if`, `preproc_elif` and `preproc_else` ga
 The [schema register](docs/validation/grammar-schemas.md#v060-c-v0240) records the additions,
 and [upstream's release notes](https://github.com/tree-sitter/tree-sitter-c-sharp/releases/tag/v0.24.0)
 list the parsing fixes. The four [C# known gaps](docs/known-gaps/csharp.md) still apply.
+
+## Unreleased (after v0.6.0)
+
+### Swift grammar fef1236
+
+The development tree moves from `a1d4a7b` to `fef1236` in the same tier-3 upstream. A single
+`catch_block` can now contain comma-separated patterns with individual `where` clauses. Review queries
+and code that assume at most one `error` field on `catch_block`; use `ChildrenByFieldName("error")`
+when collecting the patterns. See the [upstream change](https://github.com/alex-pinkus/tree-sitter-swift/commit/fef1236022ccde2d2bc5c32d4db8947c87a7f848)
+and the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-swift-fef1236).

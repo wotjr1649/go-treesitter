@@ -438,7 +438,7 @@ Swift reads the unmodified upstream-committed `src/grammar.json` (including emoj
 `generateFromSHA256` identify the selected input before generation; the full input-tree hash is retained.
 The sole owner-approved upstream-test exception is the CLI 0.27.2 outline query-path defect, recorded in
 `pins.json` separately from generator exceptions. The original full-suite exit 1 and raw log are retained.
-The gate requires all 312 corpus cases and eight highlight cases to pass, matches the exact query error, then
+The gate requires all 313 corpus cases and eight highlight cases to pass, matches the exact query error, then
 runs `tree-sitter query queries/outline.scm test/outline/outline.swift`; any other failure fails the gate.
 A CLI pin move invalidates the exception; retire it after the fixed CLI passes the full suite.
 The absent reference is not a pass for the remaining checks. The CLI generation takes about a second

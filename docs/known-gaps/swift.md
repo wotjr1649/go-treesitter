@@ -10,12 +10,12 @@ Initial E5 evidence: Windows native reference differential (windows/amd64), base
 Only the exact inputs below are covered. `TestKnownGaps` rechecks engine dumps (E3) and, with a freshly built
 `TSG_NATIVE_EXE_DIR`, compares them byte-for-byte with native C (E5). CI requires that comparison.
 
-Identity: grammar `a1d4a7b80260bf960f9e25198cddecbe5e6c46aa`; runtime `v0.27.2`; grammar patches: 0.
+Identity: grammar `fef1236022ccde2d2bc5c32d4db8947c87a7f848`; runtime `v0.27.2`; grammar patches: 0.
 The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`pins.json`](../../tools/gen/pins.json),
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/swift/provenance.json).
 
-- Source identity SHA-256: `40352a892de6474434464c097d8fac4a30c1851a238faa20a870c534993c65b0`
-- Module provenance SHA-256: `81cacc75d8f1cf8fe73560965db551448f6dc549ca8931cc6563a92b0b9edcf2`
+- Source identity SHA-256: `9b2bbb6f6acb4150147c21ccd2ddb2e38a4c24aaa189432f0ce1442b6ec2731f`
+- Module provenance SHA-256: `7bbd1af7cf6ff5a8df77af34dc94e6133620939eaea27b2e9e8ead6040dc66cb`
 
 ## swift-non-ascii-statement-label
 

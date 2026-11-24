@@ -433,8 +433,8 @@ def swift_query_exception(args, pins, grammar, code, result, raw, cwd, root, rep
     matched = (args.lang == "swift" and pins["tools"]["treeSitterCLI"] == exception.get("cli") == "0.27.2"
                and exception.get("step") == step and exception.get("reason") and exception.get("retireWhen")
                and code == 1 and raw.rstrip().endswith(error)
-               and stats["successful_parses"] == stats["total_parses"] == 312
-               and len(outcomes(result.get("parse_results", []))) == 312
+               and stats["successful_parses"] == stats["total_parses"] == 313
+               and len(outcomes(result.get("parse_results", []))) == 313
                and all(is_passed(value) and value not in ("Skipped", "Platform") for value in cases.values())
                and not any(value for key, value in result.items() if key.endswith("_failures"))
                and len(result.get("highlight_results", [])) == 8
