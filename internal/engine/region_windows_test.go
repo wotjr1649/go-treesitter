@@ -1,6 +1,9 @@
 package engine
 
-import "unsafe"
+import (
+	"testing"
+	"unsafe"
+)
 
 var procVirtualQuery = kernel32.NewProc("VirtualQuery")
 
@@ -12,17 +15,23 @@ type memoryBasicInfo struct {
 	State, Protect, Type        uint32
 }
 
-// regionState returns the VirtualQuery state of the page at addr: 0x1000 committed, 0x2000 reserved, 0x10000 free.
-func regionState(addr uintptr) uint32 {
+func queryRegion(addr uintptr) (memoryBasicInfo, error) {
 	var mbi memoryBasicInfo
-	procVirtualQuery.Call(addr, uintptr(unsafe.Pointer(&mbi)), unsafe.Sizeof(mbi))
-	return mbi.State
+	n, _, err := procVirtualQuery.Call(addr, uintptr(unsafe.Pointer(&mbi)), unsafe.Sizeof(mbi))
+	if n == 0 {
+		return mbi, err
+	}
+	return mbi, nil
 }
 
-const (
-	stateCommitted = 0x1000
-	stateFree      = 0x10000
-)
+func regionCommitted(addr uintptr) bool {
+	mbi, err := queryRegion(addr)
+	return err == nil && mbi.State == memCommit
+}
 
-func regionCommitted(addr uintptr) bool { return regionState(addr) == stateCommitted }
-func regionFreed(addr uintptr) bool     { return regionState(addr) == stateFree }
+func reportReleaseFailure(t *testing.T, addr uintptr, err error) {
+	t.Helper()
+	mbi, queryErr := queryRegion(addr)
+	t.Errorf("reservation at %#x not released: err=%v, State=%#x, AllocationBase=%#x, VirtualQuery err=%v",
+		addr, err, mbi.State, mbi.AllocationBase, queryErr)
+}

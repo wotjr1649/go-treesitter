@@ -52,11 +52,13 @@ func drop(a dropArg) {
 	live.CompareAndDelete(a.key, a.st)
 }
 
-func (s *state) free() {
+func (s *state) free() error {
 	if s.reserved {
-		s.reg.release()
+		err := s.reg.release()
 		s.reserved, s.committed = false, 0
+		return err
 	}
+	return nil
 }
 
 func stateOf(mem *[]byte, create bool) *state {
@@ -178,18 +180,25 @@ func Committed(mem *[]byte) int64 {
 // Release returns the region to the OS and drops the instance's state; idempotent. *mem is set to nil, so the
 // instance must not be used afterwards (a later access panics instead of faulting on unmapped memory).
 func Release(mem *[]byte) {
+	release(mem)
+}
+
+// release returns the OS result so tests can check the release before any address reuse can affect the result.
+func release(mem *[]byte) (released bool, err error) {
 	st := stateOf(mem, false)
 	if st == nil {
-		return
+		return false, nil
 	}
 	st.mu.Lock()
 	if st.reserved {
-		st.free()
+		err = st.free()
+		released = err == nil
 		*mem = nil
 	}
 	st.mu.Unlock()
 	st.cleanup.Stop()
 	live.CompareAndDelete(uintptr(unsafe.Pointer(mem)), st)
+	return released, err
 }
 
 // Call runs fn; any panic from it (generated-code trap) becomes *Trap. A hardware fault on unmapped memory is not a
