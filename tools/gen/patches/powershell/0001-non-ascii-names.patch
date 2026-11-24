@@ -55,12 +55,3 @@
            ),
          ),
          // A bare `--` or `-` argument (see scanner.c).
-@@ -596,7 +596,7 @@
-         seq(reservedWord('exit'), optional($.pipeline)),
-       ),
- 
--    label: ($) => token(seq(':', /[a-zA-Z_][a-zA-Z0-9_]*/)),
-+    label: ($) => token(seq(':', /[\p{L}_][\p{L}\p{Nd}_]*/u)),
- 
-     label_expression: ($) => choice($.label, $.unary_expression),
- 

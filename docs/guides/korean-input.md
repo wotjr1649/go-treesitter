@@ -150,7 +150,7 @@ produce `ERROR` nodes even though the language allows it. The table says what wa
 | `kotlin` | yes | yes | yes |
 | `php` | yes | yes | yes |
 | `postgres` | yes (unquoted and quoted; see note 2) | yes (string literals and `$태그$` dollar-quote tags and bodies; see note 2) | yes |
-| `powershell` | yes: variable, parameter, hash key, member name, type name and statement label (development tree after v0.6.0; v0.6.0 fails on them; see [limitations](../reports/limitations.md), row 31) | yes | yes |
+| `powershell` | partly: variable, parameter, hash key, member name and type name parse (development tree after v0.6.0; v0.6.0 fails on them); fails on statement labels: `:한글` is read as a command name, not a label (no `ERROR`; see [limitations](../reports/limitations.md), row 31) | yes | yes |
 | `python` | yes | yes | yes |
 | `r` | yes | yes | yes |
 | `ruby` | partly: local, instance and global variable names parse (global names in v0.6.0); fails on symbols ([Ruby](../known-gaps/ruby.md)) | yes | yes |

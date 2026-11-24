@@ -7,6 +7,11 @@ $_이름 = $camel한글 = $한글camel
 $env:값 = $script:한글
 $é = $日本語
 "$a한글 $값"
+"$한글"
+"가격: $원"
+@"
+$한
+"@
 
 --------------------------------------------------------------------------------
 
@@ -145,6 +150,48 @@ $é = $日本語
                           (string_literal
                             (expandable_string_literal
                               (variable)
+                              (variable))))))))))))))
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (string_literal
+                            (expandable_string_literal
+                              (variable))))))))))))))
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (string_literal
+                            (expandable_string_literal
+                              (variable))))))))))))))
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (string_literal
+                            (expandable_here_string_literal
                               (variable))))))))))))))))
 
 ================================================================================
@@ -394,25 +441,40 @@ class 클래스 { [int]$필드 }
         (variable)))))
 
 ================================================================================
-PowerShell Hangul statement label
+PowerShell Hangul statement label is not a label
 ================================================================================
 
-:루프 foreach ($i in 1..3) { break }
+:한글
+:한글 x
+echo a;:한글
 
 --------------------------------------------------------------------------------
 
 (program
   (statement_list
-    (label)
-    (foreach_statement
-      (variable)
-      (pipeline
-        (pipeline_chain
-          (command
-            command_name: (command_name))))
-      (statement_block
-        statement_list: (statement_list
-          (flow_control_statement))))))
+    (pipeline
+      (pipeline_chain
+        (command
+          (command_name))))
+    (pipeline
+      (pipeline_chain
+        (command
+          (command_name)
+          (command_elements
+            (command_argument_sep)
+            (generic_token)))))
+    (pipeline
+      (pipeline_chain
+        (command
+          (command_name)
+          (command_elements
+            (command_argument_sep)
+            (generic_token)))))
+    (empty_statement)
+    (pipeline
+      (pipeline_chain
+        (command
+          (command_name))))))
 
 ================================================================================
 PowerShell ASCII names unchanged
