@@ -2,6 +2,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -10,15 +11,21 @@ import (
 )
 
 func main() {
-	if len(os.Args) != 6 {
-		panic("modulezip MODULE ROOT REVISION SUBDIR OUTPUT")
+	version := flag.String("version", "v0.0.1", "version used for the module ZIP entry prefix")
+	flag.Parse()
+	if flag.NArg() != 5 {
+		panic("modulezip [-version VERSION] MODULE ROOT REVISION SUBDIR OUTPUT")
 	}
-	output, err := os.OpenFile(os.Args[5], os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
+	m := module.Version{Path: flag.Arg(0), Version: *version}
+	if err := module.Check(m.Path, m.Version); err != nil {
+		panic(err)
+	}
+	path := flag.Arg(4)
+	output, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
 	if err != nil {
 		panic(err)
 	}
-	m := module.Version{Path: os.Args[1], Version: "v0.0.1"}
-	err = zip.CreateFromVCS(output, m, os.Args[2], os.Args[3], os.Args[4])
+	err = zip.CreateFromVCS(output, m, flag.Arg(1), flag.Arg(2), flag.Arg(3))
 	closeErr := output.Close()
 	if err != nil {
 		panic(err)
@@ -26,7 +33,7 @@ func main() {
 	if closeErr != nil {
 		panic(closeErr)
 	}
-	checked, err := zip.CheckZip(m, os.Args[5])
+	checked, err := zip.CheckZip(m, path)
 	if err != nil {
 		panic(err)
 	}

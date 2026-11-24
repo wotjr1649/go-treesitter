@@ -156,6 +156,36 @@ func TestGoModModes(t *testing.T) {
 	}
 }
 
+func TestModuleRootVersion(t *testing.T) {
+	dir := t.TempDir()
+	for _, tc := range []struct {
+		lang, mod, want string
+		invalid         bool
+	}{
+		{lang: "json", mod: goMod("json", "")},
+		{lang: "bash", mod: goMod("bash", "v0.5.0"), want: "v0.5.0"},
+		{lang: "c", mod: goMod("c", "v0.6.0"), want: "v0.6.0"},
+		{lang: "css", mod: strings.ReplaceAll(goMod("css", "v1.0.0-rc.1"), "\n", "\r\n"), want: "v1.0.0-rc.1"},
+		{lang: "go-floor", mod: strings.Replace(goMod("go-floor", ""), "go 1.26.0", "go 1.27.0", 1)},
+		{lang: "wrong-module", mod: goMod("json", "v0.6.0"), invalid: true},
+		{lang: "wrong-version", mod: goMod("wrong-version", "latest"), invalid: true},
+		{lang: "wrong-replace", mod: strings.Replace(goMod("wrong-replace", ""), "../..", "../other", 1), invalid: true},
+		{lang: "missing", invalid: true},
+	} {
+		t.Run(tc.lang, func(t *testing.T) {
+			path := filepath.Join(dir, tc.lang+".mod")
+			if tc.mod != "" {
+				if err := os.WriteFile(path, []byte(tc.mod), 0o644); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if got, err := moduleRootVersion(tc.lang, path); got != tc.want || (err != nil) != tc.invalid {
+				t.Fatalf("moduleRootVersion = %q, %v; want %q (invalid: %t)", got, err, tc.want, tc.invalid)
+			}
+		})
+	}
+}
+
 // The pinned inputs must stay host independent: archives and versions, one entry per supported platform.
 func TestPinsPlan(t *testing.T) {
 	pins, err := loadPins("pins.json")

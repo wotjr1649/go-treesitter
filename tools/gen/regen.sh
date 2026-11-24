@@ -8,10 +8,8 @@
 # JS runtime and a twice-generated determinism check (ADR-0027). The fetch plan
 # (URLs, sha256, destinations) comes from tools/gen/pins.json via `gen -plan`; wasm2go is built from its pinned
 # module version with `go install -trimpath`. Output goes to grammars/<lang> in this repository.
-# go.mod form: derived from the committed grammars/*/go.mod. Release form (`require ... vX.Y.Z`, no `replace`) regenerates
-# the release form with that version; development form (`replace`) regenerates the development form; all modules
-# must agree, else this fails. ROOT_VERSION=vX.Y.Z overrides the derivation (how step 4 of docs/specs/publication.md
-# switches a development tree to the release form).
+# Each selected grammar keeps the form and minimum root from its own go.mod. ROOT_VERSION=vX.Y.Z
+# overrides that form only for the selected grammars (all grammars if no language list is given).
 set -euo pipefail
 
 W=${1:?usage: regen.sh <work-dir> [lang ...]}
@@ -29,18 +27,9 @@ EXE=""
 [ "$(go env GOOS)" = windows ] && EXE=.exe
 
 ALL=(postgres bash c cpp csharp css dart golang html java javascript json php powershell python r ruby rust tsql tsx typescript xml yaml kotlin swift)
-if [ -z "${ROOT_VERSION:-}" ]; then
-  # one line per module: "dev" (replace present), the release version, or nothing (unknown form -> count below ALL)
-  forms=$(for l in "${ALL[@]}"; do
-    if grep -q '^replace ' "$REPO/grammars/$l/go.mod"; then echo dev
-    else sed -n 's|^require github\.com/wotjr1649/go-treesitter \(v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)$|\1|p' "$REPO/grammars/$l/go.mod"
-    fi
-  done | sort | uniq -c | tr -s ' ' | sed 's/^ //')
-  [ "$(echo "$forms" | grep -c .)" = 1 ] && [ "${forms%% *}" = ${#ALL[@]} ] || {
-    echo "regen: the ${#ALL[@]} grammars/*/go.mod files must all be in one form (dev: replace; release: require vX.Y.Z, no replace); found:" >&2
-    echo "$forms" >&2; exit 1; }
-  ROOT_VERSION=${forms#* }
-  [ "$ROOT_VERSION" != dev ] || ROOT_VERSION=
+module_form=(-keep-module-form)
+if [ -n "${ROOT_VERSION:-}" ]; then
+  module_form=(-root-version "$ROOT_VERSION")
 fi
 
 mkdir -p "$W/bin" "$W/dl" "$W/src" "$W/work"
@@ -79,5 +68,5 @@ for lang in "${LANGS[@]}"; do
   "$GEN" -lang "$lang" -root tools/gen -src "$W/src" -dl "$W/dl" -sdk "$W/sdk" \
     -wasm2go "$W/bin/wasm2go$EXE" -wasm-opt "$W/binaryen/bin/wasm-opt$EXE" \
     -tree-sitter "$W/bin/tree-sitter$EXE" -fetch-npm -patch-alert "${PATCH_ALERT_THRESHOLD:-3}" \
-    -out "grammars/$lang" -work "$W/work" -repo . ${ROOT_VERSION:+-root-version "$ROOT_VERSION"}
+    -out "grammars/$lang" -work "$W/work" -repo . "${module_form[@]}"
 done

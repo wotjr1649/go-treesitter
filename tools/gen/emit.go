@@ -110,23 +110,44 @@ func checkImports(src string) error {
 	return nil
 }
 
-// goMod is a grammar module's go.mod. rootVersion "" is the local-development form (replace ../..); a version
-// emits the release form of ADR-0022: the exact root version, no replace.
+const rootModule = "github.com/wotjr1649/go-treesitter"
+const rootRequire = "\n\nrequire " + rootModule + " "
+const localRoot = "v0.0.0\n\n" +
+	"// Local development: the grammar modules live in the root repository. Removed when the root module is tagged.\n" +
+	"replace " + rootModule + " => ../..\n"
+
+// goMod uses a local replace in development and records the minimum root version for a release.
 func goMod(lang, rootVersion string) string {
-	head := "module " + modulePrefix + lang + "\n\ngo 1.26.0\n\n"
+	head := "module " + modulePrefix + lang + "\n\ngo 1.26.0" + rootRequire
 	if rootVersion != "" {
-		return head + "require github.com/wotjr1649/go-treesitter " + rootVersion + "\n"
+		return head + rootVersion + "\n"
 	}
-	return head + "require github.com/wotjr1649/go-treesitter v0.0.0\n\n" +
-		"// Local development: the grammar modules live in the root repository. Removed when the root module is tagged.\n" +
-		"replace github.com/wotjr1649/go-treesitter => ../..\n"
+	return head + localRoot
+}
+
+func moduleRootVersion(lang, path string) (string, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	mod := strings.ReplaceAll(string(data), "\r\n", "\n")
+	header, root, found := strings.Cut(mod, rootRequire)
+	goVersion, validHeader := strings.CutPrefix(header, "module "+modulePrefix+lang+"\n\ngo ")
+	if found && validHeader && goVersion != "" && !strings.Contains(goVersion, "\n") {
+		if root == localRoot {
+			return "", nil
+		}
+		if version := strings.TrimSuffix(root, "\n"); rootVersionRx.MatchString(version) {
+			return version, nil
+		}
+	}
+	return "", fmt.Errorf("%s: expected a generated development or release go.mod", path)
 }
 
 // rootGoSum returns the two go.sum lines of the root module at version, taken from `go mod download -json` through
 // the default GOPROXY and GOSUMDB (so the checksum database has verified them). It fails when they are unavailable.
 func rootGoSum(version string) (string, error) {
-	const root = "github.com/wotjr1649/go-treesitter"
-	c := proc.Command("go", "mod", "download", "-json", root+"@"+version)
+	c := proc.Command("go", "mod", "download", "-json", rootModule+"@"+version)
 	c.Env = append(os.Environ(), "GOWORK=off", "GOTOOLCHAIN=local", "GOFLAGS=")
 	c.Dir = os.TempDir()
 	var stderr bytes.Buffer
@@ -134,9 +155,9 @@ func rootGoSum(version string) (string, error) {
 	out, err := c.Output()
 	var r struct{ Sum, GoModSum, Error string }
 	if jerr := json.Unmarshal(out, &r); err != nil || jerr != nil || r.Error != "" || r.Sum == "" || r.GoModSum == "" {
-		return "", fmt.Errorf("go mod download %s@%s: sums unavailable (err=%v, json=%v, %s%s)", root, version, err, jerr, r.Error, stderr.String())
+		return "", fmt.Errorf("go mod download %s@%s: sums unavailable (err=%v, json=%v, %s%s)", rootModule, version, err, jerr, r.Error, stderr.String())
 	}
-	return fmt.Sprintf("%s %s %s\n%s %s/go.mod %s\n", root, version, r.Sum, root, version, r.GoModSum), nil
+	return fmt.Sprintf("%s %s %s\n%s %s/go.mod %s\n", rootModule, version, r.Sum, rootModule, version, r.GoModSum), nil
 }
 
 // ---- language meta ----

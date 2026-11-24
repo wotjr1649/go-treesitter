@@ -67,43 +67,60 @@ approval. Commands, limits and input-ID syntax are documented in [tools/gen](../
 
 ## Multi-module release
 
-The root module and each grammar module are versioned and tagged separately (ADR-0022 §2). Go versions are
-immutable once a proxy has served them, so the order below is fixed. Every numbered step that writes to the remote
-needs the owner's explicit authority for that act (above); one grant does not cover the next step.
+The root module and each grammar module are versioned and tagged independently under
+[ADR-0028](../design/decisions/ADR-0028-root-stability-and-independent-grammar-versioning.md#decision).
+Go versions are immutable once served by a proxy. Each remote write below needs separate owner authority.
+
+- **Root release.** Run steps 1–3 and 6–11. Carry forward the published grammar tags and their minimum root
+  requirements. If selected grammars are also ready, publish any required new root first, then run steps 4–6
+  for that subset. For root RC and 1.0, use ADR-0028's root scope, including actual released grammars for
+  engine ABIs 1–4. Document grammar known gaps in the per-grammar support records.
+- **Grammar-only release.** Run step 1 and steps 4–11 using the already published roots. Keep the existing
+  grammar and pin-move gates. Record old and new pins, schema and tree/query changes, and migration examples,
+  citing the owner release and owner CHANGELOG where applicable.
+- **Combination table.** Publish the [root/grammar combination table](../reports/compatibility.md) and link it
+  from the release notes. Bind each tested combination to its release commits, new and carried-forward tags,
+  source revisions, generator identity, ABI, minimum roots and evidence scope.
+
+Select modules for a new grammar tag when their source pin moves or they have an approved same-pin fix. A pin
+move takes a grammar minor release (both modules for a shared TypeScript/TSX move). A same-pin fix that preserves
+the declared contract may take a patch.
 
 | # | Step | Owner authority |
 |---|---|---|
-| 1 | On the release commit, run the release gates (`docs/specs/validation.md`), including one nightly-diff run over every pinned grammar (retain and classify failures), and the rehearsal: module ZIPs for the root and every generated grammar listed in `tools/gen/pins.json` (currently 25 grammar modules) at `vX.Y.Z` served from a file `GOPROXY`, built by an empty-cache consumer with `CGO_ENABLED=0`, plus `GOOS=linux GOARCH=arm64 go build`. | no (local) |
+| 1 | Run the applicable [release gates](validation.md#gates) on the candidate, including the scoped nightly-diff run, and retain and classify failures. Before tagging each candidate, rehearse the exact root and grammar versions in the combination table from a file `GOPROXY`. Build candidate ZIPs from their release commits using the `-version` flag in [`tools/modulezip`](../../tools/modulezip) and use the released ZIPs for carried-forward modules. Run the consumer checks below. For a selected grammar, do the ZIP rehearsal once its step-4 commit is ready. | no (local) |
 | 2 | Tag the root `vX.Y.Z` on the release commit and push the tag. | **yes** |
 | 3 | Verify the root: `GOPROXY=direct go list -m github.com/wotjr1649/go-treesitter@vX.Y.Z` from an empty module; then the same through `GOPROXY=https://proxy.golang.org`. | no (read-only) |
-| 4 | Regenerate the grammar modules in release form: `ROOT_VERSION=vX.Y.Z bash tools/gen/regen.sh <work-dir>` (`-root-version`). Only `go.mod` and the generated `go.sum` (the root's two sum lines, verified through the checksum database) change; `engine_gen.*` must stay byte-identical. Raise the root `require` of the in-repository tool modules (`tools/conformance`, `tools/bench`) to the same version. Commit through a pull request. No `replace` may remain in a grammar module; `tools/gen/regen.sh` derives the release version from the committed `go.mod` files. | no (local commit) |
-| 5 | Tag each grammar `grammars/<dir>/vX.Y.Z` on that commit and push the tags. | **yes** |
-| 6 | Verify every grammar with `GOPROXY=direct`, then through `proxy.golang.org`: an empty consumer with no `replace` runs `go get` for the root and every grammar, builds with `CGO_ENABLED=0`, runs, and also builds for `linux/arm64`. | no (read-only) |
-| 7 | Create a **draft** GitHub release and release notes for the root tag; while the project is a Preview, mark it pre-release. Upload every archive row with column 4 equal to `source` in `gen -mirror-assets` as described below, plus `SHA256SUMS`; toolchain archives are excluded. | **yes** |
-| 8 | Before publication, compare the uploaded asset digests (`gh release view vX.Y.Z --json assets`) with local `SHA256SUMS`; the uploaded inventory must equal the rows with column 4 equal to `source` in `gen -mirror-assets` / release pins, plus `SHA256SUMS`, with no toolchain rows. Stop on missing or differing digests. | no (read-only) |
-| 9 | Publish the draft only after step 8 passes; publication makes the assets immutable. Then run `gh release verify vX.Y.Z` and retain its attestation result. | **yes** (publish); verification is read-only |
+| 4 | Select the oldest published root that supplies each grammar's API, engine ABI and generated host imports. Put only the selected grammars into release form with `ROOT_VERSION=<minimum-root> bash tools/gen/regen.sh <new-empty-work-dir> <lang> [<lang> ...]`. Group grammars by minimum root and use a separate invocation per group. On this metadata conversion only the selected `go.mod` and `go.sum` change, and `engine_gen.*` stays byte-identical. Check that each selected module has no `replace`, and that unselected modules stay in development form. Commit through a pull request. | no (local commit) |
+| 5 | Tag each selected module `grammars/<dir>/v0.x.y` on its step-4 release commit after its ZIP rehearsal. Push only those grammar tags. | **yes** |
+| 6 | Repeat the consumer checks with `GOPROXY=direct`, then through `GOPROXY=https://proxy.golang.org`, using the published versions. A root-only release runs this check after step 3 using its new root and carried-forward grammar tags. | no (read-only) |
+| 7 | Create a **draft** GitHub release and release notes for the root or grammar tag. While the project is a Preview, mark it pre-release. Upload every archive row with column 4 equal to `source` in `gen -mirror-assets` as described below, plus `SHA256SUMS`. | **yes** |
+| 8 | Before publication, compare the uploaded asset digests (`gh release view <tag> --json assets`) with local `SHA256SUMS`. The inventory is exactly the source rows in `gen -mirror-assets` for the release pins, plus `SHA256SUMS`. Stop on missing, extra or differing assets. | no (read-only) |
+| 9 | Publish the draft after step 8 passes. Publication makes the assets immutable. Then run `gh release verify <tag>` and retain its attestation result. | **yes** (publish); verification is read-only |
 | 10 | From the published new release base (the intended first mirror base), download **every row with column 4 equal to `source`** in `gen -mirror-assets` by its exact filename into an empty directory and check its SHA-256 against the row and `SHA256SUMS`. Listing assets alone is insufficient. Record the base, pins identity and every result. | no (read-only) |
-| 11 | In **one PR** after step 10, set `pins.json` `mirrors` to `[new release base, previous release base]` (for v0.6.0: `[v0.6.0 base, v0.5.0 base]`; current bases stay unchanged until step 10 passes) and restore the development form: restore every grammar `go.mod` from the commit immediately before step 4, delete the release-generated grammar `go.sum` files, and restore the previous root `require` in `tools/conformance` and `tools/bench`. Confirm only those intended module/config changes and no generated engine-byte changes; update the status board. | local preparation; remote integration needs authority |
+| 11 | In **one PR** after step 10, set `pins.json` `mirrors` to `[new release base, previous release base]` (for v0.6.0: `[v0.6.0 base, v0.5.0 base]`). Restore the selected grammar `go.mod` files from before step 4 and remove their release-generated `go.sum` files. After a root release, keep the new root `require` with `replace ../..` in `tools/conformance` and `tools/bench`, as in v0.5.0 and v0.6.0. Set it here if the root release preparation did not already set it. Confirm the paths and engine-byte hashes, and update the status board. | local preparation; remote integration needs authority |
 
-Notes:
+**Consumer checks.** For each selected grammar release, test its declared minimum root with that grammar alone
+and test the recommended root in a mixed consumer using the new tags and carried-forward tags. For root releases,
+test the candidate root with the carried-forward grammar tags, including mixed-version combinations. In each case,
+start with an empty module and module cache, use the explicit module versions and no `replace`, record
+`go list -m all`, build with `CGO_ENABLED=0`, run a parse smoke test for each imported grammar and cross-build for
+`linux/arm64`. A grammar's `require` sets its minimum root. Under [Go minimal version selection](https://go.dev/ref/mod#minimal-version-selection),
+the highest root requirement in the graph wins. Upgrading one grammar can raise the root used by the entire consumer.
 
-- The root tag (step 2) points at a commit whose grammar `go.mod` files still use the development form; that is
-  fine because the root ZIP excludes nested modules. Grammar tags point at the later step-4 commit. Do not move
-  the root tag to it.
+- The root tag (step 2) points at its tested commit. The root ZIP excludes the nested grammar modules. Only
+  the selected grammar tags point at their step-4 commit.
 - The root ZIP is built by `golang.org/x/mod/zip` from the tagged tree: it contains the root package, `internal/engine`,
   `testdata/`, `LICENSE`/`LICENSES/`, `docs/`, `.github/`, `AGENTS.md` and `tools/lane` (no `go.mod` there). It omits
   every nested module: `grammars/*`, `tools/gen`, `tools/bench`, `tools/conformance`, `tools/modulezip`, `artifacts`.
   Local-only paths (`docs/plans`, `docs/prompts`, `artifacts/handoff`, `.scratch`) must not be tracked, because a
   tracked file is published by the tag; check `git ls-files` before step 2.
-- Between releases `main` keeps the grammar modules in the development form (`require` root `v0.0.0` with
-  `replace ../..`, no `go.sum`), so they build against the working root, including engine ABI changes the released
-  root cannot load. The release form exists only in the release commit of step 4; the post-publication PR in step 11 returns to the development form together with the mirror-base update.
-- **Rollback.** A pushed tag and any version a proxy has served are never deleted, moved or re-tagged. A bad
-  version is retracted: add `retract vX.Y.Z // reason` to the `go.mod` of a newer version of the same module and tag
-  that (`vX.Y.(Z+1)`). A bad grammar is retracted in that grammar's module only; the root is unaffected. A bad
-  release before step 2 is fixed by a new commit, nothing to roll back.
-- A grammar `require`s one exact root version. If the root needs a fix, release root `vX.Y.(Z+1)`, then regenerate
-  every grammar `go.mod` against it (steps 4-6); a grammar is not re-tagged at the old number.
+- Between releases `main` keeps grammar modules in development form (`require` root `v0.0.0` with `replace ../..`
+  and no `go.sum`) so they build against the working root. Without `ROOT_VERSION`, `regen.sh` reads each selected
+  module's `go.mod`, including on a mixed release commit.
+- **Retraction.** Fix a candidate before its tag is pushed with a new commit. Keep pushed and proxy-served
+  tags immutable. Retract a bad version by adding `retract <bad-version> // reason` to that module's `go.mod`
+  and tagging a newer version of the same module.
 
 ## Pinned archive release assets
 

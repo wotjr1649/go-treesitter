@@ -37,3 +37,11 @@ new engine.
 - The generator must emit a release form of `go.mod` (exact root version, no `replace`).
 - Memory results are re-measured under the new criterion and reported next to the old numbers.
 - ADR-0002, ADR-0013, ADR-0014 and ADR-0018 describe removed code and stay as history.
+
+## Amendment (2026-11-24): Independent grammar versions
+
+[ADR-0028 decision 4](ADR-0028-root-stability-and-independent-grammar-versioning.md#decision) replaces the
+lockstep grammar tags and shared root requirement in decision 2. Grammar modules have independent `v0.x`
+tags and require their own minimum published root. Root tags keep the `vX.Y.Z` form, and each tag and release
+still needs separate owner authority. Decisions 1, 3 and 4 continue to govern, including the release-memory
+criterion and its macOS amendment.
