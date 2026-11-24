@@ -50,7 +50,11 @@ func (r *osRegion) slice() []byte {
 	return unsafe.Slice((*byte)(*(*unsafe.Pointer)(unsafe.Pointer(&u))), r.size)
 }
 
-func (r *osRegion) release() {
-	procVirtualFree.Call(r.base, 0, memRelease)
+func (r *osRegion) release() error {
+	ok, _, err := procVirtualFree.Call(r.base, 0, memRelease)
 	*r = osRegion{}
+	if ok == 0 {
+		return err
+	}
+	return nil
 }

@@ -20,7 +20,7 @@ own `LICENSE`.
 | tree-sitter-c-sharp | `grammars/csharp` | [MIT](LICENSES/tree-sitter-c-sharp.txt) |
 | tree-sitter-json | `grammars/json` | MIT, [grammars/json/LICENSE](grammars/json/LICENSE) |
 | tree-sitter-postgres | `grammars/postgres` (SQL only) | [BSD-3-Clause](LICENSES/tree-sitter-postgres.txt) |
-| tree-sitter-tsql | `grammars/tsql` from `wotjr1649/tree-sitter-mssql` owner release v2.1.0 in the development tree after v0.5.0 | MIT, [grammars/tsql/LICENSE](grammars/tsql/LICENSE) |
+| tree-sitter-tsql | `grammars/tsql` from `wotjr1649/tree-sitter-mssql` owner release v2.8.0 in the development tree after v0.5.0 | MIT, [grammars/tsql/LICENSE](grammars/tsql/LICENSE) |
 | tree-sitter-java | `grammars/java`, from `wotjr1649/tree-sitter-java` owner release v3.0.3 in the development tree after v0.5.0 | [MIT with continuation copyright](grammars/java/LICENSE), [origin NOTICE](grammars/java/NOTICE), [original license](LICENSES/tree-sitter-java.txt) |
 | tree-sitter-c | `grammars/c` | [MIT](LICENSES/tree-sitter-c.txt) |
 | tree-sitter-cpp | `grammars/cpp` | [MIT](LICENSES/tree-sitter-cpp.txt) |
@@ -29,7 +29,7 @@ own `LICENSE`.
 | tree-sitter-html | `grammars/html` | [MIT](LICENSES/tree-sitter-html.txt) |
 | tree-sitter-css | `grammars/css` | [MIT](LICENSES/tree-sitter-css.txt) |
 | tree-sitter-yaml | `grammars/yaml` | [MIT](LICENSES/tree-sitter-yaml.txt) |
-| tree-sitter-php | `grammars/php` | [MIT](LICENSES/tree-sitter-php.txt) |
+| tree-sitter-php | `grammars/php` from upstream v0.25.2 in the development tree after v0.5.0 | [MIT](LICENSES/tree-sitter-php.txt) |
 | tree-sitter-powershell | `grammars/powershell` | [MIT](LICENSES/tree-sitter-powershell.txt) |
 | tree-sitter-r | `grammars/r` | [MIT](LICENSES/tree-sitter-r.txt) |
 | tree-sitter-dart | `grammars/dart` | [MIT](LICENSES/tree-sitter-dart.txt) |

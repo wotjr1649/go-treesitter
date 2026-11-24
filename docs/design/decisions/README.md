@@ -60,6 +60,6 @@ understand whether the contract is still right.
 | 0022 | Wave-1 preview, multi-module versioning, release-memory criterion, carrier removal | Accepted |
 | 0023 | Temporary, retirable patches to upstream grammar C | Accepted; amends ADR-0020 §1, §4 for grammars; decision 1 amended 2026-11-17 (PostgreSQL Korean support) and 2026-11-18 (scope, five-patch limit, 12-month review) |
 | 0024 | Grammar source tiers: one upstream per language | Accepted; Consequences amended by ADR-0025; rule 6 (follow a maintained fork) added 2026-11-16; rule 7 (owner-maintained repositories) added 2026-11-18; rule 7.7 (vendored owner JavaScript input) amended 2026-11-21 |
-| 0025 | Absorbing tree-sitter-grammar-kit | Accepted; amends ADR-0020 (decision 6), ADR-0024; decisions 4 and 5 amended 2026-11-16; decision 5 amended again 2026-11-19 (agents draft, owner posts, one-line disclosure) |
+| 0025 | Absorbing tree-sitter-grammar-kit | Accepted; amends ADR-0020 (decision 6), ADR-0024; decisions 4 and 5 amended 2026-11-16; decision 5 amended again 2026-11-19 (agents draft, owner posts, one-line disclosure) and 2026-11-23 (agents post under an owner decision; disclosure follows the target's policy) |
 | 0026 | Never block on upstream: mirrors, grammar patches, health watch | Accepted; extends ADR-0023, ADR-0024; S1 amended 2026-11-15: sources mirrored, toolchains deferred until complete bundled notices |
 | 0027 | One pinned generator CLI for every grammar | Accepted 2026-11-16, implementation pending; amends ADR-0020 decision 1 |

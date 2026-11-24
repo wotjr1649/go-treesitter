@@ -46,7 +46,7 @@ type knownGap struct {
 	ID, Grammar, Input, InputSHA256, DumpSHA256 string
 	Observed, Expected                          string
 	Specs                                       []struct{ Title, URL string }
-	Upstream                                    string
+	Upstream, UpstreamNote                      string
 }
 
 func loadKnownGaps(t *testing.T) knownGapRegister {
@@ -275,8 +275,13 @@ func knownGapDocs(r knownGapRegister) map[string][]byte {
 			}
 			if g.Upstream == "" {
 				b.WriteString("- Upstream issue: none recorded.\n")
+			} else if strings.Contains(g.Upstream, "/pull/") {
+				fmt.Fprintf(&b, "- [Upstream pull request](%s)\n", g.Upstream)
 			} else {
 				fmt.Fprintf(&b, "- [Upstream issue](%s)\n", g.Upstream)
+			}
+			if g.UpstreamNote != "" {
+				fmt.Fprintf(&b, "- %s\n", g.UpstreamNote)
 			}
 			fmt.Fprintf(&b, "- Input SHA-256: `%s`\n- [Recorded native dump](../../tools/conformance/testdata/known-gaps/%s.dump), SHA-256: `%s`\n\n", g.InputSHA256, g.ID, g.DumpSHA256)
 		}
