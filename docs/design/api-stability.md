@@ -328,20 +328,21 @@ changed-range assertion in the consumer to cover the released-module path.
 
 ### CI and evidence
 
-Add an `engine-consumer-compat` job to `.github/workflows/engine.yml` for pull requests,
-main and manual candidate runs. Run the representative ABI rows and mixed-version cases on Linux amd64
-at the Go floor. Keep synthetic ABI rejection in the existing root test jobs, where the internal fake
-module can represent a future ABI. For an RC or final release, also run an empty-cache consumer against
+The `engine-consumer-compat` job runs the representative ABI rows and mixed-version cases on Linux amd64
+at the Go floor for pull requests, pushes to main, and manual candidate runs. It also cross-builds the
+mixed candidate for Linux arm64. The existing root jobs run synthetic ABI rejection tests using fake
+engine modules. For an RC or final release, also run an empty-cache consumer against
 all 25 published `grammars/*/v0.6.0` modules plus any additional grammar tags in the release combination
 table. The published-tags run follows the publication procedure. The candidate job is part of the
-root Release-Critical gate once implemented. [Engine workflow](../../.github/workflows/engine.yml)
+root Release-Critical gate. [Engine workflow](../../.github/workflows/engine.yml)
 
 The existing `engine`, `engine-go126`, and `grammar` jobs cover the checkout and its embedded grammar
 samples. `TestIncompatibleLanguage`, `TestFieldLookupLegacyABI`, `TestFieldLookupCurrentABIRejectsFormat1`,
 `TestQueryABI1Compatibility` and `TestSymbolForNamePublicAlias` cover focused cases with synthetic
 modules. The release status board records earlier empty-cache packaging runs, including the v0.2.0
-rehearsal with an ABI 1 grammar, and the published v0.6.0 sweep. The planned job extends that coverage
-to historical tags and mixed versions against each new root.
+rehearsal with an ABI 1 grammar, and the published v0.6.0 sweep. The candidate job extends that coverage
+to historical tags and mixed versions against each new root. Its artifact retains the consumer sources,
+module graphs and sums, candidate and grammar identities, and execution log even when a consumer fails.
 [Parser tests](../../parser_v2_test.go) · [Field tests](../../field_lookup_test.go) · [Query tests](../../query_test.go)
 · [Symbol tests](../../node_test.go) · [Release status board](../reports/release-critical-status.md#released)
 

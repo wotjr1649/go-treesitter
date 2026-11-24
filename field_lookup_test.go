@@ -2,6 +2,7 @@ package treesitter
 
 import (
 	"encoding/binary"
+	"errors"
 	"slices"
 	"testing"
 
@@ -206,4 +207,7 @@ func TestFieldLookupCurrentABIRejectsFormat1(t *testing.T) {
 		t.Fatalf("ABI %d module with format 1 created a parser", engine.ABIVersion)
 	}
 	wantPE(t, err, IncompatibleLanguage, false)
+	if !errors.Is(err, ErrIncompatibleLanguage) || len(fl.mods) != 1 || !fl.mods[0].released.Load() {
+		t.Fatalf("unsupported snapshot format must return ErrIncompatibleLanguage and release the instance: %v", err)
+	}
 }
