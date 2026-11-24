@@ -14,14 +14,14 @@ own `LICENSE`.
 | tree-sitter | Runtime C inside every grammar module; native C reference builds | [MIT](LICENSES/tree-sitter.txt) |
 | tree-sitter-go | `grammars/golang` | [MIT](LICENSES/tree-sitter-go.txt) |
 | tree-sitter-python | `grammars/python` | [MIT](LICENSES/tree-sitter-python.txt) |
-| tree-sitter-javascript | `grammars/javascript` (including JSX) from `wotjr1649/tree-sitter-javascript` owner release v4.4.0 in the development tree after v0.5.0 | [MIT with continuation copyright](grammars/javascript/LICENSE), [origin NOTICE](grammars/javascript/NOTICE), [original license](LICENSES/tree-sitter-javascript.txt) |
-| `wotjr1649/tree-sitter-javascript` owner release v4.4.0 (`e5ada30`) | Vendored `grammar.js` used to generate TypeScript and TSX in the development tree after v0.5.0 | [MIT with continuation copyright](grammars/javascript/LICENSE), [TypeScript NOTICE](grammars/typescript/NOTICE), [TSX NOTICE](grammars/tsx/NOTICE) |
-| tree-sitter-typescript | `grammars/typescript` and `grammars/tsx` from `wotjr1649/tree-sitter-typescript` owner release v3.1.0 in the development tree after v0.5.0 | MIT with continuation copyright ([TypeScript LICENSE](grammars/typescript/LICENSE), [TSX LICENSE](grammars/tsx/LICENSE)), [TypeScript NOTICE](grammars/typescript/NOTICE), [TSX NOTICE](grammars/tsx/NOTICE), [original license](LICENSES/tree-sitter-typescript.txt) |
+| tree-sitter-javascript | `grammars/javascript` (including JSX) from `wotjr1649/tree-sitter-javascript` owner release v4.4.0 in v0.6.0 | [MIT with continuation copyright](grammars/javascript/LICENSE), [origin NOTICE](grammars/javascript/NOTICE), [original license](LICENSES/tree-sitter-javascript.txt) |
+| `wotjr1649/tree-sitter-javascript` owner release v4.4.0 (`e5ada30`) | Vendored `grammar.js` used to generate TypeScript and TSX in v0.6.0 | [MIT with continuation copyright](grammars/javascript/LICENSE), [TypeScript NOTICE](grammars/typescript/NOTICE), [TSX NOTICE](grammars/tsx/NOTICE) |
+| tree-sitter-typescript | `grammars/typescript` and `grammars/tsx` from `wotjr1649/tree-sitter-typescript` owner release v3.1.0 in v0.6.0 | MIT with continuation copyright ([TypeScript LICENSE](grammars/typescript/LICENSE), [TSX LICENSE](grammars/tsx/LICENSE)), [TypeScript NOTICE](grammars/typescript/NOTICE), [TSX NOTICE](grammars/tsx/NOTICE), [original license](LICENSES/tree-sitter-typescript.txt) |
 | tree-sitter-c-sharp (upstream v0.24.0 in the development tree) | `grammars/csharp` | [MIT](LICENSES/tree-sitter-c-sharp.txt) |
 | tree-sitter-json | `grammars/json` | MIT, [grammars/json/LICENSE](grammars/json/LICENSE) |
 | tree-sitter-postgres | `grammars/postgres` (SQL only) | [BSD-3-Clause](LICENSES/tree-sitter-postgres.txt) |
-| tree-sitter-tsql | `grammars/tsql` from `wotjr1649/tree-sitter-mssql` owner release v2.8.0 in the development tree after v0.5.0 | MIT, [grammars/tsql/LICENSE](grammars/tsql/LICENSE) |
-| tree-sitter-java | `grammars/java`, from `wotjr1649/tree-sitter-java` owner release v3.0.3 in the development tree after v0.5.0 | [MIT with continuation copyright](grammars/java/LICENSE), [origin NOTICE](grammars/java/NOTICE), [original license](LICENSES/tree-sitter-java.txt) |
+| tree-sitter-tsql | `grammars/tsql` from `wotjr1649/tree-sitter-mssql` owner release v2.8.0 in v0.6.0 | MIT, [grammars/tsql/LICENSE](grammars/tsql/LICENSE) |
+| tree-sitter-java | `grammars/java`, from `wotjr1649/tree-sitter-java` owner release v3.0.3 in v0.6.0 | [MIT with continuation copyright](grammars/java/LICENSE), [origin NOTICE](grammars/java/NOTICE), [original license](LICENSES/tree-sitter-java.txt) |
 | tree-sitter-c | `grammars/c` | [MIT](LICENSES/tree-sitter-c.txt) |
 | tree-sitter-cpp | `grammars/cpp` | [MIT](LICENSES/tree-sitter-cpp.txt) |
 | tree-sitter-rust | `grammars/rust` | [MIT](LICENSES/tree-sitter-rust.txt) |
@@ -29,7 +29,7 @@ own `LICENSE`.
 | tree-sitter-html | `grammars/html` | [MIT](LICENSES/tree-sitter-html.txt) |
 | tree-sitter-css | `grammars/css` | [MIT](LICENSES/tree-sitter-css.txt) |
 | tree-sitter-yaml | `grammars/yaml` | [MIT](LICENSES/tree-sitter-yaml.txt) |
-| tree-sitter-php | `grammars/php` from upstream v0.25.2 in the development tree after v0.5.0 | [MIT](LICENSES/tree-sitter-php.txt) |
+| tree-sitter-php | `grammars/php` from upstream v0.25.2 in v0.6.0 | [MIT](LICENSES/tree-sitter-php.txt) |
 | tree-sitter-powershell | `grammars/powershell` | [MIT](LICENSES/tree-sitter-powershell.txt) |
 | tree-sitter-r | `grammars/r` | [MIT](LICENSES/tree-sitter-r.txt) |
 | tree-sitter-dart | `grammars/dart` | [MIT](LICENSES/tree-sitter-dart.txt) |

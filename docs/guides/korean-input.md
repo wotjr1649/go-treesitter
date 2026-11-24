@@ -6,9 +6,9 @@ grammars and queries. Rules owned elsewhere are linked, not repeated: [invalid U
 `HasInvalidUTF8`](../specs/parser-result.md#input), [the `Source` and `LineIndex`
 signatures](../design/api-v2.md#7-primitives-that-set-this-library-apart-v001), [known limits](../reports/limitations.md).
 
-This guide describes the development tree after v0.5.0. The published v0.5.0 has no CP949 decoder, no
+This guide describes v0.6.0. The published v0.5.0 has no CP949 decoder, no
 `Source.UTF8Offset`, no `LineIndex.Offset`, the earlier query regex meaning and the earlier heredoc end-word comparison;
-[MIGRATING](../../MIGRATING.md#unreleased-after-v050) lists the changes.
+[MIGRATING](../../MIGRATING.md#upgrading-from-v050-to-v060-engine-abi-4) lists the changes.
 
 ## Choose the entry point
 
@@ -116,8 +116,8 @@ decoded Hangul even when the file was CP949.
 To get the old ASCII meaning of a shorthand class or a boundary, scope it: `(?-u:\w+\b)` matches ASCII word characters
 only. What the regex subset accepts and where it differs from the CLI (`\p{...}` follows your Go toolchain, a few
 Rust-only forms are query errors) is owned by [limitations, row 5](../reports/limitations.md), the
-[query contract](../design/query-abi.md#regex-predicate-subset-development-tree-after-v050) and the
-[migration notes](../../MIGRATING.md#unreleased-after-v050); a pattern that Go accepted before can now be a query error.
+[query contract](../design/query-abi.md#regex-predicate-subset-v060) and the
+[migration notes](../../MIGRATING.md#upgrading-from-v050-to-v060-engine-abi-4); a pattern that Go accepted before can now be a query error.
 
 ## Which grammars take Korean
 
@@ -155,7 +155,7 @@ produce `ERROR` nodes even though the language allows it. The table says what wa
 | `powershell` | no: fails on variable, parameter, hash key, member name, type name ([PowerShell](../known-gaps/powershell.md)) | yes | yes |
 | `python` | yes | yes | yes |
 | `r` | yes | yes | yes |
-| `ruby` | partly: local, instance and global variable names parse (global names in the development tree after v0.5.0); fails on symbols ([Ruby](../known-gaps/ruby.md)) | yes | yes |
+| `ruby` | partly: local, instance and global variable names parse (global names in v0.6.0); fails on symbols ([Ruby](../known-gaps/ruby.md)) | yes | yes |
 | `rust` | yes | yes | yes |
 | `swift` | partly: variable, function, parameter, type and field names parse; fails on statement labels ([Swift](../known-gaps/swift.md)) | yes | yes |
 | `tsql` | yes on the retained bracketed, double-quoted and regular identifiers, variables and label cases (development tree, owner release v2.8.0, as since v2.1.0; v0.5.0 rejects regular identifiers) | yes | yes |
@@ -173,7 +173,7 @@ produce `ERROR` nodes even though the language allows it. The table says what wa
 2. The development tree uses upstream v19.0.0, which incorporates both Korean-support fixes. The published v0.5.0
    `postgres` fails on Hangul identifiers and dollar-quote tags. The development scanner caps tags at 63 code points.
    U+3000 and other non-ASCII spaces are identifier characters. See
-   [limitations, PostgreSQL Korean support](../reports/limitations.md#postgresql-korean-support-development-tree-after-v050).
+   [limitations, PostgreSQL Korean support](../reports/limitations.md#postgresql-korean-support-v060).
 
 **Evidence.** `TestCorpusKorean` in [`tools/conformance`](../../tools/conformance/korean_test.go) runs the retained
 inputs listed in [`manifest.csv`](../../tools/conformance/testdata/korean/manifest.csv) through the product. In every

@@ -42,6 +42,13 @@
     "reason": "[ADR-0024 tier review](https://github.com/wotjr1649/go-treesitter/blob/main/docs/design/decisions/ADR-0024-grammar-source-tiers.md#amendment-2026-11-16-tier-review-of-tier-1-sources-without-a-commit-in-12-months): no maintained fork under rule 6; retain the tier-1 source."
   },
   {
+    "component": "swift",
+    "kind": "nvim-treesitter: **we are behind**",
+    "accepted": "2026-11-24",
+    "expires": "2027-02-24",
+    "reason": "v0.6.0 ships the gated pin a1d4a7b; nvim-treesitter's fef1236 adds multi-pattern catch clauses (grammar only). [Move the pin after the release](https://github.com/wotjr1649/go-treesitter/issues/109)."
+  },
+  {
     "component": "tsx",
     "kind": "nvim-treesitter: **different repository**",
     "accepted": "2026-11-19",

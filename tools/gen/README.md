@@ -340,15 +340,17 @@ kind `source`/`toolchain`; no header):
 awk -F '\t' '$4 == "source"' release-assets.tsv > release-source-assets.tsv
 ```
 
-The command lists 34 rows for the current pins: 26 `source` archives and eight `toolchain` archives. The immutable v0.4.0 release
+The command lists 34 rows for the v0.6.0 pins. The v0.6.0 candidate inventory is all 26 `source` archives
+plus `SHA256SUMS` and excludes the eight `toolchain` rows. The immutable v0.4.0 release
 contains its original 24 source archives plus `SHA256SUMS`; the new C and PostgreSQL archives have no fallback there.
 The v0.5.0 release mirrors the 25 rows with column 4 equal to `source` that existed then, plus `SHA256SUMS`.
-The Swift archive, the T-SQL owner release v2.8.0 archive `tree-sitter-mssql-3d42c1a55fb5.tar.gz`, the Java v3.0.3 archive
-`tree-sitter-java-358048c1c6f9.tar.gz`, the shared TypeScript/TSX owner release v3.1.0 archive
-`tree-sitter-typescript-c37edc69610d.tar.gz`, and the JavaScript v4.4.0 archive
-`tree-sitter-javascript-e5ada307a6f1.tar.gz` and the PostgreSQL upstream v19.0.0 archive
-`tree-sitter-postgres-83c0cc2f.tar.gz` were added afterwards and
-have no mirror fallback until a release carrying them is published and its base is configured. Check their filenames against `runtime.archive`,
+The v0.6.0 inventory adds the Swift archive, the T-SQL owner release v2.8.0 archive `tree-sitter-mssql-3d42c1a55fb5.tar.gz`,
+the Java v3.0.3 archive `tree-sitter-java-358048c1c6f9.tar.gz`, the shared TypeScript/TSX owner release v3.1.0 archive
+`tree-sitter-typescript-c37edc69610d.tar.gz`, the JavaScript v4.4.0 archive `tree-sitter-javascript-e5ada307a6f1.tar.gz`,
+the PostgreSQL upstream v19.0.0 archive `tree-sitter-postgres-83c0cc2f.tar.gz`, the PHP upstream v0.25.2 archive
+`php-c1e13490bd65.tar.gz` and the C# upstream v0.24.0 archive `tree-sitter-c-sharp-d4bbe18103c3.tar.gz`.
+Those archives gain fallback coverage after a release carrying them is published and its base is configured.
+Check the selected filenames against `runtime.archive`,
 `wasiLibc.archive`, and each grammar's `archive` in `pins.json`, deduplicating TypeScript/TSX's shared archive;
 the [publication procedure](../../docs/specs/publication.md#pinned-archive-release-assets) specifies the inventory
 and digest checks. Both configured bases carry the historical T-SQL origin archive
@@ -356,9 +358,9 @@ and digest checks. Both configured bases carry the historical T-SQL origin archi
 established. Those tools are fetched from their official releases with pinned SHA-256 checks and have no assets
 in this release to provide mirror fallback, even if the fetch plan lists URLs at the configured bases.
 
-The pins use v0.5.0 and then v0.4.0 as mirror bases. After publishing and checking all selected source rows at a
-new release base, update `mirrors` in a follow-up PR. A configured base can supply only the exact files already
-published there. A new source archive gains fallback coverage when a
+The pins use v0.5.0 and then v0.4.0 as mirror bases. After publishing v0.6.0 and checking all selected source rows at
+its release base, update `mirrors` to v0.6.0 and then v0.5.0 in the follow-up PR that restores the development module form.
+A configured base can supply only the exact files already published there. A new source archive gains fallback coverage when a
 carrying release is published and its base is configured. Published releases are immutable. This command does not
 upload anything. `wasm2go` remains a Go module installed through Go's checksum-verified module mechanism
 (`wasm2goSum`), not an archive in this list. The Go toolchain and system C compiler are host prerequisites, not
@@ -443,4 +445,4 @@ A CLI pin move invalidates the exception; retire it after the fixed CLI passes t
 The absent reference is not a pass for the remaining checks. The CLI generation takes about a second
 on the Windows measurement host. The scanner's allocation-failure branch calls `fprintf(stderr, ...)` and `exit(1)`; the engine
 host maps the resulting WASI `proc_exit` import to a trap (EngineFault), so `checkImports` allows it. See
-[limitations](../../docs/reports/limitations.md#swift-development-tree-after-v050).
+[limitations](../../docs/reports/limitations.md#swift-v060).

@@ -20,5 +20,5 @@ The [fresh and incremental regression tests](../../../conformance/postgres_patch
 retain identifier, scanner and lexical boundary cases.
 
 The [dated ADR-0023 amendment](../../../../docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md#amendment-2026-11-17-decision-1-postgresql-korean-support)
-records the original exception. [Current lexical limits](../../../../docs/reports/limitations.md#postgresql-korean-support-development-tree-after-v050)
+records the original exception. [Current lexical limits](../../../../docs/reports/limitations.md#postgresql-korean-support-v060)
 cover U+3000 and numeric or parameter adjacency.

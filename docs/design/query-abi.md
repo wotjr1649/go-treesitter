@@ -117,7 +117,7 @@ type QueryMatch struct{ Pattern int; Captures []QueryCapture }   // Captures[i].
   and discards any match produced by that same next call. Previously yielded matches remain valid; small limits may
   yield no matches at all. The public doc comments state this explicitly.
 
-## Regex predicate subset (development tree after v0.5.0)
+## Regex predicate subset (v0.6.0)
 
 `#match?` and `#not-match?` use boolean search semantics. Shorthand classes `\w`, `\d`, `\s` (and their negations),
 `\b`/`\B` word membership and `(?i)` simple case folding use generated Unicode 16.0.0 tables from `regex-syntax`

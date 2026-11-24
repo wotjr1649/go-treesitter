@@ -103,7 +103,7 @@ a v0.5.0 grammar module requires root v0.5.0. Release module versions are prepar
 bounded grammar-kit input subset; it is additional test coverage, not a new parsing feature or a language-validity
 claim. See [limitations](docs/reports/limitations.md) for patch bounds and identity-bound evidence.
 
-## Unreleased (after v0.5.0)
+## Upgrading from v0.5.0 to v0.6.0 (engine ABI 4)
 
 - **Public symbol IDs (#77, engine ABI 4).** Upgrade the root and the grammar modules you use. With the newer
   grammars, `SymbolForName(name, named)` returns the same kind of ID as `Node.Symbol()` and `Index.OfSymbol`.
@@ -120,13 +120,13 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   interpolation (`"#$a한"`, also in heredocs and regular expressions), the `interpolation` covered only `$a` and the
   rest was `string_content` (`heredoc_content` in heredocs). Queries matching `(call method: (global_variable))`, the
   nested nodes or that string content lose those matches; `(global_variable) @global` captures the full name.
-  [Schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-ruby-global-variable-patch)
+  [Schema register](docs/validation/grammar-schemas.md#v060-ruby-global-variable-patch)
 
 - **Go 1.26 `new(expr)`** accepts `new(42)` with an `int_literal` under `argument_list` in place of an
   error. The Go parser also assigns new numeric IDs to some existing symbols. For example, the public
   `argument_list` symbol moves from 174 to 175. Use `SymbolForName` with the updated Go grammar (ABI 4) to refresh
   cached symbol IDs, and recompute cached subtree hashes after upgrading. The node-type names and named fields are the same.
-  [Schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-go-new-expression-patch)
+  [Schema register](docs/validation/grammar-schemas.md#v060-go-new-expression-patch)
 
 - **JavaScript v4.4.0:** `grammars/javascript` keeps the same Go API and moves from the patched owner
   v1.0.0 pin to v4.4.0 (`e5ada307a6f1741a573d5c8d4dafee9234330b1f`). Regenerate tree snapshots and
@@ -138,7 +138,7 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   accepts hyphenated first segments in JSX member tags and parenthesized decorators. It rejects some
   inputs formerly accepted by v1.0.0, including `yield` expressions outside generators and JSX
   attributes with empty expressions. The owner grammar carries the JSX bare-ampersand fix.
-  [Schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-javascript-v440) ·
+  [Schema register](docs/validation/grammar-schemas.md#v060-javascript-v440) ·
   [Owner CHANGELOG](https://github.com/wotjr1649/tree-sitter-javascript/blob/v4.4.0/CHANGELOG.md)
 
 - **Rust block comments:** the scanner compares full Unicode code points when recognizing block comment
@@ -170,7 +170,7 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   ASCII `/*!` and `/**` documentation markers and the static node-type schema are preserved. On Windows amd64,
   the decision 4 comparison used 195 fixed inputs (151 pinned upstream corpus cases, 16 fuzz seeds and edits,
   21 retained regressions, and 7 Korean corpus cases). A separate native enumeration covered 16,441 short
-  comment inputs. See the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-rust-javascript-and-html-patches)
+  comment inputs. See the [schema register](docs/validation/grammar-schemas.md#v060-rust-javascript-and-html-patches)
   for the input scope and results. Other inputs can change in the same ways.
   [Upstream issue #315](https://github.com/tree-sitter/tree-sitter-rust/issues/315)
 
@@ -184,7 +184,7 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
 
 - **T-SQL v2.1.0:** `grammars/tsql` moves to owner release v2.1.0 of `wotjr1649/tree-sitter-mssql`
   at `80037156b044543a8248299205a90552687c0c40`, with CLI 0.27.2 and no grammar patches.
-  The Go signatures and engine ABI are unchanged. The schema diff's seven `CHILDREN_TYPE_REMOVED`
+  The T-SQL source move requires no Go API changes. The schema diff's seven `CHILDREN_TYPE_REMOVED`
   entries describe existing nodes gaining named fields: function/procedure bodies move to `body`,
   the CTE identifier to `name`, and trigger object references to `name`/`target`.
   These fields were already present in alfpricot v1.0.0 (`852cbd20d7dc`); the nodes remain children,
@@ -195,19 +195,18 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   rejects and the old grammar accepted now yields an error tree, for example `SELECT 1 WHERE;`, a variable as an
   alias (`SELECT 1 AS @a;`), `BACKUP ... WITH ENCRYPTION;` without options, an unterminated `/*` comment, and
   sqlcmd commands run into their argument (`:rfile.sql`). Review the
-  [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-t-sql-v210).
+  [schema register](docs/validation/grammar-schemas.md#v060-t-sql-v210).
   The recorded Hangul alias, variable, column and label cases now parse cleanly and remain Korean regression inputs.
-  This development change does not choose a module release version or authorize publication.
 
-- **PHP upstream v0.25.2 (development tree after v0.5.0).** Cast and clone operands can be general
+- **PHP upstream v0.25.2.** Cast and clone operands can be general
   expressions, including `match`. Cast precedence and tree nesting change around unary operators,
   exponentiation and `instanceof`. Cast-type spellings can produce `name` nodes in expression and
   constant positions. Review queries that match a direct cast operand, treat casts as variables, or count on
-  a keyword being unnamed. The [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-php-v0252)
+  a keyword being unnamed. The [schema register](docs/validation/grammar-schemas.md#v060-php-v0252)
   lists the changed contracts. [Upstream v0.25.2](https://github.com/tree-sitter/tree-sitter-php/releases/tag/v0.25.2)
 
-- **T-SQL v2.8.0:** The development module uses [owner release v2.8.0](https://github.com/wotjr1649/tree-sitter-mssql/releases/tag/v2.8.0)
-  at `3d42c1a55fb5a11927c3b0c65c2fd442457e28e8`. Go signatures and the engine ABI are unchanged.
+- **T-SQL v2.8.0:** The v0.6.0 module uses [owner release v2.8.0](https://github.com/wotjr1649/tree-sitter-mssql/releases/tag/v2.8.0)
+  at `3d42c1a55fb5a11927c3b0c65c2fd442457e28e8`. The source move requires no Go API changes.
   In `WRITETEXT BULK`, matches under `writetext_statement` now find a `keyword_bulk` child and the actual
   target as an `object_reference`. `WITH LOG` is accepted for the data-less BULK form. Inline data with `BULK`
   and a plain `WRITETEXT` with no data produce error trees.
@@ -217,12 +216,12 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   `char varying` and `binary varying` now produce `varchar` and `varbinary` type trees, respectively.
   Query files are unchanged. Queries that match affected kinds, fields or recovery nodes can return different
   captures. See the [owner CHANGELOG](https://github.com/wotjr1649/tree-sitter-mssql/blob/3d42c1a55fb5a11927c3b0c65c2fd442457e28e8/CHANGELOG.md)
-  and the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-t-sql-v280).
+  and the [schema register](docs/validation/grammar-schemas.md#v060-t-sql-v280).
   A Go parse reports grammar errors as `ERROR` or `MISSING` nodes in an accepted tree (`AcceptedWithErrors`) with
   a nil error. The owner repository's separate tree-check constraints and SQL Server's
   compatibility-level and session validation are outside that API.
 
-- **PostgreSQL upstream v19.0.0 (development tree after v0.5.0):** the SQL module retires its two temporary
+- **PostgreSQL upstream v19.0.0:** the SQL module retires its two temporary
   Korean-support patches because [upstream PR #102](https://github.com/gmr/tree-sitter-postgres/pull/102) incorporated both fixes.
   Compared with published v0.5.0, unquoted identifiers now accept every
   non-ASCII code point, including Hangul, NFD combining characters and supplementary characters, matching
@@ -237,7 +236,7 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   also refreshes the documentation SQL corpus for PostgreSQL 19.0 ([upstream PR #103](https://github.com/gmr/tree-sitter-postgres/pull/103)).
   See [upstream issue #101](https://github.com/gmr/tree-sitter-postgres/issues/101), the
   [retirement record](tools/gen/patches/postgres/README.md) and the
-  [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-postgresql-v1900).
+  [schema register](docs/validation/grammar-schemas.md#v060-postgresql-v1900).
   The existing grammar can still accept `SELECT 9값;` as an integer plus alias, and
   `SELECT $9끝$body$9끝$;` as a parameter plus alias; the analogous ASCII inputs were already accepted.
   PostgreSQL rejects such adjacent numeric/parameter junk. A clean tree does not validate SQL against a server.
@@ -249,7 +248,7 @@ claim. See [limitations](docs/reports/limitations.md) for patch bounds and ident
   scanner state buffer includes all open end words and metadata. Overflow returns zero serialized bytes
   and loses state, so roughly 330 Hangul syllables in total can exhaust it; other scanner state lowers
   the bound. This change does not remove other upstream heredoc syntax limits.
-  Published v0.5.0 retains the earlier low-byte patch; these changes apply to the development tree.
+  v0.5.0 used the earlier low-byte patch.
   Bash `<<-` still strips `iswspace` characters, including U+3000, rather than tabs only.
   Different invalid bytes with the same number of decode errors can match. Stored words with different
   error counts differ, but Ruby repeated-word scanning can still close on a longer line.
@@ -290,7 +289,7 @@ meaning: `\<`, `\>`, `\b{...}`, class set operations
 (`&&`, `--`, `~~`, including `[--a]`, `[&&]` and `[a--]`), nested classes other than POSIX classes, verbose `(?x)`
 and CRLF `(?R)` modes, Rust-only Unicode properties, repetitions above 1000 and dotted capture-group names. `\p{...}` supports Go categories and scripts and follows the consumer's
 Go toolchain Unicode version; it can therefore differ from the pinned Unicode 16 tables. See the
-[query contract](docs/design/query-abi.md#regex-predicate-subset-development-tree-after-v050) for the exact boundary.
+[query contract](docs/design/query-abi.md#regex-predicate-subset-v060) for the exact boundary.
 Compilation budgets differ too: the CLI can reject Unicode repetitions such as `\w{1000}` for compiled size while
 this implementation accepts them within its count limit.
 
@@ -358,7 +357,7 @@ The following additions and one behaviour change affect the root module; the eng
 
 The [owner CHANGELOG](https://github.com/wotjr1649/tree-sitter-java/blob/358048c1c6f9f84335ca4a42141fd0798e6a36f2/CHANGELOG.md)
 records the 2.x and 3.x grammar changes and retained cases. See the
-[Java schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-java-v303)
+[Java schema register](docs/validation/grammar-schemas.md#v060-java-v303)
 for the static contract changes.
 
 ### TypeScript and TSX grammar v3.1.0
@@ -396,14 +395,14 @@ This move from v1.0.0 includes the CST changes in v2.0.0 and v3.0.0.
 The repository's highlights, locals and tags query files retain their bytes. CST changes can alter
 captures and byte spans. See the
 [owner CHANGELOG](https://github.com/wotjr1649/tree-sitter-typescript/blob/c37edc69610d304fb2a11005ca9c4e52ad1f4863/CHANGELOG.md)
-and the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-typescript-and-tsx-v310).
+and the [schema register](docs/validation/grammar-schemas.md#v060-typescript-and-tsx-v310).
 
 ### C# grammar v0.24.0
 
-The development tree moves from `9150f7d56bb4` to `d4bbe18103c3` in the same tier-1 upstream.
+v0.6.0 uses `d4bbe18103c3` from the same tier-1 upstream as the previous pin `9150f7d56bb4`.
 Review queries that depend on list-pattern precedence before logical operators or on how preprocessor branches
 hold declarations or expressions. File-based app directives such as `#:package` have dedicated directive
 nodes and highlight captures. `preproc_if`, `preproc_elif` and `preproc_else` gain a `body` field.
-The [schema register](docs/validation/grammar-schemas.md#unreleased-after-v050-c-v0240) records the additions,
+The [schema register](docs/validation/grammar-schemas.md#v060-c-v0240) records the additions,
 and [upstream's release notes](https://github.com/tree-sitter/tree-sitter-c-sharp/releases/tag/v0.24.0)
 list the parsing fixes. The four [C# known gaps](docs/known-gaps/csharp.md) still apply.
