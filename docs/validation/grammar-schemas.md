@@ -555,6 +555,23 @@ item 5 for those inputs only. The pinned upstream `highlights.scm` compiled, and
 native reference on 220 raw query/input comparisons with no mismatch (E5, Windows amd64).
 [Migration notes](../../MIGRATING.md#xml-names-and-tag-names)
 
+## Unreleased (after v0.6.0): CSS name patch
+
+The [temporary grammar-input patch](../../tools/gen/patches/css) independently addresses the name defect
+reported in [upstream PR #105](https://github.com/tree-sitter/tree-sitter-css/pull/105) at CSS commit
+`dda5cfc5722c429eaba1c910ca32c2c0c5bb1a3f`. Both node-type files produced with the pinned CLI pass the
+strict schema check. They are byte-identical (43,620 bytes, SHA-256
+`fbbf8d22d82608f6d2f61cfdb374e6758779754fb2f42643e9dc5af6ead0d5d2`), and the strict diff has zero changes.
+
+The Windows amd64 native A/B corpus and edit comparison (E4) found changes in seven patch-corpus trees
+and nineteen seeded edits. The 40 upstream corpus trees, their 120 edits and the pinned `bootstrap.css`
+were byte-identical. A second fresh comparison (E4) covered 51 corpus inputs, 12 Korean fixtures and
+16 fixed fuzz inputs. It found changes in seven patch-corpus trees and eight Korean trees.
+Neither comparison changed a previously error-free tree of the unpatched build.
+The patched engine and pinned native reference agree on the corpus, seeded edits and raw query matches
+(E5, Windows amd64). The pinned `highlights.scm` compiles and runs on the repaired inputs.
+See the [migration notes](../../MIGRATING.md#css-non-latin-1-names) for the new captures.
+
 ## Unreleased (after v0.6.0): PowerShell name patch
 
 At PowerShell pin `65ea6919e816`, the strict check of the regenerated `node-types.json` passes with zero findings, and

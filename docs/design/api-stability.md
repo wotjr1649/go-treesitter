@@ -16,13 +16,22 @@ gates cover the root contract, packaging, and the root-scoped Release-Critical a
 | GENERATOR-ONLY | Reserve the entry point for generated grammars. A change that prevents a released ABI 1–4 grammar from building, loading, or retaining the documented behavior of its ABI requires a root major release. A compatible new ABI can ship in a root minor. |
 | DEPRECATE-BEFORE-1.0 | Decide the replacement and migration path before freezing the API. Mark the old export deprecated and either remove it before 1.0 or classify and document it explicitly for 1.x. |
 
-The stable behavior includes error classification with `errors.Is` and `errors.As`, the closed
-`Outcome` set, edit and changed-range semantics, ownership and lifetimes, concurrency, encoding and
-coordinate conversions, and query validation and execution. Atoms are scoped to a snapshot. Field and
-symbol IDs are scoped to the active grammar. Compare subtree hashes within the same grammar and compare
-structure when a collision matters. When a new Go major changes the Go team's support window, ADR-0028
-allows a root minor to raise the Go floor and update minimum-version CI together.
-[Parser result contract](../specs/parser-result.md) · [API design](api-v2.md) · [Query contract](query-abi.md)
+The stable behavior includes the closed `Outcome` set, edit and changed-range semantics, ownership
+and lifetimes, concurrency, encoding and coordinate conversions, and query validation and execution.
+Atoms are scoped to a snapshot. Field and symbol IDs are scoped to the active grammar. When a new
+Go major changes the Go team's support window, ADR-0028 allows a root minor to raise the Go floor and
+update minimum-version CI together.
+[Parser result contract](../specs/parser-result.md) · [Query contract](query-abi.md) · [Historical API design](api-v2.md)
+
+`Node.Hash` and `Node.ShapeHash` preserve their documented equality semantics within the same grammar.
+Compare hashes produced by the same release, and compare structure when a collision matters. Numeric
+subtree hash values may change in any release. The documented zero-value behavior of a zero `Node`
+still applies.
+
+Use `errors.Is` and `errors.As` for documented error classification and diagnostic fields such as
+`ParseError.Outcome`, `ParseError.InstanceReset`, `QueryError.Type`, and `QueryError.Offset` for
+structured details. Error and diagnostic message text, including the text in `ParseError.Reason`,
+may change in any release.
 
 ## Exported identifiers
 
@@ -265,17 +274,13 @@ The package documentation already marks this API experimental.
 
 ## Decisions before RC
 
-- Confirm the classification of the full inventory and whether to deprecate any exports before 1.0.
-  The current inventory assigns every consumer export in the root package to STABLE and has no
-  DEPRECATE-BEFORE-1.0 candidates.
-- Confirm the compatibility limits for exact numeric hashes and diagnostics. The current APIs document
-  hash equality and comparison scope, error classification, and diagnostic fields. Decide whether any
-  additional cross-release hash representation or message text becomes contractual.
-- Review the historical wording in API v2 before using it as the 1.x reference. Its header
-  describes the pre-tag design. Section 2 still describes lockstep grammar requirements and claims CI for
-  the oldest published grammar. ADR-0028 defines independent requirements, and the external consumer job
-  below is planned. Reconcile the remaining parsing and lifetime summaries with the parser result
-  contract when freezing the behavior. [API v2](api-v2.md) · [Parser result contract](../specs/parser-result.md)
+- **Decided 2026-11-25.** The inventory classification stands: every consumer export in the root
+  package is STABLE, with no DEPRECATE-BEFORE-1.0 candidates. The five `experimental/match` exports
+  stay EXPERIMENTAL after 1.0, outside the 1.x compatibility promise, until their nil and zero-snapshot
+  handling, snapshot direction rules and match semantics are specified.
+- **Decided 2026-11-25.** The contract covers documented hash equality and comparison scope,
+  error classification, and diagnostic fields. Numeric subtree hashes and message text may change
+  in any release. [Compatibility rules](#compatibility-rules) · [Go guidance on error APIs](https://go.dev/blog/go1.13-errors#errors-and-package-apis)
 
 ## Compatibility test plan
 
@@ -328,20 +333,21 @@ changed-range assertion in the consumer to cover the released-module path.
 
 ### CI and evidence
 
-Add an `engine-consumer-compat` job to `.github/workflows/engine.yml` for pull requests,
-main and manual candidate runs. Run the representative ABI rows and mixed-version cases on Linux amd64
-at the Go floor. Keep synthetic ABI rejection in the existing root test jobs, where the internal fake
-module can represent a future ABI. For an RC or final release, also run an empty-cache consumer against
+The `engine-consumer-compat` job runs the representative ABI rows and mixed-version cases on Linux amd64
+at the Go floor for pull requests, pushes to main, and manual candidate runs. It also cross-builds the
+mixed candidate for Linux arm64. The existing root jobs run synthetic ABI rejection tests using fake
+engine modules. For an RC or final release, also run an empty-cache consumer against
 all 25 published `grammars/*/v0.6.0` modules plus any additional grammar tags in the release combination
 table. The published-tags run follows the publication procedure. The candidate job is part of the
-root Release-Critical gate once implemented. [Engine workflow](../../.github/workflows/engine.yml)
+root Release-Critical gate. [Engine workflow](../../.github/workflows/engine.yml)
 
 The existing `engine`, `engine-go126`, and `grammar` jobs cover the checkout and its embedded grammar
 samples. `TestIncompatibleLanguage`, `TestFieldLookupLegacyABI`, `TestFieldLookupCurrentABIRejectsFormat1`,
 `TestQueryABI1Compatibility` and `TestSymbolForNamePublicAlias` cover focused cases with synthetic
 modules. The release status board records earlier empty-cache packaging runs, including the v0.2.0
-rehearsal with an ABI 1 grammar, and the published v0.6.0 sweep. The planned job extends that coverage
-to historical tags and mixed versions against each new root.
+rehearsal with an ABI 1 grammar, and the published v0.6.0 sweep. The candidate job extends that coverage
+to historical tags and mixed versions against each new root. Its artifact retains the consumer sources,
+module graphs and sums, candidate and grammar identities, and execution log even when a consumer fails.
 [Parser tests](../../parser_v2_test.go) · [Field tests](../../field_lookup_test.go) · [Query tests](../../query_test.go)
 · [Symbol tests](../../node_test.go) · [Release status board](../reports/release-critical-status.md#released)
 

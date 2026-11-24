@@ -140,7 +140,7 @@ produce `ERROR` nodes even though the language allows it. The table says what wa
 | `c` | yes | yes | yes |
 | `cpp` | yes | yes | yes |
 | `csharp` | yes | yes | yes |
-| `css` | no: fails on class, id and type selectors, custom properties, attribute selectors, identifier values ([CSS](../known-gaps/css.md)) | yes (a `content` string) | yes |
+| `css` | partly: class, ID, type, attribute and property names, custom property references and keyframe names parse in the development tree after v0.6.0. Bare identifier attribute and declaration values, unquoted `url()` arguments, units, and at-rule names and arguments remain outside the patch scope. See the [recorded bare value gap](../known-gaps/css.md) | yes (a `content` string) | yes |
 | `dart` | not recorded | yes | yes |
 | `go` | yes | yes | yes |
 | `html` | yes (tag and attribute names; see note 1) | yes | yes |
@@ -150,7 +150,7 @@ produce `ERROR` nodes even though the language allows it. The table says what wa
 | `kotlin` | yes | yes | yes |
 | `php` | yes | yes | yes |
 | `postgres` | yes (unquoted and quoted; see note 2) | yes (string literals and `$태그$` dollar-quote tags and bodies; see note 2) | yes |
-| `powershell` | partly: variable, parameter, hash key, member name and type name parse (development tree after v0.6.0; v0.6.0 fails on them); fails on statement labels: `:한글` is read as a command name, not a label (no `ERROR`; see [limitations](../reports/limitations.md), row 31) | yes | yes |
+| `powershell` | partly: variable, parameter, hash key, member name and type name parse (development tree after v0.6.0; v0.6.0 fails on them); fails on statement labels: `:한글` is read as a command name, not a label (no `ERROR`; see [limitations](../reports/limitations.md), row 32) | yes | yes |
 | `python` | yes | yes | yes |
 | `r` | yes | yes | yes |
 | `ruby` | partly: local, instance and global variable names parse (global names in v0.6.0); fails on symbols ([Ruby](../known-gaps/ruby.md)) | yes | yes |

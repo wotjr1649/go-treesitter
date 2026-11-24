@@ -16,6 +16,18 @@ digests they describe. The current lanes use:
 | Built-in fuzz seeds (one small sample per grammar) | `tools/conformance/fuzz_test.go` (`FuzzParse<Lang>`); crashers go to `tools/conformance/testdata/fuzz/` | `go test -fuzz` |
 | Embedded samples | each `grammars/<lang>` module | its own tests |
 | Known upstream grammar defects (5 minimal inputs, Python and C#) | [`register.json`](../../tools/conformance/testdata/known-gaps/register.json): exact JSON input strings, input/dump SHA-256, spec citations and source/module identities; adjacent `.dump` files | `TestKnownGaps` (engine and live native reference), `TestKnownGapRatchet`, `TestKnownGapDocs` |
+| Published grammar consumers | [Consumer tests](../../testdata/consumer-compat/) | `engine-consumer-compat` |
+
+The published grammar consumers use these input bytes. The job records query hashes and expected captures with the results.
+
+| Grammar | Input | SHA-256 |
+|---|---|---|
+| JSON | `{"a":1}` | `015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862` |
+| JSON edit | `{"a":true}` | `5daa0644c4a1c43ea018f7f1ef2944b90e0165ef1f2d5669ca89e5d4f69ac597` |
+| C++ | `cpp/expressions-025`, with leading and trailing LF. [Pinned corpus case](https://github.com/tree-sitter/tree-sitter-cpp/blob/c009222808634c1014f82438d4883753516a2c24/test/corpus/expressions.txt) · [MIT license](https://github.com/tree-sitter/tree-sitter-cpp/blob/c009222808634c1014f82438d4883753516a2c24/LICENSE) | `f6b8b31f177bb4196f78e85d17f0cbe7b797d898a12f01ebc4abebb1f739e87e` |
+| Go | `package p\nfunc f() { g(1) }\n` (escaped LF) | `2fcb456ae23480a0523865b090f5011876af69cb89becd2d9cb9fef918ba276d` |
+
+The JSON and Go inputs and the queries are original fixtures under this repository's MIT license.
 
 The known-gap inputs are original minimal reproductions written for this repository (repository MIT license),
 motivated by [grammar-kit handoff B](https://github.com/wotjr1649/tree-sitter-grammar-kit/blob/0a12156/docs/reports/repository-closure-handoff-b.md).

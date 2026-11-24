@@ -109,6 +109,35 @@ jobs:
           go vet ./internal/engine ./internal/langid ./experimental/... .
           go test -count=1 -timeout 600s ./internal/engine ./experimental/... .
 
+  engine-consumer-compat:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GOENV: "off"
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.26.0'
+          cache: false
+      - name: Published grammar consumers
+        shell: bash
+        run: |
+          test "$(go env GOHOSTOS)/$(go env GOHOSTARCH)" = linux/amd64
+          dir="$RUNNER_TEMP/engine-consumer-compat"
+          mkdir -p "$dir"
+          python3 tools/lane/consumer_compat.py "$dir" 2>&1 | tee "$dir/run.log"
+      - name: Consumer evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: engine-consumer-compat
+          path: ${{ runner.temp }}/engine-consumer-compat/
+
   grammar:
     name: grammar (${{ matrix.runner }}, Go ${{ matrix.go }}, ${{ matrix.lang }})
     strategy:
