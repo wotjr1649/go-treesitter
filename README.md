@@ -1,6 +1,6 @@
 # go-treesitter
 
-**Preview (v0.5.0).** A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
+**Preview (v0.6.0).** A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
 module is generated from the unmodified upstream tree-sitter runtime and pinned grammar C (wasm translated to Go by
 `tools/gen`). Grammar C may carry recorded temporary
 [ADR-0023 patches](docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md); each patched module discloses them.
@@ -14,11 +14,11 @@ Start with [AGENTS.md](AGENTS.md) and the [documentation map](docs/README.md). T
 
 ## Use
 
-The root module has no grammar. v0.5.0 provides 24 grammar modules using engine ABI 3.
+The root module has no grammar. v0.6.0 provides 25 grammar modules using engine ABI 4.
 Add the modules you need
 under `grammars/`: `bash`, `c`, `cpp`, `csharp`, `css`, `dart`, `golang`, `html`, `java`, `javascript` (including JSX),
-`json`, `kotlin`, `postgres` (PostgreSQL SQL only; PL/pgSQL excluded), `php` (PHP parser only), `powershell`, `python`, `r`, `ruby`, `rust`, `tsql`, `tsx`, `typescript`,
-`xml` (XML parser only), and `yaml`. The development tree after v0.5.0 also has `swift` (not part of any release).
+`json`, `kotlin`, `php` (PHP parser only), `postgres` (PostgreSQL SQL only; PL/pgSQL excluded), `powershell`,
+`python`, `r`, `ruby`, `rust`, `swift` (first release), `tsql`, `tsx`, `typescript`, `xml` (XML parser only), and `yaml`.
 
 Use `typescript` for `.ts` and `tsx` for `.tsx`: the same owner repository provides both grammars.
 `<T>expr` type assertions are TypeScript-only; JSX is TSX-only.
@@ -28,20 +28,27 @@ Each language has exactly one grammar source repository, chosen by the tiers of
 
 | Tier | Modules | Grammar source |
 |---|---|---|
-| 1 | `bash`, `cpp`, `csharp`, `css`, `golang`, `html`, `json`, `php`, `python`, `ruby`, `rust` | `tree-sitter` organisation (`golang` uses `tree-sitter-go`; in the development tree after v0.5.0, `csharp` uses upstream v0.24.0 and `php` uses [upstream v0.25.2](https://github.com/tree-sitter/tree-sitter-php/releases/tag/v0.25.2)) |
+| 1 | `bash`, `cpp`, `csharp`, `css`, `golang`, `html`, `json`, `php`, `python`, `ruby`, `rust` | `tree-sitter` organisation (`golang` uses `tree-sitter-go`; `csharp` regenerates from upstream v0.24.0 and `php` uses [upstream v0.25.2](https://github.com/tree-sitter/tree-sitter-php/releases/tag/v0.25.2)) |
 | 1 (maintained fork) | `c` | `tree-sitter-grammars/tree-sitter-c@f3202ac` (ADR-0024 rule 6) |
 | 2 | `xml`, `yaml` | `tree-sitter-grammars/tree-sitter-xml`, `tree-sitter-grammars/tree-sitter-yaml` |
-| 3 | `dart`, `kotlin`, `powershell`, `r`, `swift` | `UserNobody14/tree-sitter-dart`, `fwcd/tree-sitter-kotlin`, `airbus-cert/tree-sitter-powershell`, `r-lib/tree-sitter-r`, `alex-pinkus/tree-sitter-swift` (development tree after v0.5.0) |
-| Owner-designated | `postgres` | `gmr/tree-sitter-postgres` (upstream v19.0.0 in the development tree after v0.5.0; ADR-0024 rule 4) |
-| 7 (owner-maintained) | `tsql` | `wotjr1649/tree-sitter-mssql` (owner release v2.8.0 in the development tree after v0.5.0; origin `alfpricot/tree-sitter-mssql` v1.0.0; ADR-0024 rule 7) |
-| 7 (owner-maintained) | `java` | `wotjr1649/tree-sitter-java` (owner release v3.0.3 in the development tree after v0.5.0; origin `tree-sitter/tree-sitter-java` v0.23.5; ADR-0024 rule 7) |
-| 7 (owner-maintained) | `javascript` (including JSX) | `wotjr1649/tree-sitter-javascript` (owner release v4.4.0 in the development tree after v0.5.0; origin `tree-sitter/tree-sitter-javascript` v0.25.0; ADR-0024 rule 7) |
-| 7 (owner-maintained) | `typescript`, `tsx` | `wotjr1649/tree-sitter-typescript` (owner release v3.1.0 in the development tree after v0.5.0; origin `tree-sitter/tree-sitter-typescript` v0.23.2; ADR-0024 rule 7) |
+| 3 | `dart`, `kotlin`, `powershell`, `r`, `swift` | `UserNobody14/tree-sitter-dart`, `fwcd/tree-sitter-kotlin`, `airbus-cert/tree-sitter-powershell`, `r-lib/tree-sitter-r`, `alex-pinkus/tree-sitter-swift@a1d4a7b` |
+| Owner-designated | `postgres` | `gmr/tree-sitter-postgres` (upstream v19.0.0; ADR-0024 rule 4) |
+| 7 (owner-maintained) | `tsql` | `wotjr1649/tree-sitter-mssql` (owner release v2.8.0; origin `alfpricot/tree-sitter-mssql` v1.0.0; ADR-0024 rule 7) |
+| 7 (owner-maintained) | `java` | `wotjr1649/tree-sitter-java` (owner release v3.0.3; origin `tree-sitter/tree-sitter-java` v0.23.5; ADR-0024 rule 7) |
+| 7 (owner-maintained) | `javascript` (including JSX) | `wotjr1649/tree-sitter-javascript` (owner release v4.4.0; origin `tree-sitter/tree-sitter-javascript` v0.25.0; ADR-0024 rule 7) |
+| 7 (owner-maintained) | `typescript`, `tsx` | `wotjr1649/tree-sitter-typescript` (owner release v3.1.0; origin `tree-sitter/tree-sitter-typescript` v0.23.2; ADR-0024 rule 7) |
 
-Exact revisions are in [pins.json](tools/gen/pins.json). Bash, Ruby, YAML and Python carry recorded temporary C-only patches
+Exact revisions are in [pins.json](tools/gen/pins.json). Bash, Go, HTML, Python, Ruby, Rust and YAML carry recorded temporary patches
 ([ADR-0023](docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md); each module's README lists them).
 See the [status board](docs/reports/release-critical-status.md) for measured scopes and pending release gates, and
 [limitations](docs/reports/limitations.md).
+
+Install the root and the grammar modules you use. For example,
+
+```sh
+go get github.com/wotjr1649/go-treesitter@v0.6.0
+go get github.com/wotjr1649/go-treesitter/grammars/golang@v0.6.0
+```
 
 ```go
 import (

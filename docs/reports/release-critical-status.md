@@ -1,13 +1,73 @@
 # Release-Critical status board
 
-Updated 2026-11-16 for the v0.5.0 preview release (24 grammars, engine ABI 3). Status, not a promise. Nothing here is release-approved.
-Historical gate tables retain their original commits, pins and scope; their passing results do not transfer to v0.5.0.
-The previous board for the `gotreesitter` carrier is in Git history at main `9ad82eb`; none of its results transfer
-to the new engine.
+Updated 2026-11-24 for v0.6.0 Preview (25 grammar modules, engine ABI 4).
+Historical gate tables retain their original commits, pins and scope.
+The previous board for the `gotreesitter` carrier is in Git history at main `9ad82eb`.
+
+## v0.6.0 release scope
+
+- **Release-Critical scope.** All 25 grammar pins, including the first Swift module and PostgreSQL SQL (`postgres`).
+  The [README](../../README.md#use) names the source tiers and the [migration notes](../../MIGRATING.md#upgrading-from-v050-to-v060-engine-abi-4)
+  describe consumer-visible changes.
+- **Release policy (ADR-0022).** The [publication procedure](../specs/publication.md#multi-module-release) governs
+  this Preview pre-release. Tags and publication require separate owner authority.
+
+## v0.6.0 preparation gates
+
+Candidate: [`8c14a15083c38fbc692cd08bb10e4fed90d4c46c`](https://github.com/wotjr1649/go-treesitter/commit/8c14a15083c38fbc692cd08bb10e4fed90d4c46c).
+The release-preparation commit differs from this candidate only in documentation. Every hosted run below
+reports the candidate as its head SHA. The pins SHA-256 is
+`66f7fda502664f8104f42d001b7bb63cf24a8bef51841f3e38ddee3074d8f7e2`. The candidate uses tree-sitter
+runtime and CLI 0.27.2, pins schema 3, recipe `v2-O3` and engine ABI 4. Product results use `CGO_ENABLED=0`.
+
+| Gate | v0.6.0 candidate result | Scope |
+|---|---|---|
+| Windows product lane | PASS, E3 product, 4/4 jobs | Native Windows amd64/arm64 product execution and licence checks. The separate race job contributes diagnostic evidence. [45311382045](https://github.com/wotjr1649/go-treesitter/actions/runs/45311382045) |
+| Grammar pin move evidence | PASS, 1/1 push job, diff skipped | The push supplied no explicit comparison refs. C# v0.24.0 has separate old/new pin evidence on PR [#104](https://github.com/wotjr1649/go-treesitter/pull/104). [45311382097](https://github.com/wotjr1649/go-treesitter/actions/runs/45311382097) |
+| Reproducible generation | PASS, E3, attempt 2, 26/26 jobs | All 25 Linux amd64 grammar shards matched committed bytes, including regenerated C# v0.24.0. The aggregate passed. The first attempt is recorded below. [45311381991, attempt 2](https://github.com/wotjr1649/go-treesitter/actions/runs/45311381991/attempts/2) |
+| Conformance | PASS, E5, 52/52 jobs | 25 grammar shards and one aggregate per Linux architecture (amd64 and arm64). Pinned corpora and bounded kit inputs cover native dumps, seeded edits and ranges, raw query matches, strict fresh/edited fields, symbol lookups and retained known gaps. [45311382111](https://github.com/wotjr1649/go-treesitter/actions/runs/45311382111) |
+| Engine CI | PASS, E3, 156/156 jobs | 150 grammar jobs and six engine jobs. Native Linux amd64/arm64, macOS arm64 and Windows amd64/arm64 on Go 1.27.x, plus native Linux amd64 on supported Go 1.26.x. [45311382038](https://github.com/wotjr1649/go-treesitter/actions/runs/45311382038) |
+| Speed / memory bench | PASS, E4, 75/75 grammar/platform jobs | Paired product/native speed and memory on hashed large inputs and the pinned small corpora, on Linux amd64/arm64 and macOS arm64. macOS uses the ADR-0022 private-byte adjustment and reports engine-region counts as `NOT_RUN`. [45318803258](https://github.com/wotjr1649/go-treesitter/actions/runs/45318803258) |
+| Balancing cancellation | PASS, E5 probe builds, 25/25 jobs | Linux amd64. Across the pinned big and follow-up inputs, 6,175 stops landed in balancing and all 8,618 next parses matched the native reference. The JSON no-reset control disagreed in all three comparisons. [45318808525](https://github.com/wotjr1649/go-treesitter/actions/runs/45318808525) |
+| Nightly diff | PASS, E5 for sampled cases, 50/50 jobs | All 25 grammars on Linux amd64/arm64. Seed `20261124`, four minutes per grammar, 30 seconds per Go fuzz target and a 30-second watchdog per Go case/native operation. [45318813099](https://github.com/wotjr1649/go-treesitter/actions/runs/45318813099) |
+| Upstream watch | PASS, E1, 2/2 jobs | One unaccepted warning (Swift), with existing tier-review notices for CSS, Go, HTML and Python. Bash was below the age threshold in this run. [45318817150](https://github.com/wotjr1649/go-treesitter/actions/runs/45318817150) |
+| Candidate module ZIP rehearsal | PASS, local E3 packaging | Windows amd64, Go 1.27.4, file `GOPROXY`, empty module cache and no `replace`. The root and all 25 grammar ZIPs resolved at v0.6.0, all 25 samples parsed cleanly with `CGO_ENABLED=0`, and the consumer linked for `linux/arm64`. |
+| Candidate source-row inventory | PASS, local E1 | 34 fetch-plan rows: all 26 selected source archives matched their pins after download and eight toolchain rows were excluded. Draft upload inventory is the 26 source archives plus `SHA256SUMS`. |
+| Tag/proxy resolution and published mirror assets | Pending | Root and grammar tags, direct/public proxy resolution, draft asset digests, attestation and published download hashes are publication steps. |
+
+- **Regeneration attempt 1.** Twenty-four grammar shards passed. The C shard stopped before comparing generated
+  bytes after the official WASI SDK 34 Linux x86-64 URL and the v0.5.0 and v0.4.0 mirror requests each
+  returned HTTP 403. The aggregate also failed. A single rerun on the same candidate passed every shard.
+  [First C job](https://github.com/wotjr1649/go-treesitter/actions/runs/45311381991/job/138167676328) ·
+  [First aggregate job](https://github.com/wotjr1649/go-treesitter/actions/runs/45311381991/job/138173733682)
+- **Conformance.** Each Linux platform recorded 8,462 fresh corpus inputs, 24,726 seeded edit/range comparisons,
+  115,938 query/input pairs (stride 1), 76,405 fresh-field rows and 179,919 edited-field native result rows, with
+  zero differences against the native reference. Native and Go incremental trees differ from fresh in the same
+  30 cases per platform. The shard inputs include the [bounded kit register](../validation/workloads.md#bounded-grammar-kit-inputs).
+  [Conformance run](https://github.com/wotjr1649/go-treesitter/actions/runs/45311382111)
+- **Bench.** The highest all-paired-round large-input geomean was 2.347x native (Python, Linux amd64). TSX
+  `App.tsx` geomeans were 1.783x / 1.838x / 1.892x on Linux amd64 / Linux arm64 / macOS arm64. All 8,183
+  eligible small files passed on the first pass on each platform (24,549 file/platform decisions). The ratios
+  describe the paired measurement windows on these shared runners. [Bench run](https://github.com/wotjr1649/go-treesitter/actions/runs/45318803258)
+- **Nightly inputs.** Each shard mutates its pinned `test/corpus` and [bounded kit](../validation/workloads.md#bounded-grammar-kit-inputs)
+  seeds, generates edits and compares dumps, incremental dumps and changed ranges with the pinned native
+  executable. The 50 job summaries record per-shard input-set hashes and kit manifest SHA-256
+  `2e694d893c5cfd74cbb46f2c9b1837bccd75c8da101cac7f2da9491e82afed8c`. Under seed `20261124`, the
+  summaries report 670,491 cases on Linux amd64 and 563,508 on Linux arm64 with zero mismatches.
+  [Nightly run](https://github.com/wotjr1649/go-treesitter/actions/runs/45318813099)
+- **Source watch.** nvim-treesitter is ahead of the Swift pin at `fef1236022cc`. The successful watch run still
+  records that warning as unaccepted. CSS, Go (`golang`), HTML and Python have source-age tier-review notices
+  covered by existing acceptances expiring 2027-05-16 UTC (exclusive). Bash matched the reference pin and had
+  no age warning on 2026-11-24. [Watch run](https://github.com/wotjr1649/go-treesitter/actions/runs/45318817150) ·
+  [Bash follow-up #107](https://github.com/wotjr1649/go-treesitter/issues/107)
+
+The local rehearsal packaged the tested candidate tree. The publication procedure calls for a rehearsal of the
+final release commit so the root ZIP includes the final document bytes. The release decision includes owner
+review of the [known limitations](limitations.md) and the Swift watch warning.
 
 ## v0.5.0 release scope
 
-- **v0.5.0 Release-Critical scope:** all 24 current pins, including `postgres` (SQL only, no PL/pgSQL). Swift is excluded from v0.5.0 (the development tree adds it afterwards, [limitations](limitations.md#swift-development-tree-after-v050)); the T-SQL pin stays unchanged. Sources and tiers are in the [README](../../README.md#use).
+- **v0.5.0 Release-Critical scope:** the 24 release pins, including `postgres` (SQL only, no PL/pgSQL). Swift is excluded from v0.5.0 (its first release is v0.6.0, [limitations](limitations.md#swift-v060)); the T-SQL pin stays unchanged. Sources and tiers are in the [README](../../README.md#use).
 - **Release policy (ADR-0022):** Preview (GitHub pre-release), following [publication.md](../specs/publication.md) step by step. Tags and publication require separate owner authority.
 - Identity: tree-sitter v0.27.2 and the grammar commits in `tools/gen/pins.json`; Go 1.27.4; `CGO_ENABLED=0`.
 
@@ -144,7 +204,7 @@ filenames and hashes; it does not establish uploaded/downloaded asset digests or
 | Gate | State | Evidence level |
 |---|---|---|
 | Raw query matches vs native C (grammars' own `queries/*.scm` + probe queries over the corpora) | PASS, 0 differences: 22,047 query/input pairs on Windows amd64 (local); 12,584 per platform in CI on Linux x64 and arm64 | E5 (those queries and inputs) |
-| Query predicates vs tree-sitter CLI 0.27.2 | Historical v0.2.0 behavior: agree except the RE2/Rust regex difference (Unicode `\w`); 20/20 acceptance probes agree. This predates the development-tree regex change after v0.5.0. | E3 (retained CLI probes; not native C evidence) |
+| Query predicates vs tree-sitter CLI 0.27.2 | Historical v0.2.0 behavior: agree except the RE2/Rust regex difference (Unicode `\w`); 20/20 acceptance probes agree. This predates the [v0.6.0 regex change](../design/query-abi.md#regex-predicate-subset-v060). | E3 (retained CLI probes; not native C evidence) |
 | Cancel during balancing, then reparse (all 7 grammars, test-only probe builds) | PASS: 1,729 stops in balancing, 2,411/2,411 next parses equal native, no-reset control 3/3 mismatches (Windows); Linux x64 run 43583147260 PASS with identical callback counts | E5 (probe builds, those inputs) |
 | Large-input speed (bench run 43584133627) | PASS: geomean 1.705x (Linux x64), 1.959x (Linux arm64), 1.818x (macOS arm64); limit 2.5x | bench lane |
 | Memory peak / release (same run) | PASS on all three; macOS private bytes under the ADR-0022 §3 macOS amendment | bench lane |
@@ -313,13 +373,6 @@ The six wasi-sdk/binaryen/tree-sitter CLI host archives are fetched from officia
 checks; this release supplies no toolchain fallback assets until complete bundled notices are established.
 The source-only release scope removes the SDK redistribution-notice blocker; collected texts stay in the
 maintainer-local evidence archive for later SBOM work.
-
-
-## Next
-
-- Complete the v0.5.0 release-commit gates and fill the markers above before publication. Preserve the current T-SQL pin and all historical failure records.
-- After publication, check all selected source rows from the first mirror base and use one PR for mirror configuration plus development-form restoration.
-- PostgreSQL is included in v0.5.0; Swift remains outside v0.5.0 scope and has only local development-tree evidence, listed in [limitations](limitations.md#swift-development-tree-after-v050).
 
 
 ## PostgreSQL adoption evidence (Windows amd64, local, before the rebase)

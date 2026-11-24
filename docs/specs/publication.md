@@ -83,7 +83,7 @@ needs the owner's explicit authority for that act (above); one grant does not co
 | 8 | Before publication, compare the uploaded asset digests (`gh release view vX.Y.Z --json assets`) with local `SHA256SUMS`; the uploaded inventory must equal the rows with column 4 equal to `source` in `gen -mirror-assets` / release pins, plus `SHA256SUMS`, with no toolchain rows. Stop on missing or differing digests. | no (read-only) |
 | 9 | Publish the draft only after step 8 passes; publication makes the assets immutable. Then run `gh release verify vX.Y.Z` and retain its attestation result. | **yes** (publish); verification is read-only |
 | 10 | From the published new release base (the intended first mirror base), download **every row with column 4 equal to `source`** in `gen -mirror-assets` by its exact filename into an empty directory and check its SHA-256 against the row and `SHA256SUMS`. Listing assets alone is insufficient. Record the base, pins identity and every result. | no (read-only) |
-| 11 | In **one PR** after step 10, set `pins.json` `mirrors` to `[new release base, previous release base]` (for v0.5.0: `[v0.5.0 base, v0.4.0 base]`; current bases stay unchanged until step 10 passes) and restore the development form: restore every grammar `go.mod` from the commit immediately before step 4, delete the release-generated grammar `go.sum` files, and restore the previous root `require` in `tools/conformance` and `tools/bench`. Confirm only those intended module/config changes and no generated engine-byte changes; update the status board. | local preparation; remote integration needs authority |
+| 11 | In **one PR** after step 10, set `pins.json` `mirrors` to `[new release base, previous release base]` (for v0.6.0: `[v0.6.0 base, v0.5.0 base]`; current bases stay unchanged until step 10 passes) and restore the development form: restore every grammar `go.mod` from the commit immediately before step 4, delete the release-generated grammar `go.sum` files, and restore the previous root `require` in `tools/conformance` and `tools/bench`. Confirm only those intended module/config changes and no generated engine-byte changes; update the status board. | local preparation; remote integration needs authority |
 
 Notes:
 
@@ -108,7 +108,7 @@ Notes:
 ## Pinned archive release assets
 
 Under the [2026-11-15 ADR-0026 amendment](../design/decisions/ADR-0026-never-block-on-upstream.md#amendment-2026-11-15),
-immutable releases mirror source archives plus `SHA256SUMS` (v0.4.0: 24 source archives; current pins: 26).
+immutable releases mirror source archives plus `SHA256SUMS` (v0.4.0: 24 source archives; v0.6.0: 26 source archives).
 `(cd tools/gen && CGO_ENABLED=0 go run . -mirror-assets)` lists the candidate rows for the current pins (34) as
 headerless TSV: filename, SHA-256, primary download URL, kind (`source`/`toolchain`). Select column 4 equal to `source`
 (for example, `awk -F '\t' '$4 == "source"' release-assets.tsv`), excluding the `toolchain` rows.

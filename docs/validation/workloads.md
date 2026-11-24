@@ -446,7 +446,7 @@ The grammar corpus and queries are extracted from the SHA-pinned upstream archiv
 
 ## Swift candidate
 
-`swift` is the Swift grammar of `alex-pinkus/tree-sitter-swift` (development tree after v0.5.0). The large inputs are
+`swift` is the Swift grammar of `alex-pinkus/tree-sitter-swift` (first released in v0.6.0). The large inputs are
 real project files, not padding: one machine-generated file and two hand-written ones. They do not represent all
 Swift syntax, and no Swift language-version coverage is claimed. The hosted bench fetch manifest includes them; the
 upstream corpus supplies the small-file lane and one original small file adds a named small workload.
