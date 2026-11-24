@@ -4,17 +4,17 @@ package engine
 
 import (
 	"syscall"
+	"testing"
 	"unsafe"
 )
 
-// mprotect on an unmapped page fails with ENOMEM; on a mapped page it succeeds.
-func probe(addr uintptr, prot int) error {
+func regionCommitted(addr uintptr) bool {
 	u := addr
 	b := unsafe.Slice((*byte)(*(*unsafe.Pointer)(unsafe.Pointer(&u))), 4096)
-	return syscall.Mprotect(b, prot)
+	return syscall.Mprotect(b, syscall.PROT_READ|syscall.PROT_WRITE) == nil
 }
 
-func regionCommitted(addr uintptr) bool {
-	return probe(addr, syscall.PROT_READ|syscall.PROT_WRITE) == nil
+func reportReleaseFailure(t *testing.T, addr uintptr, err error) {
+	t.Helper()
+	t.Errorf("reservation at %#x not released: err=%v", addr, err)
 }
-func regionFreed(addr uintptr) bool { return probe(addr, syscall.PROT_NONE) != nil }

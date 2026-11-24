@@ -28,7 +28,8 @@ func (r *osRegion) commit(off, n int) error {
 
 func (r *osRegion) slice() []byte { return r.raw }
 
-func (r *osRegion) release() {
-	syscall.Munmap(r.raw) // r.raw is the exact slice Mmap returned, as Munmap requires
+func (r *osRegion) release() error {
+	err := syscall.Munmap(r.raw) // r.raw is the exact slice Mmap returned, as Munmap requires
 	r.raw = nil
+	return err
 }
