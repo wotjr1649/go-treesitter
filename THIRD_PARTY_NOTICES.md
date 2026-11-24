@@ -36,7 +36,7 @@ own `LICENSE`.
 | tree-sitter-xml | `grammars/xml` | [MIT](LICENSES/tree-sitter-xml.txt) |
 | tree-sitter-ruby | `grammars/ruby` | [MIT](LICENSES/tree-sitter-ruby.txt) |
 | tree-sitter-kotlin | `grammars/kotlin` | [MIT](LICENSES/tree-sitter-kotlin.txt) |
-| tree-sitter-swift | `grammars/swift` | [MIT](LICENSES/tree-sitter-swift.txt) |
+| tree-sitter-swift | `grammars/swift` from upstream `fef1236` in the development tree after v0.6.0 | [MIT](LICENSES/tree-sitter-swift.txt) |
 | Newtonsoft.Json | Copied C# test fixtures | [MIT](testdata/newtonsoft/LICENSE.md) |
 | regex-syntax 0.8.11 | Generated Unicode character and simple case-fold tables for query regex predicates | [MIT](LICENSES/regex-MIT.txt) or [Apache-2.0](LICENSES/regex-APACHE.txt) |
 | Unicode data | Unicode 16.0.0 tables distributed in regex-syntax 0.8.11 | [Unicode data license](LICENSES/Unicode.txt) |

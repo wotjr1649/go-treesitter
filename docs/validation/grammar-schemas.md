@@ -523,3 +523,19 @@ The strict diff records 30 additions. The six new kinds are `#:`, `directive_kin
 `directive_separator`, `directive_value` and `ignored_directive`. Preprocessor branches gain
 `body` fields and additional child and field alternatives. The previous pin already included
 `extension_declaration`, `receiver_parameter` and `slice_pattern`.
+
+## Unreleased (after v0.6.0): Swift fef1236
+
+The tier-3 [Swift upstream revision](https://github.com/alex-pinkus/tree-sitter-swift/commit/fef1236022ccde2d2bc5c32d4db8947c87a7f848)
+moves the development module from `a1d4a7b8` to `fef12360`. The archive SHA-256 is
+`121cddea55b524c2a6dc4b29efe56ccea756d42a52dee88d9700e4377c077d48`. The pinned CLI 0.27.2 generates C and the schema
+from the archived `src/grammar.json`. The candidate's archived and generated schemas are byte-identical.
+
+| Source | Bytes | Schema SHA-256 |
+|---|---:|---|
+| v0.6.0 archived `src/node-types.json` | 693860 | `f806012c196c40978d1c00145aa6adca089193a6307824f99f55cd618ebcb1b5` |
+| fef1236 archived and generated `src/node-types.json` | 693859 | `b75daf885572904d69a91086f4b7953e47a43d8077af36493c47cd12730a699d` |
+
+Both schemas pass the strict check with zero findings. The static diff records one
+`FIELD_MULTIPLE_CHANGED` / `CARDINALITY_WIDENED` change. The `catch_block.error` field changes from
+`multiple: false` to `multiple: true`. See the [Swift migration notes](../../MIGRATING.md#swift-grammar-fef1236).

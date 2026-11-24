@@ -42,6 +42,11 @@ It includes parsing fixes and file-based app directives. The four [C# known gaps
 still apply, including the split conditional in row 19. See the [C# migration notes](../../MIGRATING.md#c-grammar-v0240)
 for tree and query changes.
 
+The development Swift module moves to tier-3 upstream `fef1236` for multi-pattern catch clauses.
+The [Hangul statement-label gap](../known-gaps/swift.md) still applies. See the
+[Swift migration notes](../../MIGRATING.md#swift-grammar-fef1236) for the field cardinality change.
+The Swift v0.6.0 measurements below apply to the release pin.
+
 Release authority, tags and publication are separate from this list: see
 [`publication.md`](../specs/publication.md).
 

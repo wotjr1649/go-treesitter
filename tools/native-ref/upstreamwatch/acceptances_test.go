@@ -63,15 +63,11 @@ func TestAcceptedWarnings(t *testing.T) {
 
 func TestCheckedInAcceptances(t *testing.T) {
 	entries, err := loadAcceptances(acceptedWarningsJSON)
-	if err != nil || len(entries) != 9 {
+	if err != nil || len(entries) != 8 {
 		t.Fatalf("checked-in list: %d entries, %v", len(entries), err)
 	}
 	for _, a := range entries {
 		switch {
-		case a.Component == "swift":
-			if a.Kind != "nvim-treesitter: **we are behind**" || a.Accepted != "2026-11-24" || a.Expires != "2027-02-24" {
-				t.Fatalf("unexpected acceptance: %+v", a)
-			}
 		case a.Component == "javascript" || a.Component == "tsx" || a.Component == "typescript":
 			if a.Kind != "nvim-treesitter: **different repository**" || a.Accepted != "2026-11-19" || a.Expires != "2027-05-19" {
 				t.Fatalf("unexpected acceptance: %+v", a)

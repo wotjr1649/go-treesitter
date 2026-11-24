@@ -4,12 +4,12 @@
     "cli": "0.27.2",
     "jsRuntime": "native",
     "generateFrom": "grammar.json",
-    "generateFromSHA256": "178a9783bac58092ed8cb7d95cf4ecda6ec734d70613e42aa628ed8274846e6d",
-    "inputSHA256": "11e6df27e61c06487b2a40e4ed22ec1fe94024373bba6ccbb4911955ea176fa0",
+    "generateFromSHA256": "7b6058089495b757cb8c1d608e3432a26b5103a5d08edd4bb2cbc630a2a21498",
+    "inputSHA256": "6f0b74c84fbbf1c46d92772119450d4fa621135f63d69106f1df505c3b776fab",
     "outputs": {
-      "grammar.json": "178a9783bac58092ed8cb7d95cf4ecda6ec734d70613e42aa628ed8274846e6d",
-      "node-types.json": "f806012c196c40978d1c00145aa6adca089193a6307824f99f55cd618ebcb1b5",
-      "parser.c": "f21084a944bc2d927913f119860a513a22d897cb5c6f88f53abc46daf21ea149",
+      "grammar.json": "7b6058089495b757cb8c1d608e3432a26b5103a5d08edd4bb2cbc630a2a21498",
+      "node-types.json": "b75daf885572904d69a91086f4b7953e47a43d8077af36493c47cd12730a699d",
+      "parser.c": "1b2378708a6843f67b6c2c6e61401491655b7b8733de75f4c44c9726ce16090d",
       "scanner.c": "f054430c6a1eb29ef2ca779a9c2103466236a1fc0f44bc64f82d353ddd723946",
       "tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
       "tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
@@ -24,23 +24,23 @@
   "identity": {
     "Runtime": "v0.27.2",
     "GrammarRepo": "https://github.com/alex-pinkus/tree-sitter-swift",
-    "GrammarRev": "a1d4a7b80260bf960f9e25198cddecbe5e6c46aa",
+    "GrammarRev": "fef1236022ccde2d2bc5c32d4db8947c87a7f848",
     "SourceSHA256": {
       "grammar.LICENSE": "3533cec129bb4bba015c0d61d86dd7c3b7e82110e4d2ff7837a01eff5bad5ccc",
       "grammar.scanner.c": "f054430c6a1eb29ef2ca779a9c2103466236a1fc0f44bc64f82d353ddd723946",
-      "grammar.tree": "772c7ca85ce72b53a22e9547d3321bd91197867d5b4c6263e8e6689b9e61b323",
-      "patched.grammar.grammar.json": "178a9783bac58092ed8cb7d95cf4ecda6ec734d70613e42aa628ed8274846e6d",
-      "patched.grammar.node-types.json": "f806012c196c40978d1c00145aa6adca089193a6307824f99f55cd618ebcb1b5",
-      "patched.grammar.parser.c": "f21084a944bc2d927913f119860a513a22d897cb5c6f88f53abc46daf21ea149",
+      "grammar.tree": "6828413c9d97505cd262c8bcd33589873567ad32cfa59e1646e3d024835aed5a",
+      "patched.grammar.grammar.json": "7b6058089495b757cb8c1d608e3432a26b5103a5d08edd4bb2cbc630a2a21498",
+      "patched.grammar.node-types.json": "b75daf885572904d69a91086f4b7953e47a43d8077af36493c47cd12730a699d",
+      "patched.grammar.parser.c": "1b2378708a6843f67b6c2c6e61401491655b7b8733de75f4c44c9726ce16090d",
       "patched.grammar.scanner.c": "f054430c6a1eb29ef2ca779a9c2103466236a1fc0f44bc64f82d353ddd723946",
       "patched.grammar.tree_sitter/alloc.h": "b29c1c9fb7cc82f58c84b376df1297d6e2737a1d655fd356db0859e3c29c2fea",
       "patched.grammar.tree_sitter/array.h": "20e6ba85abb9d5b7e2e6dedf675c9424a057a06feee03aa3e2dd48a1cb4bf8a2",
       "patched.grammar.tree_sitter/parser.h": "180b893c8734778fd32f372dfbc27bd6ad1cd2221f26150b31256ff6716320d2",
-      "patches.inputs": "11e6df27e61c06487b2a40e4ed22ec1fe94024373bba6ccbb4911955ea176fa0",
+      "patches.inputs": "6f0b74c84fbbf1c46d92772119450d4fa621135f63d69106f1df505c3b776fab",
       "runtime.tree": "8794f32a54b98c69866f30736bf1d6a388f92bd6fb8814dca3e578abe3058b94",
       "shim.tsg_abi.c": "fd567c8fc616aeb97b5db0331a15243912c6ba27f6b73d1c512738b68d087816"
     },
-    "RecipeSHA256": "cc7ed87cbfb7574c13e85fc7b553c3021dd998cf040c7a036d3fdfa77dd95f4f",
+    "RecipeSHA256": "737ab2cfde8cfcd8baa214f982f9fd7a25aface24dffb9d78876f63e5859393c",
     "Tools": {
       "binaryen": "133",
       "clang": "23.1.0",
@@ -62,9 +62,9 @@
     "LICENSES/wasi-libc/cloudlibc-LICENSE": "c8b789cf5a746611e6300a0cc7750dbf92b61912a709d04e639245f7290656d0",
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
-    "engine_gen.dat": "4ce50b0d9e7d12a246e9c7dbabf98a9787f52c913cb47b370801c273e47406ea",
-    "engine_gen.go": "63f9a5b6fbdaf8271d06e77219f8a5508e65cb8aec5f4bf9e96c00ed31b0dd18",
-    "wasm": "0305f71ab853350113cdd3e10c9489c940286baf9eaf300fdd6cf902505681b0",
-    "wasm.clang": "5d4af6c5846a26cd69695a2b91d7f9e17491b676608b4bbfa9c9443b9eaa3990"
+    "engine_gen.dat": "32b9a07f4ff1bb11bf16df1b4eca0305780217644410f7332e53ebdd28865ad7",
+    "engine_gen.go": "c0bc6ad0f60eefeed66a3da0c3685f7f367dbdde52266d440847ad289979cd8c",
+    "wasm": "391b6cfe5c33fdd12134167f7e2879e7aa2a4617f442aa47d0a50d9418229c52",
+    "wasm.clang": "32838caf3cac7e6f9c8c4e7124238708006dc1cbf3472a4eb2a5ed51c9e65e21"
   }
 }

@@ -55,9 +55,9 @@
     },
     "swift": {
       "Name": "Swift",
-      "Commit": "a1d4a7b80260bf960f9e25198cddecbe5e6c46aa",
-      "PinSHA256": "40352a892de6474434464c097d8fac4a30c1851a238faa20a870c534993c65b0",
-      "ProvenanceSHA256": "81cacc75d8f1cf8fe73560965db551448f6dc549ca8931cc6563a92b0b9edcf2",
+      "Commit": "fef1236022ccde2d2bc5c32d4db8947c87a7f848",
+      "PinSHA256": "c05381bf73e0cc73cb0258a21d871724bd1d956258680a8b1207946843867760",
+      "ProvenanceSHA256": "7bbd1af7cf6ff5a8df77af34dc94e6133620939eaea27b2e9e8ead6040dc66cb",
       "PatchCount": 0
     }
   },
