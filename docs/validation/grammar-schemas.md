@@ -575,7 +575,7 @@ See the [migration notes](../../MIGRATING.md#css-non-latin-1-names) for the new 
 
 ## Unreleased after v0.7.0: CSS declaration value patch
 
-The [second grammar-input patch](../../tools/gen/patches/css#0002-non-latin-1-declaration-value)
+The [second grammar-input patch](../../tools/gen/patches/css/README.md#0002-non-latin-1-declaration-value)
 fixes the failure reported in the [comment on upstream PR #105](https://github.com/tree-sitter/tree-sitter-css/pull/105#issuecomment-7140588000).
 It uses the same CSS commit and CLI 0.27.2. The generated schemas with zero, one and two patches
 each pass the strict check and have the same 43,620 bytes and SHA-256

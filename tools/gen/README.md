@@ -285,7 +285,10 @@ Recorded C-only patches exist for bash and ruby (`0001-heredoc-utf8`), yaml (`00
 Go applies `0001-new-value-argument` before generation to accept Go 1.26 expression arguments to `new`.
 Ruby applies `0002-global-variable-non-ascii` before generation to accept non-ASCII global-variable names, and
 `0003-non-ascii-symbol` (`src/scanner.c`, after generation) so the scanner compares whole code points in plain `:symbol` names.
-CSS applies `0001-non-latin1-names` and then `0002-non-latin1-value` before generation to accept non-Latin-1 names and a bare identifier as a declaration value.
+CSS applies `0001-non-latin1-names` and then `0002-non-latin1-value` before generation to accept non-Latin-1 names and
+a single unquoted, unescaped identifier as a declaration value when it starts with a code point beyond Latin-1,
+optionally after a hyphen. See the [migration notes](../../MIGRATING.md#css-non-latin-1-declaration-values)
+for recovery and query capture changes.
 XML applies `0001-non-ascii-names` (`common/common.mjs`) before generation and `0002-tag-name-code-points` (`xml/src/scanner.c`) after it.
 PowerShell applies `0001-non-ascii-names` (`grammar.js`) before generation to accept non-ASCII variable, parameter, hash-key, member and type names (statement labels stay ASCII-only).
 `gen -patch-status` lists 17 records in total, including three for Ruby, two each for CSS and XML, and one for PowerShell. Retire each with an approved pin move to a source that contains the fix (for an owner-maintained repository, an owner release; ADR-0024 rule 7.6).
