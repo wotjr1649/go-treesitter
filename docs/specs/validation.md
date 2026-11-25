@@ -114,6 +114,10 @@ Never widen a record to absorb a new failure. Open a new record.
 
 ## Failure and iteration policy
 
+A push to a PR may cancel superseded automatic `pull_request` runs of the same workflow for that PR. Main push,
+scheduled, dispatched, pin-move evidence and release runs are exempt. Keep completed results under their original
+commit. Work canceled before execution is `NOT_RUN`.
+
 | Situation | Required action |
 |---|---|
 | Focused test fails because of your change | Diagnose, fix, rerun. Loop without asking. |
