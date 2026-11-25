@@ -30,6 +30,7 @@ Observed: The root has errors: the declaration is an ERROR over [4,13) and the H
 Expected rule: 한글 is an identifier value (plain_value) of the declaration b, with no error.
 
 - Specification: [CSS Syntax Module Level 3 (2026-10-01): ident-start code point](https://www.w3.org/TR/2026/CRD-css-syntax-3-20261001/#ident-start-code-point)
-- Upstream issue: none recorded.
+- [Upstream pull request](https://github.com/tree-sitter/tree-sitter-css/pull/105#issuecomment-7140588000)
+- Reported as a comment on open pull request [#105](https://github.com/tree-sitter/tree-sitter-css/pull/105); no maintainer response as of 2026-11-25.
 - Input SHA-256: `9e72dd72130d55d7d5294e143ea1fbd1656ec0c3a7879e306db4fb46d9c730a1`
 - [Recorded native dump](../../tools/conformance/testdata/known-gaps/css-non-latin1-value.dump), SHA-256: `1e2f75f20d41affef8fa61e82f8570e8b5432cabbd307af2b2b93048e5ea58f3`
