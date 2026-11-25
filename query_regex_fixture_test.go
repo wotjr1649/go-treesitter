@@ -1,8 +1,10 @@
 package treesitter
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
+	"math"
 	"os"
 	"strings"
 	"testing"
@@ -74,6 +76,11 @@ func TestQueryRegexRecordedCLI(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			compile := newQueryMeter(context.Background(), math.MaxInt64, "query regex")
+			budgeted, err := compileQueryRegexWithMeter(pattern, &compile)
+			if err != nil {
+				t.Fatal(err)
+			}
 			if len(row.Matches) != len(fixture.Inputs) {
 				t.Fatal("incomplete matrix row")
 			}
@@ -97,6 +104,11 @@ func TestQueryRegexRecordedCLI(t *testing.T) {
 					if row.Name == "property-L" && input.Name == "unicode17-new-letter" {
 						want = unicode.IsLetter('\U00010940')
 					}
+				}
+				work := newQueryMeter(context.Background(), math.MaxInt64, "query predicate work")
+				got := regexVMMatchWithMeter(budgeted.prog, text, budgeted.asciiBoundaries, &work)
+				if work.err != nil || got != want || budgeted.MatchString(text) != want {
+					t.Errorf("%s: budgeted regex=%v err=%v want=%v", input.Name, got, work.err, want)
 				}
 				if got := re.MatchString(text); got != want {
 					t.Errorf("%s: pattern=%q Go=%v recorded CLI=%v expected Go=%v residual=%q", input.Name, pattern, got, row.Matches[i], want, row.Residual)

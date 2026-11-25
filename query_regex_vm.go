@@ -1,6 +1,7 @@
 package treesitter
 
 import (
+	"math/bits"
 	"regexp/syntax"
 	"unicode/utf8"
 )
@@ -8,11 +9,21 @@ import (
 // regexVMMatch runs an unanchored boolean search with O(len(text)*len(prog.Inst))
 // work and O(len(prog.Inst)) per-call storage. Capture priorities are irrelevant.
 func regexVMMatch(prog *syntax.Prog, text string, asciiBoundaries map[uint32]bool) bool {
+	return regexVMMatchWithMeter(prog, text, asciiBoundaries, nil)
+}
+
+func regexVMMatchWithMeter(prog *syntax.Prog, text string, asciiBoundaries map[uint32]bool, work *queryMeter) bool {
+	if !work.charge(3 * int64(len(prog.Inst))) {
+		return false
+	}
 	seen := make([]int, len(prog.Inst))
 	pending := make([]uint32, 0, len(prog.Inst))
 	next := make([]uint32, 0, len(prog.Inst))
 	previous, previousValid := rune(-1), true
 	for pos, generation := 0, 1; ; generation++ {
+		if !work.charge(1) {
+			return false
+		}
 		current, width := rune(-1), 0
 		valid := true
 		if pos < len(text) {
@@ -27,12 +38,18 @@ func regexVMMatch(prog *syntax.Prog, text string, asciiBoundaries map[uint32]boo
 				if width < 2 || len(asciiBoundaries) == 0 {
 					break
 				}
+				if !work.charge(1) {
+					return false
+				}
 				generation++
 				unicodeFlags, asciiFlags = 0, syntax.EmptyNoWordBoundary
 			}
 			consume := !interior && width != 0 && valid
 			pending = append(pending, uint32(prog.Start))
 			for len(pending) > 0 {
+				if !work.charge(1) {
+					return false
+				}
 				last := len(pending) - 1
 				pc := pending[last]
 				pending = pending[:last]
@@ -57,8 +74,13 @@ func regexVMMatch(prog *syntax.Prog, text string, asciiBoundaries map[uint32]boo
 						pending = append(pending, inst.Out)
 					}
 				case syntax.InstRune, syntax.InstRune1:
-					if consume && inst.MatchRune(current) {
-						next = append(next, inst.Out)
+					if consume {
+						if work != nil && !work.charge(int64(4+bits.Len(uint(len(inst.Rune))))) {
+							return false
+						}
+						if inst.MatchRune(current) {
+							next = append(next, inst.Out)
+						}
 					}
 				case syntax.InstRuneAny:
 					if consume {

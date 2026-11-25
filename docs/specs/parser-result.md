@@ -43,6 +43,20 @@ queries whose `Query` values were garbage-collected (decided 2026-11-25). A faul
 returned with its usual outcome. Cancellation during the engine call is detected in the progress
 callback; the call returns after the C parser's cleanup.
 
+## Query results and limits
+
+`NewQueryWithOptions` and `Tree.MatchesWithOptions` use the existing error outcomes.
+A malformed query returns `InvalidInput` with a `*QueryError` available through `errors.As`.
+`NewQuery` returns that query error directly. Context cancellation or expiration uses `Cancelled`
+or `Timeout`. Go-side budget exhaustion returns `ResourceLimit` with `InstanceReset == false`.
+Engine growth refusal can require an instance reset. The cursor's in-progress `MatchLimit`
+reports `ErrQueryMatchLimit` and discards any result produced by the same engine call.
+
+A stopped match sequence emits at most one terminal error and releases the parser's busy guard.
+Previously yielded capture nodes retain their snapshots. An iteration that ends cleanly, stops
+on a Go limit, observes cooperative cancellation, or breaks early leaves the live tree reusable.
+See the [query contract](../design/query-abi.md#opt-in-go-budgets) for enforcement points.
+
 ## Input
 
 Bytes are parsed like C tree-sitter (UTF-8; a leading BOM is skipped; invalid bytes become decode errors in the
