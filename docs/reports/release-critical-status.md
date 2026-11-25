@@ -1,7 +1,7 @@
 # Release-Critical status board
 
-Updated 2026-11-25 for the v0.7.0 Preview candidate (25 grammar modules, five of them with new tags, engine ABI 4).
-The latest published release is v0.6.0 (see [Released](#released)). Historical gate tables retain their original commits, pins and scope.
+Updated 2026-11-25 for the v0.7.0 Preview release (25 grammar modules, five of them with new tags, engine ABI 4).
+The latest published release is v0.7.0 (see [Released](#released)). Historical gate tables retain their original commits, pins and scope.
 The previous board for the `gotreesitter` carrier is in Git history at main `9ad82eb`.
 
 ## v0.7.0 release scope
@@ -27,12 +27,11 @@ The previous board for the `gotreesitter` carrier is in Git history at main `9ad
 
 Candidate: [`7e243318b5b1f8223ac0e1f49e06e10a9b107757`](https://github.com/wotjr1649/go-treesitter/commit/7e243318b5b1f8223ac0e1f49e06e10a9b107757),
 main after PRs #117 to #123 merged. The release-preparation commit differs from this candidate only in documentation.
-The grammar release-form commit (publication step 4) will additionally change only the selected modules' `go.mod` and
+The grammar release-form commit (publication step 4, `11bafe0`) additionally changed only the selected modules' `go.mod` and
 `go.sum`. Every hosted run below reports the candidate as its head SHA. The pins SHA-256 is
 `538a27f991d48a81d7958b23f8d148ba492e1df75110fcf39586720b6fb406a8`. The candidate uses tree-sitter runtime and CLI
 0.27.2, pins schema 3, recipe `v2-O3` and engine ABI 4. Product results use `CGO_ENABLED=0`. All nine hosted runs finished on their
-first attempt; none was re-run. Eight passed and the bench failed (see the exception below). Rows still marked `NOT_RUN`
-have not been executed.
+first attempt; none was re-run. Eight passed and the bench failed (see the exception below). The rows after the bench list the publication checks of steps 1 to 10, with their results.
 
 | Gate | v0.7.0 candidate result | Scope |
 |---|---|---|
@@ -46,11 +45,11 @@ have not been executed.
 | Nightly diff | PASS, E5 for sampled cases, 50/50 jobs | All 25 grammars on Linux amd64/arm64. Seed `20261125`, four minutes per grammar and 30 seconds per Go fuzz target. [45540891798](https://github.com/wotjr1649/go-treesitter/actions/runs/45540891798) |
 | Upstream watch | PASS, E1, 2/2 jobs | 0 unaccepted warnings. `swift` is at `fef1236`, the same revision as nvim-treesitter, and has no exception. CSS, Go (`golang`), HTML and Python source-age tier-review notices and the Java, JavaScript, TSX and TypeScript different-repository notices are covered by existing acceptances; no stale acceptance was listed. [45540895804](https://github.com/wotjr1649/go-treesitter/actions/runs/45540895804) |
 | Windows amd64 local bench of the five new tags | PASS, E4, maintainer-local, 5/5 grammars | Candidate `7e24331`, Windows amd64, Go 1.27.4, `CGO_ENABLED=0`, `swift`, `xml`, `css`, `ruby` and `powershell`, with the hosted bench's workflow steps and its declared repetitions (5 rounds x 5 reps for large inputs, 3 x 7 for small files, 3 fresh processes per memory condition). Every measured criterion passed, with no failure or re-check: large-input geomean 1.388 over the 7 registered large files (geomean of per-file medians 1.376; limit 2.5), per-grammar small-file medians at most 0.018 ms (Swift 313, XML 16, CSS 40, Ruby 291 and PowerShell 165 files, all passing on the first pass), peaks within their limits, private-byte growth at most 5.6 MiB (limit 16) and every engine region returned. The smallest peak margin is Ruby's snapshot: 183.3 MiB against the 193.5 MiB limit. The evidence covers these inputs and this host only and is not E5 or a release gate. The other 20 grammars on Windows and Windows arm64 are NOT_RUN; the hosted bench has no Windows lane. |
-| Root ZIP rehearsal (step 1) | NOT_RUN | Before the root tag: the exact root version from a file `GOPROXY` with the carried-forward `v0.6.0` grammar tags (empty module and cache, no `replace`, `CGO_ENABLED=0`, a parse smoke test per grammar, `linux/arm64` cross-build). No owner approval needed; the tag push does need it. |
-| New-grammar ZIP rehearsal (steps 1 and 4) | NOT_RUN | After the step-4 release-form commit and before the step-5 grammar tags: each new tag alone at root `v0.6.0`, and mixed with the carried-forward tags at root `v0.7.0`, from a file `GOPROXY`. |
-| Candidate source-row inventory | Listing only, local E1 | `gen -mirror-assets` lists 34 rows: 26 `source` and eight `toolchain`. Draft upload would be the 26 source archives plus `SHA256SUMS`. Downloads and digest checks: NOT_RUN. |
-| Tag/proxy resolution (steps 3 and 6) | NOT_RUN | After the tags exist: `GOPROXY=direct` and the public proxy, read-only. |
-| Draft assets, publication and published mirror assets (steps 7 to 10) | NOT_RUN | Asset digests, `gh release verify` and anonymous source-archive downloads follow the draft release and publication. |
+| Root ZIP rehearsal (step 1) | PASS, local E3 packaging | Merge commit `7e777f7` (PR [#124](https://github.com/wotjr1649/go-treesitter/pull/124)), Windows amd64, Go 1.27.4, file `GOPROXY`, empty module cache and no `replace`: root v0.7.0 with the 25 carried-forward v0.6.0 grammar tags. All 25 samples parsed cleanly with `CGO_ENABLED=0`, `go mod verify` passed and the consumer linked for `linux/arm64`. The root ZIP (SHA-256 `642c8becf69610e05a9217b988b66ef1e124621c3d954f61e716e2af1d8e7aa1`) was reproducible and its file list equalled the tracked files minus the nested modules. |
+| New-grammar ZIP rehearsal (steps 1 and 4) | PASS, local E3 packaging, 73 assertions | Release-form commit `11bafe0` (tree `677a785`, equal to the merge commit `2d11c3f` of PR [#125](https://github.com/wotjr1649/go-treesitter/pull/125)), same host and settings. Each new tag alone at root v0.6.0 (five consumers, Go selected root v0.6.0) and the mixed consumer (root v0.7.0, five new tags, 20 carried-forward tags, Go selected root v0.7.0) built, parsed their samples cleanly, passed `go mod verify` and cross-built for `linux/arm64`. The five grammar ZIPs and the root ZIP were reproducible. |
+| Candidate source-row inventory | PASS, local E1 | `gen -mirror-assets` listed 34 rows: 26 `source` and eight `toolchain`. The draft upload was the 26 source archives plus `SHA256SUMS`. The anonymous downloads are in the last row. |
+| Tag/proxy resolution (steps 3 and 6) | PASS, read-only publication checks | With `GOPROXY=direct` and `https://proxy.golang.org` (checksum database on, empty module and cache, no `replace`): root v0.7.0 resolved to ZIP `h1:3ACDdctZaRFxr56ZNrmiVfgtPtQzEExl7Oe50GGrOdw=` and `go.mod` `h1:KJIvMYLvodmn4BQJCoD6xv78V+az/OFejtkmaybKoGk=` on both routes, equal to the step-1 rehearsal. On each route five consumers (root v0.6.0 and one new grammar tag), one mixed consumer (root v0.7.0, five new tags and 20 carried-forward v0.6.0 tags) and one root-only consumer (root v0.7.0 and all 25 grammars at v0.6.0; `go list -m all` saved) passed `go list -m all`, `CGO_ENABLED=0` build, parse smoke, `go mod verify` and the `linux/arm64` cross-build. Their `go.sum` lines were identical on both routes and equal to the file-`GOPROXY` rehearsal. The selections of the single and mixed consumers were printed and recorded, but their `go list -m all` output was not saved. See [Released](#released). |
+| Draft assets, publication and published mirror assets (steps 7 to 10) | PASS, read-only publication checks | All 27 draft asset digests matched the local files. `gh release verify v0.7.0` passed after publication. All 26 anonymous source archive downloads and `SHA256SUMS` matched their pinned SHA-256 hashes. See [Released](#released). |
 
 - **Conformance.** Each Linux platform recorded 8,463 fresh corpus inputs, 24,729 seeded edit/range comparisons,
   115,956 query/input pairs (stride 1), 76,414 fresh-field rows and 179,899 edited-field native result rows, with
@@ -92,11 +91,9 @@ have not been executed.
   `accepted-warnings.json` when it moved the pin, so the v0.7.0 candidate has no Swift exception. The candidate watch run
   is [45540895804](https://github.com/wotjr1649/go-treesitter/actions/runs/45540895804).
 
-- **Order and approvals.** Per the [publication procedure](../specs/publication.md#multi-module-release): the gates and
-  both local file-`GOPROXY` rehearsals (root before its tag, new grammars after the step-4 commit and before their tags)
-  need no approval. Pushing the root tag, pushing the grammar tags, creating the draft release and publishing it each
-  need separate owner approval. The direct and public-proxy checks and the mirror download check are read-only and run
-  after the tags or the publication they check.
+- **Order and approvals.** Per the [publication procedure](../specs/publication.md#multi-module-release), the root tag, the grammar tags,
+  the draft release and its publication each had separate owner approval. The gates, both local file-`GOPROXY` rehearsals, the direct and
+  public-proxy checks and the mirror download check needed none (the checks are read-only).
 
 The [known limitations](limitations.md) describe the scope of this Preview.
 
@@ -261,6 +258,15 @@ filenames and hashes; it does not establish uploaded/downloaded asset digests or
 
 ## Released
 
+- **v0.7.0 Preview** (2026-11-25 07:52:05 UTC, immutable GitHub pre-release). Root tag `v0.7.0` points to `7e777f7` (merge of
+  PR [#124](https://github.com/wotjr1649/go-treesitter/pull/124)). The five grammar tags `grammars/{swift,xml,css,ruby,powershell}/v0.7.0` point to
+  `2d11c3f` (merge of PR [#125](https://github.com/wotjr1649/go-treesitter/pull/125), tree equal to the step-4 release-form commit `11bafe0`). The other
+  20 grammars keep their `grammars/<lang>/v0.6.0` tags (`a8af436`). `GOPROXY=direct` and `https://proxy.golang.org` returned the same root ZIP
+  `h1:3ACDdctZaRFxr56ZNrmiVfgtPtQzEExl7Oe50GGrOdw=` and `go.mod` `h1:KJIvMYLvodmn4BQJCoD6xv78V+az/OFejtkmaybKoGk=`. On each route empty-cache consumers
+  on Windows amd64 (Go 1.27.4) without `replace` installed each new grammar tag with root v0.6.0 (five consumers), the mixed set of root v0.7.0, the
+  five new tags and the 20 carried-forward tags, and root v0.7.0 with all 25 grammars at v0.6.0, built with `CGO_ENABLED=0`, parsed the samples cleanly and cross-built for `linux/arm64`. The release
+  includes 26 pinned source archives and `SHA256SUMS`. The configured mirror order is v0.7.0, then v0.6.0.
+  [GitHub release](https://github.com/wotjr1649/go-treesitter/releases/tag/v0.7.0)
 - **v0.6.0 Preview** (2026-11-24 06:44:40 UTC, immutable GitHub pre-release). Root tag
   `v0.6.0` points to `f723d8e`. All 25 grammar tags `grammars/<lang>/v0.6.0`, including Swift's first module release,
   point to `a8af436`. `GOPROXY=direct` and `GOPROXY=https://proxy.golang.org` returned the same root ZIP

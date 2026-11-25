@@ -1,7 +1,7 @@
 # go-treesitter
 
-**Preview (v0.7.0).** The latest published release is [v0.6.0](https://github.com/wotjr1649/go-treesitter/releases/tag/v0.6.0)
-(GitHub pre-release). A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
+**[Preview v0.7.0](https://github.com/wotjr1649/go-treesitter/releases/tag/v0.7.0)** (GitHub pre-release).
+A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
 module is generated from the unmodified upstream tree-sitter runtime and pinned grammar C (wasm translated to Go by
 `tools/gen`). Grammar C may carry recorded temporary
 [ADR-0023 patches](docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md); each patched module discloses them.
@@ -58,9 +58,7 @@ Go selects the highest root that any selected module requires. Each new tag decl
 root `v0.7.0` is the recommended pairing. The [compatibility table](docs/reports/compatibility.md) records the tested combinations and the
 [support table](docs/reports/grammar-support.md) lists known limits by tag.
 
-Install the root and the grammar modules you use, each at the tag in the table above. Until v0.7.0 is published, use
-the [v0.6.0 install example](https://github.com/wotjr1649/go-treesitter/blob/v0.6.0/README.md#use) (the root and every
-grammar at `v0.6.0`). After v0.7.0 is published, for example,
+Install the root and the grammar modules you use, each at the tag in the table above. For example,
 
 ```sh
 go get github.com/wotjr1649/go-treesitter@v0.7.0
