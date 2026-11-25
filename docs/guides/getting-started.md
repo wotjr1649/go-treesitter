@@ -2,7 +2,9 @@
 
 How to parse source code with go-treesitter, from install to concurrent use. The root module has no grammar: you add
 one grammar module per language. Everything below runs as a test (`tools/conformance/getting_started_test.go`),
-and each Go snippet is that test's text, so CI notices when the guide and the code drift apart.
+and each Go snippet is that test's text. A test compares them, so a drift between the guide and the code fails it. The
+conformance workflow runs these tests once its step selects `^Example` (the change in PR #127); until that is on main,
+run them yourself: `cd tools/conformance && go test -run Example .`.
 
 This is a Preview (v0.x): the compatibility rules of [api-stability.md](../design/api-stability.md) start at root 1.0.
 For the exact contracts read [parser-result.md](../specs/parser-result.md) and the package documentation
@@ -13,8 +15,10 @@ For the exact contracts read [parser-result.md](../specs/parser-result.md) and t
 Add the root module and a grammar module, each at the tag the [README](../../README.md#use) lists:
 
 ```sh
+go mod init example.com/app   # in a new, empty directory
 go get github.com/wotjr1649/go-treesitter@v0.7.0
 go get github.com/wotjr1649/go-treesitter/grammars/golang@v0.6.0
+go mod tidy                   # after the imports below are in your code
 ```
 
 Go 1.26 or later; no C compiler is needed (`CGO_ENABLED=0` builds). Import both packages. The grammar package
@@ -28,7 +32,9 @@ import (
 ```
 
 The snippets below also use `context`, `errors`, `fmt`, `log`, `sync`, `strings` and `time` from the standard library and
-leave the `func main` around them out.
+leave the `func main` around them out. Paste them one after another into one `func main`: they use distinct names, and
+only `ctx` and `parser` (from the first snippet) and `snap` (the walk snippet) carry over. Each snippet can also stand
+alone in its own function if you add those lines to it.
 
 ## Parse a file and walk the snapshot
 
@@ -100,18 +106,18 @@ where the grammar recovered:
 <!-- snippet:syntax-errors -->
 ```go
 // A syntax error is not a Go error: the tree is complete and Outcome says it has errors.
-tree, err := parser.Parse(ctx, []byte("package p\n\nfunc (\n"), nil)
+broken, err := parser.Parse(ctx, []byte("package p\n\nfunc (\n"), nil)
 if err != nil {
 	log.Fatal(err)
 }
-defer tree.Close()
-fmt.Println(tree.Outcome())
-snap, err := tree.Snapshot(ctx)
+defer broken.Close()
+fmt.Println(broken.Outcome())
+brokenSnap, err := broken.Snapshot(ctx)
 if err != nil {
 	log.Fatal(err)
 }
-fmt.Println(snap.Root().HasError())
-for n := range snap.All() {
+fmt.Println(brokenSnap.Root().HasError())
+for n := range brokenSnap.All() {
 	if n.IsError() || n.IsMissing() {
 		fmt.Println(n.Kind(), n.IsMissing(), n.StartPoint())
 	}
@@ -227,15 +233,15 @@ After `Edit` the tree is only useful as the old tree of the next `Parse`: its `S
 
 ## Resource limits and cancellation
 
-Options bound the cost of untrusted input. A value of 0 means no explicit limit; a negative or out-of-range value
-makes `NewParser` fail.
+Options bound the cost of untrusted input. A value of 0 means no explicit limit (for memory: the engine default of
+1 GiB); a negative or out-of-range value makes `NewParser` fail with `InvalidInput`.
 
 | Option | Bounds |
 |---|---|
 | `WithMaxInputBytes` | source length, checked before any parsing (`ResourceLimit`) |
 | `WithMaxSnapshotNodes` | node count of an exported snapshot, checked before the export (`ResourceLimit`) |
-| `WithMaxMemoryBytes` | the linear memory of **this parser's** engine instance, including query indexes and match buffers. It does not cover the Go heap of sources, snapshots and line indexes. A refused growth is `ResourceLimit` |
-| `WithRecycleAboveBytes` | not a limit: recreates the instance after a large parse so its memory returns to the OS |
+| `WithMaxMemoryBytes` | the linear memory of **this parser's** engine instance, including query indexes and match buffers; from 32 MiB to 4 GiB, anything else fails `NewParser`. It does not cover the Go heap of sources, snapshots and line indexes. A refused growth is `ResourceLimit` |
+| `WithRecycleAboveBytes` | not a limit: recreates the instance after a large parse so its memory returns to the OS. It waits while the parser holds a live `Tree` (`ParseSnapshot` recycles at once), so close your trees |
 | `WithStrictUTF8` | rejects invalid UTF-8 (`InvalidInput`) instead of parsing it as C tree-sitter does |
 
 Every parse takes a `context.Context`; a deadline or cancellation ends the parse between parser steps with
@@ -243,33 +249,32 @@ Every parse takes a `context.Context`; a deadline or cancellation ends the parse
 
 <!-- snippet:limits -->
 ```go
-parser, err := treesitter.NewParser(golang.Language(),
+limited, err := treesitter.NewParser(golang.Language(),
 	treesitter.WithMaxInputBytes(1<<20),     // reject larger sources before any parsing
 	treesitter.WithMaxSnapshotNodes(100000), // reject a larger export (ParseSnapshot, Tree.Snapshot)
-	treesitter.WithMaxMemoryBytes(256<<20),  // linear memory of this parser's engine instance
+	treesitter.WithMaxMemoryBytes(256<<20),  // linear memory of this parser's engine instance (32 MiB to 4 GiB)
 )
 if err != nil {
 	log.Fatal(err)
 }
-defer parser.Close()
+defer limited.Close()
 
-src := []byte("package p\n\nfunc F() {}\n")
+input := []byte("package p\n\nfunc F() {}\n")
 
 // A context that is already cancelled or expired stops the parse before it starts.
-ctx, cancel := context.WithCancel(context.Background())
+done, cancel := context.WithCancel(context.Background())
 cancel()
-_, err = parser.ParseSnapshot(ctx, src)
+_, err = limited.ParseSnapshot(done, input)
 fmt.Println(errors.Is(err, treesitter.ErrCancelled), errors.Is(err, context.Canceled))
 
-ctx, cancel = context.WithTimeout(context.Background(), time.Nanosecond)
-defer cancel()
-time.Sleep(time.Millisecond)
-_, err = parser.ParseSnapshot(ctx, src)
+late, cancelLate := context.WithDeadline(context.Background(), time.Now().Add(-time.Second))
+defer cancelLate()
+_, err = limited.ParseSnapshot(late, input)
 fmt.Println(errors.Is(err, treesitter.ErrTimeout), errors.Is(err, context.DeadlineExceeded))
 
 // The parser stays usable after a failed parse.
-snap, err := parser.ParseSnapshot(context.Background(), src)
-fmt.Println(err, snap.Root().Kind())
+again, err := limited.ParseSnapshot(context.Background(), input)
+fmt.Println(err, again.Root().Kind())
 // Output:
 // true true
 // true true
@@ -331,7 +336,8 @@ fmt.Println(strings.Join(kinds, " "))
 
 ## Korean and other non-UTF-8 input
 
-The parser takes UTF-8. A UTF-8 BOM is fine as it is; `NewSource` converts UTF-16 that starts with a BOM,
+The parser takes UTF-8. A UTF-8 BOM is fine as it is (the first line's columns then count its bytes: see
+[korean-input.md](korean-input.md)); `NewSource` converts UTF-16 that starts with a BOM,
 `NewSourceUTF16` converts UTF-16 of a known byte order, and `NewSourceCP949` converts CP949 (windows-949). Nothing
 guesses an encoding. `Source.OriginalOffset` maps a UTF-8 offset back to the file's bytes, and `LineIndex` gives byte,
 UTF-16 and rune columns (for LSP). Check `Source.Replacements` before you write converted text back.
@@ -348,22 +354,22 @@ if src.Replacements() != 0 {
 	log.Fatal("input holds bytes that are not CP949; do not write the converted text back")
 }
 
-parser, err := treesitter.NewParser(golang.Language())
+koParser, err := treesitter.NewParser(golang.Language())
 if err != nil {
 	log.Fatal(err)
 }
-defer parser.Close()
-snap, err := parser.ParseSnapshot(context.Background(), src.Bytes()) // UTF-8 from here on
+defer koParser.Close()
+koSnap, err := koParser.ParseSnapshot(context.Background(), src.Bytes()) // UTF-8 from here on
 if err != nil {
 	log.Fatal(err)
 }
 
-comment := snap.Root().NamedChild
+comment := koSnap.Root().NamedChild
 first, _ := comment(0)
 end := first.EndByte()
-pos := snap.Lines().Pos(end)
+at := koSnap.Lines().Pos(end)
 fmt.Println(first.Text(), end, src.OriginalOffset(end))
-fmt.Println(pos.Line, pos.ByteCol, pos.UTF16Col, pos.RuneCol)
+fmt.Println(at.Line, at.ByteCol, at.UTF16Col, at.RuneCol)
 // Output:
 // // 한글 9 7
 // 0 9 5 5

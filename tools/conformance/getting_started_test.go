@@ -91,18 +91,18 @@ func Example_gettingStartedErrors() {
 
 	// snippet:syntax-errors
 	// A syntax error is not a Go error: the tree is complete and Outcome says it has errors.
-	tree, err := parser.Parse(ctx, []byte("package p\n\nfunc (\n"), nil)
+	broken, err := parser.Parse(ctx, []byte("package p\n\nfunc (\n"), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer tree.Close()
-	fmt.Println(tree.Outcome())
-	snap, err := tree.Snapshot(ctx)
+	defer broken.Close()
+	fmt.Println(broken.Outcome())
+	brokenSnap, err := broken.Snapshot(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(snap.Root().HasError())
-	for n := range snap.All() {
+	fmt.Println(brokenSnap.Root().HasError())
+	for n := range brokenSnap.All() {
 		if n.IsError() || n.IsMissing() {
 			fmt.Println(n.Kind(), n.IsMissing(), n.StartPoint())
 		}
@@ -209,33 +209,32 @@ func Example_gettingStartedEdit() {
 
 func Example_gettingStartedLimits() {
 	// snippet:limits
-	parser, err := treesitter.NewParser(golang.Language(),
+	limited, err := treesitter.NewParser(golang.Language(),
 		treesitter.WithMaxInputBytes(1<<20),     // reject larger sources before any parsing
 		treesitter.WithMaxSnapshotNodes(100000), // reject a larger export (ParseSnapshot, Tree.Snapshot)
-		treesitter.WithMaxMemoryBytes(256<<20),  // linear memory of this parser's engine instance
+		treesitter.WithMaxMemoryBytes(256<<20),  // linear memory of this parser's engine instance (32 MiB to 4 GiB)
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer parser.Close()
+	defer limited.Close()
 
-	src := []byte("package p\n\nfunc F() {}\n")
+	input := []byte("package p\n\nfunc F() {}\n")
 
 	// A context that is already cancelled or expired stops the parse before it starts.
-	ctx, cancel := context.WithCancel(context.Background())
+	done, cancel := context.WithCancel(context.Background())
 	cancel()
-	_, err = parser.ParseSnapshot(ctx, src)
+	_, err = limited.ParseSnapshot(done, input)
 	fmt.Println(errors.Is(err, treesitter.ErrCancelled), errors.Is(err, context.Canceled))
 
-	ctx, cancel = context.WithTimeout(context.Background(), time.Nanosecond)
-	defer cancel()
-	time.Sleep(time.Millisecond)
-	_, err = parser.ParseSnapshot(ctx, src)
+	late, cancelLate := context.WithDeadline(context.Background(), time.Now().Add(-time.Second))
+	defer cancelLate()
+	_, err = limited.ParseSnapshot(late, input)
 	fmt.Println(errors.Is(err, treesitter.ErrTimeout), errors.Is(err, context.DeadlineExceeded))
 
 	// The parser stays usable after a failed parse.
-	snap, err := parser.ParseSnapshot(context.Background(), src)
-	fmt.Println(err, snap.Root().Kind())
+	again, err := limited.ParseSnapshot(context.Background(), input)
+	fmt.Println(err, again.Root().Kind())
 	// Output:
 	// true true
 	// true true
@@ -291,22 +290,22 @@ func Example_gettingStartedKorean() {
 		log.Fatal("input holds bytes that are not CP949; do not write the converted text back")
 	}
 
-	parser, err := treesitter.NewParser(golang.Language())
+	koParser, err := treesitter.NewParser(golang.Language())
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer parser.Close()
-	snap, err := parser.ParseSnapshot(context.Background(), src.Bytes()) // UTF-8 from here on
+	defer koParser.Close()
+	koSnap, err := koParser.ParseSnapshot(context.Background(), src.Bytes()) // UTF-8 from here on
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	comment := snap.Root().NamedChild
+	comment := koSnap.Root().NamedChild
 	first, _ := comment(0)
 	end := first.EndByte()
-	pos := snap.Lines().Pos(end)
+	at := koSnap.Lines().Pos(end)
 	fmt.Println(first.Text(), end, src.OriginalOffset(end))
-	fmt.Println(pos.Line, pos.ByteCol, pos.UTF16Col, pos.RuneCol)
+	fmt.Println(at.Line, at.ByteCol, at.UTF16Col, at.RuneCol)
 	// Output:
 	// // 한글 9 7
 	// 0 9 5 5
