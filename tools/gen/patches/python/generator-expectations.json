@@ -2,8 +2,8 @@
   "identity": {
     "grammarCommit": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64",
     "seed": 1,
-    "corpusManifestSHA256": "003f57a8b6ea8ac4e41a319b8e7cf3173e2189a3745ece61b5d0b3a93783ba4e",
-    "editsManifestSHA256": "9970e0ba8e015851a085a9d9266bf60e2fa4e6d26c0ca728dd690283714f43e7",
+    "corpusManifestSHA256": "bdf13fb158e83a87011ba1b0d35689d14c995bbdc5ddf735c2c9f3476dd6556f",
+    "editsManifestSHA256": "bdf24b8a2cb0afe763c434b86bb77af48d5809ddf49ebb95411d24828e5cfcc1",
     "largeEntries": [
       {
         "lang": "python",
@@ -28,7 +28,7 @@
       }
     ],
     "patchCorpusFilesSHA256": {
-      "await-power.txt": "123c9065d9e5d077613460160270d2f270a7ce3ffef69d2e02cad2037e6fe48c"
+      "await-power.txt": "bb4c9abd12c07b9849ede6ea0143591e9bf4c4fedda28b3bb07aee07edd89bd8"
     },
     "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
     "cli": "0.27.2",
@@ -52,7 +52,7 @@
       }
     ]
   },
-  "reason": "Bind await tighter than the power operator, so `await f() ** 2` groups as `(await f()) ** 2` instead of `await (f() ** 2)`. Five patch corpus trees, one pinned kit input (`r = await f() ** 2`, alt-python-B02-05 step 0) and thirteen seeded edits of the patch corpus change. Each previously error-free fresh tree changes only by the documented fix: an `await` whose operand held the following `**` expression now ends before the operator, and that `binary_operator` takes the `await` as its left operand. Of the thirteen edits, two (001-e1, 006-e2) are error-free before and after, and eleven have an error tree in both builds (003-e1 differs only in its changed ranges). Every other pinned upstream corpus tree and edit, the three pinned large inputs and every other previously error-free tree in this comparison are unchanged.",
+  "reason": "Bind await tighter than the power operator, so `await f() ** 2` groups as `(await f()) ** 2` instead of `await (f() ** 2)`. Six patch corpus trees, one pinned kit input (`r = await f() ** 2`, alt-python-B02-05 step 0) and fourteen seeded edits of the patch corpus change. Each previously error-free fresh tree changes only by the documented fix: an `await` whose operand held the following `**` expression now ends before the operator, and that `binary_operator` takes the `await` as its left operand. Of the fourteen edits, three (001-e1, 006-e2, 009-e3) are error-free before and after, and eleven have an error tree in both builds (003-e1 differs only in its changed ranges). Every other pinned upstream corpus tree and edit, the three pinned large inputs and every other previously error-free tree in this comparison are unchanged.",
   "retireWhen": "An approved Python pin contains a fix for the await and power-operator binding defect reported in upstream PR #360. The pin move updates the patch corpus expectations.",
   "differences": [
     {
@@ -89,6 +89,13 @@
       "inputSHA256": "912f322bf00387e848ca47629ee5387b27126bc0b9ae89ad57143ba66fd75256",
       "referenceDumpSHA256": "01e8ca45730a2c9d7b5336e78f8e7d212dd6799920b28356828fd99d1a0b946f",
       "candidateDumpSHA256": "b66ed538e258064cb09ad74bc78a6ee0da68b0d1d625ce123e1512d3b0b3b106"
+    },
+    {
+      "id": "corpus/python/grammar-patch-await-power-009",
+      "kind": "corpus",
+      "inputSHA256": "eff7dd965cde906dfae3357513769b4a078d3d451b45ed01e0a1ef71e2c6fb39",
+      "referenceDumpSHA256": "0d4ef1b0e796816fb5ec9d786cee55b4d821a81bc7405634ac101c8ce048fda5",
+      "candidateDumpSHA256": "eb69026c408f855fc0bc050edf0808c25b2038239ad91ab0bf984581ba4e1018"
     },
     {
       "id": "corpus/python/kit-c51d3e90977f470902153aec1082db31e19cf5950bcebd64c802660ac1816861",
@@ -277,6 +284,20 @@
       "newSHA256": "3fe8117acd094e875db57b2b965d8ff174e5e1c3514ce88adca61c4b20f939d8",
       "referenceDumpSHA256": "ec174337318c96332e2dfc7be54d1471936259a290f7bad41be3d989d4685c18",
       "candidateDumpSHA256": "c5795239c7621de3d89f2a3ebabb48dafcf161e7b623fd63213816578759fa71"
+    },
+    {
+      "id": "edits/python/grammar-patch-await-power-009-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "eff7dd965cde906dfae3357513769b4a078d3d451b45ed01e0a1ef71e2c6fb39",
+      "newSHA256": "b94eb476b5356ef7f95d66ddcbb2d097d41a0fafbc5d219a3a43f4c4fe21d410",
+      "referenceDumpSHA256": "dd1de92b74786efb88688e5554feb9252afbdd55b3e8d2082f0228459f34e4ae",
+      "candidateDumpSHA256": "234e4af4507a240191f8f3ad2ba028c0c8eb896d10222ef2bcf09d7fb213314b"
     }
   ]
 }

@@ -232,3 +232,66 @@ async def g():
               (identifier)))
           (await
             (identifier)))))))
+
+================================================================================
+Await on both sides of the power operator
+================================================================================
+
+async def g():
+    x = await a ** await b
+
+--------------------------------------------------------------------------------
+
+(module
+  (function_definition
+    (identifier)
+    (parameters)
+    (block
+      (assignment
+        (identifier)
+        (binary_operator
+          (await
+            (identifier))
+          (await
+            (identifier)))))))
+
+================================================================================
+Unchanged: unary minus around a power
+================================================================================
+
+async def g():
+    x = -a ** b
+
+--------------------------------------------------------------------------------
+
+(module
+  (function_definition
+    (identifier)
+    (parameters)
+    (block
+      (assignment
+        (identifier)
+        (unary_operator
+          (binary_operator
+            (identifier)
+            (identifier)))))))
+
+================================================================================
+Unchanged: await of a unary operand
+================================================================================
+
+async def g():
+    x = await -a
+
+--------------------------------------------------------------------------------
+
+(module
+  (function_definition
+    (identifier)
+    (parameters)
+    (block
+      (assignment
+        (identifier)
+        (await
+          (unary_operator
+            (identifier)))))))

@@ -621,14 +621,15 @@ patch both pass the strict schema check. They are byte-identical (67,804 bytes, 
 
 Node types and fields do not change, but previously error-free trees do: the documented fix moves the `binary_operator`
 that held `**` out of the `await` operand. The Windows amd64 native A/B comparison (E4) against the fully unpatched build
-covered 168 corpus inputs (the pinned upstream corpus, the pinned kit inputs and the eight patch-corpus cases), 410 seeded edits and
-the pinned large inputs `topics.py`, `_pydecimal.py` and `typing.py`. It changed five patch-corpus trees, one kit input (`r = await f() ** 2`)
-and thirteen seeded edits of patch-corpus inputs. Each changed error-free tree is an `await` whose operand held a `**`
+covered 171 corpus inputs (the pinned upstream corpus, the pinned kit inputs and the eleven patch-corpus cases), 419 seeded edits and
+the pinned large inputs `topics.py`, `_pydecimal.py` and `typing.py`. It changed six patch-corpus trees, one kit input (`r = await f() ** 2`)
+and fourteen seeded edits of patch-corpus inputs. Each changed error-free tree is an `await` whose operand held a `**`
 expression. All other trees, edits and large dumps were byte-identical, and the unpatched build matched the committed C on every input.
-A separate fresh-parse comparison over 188 inputs (the 168 corpus inputs and 20 fixed fuzz seeds and variants) changed the same six trees.
+A separate fresh-parse comparison, made before the last three patch-corpus cases were added, covered 188 inputs (the 168 corpus inputs of that time and 20 fixed fuzz seeds and variants) and changed the same six trees (five patch-corpus trees and the kit input).
 The existing scanner patch `0001` keeps its 16 reviewed cases; only the build identity of its expectations changed.
 Python 3.14.8 groups every expression of two sets (3,640 two-operand and 3,759 random multi-operand expressions it accepts) as the patched
 grammar does; the unpatched grammar differs on 450 and 918 of them (one-off check, E2).
-The patched engine and pinned native reference agree on the corpus, seeded edits and raw query matches
-(E5, Windows amd64; 1,920 query comparisons over 160 inputs, no mismatch). The pinned `highlights.scm` and `tags.scm` compile and run on the
+The patched engine and pinned native reference agree (E5, Windows amd64) on the 160 pinned upstream and kit inputs, their 386 seeded edits and
+1,920 raw query comparisons over those inputs (no mismatch), and on eleven grammar-text fixtures that cover the same constructs as the patch-corpus cases
+(`TestScannerPatchesGrammarText`). The patch-corpus edits and the three large inputs have only the native comparison above (E4). The pinned `highlights.scm` and `tags.scm` compile and run on the
 repaired inputs. See the [migration notes](../../MIGRATING.md#python-await-and-the-power-operator).
