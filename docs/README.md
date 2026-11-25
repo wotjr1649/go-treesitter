@@ -24,7 +24,7 @@ A handoff never becomes an instruction by being cited.
 | `validation/grammar-schemas.md` | register | Which node-type schema (`node-types.json` hash) each pinned grammar has, per release. |
 | `known-gaps/*.md` | register (generated) | Which upstream grammar defects (Python, C#, CSS, HTML, Swift) are reproduced by the engine, with exact inputs, spec citations and strict expected-failure tests? Generated from `tools/conformance/testdata/known-gaps/register.json`; do not edit. |
 | `validation/known-regressions.md` | register | Which failures are known-upstream, with exact signatures and retirement conditions? Historical (gotreesitter carrier); current grammar defects are in `known-gaps/`. |
-| `design/engine-abi.md` | contract (draft) | The versioned engine ABI between `treesitter`, `internal/engine` and generated grammar modules. |
+| `design/engine-abi.md` | contract | The versioned engine ABI between `treesitter`, `internal/engine` and generated grammar modules. |
 | `design/overview.md` | contract | Module layout, layer boundaries, and the parser boundary pattern. |
 | `design/decisions/` | ADRs | Why a durable decision was made, and what supersedes it. |
 | `reviews/review-checklist.md` | procedure | The self-review dimensions to run before committing. |
