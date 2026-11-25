@@ -30,6 +30,14 @@
         "sha256": "00163049bb971eb8a24d1f6a3bb9445259dffb68202992676a84b792d379c598",
         "source": "src/scanner.c",
         "upstreamReport": "https://github.com/tree-sitter/tree-sitter-python/issues/350"
+      },
+      {
+        "afterSHA256": "5fb8ae873dae0767d4ac0b75bd528cc663f2e932e54afc8eee1196b546c820ca",
+        "beforeSHA256": "5071cb77def12a276ec71c2c584ef276b1266df720e16f642530bac35c5c2560",
+        "file": "patches/python/0002-await-power-precedence.patch",
+        "sha256": "3c827a59538f70cfc088e6f47969de068e6a054cdb08512468eea2bf51086e02",
+        "source": "grammar.js",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-python/pull/360"
       }
     ],
     "runtimeArchiveSHA256": "9f33b10babb69ef84ac700731a11795b13a4b404dafaa8064e7acbf005fd0732",
@@ -41,9 +49,9 @@
   "comparisons": [
     {
       "patch": "patches/python/0001-bound-serialized-indent-bytes.patch",
-      "beforeSourcesSHA256": "96c2ebc7ca72afb092b4a6ea18199a11025aabd4fabcfc2ba1fa7dd9dd084918",
-      "afterSourcesSHA256": "31b6417c3337aa85cce91a5e0a270768a09ccb4e2f874fb864b49d789681330c",
-      "resultsSHA256": "c8bd15549eaca2fa7ba790e8c62c3de5cc25be1b2316c4d86e3bcdb52f6e2a90",
+      "beforeSourcesSHA256": "ee65849629fbb6b48341ac6b68b52e17699455e9aa7a2ff5e9fd776f6a9e3ca1",
+      "afterSourcesSHA256": "8fa9704b487380094a3c5002e6d415f12a6dc02beb7fac201dc061a95631be49",
+      "resultsSHA256": "86fd92a0ac7ced883fe7aaf3ec4eb4644b94d80af55511515b1fa1d7bb768cad",
       "reason": "Bound the serialized indent bytes to the external scanner buffer for deeply nested blocks.",
       "retireWhen": "The grammar pin includes the fix for tree-sitter-python issue 350 and passes the retained depth cases.",
       "differences": [

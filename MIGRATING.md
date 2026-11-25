@@ -518,3 +518,28 @@ A temporary ADR-0023 scanner patch carries [upstream issue #292](https://github.
   taken for a short interpolation (see [limitations](docs/reports/limitations.md), rows 27 and 33).
 
 The pinned upstream Ruby queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#v070-ruby-symbol-patch)).
+
+## Unreleased after v0.7.0
+
+### Python `await` and the power operator
+
+A temporary ADR-0023 grammar-input patch carries [upstream PR #360](https://github.com/tree-sitter/tree-sitter-python/pull/360).
+Node types and fields are unchanged (`node-types.json` is byte-identical with and without the patch).
+
+- **`await` ends before `**`.** Python's `await` takes a primary and `**` takes it as its left operand, so `await f() ** 2` is
+  `(await f()) ** 2`. The grammar used to read `await (f() ** 2)`: an `await` containing a `binary_operator`. It now reads a
+  `binary_operator` whose `left` is the `await`, with the `await` ending at `f()`. These inputs were error-free before, so the
+  trees of previously error-free inputs change. The same holds for `await x ** y ** z` (now `(await x) ** (y ** z)`), for
+  `-await x ** 2` and `not await x ** 2` (the `argument` of the operator is now the `binary_operator`, not an `await`), and in arguments, comprehensions and
+  f-string replacement fields. Queries and code that match `(await (binary_operator))`, or that read the range or children of
+  such an `await` or `binary_operator`, see the new shape. Calls, attributes and subscripts still belong to the `await`
+  operand: `await f().x[0]` is one `await`.
+- **Unchanged.** `await (f() ** 2)`, `(await f()) ** 2`, `2 ** await f()`, `await x + 1`, `await x * 2` and `await x.y - await z` keep
+  their trees. A few inputs that Python rejects, such as `await x ** await await x`, were already accepted; their trees change in the
+  same way.
+- **Check.** Over 3,640 expressions of two operands that Python 3.14.8 accepts (every combination of the prefixes `await`, `-`, `not`, `~`
+  with five atoms and the operators `**`, `*`, `+`), the patched grammar groups each one as Python does and the unpatched grammar did not
+  for 450 of them (one-off check, E2).
+
+Retire the patch in the approved pin move to an upstream source containing a fix for the reported defect. That move updates the
+patch corpus expectations. See the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v070-python-await-patch).

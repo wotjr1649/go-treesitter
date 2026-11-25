@@ -1,0 +1,234 @@
+================================================================================
+Await binds tighter than power
+================================================================================
+
+async def g():
+    await f() ** 2
+
+--------------------------------------------------------------------------------
+
+(module
+  (function_definition
+    (identifier)
+    (parameters)
+    (block
+      (binary_operator
+        (await
+          (call
+            (identifier)
+            (argument_list)))
+        (integer)))))
+
+================================================================================
+Await operand ends before the power operator
+================================================================================
+
+async def g():
+    x = await a ** b ** c
+
+--------------------------------------------------------------------------------
+
+(module
+  (function_definition
+    (identifier)
+    (parameters)
+    (block
+      (assignment
+        (identifier)
+        (binary_operator
+          (await
+            (identifier))
+          (binary_operator
+            (identifier)
+            (identifier)))))))
+
+================================================================================
+Await takes calls, attributes and subscripts
+================================================================================
+
+async def g():
+    return await f().x[0] ** 2
+
+--------------------------------------------------------------------------------
+
+(module
+  (function_definition
+    (identifier)
+    (parameters)
+    (block
+      (return_statement
+        (binary_operator
+          (await
+            (subscript
+              (attribute
+                (call
+                  (identifier)
+                  (argument_list))
+                (identifier))
+              (integer)))
+          (integer))))))
+
+================================================================================
+Power with await on the right
+================================================================================
+
+async def g():
+    y = 2 ** await f()
+
+--------------------------------------------------------------------------------
+
+(module
+  (function_definition
+    (identifier)
+    (parameters)
+    (block
+      (assignment
+        (identifier)
+        (binary_operator
+          (integer)
+          (await
+            (call
+              (identifier)
+              (argument_list))))))))
+
+================================================================================
+Await operand in other expression positions
+================================================================================
+
+async def g():
+    print(await f() ** 2, [await x ** 2 for x in xs], f"{await x ** 2}")
+
+--------------------------------------------------------------------------------
+
+(module
+  (function_definition
+    (identifier)
+    (parameters)
+    (block
+      (call
+        (identifier)
+        (argument_list
+          (binary_operator
+            (await
+              (call
+                (identifier)
+                (argument_list)))
+            (integer))
+          (list_comprehension
+            (binary_operator
+              (await
+                (identifier))
+              (integer))
+            (for_in_clause
+              (identifier)
+              (identifier)))
+          (string
+            (string_start)
+            (interpolation
+              (binary_operator
+                (await
+                  (identifier))
+                (integer)))
+            (string_end)))))))
+
+================================================================================
+Unary minus and not around await power
+================================================================================
+
+async def g():
+    a = -await x ** 2
+    b = not await x ** 2
+
+--------------------------------------------------------------------------------
+
+(module
+  (function_definition
+    (identifier)
+    (parameters)
+    (block
+      (assignment
+        (identifier)
+        (unary_operator
+          (binary_operator
+            (await
+              (identifier))
+            (integer))))
+      (assignment
+        (identifier)
+        (not_operator
+          (binary_operator
+            (await
+              (identifier))
+            (integer)))))))
+
+================================================================================
+Unchanged: parenthesized operands
+================================================================================
+
+async def g():
+    a = await (f() ** 2)
+    b = (await f()) ** 2
+
+--------------------------------------------------------------------------------
+
+(module
+  (function_definition
+    (identifier)
+    (parameters)
+    (block
+      (assignment
+        (identifier)
+        (await
+          (parenthesized_expression
+            (binary_operator
+              (call
+                (identifier)
+                (argument_list))
+              (integer)))))
+      (assignment
+        (identifier)
+        (binary_operator
+          (parenthesized_expression
+            (await
+              (call
+                (identifier)
+                (argument_list))))
+          (integer))))))
+
+================================================================================
+Unchanged: await with other operators
+================================================================================
+
+async def g():
+    a = await x + 1
+    b = await x * 2
+    c = await x.y - await z
+
+--------------------------------------------------------------------------------
+
+(module
+  (function_definition
+    (identifier)
+    (parameters)
+    (block
+      (assignment
+        (identifier)
+        (binary_operator
+          (await
+            (identifier))
+          (integer)))
+      (assignment
+        (identifier)
+        (binary_operator
+          (await
+            (identifier))
+          (integer)))
+      (assignment
+        (identifier)
+        (binary_operator
+          (await
+            (attribute
+              (identifier)
+              (identifier)))
+          (await
+            (identifier)))))))

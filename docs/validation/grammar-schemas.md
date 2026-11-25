@@ -610,3 +610,25 @@ trees to clean trees; the retained negative inputs (`:+일`, `:@일?`, `:@한글
 record is limited to error trees becoming clean. The pinned upstream `highlights.scm`, `locals.scm` and `tags.scm` compiled, and
 the query lane matched the patched native reference on 3,783 raw query/input comparisons with no mismatch (E5, Windows amd64).
 [Migration notes](../../MIGRATING.md#ruby-symbol-names)
+
+## Unreleased after v0.7.0: Python await patch
+
+The [temporary grammar-input patch](../../tools/gen/patches/python) carries the grammar change of
+[upstream PR #360](https://github.com/tree-sitter/tree-sitter-python/pull/360) at Python commit
+`26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64`. The `node-types.json` files produced with the pinned CLI with and without the
+patch both pass the strict schema check. They are byte-identical (67,804 bytes, SHA-256
+`01ef9e39132daf7b77d3eda7db0897a2bc854a41d52a52c9f8f92a0b369e898d`), and the strict diff has zero changes (E1, CLI 0.27.2).
+
+Node types and fields do not change, but previously error-free trees do: the documented fix moves the `binary_operator`
+that held `**` out of the `await` operand. The Windows amd64 native A/B comparison (E4) against the fully unpatched build
+covered 168 corpus inputs (the pinned upstream corpus, the pinned kit inputs and the eight patch-corpus cases), 410 seeded edits and
+the pinned large inputs `topics.py`, `_pydecimal.py` and `typing.py`. It changed five patch-corpus trees, one kit input (`r = await f() ** 2`)
+and thirteen seeded edits of patch-corpus inputs. Each changed error-free tree is an `await` whose operand held a `**`
+expression. All other trees, edits and large dumps were byte-identical, and the unpatched build matched the committed C on every input.
+A separate fresh-parse comparison over 188 inputs (the 168 corpus inputs and 20 fixed fuzz seeds and variants) changed the same six trees.
+The existing scanner patch `0001` keeps its 16 reviewed cases; only the build identity of its expectations changed.
+Python 3.14.8 groups every expression of two sets (3,640 two-operand and 3,759 random multi-operand expressions it accepts) as the patched
+grammar does; the unpatched grammar differs on 450 and 918 of them (one-off check, E2).
+The patched engine and pinned native reference agree on the corpus, seeded edits and raw query matches
+(E5, Windows amd64; 1,920 query comparisons over 160 inputs, no mismatch). The pinned `highlights.scm` and `tags.scm` compile and run on the
+repaired inputs. See the [migration notes](../../MIGRATING.md#python-await-and-the-power-operator).

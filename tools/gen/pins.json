@@ -191,6 +191,14 @@
           "beforeSHA256": "6db82134ac2d4c90a1a1475487a625cface02662ebda9b7478cad9c7147e9afe",
           "afterSHA256": "7a0c6bb9e0c121ff3e25f9180dd6625526725c2ddb62321ccc2cf35adaf488eb",
           "upstreamReport": "https://github.com/tree-sitter/tree-sitter-python/issues/350"
+        },
+        {
+          "file": "patches/python/0002-await-power-precedence.patch",
+          "sha256": "3c827a59538f70cfc088e6f47969de068e6a054cdb08512468eea2bf51086e02",
+          "source": "grammar.js",
+          "beforeSHA256": "5071cb77def12a276ec71c2c584ef276b1266df720e16f642530bac35c5c2560",
+          "afterSHA256": "5fb8ae873dae0767d4ac0b75bd528cc663f2e932e54afc8eee1196b546c820ca",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-python/pull/360"
         }
       ],
       "regenerate": true

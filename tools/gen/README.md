@@ -288,7 +288,8 @@ Ruby applies `0002-global-variable-non-ascii` before generation to accept non-AS
 CSS applies `0001-non-latin1-names` before generation to accept non-Latin-1 names.
 XML applies `0001-non-ascii-names` (`common/common.mjs`) before generation and `0002-tag-name-code-points` (`xml/src/scanner.c`) after it.
 PowerShell applies `0001-non-ascii-names` (`grammar.js`) before generation to accept non-ASCII variable, parameter, hash-key, member and type names (statement labels stay ASCII-only).
-`gen -patch-status` lists 16 records in total, including three for Ruby, two for XML and one each for CSS and PowerShell. Retire each with an approved pin move to a source that contains the fix (for an owner-maintained repository, an owner release; ADR-0024 rule 7.6).
+Python applies `0002-await-power-precedence` (`grammar.js`) before generation so that `await` binds tighter than `**`; its `0001` scanner patch applies after generation.
+`gen -patch-status` lists 17 records in total, including three for Ruby, two each for XML and Python, and one each for CSS and PowerShell. Retire each with an approved pin move to a source that contains the fix (for an owner-maintained repository, an owner release; ADR-0024 rule 7.6).
 JavaScript retired `0001-jsx-bare-ampersand` with its owner v4.4.0 pin (`e5ada307a6f1741a573d5c8d4dafee9234330b1f`).
 The fix first shipped in [owner v2.0.0](https://github.com/wotjr1649/tree-sitter-javascript/releases/tag/v2.0.0)
 ([fix commit](https://github.com/wotjr1649/tree-sitter-javascript/commit/4765cd79603fa478da221da50500162757859e20)).

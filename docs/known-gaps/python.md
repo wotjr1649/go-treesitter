@@ -10,12 +10,12 @@ Initial E5 evidence: Windows native reference differential (windows/amd64), base
 Only the exact inputs below are covered. `TestKnownGaps` rechecks engine dumps (E3) and, with a freshly built
 `TSG_NATIVE_EXE_DIR`, compares them byte-for-byte with native C (E5). CI requires that comparison.
 
-Identity: grammar `26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64`; runtime `v0.27.2`; grammar patches: 1.
+Identity: grammar `26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64`; runtime `v0.27.2`; grammar patches: 2.
 The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`pins.json`](../../tools/gen/pins.json),
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/python/provenance.json).
 
-- Source identity SHA-256: `fe37ad83c6804c3f5a4aad3405bfaeb510dbaa5eda22714dc077abdd9786597f`
-- Module provenance SHA-256: `16c80f55a44a26b4781473df6a69dc8f84caf967ad9a0967d48b6f242df27a76`
+- Source identity SHA-256: `8fb2d425ba28d52f392ecc16852ccb8d71075d48455b39be5dc2b3bdfbcdf1c2`
+- Module provenance SHA-256: `be4a924f1af1217319b3139723df00a25accb334d2af92814b5e6adc47a2e640`
 
 ## python-bitwise-precedence
 
@@ -33,21 +33,3 @@ Expected rule: & binds tighter than ^, so the expression must group as a ^ (b & 
 - [Upstream issue](https://github.com/tree-sitter/tree-sitter-python/issues/358)
 - Input SHA-256: `03545f6a4d6bce1014bb6e30b243104f137f8ee3ad2c3656e7980e5a66a3cb39`
 - [Recorded native dump](../../tools/conformance/testdata/known-gaps/python-bitwise-precedence.dump), SHA-256: `dcf314e5282f04508b5d8e8fd8d1d4e689aee0fc4471e959e04a0acffb4d6b5b`
-
-## python-await-power
-
-Input (JSON string; escapes and final newline are significant):
-
-```json
-"async def g():\n    await f() ** 2\n"
-```
-
-Observed: The named await node spans [19,33), containing the ** binary_operator over [25,33): await (f() ** 2), without errors.
-
-Expected rule: await_expr takes a primary; power takes await_expr on its left. Group as (await f()) ** 2; the await operand ends at byte 28.
-
-- Specification: [Python reference 6.4: Await expression](https://docs.python.org/3/reference/expressions.html#await-expression)
-- Specification: [Python reference 6.5: The power operator](https://docs.python.org/3/reference/expressions.html#the-power-operator)
-- Upstream issue: none recorded.
-- Input SHA-256: `cd893c4c0e887b6f60b5b21dc8d9b61bdd2b8c01787f314ae4ad69b45e3e065e`
-- [Recorded native dump](../../tools/conformance/testdata/known-gaps/python-await-power.dump), SHA-256: `28cca2fdede80ce83a60920a29c26db0f0f2f8d29e1e6f7f212e3cdfbc87e021`
