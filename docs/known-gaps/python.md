@@ -31,6 +31,7 @@ Expected rule: & binds tighter than ^, so the expression must group as a ^ (b & 
 
 - Specification: [Python reference 6.9: Binary bitwise operations](https://docs.python.org/3/reference/expressions.html#binary-bitwise-operations)
 - [Upstream issue](https://github.com/tree-sitter/tree-sitter-python/issues/358)
+- Issue [#358](https://github.com/tree-sitter/tree-sitter-python/issues/358) was closed on 2026-11-21 by its reporter, who pointed to a community fork; the fix is not in upstream `master`.
 - Input SHA-256: `03545f6a4d6bce1014bb6e30b243104f137f8ee3ad2c3656e7980e5a66a3cb39`
 - [Recorded native dump](../../tools/conformance/testdata/known-gaps/python-bitwise-precedence.dump), SHA-256: `dcf314e5282f04508b5d8e8fd8d1d4e689aee0fc4471e959e04a0acffb4d6b5b`
 
@@ -48,6 +49,7 @@ Expected rule: await_expr takes a primary; power takes await_expr on its left. G
 
 - Specification: [Python reference 6.4: Await expression](https://docs.python.org/3/reference/expressions.html#await-expression)
 - Specification: [Python reference 6.5: The power operator](https://docs.python.org/3/reference/expressions.html#the-power-operator)
-- Upstream issue: none recorded.
+- [Upstream pull request](https://github.com/tree-sitter/tree-sitter-python/pull/360)
+- Open as of 2026-11-25, with no comments or reviews.
 - Input SHA-256: `cd893c4c0e887b6f60b5b21dc8d9b61bdd2b8c01787f314ae4ad69b45e3e065e`
 - [Recorded native dump](../../tools/conformance/testdata/known-gaps/python-await-power.dump), SHA-256: `28cca2fdede80ce83a60920a29c26db0f0f2f8d29e1e6f7f212e3cdfbc87e021`
