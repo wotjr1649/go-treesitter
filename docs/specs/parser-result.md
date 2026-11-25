@@ -37,7 +37,10 @@ Adding a member is a contract change and needs an ADR. Lifetime errors are separ
 ## Required evaluation order
 
 nil or already-done `ctx` → option and input checks (size, strict UTF-8, ownership and validity of `old`) → engine.
-Checks before the engine never touch the instance. Cancellation during the engine call is detected in the progress
+Option and input checks never touch the instance. Before them, the parser may do internal housekeeping that
+does not depend on the call's input: it recreates an instance discarded by an earlier fault and deletes engine
+queries whose `Query` values were garbage-collected (decided 2026-11-25). A fault during that housekeeping is
+returned with its usual outcome. Cancellation during the engine call is detected in the progress
 callback; the call returns after the C parser's cleanup.
 
 ## Input

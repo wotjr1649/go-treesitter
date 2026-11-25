@@ -364,7 +364,17 @@
       },
       "licenseSHA256": "c5cfb43042b6b72045f4ba997834d0a7786d2793d91680868b5815b39f14fc78",
       "cSymbol": "tree_sitter_css",
-      "regenerate": true
+      "regenerate": true,
+      "patches": [
+        {
+          "file": "patches/css/0001-non-latin1-names.patch",
+          "sha256": "d2965e054f530064b70a4977a570f7b91591fe86fbddbd01c96da4faee927e49",
+          "source": "grammar.js",
+          "beforeSHA256": "c6d9efdeaf3a4902f026849e08a103a6d1ec1f015c5f396d3fe92dc57ce034ae",
+          "afterSHA256": "8ae6785b70c26bb95ce59a9770cf9974e5c65346bc85744a8f45ca520e32cce1",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-css/pull/105"
+        }
+      ]
     },
     "java": {
       "repo": "https://github.com/wotjr1649/tree-sitter-java",
@@ -546,6 +556,16 @@
       },
       "licenseSHA256": "1fca8454c0d77a73f9922a52d39e1f7c339f5da5d03f2766eff66b859fa19477",
       "cSymbol": "tree_sitter_powershell",
+      "patches": [
+        {
+          "file": "patches/powershell/0001-non-ascii-names.patch",
+          "sha256": "99612eb902795e7e0e455a2da74a141b6404430ff874e9f924a67d45e058cacd",
+          "source": "grammar.js",
+          "beforeSHA256": "bb3aad41587d910b1ce09fdee6ad326919a12a6fc3433f3902e874a0b852ca77",
+          "afterSHA256": "72d6f39b9ab6cc99d09226f57a69acc33fc525e635955d2157f7f1e51255df62",
+          "upstreamReport": "https://github.com/airbus-cert/tree-sitter-powershell/issues/70"
+        }
+      ],
       "regenerate": true
     },
     "r": {
@@ -673,6 +693,14 @@
           "beforeSHA256": "3b5a0afa4ad836b2579c6d836450a373c6736bb0da3d7e030a9d4e66b94fbc7a",
           "afterSHA256": "f5da18f1fd401eef7f98db5512b9f5de682ff3c03fcad9e143e875ec46e39182",
           "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/306"
+        },
+        {
+          "file": "patches/ruby/0003-non-ascii-symbol.patch",
+          "sha256": "a5c4dd2d13fd31dcdafe6875e36c2f626081870b5f0f8533e05de7e6ea033650",
+          "source": "src/scanner.c",
+          "beforeSHA256": "387e6c2306b49962b93d6b571936169e2f1f372a374b48f7548bfa97e0ad508f",
+          "afterSHA256": "c4ac893eedc0b57bb2aeac18f36b3b1c5bcbda2fdadb81f80caa3052822cdfbb",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-ruby/issues/292"
         }
       ],
       "regenerate": true

@@ -393,8 +393,12 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 		switch lang {
 		case "bash", "ruby":
 			result += "\nThe heredoc patch stores and compares UTF-8 end words, preserving ASCII bytes and distinguishing code points that share a low byte. Invalid lookaheads all compare as 0xFF, distinct from U+FFFD. The 1024-byte scanner state buffer includes all open end words and metadata; overflow loses state (about 330 Hangul syllables total, fewer with other state).\n"
+		case "css":
+			result += "\nAn independently implemented name patch addresses the defect reported in upstream PR #105. It extends class, ID, type and attribute names, property names, custom property references, and keyframe names. The patch leaves bare identifier attribute values, unquoted URLs, bare declaration values, units, and at-rule names and arguments outside its scope. See MIGRATING.md for the descendant selector limit and retirement criteria.\n"
 		case "xml":
 			result += "\nThe name patch lets Name tokens (attribute names including namespace declarations such as `xmlns:접두`, DOCTYPE, DTD and entity names) use the XML 1.0 NameStartChar and NameChar ranges instead of ASCII only; `:` still cannot start a name. The scanner patch compares complete UTF-8 tag names, so names that share a low byte stay distinct. Names are serialized as UTF-8 bytes in the 1024-byte scanner state with a 255-byte limit per name (85 Hangul syllables); beyond it, or with deeply nested tags, an end tag after an edit-time state restore can fail to match (see MIGRATING.md).\n"
+		case "powershell":
+			result += "\nThe name patch widens the ASCII-only name patterns of variables (including scope prefixes), command parameters, simple names (hash keys, member names, class and enum names) and type identifiers to Unicode letters (`\\p{L}`), decimal digits (`\\p{Nd}`) and `_`. ASCII names match as before; a name after `$` in an expandable string can now continue over non-ASCII letters, and a `$` directly followed by one now starts a variable there (see MIGRATING.md). Statement labels stay ASCII-only: `:한글` at the start of a statement is still read as a command name. Supplementary-plane letters are accepted as the specification says, although PowerShell 7.6.10 reads names by UTF-16 code unit and rejects them (one-off check, E2).\n"
 		case "yaml":
 			result += "\nYAML patch 0001 prevents premature end-of-input acceptance and silent source truncation.\n"
 			if len(g.Patches) > 1 {
@@ -415,6 +419,12 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 		for _, p := range g.Patches {
 			if p.File == "patches/ruby/0002-global-variable-non-ascii.patch" {
 				result += "\nThe global-variable patch accepts non-ASCII names such as `$한글`. Previously error-free trees change where an ASCII global name is directly followed by non-ASCII characters (for example `$a한 = 1` or `\"#$a한\"`): the whole name becomes one `global_variable` (see MIGRATING.md).\n"
+				break
+			}
+		}
+		for _, p := range g.Patches {
+			if p.File == "patches/ruby/0003-non-ascii-symbol.patch" {
+				result += "\nThe symbol patch compares whole code points when the scanner reads a plain `:symbol` name (no `@`, `@@` or `$` prefix and no operator), so non-ASCII names such as `:한글` parse as `simple_symbol`. Every non-ASCII code point (including non-ASCII white space such as U+3000) continues such a name, as in Ruby; before, only its low byte was tested. Variable and operator symbols and the name after `#@` in a string still use the low byte (for example `:@한글`, `\"#@일\"` and `\"#Ĥ!\"`).\n"
 				break
 			}
 		}

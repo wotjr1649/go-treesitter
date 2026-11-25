@@ -1,0 +1,103 @@
+================================================================================
+non-ASCII symbols
+================================================================================
+
+a = :한글
+b = :일
+c = :言
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    (identifier)
+    (simple_symbol))
+  (assignment
+    (identifier)
+    (simple_symbol))
+  (assignment
+    (identifier)
+    (simple_symbol)))
+
+================================================================================
+non-ASCII symbol prefixes, middles and suffixes
+================================================================================
+
+x = [:a한글, :한글=, :값?, :끝!]
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    (identifier)
+    (array
+      (simple_symbol)
+      (simple_symbol)
+      (simple_symbol)
+      (simple_symbol))))
+
+================================================================================
+non-ASCII symbols as keys and arguments
+================================================================================
+
+h = { :한글 => 1 }
+p :일, :한글
+puts :한글.to_s
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    (identifier)
+    (hash
+      (pair
+        (simple_symbol)
+        (integer))))
+  (call
+    (identifier)
+    (argument_list
+      (simple_symbol)
+      (simple_symbol)))
+  (call
+    (identifier)
+    (argument_list
+      (call
+        (simple_symbol)
+        (identifier)))))
+
+================================================================================
+a code point after # whose low byte is @ stays string content
+================================================================================
+
+x = "#ŀ일"
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    (identifier)
+    (string
+      (string_content))))
+
+================================================================================
+quoted symbols and ASCII symbols are unchanged
+================================================================================
+
+x = [:"한글", %s(한글), :abc, :a?, :b!, :c=, :+, :[]]
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    (identifier)
+    (array
+      (delimited_symbol
+        (string_content))
+      (delimited_symbol
+        (string_content))
+      (simple_symbol)
+      (simple_symbol)
+      (simple_symbol)
+      (simple_symbol)
+      (simple_symbol)
+      (simple_symbol))))

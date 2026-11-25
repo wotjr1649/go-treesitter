@@ -33,7 +33,8 @@ func scannerInputs(lang, corpus, source, regressions string) ([]input, error) {
 	}
 	inputs = appendFuzzInputs(inputs, seeds)
 
-	if lang == "rust" || lang == "javascript" || lang == "xml" {
+	// Ruby also compares its grammar-text fixtures, which carry the symbol regressions.
+	if lang == "rust" || lang == "javascript" || lang == "xml" || lang == "ruby" {
 		path := filepath.Join(regressions, "grammar-text-patches.json")
 		var fixtures map[string][]struct{ Name, Source string }
 		b, err := os.ReadFile(path)
@@ -49,7 +50,8 @@ func scannerInputs(lang, corpus, source, regressions string) ([]input, error) {
 		for _, f := range fixtures[lang] {
 			inputs = append(inputs, input{"regression/" + f.Name, []byte(f.Source)})
 		}
-	} else {
+	}
+	if lang != "rust" && lang != "javascript" && lang != "xml" {
 		files := []string{lang + ".json"}
 		switch lang {
 		case "yaml", "python":

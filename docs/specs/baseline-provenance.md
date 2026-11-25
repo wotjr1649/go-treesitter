@@ -18,10 +18,10 @@ Every grammar module is generated, never hand-edited, from:
 The runtime stays unmodified. Temporary grammar patches carried by go-treesitter follow the recorded, hash-checked patch
 and retirement mechanism of ADR-0023. Fixes released by a designated owner repository arrive through an approved
 ADR-0024 rule 7 pin move. Grammar-input changes regenerate C with the pinned CLI, identically for the engine and native reference.
-The YAML early-EOF fix, Bash/Ruby heredoc comparisons, YAML/Python serialization bounds, YAML scanner row widening, Rust block comment
+The YAML early-EOF fix, Bash/Ruby heredoc comparisons, Ruby symbol-name comparison, YAML/Python serialization bounds, YAML scanner row widening, Rust block comment
 code-point fix are C-only patches. HTML patches `grammar.js` to accept `>` and
 bare `&` in text, Go patches it to accept Go 1.26 expression arguments to `new`, Ruby patches it to accept
-non-ASCII global-variable names, and XML patches `common/common.mjs` to accept non-ASCII names (its scanner patch is C-only). The pins and generated provenance record original and result source hashes and each patch identity.
+non-ASCII global-variable names, CSS patches it to accept non-Latin-1 names, XML patches `common/common.mjs` to accept non-ASCII names (its scanner patch is C-only), and PowerShell patches `grammar.js` to accept non-ASCII names. The pins and generated provenance record original and result source hashes and each patch identity.
 PostgreSQL retired the two temporary Korean-support patches with the upstream v19.0.0 pin, which includes
 [upstream PR #102](https://github.com/gmr/tree-sitter-postgres/pull/102). See the
 [retirement record](../../tools/gen/patches/postgres/README.md) for both patch identities and retained regressions.

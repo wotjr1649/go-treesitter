@@ -1,0 +1,613 @@
+================================================================================
+PowerShell Hangul variable names
+================================================================================
+
+$값 = 1
+$_이름 = $camel한글 = $한글camel
+$env:값 = $script:한글
+$é = $日本語
+"$a한글 $값"
+"$한글"
+"가격: $원"
+@"
+$한
+"@
+
+--------------------------------------------------------------------------------
+
+(program
+  (statement_list
+    (pipeline
+      (assignment_expression
+        (left_assignment_expression
+          (logical_expression
+            (bitwise_expression
+              (comparison_expression
+                (additive_expression
+                  (multiplicative_expression
+                    (format_expression
+                      (range_expression
+                        (array_literal_expression
+                          (unary_expression
+                            (variable)))))))))))
+        (assignement_operator)
+        value: (pipeline
+          (pipeline_chain
+            (logical_expression
+              (bitwise_expression
+                (comparison_expression
+                  (additive_expression
+                    (multiplicative_expression
+                      (format_expression
+                        (range_expression
+                          (array_literal_expression
+                            (unary_expression
+                              (integer_literal
+                                (decimal_integer_literal)))))))))))))))
+    (pipeline
+      (assignment_expression
+        (left_assignment_expression
+          (logical_expression
+            (bitwise_expression
+              (comparison_expression
+                (additive_expression
+                  (multiplicative_expression
+                    (format_expression
+                      (range_expression
+                        (array_literal_expression
+                          (unary_expression
+                            (variable)))))))))))
+        (assignement_operator)
+        value: (pipeline
+          (assignment_expression
+            (left_assignment_expression
+              (logical_expression
+                (bitwise_expression
+                  (comparison_expression
+                    (additive_expression
+                      (multiplicative_expression
+                        (format_expression
+                          (range_expression
+                            (array_literal_expression
+                              (unary_expression
+                                (variable)))))))))))
+            (assignement_operator)
+            value: (pipeline
+              (pipeline_chain
+                (logical_expression
+                  (bitwise_expression
+                    (comparison_expression
+                      (additive_expression
+                        (multiplicative_expression
+                          (format_expression
+                            (range_expression
+                              (array_literal_expression
+                                (unary_expression
+                                  (variable))))))))))))))))
+    (pipeline
+      (assignment_expression
+        (left_assignment_expression
+          (logical_expression
+            (bitwise_expression
+              (comparison_expression
+                (additive_expression
+                  (multiplicative_expression
+                    (format_expression
+                      (range_expression
+                        (array_literal_expression
+                          (unary_expression
+                            (variable)))))))))))
+        (assignement_operator)
+        value: (pipeline
+          (pipeline_chain
+            (logical_expression
+              (bitwise_expression
+                (comparison_expression
+                  (additive_expression
+                    (multiplicative_expression
+                      (format_expression
+                        (range_expression
+                          (array_literal_expression
+                            (unary_expression
+                              (variable))))))))))))))
+    (pipeline
+      (assignment_expression
+        (left_assignment_expression
+          (logical_expression
+            (bitwise_expression
+              (comparison_expression
+                (additive_expression
+                  (multiplicative_expression
+                    (format_expression
+                      (range_expression
+                        (array_literal_expression
+                          (unary_expression
+                            (variable)))))))))))
+        (assignement_operator)
+        value: (pipeline
+          (pipeline_chain
+            (logical_expression
+              (bitwise_expression
+                (comparison_expression
+                  (additive_expression
+                    (multiplicative_expression
+                      (format_expression
+                        (range_expression
+                          (array_literal_expression
+                            (unary_expression
+                              (variable))))))))))))))
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (string_literal
+                            (expandable_string_literal
+                              (variable)
+                              (variable))))))))))))))
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (string_literal
+                            (expandable_string_literal
+                              (variable))))))))))))))
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (string_literal
+                            (expandable_string_literal
+                              (variable))))))))))))))
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (string_literal
+                            (expandable_here_string_literal
+                              (variable))))))))))))))))
+
+================================================================================
+PowerShell Hangul command parameters
+================================================================================
+
+Get-Item -이름 1
+git log -이름=값
+Get-한글 값 -n 값
+
+--------------------------------------------------------------------------------
+
+(program
+  (statement_list
+    (pipeline
+      (pipeline_chain
+        (command
+          command_name: (command_name)
+          command_elements: (command_elements
+            (command_argument_sep)
+            (command_parameter)
+            (command_argument_sep)
+            (array_literal_expression
+              (unary_expression
+                (integer_literal
+                  (decimal_integer_literal))))))))
+    (pipeline
+      (pipeline_chain
+        (command
+          command_name: (command_name)
+          command_elements: (command_elements
+            (command_argument_sep)
+            (generic_token)
+            (command_argument_sep)
+            (command_parameter)))))
+    (pipeline
+      (pipeline_chain
+        (command
+          command_name: (command_name)
+          command_elements: (command_elements
+            (command_argument_sep)
+            (generic_token)
+            (command_argument_sep)
+            (command_parameter)
+            (command_argument_sep)
+            (generic_token)))))))
+
+================================================================================
+PowerShell Hangul hash keys and member names
+================================================================================
+
+@{ 키 = 1; 이름 = 2 }
+$a.속성
+$a.메서드(1)
+[한글]::값
+
+--------------------------------------------------------------------------------
+
+(program
+  (statement_list
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (hash_literal_expression
+                            (hash_literal_body
+                              (hash_entry
+                                (key_expression
+                                  (simple_name))
+                                (pipeline
+                                  (pipeline_chain
+                                    (logical_expression
+                                      (bitwise_expression
+                                        (comparison_expression
+                                          (additive_expression
+                                            (multiplicative_expression
+                                              (format_expression
+                                                (range_expression
+                                                  (array_literal_expression
+                                                    (unary_expression
+                                                      (integer_literal
+                                                        (decimal_integer_literal))))))))))))))
+                              (hash_entry
+                                (key_expression
+                                  (simple_name))
+                                (pipeline
+                                  (pipeline_chain
+                                    (logical_expression
+                                      (bitwise_expression
+                                        (comparison_expression
+                                          (additive_expression
+                                            (multiplicative_expression
+                                              (format_expression
+                                                (range_expression
+                                                  (array_literal_expression
+                                                    (unary_expression
+                                                      (integer_literal
+                                                        (decimal_integer_literal)))))))))))))))))))))))))))
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (member_access
+                            (variable)
+                            (member_name
+                              (simple_name))))))))))))))
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (invokation_expression
+                            (variable)
+                            (member_name
+                              (simple_name))
+                            (argument_list
+                              argument_expression_list: (argument_expression_list
+                                (argument_expression
+                                  (logical_argument_expression
+                                    (bitwise_argument_expression
+                                      (comparison_argument_expression
+                                        (additive_argument_expression
+                                          (multiplicative_argument_expression
+                                            (format_argument_expression
+                                              (range_argument_expression
+                                                (unary_expression
+                                                  (integer_literal
+                                                    (decimal_integer_literal)))))))))))))))))))))))))
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (member_access
+                            (type_literal
+                              (type_spec
+                                (type_name
+                                  (type_identifier))))
+                            (member_name
+                              (simple_name))))))))))))))))
+
+================================================================================
+PowerShell Hangul type names
+================================================================================
+
+[한글]$a
+[한.글]$a
+[int]$필드
+class 클래스 { [int]$필드 }
+
+--------------------------------------------------------------------------------
+
+(program
+  (statement_list
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (expression_with_unary_operator
+                            (cast_expression
+                              (type_literal
+                                (type_spec
+                                  (type_name
+                                    (type_identifier))))
+                              (unary_expression
+                                (variable)))))))))))))))
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (expression_with_unary_operator
+                            (cast_expression
+                              (type_literal
+                                (type_spec
+                                  (type_name
+                                    (type_name
+                                      (type_identifier))
+                                    (type_identifier))))
+                              (unary_expression
+                                (variable)))))))))))))))
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (expression_with_unary_operator
+                            (cast_expression
+                              (type_literal
+                                (type_spec
+                                  (type_name
+                                    (type_identifier))))
+                              (unary_expression
+                                (variable)))))))))))))))
+    (class_statement
+      (simple_name)
+      (class_property_definition
+        (type_literal
+          (type_spec
+            (type_name
+              (type_identifier))))
+        (variable)))))
+
+================================================================================
+PowerShell Hangul statement label is not a label
+================================================================================
+
+:한글
+:한글 x
+echo a;:한글
+
+--------------------------------------------------------------------------------
+
+(program
+  (statement_list
+    (pipeline
+      (pipeline_chain
+        (command
+          (command_name))))
+    (pipeline
+      (pipeline_chain
+        (command
+          (command_name)
+          (command_elements
+            (command_argument_sep)
+            (generic_token)))))
+    (pipeline
+      (pipeline_chain
+        (command
+          (command_name)
+          (command_elements
+            (command_argument_sep)
+            (generic_token)))))
+    (empty_statement)
+    (pipeline
+      (pipeline_chain
+        (command
+          (command_name))))))
+
+================================================================================
+PowerShell ASCII names unchanged
+================================================================================
+
+$value = 1
+Get-Item -Name 1
+@{ abc = 1 }
+$a.abc
+[int]$a
+:loop while ($true) { break }
+
+--------------------------------------------------------------------------------
+
+(program
+  (statement_list
+    (pipeline
+      (assignment_expression
+        (left_assignment_expression
+          (logical_expression
+            (bitwise_expression
+              (comparison_expression
+                (additive_expression
+                  (multiplicative_expression
+                    (format_expression
+                      (range_expression
+                        (array_literal_expression
+                          (unary_expression
+                            (variable)))))))))))
+        (assignement_operator)
+        value: (pipeline
+          (pipeline_chain
+            (logical_expression
+              (bitwise_expression
+                (comparison_expression
+                  (additive_expression
+                    (multiplicative_expression
+                      (format_expression
+                        (range_expression
+                          (array_literal_expression
+                            (unary_expression
+                              (integer_literal
+                                (decimal_integer_literal)))))))))))))))
+    (pipeline
+      (pipeline_chain
+        (command
+          command_name: (command_name)
+          command_elements: (command_elements
+            (command_argument_sep)
+            (command_parameter)
+            (command_argument_sep)
+            (array_literal_expression
+              (unary_expression
+                (integer_literal
+                  (decimal_integer_literal))))))))
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (hash_literal_expression
+                            (hash_literal_body
+                              (hash_entry
+                                (key_expression
+                                  (simple_name))
+                                (pipeline
+                                  (pipeline_chain
+                                    (logical_expression
+                                      (bitwise_expression
+                                        (comparison_expression
+                                          (additive_expression
+                                            (multiplicative_expression
+                                              (format_expression
+                                                (range_expression
+                                                  (array_literal_expression
+                                                    (unary_expression
+                                                      (integer_literal
+                                                        (decimal_integer_literal)))))))))))))))))))))))))))
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (member_access
+                            (variable)
+                            (member_name
+                              (simple_name))))))))))))))
+    (pipeline
+      (pipeline_chain
+        (logical_expression
+          (bitwise_expression
+            (comparison_expression
+              (additive_expression
+                (multiplicative_expression
+                  (format_expression
+                    (range_expression
+                      (array_literal_expression
+                        (unary_expression
+                          (expression_with_unary_operator
+                            (cast_expression
+                              (type_literal
+                                (type_spec
+                                  (type_name
+                                    (type_identifier))))
+                              (unary_expression
+                                (variable)))))))))))))))
+    (label)
+    (while_statement
+      condition: (while_condition
+        (pipeline
+          (pipeline_chain
+            (logical_expression
+              (bitwise_expression
+                (comparison_expression
+                  (additive_expression
+                    (multiplicative_expression
+                      (format_expression
+                        (range_expression
+                          (array_literal_expression
+                            (unary_expression
+                              (variable)))))))))))))
+      (statement_block
+        statement_list: (statement_list
+          (flow_control_statement))))))

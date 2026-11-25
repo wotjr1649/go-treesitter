@@ -554,3 +554,58 @@ from a clean element to an `ERROR` (E4, Windows amd64). This is a breaking tree 
 item 5 for those inputs only. The pinned upstream `highlights.scm` compiled, and the query lane matched the patched
 native reference on 220 raw query/input comparisons with no mismatch (E5, Windows amd64).
 [Migration notes](../../MIGRATING.md#xml-names-and-tag-names)
+
+## Unreleased (after v0.6.0): CSS name patch
+
+The [temporary grammar-input patch](../../tools/gen/patches/css) independently addresses the name defect
+reported in [upstream PR #105](https://github.com/tree-sitter/tree-sitter-css/pull/105) at CSS commit
+`dda5cfc5722c429eaba1c910ca32c2c0c5bb1a3f`. Both node-type files produced with the pinned CLI pass the
+strict schema check. They are byte-identical (43,620 bytes, SHA-256
+`fbbf8d22d82608f6d2f61cfdb374e6758779754fb2f42643e9dc5af6ead0d5d2`), and the strict diff has zero changes.
+
+The Windows amd64 native A/B corpus and edit comparison (E4) found changes in seven patch-corpus trees
+and nineteen seeded edits. The 40 upstream corpus trees, their 120 edits and the pinned `bootstrap.css`
+were byte-identical. A second fresh comparison (E4) covered 51 corpus inputs, 12 Korean fixtures and
+16 fixed fuzz inputs. It found changes in seven patch-corpus trees and eight Korean trees.
+Neither comparison changed a previously error-free tree of the unpatched build.
+The patched engine and pinned native reference agree on the corpus, seeded edits and raw query matches
+(E5, Windows amd64). The pinned `highlights.scm` compiles and runs on the repaired inputs.
+See the [migration notes](../../MIGRATING.md#css-non-latin-1-names) for the new captures.
+
+## Unreleased (after v0.6.0): PowerShell name patch
+
+At PowerShell pin `65ea6919e816`, the strict check of the regenerated `node-types.json` passes with zero findings, and
+it has the same 72778 bytes and SHA-256 `db02c7bdba010b518e4fa12b3ba045d0156d475f414b3ff4622eb30f51281c4e` as the
+archived upstream file (E1, CLI 0.27.2). The strict diff reports no changes. The patch changes name matching, not
+node types.
+Against the unpatched native build, the 165 pinned upstream corpus cases, 495 seeded edits, 16 fuzz seeds and the
+pinned large input (build.psm1) are byte-identical; six patch-corpus cases and their 18 edits are added. Four of the
+cases (Hangul and other non-ASCII variable, parameter, hash-key, member and type names) change from error trees to
+clean trees; the other two (Hangul statement labels, which stay command names, and ASCII names) are unchanged (E4,
+Windows amd64). The patch does not widen the `label` rule, so no statement-label input changes.
+A further 741 input files were compared, unpatched against patched (retained regression inputs, Korean rows,
+grammar-text fixtures, earlier probes and a 553-input insertion probe that puts one Hangul letter at every position
+of 30 ASCII snippets; E4, Windows amd64). No error-free tree became an `ERROR`. In 47 of the files (some inputs are in
+more than one group) an error-free tree changed to another error-free tree, in exactly three forms, all from a variable name continuing over non-ASCII letters or
+digits (as PowerShell 7.6.10 reads it, E2): in an expandable string or here-string, a `$name` followed directly by such a
+character (`"$name님"`, `"$env:값"`, `"$a:한글"`) and a `$` followed directly by one (`"$한글"`, `"가격: $원"`, here-string
+`$한`), where the `$` was text and is now a `variable` node; and, as a command argument, `echo $env:한글` and
+`echo $a:한`, which were `$env`, a `:` token and a word and are now one `variable`. The 553-input probe found 21 of
+these, all in strings. The result covers these inputs only. This is a breaking tree change under ADR-0023 amendment
+item 5 for those inputs only. The pinned upstream `highlights.scm` and `folds.scm` compiled, and the query lane
+matched the patched native reference on 1980 raw query/input comparisons with no mismatch (E5, Windows amd64).
+[Migration notes](../../MIGRATING.md#powershell-names)
+
+## Unreleased (after v0.6.0): Ruby symbol patch
+
+At Ruby pin `ad907a69da0c`, the strict check of the regenerated `node-types.json` passes with zero findings, and it has the
+same 69862 bytes and SHA-256 `a95d2f382017895771063837dbb959c4e5fde829fc185a2967695c770cc297bf` as before the patch
+(E1, CLI 0.27.2). The patch is a scanner change after generation, so the generated `parser.c` and node types are unchanged
+and a static diff against the previous generated file has nothing to report. Against the fully unpatched native build, the
+291 pinned upstream corpus and kit inputs, 873 seeded edits and the pinned large input (gb18030-tbl.rb) are byte-identical
+(E4, Windows amd64). In the scanner comparison over 360 inputs, only six retained symbol regressions change, all from error
+trees to clean trees; the retained negative inputs (`:+일`, `:@일?`, `:@한글` forms, `"#ŀ일"` and `"#@일"`) are unchanged
+(E4, Windows amd64). No error-free tree changes in the recorded inputs, so the ADR-0023 amendment item 5 breaking-change
+record is limited to error trees becoming clean. The pinned upstream `highlights.scm`, `locals.scm` and `tags.scm` compiled, and
+the query lane matched the patched native reference on 3,783 raw query/input comparisons with no mismatch (E5, Windows amd64).
+[Migration notes](../../MIGRATING.md#ruby-symbol-names)
