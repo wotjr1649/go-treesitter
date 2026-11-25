@@ -84,8 +84,8 @@ func readPins(path string) (pins, error) {
 var driverFile string
 
 // stageOnly (-stage) downloads and verifies every archive a build would need (runtime, wasi-libc, grammars, the pinned CLI,
-// npm inputs) and extracts the corpora, but compiles and generates nothing, so the trusted fetch step of the isolated
-// comparison workflow executes no third-party code. The sandbox then runs this tool offline.
+// npm inputs) and extracts the corpora, but compiles and generates nothing, so the staging step of the comparison workflow
+// executes no third-party code before the measuring step runs this tool offline.
 var stageOnly bool
 
 func main() {

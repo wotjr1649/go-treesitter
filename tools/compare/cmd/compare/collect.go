@@ -131,7 +131,7 @@ func cmdCollect(args []string) error {
 		kept = append(kept, rel)
 	}
 	for _, rel := range kept {
-		b, err := os.ReadFile(filepath.Join(*in, filepath.FromSlash(rel))) // size already bounded by maxFile
+		b, err := readBounded(filepath.Join(*in, filepath.FromSlash(rel)), maxFile)
 		if err != nil {
 			return err
 		}
@@ -278,7 +278,7 @@ func validate(p, rel string, exp *expectation) error {
 		}
 		return sc.Err()
 	case strings.HasPrefix(rel, "failures/") || strings.HasPrefix(rel, "provenance/") && !strings.HasSuffix(rel, ".json") && !strings.HasSuffix(rel, ".csv"):
-		b, err := os.ReadFile(p)
+		b, err := readBounded(p, maxFile)
 		if err != nil {
 			return err
 		}
@@ -291,7 +291,7 @@ func validate(p, rel string, exp *expectation) error {
 			return errors.New("module file over 1 MiB")
 		}
 	case strings.HasSuffix(rel, ".json"):
-		b, err := os.ReadFile(p)
+		b, err := readBounded(p, maxFile)
 		if err != nil {
 			return err
 		}
@@ -301,7 +301,7 @@ func validate(p, rel string, exp *expectation) error {
 		var v any
 		return json.Unmarshal(b, &v)
 	case strings.HasSuffix(rel, ".csv"):
-		b, err := os.ReadFile(p)
+		b, err := readBounded(p, maxFile)
 		if err != nil {
 			return err
 		}
@@ -412,13 +412,13 @@ func validateRow(r Row, exp *expectation) error {
 	return nil
 }
 
-// cmdGateNocc fails when the product's compiler-free build or smoke parse did not succeed, and checks that every
-// row carries one of the distinct outcomes.
+// cmdGateNocc fails when the product's compiler-free build or smoke parse did not succeed, and checks the file against
+// the exact expected adapter set, one row each, with consistent status, exit and outcome values.
 func cmdGateNocc(args []string) error {
 	fs := flag.NewFlagSet("gate-nocc", flag.ExitOnError)
 	file := fs.String("builds", "", "builds.csv of the no-compiler job")
 	fs.Parse(args)
-	b, err := os.ReadFile(*file)
+	b, err := readBounded(*file, maxFile)
 	if err != nil {
 		return err
 	}
@@ -430,23 +430,44 @@ func cmdGateNocc(args []string) error {
 	for i, h := range recs[0] {
 		col[h] = i
 	}
-	seenProduct := false
+	for _, need := range []string{"adapter", "status", "exit", "bytes", "smoke_parse", "outcome"} {
+		if _, ok := col[need]; !ok {
+			return fmt.Errorf("column %s missing", need)
+		}
+	}
+	seen := map[string]bool{}
 	for _, r := range recs[1:] {
-		out := r[col["outcome"]]
+		if len(r) != len(recs[0]) {
+			return errors.New("ragged builds.csv")
+		}
+		a := r[col["adapter"]]
+		if seen[a] || !has(noccAdapters, a) {
+			return fmt.Errorf("unexpected or repeated adapter %q", a)
+		}
+		seen[a] = true
+		st, exit, out := r[col["status"]], r[col["exit"]], r[col["outcome"]]
 		switch out {
 		case "ok", "expected-unsupported", "build-failure", "smoke-failure":
 		default:
-			return fmt.Errorf("%s: unknown outcome %q", r[0], out)
+			return fmt.Errorf("%s: unknown outcome %q", a, out)
 		}
-		if r[0] == refAdapter {
-			seenProduct = true
-			if out != "ok" || r[col["smoke_parse"]] != "ok" {
-				return fmt.Errorf("the product's compiler-free build or smoke parse failed: outcome=%s smoke=%s", out, r[col["smoke_parse"]])
-			}
+		if (st == "ok") != (exit == "0") || (st != "ok" && st != "failed") {
+			return fmt.Errorf("%s: status %q and exit %q disagree", a, st, exit)
+		}
+		if out == "ok" && (st != "ok" || r[col["bytes"]] == "0" || a != "empty" && r[col["smoke_parse"]] != "ok") {
+			return fmt.Errorf("%s: outcome ok without a successful build and smoke parse", a)
+		}
+		if out == "expected-unsupported" && a != "official" && a != "smacker" {
+			return fmt.Errorf("%s: only the cgo adapters may be expected-unsupported", a)
+		}
+		if a == refAdapter && out != "ok" {
+			return fmt.Errorf("the product's compiler-free build or smoke parse failed: outcome=%s smoke=%s", out, r[col["smoke_parse"]])
 		}
 	}
-	if !seenProduct {
-		return errors.New("no product row in builds.csv")
+	for _, a := range noccAdapters {
+		if !seen[a] {
+			return fmt.Errorf("no row for %s", a)
+		}
 	}
 	return nil
 }

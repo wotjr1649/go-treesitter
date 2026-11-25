@@ -12,6 +12,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -148,8 +149,10 @@ func Run(adapter string, open Opener, args []string, stdout io.Writer) int {
 		}
 		runtime.KeepAlive(keep)
 	case *mode == "time" || *mode == "alloc":
+		var mu sync.Mutex        // guards res between the measuring goroutine and the watchdog
 		watch := func() func() { // a hung operation leaves a partial result and a distinct status, not silence
 			t := time.AfterFunc(OpWatchdog, func() {
+				mu.Lock()
 				res.Status, res.Error = "timeout", fmt.Sprintf("operation exceeded %s", OpWatchdog)
 				res.PeakRSSKiB = peakRSSKiB()
 				_ = json.NewEncoder(stdout).Encode(res)
@@ -157,7 +160,7 @@ func Run(adapter string, open Opener, args []string, stdout io.Writer) int {
 			})
 			return func() { t.Stop() }
 		}
-		if err := timed(sess, res, *op, *mode == "alloc", *reps, src, newSrc, edit, watch); err != nil {
+		if err := timed(sess, res, &mu, *op, *mode == "alloc", *reps, src, newSrc, edit, watch); err != nil {
 			return fail(statusOf(err), err)
 		}
 	default:
@@ -171,7 +174,7 @@ func Run(adapter string, open Opener, args []string, stdout io.Writer) int {
 }
 
 // timed runs the warm-up and the measured loop. The prepared old tree and every release stay outside the counters.
-func timed(sess Session, res *Result, op string, alloc bool, reps int, src, newSrc []byte, e Edit, watch func() func()) error {
+func timed(sess Session, res *Result, mu *sync.Mutex, op string, alloc bool, reps int, src, newSrc []byte, e Edit, watch func() func()) error {
 	type step struct {
 		prep func() (Tree, error) // outside the measurement
 		do   func(Tree) (Tree, error)
@@ -216,7 +219,9 @@ func timed(sess Session, res *Result, op string, alloc bool, reps int, src, newS
 	if err := run(func(f func() (Tree, error)) (Tree, error) { return f() }); err != nil {
 		return err
 	}
+	mu.Lock()
 	res.WarmupNs = time.Since(w0).Nanoseconds()
+	mu.Unlock()
 	var m0, m1 runtime.MemStats
 	for i := 0; i < reps; i++ {
 		err := run(func(f func() (Tree, error)) (Tree, error) {
@@ -224,13 +229,18 @@ func timed(sess Session, res *Result, op string, alloc bool, reps int, src, newS
 				runtime.ReadMemStats(&m0)
 				t, err := f()
 				runtime.ReadMemStats(&m1)
+				mu.Lock()
 				res.Mallocs += m1.Mallocs - m0.Mallocs
 				res.TotalAlloc += m1.TotalAlloc - m0.TotalAlloc
+				mu.Unlock()
 				return t, err
 			}
 			t0 := time.Now()
 			t, err := f()
-			res.SamplesNs = append(res.SamplesNs, time.Since(t0).Nanoseconds())
+			d := time.Since(t0).Nanoseconds()
+			mu.Lock()
+			res.SamplesNs = append(res.SamplesNs, d)
+			mu.Unlock()
 			return t, err
 		})
 		if err != nil {

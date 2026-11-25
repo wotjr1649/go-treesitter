@@ -213,7 +213,7 @@ func exeSuffix() string {
 	return ""
 }
 
-func TestSealCapAndNoccGate(t *testing.T) {
+func TestSealCap(t *testing.T) {
 	dir := t.TempDir()
 	mustWrite(t, filepath.Join(dir, "a.txt"), []byte("x"))
 	if err := cmdSeal([]string{"-dir", dir}); err != nil {
@@ -223,15 +223,103 @@ func TestSealCapAndNoccGate(t *testing.T) {
 	if err := cmdSeal([]string{"-dir", dir}); err == nil {
 		t.Fatal("over-cap set sealed")
 	}
-	good := "adapter,mode,status,exit,bytes,delta,seconds,smoke_parse,outcome,diagnostics\nproduct,x,ok,0,1,1,1,ok,ok,\nofficial,x,failed,1,0,0,1,n/a,expected-unsupported,cgo\n"
-	p := filepath.Join(dir, "builds.csv")
-	mustWrite(t, p, []byte(good))
+}
+
+func noccCSV(product, official string) string {
+	rows := []string{"adapter,mode,status,exit,bytes,delta_vs_empty_bytes,seconds,smoke_parse,outcome,diagnostics", "empty,x,ok,0,10,0,1,n/a,ok,"}
+	rows = append(rows, product)
+	rows = append(rows, official, "smacker,x,failed,1,0,0,1,n/a,expected-unsupported,cgo",
+		"gotreesitter,x,ok,0,30,20,1,ok,ok,", "bonsai,x,ok,0,30,20,1,ok,ok,", "malivvan,x,ok,0,30,20,1,ok,ok,")
+	return strings.Join(rows, "\n") + "\n"
+}
+
+func TestNoccGate(t *testing.T) {
+	p := filepath.Join(t.TempDir(), "builds.csv")
+	good, off := "product,x,ok,0,30,20,1,ok,ok,", "official,x,failed,1,0,0,1,n/a,expected-unsupported,cgo"
+	mustWrite(t, p, []byte(noccCSV(good, off)))
 	if err := cmdGateNocc([]string{"-builds", p}); err != nil {
 		t.Fatal(err)
 	}
-	mustWrite(t, p, []byte(strings.Replace(good, "product,x,ok,0,1,1,1,ok,ok,", "product,x,ok,0,1,1,1,none,smoke-failure,", 1)))
-	if err := cmdGateNocc([]string{"-builds", p}); err == nil {
-		t.Fatal("a failed product smoke parse passed the gate")
+	for name, csv := range map[string]string{
+		"product smoke failure":   noccCSV("product,x,ok,0,30,20,1,none,smoke-failure,", off),
+		"status/exit disagree":    noccCSV("product,x,ok,1,30,20,1,ok,ok,", off),
+		"ok without smoke":        noccCSV("product,x,ok,0,30,20,1,none,ok,", off),
+		"pure-Go expected-unsup.": noccCSV(good, off) + "bonsai,x,failed,1,0,0,1,n/a,expected-unsupported,\n",
+		"missing adapter":         strings.Replace(noccCSV(good, off), "malivvan,x,ok,0,30,20,1,ok,ok,\n", "", 1),
+	} {
+		mustWrite(t, p, []byte(csv))
+		if err := cmdGateNocc([]string{"-builds", p}); err == nil {
+			t.Errorf("%s passed the gate", name)
+		}
+	}
+}
+
+// The no-compiler build runs the real go tool offline on tiny stdlib-and-harness adapters: a pure-Go product must build and
+// parse the smoke fixture, a cgo adapter must be reported as expected-unsupported, and a broken smoke parse is a smoke-failure.
+func TestNoccBuildsAndClassifies(t *testing.T) {
+	if testing.Short() {
+		t.Skip("runs go build")
+	}
+	goPath, err := exec.LookPath("go")
+	if err != nil {
+		t.Skip("no go tool")
+	}
+	harnessDir, _ := filepath.Abs("../../harness")
+	ad := filepath.Join(t.TempDir(), "adapters")
+	mod := func(name string) {
+		mustWrite(t, filepath.Join(ad, name, "go.mod"), []byte("module example.invalid/"+name+"\n\ngo 1.26.0\n\nrequire github.com/wotjr1649/go-treesitter/tools/compare/harness v0.0.0\n\nreplace github.com/wotjr1649/go-treesitter/tools/compare/harness => "+filepath.ToSlash(harnessDir)+"\n"))
+	}
+	good := "package main\nimport h \"github.com/wotjr1649/go-treesitter/tools/compare/harness\"\ntype s struct{ h.Base }\nfunc (s) Identity() map[string]string { return nil }\nfunc (s) Parse(b []byte) (h.Tree, error) { return b, nil }\nfunc (s) Sexp(h.Tree) (string, bool, error) { return \"(x)\", false, nil }\nfunc main() { h.Main(\"NAME\", func(string) (h.Session, error) { return s{}, nil }) }\n"
+	for _, a := range noccAdapters {
+		mod(a)
+		src := strings.ReplaceAll(good, "NAME", a)
+		switch a {
+		case "empty":
+			src = "package main\nfunc main() {}\n"
+		case "official", "smacker":
+			src = "package main\n// #include <stdio.h>\nimport \"C\"\nfunc main() {}\n"
+		case "bonsai": // builds, but answers as another adapter: a smoke failure
+			src = strings.ReplaceAll(good, "NAME", "somebody-else")
+		}
+		mustWrite(t, filepath.Join(ad, a, "main.go"), []byte(src))
+	}
+	out := filepath.Join(t.TempDir(), "builds.csv")
+	cache, _ := exec.Command(goPath, "env", "GOMODCACHE").Output()
+	if err := nocc(noccOpts{adapters: ad, gobin: filepath.Dir(goPath), modcache: strings.TrimSpace(string(cache)), out: out}); err != nil {
+		t.Fatal(err)
+	}
+	b, _ := os.ReadFile(out)
+	got := map[string]string{}
+	for _, l := range strings.Split(strings.TrimSpace(string(b)), "\n")[1:] {
+		f := strings.Split(l, ",")
+		got[f[0]] = f[8]
+	}
+	want := map[string]string{"empty": "ok", "product": "ok", "official": "expected-unsupported", "smacker": "expected-unsupported",
+		"gotreesitter": "ok", "bonsai": "smoke-failure", "malivvan": "ok"}
+	for a, w := range want {
+		if got[a] != w {
+			t.Errorf("%s: %q, want %q\n%s", a, got[a], w, b)
+		}
+	}
+	if err := cmdGateNocc([]string{"-builds", out}); err != nil {
+		t.Errorf("the product is ok, the gate must pass: %v", err)
+	}
+}
+
+// Only tree-equal (or exact) grades of the case the cell exercised qualify; lossy, shape-only and mismatch do not.
+func TestGradedEqualOnlyForEqualTrees(t *testing.T) {
+	g := map[string]string{
+		"a|i|fresh|": "tree-equal", "b|i|fresh|": "mismatch", "c|i|fresh|": "shape-only", "d|i|fresh|": "tree-lossy", "e|i|fresh|": "sexp-exact",
+		"a|i|incremental|token": "mismatch", "e|i|incremental|token": "tree-equal",
+	}
+	parse, edit := Cell{Input: "i", Op: "parse"}, Cell{Input: "i", Op: "edit"}
+	for ad, want := range map[string]bool{"a": true, "b": false, "c": false, "d": false, "e": true, "z": false} {
+		if gradedEqual(g, ad, parse) != want {
+			t.Errorf("parse %s: want %t", ad, want)
+		}
+	}
+	if gradedEqual(g, "a", edit) || !gradedEqual(g, "e", edit) { // a fresh grade never approves the incremental case
+		t.Error("edit cells must use the incremental token case")
 	}
 }
 

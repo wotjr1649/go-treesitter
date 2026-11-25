@@ -31,9 +31,17 @@ func ParseSexp(s string) (*SNode, error) {
 	return n, nil
 }
 
+// Limits that keep the parse of an untrusted S-expression bounded.
+const (
+	maxSexpDepth = 20000
+	maxSexpNodes = 30_000_000
+)
+
 type sexpParser struct {
-	s string
-	i int
+	s     string
+	i     int
+	depth int
+	nodes int
 }
 
 func (p *sexpParser) skip() {
@@ -65,6 +73,13 @@ func (p *sexpParser) atom() string {
 }
 
 func (p *sexpParser) node(field string) (*SNode, error) {
+	if p.depth++; p.depth > maxSexpDepth {
+		return nil, fmt.Errorf("nesting deeper than %d", maxSexpDepth)
+	}
+	defer func() { p.depth-- }()
+	if p.nodes++; p.nodes > maxSexpNodes {
+		return nil, fmt.Errorf("more than %d nodes", maxSexpNodes)
+	}
 	p.skip()
 	if p.i >= len(p.s) || p.s[p.i] != '(' {
 		return nil, fmt.Errorf("expected '(' at byte %d", p.i)

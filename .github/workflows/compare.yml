@@ -1,23 +1,23 @@
-name: Comparative benchmark (isolated)
+name: Comparative benchmark
 
 # Compares this library with other Go tree-sitter libraries on identified inputs (tools/compare, plan S7/S10).
 #
-# Trigger: workflow_dispatch only, and only for the reviewed main branch: every job refuses any other ref. There is no
-# pull_request or schedule trigger, so no unreviewed change ever reaches these jobs. Land a change to tools/compare on main
-# first; this workflow then measures that commit.
+# Trigger: workflow_dispatch only, and only for the reviewed main branch: every job refuses any other ref.
 #
-# Isolation: contents: read, no secrets, no id-token; actions pinned by commit SHA; no cache, self-hosted runner or
-# environment. Trusted steps (this repository's own Go code and 'go mod download') fetch the pinned inputs and verify them
-# by checksum. Every step that compiles or runs third-party code runs in a digest-pinned container with no network, a
-# read-only root file system, bounded processes/memory/CPUs and read-only inputs; candidate processes run as separate
-# unprivileged users in private directories, and only the measurer writes results. A trusted collector validates the
-# results against the measurer's plan before anything is reported or uploaded.
+# Threat model (tools/compare/README.md): the isolation boundary is the ephemeral GitHub-hosted runner VM of each job.
+# The job protects the repository and its credentials: top-level permissions are empty and no job asks for any, there are no
+# secrets, no id-token, no caches and no environment, the commit is fetched anonymously (the repository is public; checkout
+# would need contents: read only for its token), actions are pinned by commit SHA, and nothing an artifact contains is ever
+# executed or fed to a later privileged step. Candidates and the product run as the runner user in the same VM, which paired
+# timing needs; the integrity of a number against a malicious candidate is NOT protected (it could falsify its own job's rows).
+# Correctness is cross-checked against the native C reference, and the aggregate job validates every artifact with strict
+# schemas and bounded reads.
 #
 # Module pins: tools/compare/adapters/*/go.mod. Their go.sum files must be committed before a measuring run:
-#   1. Dispatch once with bootstrap=true. Only the PROPOSAL job runs: it resolves each module graph on a copy with
+#   1. Dispatch once with bootstrap=true. Only the proposal job runs: it resolves each module graph on a copy with
 #      'go mod tidy' and uploads go-sum-proposal/. No candidate is built, run or measured.
 #   2. Review the proposal and commit tools/compare/adapters/*/go.mod and go.sum to main.
-#   3. Normal runs stop before any sandbox step unless those files are committed, and fail if resolution would change them.
+#   3. Normal runs stop before any candidate step unless those files are committed, and fail if resolution would change them.
 
 on:
   workflow_dispatch:
@@ -32,8 +32,7 @@ on:
         type: boolean
         default: false
 
-permissions:
-  contents: read
+permissions: {}
 
 concurrency:
   group: compare
@@ -51,29 +50,32 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' && inputs.bootstrap }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    permissions: {}
     defaults:
       run:
         shell: bash
     env:
       T: ${{ runner.temp }}/cmp
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-      - name: Resolve the module graphs (trusted, network; executes no candidate code)
+      - name: Refuse any ref but main
+        run: '[ "$GITHUB_REF" = refs/heads/main ]'
+      - name: Fetch the commit (no token, no action)
+        env:
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          git init -q .
+          git remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
+          git fetch -q --depth 1 origin "$GITHUB_SHA"
+          git checkout -q --detach FETCH_HEAD
+      - name: Resolve the module graphs (executes no candidate code)
         env:
           STAGE_MODE: bootstrap
         run: bash tools/compare/scripts/stage.sh "$T" none
-      - name: Validate and seal
-        run: |
-          "$T/bin/compare" collect -in "$T/out" -out "$T/collected"
-          "$T/bin/compare" seal -dir "$T/collected"
-          { echo "## go.sum proposal"; echo; echo "Review, then commit tools/compare/adapters/<name>/go.mod and go.sum from the artifact."; echo; echo '~~~'; cat "$T/collected/SHA256SUMS"; echo '~~~'; } >> "$GITHUB_STEP_SUMMARY"
       - name: Upload the proposal
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: compare-go-sum-proposal
-          path: ${{ runner.temp }}/cmp/collected
+          path: ${{ runner.temp }}/cmp/out
           if-no-files-found: error
           retention-days: 14
 
@@ -87,6 +89,7 @@ jobs:
         lang: [c, go, javascript, json, python]
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 40
+    permissions: {}
     defaults:
       run:
         shell: bash
@@ -95,38 +98,29 @@ jobs:
     steps:
       - name: Refuse any ref but main
         run: '[ "$GITHUB_REF" = refs/heads/main ]'
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-      - name: Stage inputs (trusted, network; stops here unless every go.sum is committed)
+      - name: Fetch the commit (no token, no action)
         env:
-          GITHUB_TOKEN: ${{ github.token }} # API rate limits for the pinned downloads only
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          git init -q .
+          git remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
+          git fetch -q --depth 1 origin "$GITHUB_SHA"
+          git checkout -q --detach FETCH_HEAD
+      - name: Stage the pinned inputs (stops here unless every go.sum is committed)
         run: bash tools/compare/scripts/stage.sh "$T" "${{ matrix.lang }}"
-      - name: Pull the pinned image
-        run: . tools/compare/scripts/pins.env && docker pull --quiet "$IMG_CGO" > /dev/null
-      - name: Build and measure in the sandbox (no network)
+      - name: Build and measure (candidates run on this VM only)
         run: |
-          . tools/compare/scripts/pins.env
           budget=20; [ "$MODE" = smoke ] && budget=5
-          bash tools/compare/scripts/docker-run.sh "$T" "$IMG_CGO" sandbox-measure.sh LANGK="${{ matrix.lang }}" MODE="$MODE" BUDGET_MIN="$budget"
-      - name: Validate against the plan, record identity, report and seal (trusted)
-        run: |
-          . tools/compare/scripts/pins.env
-          "$T/bin/compare" collect -in "$T/out" -out "$T/collected"
-          mkdir -p "$T/collected/provenance"
-          cp "$T"/identity/*.txt "$T/collected/provenance/"
-          printf '{"repository":"%s","run_id":"%s","run_attempt":"%s","sha":"%s","ref":"%s","workflow":"%s","runner_arch":"%s","runner_image":"%s","mode":"%s","image":"%s","image_id":"%s"}\n' \
-            "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" "$GITHUB_SHA" "$GITHUB_REF" "$GITHUB_WORKFLOW" "$RUNNER_ARCH" "${ImageVersion:-unknown}" "$MODE" "$IMG_CGO" \
-            "$(docker image inspect --format '{{.Id}}' "$IMG_CGO")" > "$T/collected/provenance/workflow.json"
-          "$T/bin/compare" report -in "$T/collected"
-          "$T/bin/compare" seal -dir "$T/collected"
-          { echo "## ${{ matrix.runner }} / ${{ matrix.lang }} (mode: $MODE)"; echo; cat "$T/collected/summary.md"; } >> "$GITHUB_STEP_SUMMARY"
-      - name: Upload the validated results
+          bash tools/compare/scripts/measure.sh "$T" "${{ matrix.lang }}" "$MODE" "$budget"
+      - name: Record the run's identity
+        if: ${{ !cancelled() }}
+        run: bash tools/compare/scripts/identity.sh "$T" "$MODE"
+      - name: Upload the results (validated later, never executed)
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: compare-${{ matrix.runner }}-${{ matrix.lang }}
-          path: ${{ runner.temp }}/cmp/collected
+          path: ${{ runner.temp }}/cmp/out
           if-no-files-found: error
           retention-days: 14
 
@@ -139,6 +133,7 @@ jobs:
         runner: [ubuntu-24.04, ubuntu-24.04-arm]
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 25
+    permissions: {}
     defaults:
       run:
         shell: bash
@@ -147,64 +142,76 @@ jobs:
     steps:
       - name: Refuse any ref but main
         run: '[ "$GITHUB_REF" = refs/heads/main ]'
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-      - name: Stage the module cache and run the orchestrator's unit tests (trusted, network)
+      - name: Fetch the commit (no token, no action)
+        env:
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          git init -q .
+          git remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
+          git fetch -q --depth 1 origin "$GITHUB_SHA"
+          git checkout -q --detach FETCH_HEAD
+      - name: Stage the module cache and run the orchestrator's unit tests
         env:
           RUN_UNIT: "1"
         run: bash tools/compare/scripts/stage.sh "$T" none
-      - name: Pull the pinned compiler-free image
-        run: . tools/compare/scripts/pins.env && docker pull --quiet "$IMG_NOCC" > /dev/null
-      - name: Build every adapter without a C compiler (sandbox, no network)
+      - name: Build every adapter with CGO_ENABLED=0 and no compiler on PATH, then smoke-parse
         run: |
-          . tools/compare/scripts/pins.env
-          bash tools/compare/scripts/docker-run.sh "$T" "$IMG_NOCC" sandbox-nocc.sh
-      - name: Validate and seal (trusted)
-        run: |
-          "$T/bin/compare" collect -in "$T/out" -out "$T/collected"
-          mkdir -p "$T/collected/provenance"; cp "$T"/identity/*.txt "$T/collected/provenance/"
-          "$T/bin/compare" seal -dir "$T/collected"
-          { echo "## No-C-compiler build (${{ matrix.runner }})"; echo; awk -F, 'NR==1{print "| adapter | build | bytes | smoke parse | outcome |"; print "|---|---|---|---|---|"; next} {print "| " $1 " | " $3 " | " $5 " | " $8 " | " $9 " |"}' "$T/collected/builds.csv"; } >> "$GITHUB_STEP_SUMMARY"
-      - name: Upload the validated results
+          mkdir -p "$T/out"
+          "$T/bin/compare" nocc -adapters tools/compare/adapters -go-bin "$T/go/bin" -modcache "$T/modcache" -out "$T/out/builds.csv"
+      - name: Record the run's identity
+        if: ${{ !cancelled() }}
+        run: bash tools/compare/scripts/identity.sh "$T" "$MODE"
+      - name: Upload the results (validated later, never executed)
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: compare-nocc-${{ matrix.runner }}
-          path: ${{ runner.temp }}/cmp/collected
+          path: ${{ runner.temp }}/cmp/out
           if-no-files-found: error
           retention-days: 14
       - name: The product must build and parse without a C compiler
-        run: '"$T/bin/compare" gate-nocc -builds "$T/collected/builds.csv"'
+        run: '"$T/bin/compare" gate-nocc -builds "$T/out/builds.csv"'
 
   aggregate:
-    name: aggregate (trusted)
+    name: aggregate (no candidate code)
     needs: [measure, nocc]
     if: ${{ !cancelled() && github.ref == 'refs/heads/main' && !inputs.bootstrap }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    permissions: {}
+    defaults:
+      run:
+        shell: bash
+    env:
+      T: ${{ runner.temp }}/cmp
     steps:
+      - name: Refuse any ref but main
+        run: '[ "$GITHUB_REF" = refs/heads/main ]'
+      - name: Fetch only the orchestrator's sources (no adapter, no candidate module)
+        env:
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          git init -q .
+          git remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
+          git fetch -q --depth 1 origin "$GITHUB_SHA"
+          git checkout -q FETCH_HEAD -- tools/compare/cmd tools/compare/harness tools/compare/go.mod tools/compare/scripts/stage.sh tools/compare/scripts/pins.env tools/bench/proc
+      - name: Build the aggregator
+        env:
+          STAGE_MODE: tools
+        run: bash tools/compare/scripts/stage.sh "$T" none
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           path: results
-      - name: Require every expected artifact, intact
+      - name: Validate every artifact with strict schemas and report (executes nothing from them)
         run: |
-          missing=0
-          for r in ubuntu-24.04 ubuntu-24.04-arm; do
-            for l in c go javascript json python; do
-              d="results/compare-$r-$l"
-              if [ -s "$d/measurements.jsonl" ] && [ "$(wc -l < "$d/correctness.csv")" -gt 1 ] && [ -s "$d/SHA256SUMS" ]; then
-                (cd "$d" && sha256sum --check --quiet SHA256SUMS) || { echo "::error::checksum mismatch in $d"; missing=1; }
-              else
-                echo "::error::missing or empty results for $r/$l"; missing=1
-              fi
-            done
-            d="results/compare-nocc-$r"
-            if [ -s "$d/builds.csv" ] && [ -s "$d/SHA256SUMS" ]; then
-              (cd "$d" && sha256sum --check --quiet SHA256SUMS) || { echo "::error::checksum mismatch in $d"; missing=1; }
-            else
-              echo "::error::missing no-compiler build record for $r"; missing=1
-            fi
-          done
-          { echo "## Result files"; echo; (cd results && find . -type f | sort | head -300 | sed 's/^/- /'); } >> "$GITHUB_STEP_SUMMARY"
-          exit $missing
+          "$T/bin/compare" aggregate -in results -out "$T/aggregate" || rc=$?
+          [ -f "$T/aggregate/summary.md" ] && cat "$T/aggregate/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          exit ${rc:-0}
+      - name: Upload the validated summary
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: compare-summary
+          path: ${{ runner.temp }}/cmp/aggregate
+          if-no-files-found: error
+          retention-days: 14

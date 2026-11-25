@@ -47,6 +47,7 @@ type Row struct {
 	Input    string          `json:"input,omitempty"`
 	Exit     int             `json:"exit"`
 	TimedOut bool            `json:"timed_out,omitempty"`
+	Failed   bool            `json:"failed,omitempty"` // the process could not be started or reaped cleanly, or its output was cut
 	WallNs   int64           `json:"wall_ns"`
 	Err      string          `json:"err,omitempty"`
 	Res      *harness.Result `json:"result,omitempty"`
@@ -76,8 +77,6 @@ type runOpts struct {
 	budget                  time.Duration
 	perOp                   time.Duration
 	seed                    string
-	uidBase                 int
-	workRoot                string
 }
 
 // readiness is the preflight verdict of one adapter on one language.
@@ -112,8 +111,6 @@ func cmdRun(args []string) error {
 	fs.DurationVar(&o.budget, "budget", 35*time.Minute, "wall budget; later cells are recorded incomplete")
 	fs.DurationVar(&o.perOp, "op-watchdog", 30*time.Second, "watchdog per operation (a block gets reps+1 of them)")
 	fs.StringVar(&o.seed, "seed", "", "manifest seed (default: the workload's)")
-	fs.IntVar(&o.uidBase, "uid-base", 0, "run adapter i as user uid-base+i (Linux sandbox; 0 keeps the measurer's user)")
-	fs.StringVar(&o.workRoot, "work-root", "", "directory holding one private writable directory per adapter")
 	fs.Parse(args)
 	o.langs, o.adapters = strings.Split(langs, ","), strings.Split(adapters, ",")
 	if o.workload == "" || o.bin == "" || o.out == "" {
@@ -126,7 +123,7 @@ func cmdRun(args []string) error {
 }
 
 func run(o runOpts) error {
-	r := &runner{o: o, until: time.Now().Add(o.budget), sb: &sandbox{UIDBase: o.uidBase, WorkRoot: o.workRoot, Adapters: o.adapters}}
+	r := &runner{o: o, until: time.Now().Add(o.budget), sb: &sandbox{}}
 	raw, err := os.ReadFile(filepath.Join(o.workload, "workload.json"))
 	if err != nil {
 		return err
@@ -252,7 +249,11 @@ func (r *runner) rounds(group string) int {
 // complete reports whether a worker row is a finished, normally exiting block with every scheduled sample.
 func complete(row Row, pass string, reps int) bool {
 	res := row.Res
-	if res == nil || res.Status != "ok" || row.Exit != 0 || row.TimedOut || res.Reps != reps {
+	if res == nil || res.Status != "ok" || row.Exit != 0 || row.TimedOut || row.Failed || res.Reps != reps {
+		return false
+	}
+	// the result must describe this very call
+	if res.Adapter != row.Adapter || res.Lang != row.Lang || res.Mode != pass || res.Op != row.Op {
 		return false
 	}
 	if pass == "time" {
@@ -373,8 +374,7 @@ func (r *runner) exec(row Row, args []string, reps int) Row {
 	bin := filepath.Join(r.o.bin, row.Adapter)
 	timeout := time.Duration(reps+1)*r.o.perOp + r.o.perOp
 	sp := r.sb.spawn(row.Adapter, bin, args, timeout, 64<<10)
-	r.sb.clean(row.Adapter)
-	row.WallNs, row.Exit, row.TimedOut = sp.Wall.Nanoseconds(), sp.Exit, sp.TimedOut
+	row.WallNs, row.Exit, row.TimedOut, row.Failed = sp.Wall.Nanoseconds(), sp.Exit, sp.TimedOut, sp.Failed || sp.Truncated
 	if sp.Err != nil {
 		row.Err = printable(sp.Err.Error(), 300)
 	}

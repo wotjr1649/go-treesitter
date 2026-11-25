@@ -46,9 +46,8 @@ func okRes(r Row) *harness.Result {
 	return nil
 }
 
-// gradedSet lists the (adapter, input) pairs whose fresh parse was compared with a native reference: the correctness
-// grade every summarized cell must have for the same input on both sides.
-func gradedSet(p string) (map[string]bool, error) {
+// gradedSet maps adapter|input|case|edit-kind to the grade level of that compared case.
+func gradedSet(p string) (map[string]string, error) {
 	f, err := os.Open(p)
 	if err != nil {
 		return nil, err
@@ -62,13 +61,25 @@ func gradedSet(p string) (map[string]bool, error) {
 	for i, h := range recs[0] {
 		col[h] = i
 	}
-	g := map[string]bool{}
+	g := map[string]string{}
 	for _, r := range recs[1:] {
-		if r[col["case"]] == "fresh" && r[col["status"]] == "compared" {
-			g[r[col["adapter"]]+"|"+r[col["input"]]] = true
+		if r[col["status"]] == "compared" {
+			g[r[col["adapter"]]+"|"+r[col["input"]]+"|"+r[col["case"]]+"|"+r[col["edit_kind"]]] = r[col["level"]]
 		}
 	}
 	return g, nil
+}
+
+// gradedEqual reports whether the case the cell's operation exercised was compared with the reference and the tree
+// is the same: only sexp-exact and tree-equal qualify. tree-lossy, shape-only, mismatch and unparsed cells are
+// counted but never enter a ratio, and the timed edit's own incremental case grades an edit cell.
+func gradedEqual(g map[string]string, adapter string, c Cell) bool {
+	key := adapter + "|" + c.Input + "|fresh|"
+	if c.Op == "edit" {
+		key = adapter + "|" + c.Input + "|incremental|token"
+	}
+	lv := g[key]
+	return lv == harness.LevelExact || lv == harness.LevelTree
 }
 
 // mdEscape makes text that came from a candidate or a file name inert in Markdown (links, mentions, HTML, tables).
@@ -198,19 +209,19 @@ func cmdReport(args []string) error {
 	}
 	graded, gerr := gradedSet(filepath.Join(*in, "correctness.csv"))
 	if gerr != nil {
-		graded = map[string]bool{}
+		graded = map[string]string{}
 	}
 	include := func(c Cell) bool {
-		return c.State == "measured" && graded[refAdapter+"|"+c.Input] && graded[c.Cand+"|"+c.Input]
+		return c.State == "measured" && gradedEqual(graded, refAdapter, c) && gradedEqual(graded, c.Cand, c)
 	}
 	timing, alloc := pairStats(rows, cells, "time", include), pairStats(rows, cells, "alloc", include)
 
 	var md strings.Builder
 	w := func(f string, a ...any) { fmt.Fprintf(&md, f+"\n", a...) }
 	w("# Comparative benchmark summary\n")
-	w("Every number below describes the identified consumer artifacts on this runner. No row is an E4 speed claim and none is E5 C agreement:")
-	w("grammar bytes, runtime releases and scanners differ between the libraries, and S-expression agreement is at most E2 (docs/specs/validation.md).")
-	w("Only cells that finished every scheduled round of both passes, exited normally and have a correctness grade for the same input on both sides enter the ratios below.")
+	w("Every number below describes the identified consumer artifacts on this runner VM. Timings are at most E4 (docs/specs/validation.md), and only a pair whose")
+	w("grammar bytes, runtime and API work are controlled would qualify; the libraries here ship different ones, so the rows are descriptive observations. S-expression agreement is at most E2 and nothing here is E5.\n")
+	w("Only cells that finished every scheduled round of both passes, exited cleanly and whose own operation (fresh parse, or the timed incremental edit) produced a tree equal to the native reference's (sexp-exact or tree-equal) on both sides enter the ratios below.")
 	w("Failed, partial, incomplete, unsupported, unavailable and ungraded cells are counted in the coverage table; their raw rows stay in measurements.jsonl.\n")
 	if gerr != nil {
 		w("**correctness.csv is missing or unreadable (%s): no cell is graded, so no timing row is shown.**\n", mdEscape(gerr.Error()))
@@ -218,7 +229,7 @@ func cmdReport(args []string) error {
 	writeRunInfo(&md, runInfo)
 
 	w("\n## Cell coverage\n")
-	w("| candidate | op | measured and graded | measured, ungraded | partial | failed | incomplete | unsupported | unavailable |")
+	w("| candidate | op | measured and graded | measured, not tree-equal | partial | failed | incomplete | unsupported | unavailable |")
 	w("|---|---|---:|---:|---:|---:|---:|---:|---:|")
 	type k2 struct{ cand, op string }
 	cov := map[k2]map[string]int{}
@@ -285,7 +296,7 @@ func cmdReport(args []string) error {
 }
 
 func readJSON(p string, v any) error {
-	b, err := os.ReadFile(p)
+	b, err := readBounded(p, maxFile)
 	if err != nil {
 		return err
 	}

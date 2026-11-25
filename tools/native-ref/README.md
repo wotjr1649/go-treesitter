@@ -38,7 +38,7 @@ go run . -pins ../gen/pins.json -dl <archive dir> -work <empty dir> -out <exe di
 points. It fetches and verifies the pinned wasi-libc archive; set `TSG_NATIVE_DL` to an existing archive directory
 to reuse a local copy, and `CC` to select clang instead of the default gcc.
 
-Two flags serve `tools/compare` (the isolated comparative benchmark): `-driver FILE` links another C driver instead of
+Two flags serve `tools/compare` (the comparative benchmark): `-driver FILE` links another C driver instead of
 `c/native_ref.c` (same shims, flags and pinned sources; use a separate `-out`), and `-stage` fetches and sha256-verifies every
 input a build needs (runtime, wasi-libc, grammar archives, the pinned CLI, npm inputs) and extracts `-corpus`, but generates and
 compiles nothing, so a later offline run needs no network.

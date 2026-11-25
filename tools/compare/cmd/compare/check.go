@@ -54,8 +54,6 @@ type checkOpts struct {
 	smoke                    bool
 	jobs                     int
 	perOp                    time.Duration
-	uidBase                  int
-	workRoot                 string
 }
 
 func cmdCheck(args []string) error {
@@ -71,14 +69,12 @@ func cmdCheck(args []string) error {
 	fs.BoolVar(&o.smoke, "smoke", false, "two small inputs and the smallest large input per language")
 	fs.IntVar(&o.jobs, "j", 3, "parallel checks (outside any timing window)")
 	fs.DurationVar(&o.perOp, "op-watchdog", 60*time.Second, "watchdog per process (three times as long for a large input)")
-	fs.IntVar(&o.uidBase, "uid-base", 0, "run adapter i as user uid-base+i (Linux sandbox)")
-	fs.StringVar(&o.workRoot, "work-root", "", "directory holding one private writable directory per adapter")
 	fs.Parse(args)
 	o.langs, o.adapters = strings.Split(langs, ","), strings.Split(adapters, ",")
 	if o.workload == "" || o.bin == "" || o.refs == "" || o.out == "" {
 		return errors.New("check needs -workload, -bin, -refs and -out")
 	}
-	c := &checker{o: o, sb: &sandbox{UIDBase: o.uidBase, WorkRoot: o.workRoot, Adapters: o.adapters}}
+	c := &checker{o: o, sb: &sandbox{}}
 	if err := readJSON(filepath.Join(o.workload, "workload.json"), &c.w); err != nil {
 		return err
 	}
@@ -99,9 +95,7 @@ func cmdCheck(args []string) error {
 		}
 	}
 	wg.Wait()
-	for _, ad := range o.adapters {
-		c.sb.clean(ad)
-	}
+	c.sb.close()
 	return c.write()
 }
 
@@ -180,12 +174,21 @@ func (c *checker) grade(row *checkRow, in Input, ad, refPath, name, old, nw stri
 		row.Status, row.Reason = "error", "no valid result line: "+printable(sp.Stderr+" "+errString(sp.Err), 300)
 		return
 	}
+	// the result must describe this very call, and the process must have exited cleanly, before any status is believed
+	if sp.Failed || sp.Truncated || sp.TimedOut || sp.Exit != 0 || sp.Err != nil {
+		row.Status, row.Reason = "error", printable(fmt.Sprintf("status=%s exit=%d failed=%t timeout=%t %s", res.Status, sp.Exit, sp.Failed, sp.TimedOut, res.Error), 300)
+		return
+	}
+	if res.Adapter != ad || res.Lang != in.Lang || res.Op != op || res.Mode != "out" {
+		row.Status, row.Reason = "error", "the result line does not describe this call"
+		return
+	}
 	switch {
 	case res.Status == "unsupported":
 		row.Status, row.Reason = "unsupported", res.Error
 		return
-	case sp.TimedOut || sp.Exit != 0 || sp.Err != nil || res.Status != "ok":
-		row.Status, row.Reason = "error", printable(fmt.Sprintf("status=%s exit=%d timeout=%t %s", res.Status, sp.Exit, sp.TimedOut, res.Error), 300)
+	case res.Status != "ok":
+		row.Status, row.Reason = "error", printable(fmt.Sprintf("status=%s %s", res.Status, res.Error), 300)
 		return
 	case row.RefKind == "unavailable":
 		row.Status = "ref-unavailable"
@@ -202,7 +205,7 @@ func (c *checker) grade(row *checkRow, in Input, ad, refPath, name, old, nw stri
 	}
 	rp := c.sb.spawn(ad, refPath, rargs, timeout, maxSexp)
 	head, body, _ := bytes.Cut(rp.Stdout, []byte("\n"))
-	if rp.TimedOut || rp.Exit != 0 || rp.Err != nil || !bytes.HasPrefix(head, []byte(refHeader)) {
+	if rp.Failed || rp.Truncated || rp.TimedOut || rp.Exit != 0 || rp.Err != nil || (string(head) != refHeader+"0" && string(head) != refHeader+"1") {
 		row.Status, row.Reason = "error", "native reference failed: "+printable(fmt.Sprintf("exit=%d timeout=%t %s %s", rp.Exit, rp.TimedOut, errString(rp.Err), rp.Stderr), 300)
 		return
 	}

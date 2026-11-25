@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -15,54 +16,32 @@ import (
 	"github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
-// sandbox separates the measurer (this process, which writes every result file) from the candidate processes.
-// With UIDBase > 0 each adapter runs as its own user UIDBase+index in its own directory under WorkRoot; the measurer
-// (root with only CAP_SETUID/SETGID/CHOWN/DAC_OVERRIDE/FOWNER in the container) owns the inputs, binaries and
-// results, none of which a candidate user can write. With UIDBase == 0 (local tests) the credential switch is skipped.
+// Candidates and the product run as the measurer's own user in the same VM (threat model: the ephemeral runner VM is the
+// isolation boundary, see README.md). This file only keeps what the measurement itself needs: a private working directory
+// for the files a worker writes, watchdogs, bounded output and bounded, link-refusing file reads.
 type sandbox struct {
-	UIDBase  int
-	WorkRoot string
-	Adapters []string
-	mu       sync.Mutex
-	dirs     map[string]string
+	mu   sync.Mutex
+	root string
+	dirs map[string]string
 }
 
-func (s *sandbox) uid(ad string) int {
-	if s.UIDBase <= 0 {
-		return 0
-	}
-	for i, a := range s.Adapters {
-		if a == ad {
-			return s.UIDBase + i
-		}
-	}
-	return s.UIDBase + len(s.Adapters) // unknown adapters still never run as the measurer
-}
-
-// dir returns the adapter's private writable directory, creating it once (owned by the adapter's user).
+// dir returns the adapter's working directory (created once, under a fresh temporary root).
 func (s *sandbox) dir(ad string) (string, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if s.root == "" {
+		r, err := os.MkdirTemp("", "compare-work-")
+		if err != nil {
+			return "", err
+		}
+		s.root = r
+	}
 	if d, ok := s.dirs[ad]; ok {
 		return d, nil
 	}
-	var d string
-	var err error
-	if s.WorkRoot != "" {
-		d = filepath.Join(s.WorkRoot, ad, "run")
-		err = os.MkdirAll(d, 0o700)
-	} else {
-		d, err = os.MkdirTemp("", "compare-"+ad+"-")
-	}
-	if err != nil {
+	d := filepath.Join(s.root, ad)
+	if err := os.MkdirAll(d, 0o700); err != nil {
 		return "", err
-	}
-	if u := s.uid(ad); u > 0 {
-		for _, p := range []string{d, filepath.Dir(d)} {
-			if err := chown(p, u); err != nil {
-				return "", err
-			}
-		}
 	}
 	if s.dirs == nil {
 		s.dirs = map[string]string{}
@@ -71,46 +50,52 @@ func (s *sandbox) dir(ad string) (string, error) {
 	return d, nil
 }
 
-// clean empties the adapter's directory so one run's files never reach the next.
-func (s *sandbox) clean(ad string) {
-	d, err := s.dir(ad)
-	if err != nil {
-		return
-	}
-	ents, _ := os.ReadDir(d)
-	for _, e := range ents {
-		os.RemoveAll(filepath.Join(d, e.Name()))
+// close removes the working directories.
+func (s *sandbox) close() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.root != "" {
+		os.RemoveAll(s.root)
 	}
 }
 
+// limited keeps the first max bytes and remembers that more was written.
 type limited struct {
-	buf bytes.Buffer
-	max int
+	buf       bytes.Buffer
+	max       int
+	truncated bool
 }
 
 func (l *limited) Write(p []byte) (int, error) {
-	if room := l.max - l.buf.Len(); room > 0 {
+	room := l.max - l.buf.Len()
+	if room < len(p) {
+		l.truncated = true
+	}
+	if room > 0 {
 		l.buf.Write(p[:min(room, len(p))])
 	}
 	return len(p), nil
 }
 
-// Spawned is what one candidate process left behind, as bytes the measurer reads itself.
+// Spawned is what one process left behind. Failed is true when the process could not be started or reaped cleanly
+// (a start error, a wait error other than a plain nonzero exit, or a watchdog kill); a Failed block is never complete.
 type Spawned struct {
-	Stdout   []byte
-	Stderr   string
-	Exit     int
-	TimedOut bool
-	Wall     time.Duration
-	Err      error
+	Stdout    []byte
+	Stderr    string
+	Exit      int
+	TimedOut  bool
+	Failed    bool
+	Truncated bool
+	Wall      time.Duration
+	Err       error
 }
 
-// spawn runs bin as the adapter's user in its directory with a clean environment, a watchdog and bounded output.
+// spawn runs bin in the adapter's directory with a clean environment, a watchdog and bounded output.
 func (s *sandbox) spawn(ad, bin string, args []string, timeout time.Duration, maxOut int) Spawned {
 	var sp Spawned
 	dir, err := s.dir(ad)
 	if err != nil {
-		sp.Err = err
+		sp.Err, sp.Failed = err, true
 		return sp
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
@@ -118,24 +103,25 @@ func (s *sandbox) spawn(ad, bin string, args []string, timeout time.Duration, ma
 	cmd := proc.CommandContext(ctx, bin, args...)
 	cmd.Dir = dir
 	cmd.Env = []string{"GOMAXPROCS=1", "GOGC=100", "GOENV=off", "LC_ALL=C", "TZ=UTC", "TMPDIR=" + dir, "HOME=" + dir}
-	if err := setCredential(cmd.Cmd, s.uid(ad)); err != nil {
-		sp.Err = err
-		return sp
-	}
 	out, errb := &limited{max: maxOut}, &limited{max: 4 << 10}
 	cmd.Stdout, cmd.Stderr = out, errb
 	t0 := time.Now()
 	err = cmd.Run()
 	sp.Wall = time.Since(t0)
-	sp.Stdout = out.buf.Bytes()
+	sp.Stdout, sp.Truncated = out.buf.Bytes(), out.truncated
 	sp.Stderr = printable(errb.buf.String(), 512)
 	sp.TimedOut = ctx.Err() != nil
 	if err != nil {
 		sp.Err = err
-		var ee interface{ ExitCode() int }
+		var ee *exec.ExitError
 		if errors.As(err, &ee) {
 			sp.Exit = ee.ExitCode()
 		}
+		// a plain nonzero exit is a result; a signal death, start/wait/kill error or timeout is a failed spawn
+		sp.Failed = ee == nil || sp.Exit <= 0
+	}
+	if sp.TimedOut {
+		sp.Failed = true
 	}
 	return sp
 }
