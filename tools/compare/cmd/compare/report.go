@@ -40,10 +40,46 @@ func readRows(p string) ([]Row, error) {
 }
 
 func okRes(r Row) *harness.Result {
-	if r.Res != nil && r.Res.Status == "ok" && r.Exit == 0 && !r.TimedOut {
+	if r.Res != nil && r.Res.Status == "ok" && r.Exit == 0 && !r.TimedOut && (r.Pass != "time" || len(r.Res.SamplesNs) == r.Res.Reps) {
 		return r.Res
 	}
 	return nil
+}
+
+// gradedSet lists the (adapter, input) pairs whose fresh parse was compared with a native reference: the correctness
+// grade every summarized cell must have for the same input on both sides.
+func gradedSet(p string) (map[string]bool, error) {
+	f, err := os.Open(p)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	recs, err := csv.NewReader(f).ReadAll()
+	if err != nil || len(recs) == 0 {
+		return nil, fmt.Errorf("%s: %v", p, err)
+	}
+	col := map[string]int{}
+	for i, h := range recs[0] {
+		col[h] = i
+	}
+	g := map[string]bool{}
+	for _, r := range recs[1:] {
+		if r[col["case"]] == "fresh" && r[col["status"]] == "compared" {
+			g[r[col["adapter"]]+"|"+r[col["input"]]] = true
+		}
+	}
+	return g, nil
+}
+
+// mdEscape makes text that came from a candidate or a file name inert in Markdown (links, mentions, HTML, tables).
+func mdEscape(s string) string {
+	return strings.Map(func(r rune) rune {
+		switch r {
+		case '<', '>', '|', '`', '@', '[', ']', '!', '~', '*', '\\', '#':
+			return '_'
+		}
+		return r
+	}, s)
 }
 
 func ms(ns float64) float64 { return ns / 1e6 }
@@ -67,7 +103,7 @@ type CellStat struct {
 }
 
 // pairStats groups the rows of a pass by cell and round and forms the per-round candidate/product ratios.
-func pairStats(rows []Row, cells map[string]Cell, pass string) []CellStat {
+func pairStats(rows []Row, cells map[string]Cell, pass string, include func(Cell) bool) []CellStat {
 	type key struct {
 		cell  string
 		round int
@@ -95,6 +131,9 @@ func pairStats(rows []Row, cells map[string]Cell, pass string) []CellStat {
 	for ck, rounds := range byCell {
 		sort.Ints(rounds)
 		c := cells[ck]
+		if !include(c) { // only complete, graded cells enter a summary; their raw rows stay in measurements.jsonl
+			continue
+		}
 		s := CellStat{Lang: c.Lang, Cand: c.Cand, Op: c.Op, Group: c.Group, Input: c.Input, Rounds: len(rounds)}
 		var ratios, bratios, pm, cm []float64
 		var pa, ca, pb, cb []float64
@@ -157,19 +196,30 @@ func cmdReport(args []string) error {
 	for _, c := range cellList {
 		cells[c.Key] = c
 	}
-	timing, alloc := pairStats(rows, cells, "time"), pairStats(rows, cells, "alloc")
+	graded, gerr := gradedSet(filepath.Join(*in, "correctness.csv"))
+	if gerr != nil {
+		graded = map[string]bool{}
+	}
+	include := func(c Cell) bool {
+		return c.State == "measured" && graded[refAdapter+"|"+c.Input] && graded[c.Cand+"|"+c.Input]
+	}
+	timing, alloc := pairStats(rows, cells, "time", include), pairStats(rows, cells, "alloc", include)
 
 	var md strings.Builder
 	w := func(f string, a ...any) { fmt.Fprintf(&md, f+"\n", a...) }
 	w("# Comparative benchmark summary\n")
 	w("Every number below describes the identified consumer artifacts on this runner. No row is an E4 speed claim and none is E5 C agreement:")
 	w("grammar bytes, runtime releases and scanners differ between the libraries, and S-expression agreement is at most E2 (docs/specs/validation.md).")
-	w("Cells that failed, timed out, were unsupported or did not run are listed with their counts; they are excluded from the ratios, never dropped from the table.\n")
+	w("Only cells that finished every scheduled round of both passes, exited normally and have a correctness grade for the same input on both sides enter the ratios below.")
+	w("Failed, partial, incomplete, unsupported, unavailable and ungraded cells are counted in the coverage table; their raw rows stay in measurements.jsonl.\n")
+	if gerr != nil {
+		w("**correctness.csv is missing or unreadable (%s): no cell is graded, so no timing row is shown.**\n", mdEscape(gerr.Error()))
+	}
 	writeRunInfo(&md, runInfo)
 
 	w("\n## Cell coverage\n")
-	w("| candidate | op | measured | unsupported | unavailable | failed | incomplete |")
-	w("|---|---|---:|---:|---:|---:|---:|")
+	w("| candidate | op | measured and graded | measured, ungraded | partial | failed | incomplete | unsupported | unavailable |")
+	w("|---|---|---:|---:|---:|---:|---:|---:|---:|")
 	type k2 struct{ cand, op string }
 	cov := map[k2]map[string]int{}
 	for _, c := range cellList {
@@ -178,11 +228,15 @@ func cmdReport(args []string) error {
 			m = map[string]int{}
 			cov[k2{c.Cand, c.Op}] = m
 		}
-		m[c.State]++
+		if c.State == "measured" && !include(c) {
+			m["ungraded"]++
+		} else {
+			m[c.State]++
+		}
 	}
 	for _, k := range sortedKeys(cov, func(a, b k2) bool { return a.cand+a.op < b.cand+b.op }) {
 		m := cov[k]
-		w("| %s | %s | %d | %d | %d | %d | %d |", k.cand, k.op, m["measured"], m["unsupported"], m["unavailable"], m["failed"], m["incomplete"]+m["planned"])
+		w("| %s | %s | %d | %d | %d | %d | %d | %d | %d |", k.cand, k.op, m["measured"], m["ungraded"], m["partial"], m["failed"], m["incomplete"]+m["planned"], m["unsupported"], m["unavailable"])
 	}
 
 	w("\n## Time: candidate / product, paired per round (median of rounds; fixture ratios, not pooled)\n")
@@ -199,9 +253,14 @@ func cmdReport(args []string) error {
 	writeAllocTable(&md, alloc, cellList)
 
 	w("\n## Peak RSS (large inputs, KiB, worker VmHWM): operation minus no-parse control\n")
-	w("| lang | input | op | adapter | peak | control | delta |")
-	w("|---|---|---|---|---:|---:|---:|")
-	writeMemory(&md, rows)
+	want := 3
+	if v, ok := runInfo["rss_runs"].(float64); ok {
+		want = int(v)
+	}
+	w("A delta is shown only when both the operation and its control have the %d scheduled fresh-process samples; otherwise the row says n/a.\n", want)
+	w("| lang | input | op | adapter | samples | peak | control | delta |")
+	w("|---|---|---|---|---:|---:|---:|---:|")
+	writeMemory(&md, rows, want)
 
 	for _, f := range []struct{ file, title string }{
 		{"correctness.csv", "Correctness against the native reference"},
@@ -215,6 +274,7 @@ func cmdReport(args []string) error {
 	w("- Timing and memory conclusions are Linux-only and specific to the runner architecture named above; absolute times between runs are not comparable.")
 	w("- A fixture with a spread above 20%% of its median ratio, or a range crossing 1x, is inconclusive for a direction (never rerun to change it).")
 	w("- Each candidate's grammar, runtime and scanner differ from the product's: the rows describe consumer artifacts, not an implementation-only change.")
+	w("- Correctness levels compare parent/child structure; tree-lossy discards UNEXPECTED token text, shape-only ignores field labels and ERROR/MISSING marks, and neither is a C-agreement claim.")
 	if err := writeFileAll(filepath.Join(*out, "summary.md"), []byte(md.String())); err != nil {
 		return err
 	}
@@ -244,7 +304,7 @@ func sortedKeys[K comparable, V any](m map[K]V, less func(a, b K) bool) []K {
 func writeRunInfo(md *strings.Builder, info map[string]any) {
 	b, _ := json.MarshalIndent(info, "", "  ")
 	md.WriteString("<details><summary>run.json (identities, parameters, host)</summary>\n\n~~~json\n")
-	md.Write(b)
+	md.WriteString(strings.ReplaceAll(string(b), "~~~", "~_~"))
 	md.WriteString("\n~~~\n\n</details>\n")
 }
 
@@ -253,7 +313,7 @@ type gkey struct{ lang, cand, op, group string }
 func writeGroupTable(md *strings.Builder, stats []CellStat, cells []Cell, pick func(CellStat) (Ratio, bool)) {
 	expected := map[gkey]int{}
 	for _, c := range cells {
-		if c.State == "measured" || c.State == "failed" || c.State == "incomplete" || c.State == "planned" {
+		if c.State == "measured" || c.State == "failed" || c.State == "partial" || c.State == "incomplete" || c.State == "planned" {
 			expected[gkey{c.Lang, c.Cand, c.Op, c.Group}]++
 		}
 	}
@@ -284,7 +344,7 @@ func writeGroupTable(md *strings.Builder, stats []CellStat, cells []Cell, pick f
 func writeAllocTable(md *strings.Builder, stats []CellStat, cells []Cell) {
 	expected := map[gkey]int{}
 	for _, c := range cells {
-		if c.State == "measured" || c.State == "failed" || c.State == "incomplete" {
+		if c.State == "measured" || c.State == "failed" || c.State == "partial" || c.State == "incomplete" || c.State == "planned" {
 			expected[gkey{c.Lang, c.Cand, c.Op, c.Group}]++
 		}
 	}
@@ -311,7 +371,7 @@ func writeAllocTable(md *strings.Builder, stats []CellStat, cells []Cell) {
 	}
 }
 
-func writeMemory(md *strings.Builder, rows []Row) {
+func writeMemory(md *strings.Builder, rows []Row, want int) {
 	type mk struct{ lang, input, op, adapter string }
 	rss, ctl := map[mk][]float64{}, map[mk][]float64{}
 	for _, r := range rows {
@@ -330,7 +390,11 @@ func writeMemory(md *strings.Builder, rows []Row) {
 		return strings.Join([]string{a.lang, a.input, a.op, a.adapter}, "|") < strings.Join([]string{b.lang, b.input, b.op, b.adapter}, "|")
 	}) {
 		p, c := median(rss[k]), median(ctl[k])
-		fmt.Fprintf(md, "| %s | %s | %s | %s | %.0f | %.0f | %.0f |\n", k.lang, k.input, k.op, k.adapter, p, c, p-c)
+		if len(rss[k]) < want || len(ctl[k]) < want {
+			fmt.Fprintf(md, "| %s | %s | %s | %s | %d/%d | n/a | n/a | n/a |\n", mdEscape(k.lang), mdEscape(k.input), k.op, k.adapter, len(rss[k]), len(ctl[k]))
+			continue
+		}
+		fmt.Fprintf(md, "| %s | %s | %s | %s | %d/%d | %.0f | %.0f | %.0f |\n", mdEscape(k.lang), mdEscape(k.input), k.op, k.adapter, len(rss[k]), len(ctl[k]), p, c, p-c)
 	}
 }
 
@@ -353,7 +417,7 @@ func appendCSVSummary(md *strings.Builder, p, title string) error {
 	fmt.Fprintf(md, "| %s |\n|%s\n", strings.Join(recs[0], " | "), strings.Repeat("---|", len(recs[0])))
 	for _, r := range recs[1:] {
 		for i := range r {
-			r[i] = strings.ReplaceAll(strings.ReplaceAll(r[i], "|", "\\|"), "\n", " ")
+			r[i] = mdEscape(strings.ReplaceAll(r[i], "\n", " "))
 		}
 		fmt.Fprintf(md, "| %s |\n", strings.Join(r, " | "))
 	}

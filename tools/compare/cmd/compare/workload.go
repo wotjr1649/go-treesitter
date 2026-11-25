@@ -413,3 +413,30 @@ func writeJSON(p string, v any) error {
 	}
 	return writeFileAll(p, append(b, '\n'))
 }
+
+// inputsFor selects the inputs of a language: all of them, or in smoke mode two small ones and the smallest large one.
+func (w *Workload) inputsFor(lang string, smoke bool) (small, large []Input) {
+	for _, in := range w.Inputs {
+		if in.Lang != lang {
+			continue
+		}
+		if in.Group == "small" {
+			small = append(small, in)
+		} else {
+			large = append(large, in)
+		}
+	}
+	if smoke {
+		small = small[:min(2, len(small))]
+		if len(large) > 1 {
+			best := large[0]
+			for _, in := range large {
+				if in.Bytes < best.Bytes {
+					best = in
+				}
+			}
+			large = []Input{best}
+		}
+	}
+	return
+}

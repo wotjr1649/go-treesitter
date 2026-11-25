@@ -15,6 +15,10 @@ import (
 	"time"
 )
 
+// OpWatchdog bounds one operation (a warm-up, or one prepared-and-measured repetition): the worker prints what it has
+// with status "timeout" and exits 3.
+var OpWatchdog = 30 * time.Second
+
 // Main is the whole body of an adapter's main function.
 //
 //	worker -lang L -op parse|snapshot|edit|sexp|ssexp|esexp|ctl -mode time|alloc|rss|out -src FILE [-new FILE -edit S,OE,NE]
@@ -144,7 +148,16 @@ func Run(adapter string, open Opener, args []string, stdout io.Writer) int {
 		}
 		runtime.KeepAlive(keep)
 	case *mode == "time" || *mode == "alloc":
-		if err := timed(sess, res, *op, *mode == "alloc", *reps, src, newSrc, edit); err != nil {
+		watch := func() func() { // a hung operation leaves a partial result and a distinct status, not silence
+			t := time.AfterFunc(OpWatchdog, func() {
+				res.Status, res.Error = "timeout", fmt.Sprintf("operation exceeded %s", OpWatchdog)
+				res.PeakRSSKiB = peakRSSKiB()
+				_ = json.NewEncoder(stdout).Encode(res)
+				os.Exit(3)
+			})
+			return func() { t.Stop() }
+		}
+		if err := timed(sess, res, *op, *mode == "alloc", *reps, src, newSrc, edit, watch); err != nil {
 			return fail(statusOf(err), err)
 		}
 	default:
@@ -158,7 +171,7 @@ func Run(adapter string, open Opener, args []string, stdout io.Writer) int {
 }
 
 // timed runs the warm-up and the measured loop. The prepared old tree and every release stay outside the counters.
-func timed(sess Session, res *Result, op string, alloc bool, reps int, src, newSrc []byte, e Edit) error {
+func timed(sess Session, res *Result, op string, alloc bool, reps int, src, newSrc []byte, e Edit, watch func() func()) error {
 	type step struct {
 		prep func() (Tree, error) // outside the measurement
 		do   func(Tree) (Tree, error)
@@ -181,6 +194,7 @@ func timed(sess Session, res *Result, op string, alloc bool, reps int, src, newS
 		return fmt.Errorf("op %q has no timed mode", op)
 	}
 	run := func(measure func(func() (Tree, error)) (Tree, error)) error {
+		defer watch()()
 		var old Tree
 		if s.prep != nil {
 			t, err := s.prep()

@@ -138,14 +138,22 @@ func TestEndToEndWithFakeWorkers(t *testing.T) {
 	if err := cmdCheck([]string{"-workload", work, "-bin", bin, "-refs", refs, "-out", res, "-langs", "c", "-smoke", "-j", "2"}); err != nil {
 		t.Fatal(err)
 	}
-	if err := cmdReport([]string{"-in", res}); err != nil {
-		t.Fatal(err)
-	}
+	wj, _ := os.ReadFile(filepath.Join(work, "workload.json"))
+	mustWrite(t, filepath.Join(res, "workload.json"), wj) // the sandbox script copies it next to the results
 	col := filepath.Join(dir, "collected")
 	if err := cmdCollect([]string{"-in", res, "-out", col}); err != nil {
 		t.Fatal(err)
 	}
-	summary, _ := os.ReadFile(filepath.Join(res, "summary.md"))
+	if err := cmdReport([]string{"-in", col}); err != nil {
+		t.Fatal(err)
+	}
+	if err := cmdSeal([]string{"-dir", col}); err != nil {
+		t.Fatal(err)
+	}
+	if b, _ := os.ReadFile(filepath.Join(col, "SHA256SUMS")); !strings.Contains(string(b), "summary.md") {
+		t.Fatal("seal did not hash the report")
+	}
+	summary, _ := os.ReadFile(filepath.Join(col, "summary.md"))
 	corr, _ := os.ReadFile(filepath.Join(res, "correctness.csv"))
 	s, cs := string(summary), string(corr)
 	for _, want := range []string{"## Cell coverage", "| official | parse |", "| bonsai | snapshot |", "unsupported"} {
@@ -166,6 +174,31 @@ func TestEndToEndWithFakeWorkers(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(col, "SHA256SUMS")); err != nil {
 		t.Fatal(err)
 	}
+	// complete cells only: the fake workers finish every round, so measured cells exist and the ratios table has rows
+	var cellList []Cell
+	if err := readJSON(filepath.Join(res, "cells.json"), &cellList); err != nil {
+		t.Fatal(err)
+	}
+	measured := 0
+	for _, c := range cellList {
+		if c.State == "measured" && c.OK["time"] == c.Want && c.OK["alloc"] == c.Want {
+			measured++
+		}
+	}
+	if measured == 0 || !strings.Contains(s, "| c | official | parse | small |") {
+		t.Errorf("measured=%d, summary:\n%s", measured, s)
+	}
+	// a forged row for a cell the plan does not contain is rejected
+	forged := filepath.Join(dir, "forged")
+	if err := os.CopyFS(forged, os.DirFS(res)); err != nil {
+		t.Fatal(err)
+	}
+	f, _ := os.OpenFile(filepath.Join(forged, "measurements.jsonl"), os.O_APPEND|os.O_WRONLY, 0o644)
+	f.WriteString(`{"cell":"c|official|parse|nope","pass":"time","round":0,"role":"candidate","adapter":"official","lang":"c","op":"parse","exit":0,"wall_ns":1}` + "\n")
+	f.Close()
+	if err := cmdCollect([]string{"-in", forged, "-out", filepath.Join(dir, "c3")}); err == nil || !strings.Contains(err.Error(), "expected cell") {
+		t.Fatalf("forged row accepted: %v", err)
+	}
 	// a stray file and a link must be rejected
 	mustWrite(t, filepath.Join(res, "stray.bin"), []byte("x"))
 	if err := cmdCollect([]string{"-in", res, "-out", filepath.Join(dir, "c2")}); err == nil || !strings.Contains(err.Error(), "stray.bin") {
@@ -178,4 +211,45 @@ func exeSuffix() string {
 		return ".exe"
 	}
 	return ""
+}
+
+func TestSealCapAndNoccGate(t *testing.T) {
+	dir := t.TempDir()
+	mustWrite(t, filepath.Join(dir, "a.txt"), []byte("x"))
+	if err := cmdSeal([]string{"-dir", dir}); err != nil {
+		t.Fatal(err)
+	}
+	mustWrite(t, filepath.Join(dir, "big.bin"), make([]byte, maxTotal+1))
+	if err := cmdSeal([]string{"-dir", dir}); err == nil {
+		t.Fatal("over-cap set sealed")
+	}
+	good := "adapter,mode,status,exit,bytes,delta,seconds,smoke_parse,outcome,diagnostics\nproduct,x,ok,0,1,1,1,ok,ok,\nofficial,x,failed,1,0,0,1,n/a,expected-unsupported,cgo\n"
+	p := filepath.Join(dir, "builds.csv")
+	mustWrite(t, p, []byte(good))
+	if err := cmdGateNocc([]string{"-builds", p}); err != nil {
+		t.Fatal(err)
+	}
+	mustWrite(t, p, []byte(strings.Replace(good, "product,x,ok,0,1,1,1,ok,ok,", "product,x,ok,0,1,1,1,none,smoke-failure,", 1)))
+	if err := cmdGateNocc([]string{"-builds", p}); err == nil {
+		t.Fatal("a failed product smoke parse passed the gate")
+	}
+}
+
+func TestMeasuredNeedsEveryRound(t *testing.T) {
+	c := Cell{State: "planned", Want: 2, OK: map[string]int{"time": 2, "alloc": 1}}
+	r := &runner{cells: []Cell{c}}
+	r.finalize()
+	if r.cells[0].State != "incomplete" {
+		t.Fatalf("%s", r.cells[0].State)
+	}
+	r.cells = []Cell{{State: "planned", Want: 2, bad: true, OK: map[string]int{"time": 1}}}
+	r.finalize()
+	if r.cells[0].State != "partial" {
+		t.Fatalf("%s", r.cells[0].State)
+	}
+	r.cells = []Cell{{State: "planned", Want: 2, OK: map[string]int{"time": 2, "alloc": 2}}}
+	r.finalize()
+	if r.cells[0].State != "measured" {
+		t.Fatalf("%s", r.cells[0].State)
+	}
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/json"
@@ -16,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wotjr1649/go-treesitter/tools/bench/proc"
 	"github.com/wotjr1649/go-treesitter/tools/compare/harness"
 )
 
@@ -56,14 +54,17 @@ type Row struct {
 
 // Cell is one expected grammar x library x operation x input; its State is final when the run ends.
 type Cell struct {
-	Key    string `json:"key"`
-	Lang   string `json:"lang"`
-	Cand   string `json:"candidate"`
-	Op     string `json:"op"`
-	Group  string `json:"group"`
-	Input  string `json:"input"`
-	State  string `json:"state"` // measured | unsupported | unavailable | incomplete | failed
-	Reason string `json:"reason,omitempty"`
+	Key    string         `json:"key"`
+	Lang   string         `json:"lang"`
+	Cand   string         `json:"candidate"`
+	Op     string         `json:"op"`
+	Group  string         `json:"group"`
+	Input  string         `json:"input"`
+	State  string         `json:"state"` // measured (complete) | partial | failed | incomplete | unsupported | unavailable
+	Reason string         `json:"reason,omitempty"`
+	Want   int            `json:"rounds_wanted"`
+	OK     map[string]int `json:"rounds_ok"` // complete paired rounds per pass (time, alloc)
+	bad    bool
 }
 
 type runOpts struct {
@@ -75,9 +76,15 @@ type runOpts struct {
 	budget                  time.Duration
 	perOp                   time.Duration
 	seed                    string
+	uidBase                 int
+	workRoot                string
 }
 
+// readiness is the preflight verdict of one adapter on one language.
+type readiness struct{ kind, reason string } // kind: "" ready, "unsupported", "failed"
+
 type runner struct {
+	sb    *sandbox
 	o     runOpts
 	w     Workload
 	rows  *os.File
@@ -105,6 +112,8 @@ func cmdRun(args []string) error {
 	fs.DurationVar(&o.budget, "budget", 35*time.Minute, "wall budget; later cells are recorded incomplete")
 	fs.DurationVar(&o.perOp, "op-watchdog", 30*time.Second, "watchdog per operation (a block gets reps+1 of them)")
 	fs.StringVar(&o.seed, "seed", "", "manifest seed (default: the workload's)")
+	fs.IntVar(&o.uidBase, "uid-base", 0, "run adapter i as user uid-base+i (Linux sandbox; 0 keeps the measurer's user)")
+	fs.StringVar(&o.workRoot, "work-root", "", "directory holding one private writable directory per adapter")
 	fs.Parse(args)
 	o.langs, o.adapters = strings.Split(langs, ","), strings.Split(adapters, ",")
 	if o.workload == "" || o.bin == "" || o.out == "" {
@@ -117,7 +126,7 @@ func cmdRun(args []string) error {
 }
 
 func run(o runOpts) error {
-	r := &runner{o: o, until: time.Now().Add(o.budget)}
+	r := &runner{o: o, until: time.Now().Add(o.budget), sb: &sandbox{UIDBase: o.uidBase, WorkRoot: o.workRoot, Adapters: o.adapters}}
 	raw, err := os.ReadFile(filepath.Join(o.workload, "workload.json"))
 	if err != nil {
 		return err
@@ -142,16 +151,18 @@ func run(o runOpts) error {
 	start := time.Now()
 
 	ident := map[string]map[string]map[string]string{} // adapter -> lang -> identity
-	ready := map[string]map[string]string{}            // adapter -> lang -> "" ready, or the unavailability reason
+	ready := map[string]map[string]readiness{}         // adapter -> lang -> verdict
 	for _, a := range o.adapters {
-		ident[a], ready[a] = map[string]map[string]string{}, map[string]string{}
+		ident[a], ready[a] = map[string]map[string]string{}, map[string]readiness{}
 		for _, lang := range o.langs {
 			row := r.exec(Row{Pass: "preflight", Cell: a + "/" + lang, Role: roleOf(a), Adapter: a, Lang: lang, Op: "ctl"}, []string{"-lang", lang, "-op", "ctl", "-mode", "rss"}, 1)
 			switch {
-			case row.Res == nil:
-				ready[a][lang] = "worker failed: " + row.Err
+			case row.Res == nil || row.Exit != 0 || row.TimedOut:
+				ready[a][lang] = readiness{"failed", "worker failed: " + row.Err}
+			case row.Res.Status == "unsupported":
+				ready[a][lang] = readiness{"unsupported", row.Res.Error}
 			case row.Res.Status != "ok":
-				ready[a][lang] = row.Res.Status + ": " + row.Res.Error
+				ready[a][lang] = readiness{"failed", row.Res.Status + ": " + row.Res.Error}
 			default:
 				ident[a][lang] = row.Res.Identity
 			}
@@ -168,6 +179,7 @@ func run(o runOpts) error {
 	for _, pass := range []string{"time", "alloc"} {
 		r.pairs(pass)
 	}
+	r.finalize()
 	r.memory()
 	r.finish(ident, ready, start)
 	return nil
@@ -189,42 +201,21 @@ func has(l []string, s string) bool {
 	return false
 }
 
-// inputsFor selects the inputs of a language: all of them, or in smoke mode two small and the smallest large one.
 func (r *runner) inputsFor(lang string) (small, large []Input) {
-	for _, in := range r.w.Inputs {
-		if in.Lang != lang {
-			continue
-		}
-		if in.Group == "small" {
-			small = append(small, in)
-		} else {
-			large = append(large, in)
-		}
-	}
-	if r.o.smoke {
-		small = small[:min(2, len(small))]
-		if len(large) > 1 {
-			best := large[0]
-			for _, in := range large {
-				if in.Bytes < best.Bytes {
-					best = in
-				}
-			}
-			large = []Input{best}
-		}
-	}
-	return
+	return r.w.inputsFor(lang, r.o.smoke)
 }
 
-func (r *runner) planCells(lang, cand, op string, ready map[string]map[string]string) {
+func (r *runner) planCells(lang, cand, op string, ready map[string]map[string]readiness) {
 	small, large := r.inputsFor(lang)
 	for _, in := range append(small, large...) {
-		c := Cell{Key: strings.Join([]string{lang, cand, op, in.ID}, "|"), Lang: lang, Cand: cand, Op: op, Group: in.Group, Input: in.ID, State: "planned"}
+		c := Cell{Key: strings.Join([]string{lang, cand, op, in.ID}, "|"), Lang: lang, Cand: cand, Op: op, Group: in.Group, Input: in.ID, State: "planned", OK: map[string]int{}, Want: r.rounds(in.Group)}
 		switch {
-		case ready[refAdapter][lang] != "":
-			c.State, c.Reason = "unavailable", "product: "+ready[refAdapter][lang]
-		case ready[cand][lang] != "":
-			c.State, c.Reason = "unsupported", ready[cand][lang]
+		case ready[refAdapter][lang].kind != "":
+			c.State, c.Reason = "unavailable", "product: "+ready[refAdapter][lang].reason
+		case ready[cand][lang].kind == "unsupported":
+			c.State, c.Reason = "unsupported", ready[cand][lang].reason
+		case ready[cand][lang].kind == "failed":
+			c.State, c.Reason = "failed", ready[cand][lang].reason
 		case !has(declared[cand], op):
 			c.State, c.Reason = "unsupported", "public API has no such operation (declared)"
 		case !has(declared[refAdapter], op):
@@ -251,7 +242,34 @@ func (r *runner) firstIsProduct(key string, round int) bool {
 	return (binary.BigEndian.Uint64(h[:8])+uint64(round))%2 == 0
 }
 
+func (r *runner) rounds(group string) int {
+	if group == "small" {
+		return r.o.sRounds
+	}
+	return r.o.lRounds
+}
+
+// complete reports whether a worker row is a finished, normally exiting block with every scheduled sample.
+func complete(row Row, pass string, reps int) bool {
+	res := row.Res
+	if res == nil || res.Status != "ok" || row.Exit != 0 || row.TimedOut || res.Reps != reps {
+		return false
+	}
+	if pass == "time" {
+		if len(res.SamplesNs) != reps {
+			return false
+		}
+		for _, s := range res.SamplesNs {
+			if s < 0 {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 // pairs runs the paired time (or allocation) blocks: per round, the product and the candidate one after the other.
+// A cell advances only through complete rounds; a failed or short block stops that cell and keeps its raw rows.
 func (r *runner) pairs(pass string) {
 	for _, group := range []string{"large", "small"} {
 		rounds, reps := r.o.lRounds, r.o.lReps
@@ -261,16 +279,13 @@ func (r *runner) pairs(pass string) {
 		for round := 0; round < rounds; round++ {
 			for i := range r.cells {
 				c := &r.cells[i]
-				if c.Group != group || c.State != "planned" && c.State != "measured" {
+				if c.Group != group || c.State != "planned" || c.bad || c.OK[pass] != round {
 					continue
 				}
 				if time.Now().After(r.until) {
 					r.over = true
 				}
 				if r.over {
-					if c.State == "planned" {
-						c.State, c.Reason = "incomplete", "wall budget exhausted before this cell ran"
-					}
 					continue
 				}
 				in := r.input(c.Input)
@@ -283,7 +298,7 @@ func (r *runner) pairs(pass string) {
 				for _, ad := range []string{first, second} {
 					row := Row{Cell: c.Key, Pass: pass, Round: round, Order: order, Role: roleOf(ad), Adapter: ad, Lang: c.Lang, Op: c.Op, Group: group, Input: c.Input}
 					row = r.exec(row, r.args(pass, c.Op, in, pass, reps), reps)
-					if row.Res == nil || row.Res.Status != "ok" {
+					if !complete(row, pass, reps) {
 						ok = false
 						if row.Res != nil && row.Res.Status == "unsupported" && ad == c.Cand {
 							c.State, c.Reason = "unsupported", row.Res.Error
@@ -292,12 +307,32 @@ func (r *runner) pairs(pass string) {
 				}
 				switch {
 				case c.State == "unsupported":
-				case ok && c.State == "planned":
-					c.State = "measured"
-				case !ok && c.State != "failed":
-					c.State, c.Reason = "failed", fmt.Sprintf("a worker did not finish cleanly in round %d, pass %s", round, pass)
+				case ok:
+					c.OK[pass]++
+				default:
+					c.bad, c.Reason = true, fmt.Sprintf("a worker block was not complete in round %d, pass %s", round, pass)
 				}
 			}
+		}
+	}
+}
+
+// finalize gives every planned cell its terminal state: measured only when both passes finished every scheduled round.
+func (r *runner) finalize() {
+	for i := range r.cells {
+		c := &r.cells[i]
+		if c.State != "planned" {
+			continue
+		}
+		switch {
+		case c.OK["time"] == c.Want && c.OK["alloc"] == c.Want:
+			c.State = "measured"
+		case c.bad && c.OK["time"]+c.OK["alloc"] > 0:
+			c.State = "partial"
+		case c.bad:
+			c.State = "failed"
+		default:
+			c.State, c.Reason = "incomplete", "wall budget exhausted before every scheduled round ran"
 		}
 	}
 }
@@ -332,53 +367,55 @@ func (r *runner) memory() {
 	}
 }
 
-type limited struct {
-	buf bytes.Buffer
-	max int
-}
-
-func (l *limited) Write(p []byte) (int, error) {
-	if room := l.max - l.buf.Len(); room > 0 {
-		l.buf.Write(p[:min(room, len(p))])
-	}
-	return len(p), nil
-}
-
-// exec runs one worker with a clean environment and a watchdog, records the Row and returns it.
+// exec runs one worker as its adapter's user with a watchdog, records the Row and returns it. The measurer parses the
+// result line itself; whatever text the candidate produced is reduced to bounded printable ASCII first.
 func (r *runner) exec(row Row, args []string, reps int) Row {
 	bin := filepath.Join(r.o.bin, row.Adapter)
 	timeout := time.Duration(reps+1)*r.o.perOp + r.o.perOp
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	cmd := proc.CommandContext(ctx, bin, args...)
-	cmd.Env = []string{"GOMAXPROCS=1", "GOGC=100", "GOENV=off", "LC_ALL=C", "TZ=UTC"}
-	var out, errb = &limited{max: 64 << 10}, &limited{max: 4 << 10}
-	cmd.Stdout, cmd.Stderr = out, errb
-	t0 := time.Now()
-	err := cmd.Run()
-	row.WallNs = time.Since(t0).Nanoseconds()
-	if err != nil {
-		row.Err = err.Error()
-		var ee interface{ ExitCode() int }
-		if errors.As(err, &ee) {
-			row.Exit = ee.ExitCode()
-		}
-		row.TimedOut = ctx.Err() != nil
+	sp := r.sb.spawn(row.Adapter, bin, args, timeout, 64<<10)
+	r.sb.clean(row.Adapter)
+	row.WallNs, row.Exit, row.TimedOut = sp.Wall.Nanoseconds(), sp.Exit, sp.TimedOut
+	if sp.Err != nil {
+		row.Err = printable(sp.Err.Error(), 300)
 	}
-	if s := strings.TrimSpace(errb.buf.String()); s != "" {
-		row.Err += " | stderr: " + s[:min(len(s), 512)]
+	if sp.Stderr != "" {
+		row.Err += " | stderr: " + sp.Stderr
 	}
 	var res harness.Result
-	if jerr := json.Unmarshal(out.buf.Bytes(), &res); jerr == nil && res.Schema == harness.Schema {
+	line, _, _ := bytes.Cut(sp.Stdout, []byte("\n"))
+	if jerr := json.Unmarshal(line, &res); jerr == nil && res.Schema == harness.Schema && boundResult(&res) {
 		row.Res = &res
 	} else if row.Err == "" {
-		row.Err = "no result line on stdout"
+		row.Err = "no valid result line on stdout"
 	}
 	_ = r.enc.Encode(row)
 	return row
 }
 
-func (r *runner) finish(ident map[string]map[string]map[string]string, ready map[string]map[string]string, start time.Time) {
+// boundResult clamps and sanitizes the candidate-controlled fields of a Result; false rejects it.
+func boundResult(res *harness.Result) bool {
+	if len(res.SamplesNs) > 1000 || res.Reps < 0 || res.Reps > 1000 {
+		return false
+	}
+	switch res.Status {
+	case "ok", "unsupported", "error", "timeout":
+	default:
+		return false
+	}
+	res.Error = printable(res.Error, 400)
+	res.Adapter, res.Lang, res.Op, res.Mode, res.Src = printable(res.Adapter, 40), printable(res.Lang, 40), printable(res.Op, 20), printable(res.Mode, 20), printable(res.Src, 200)
+	id := map[string]string{}
+	for k, v := range res.Identity {
+		if len(id) < 64 {
+			id[printable(k, 120)] = printable(v, 200)
+		}
+	}
+	res.Identity = id
+	res.OutSHA256 = printable(res.OutSHA256, 64)
+	return true
+}
+
+func (r *runner) finish(ident map[string]map[string]map[string]string, ready map[string]map[string]readiness, start time.Time) {
 	must(writeJSON(filepath.Join(r.o.out, "cells.json"), r.cells))
 	counts := map[string]int{}
 	for _, c := range r.cells {

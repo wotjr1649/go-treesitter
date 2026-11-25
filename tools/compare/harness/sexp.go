@@ -7,11 +7,13 @@ import (
 
 // SNode is one visible node of a ts_node_string-style S-expression.
 type SNode struct {
-	Field   string
-	Kind    string
-	Missing bool
-	Err     bool // ERROR or UNEXPECTED
-	Kids    []*SNode
+	Field      string
+	Kind       string
+	Missing    bool
+	Err        bool   // ERROR or UNEXPECTED
+	Unexpected bool   // printed as (UNEXPECTED 'c'): a leaf error; Text keeps the quoted token
+	Text       string // the UNEXPECTED token text
+	Kids       []*SNode
 }
 
 // ParseSexp reads the format shared by ts_node_string and the candidates' public S-expression calls:
@@ -75,8 +77,8 @@ func (p *sexpParser) node(field string) (*SNode, error) {
 	case "MISSING":
 		n.Missing, n.Kind = true, p.atom()
 	case "UNEXPECTED":
-		n.Err, n.Kind = true, "ERROR"
-		p.atom()
+		n.Err, n.Unexpected, n.Kind = true, true, "ERROR"
+		n.Text = p.atom()
 	case "ERROR":
 		n.Err, n.Kind = true, kind
 	default:
@@ -107,22 +109,15 @@ func (p *sexpParser) node(field string) (*SNode, error) {
 	}
 }
 
-// walk visits the tree in preorder with each node's path.
-func (n *SNode) walk(path string, f func(path string, n *SNode)) {
-	path += "/" + n.Kind
-	f(path, n)
-	for i, k := range n.Kids {
-		k.walk(fmt.Sprintf("%s[%d]", path, i), f)
-	}
-}
-
-// Levels of agreement between a candidate and its native reference, strongest first.
+// Levels of agreement between a candidate and its native reference, strongest first. Every level above "mismatch"
+// compares the tree structure (parent/child relations in order); the levels differ only in what else must match.
 const (
-	LevelExact    = "sexp-exact"    // the public strings are byte-identical
-	LevelMarks    = "profile-marks" // kinds, field labels and ERROR/MISSING marks equal; only formatting differs
-	LevelKinds    = "profile-kinds" // the ordered visible node kinds equal; fields or marks differ
-	LevelMismatch = "mismatch"      // different node sequences
-	LevelUnparsed = "unparsed"      // a side is not a recognizable S-expression
+	LevelExact    = "sexp-exact" // the public strings are byte-identical
+	LevelTree     = "tree-equal" // the same tree (kinds, fields, MISSING/ERROR marks, UNEXPECTED text); only formatting differs
+	LevelLossy    = "tree-lossy" // the same tree once the token text of UNEXPECTED leaves is discarded (a lossy normalization)
+	LevelShape    = "shape-only" // same parent/child shape and kinds, but field labels or marks differ
+	LevelMismatch = "mismatch"   // different trees
+	LevelUnparsed = "unparsed"   // a side is not a recognizable S-expression
 )
 
 // Diff is the outcome of Compare.
@@ -133,8 +128,64 @@ type Diff struct {
 	Extra     int    `json:"extra"`                // candidate nodes the reference lacks
 }
 
-// Compare grades cand against ref. Only a raw mismatch that still matches a normalized profile may be called
-// formatting-only; the report keeps the level name so no such claim is implied by Level alone.
+type cmpMode int
+
+const (
+	cmpFull cmpMode = iota
+	cmpLossy
+	cmpShape
+)
+
+// same reports whether a and b are the same tree under the mode, comparing children in order.
+func same(a, b *SNode, m cmpMode) bool {
+	if a.Kind != b.Kind || len(a.Kids) != len(b.Kids) {
+		return false
+	}
+	if m != cmpShape && (a.Field != b.Field || a.Missing != b.Missing || a.Err != b.Err) {
+		return false
+	}
+	if m == cmpFull && (a.Unexpected != b.Unexpected || a.Text != b.Text) {
+		return false
+	}
+	for i := range a.Kids {
+		if !same(a.Kids[i], b.Kids[i], m) {
+			return false
+		}
+	}
+	return true
+}
+
+// firstDiff walks both trees in step and names the first node that differs, as a path of kinds with child indices.
+func firstDiff(a, b *SNode, path string) (string, bool) {
+	path += "/" + a.Kind
+	if a.Kind != b.Kind {
+		return path + " vs " + b.Kind, true
+	}
+	if a.Field != b.Field || a.Missing != b.Missing || a.Err != b.Err {
+		return path + " (field or mark)", true
+	}
+	for i := 0; i < len(a.Kids) || i < len(b.Kids); i++ {
+		switch {
+		case i >= len(b.Kids):
+			return fmt.Sprintf("%s[%d] (candidate ends)", path, i), true
+		case i >= len(a.Kids):
+			return fmt.Sprintf("%s[%d] (reference ends)", path, i), true
+		}
+		if p, ok := firstDiff(a.Kids[i], b.Kids[i], fmt.Sprintf("%s[%d]", path, i)); ok {
+			return p, true
+		}
+	}
+	return "", false
+}
+
+func countKinds(n *SNode, into map[string]int, delta int) {
+	into[n.Kind] += delta
+	for _, k := range n.Kids {
+		countKinds(k, into, delta)
+	}
+}
+
+// Compare grades cand against ref. A level other than mismatch/unparsed means the parent/child structure is equal.
 func Compare(ref, cand string) Diff {
 	if ref == cand {
 		return Diff{Level: LevelExact}
@@ -150,45 +201,20 @@ func Compare(ref, cand string) Diff {
 		}
 		return Diff{Level: LevelUnparsed, FirstDiff: msg}
 	}
-	type sig struct {
-		Field, Kind  string
-		Missing, Err bool
+	switch {
+	case same(a, b, cmpFull):
+		return Diff{Level: LevelTree}
+	case same(a, b, cmpLossy):
+		return Diff{Level: LevelLossy, FirstDiff: "UNEXPECTED token text discarded"}
 	}
-	type row struct {
-		path string
-		n    sig
-	}
-	flat := func(r *SNode) (out []row) {
-		r.walk("", func(p string, n *SNode) { out = append(out, row{p, sig{n.Field, n.Kind, n.Missing, n.Err}}) })
-		return out
-	}
-	fa, fb := flat(a), flat(b)
-	d := Diff{Level: LevelMarks}
-	kinds := true
-	for i := 0; i < max(len(fa), len(fb)); i++ {
-		switch {
-		case i >= len(fa) || i >= len(fb):
-			d.FirstDiff, kinds = firstNonEmpty(d.FirstDiff, pathOf(fa, fb, i, func(r row) string { return r.path })), false
-		case fa[i].n.Kind != fb[i].n.Kind:
-			d.FirstDiff, kinds = firstNonEmpty(d.FirstDiff, fa[i].path+" vs "+fb[i].path), false
-		case fa[i].n != fb[i].n:
-			d.FirstDiff = firstNonEmpty(d.FirstDiff, fa[i].path+" (field/mark)")
-			d.Level = LevelKinds
-		}
-		if !kinds {
-			break
-		}
-	}
-	if !kinds {
+	d := Diff{Level: LevelShape}
+	if !same(a, b, cmpShape) {
 		d.Level = LevelMismatch
 	}
+	d.FirstDiff, _ = firstDiff(a, b, "")
 	count := map[string]int{}
-	for _, r := range fa {
-		count[r.n.Kind]++
-	}
-	for _, r := range fb {
-		count[r.n.Kind]--
-	}
+	countKinds(a, count, 1)
+	countKinds(b, count, -1)
 	for _, c := range count {
 		if c > 0 {
 			d.Missing += c
@@ -197,20 +223,6 @@ func Compare(ref, cand string) Diff {
 		}
 	}
 	return d
-}
-
-func firstNonEmpty(a, b string) string {
-	if a != "" {
-		return a
-	}
-	return b
-}
-
-func pathOf[T any](a, b []T, i int, f func(T) string) string {
-	if i < len(a) {
-		return f(a[i]) + " (candidate ends)"
-	}
-	return f(b[i]) + " (reference ends)"
 }
 
 // FormatSexp renders a tree the way ts_node_string does (visible nodes only: the caller leaves anonymous nodes out),

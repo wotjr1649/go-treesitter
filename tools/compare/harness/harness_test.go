@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestMakeEditPoints(t *testing.T) {
@@ -31,8 +33,8 @@ func TestCompareLevels(t *testing.T) {
 	ref := "(program (function name: (identifier) body: (block)))"
 	for _, c := range []struct{ cand, level string }{
 		{ref, LevelExact},
-		{"(program\n  (function\n    name: (identifier) body: (block)))", LevelMarks},
-		{"(program (function (identifier) (block)))", LevelKinds},
+		{"(program\n  (function\n    name: (identifier) body: (block)))", LevelTree},
+		{"(program (function (identifier) (block)))", LevelShape},
 		{"(program (function name: (identifier) body: (ERROR)))", LevelMismatch},
 		{"(program", LevelUnparsed},
 	} {
@@ -42,6 +44,31 @@ func TestCompareLevels(t *testing.T) {
 	}
 	d := Compare(ref, "(program (function name: (identifier)))")
 	if d.Level != LevelMismatch || d.Missing != 1 || d.Extra != 0 || !strings.Contains(d.FirstDiff, "ends") {
+		t.Fatalf("%+v", d)
+	}
+}
+
+// Same kinds in the same preorder but different parents must never grade as a match (review R8 P1-6).
+func TestCompareDistinguishesParents(t *testing.T) {
+	d := Compare("(root (a (b)) (c))", "(root (a) (b) (c))")
+	if d.Level != LevelMismatch {
+		t.Fatalf("different parents graded %q", d.Level)
+	}
+	if d := Compare("(root (a (b)) (c))", "(root (a (b)) (c))"); d.Level != LevelExact {
+		t.Fatal(d)
+	}
+	if d := Compare("(root (a (b)) (c))", "(root\n (a\n (b))\n (c))"); d.Level != LevelTree {
+		t.Fatal(d)
+	}
+}
+
+// UNEXPECTED token text is discarded only under the separately labelled lossy level.
+func TestCompareLossyUnexpected(t *testing.T) {
+	d := Compare("(root (ERROR (UNEXPECTED 'x')))", "(root (ERROR (UNEXPECTED 'y')))")
+	if d.Level != LevelLossy {
+		t.Fatalf("%+v", d)
+	}
+	if d := Compare("(root (ERROR (UNEXPECTED 'x')))", "(root (ERROR))"); d.Level == LevelTree || d.Level == LevelExact {
 		t.Fatalf("%+v", d)
 	}
 }
@@ -134,5 +161,35 @@ func TestWorkerOps(t *testing.T) {
 	}
 	if r = runFake(t, &fakeSess{}, "-lang", "c", "-op", "edit", "-src", src, "-new", nw, "-edit", "0,1,1"); r.Status != "error" {
 		t.Fatalf("inconsistent edit accepted: %+v", r)
+	}
+}
+
+type slowSess struct{ fakeSess }
+
+func (s *slowSess) Parse(src []byte) (Tree, error) {
+	time.Sleep(300 * time.Millisecond)
+	return s.fakeSess.Parse(src)
+}
+
+// The watchdog exits the process, so the test re-executes itself.
+func TestWatchdogReportsTimeout(t *testing.T) {
+	if os.Getenv("HARNESS_WATCHDOG_CHILD") == "1" {
+		OpWatchdog = 50 * time.Millisecond
+		Run("slow", func(string) (Session, error) { return &slowSess{}, nil }, []string{"-lang", "c", "-op", "parse", "-src", os.Getenv("HARNESS_SRC"), "-reps", "2"}, os.Stdout)
+		return
+	}
+	src := filepath.Join(t.TempDir(), "a")
+	os.WriteFile(src, []byte("x"), 0o644)
+	cmd := exec.Command(os.Args[0], "-test.run=TestWatchdogReportsTimeout")
+	cmd.Env = append(os.Environ(), "HARNESS_WATCHDOG_CHILD=1", "HARNESS_SRC="+src)
+	out, err := cmd.Output()
+	var ee *exec.ExitError
+	if !errors.As(err, &ee) || ee.ExitCode() != 3 {
+		t.Fatalf("exit: %v", err)
+	}
+	var r Result
+	line, _, _ := strings.Cut(string(out), "\n")
+	if json.Unmarshal([]byte(line), &r) != nil || r.Status != "timeout" {
+		t.Fatalf("%q", out)
 	}
 }
