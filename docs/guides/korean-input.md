@@ -6,7 +6,8 @@ grammars and queries. Rules owned elsewhere are linked, not repeated: [invalid U
 `HasInvalidUTF8`](../specs/parser-result.md#input), [the `Source` and `LineIndex`
 signatures](../design/api-v2.md#7-primitives-that-set-this-library-apart-v001), [known limits](../reports/limitations.md).
 
-This guide describes v0.6.0. The published v0.5.0 has no CP949 decoder, no
+This guide describes v0.7.0. Where a grammar's `v0.7.0` tag differs from its `v0.6.0` tag the table says so; the other
+grammars keep their `v0.6.0` tags. The published v0.5.0 has no CP949 decoder, no
 `Source.UTF8Offset`, no `LineIndex.Offset`, the earlier query regex meaning and the earlier heredoc end-word comparison;
 [MIGRATING](../../MIGRATING.md#upgrading-from-v050-to-v060-engine-abi-4) lists the changes.
 
@@ -107,7 +108,7 @@ marks and emoji sequences have their own widths: compute display width with a wi
 
 ## Korean in queries
 
-In the development tree, `#match?` and `#not-match?` evaluate regular expressions the way the tree-sitter CLI does: `\w`,
+Since v0.6.0, `#match?` and `#not-match?` evaluate regular expressions the way the tree-sitter CLI does: `\w`,
 `\d`, `\s`, `\b`/`\B` and the case folding of `(?i)` are Unicode. `\w` matches Hangul syllables and jamo, so
 the pattern `^\w+$` accepts `한글`, and `\b` finds word edges next to Hangul. Write plain `\w` for Hangul; a class
 such as `\p{L}` is not needed. A node's text is a substring of the UTF-8 text that was parsed, so the predicates see
@@ -140,7 +141,7 @@ produce `ERROR` nodes even though the language allows it. The table says what wa
 | `c` | yes | yes | yes |
 | `cpp` | yes | yes | yes |
 | `csharp` | yes | yes | yes |
-| `css` | partly: class, ID, type, attribute and property names, custom property references and keyframe names parse in the development tree after v0.6.0. Bare identifier attribute and declaration values, unquoted `url()` arguments, units, and at-rule names and arguments remain outside the patch scope. See the [recorded bare value gap](../known-gaps/css.md) | yes (a `content` string) | yes |
+| `css` | partly: class, ID, type, attribute and property names, custom property references and keyframe names parse in the `v0.7.0` tag (the `v0.6.0` tag fails on them). Bare identifier attribute and declaration values, unquoted `url()` arguments, units, and at-rule names and arguments remain outside the patch scope. See the [recorded bare value gap](../known-gaps/css.md) | yes (a `content` string) | yes |
 | `dart` | not recorded | yes | yes |
 | `go` | yes | yes | yes |
 | `html` | yes (tag and attribute names; see note 1) | yes | yes |
@@ -150,16 +151,16 @@ produce `ERROR` nodes even though the language allows it. The table says what wa
 | `kotlin` | yes | yes | yes |
 | `php` | yes | yes | yes |
 | `postgres` | yes (unquoted and quoted; see note 2) | yes (string literals and `$태그$` dollar-quote tags and bodies; see note 2) | yes |
-| `powershell` | partly: variable, parameter, hash key, member name and type name parse (development tree after v0.6.0; v0.6.0 fails on them); fails on statement labels: `:한글` is read as a command name, not a label (no `ERROR`; see [limitations](../reports/limitations.md), row 32) | yes | yes |
+| `powershell` | partly: variable, parameter, hash key, member name and type name parse (`v0.7.0` tag; `v0.6.0` fails on them); fails on statement labels: `:한글` is read as a command name, not a label (no `ERROR`; see [limitations](../reports/limitations.md), row 32) | yes | yes |
 | `python` | yes | yes | yes |
 | `r` | yes | yes | yes |
-| `ruby` | partly: local, instance, global and plain symbol names parse (global names in v0.6.0; plain symbols such as `:한글` and `:일` in the development tree after v0.6.0, where v0.6.0 fails on them); fails on variable symbols such as `:@한글`, and `#@일` in a string is not interpolated ([limitations](../reports/limitations.md), rows 27 and 31) | yes | yes |
+| `ruby` | partly: local, instance, global and plain symbol names parse (global names since `v0.6.0`; plain symbols such as `:한글` and `:일` in the `v0.7.0` tag, where `v0.6.0` fails on them); fails on variable symbols such as `:@한글`, and `#@일` in a string is not interpolated ([limitations](../reports/limitations.md), rows 27 and 31) | yes | yes |
 | `rust` | yes | yes | yes |
 | `swift` | partly: variable, function, parameter, type and field names parse; fails on statement labels ([Swift](../known-gaps/swift.md)) | yes | yes |
-| `tsql` | yes on the retained bracketed, double-quoted and regular identifiers, variables and label cases (development tree, owner release v2.8.0, as since v2.1.0; v0.5.0 rejects regular identifiers) | yes | yes |
+| `tsql` | yes on the retained bracketed, double-quoted and regular identifiers, variables and label cases (owner release v2.8.0 in `v0.6.0`, as since v2.1.0; v0.5.0 rejects regular identifiers) | yes | yes |
 | `tsx` | yes (includes JSX element names) | yes (includes JSX text) | yes |
 | `typescript` | yes | yes | yes |
-| `xml` | yes: element, attribute and namespace-prefix names (attribute names and prefixes in the development tree after v0.6.0; v0.6.0 fails on them)<sup>1</sup> | yes | yes |
+| `xml` | yes: element, attribute and namespace-prefix names (attribute names and prefixes in the `v0.7.0` tag; `v0.6.0` fails on them)<sup>1</sup> | yes | yes |
 | `yaml` | yes | yes | yes |
 
 **Notes.**
@@ -167,10 +168,10 @@ produce `ERROR` nodes even though the language allows it. The table says what wa
 1. The HTML scanner stores each tag-name character in one byte, so names whose characters share a low byte close each other:
    `<x-걁>body</x-굁>` parses without an error. This pinned upstream defect is not exercised by the recorded rows: see
    [HTML](../known-gaps/html.md#html-hangul-tag-low-byte-mismatch), which shows that an ASCII mismatch is still an `ERROR`.
-   The XML scanner had the same defect; the development tree (after v0.6.0) compares complete tag names, so
+   The XML scanner had the same defect; the `v0.7.0` tag compares complete tag names, so
    `<x걁>body</x굁>` is an `ERROR` there ([limitations](../reports/limitations.md), row 30).
-2. The development tree uses upstream v19.0.0, which incorporates both Korean-support fixes. The published v0.5.0
-   `postgres` fails on Hangul identifiers and dollar-quote tags. The development scanner caps tags at 63 code points.
+2. Since v0.6.0 the module uses upstream v19.0.0, which incorporates both Korean-support fixes. The published v0.5.0
+   `postgres` fails on Hangul identifiers and dollar-quote tags. The scanner caps tags at 63 code points.
    U+3000 and other non-ASCII spaces are identifier characters. See
    [limitations, PostgreSQL Korean support](../reports/limitations.md#postgresql-korean-support-v060).
 
@@ -186,7 +187,7 @@ Korean": "yes" means "these inputs".
 
 ## Heredocs with Korean end words (Bash and Ruby)
 
-Upstream stores each end-word character in one byte, so a Korean end word never closed. The development tree stores end
+Upstream stores each end-word character in one byte, so a Korean end word never closed. Since v0.6.0 the grammar stores end
 words as UTF-8 and compares whole characters: `<<끝` closes on a line holding `끝`, and a different syllable, or an ASCII
 byte that equals its low byte, no longer closes it. The published v0.5.0 keeps the earlier low-byte comparison, where
 two syllables with the same low byte close each other.

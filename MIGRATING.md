@@ -407,15 +407,21 @@ The [schema register](docs/validation/grammar-schemas.md#v060-c-v0240) records t
 and [upstream's release notes](https://github.com/tree-sitter/tree-sitter-c-sharp/releases/tag/v0.24.0)
 list the parsing fixes. The four [C# known gaps](docs/known-gaps/csharp.md) still apply.
 
-## Unreleased (after v0.6.0)
+## Upgrading from v0.6.0 to v0.7.0
+
+Root v0.7.0 has no API, engine ABI or behavior change from v0.6.0: it adds a consumer-compatibility CI job and tests
+and updates the documentation. The changes below ship in the grammar modules. Five modules have new tags,
+`grammars/<dir>/v0.7.0` for `css`, `powershell`, `ruby`, `swift` and `xml`; each declares root v0.6.0 as its minimum.
+The other 20 modules keep their `v0.6.0` tags, and the `v0.6.0` tags of the five keep their earlier behavior. See the
+[compatibility table](docs/reports/compatibility.md) and the [per-tag support table](docs/reports/grammar-support.md).
 
 ### Swift grammar fef1236
 
-The development tree moves from `a1d4a7b` to `fef1236` in the same tier-3 upstream. A single
+The `swift` v0.7.0 module moves from `a1d4a7b` to `fef1236` in the same tier-3 upstream. A single
 `catch_block` can now contain comma-separated patterns with individual `where` clauses. Review queries
 and code that assume at most one `error` field on `catch_block`; use `ChildrenByFieldName("error")`
 when collecting the patterns. See the [upstream change](https://github.com/alex-pinkus/tree-sitter-swift/commit/fef1236022ccde2d2bc5c32d4db8947c87a7f848)
-and the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-swift-fef1236).
+and the [schema register](docs/validation/grammar-schemas.md#v070-swift-fef1236).
 
 ### XML names and tag names
 
@@ -434,7 +440,7 @@ Node types and fields are unchanged.
   incremental edit, a name longer than 85 Hangul syllables or about 63 open elements with five-syllable Hangul names
   can lose that state, and an end tag then reports an `ERROR`; before, such names used one byte per character.
 
-The pinned upstream XML queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-xml-name-patches)).
+The pinned upstream XML queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#v070-xml-name-patches)).
 
 ### CSS non-Latin-1 names
 
@@ -452,7 +458,7 @@ error after whitespace when the pinned scanner does not recognize its first char
 
 Retire the patch in the approved pin move to an upstream source containing a fix for the reported defect.
 That move reviews and updates affected known-gap entries and corpus expectations. See the
-[schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-css-name-patch).
+[schema register](docs/validation/grammar-schemas.md#v070-css-name-patch).
 
 ### PowerShell names
 
@@ -489,7 +495,7 @@ Node types and fields are unchanged (`node-types.json` is byte-identical to the 
   language specification says, but PowerShell 7.6.10 reads names by UTF-16 code unit and rejects them (one-off
   check, E2).
 
-The pinned upstream PowerShell queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-powershell-name-patch)).
+The pinned upstream PowerShell queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#v070-powershell-name-patch)).
 
 ### Ruby symbol names
 
@@ -511,4 +517,4 @@ A temporary ADR-0023 scanner patch carries [upstream issue #292](https://github.
   low byte `@`) stays a plain string. The character right after `#` is still read by its low byte, so `"#Ĥ!"` can still be
   taken for a short interpolation (see [limitations](docs/reports/limitations.md), rows 27 and 33).
 
-The pinned upstream Ruby queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-ruby-symbol-patch)).
+The pinned upstream Ruby queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#v070-ruby-symbol-patch)).

@@ -17,7 +17,7 @@ own `LICENSE`.
 | tree-sitter-javascript | `grammars/javascript` (including JSX) from `wotjr1649/tree-sitter-javascript` owner release v4.4.0 in v0.6.0 | [MIT with continuation copyright](grammars/javascript/LICENSE), [origin NOTICE](grammars/javascript/NOTICE), [original license](LICENSES/tree-sitter-javascript.txt) |
 | `wotjr1649/tree-sitter-javascript` owner release v4.4.0 (`e5ada30`) | Vendored `grammar.js` used to generate TypeScript and TSX in v0.6.0 | [MIT with continuation copyright](grammars/javascript/LICENSE), [TypeScript NOTICE](grammars/typescript/NOTICE), [TSX NOTICE](grammars/tsx/NOTICE) |
 | tree-sitter-typescript | `grammars/typescript` and `grammars/tsx` from `wotjr1649/tree-sitter-typescript` owner release v3.1.0 in v0.6.0 | MIT with continuation copyright ([TypeScript LICENSE](grammars/typescript/LICENSE), [TSX LICENSE](grammars/tsx/LICENSE)), [TypeScript NOTICE](grammars/typescript/NOTICE), [TSX NOTICE](grammars/tsx/NOTICE), [original license](LICENSES/tree-sitter-typescript.txt) |
-| tree-sitter-c-sharp (upstream v0.24.0 in the development tree) | `grammars/csharp` | [MIT](LICENSES/tree-sitter-c-sharp.txt) |
+| tree-sitter-c-sharp (upstream v0.24.0 in v0.6.0) | `grammars/csharp` | [MIT](LICENSES/tree-sitter-c-sharp.txt) |
 | tree-sitter-json | `grammars/json` | MIT, [grammars/json/LICENSE](grammars/json/LICENSE) |
 | tree-sitter-postgres | `grammars/postgres` (SQL only) | [BSD-3-Clause](LICENSES/tree-sitter-postgres.txt) |
 | tree-sitter-tsql | `grammars/tsql` from `wotjr1649/tree-sitter-mssql` owner release v2.8.0 in v0.6.0 | MIT, [grammars/tsql/LICENSE](grammars/tsql/LICENSE) |
@@ -36,7 +36,7 @@ own `LICENSE`.
 | tree-sitter-xml | `grammars/xml` | [MIT](LICENSES/tree-sitter-xml.txt) |
 | tree-sitter-ruby | `grammars/ruby` | [MIT](LICENSES/tree-sitter-ruby.txt) |
 | tree-sitter-kotlin | `grammars/kotlin` | [MIT](LICENSES/tree-sitter-kotlin.txt) |
-| tree-sitter-swift | `grammars/swift` from upstream `fef1236` in the development tree after v0.6.0 | [MIT](LICENSES/tree-sitter-swift.txt) |
+| tree-sitter-swift | `grammars/swift` from upstream `fef1236` in v0.7.0 (`a1d4a7b` in v0.6.0) | [MIT](LICENSES/tree-sitter-swift.txt) |
 | Newtonsoft.Json | Copied C# test fixtures | [MIT](testdata/newtonsoft/LICENSE.md) |
 | regex-syntax 0.8.11 | Generated Unicode character and simple case-fold tables for query regex predicates | [MIT](LICENSES/regex-MIT.txt) or [Apache-2.0](LICENSES/regex-APACHE.txt) |
 | Unicode data | Unicode 16.0.0 tables distributed in regex-syntax 0.8.11 | [Unicode data license](LICENSES/Unicode.txt) |

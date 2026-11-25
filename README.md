@@ -1,7 +1,7 @@
 # go-treesitter
 
-**[Preview v0.6.0](https://github.com/wotjr1649/go-treesitter/releases/tag/v0.6.0)** (GitHub pre-release).
-A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
+**Preview (v0.7.0).** The latest published release is [v0.6.0](https://github.com/wotjr1649/go-treesitter/releases/tag/v0.6.0)
+(GitHub pre-release). A CGO-free Go library for [tree-sitter](https://tree-sitter.github.io/). Each grammar
 module is generated from the unmodified upstream tree-sitter runtime and pinned grammar C (wasm translated to Go by
 `tools/gen`). Grammar C may carry recorded temporary
 [ADR-0023 patches](docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md); each patched module discloses them.
@@ -15,11 +15,12 @@ Start with [AGENTS.md](AGENTS.md) and the [documentation map](docs/README.md). T
 
 ## Use
 
-The root module has no grammar. v0.6.0 provides 25 grammar modules using engine ABI 4.
+The root module has no grammar. v0.7.0 provides 25 grammar modules using engine ABI 4: five at new `v0.7.0` tags
+(`css`, `powershell`, `ruby`, `swift`, `xml`) and 20 that keep their `v0.6.0` tags ([tag table](#use)).
 Add the modules you need
 under `grammars/`: `bash`, `c`, `cpp`, `csharp`, `css`, `dart`, `golang`, `html`, `java`, `javascript` (including JSX),
 `json`, `kotlin`, `php` (PHP parser only), `postgres` (PostgreSQL SQL only; PL/pgSQL excluded), `powershell`,
-`python`, `r`, `ruby`, `rust`, `swift` (first release), `tsql`, `tsx`, `typescript`, `xml` (XML parser only), and `yaml`.
+`python`, `r`, `ruby`, `rust`, `swift`, `tsql`, `tsx`, `typescript`, `xml` (XML parser only), and `yaml`.
 
 Use `typescript` for `.ts` and `tsx` for `.tsx`: the same owner repository provides both grammars.
 `<T>expr` type assertions are TypeScript-only; JSX is TSX-only.
@@ -39,17 +40,35 @@ Each language has exactly one grammar source repository, chosen by the tiers of
 | 7 (owner-maintained) | `javascript` (including JSX) | `wotjr1649/tree-sitter-javascript` (owner release v4.4.0; origin `tree-sitter/tree-sitter-javascript` v0.25.0; ADR-0024 rule 7) |
 | 7 (owner-maintained) | `typescript`, `tsx` | `wotjr1649/tree-sitter-typescript` (owner release v3.1.0; origin `tree-sitter/tree-sitter-typescript` v0.23.2; ADR-0024 rule 7) |
 
-Exact revisions are in [pins.json](tools/gen/pins.json). Bash, Go, HTML, Python, Ruby, Rust and YAML carry recorded temporary patches
+Exact revisions are in [pins.json](tools/gen/pins.json). Bash, CSS, Go, HTML, PowerShell, Python, Ruby, Rust, XML and YAML carry recorded temporary patches
 ([ADR-0023](docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md); each module's README lists them).
 See the [status board](docs/reports/release-critical-status.md) for gate results and publication evidence, and
 [limitations](docs/reports/limitations.md) for the scope of this Preview.
 
-Install the root and the grammar modules you use. For example,
+A grammar module is versioned independently of the root ([ADR-0028](docs/design/decisions/ADR-0028-root-stability-and-independent-grammar-versioning.md#decision)).
+v0.7.0 gives new tags to the five modules whose pin or patches changed after v0.6.0; the other 20 modules have no
+change to release and keep their published tags.
+
+| Grammar tag | Modules | Minimum root |
+|---|---|---|
+| `grammars/<dir>/v0.7.0` (new) | `css`, `powershell`, `ruby`, `swift`, `xml` | `v0.6.0` |
+| `grammars/<dir>/v0.6.0` (carried forward) | `bash`, `c`, `cpp`, `csharp`, `dart`, `golang`, `html`, `java`, `javascript`, `json`, `kotlin`, `php`, `postgres`, `python`, `r`, `rust`, `tsql`, `tsx`, `typescript`, `yaml` | `v0.6.0` |
+
+Go selects the highest root that any selected module requires. Each new tag declares root `v0.6.0` as its minimum;
+root `v0.7.0` is the recommended pairing. The [compatibility table](docs/reports/compatibility.md) records the tested combinations and the
+[support table](docs/reports/grammar-support.md) lists known limits by tag.
+
+Install the root and the grammar modules you use, each at the tag in the table above. Until v0.7.0 is published, use
+the [v0.6.0 install example](https://github.com/wotjr1649/go-treesitter/blob/v0.6.0/README.md#use) (the root and every
+grammar at `v0.6.0`). After v0.7.0 is published, for example,
 
 ```sh
-go get github.com/wotjr1649/go-treesitter@v0.6.0
+go get github.com/wotjr1649/go-treesitter@v0.7.0
 go get github.com/wotjr1649/go-treesitter/grammars/golang@v0.6.0
+go get github.com/wotjr1649/go-treesitter/grammars/swift@v0.7.0
 ```
+
+Upgrading only the root to v0.7.0 keeps your existing grammar tags; a grammar changes only when you request its new tag.
 
 ```go
 import (

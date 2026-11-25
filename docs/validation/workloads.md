@@ -480,7 +480,7 @@ line endings. The generator gate adds its `SELECT 한글;` input to both native 
 edits. It exercises ADR-0023's non-ASCII unquoted identifier fix without changing the upstream corpus or its tests.
 Corpus-format file: 520 bytes, SHA-256 `5ddf7ad1aafcf144351bab7ffef3352897b01cc51ef5e4378d148d57048ad0f3`.
 
-## T-SQL v2.1.0 Korean regression inputs (development tree)
+## T-SQL v2.1.0 Korean regression inputs (v0.6.0)
 
 The Korean [manifest](../../tools/conformance/testdata/korean/manifest.csv) retains 11 T-SQL inputs,
 all requiring clean trees and explicit node-span expectations. Five former known-gap rows become clean;
