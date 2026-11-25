@@ -36,6 +36,12 @@ on:
 
 permissions: {}
 
+# No job of this workflow may read or write the Actions cache: other workflows (bench.yml via setup-go, pin-move.yml via
+# actions/cache) restore caches from the default branch, and a workflow_dispatch run on main would otherwise be allowed to
+# write them. cache-mode: none is enforced by GitHub with scoped cache tokens (docs: Workflow syntax > cache-mode, and
+# Dependency caching reference > Controlling cache access with cache-mode); it is repeated on every job.
+cache-mode: none
+
 concurrency:
   group: compare
   cancel-in-progress: false
@@ -53,6 +59,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions: {}
+    cache-mode: none
     defaults:
       run:
         shell: bash
@@ -94,6 +101,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 40
     permissions: {}
+    cache-mode: none
     defaults:
       run:
         shell: bash
@@ -144,6 +152,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 25
     permissions: {}
+    cache-mode: none
     defaults:
       run:
         shell: bash
@@ -195,6 +204,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions: {}
+    cache-mode: none
     defaults:
       run:
         shell: bash
@@ -218,62 +228,62 @@ jobs:
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: compare-ubuntu-24.04-c.zip
-          path: results
+          path: results/compare-ubuntu-24.04-c.zip
           skip-decompress: true
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: compare-ubuntu-24.04-go.zip
-          path: results
+          path: results/compare-ubuntu-24.04-go.zip
           skip-decompress: true
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: compare-ubuntu-24.04-javascript.zip
-          path: results
+          path: results/compare-ubuntu-24.04-javascript.zip
           skip-decompress: true
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: compare-ubuntu-24.04-json.zip
-          path: results
+          path: results/compare-ubuntu-24.04-json.zip
           skip-decompress: true
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: compare-ubuntu-24.04-python.zip
-          path: results
+          path: results/compare-ubuntu-24.04-python.zip
           skip-decompress: true
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: compare-nocc-ubuntu-24.04.zip
-          path: results
+          path: results/compare-nocc-ubuntu-24.04.zip
           skip-decompress: true
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: compare-ubuntu-24.04-arm-c.zip
-          path: results
+          path: results/compare-ubuntu-24.04-arm-c.zip
           skip-decompress: true
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: compare-ubuntu-24.04-arm-go.zip
-          path: results
+          path: results/compare-ubuntu-24.04-arm-go.zip
           skip-decompress: true
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: compare-ubuntu-24.04-arm-javascript.zip
-          path: results
+          path: results/compare-ubuntu-24.04-arm-javascript.zip
           skip-decompress: true
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: compare-ubuntu-24.04-arm-json.zip
-          path: results
+          path: results/compare-ubuntu-24.04-arm-json.zip
           skip-decompress: true
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: compare-ubuntu-24.04-arm-python.zip
-          path: results
+          path: results/compare-ubuntu-24.04-arm-python.zip
           skip-decompress: true
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: compare-nocc-ubuntu-24.04-arm.zip
-          path: results
+          path: results/compare-nocc-ubuntu-24.04-arm.zip
           skip-decompress: true
       - name: Validate every bundle (bounded unpack, strict schemas) and report; executes nothing from them
         run: |

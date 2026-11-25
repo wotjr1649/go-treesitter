@@ -98,6 +98,16 @@ func aggregateOne(in, out string, nocc bool) (string, error) {
 	if err := cmdCollect([]string{"-in", tmp, "-out", out}); err != nil {
 		return "", err
 	}
+	// a bundle must carry every file the report and the gate rely on; a missing one is a rejection, not a smaller report
+	required := []string{"provenance/workflow.json", "builds.csv"}
+	if !nocc {
+		required = append(required, "measurements.jsonl", "cells.json", "run.json", "workload.json", "correctness.csv")
+	}
+	for _, f := range required {
+		if st, err := os.Lstat(filepath.Join(out, filepath.FromSlash(f))); err != nil || !st.Mode().IsRegular() {
+			return "", fmt.Errorf("the bundle lacks %s", f)
+		}
+	}
 	if nocc {
 		if err := cmdGateNocc([]string{"-builds", filepath.Join(out, "builds.csv")}); err != nil {
 			return "", err

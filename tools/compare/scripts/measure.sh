@@ -59,7 +59,7 @@ build() { # name cgo baseline -> prints the size
   (cd "$repo/tools/compare/adapters/$a" && CGO_ENABLED=$cgo go build -trimpath -buildvcs=false -ldflags="-s -w" -o "$T/bin-w/$a" .) > "$T/prov/build-$a.log" 2>&1 || rc=$?
   [ $rc -eq 0 ] && sz=$(stat -c %s "$T/bin-w/$a")
   local d; d=$(diag "$T/prov/build-$a.log")
-  echo "$a,compiler-image cgo=$cgo,$([ $rc -eq 0 ] && echo ok || echo failed),$rc,$sz,$((sz>0 && base>0 ? sz-base : 0)),$((SECONDS-t0)),$d" >> "$out/builds.csv"
+  echo "$a,compiler-image cgo=$cgo,$([ $rc -eq 0 ] && echo ok || echo failed),$rc,$sz,$((sz>base && base>0 ? sz-base : 0)),$((SECONDS-t0)),$d" >> "$out/builds.csv"
   [ $rc -eq 0 ] || echo "exit=$rc $d" > "$out/failures/build-$a.txt"
   echo $sz
 }

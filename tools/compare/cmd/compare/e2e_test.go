@@ -140,7 +140,9 @@ func TestEndToEndWithFakeWorkers(t *testing.T) {
 		t.Fatal(err)
 	}
 	wj, _ := os.ReadFile(filepath.Join(work, "workload.json"))
-	mustWrite(t, filepath.Join(res, "workload.json"), wj) // the sandbox script copies it next to the results
+	mustWrite(t, filepath.Join(res, "workload.json"), wj) // the measuring script copies it next to the results
+	mustWrite(t, filepath.Join(res, "builds.csv"), []byte("adapter,mode,status,exit,bytes,delta_vs_empty_bytes,seconds,diagnostics\nproduct,x,ok,0,10,0,1,\n"))
+	mustWrite(t, filepath.Join(res, "provenance", "workflow.json"), []byte(workflowJSON))
 	col := filepath.Join(dir, "collected")
 	if err := cmdCollect([]string{"-in", res, "-out", col}); err != nil {
 		t.Fatal(err)
@@ -151,6 +153,7 @@ func TestEndToEndWithFakeWorkers(t *testing.T) {
 		t.Fatal(err)
 	}
 	noccDir := filepath.Join(dir, "nocc")
+	mustWrite(t, filepath.Join(noccDir, "provenance", "workflow.json"), []byte(workflowJSON))
 	mustWrite(t, filepath.Join(noccDir, "builds.csv"), []byte(noccCSV("product,x,ok,0,30,20,1,ok,ok,", "official,x,failed,1,0,0,1,n/a,expected-unsupported,cgo")))
 	if err := cmdPack([]string{"-dir", noccDir, "-out", filepath.Join(bundles, "compare-nocc-r1.zip")}); err != nil {
 		t.Fatal(err)
@@ -442,5 +445,64 @@ func TestStrictSchemas(t *testing.T) {
 	}
 	if err := checkCSVShape("correctness.csv", [][]string{{"lang", "adapter"}}, nil); err == nil {
 		t.Fatal("a wrong correctness header was accepted")
+	}
+}
+
+const workflowJSON = `{"repository":"o/r","run_id":"1","run_attempt":"1","sha":"abc","ref":"refs/heads/main","workflow":"w","runner_arch":"X64","runner_image":"i","mode":"smoke"}`
+
+// The top level must end after the value: Decoder.More is not an end-of-input check (a stray closing bracket fools it).
+func TestStrictTopLevelEOFAndJSONL(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "run.json")
+	var v runInfo
+	for _, bad := range []string{`{"schema":1} ]`, `{"schema":1} }`, `{"schema":1} 5`, `{"schema":1}{`} {
+		mustWrite(t, p, []byte(bad))
+		if err := strictFile(p, &v); err == nil {
+			t.Errorf("%q accepted", bad)
+		}
+	}
+	mustWrite(t, p, []byte("{\"schema\":1}\n\n"))
+	if err := strictFile(p, &v); err != nil {
+		t.Fatal(err)
+	}
+	exp := &expectation{cells: map[string]Cell{}, inputs: map[string]bool{}}
+	jl := filepath.Join(dir, "measurements.jsonl")
+	row := `{"cell":"official/c","pass":"preflight","round":0,"role":"candidate","adapter":"official","lang":"c","op":"ctl","exit":0,"wall_ns":1}`
+	mustWrite(t, jl, []byte(row+"\n"))
+	if err := validate(jl, "measurements.jsonl", exp); err != nil {
+		t.Fatalf("a good row: %v", err)
+	}
+	mustWrite(t, jl, []byte(strings.Replace(row, `"adapter":"official"`, `"adapter":"product"`, 1)+"\n"))
+	if err := validate(jl, "measurements.jsonl", exp); err == nil {
+		t.Fatal("a preflight row for the wrong cell was accepted")
+	}
+	mustWrite(t, jl, []byte(row+" ]\n"))
+	if err := validate(jl, "measurements.jsonl", exp); err == nil {
+		t.Fatal("trailing data after a JSONL value was accepted")
+	}
+}
+
+func TestBundleMustCarryEveryRequiredFile(t *testing.T) {
+	dir := t.TempDir()
+	d := filepath.Join(dir, "b")
+	mustWrite(t, filepath.Join(d, "builds.csv"), []byte(noccCSV("product,x,ok,0,30,20,1,ok,ok,", "official,x,failed,1,0,0,1,n/a,expected-unsupported,cgo")))
+	bundles := filepath.Join(dir, "bundles")
+	if err := cmdPack([]string{"-dir", d, "-out", filepath.Join(bundles, "compare-nocc-r1.zip")}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := aggregateOne(filepath.Join(bundles, "compare-nocc-r1"), filepath.Join(dir, "o"), true); err == nil || !strings.Contains(err.Error(), "workflow.json") {
+		t.Fatalf("a bundle without provenance was accepted: %v", err)
+	}
+}
+
+func TestExactRoundsAndBothPasses(t *testing.T) {
+	if !exactRounds([]int{0, 1, 2}) || exactRounds([]int{0, 2, 3}) || exactRounds([]int{1, 2, 3}) {
+		t.Fatal("exactRounds")
+	}
+	a := []CellStat{{Lang: "c", Cand: "x", Op: "parse", Group: "small", Input: "i1"}, {Lang: "c", Cand: "x", Op: "parse", Group: "small", Input: "i2"}}
+	b := []CellStat{{Lang: "c", Cand: "x", Op: "parse", Group: "small", Input: "i2"}}
+	ta, tb := bothPasses(a, b)
+	if len(ta) != 1 || ta[0].Input != "i2" || len(tb) != 1 {
+		t.Fatalf("%v %v", ta, tb)
 	}
 }

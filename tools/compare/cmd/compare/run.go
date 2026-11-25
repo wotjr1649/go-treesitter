@@ -182,6 +182,7 @@ func run(o runOpts) error {
 	}
 	r.finalize()
 	r.memory()
+	r.finalize() // a row lost during the memory samples still fails every cell that had been called measured
 	r.finish(ident, ready, start)
 	if r.rowsLost {
 		return errors.New("some measurement rows could not be written; their cells are marked failed")

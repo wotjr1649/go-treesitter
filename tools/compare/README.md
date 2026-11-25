@@ -31,7 +31,18 @@ candidate.
   reach the job's Actions runtime credentials: the artifact-service token and URL that the runner hands to JavaScript actions
   (`ACTIONS_RUNTIME_TOKEN`, `ACTIONS_RESULTS_URL`), the runner's files, and the VM. These credentials carry no repository permission.
   The worst case is that a candidate forges or adds artifacts **of this workflow run**, which is the same class as a candidate
-  falsifying its own numbers; it cannot write to the repository, read a secret or mint an OIDC token. No claim is made that candidate code is kept
+  falsifying its own numbers; it cannot write to the repository, read a secret or mint an OIDC token.
+* **The Actions cache is blocked at the service level.** A `workflow_dispatch` run on the default branch is a trusted trigger that may
+  write default-branch caches, and other workflows of this repository restore them (`bench.yml` through `setup-go`, `pin-move.yml` through
+  `actions/cache`), so cross-workflow cache poisoning is not accepted. `compare.yml` sets `cache-mode: none` at the workflow level and on
+  every job. GitHub documents this key as enforced with scoped cache tokens, so a job can neither restore nor save a cache
+  ([Workflow syntax: `cache-mode`](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#cache-mode) and
+  [`jobs.<job_id>.cache-mode`](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax);
+  [Dependency caching reference: controlling cache access](https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching#controlling-cache-access-with-cache-mode);
+  [GitHub changelog 2026-09-10](https://github.blog/changelog/2026-09-10-control-github-actions-cache-access-with-cache-mode/)).
+  This is GitHub's documented control; it has not been exercised by a test here. The workflow itself uses no cache action.
+* **Remaining service access, precisely:** the artifact service of this run (create and upload artifacts under any name of this run;
+  download this run's artifacts), through the runtime token above. Nothing else: no repository permission, no secret, no OIDC, no cache. No claim is made that candidate code is kept
   away from these credentials.
 * Candidates and the product run side by side in that VM, one after the other, because paired timing needs the same machine; a
   malicious candidate could also falsify the measurements and files of its own job, or interfere with the product's process in it.
@@ -39,7 +50,7 @@ candidate.
   named bundle file (`compare-<runner>-<lang>.zip`, built by this repository's Go code); only that file is uploaded (`archive: false`),
   and only after validation succeeded. No directory that a candidate could have filled with links is ever passed to the uploader.
 * The aggregate job runs no candidate code and checks out only the orchestrator's sources. It downloads **only the 12 expected artifact
-  names**, undecompressed (`skip-decompress`), and its Go code checks each bundle before extracting a byte: a regular file within the size
+  names**, each into its own directory (`results/<name>`) and undecompressed (`skip-decompress`), and its Go code checks each bundle before extracting a byte: a regular file within the size
   cap, at most 300 entries, only allowlisted unique relative paths, no links or directories, declared sizes within the per-file and total
   caps, every stream read through a limit equal to its declared size. The extracted files then pass the strict collector (typed schemas that
   refuse unknown fields and trailing data, exact CSV headers and value sets, rows checked against the run's own plan) before anything is
@@ -114,6 +125,8 @@ operation and the control.
 ## Known gaps (also listed in the implementation report)
 
 * A malicious candidate can falsify numbers in its own job (see the threat model); only the tree comparison with the native reference is independent of its answers.
+* A measurement bundle must carry every file the report relies on (`measurements.jsonl`, `cells.json`, `run.json`, `workload.json`, `correctness.csv`, `builds.csv`, `provenance/workflow.json`); a missing one rejects the bundle. A cell enters a ratio only if both passes have exactly the scheduled round numbers.
+* The raw download of a bundle reaches the aggregate VM before the Go size check (the pinned downloader writes the response body to the per-name directory); the cap applies as soon as the file is on disk.
 * The aggregate recounts every scheduled round pair from the rows before a cell enters a ratio, but a cell's plan (`cells.json`) comes from the same job as its rows, so a malicious candidate's job could forge both.
 * Snapshot-operation cells (product, Bonsai) are graded through the fresh parse; a large input has no edit grade, so large edit cells never enter a ratio.
 * Measurement rows are written one JSON line each; a write error marks the affected cells failed, but a row that was never attempted is not detectable beyond the round recount.

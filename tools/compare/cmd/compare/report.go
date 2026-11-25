@@ -146,7 +146,7 @@ func pairStats(rows []Row, cells map[string]Cell, pass string, reps map[string]i
 		c := cells[ck]
 		// only complete, graded cells enter a summary: every scheduled pair is recounted from the rows themselves rather
 		// than trusting the cell's state, and the grade must allow it; the raw rows stay in measurements.jsonl
-		if !include(c) || len(rounds) != c.Want || c.Want == 0 {
+		if !include(c) || len(rounds) != c.Want || c.Want == 0 || !exactRounds(rounds) {
 			continue
 		}
 		s := CellStat{Lang: c.Lang, Cand: c.Cand, Op: c.Op, Group: c.Group, Input: c.Input, Rounds: len(rounds)}
@@ -219,7 +219,7 @@ func cmdReport(args []string) error {
 		return c.State == "measured" && gradedEqual(graded, refAdapter, c) && gradedEqual(graded, c.Cand, c)
 	}
 	repsOf := info.Reps
-	timing, alloc := pairStats(rows, cells, "time", repsOf, include), pairStats(rows, cells, "alloc", repsOf, include)
+	timing, alloc := bothPasses(pairStats(rows, cells, "time", repsOf, include), pairStats(rows, cells, "alloc", repsOf, include))
 
 	var md strings.Builder
 	w := func(f string, a ...any) { fmt.Fprintf(&md, f+"\n", a...) }
@@ -450,3 +450,35 @@ func writeStatCSV(p string, stats []CellStat) error {
 }
 
 var _ = slices.Sort[[]int]
+
+// exactRounds reports whether the sorted round numbers are exactly 0..n-1 (the scheduled set, not just its count).
+func exactRounds(rounds []int) bool {
+	for i, r := range rounds {
+		if r != i {
+			return false
+		}
+	}
+	return true
+}
+
+// bothPasses keeps only the cells that have complete rows in both passes, so a cell whose allocation rows are missing
+// cannot leave a time ratio behind (and the reverse).
+func bothPasses(a, b []CellStat) ([]CellStat, []CellStat) {
+	key := func(s CellStat) string { return strings.Join([]string{s.Lang, s.Cand, s.Op, s.Group, s.Input}, "|") }
+	inA, inB := map[string]bool{}, map[string]bool{}
+	for _, s := range a {
+		inA[key(s)] = true
+	}
+	for _, s := range b {
+		inB[key(s)] = true
+	}
+	keep := func(in []CellStat, other map[string]bool) (out []CellStat) {
+		for _, s := range in {
+			if other[key(s)] {
+				out = append(out, s)
+			}
+		}
+		return out
+	}
+	return keep(a, inB), keep(b, inA)
+}

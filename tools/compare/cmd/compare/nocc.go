@@ -109,7 +109,7 @@ func nocc(o noccOpts) error {
 			}
 		}
 		delta := int64(0)
-		if a != "empty" && size > 0 && empty > 0 {
+		if a != "empty" && size > empty && empty > 0 { // an adapter smaller than the empty consumer records a delta of 0
 			delta = size - empty
 		}
 		status := "ok"

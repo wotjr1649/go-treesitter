@@ -278,6 +278,9 @@ func validate(p, rel string, exp *expectation) error {
 			if err := dec.Decode(&r); err != nil {
 				return fmt.Errorf("line %d: %v", n, err)
 			}
+			if err := jsonEOF(dec); err != nil {
+				return fmt.Errorf("line %d: %v", n, err)
+			}
 			if err := validateRow(r, exp); err != nil {
 				return fmt.Errorf("line %d: %v", n, err)
 			}
@@ -373,7 +376,13 @@ func strictFile(p string, v any) error {
 	if err := dec.Decode(v); err != nil {
 		return err
 	}
-	if dec.More() {
+	return jsonEOF(dec)
+}
+
+// jsonEOF requires the decoder to be at the end of its input: Decoder.More only answers whether an array or object has
+// another element, so the top level is checked by asking for one more token, which must be io.EOF.
+func jsonEOF(dec *json.Decoder) error {
+	if _, err := dec.Token(); err != io.EOF {
 		return errors.New("trailing data after the JSON value")
 	}
 	return nil
