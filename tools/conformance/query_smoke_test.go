@@ -3,6 +3,7 @@ package conformance
 import (
 	"encoding/json"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -116,24 +117,18 @@ func FuzzQueryCompile(f *testing.F) {
 		if len(source) > 512 {
 			t.Skip()
 		}
-		// NewQuery takes no context: run it in a goroutine so a pathological pattern fails the input
-		// (reported with its length) after a fixed budget instead of hanging the run.
-		type result struct {
-			q   *treesitter.Query
-			err error
+		// NewQuery takes no context; the 512-byte bound and the test process limits (go test -timeout, the fuzz
+		// worker's hang detection) stop a runaway compile without a goroutine that could outlive the input.
+		q, err := treesitter.NewQuery(lang, source)
+		if source == "(" {
+			if qe, ok := err.(*treesitter.QueryError); !ok || qe.Type != treesitter.QueryErrorSyntax {
+				t.Fatalf("NewQuery(%q): %v, want a QueryErrorSyntax", source, err)
+			}
 		}
-		done := make(chan result, 1)
-		go func() {
-			q, err := treesitter.NewQuery(lang, source)
-			done <- result{q, err}
-		}()
-		var q *treesitter.Query
-		var err error
-		select {
-		case r := <-done:
-			q, err = r.q, r.err
-		case <-time.After(10 * time.Second):
-			t.Fatalf("NewQuery did not finish within 10s for a %d-byte pattern", len(source))
+		if source == "(_) @node" {
+			if err != nil || q.PatternCount() != 1 || !slices.Equal(q.CaptureNames(), []string{"node"}) {
+				t.Fatalf("NewQuery(%q): %v, patterns %d, want 1 pattern capturing node", source, err, q.PatternCount())
+			}
 		}
 		if err != nil {
 			qe, ok := err.(*treesitter.QueryError)

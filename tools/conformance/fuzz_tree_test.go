@@ -7,7 +7,6 @@ import (
 	"slices"
 	"strings"
 	"testing"
-	"time"
 
 	treesitter "github.com/wotjr1649/go-treesitter"
 )
@@ -33,8 +32,8 @@ func FuzzQueryMatches(f *testing.F) {
 		if len(src) > 512 {
 			t.Skip()
 		}
-		ctx, cancel := context.WithTimeout(bg, 2*time.Second)
-		defer cancel()
+		// No wall-clock budget: inputs are size-bounded and the test process limits catch a hang.
+		ctx := bg
 		p := newParser(t, "json", treesitter.WithMaxMemoryBytes(64<<20))
 		tree, err := p.Parse(ctx, []byte(src), nil)
 		if err != nil {
@@ -55,8 +54,13 @@ func FuzzQueryMatches(f *testing.F) {
 		if !cancelled {
 			t.Fatal("Matches did not report cancellation")
 		}
-		matched := false
+		matched, limited := false, false
+		var got []string
 		for m, err := range tree.Matches(ctx, q, &treesitter.QueryOptions{MatchLimit: 128}) {
+			if errors.Is(err, treesitter.ErrQueryMatchLimit) { // allowed by the contract; completed matches stay valid
+				limited = true
+				break
+			}
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -69,9 +73,20 @@ func FuzzQueryMatches(f *testing.F) {
 					n.EndByte() > uint32(len(src)) || n.Text() != src[n.StartByte():n.EndByte()] {
 					t.Fatalf("invalid capture %d at [%d,%d)", c.Index, n.StartByte(), n.EndByte())
 				}
+				got = append(got, names[c.Index]+"="+n.Text())
 			}
 			matched = true
-			break
+		}
+		// The two seeds must yield these captures over the whole match stream, not only the first match.
+		switch {
+		case src == "{\"key\":true}" && query == 1 && !limited:
+			if want := []string{"key=\"key\"", "value=true"}; !slices.Equal(got, want) {
+				t.Fatalf("pair captures %q, want %q", got, want)
+			}
+		case src == "[\"x\", \"no\", \"xyz\"]" && query == 2 && !limited:
+			if want := []string{"s=\"x\"", "s=\"xyz\""}; !slices.Equal(got, want) {
+				t.Fatalf("regex captures %q, want %q", got, want)
+			}
 		}
 		if int(query)%len(queries) == 0 && !matched {
 			snap, err := tree.Snapshot(ctx)
@@ -97,12 +112,12 @@ func FuzzTreeEditRanges(f *testing.F) {
 	f.Add("[1,2]\r\n", "\n\"한😀\"", uint16(3), uint16(1), uint8(1))
 	f.Add("[\"\xff\",", "]", uint16(4), uint16(2), uint8(2))
 	f.Add("", "\n", uint16(0), uint16(0), uint8(0))
+	f.Add("[1,2]", "3", uint16(3), uint16(6), uint8(0)) // valid JSON after both edits: [1,2] -> [1,32]
 	f.Fuzz(func(t *testing.T, original, replacement string, at, remove uint16, invalid uint8) {
 		if len(original) > 256 || len(replacement) > 256 {
 			t.Skip()
 		}
-		ctx, cancel := context.WithTimeout(bg, 2*time.Second)
-		defer cancel()
+		ctx := bg
 		p := newParser(t, "json", treesitter.WithMaxMemoryBytes(64<<20))
 		old, err := p.ParseOwned(ctx, []byte(original), nil)
 		if err != nil {
@@ -114,6 +129,7 @@ func FuzzTreeEditRanges(f *testing.F) {
 			t.Fatal(err)
 		}
 
+		replacement0, at0, remove0 := replacement, at, remove // the loop below rewrites its parameters
 		src := original
 		for i := range 2 {
 			start := uint32(at) % uint32(len(src)+1)
@@ -137,6 +153,9 @@ func FuzzTreeEditRanges(f *testing.F) {
 				}
 				if err := old.Edit(bad); !errors.Is(err, treesitter.ErrInvalidInput) || old.InputBytes() != len(src) {
 					t.Fatalf("invalid Edit changed the tree or returned the wrong error: %v", err)
+				}
+				if s, err := old.Snapshot(ctx); err != nil || s.Source() != original {
+					t.Fatalf("Snapshot after an invalid Edit: %v, want the unedited tree", err)
 				}
 			}
 			if err := old.Edit(edit); err != nil || old.InputBytes() != len(next) {
@@ -168,6 +187,12 @@ func FuzzTreeEditRanges(f *testing.F) {
 		cached, err := inc.ChangedRanges(old)
 		if err != nil || !slices.Equal(changed, cached) {
 			t.Fatalf("ChangedRanges with a cached snapshot: %v, %v; first call %v", cached, err, changed)
+		}
+		if original == "[1,2]" && replacement0 == "3" && at0 == 3 && remove0 == 6 {
+			want := []treesitter.Range{{StartByte: 3, EndByte: 4, StartPoint: treesitter.Point{Column: 3}, EndPoint: treesitter.Point{Column: 4}}}
+			if !slices.Equal(changed, want) {
+				t.Fatalf("ChangedRanges %+v, want %+v", changed, want)
+			}
 		}
 		var prev uint32
 		for i, r := range changed {
