@@ -82,6 +82,7 @@ func TestPinnedPatchTracking(t *testing.T) {
 		{"ruby", "0001-heredoc-utf8.patch", "https://github.com/tree-sitter/tree-sitter-ruby/issues/305"},
 		{"ruby", "0002-global-variable-non-ascii.patch", "https://github.com/tree-sitter/tree-sitter-ruby/issues/306"},
 		{"ruby", "0003-non-ascii-symbol.patch", "https://github.com/tree-sitter/tree-sitter-ruby/issues/292"},
+		{"powershell", "0001-non-ascii-names.patch", "https://github.com/airbus-cert/tree-sitter-powershell/issues/70"},
 		{"xml", "0001-non-ascii-names.patch", "https://github.com/tree-sitter-grammars/tree-sitter-xml/issues/40"},
 		{"xml", "0002-tag-name-code-points.patch", "https://github.com/tree-sitter-grammars/tree-sitter-xml/issues/40"},
 	} {

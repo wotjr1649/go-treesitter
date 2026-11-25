@@ -1,0 +1,247 @@
+{
+  "identity": {
+    "grammarCommit": "65ea6919e816a7ac142acec7ee72757f89db8439",
+    "seed": 1,
+    "corpusManifestSHA256": "648c3748ef539538d28bd385409814b842fbf83a8a167172b30b402c2c13f062",
+    "editsManifestSHA256": "ae23d5eda6b79c0b24703c8bc3e1246946dba059c28f31da4a7c5ebb9978bc4e",
+    "largeEntries": [
+      {
+        "lang": "powershell",
+        "file": "build.psm1",
+        "kind": "url",
+        "url": "https://raw.githubusercontent.com/PowerShell/PowerShell/cb9cf48b76cf2fdafb2f2a5e4c64dad4da526486/build.psm1",
+        "sha256": "9c87bbaceee0f4724983452b5d1c1ace09fa898f955c970b620d89ec0886a6bf",
+        "license_spdx": "MIT",
+        "license_url": "https://raw.githubusercontent.com/PowerShell/PowerShell/cb9cf48b76cf2fdafb2f2a5e4c64dad4da526486/LICENSE.txt",
+        "license_sha256": "7c77a44a8acd9b41fdc209864a8016b3d430b5d0e09309818d5b7444336df744"
+      }
+    ],
+    "patchCorpusFilesSHA256": {
+      "non-ascii-names.txt": "b93157068b0da88e5ea004c93688f86c803e32555cc310d270eb6bbc6db3f590"
+    },
+    "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "cli": "0.27.2",
+    "grammarArchiveSHA256": "ce077de1a8537476750152afa984346a65519b7b795348cc8fb7f1e0e28e4a4a",
+    "patches": [
+      {
+        "file": "patches/powershell/0001-non-ascii-names.patch",
+        "sha256": "99612eb902795e7e0e455a2da74a141b6404430ff874e9f924a67d45e058cacd",
+        "source": "grammar.js",
+        "beforeSHA256": "bb3aad41587d910b1ce09fdee6ad326919a12a6fc3433f3902e874a0b852ca77",
+        "afterSHA256": "72d6f39b9ab6cc99d09226f57a69acc33fc525e635955d2157f7f1e51255df62",
+        "upstreamReport": "https://github.com/airbus-cert/tree-sitter-powershell/issues/70"
+      }
+    ]
+  },
+  "reason": "Grammar-input patch 0001 (upstream issue airbus-cert/tree-sitter-powershell#70) widens the ASCII-only name patterns of variables, command parameters, simple names and type identifiers to Unicode letters, decimal digits and underscore, so non-ASCII (for example Hangul) variable, parameter, hash-key, member and type names parse. Statement labels are not widened. Each listed difference is a patch-corpus input or its seeded edit in which such a name now parses, or in which a variable in an expandable string or here-string now spans non-ASCII letters; the pinned upstream corpus, its seeded edits, the kit inputs, the pinned large input and the Hangul statement-label corpus case are unchanged.",
+  "retireWhen": "Retire with the matching patch when the upstream pin incorporates the fix; review anew for any identity, fixture or result change.",
+  "differences": [
+    {
+      "id": "corpus/powershell/grammar-patch-non-ascii-names-001",
+      "kind": "corpus",
+      "inputSHA256": "c9ed4d696bfb10c4c32d47cb13641b28fd443d1f14da96556993080e28164e3d",
+      "referenceDumpSHA256": "ad1ca67cb1fdc23593f43151ad3d40cf1e1a7083007120e7b9663c3e01866eaa",
+      "candidateDumpSHA256": "2aed2b8774acece2b1ae68c0a89453611a464520915017fe95a4f58578a8830b"
+    },
+    {
+      "id": "corpus/powershell/grammar-patch-non-ascii-names-002",
+      "kind": "corpus",
+      "inputSHA256": "84614d0c64c39c0652b9824e3634857dbd79bdda278ab0b3c11defe088dfb431",
+      "referenceDumpSHA256": "950f2f3841936d78dc77d847a274fa932f62e6fb7315db0ab55dde9e76f52040",
+      "candidateDumpSHA256": "6a62c98cec1fd808e1f52880e5bc35f6ed394c3f5408156203dd3a7fecd61d1b"
+    },
+    {
+      "id": "corpus/powershell/grammar-patch-non-ascii-names-003",
+      "kind": "corpus",
+      "inputSHA256": "2acedb8c603ad7c256be136aa63bf8ecd6f0d804977e534fa04f5790eccbf13c",
+      "referenceDumpSHA256": "fee050e5b010452eda58d5010ef2540b792f2e07aebed379c545462aa194c9fa",
+      "candidateDumpSHA256": "523166fbbe96bbea62b1d33e1ebe04c636ab95af892fb66e048556fadac61601"
+    },
+    {
+      "id": "corpus/powershell/grammar-patch-non-ascii-names-004",
+      "kind": "corpus",
+      "inputSHA256": "2ffd6b305d40604c0cd1d017249adb8eedba16e9e932473b59706fba18be3330",
+      "referenceDumpSHA256": "641ace1744f820689cb51042372f23d5289de78b3344232c7b414792e7fa596c",
+      "candidateDumpSHA256": "f5f1a8952a4465c03df7e920881504166adf01d9ad3f940fba86fd088d663ded"
+    },
+    {
+      "id": "edits/powershell/grammar-patch-non-ascii-names-001-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "c9ed4d696bfb10c4c32d47cb13641b28fd443d1f14da96556993080e28164e3d",
+      "newSHA256": "3526683f32ac3a89aefc3257183c71a617abdcea1dcc2353a48a1c614d0e44ce",
+      "referenceDumpSHA256": "04dc263a73d32dffcf43916cd4a2202ef093836e0a4ffd99270d6e8bf276e2f1",
+      "candidateDumpSHA256": "9340b001f1a1bbb6c0617491f845485df1628858ccce02e1b1b36238e53bc514"
+    },
+    {
+      "id": "edits/powershell/grammar-patch-non-ascii-names-001-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "c9ed4d696bfb10c4c32d47cb13641b28fd443d1f14da96556993080e28164e3d",
+      "newSHA256": "e61010051c606780bdba4c9e872ee875eee053515e4c46159bc1e0d67d2b2c9a",
+      "referenceDumpSHA256": "0be519c3b8ccf35e7dfc696e35b964329cbf81ff9d94db554c947e6e51a093c0",
+      "candidateDumpSHA256": "ba062e756514d57b8048fc4857e79856ee5c3d91c2e4d06dd34781119e0ba0ce"
+    },
+    {
+      "id": "edits/powershell/grammar-patch-non-ascii-names-001-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "c9ed4d696bfb10c4c32d47cb13641b28fd443d1f14da96556993080e28164e3d",
+      "newSHA256": "c071a9e32589957edc3e3e945dac5fe67fd7a0bc38a1ed3db80a0e58ed3240e7",
+      "referenceDumpSHA256": "90bda867aabeb7102d56091f1919f7e59596d31c12ad33c160914a6a58f30c7e",
+      "candidateDumpSHA256": "8834f9fe8f86263f340fabe2bba353cfaf9fcaa2d874fa0a733cd895b82c9ae3"
+    },
+    {
+      "id": "edits/powershell/grammar-patch-non-ascii-names-002-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "84614d0c64c39c0652b9824e3634857dbd79bdda278ab0b3c11defe088dfb431",
+      "newSHA256": "67e6cfb567fabe4b6e1eb4e8e9d7674d558543295e35feec88c66441122ba0a9",
+      "referenceDumpSHA256": "4c67cec62a9b49c51af4cf9061e5d756b44a559ddfadfcc25f2ecb0c470d3adb",
+      "candidateDumpSHA256": "1ac8c8500e31b81301659fd6eafd8d4a1b1bf2f2931a0b5619181d1853c0e8a5"
+    },
+    {
+      "id": "edits/powershell/grammar-patch-non-ascii-names-002-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "84614d0c64c39c0652b9824e3634857dbd79bdda278ab0b3c11defe088dfb431",
+      "newSHA256": "5821ca8945b69538f600d9fdeddc4fe9717ff318b44a43ad3e515d4131a31566",
+      "referenceDumpSHA256": "22926bf14ca0ea39fae66a0523ae7d138dc4cafccda2de16f3445e9d7f82e3a0",
+      "candidateDumpSHA256": "85c5158cc3c75098ffed98e985c4a6bd4b15530a34116ab5bb0c972a7208eed8"
+    },
+    {
+      "id": "edits/powershell/grammar-patch-non-ascii-names-002-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "84614d0c64c39c0652b9824e3634857dbd79bdda278ab0b3c11defe088dfb431",
+      "newSHA256": "f265888db24d2f64e1ca609704f1ad96e95cd1516fddff1267fda085a7ead80c",
+      "referenceDumpSHA256": "a425bcf6eda6fdaa9f99b0c6ae9f6fdc0e0ae3871d0766e45b65700ac21e95fa",
+      "candidateDumpSHA256": "e294141af77e231a46357e62cca5990a0c874df8d78b3fff31b34d6350acdace"
+    },
+    {
+      "id": "edits/powershell/grammar-patch-non-ascii-names-003-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "2acedb8c603ad7c256be136aa63bf8ecd6f0d804977e534fa04f5790eccbf13c",
+      "newSHA256": "fc02b7cfb55909d77316f5fcd34e60a6fbe5f31b55d3cc529ebddbcea7736922",
+      "referenceDumpSHA256": "857ab4b9f40c504cb6cb3087e45c5107801db2e495084b7e39df213e8f95b429",
+      "candidateDumpSHA256": "65fea94726eebe1071695508256c6ee2066ebfd65bb1a978769f122ab2d4e006"
+    },
+    {
+      "id": "edits/powershell/grammar-patch-non-ascii-names-003-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "2acedb8c603ad7c256be136aa63bf8ecd6f0d804977e534fa04f5790eccbf13c",
+      "newSHA256": "976e8385f587b56ee2e6f602fb40471ca5d14c96a2d60b5be74b05a0741fb58f",
+      "referenceDumpSHA256": "aefe0b471699129e0f1b470370dea255feafe82de38b0857593195434529a4ba",
+      "candidateDumpSHA256": "ed5f1c089cdfcf2a100ec6007ae1fa2df344000174342e632e999e7ca0027dfe"
+    },
+    {
+      "id": "edits/powershell/grammar-patch-non-ascii-names-003-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "2acedb8c603ad7c256be136aa63bf8ecd6f0d804977e534fa04f5790eccbf13c",
+      "newSHA256": "9d9647cbfacf10e8f84c1b15999c65565c3f41d79d40be87e3f4378aaede10e3",
+      "referenceDumpSHA256": "6f819919639c97bc02ac8846196e204cd2e8fe0a1c87877cf9cd9125cb94bcf0",
+      "candidateDumpSHA256": "c85e19696b4c7b0112808b8f74f4b1d3f34170a32a342a27a4feca309c367ac6"
+    },
+    {
+      "id": "edits/powershell/grammar-patch-non-ascii-names-004-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "2ffd6b305d40604c0cd1d017249adb8eedba16e9e932473b59706fba18be3330",
+      "newSHA256": "7ccff7e3aa6b88a146aa23ed14169b34a227043aff190fdb8157266b04e2e829",
+      "referenceDumpSHA256": "ce4e3ac032c6bf0055afd6b169be0cf5963c0ae45e0ddc92daf92a169c8ecd88",
+      "candidateDumpSHA256": "c26597dd5001506b6b6bae07f6c53cb7c5cacbf429f35b6664a176e7b8adac5d"
+    },
+    {
+      "id": "edits/powershell/grammar-patch-non-ascii-names-004-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "2ffd6b305d40604c0cd1d017249adb8eedba16e9e932473b59706fba18be3330",
+      "newSHA256": "bc267ee8277d9cfd5c38d0097af07ebed5c5640e3e147c5adf421ae4b18b0995",
+      "referenceDumpSHA256": "615ae6e911876d51c5986b65c377e20ddf4207b9f0fbe38083cf8c8ede0f743c",
+      "candidateDumpSHA256": "f4b23b395fa5147e7fa3e13d7f997e5e525da271723ea8ac47f08eced92a000a"
+    },
+    {
+      "id": "edits/powershell/grammar-patch-non-ascii-names-004-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "2ffd6b305d40604c0cd1d017249adb8eedba16e9e932473b59706fba18be3330",
+      "newSHA256": "f3e95a00b09317b84b9a2be48c0ccfa76c90980e9420edcacc839186dd6babfb",
+      "referenceDumpSHA256": "509fd86cdb5dc7f8e1486afb131b08579be38427fec3fa40d467cdac8050ab78",
+      "candidateDumpSHA256": "3ce27c5268e9957e37d058c817a75caafe96780d3d2a7b47ded74d659896ce98"
+    }
+  ]
+}

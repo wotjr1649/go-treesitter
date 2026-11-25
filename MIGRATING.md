@@ -454,6 +454,43 @@ Retire the patch in the approved pin move to an upstream source containing a fix
 That move reviews and updates affected known-gap entries and corpus expectations. See the
 [schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-css-name-patch).
 
+### PowerShell names
+
+One temporary ADR-0023 patch carries [upstream issue #70](https://github.com/airbus-cert/tree-sitter-powershell/issues/70).
+Node types and fields are unchanged (`node-types.json` is byte-identical to the archived upstream file).
+
+- **Non-ASCII names.** The name patterns of variables (including scope prefixes such as `$env:값` and splatted
+  `@옵션`), command parameters (`-이름`, `-이름=값`), `simple_name` (hash keys, member names, class and enum
+  names) and `type_identifier` now accept Unicode letters (`\p{L}`), decimal digits (`\p{Nd}`) and `_`, so
+  `$값 = 1`, `Get-Item -이름 1`, `@{ 키 = 1 }`, `$a.속성` and `[한글]$a` parse without an `ERROR`. Except for the
+  scoped form in the last-but-one item, these inputs gave error trees before. A name still ends at any other character, for example `⑩` or a combining
+  mark, which is an `ERROR` as before.
+- **Hangul statement labels are not supported.** The `label` rule stays ASCII-only. A label such as `:루프` at the
+  start of a statement is still read as a command name (no `ERROR`, the same tree as before), although PowerShell
+  7.6.10 reads it as a label (one-off check, E2). ASCII labels such as `:loop` are unchanged.
+- **Variables in expandable strings change without an error.** In an expandable string or here-string a variable
+  name now continues over non-ASCII letters and digits, as PowerShell 7.6.10 reads it (E2). Two forms change, both
+  from one clean tree to another:
+  - A `$name` directly followed by a non-ASCII letter or digit used to be the variable `$name` plus text. It is now
+    one `variable` covering the whole name: `"$name님 환영합니다"` refers to the variable `$name님`, and
+    `"$env:값"` to `$env:값`.
+  - A `$` directly followed by a non-ASCII letter or digit used to be text with no `variable` node. It is now a
+    `variable`: `"$한글"`, `"가격: $원"` and the `$한` line of a here-string.
+
+  Queries and code that match `variable` nodes, their ranges, or the text around them see the new nodes and ranges.
+  Write `"${name}님"` or `"$($name)님"` to separate the name from the text. The pinned upstream corpus and its seeded
+  edits parse as before (E4, Windows amd64).
+- **Scoped variables as command arguments change without an error.** A variable with a scope or drive prefix whose
+  name starts with a non-ASCII letter or digit, written as a command argument, used to be the variable `$env`, a
+  `:` token and a word: `echo $env:한글` and `echo $a:한` parsed without an `ERROR`. They are now one `variable`
+  covering `$env:한글` and `$a:한`, as PowerShell 7.6.10 reads them (E2). With an ASCII name after the colon nothing
+  changes.
+- **Supplementary-plane letters.** The grammar accepts letters outside the BMP (for example U+20000) as the
+  language specification says, but PowerShell 7.6.10 reads names by UTF-16 code unit and rejects them (one-off
+  check, E2).
+
+The pinned upstream PowerShell queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-powershell-name-patch)).
+
 ### Ruby symbol names
 
 A temporary ADR-0023 scanner patch carries [upstream issue #292](https://github.com/tree-sitter/tree-sitter-ruby/issues/292)
@@ -472,6 +509,6 @@ A temporary ADR-0023 scanner patch carries [upstream issue #292](https://github.
   on that input only, against the patched native reference.
 - **Short interpolation is unchanged.** In a string, `#@일` and `#@@한글` stay `string_content` text, and `"#ŀ일"` (U+0140,
   low byte `@`) stays a plain string. The character right after `#` is still read by its low byte, so `"#Ĥ!"` can still be
-  taken for a short interpolation (see [limitations](docs/reports/limitations.md), rows 27 and 32).
+  taken for a short interpolation (see [limitations](docs/reports/limitations.md), rows 27 and 33).
 
 The pinned upstream Ruby queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#unreleased-after-v060-ruby-symbol-patch)).

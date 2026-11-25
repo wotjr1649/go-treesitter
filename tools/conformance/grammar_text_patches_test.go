@@ -34,6 +34,7 @@ func TestScannerPatchesGrammarText(t *testing.T) {
 		"html":       {"text", "entity", "attribute_value"},
 		"css":        {"class_selector", "class_name", "identifier", "escape_sequence"},
 		"xml":        {"element", "Attribute", "EntityRef"},
+		"powershell": {"variable", "command_parameter", "simple_name", "member_name", "type_identifier", "label"},
 	}
 	for _, lang := range langs(t) {
 		if len(kinds[lang]) == 0 {

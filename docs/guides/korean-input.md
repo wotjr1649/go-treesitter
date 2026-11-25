@@ -127,11 +127,9 @@ produce `ERROR` nodes even though the language allows it. The table says what wa
 - **yes**: every retained input of that kind parses with no `ERROR` or `MISSING` node. For each Hangul run, and each
   other non-ASCII run such as an emoji, the deepest covering named node has the kind the manifest records; when that
   node is wider than the run, its extent is recorded too. This describes the recorded tree of each input, not whether
-  the tree matches the language's own parser. Two recorded trees are known to differ from it: in
-  `powershell/str-here-string`, `$값` inside the expandable here-string is not a separate variable node (PowerShell's
-  parser reads a `VariableExpressionAst`), and in `ruby/str-heredoc-hangul-delimiter-eof-no-newline` the closing `끝`
-  at end of file without a newline is part of `heredoc_content` (Ruby ends the heredoc there). The same EOF boundary
-  occurs with an ASCII end word.
+  the tree matches the language's own parser. One recorded tree is known to differ from it: in
+  `ruby/str-heredoc-hangul-delimiter-eof-no-newline` the closing `끝` at end of file without a newline is part of
+  `heredoc_content` (Ruby ends the heredoc there). The same EOF boundary occurs with an ASCII end word.
 - **no** / **partly**: a defect in the pinned grammar, reproduced by the engine and by native C. The linked page has the exact
   input and the observed wrong tree. A tree is still returned; check `HasError()`.
 - **not recorded**: there is no retained input for it, so nothing is claimed either way.
@@ -152,7 +150,7 @@ produce `ERROR` nodes even though the language allows it. The table says what wa
 | `kotlin` | yes | yes | yes |
 | `php` | yes | yes | yes |
 | `postgres` | yes (unquoted and quoted; see note 2) | yes (string literals and `$태그$` dollar-quote tags and bodies; see note 2) | yes |
-| `powershell` | no: fails on variable, parameter, hash key, member name, type name ([PowerShell](../known-gaps/powershell.md)) | yes | yes |
+| `powershell` | partly: variable, parameter, hash key, member name and type name parse (development tree after v0.6.0; v0.6.0 fails on them); fails on statement labels: `:한글` is read as a command name, not a label (no `ERROR`; see [limitations](../reports/limitations.md), row 32) | yes | yes |
 | `python` | yes | yes | yes |
 | `r` | yes | yes | yes |
 | `ruby` | partly: local, instance, global and plain symbol names parse (global names in v0.6.0; plain symbols such as `:한글` and `:일` in the development tree after v0.6.0, where v0.6.0 fails on them); fails on variable symbols such as `:@한글`, and `#@일` in a string is not interpolated ([limitations](../reports/limitations.md), rows 27 and 31) | yes | yes |
