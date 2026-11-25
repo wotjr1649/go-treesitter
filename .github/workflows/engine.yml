@@ -25,8 +25,8 @@ defaults:
 jobs:
   engine-linux-amd64:
     needs: grammar-linux-amd64
-    # Report a failed or missing shard even when its result is canceled.
-    if: &check_grammar_result ${{ !cancelled() || join(needs.*.result) != 'success' }}
+    # Always start: the first step fails the job unless every grammar shard succeeded (a skipped job would satisfy the required check).
+    if: &check_grammar_result ${{ always() }}
     name: engine (ubuntu-24.04)
     runs-on: ubuntu-24.04
     timeout-minutes: 45
@@ -208,10 +208,17 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
       - name: Native architecture
         run: test "$(go env GOOS)" = "$EXPECTED_GOOS" && test "$(go env GOARCH)" = "$EXPECTED_GOARCH"
+      # The shard lists below must name every grammars/* directory exactly once.
+      - name: Shard lists equal grammars/*
+        run: |
+          listed="$(grep -oE 'shard: [0-9]+, grammars: "[^"]*"' .github/workflows/engine.yml | sed -E 's/.*grammars: "([^"]*)"/\1/' | tr ' ' '\n' | sort)"
+          present="$(for d in grammars/*/; do basename "$d"; done | sort)"
+          [ -n "$listed" ] && [ "$listed" = "$present" ] || { echo "::error::engine.yml shard lists differ from grammars/*"; diff <(echo "$listed") <(echo "$present"); exit 1; }
       - name: Grammar module embedded sample tests
         env:
           GRAMMARS: ${{ matrix.grammars }}
         run: |
+          [ -n "$GRAMMARS" ] || { echo "::error::empty grammar shard"; exit 1; }
           unset TSG_CORPUS
           read -r -a grammars <<< "$GRAMMARS"
           result=0
