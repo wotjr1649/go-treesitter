@@ -20,6 +20,8 @@ the ones your task touches.
 - Evidence words ("parity", "verified", "C agreement") need the level `docs/specs/validation.md` assigns. Bind results
   to their identity (commit, pins, inputs, platform); keep failures, never retry until green. Re-running a CI job that
   never ran (no runner) is allowed; note it in the PR.
+- A push to a PR may cancel only superseded automatic `pull_request` runs of the same workflow for that PR.
+  Preserve main push, scheduled, dispatched, pin-move evidence and release runs.
 - `.scratch/` is scratch. Before deleting there, copy unique evidence to `artifacts/handoff/` with hashes.
 - `tools/*` and `grammars/*` are separate Go modules: test them from their own directories.
 - This repository is public and every pushed commit stays public. Use one branch per task. Before each push, check
