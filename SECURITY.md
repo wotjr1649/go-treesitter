@@ -6,7 +6,8 @@ This policy takes effect at 1.0. Until then the project is a Preview: only the l
 
 From 1.0, security and defect fixes go to:
 
-- **Root module:** the latest 1.x minor and the previous minor.
+- **Root module:** the latest 1.x minor and the preceding 1.x minor, if any (a 0.x Preview
+  version is never supported this way).
 - **Grammar modules:** the latest tag of each grammar module only. Grammar modules are versioned independently of the
   root ([ADR-0028](docs/design/decisions/ADR-0028-root-stability-and-independent-grammar-versioning.md)).
 - **Go:** the two Go releases the Go team supports; the `go.mod` floor follows ADR-0028 decision 5.
