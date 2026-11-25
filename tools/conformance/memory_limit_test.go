@@ -39,15 +39,19 @@ func TestMemoryLimitRealEngine(t *testing.T) {
 
 	t.Run("refused grow", func(t *testing.T) {
 		p := newP(t, treesitter.WithMaxMemoryBytes(minLimit))
+		assertRefusedGrow := func(label string) {
+			t.Helper()
+			tr, err := p.Parse(bg, big, nil)
+			var pe *treesitter.ParseError
+			if tr != nil || !errors.As(err, &pe) || !errors.Is(err, treesitter.ErrResourceLimit) || pe.Outcome != treesitter.ResourceLimit || !pe.InstanceReset {
+				t.Fatalf("%s: tree = %p, err = %#v, want nil tree and ResourceLimit with InstanceReset", label, tr, err)
+			}
+		}
 		before, err := p.Parse(bg, small, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
-		_, err = p.Parse(bg, big, nil)
-		var pe *treesitter.ParseError
-		if !errors.As(err, &pe) || !errors.Is(err, treesitter.ErrResourceLimit) || pe.Outcome != treesitter.ResourceLimit || !pe.InstanceReset {
-			t.Fatalf("large parse at the minimum limit: err = %v, want ResourceLimit with InstanceReset", err)
-		}
+		assertRefusedGrow("first large parse")
 		if _, err := before.Snapshot(bg); !errors.Is(err, treesitter.ErrTreeInvalidated) {
 			t.Fatalf("tree from before the reset: err = %v, want ErrTreeInvalidated", err)
 		}
@@ -58,9 +62,7 @@ func TestMemoryLimitRealEngine(t *testing.T) {
 		if tr.Outcome() != treesitter.AcceptedClean {
 			t.Fatalf("parse after the reset: outcome %v", tr.Outcome())
 		}
-		if _, err := p.Parse(bg, big, nil); !errors.Is(err, treesitter.ErrResourceLimit) { // and fails the same way again
-			t.Fatalf("second large parse: err = %v, want ErrResourceLimit", err)
-		}
+		assertRefusedGrow("second large parse")
 	})
 
 	t.Run("enough memory", func(t *testing.T) {
