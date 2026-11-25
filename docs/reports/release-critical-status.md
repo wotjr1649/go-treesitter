@@ -13,7 +13,7 @@ The previous board for the `gotreesitter` carrier is in Git history at main `9ad
   [#120](https://github.com/wotjr1649/go-treesitter/pull/120)) and `powershell` (one patch,
   [#122](https://github.com/wotjr1649/go-treesitter/pull/122)). The other 20 modules keep their `v0.6.0` tags. Since
   v0.6.0 the root changed only in tests, the engine CI workflow, the license manifest and documentation; it has no API,
-  engine or behavior change. The release also documents the consumer-compatibility job
+  engine or behavior change. The candidate bench has one failing job, accepted as an explicit Preview exception (see the gate notes). The release also documents the consumer-compatibility job
   ([#117](https://github.com/wotjr1649/go-treesitter/pull/117)), the API contract decisions
   ([#119](https://github.com/wotjr1649/go-treesitter/pull/119)) and the per-tag support table
   ([#121](https://github.com/wotjr1649/go-treesitter/pull/121)). The [README](../../README.md#use) lists
@@ -30,20 +30,21 @@ main after PRs #117 to #123 merged. The release-preparation commit differs from 
 The grammar release-form commit (publication step 4) will additionally change only the selected modules' `go.mod` and
 `go.sum`. Every hosted run below reports the candidate as its head SHA. The pins SHA-256 is
 `538a27f991d48a81d7958b23f8d148ba492e1df75110fcf39586720b6fb406a8`. The candidate uses tree-sitter runtime and CLI
-0.27.2, pins schema 3, recipe `v2-O3` and engine ABI 4. Product results use `CGO_ENABLED=0`. Outcomes marked pending
-were not finished when this table was written; the release-form commit records them.
+0.27.2, pins schema 3, recipe `v2-O3` and engine ABI 4. Product results use `CGO_ENABLED=0`. All nine hosted runs finished on their
+first attempt; none was re-run. Eight passed and the bench failed (see the exception below). Rows still marked `NOT_RUN`
+have not been executed.
 
 | Gate | v0.7.0 candidate result | Scope |
 |---|---|---|
 | Windows product lane | PASS, E3 product (push run): 2 native product jobs, 1 licence job and 1 diagnostic CGO race job, 4/4 | Native Windows amd64/arm64 product execution (CGO 0) and licence checks. The race job contributes diagnostic evidence only. [45540776291](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776291) |
 | Grammar pin move evidence | PASS, 1/1 push job, diff skipped | The push supplies no explicit comparison refs. Swift `fef1236` has its own old/new pin evidence on PR [#112](https://github.com/wotjr1649/go-treesitter/pull/112) (run [45351697893](https://github.com/wotjr1649/go-treesitter/actions/runs/45351697893)). [45540776201](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776201) |
-| Reproducible generation | Pending (push run in progress) | All 25 Linux amd64 grammar shards must match the committed bytes, including the five regenerated patched or moved modules. [45540776220](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776220) |
-| Conformance | Pending (push run queued) | 25 grammar shards and one aggregate per Linux architecture: native dumps, seeded edits and ranges, raw query matches, strict fresh/edited fields, symbol lookups and retained known gaps. [45540776333](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776333) |
-| Engine CI | Pending (push run queued) | Native Linux amd64/arm64, macOS arm64 and Windows amd64/arm64 on Go 1.27.x, plus native Linux amd64 on supported Go 1.26.x, and the consumer-compatibility job. [45540776204](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776204) |
-| Speed / memory bench | Pending (dispatched run queued) | Paired product/native speed and memory on hashed large inputs and the pinned small corpora, all 25 grammars, Linux amd64/arm64 and macOS arm64. [45540883659](https://github.com/wotjr1649/go-treesitter/actions/runs/45540883659) |
-| Balancing cancellation | Pending (dispatched run queued) | Linux amd64 probe builds for every registered grammar. [45540887195](https://github.com/wotjr1649/go-treesitter/actions/runs/45540887195) |
-| Nightly diff | Pending (dispatched run queued) | All 25 grammars on Linux amd64/arm64, seed `20261125`. [45540891798](https://github.com/wotjr1649/go-treesitter/actions/runs/45540891798) |
-| Upstream watch | Pending (dispatched run queued) | Source-age and nvim-treesitter comparison for every pin. [45540895804](https://github.com/wotjr1649/go-treesitter/actions/runs/45540895804) |
+| Reproducible generation | PASS, E3, attempt 1, 26/26 jobs | All 25 Linux amd64 grammar shards matched the committed bytes, including the five regenerated patched or moved modules (`swift`, `xml`, `css`, `ruby`, `powershell`). The aggregate passed. [45540776220](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776220) |
+| Conformance | PASS, E5, 52/52 jobs | 25 grammar shards and one aggregate per Linux architecture (amd64 and arm64). Pinned corpora and bounded kit inputs cover native dumps, seeded edits and ranges, raw query matches, strict fresh/edited fields, symbol lookups and retained known gaps. [45540776333](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776333) |
+| Engine CI | PASS, E3, 157/157 jobs | 150 grammar jobs, six engine jobs (native Linux amd64/arm64, macOS arm64 and Windows amd64/arm64 on Go 1.27.x, plus native Linux amd64 on the oldest supported Go 1.26.x) and `engine-consumer-compat`, a required check on main. That job runs published grammar tags against a synthetic candidate root version, so it is not the exact-version ZIP rehearsal. [45540776204](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776204) |
+| Speed / memory bench | **FAIL**, E4, 74/75 grammar/platform jobs; one explicit Preview exception (see below) | Paired product/native speed and memory on hashed large inputs and the pinned small corpora, all 25 grammars, Linux amd64/arm64 and macOS arm64. The macOS arm64 `kotlin` job failed the small-file criterion on one of its 1,462 files; every other job passed all criteria. The highest large-input geomean among all 75 jobs was 2.239x native (HTML, Linux amd64); TSX job geomeans were 1.644x / 1.831x / 2.105x on Linux amd64 / Linux arm64 / macOS arm64. Of 8,184 eligible small files per platform, all passed on Linux amd64 and arm64 and 8,183 on macOS arm64. macOS uses the ADR-0022 private-byte adjustment and reports engine-region counts as `NOT_RUN`. The Windows amd64 local bench below is separate. [45540883659](https://github.com/wotjr1649/go-treesitter/actions/runs/45540883659) |
+| Balancing cancellation | PASS, E5 probe builds, 25/25 jobs | Linux amd64. Across the pinned big and follow-up inputs, 6,175 stops landed in balancing and all 8,618 next parses matched the native reference. The JSON no-reset control disagreed in all three comparisons. [45540887195](https://github.com/wotjr1649/go-treesitter/actions/runs/45540887195) |
+| Nightly diff | PASS, E5 for sampled cases, 50/50 jobs | All 25 grammars on Linux amd64/arm64. Seed `20261125`, four minutes per grammar and 30 seconds per Go fuzz target. [45540891798](https://github.com/wotjr1649/go-treesitter/actions/runs/45540891798) |
+| Upstream watch | PASS, E1, 2/2 jobs | 0 unaccepted warnings. `swift` is at `fef1236`, the same revision as nvim-treesitter, and has no exception. CSS, Go (`golang`), HTML and Python source-age tier-review notices and the Java, JavaScript, TSX and TypeScript different-repository notices are covered by existing acceptances; no stale acceptance was listed. [45540895804](https://github.com/wotjr1649/go-treesitter/actions/runs/45540895804) |
 | Windows amd64 local bench of the five new tags | PASS, E4, maintainer-local, 5/5 grammars | Candidate `7e24331`, Windows amd64, Go 1.27.4, `CGO_ENABLED=0`, `swift`, `xml`, `css`, `ruby` and `powershell`, with the hosted bench's workflow steps and its declared repetitions (5 rounds x 5 reps for large inputs, 3 x 7 for small files, 3 fresh processes per memory condition). Every measured criterion passed, with no failure or re-check: large-input geomean 1.388 over the 7 registered large files (per-file median 1.376; limit 2.5), small-file medians at most 0.018 ms (Swift 313, XML 16, CSS 40, Ruby 291 and PowerShell 165 files, all passing on the first pass), peaks within their limits, private-byte growth at most 5.6 MiB (limit 16) and every engine region returned. The smallest peak margin is Ruby's snapshot: 183.3 MiB against the 193.5 MiB limit. The evidence covers these inputs and this host only and is not E5 or a release gate. The other 20 grammars on Windows and Windows arm64 are NOT_RUN; the hosted bench has no Windows lane. |
 | Root ZIP rehearsal (step 1) | NOT_RUN | Before the root tag: the exact root version from a file `GOPROXY` with the carried-forward `v0.6.0` grammar tags (empty module and cache, no `replace`, `CGO_ENABLED=0`, a parse smoke test per grammar, `linux/arm64` cross-build). No owner approval needed; the tag push does need it. |
 | New-grammar ZIP rehearsal (steps 1 and 4) | NOT_RUN | After the step-4 release-form commit and before the step-5 grammar tags: each new tag alone at root `v0.6.0`, and mixed with the carried-forward tags at root `v0.7.0`, from a file `GOPROXY`. |
@@ -51,13 +52,40 @@ were not finished when this table was written; the release-form commit records t
 | Tag/proxy resolution (steps 3 and 6) | NOT_RUN | After the tags exist: `GOPROXY=direct` and the public proxy, read-only. |
 | Draft assets, publication and published mirror assets (steps 7 to 10) | NOT_RUN | Asset digests, `gh release verify` and anonymous source-archive downloads follow the draft release and publication. |
 
+- **Conformance.** Each Linux platform recorded 8,463 fresh corpus inputs, 24,729 seeded edit/range comparisons,
+  115,956 query/input pairs (stride 1), 76,414 fresh-field rows and 179,899 edited-field native result rows, with
+  zero differences against the native reference. Incremental trees differ from fresh in 30 cases per platform, none of
+  them a difference from native. Totals are sums of the per-grammar `SUMMARY` lines in the 25 shard logs of each architecture.
+  [Conformance run](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776333)
+- **Nightly inputs.** The 50 job summaries record seed `20261125`, the per-shard input-set hashes and kit manifest SHA-256
+  `2e694d893c5cfd74cbb46f2c9b1837bccd75c8da101cac7f2da9491e82afed8c`. They report 683,167 cases on Linux amd64 and
+  579,372 on Linux arm64 with zero mismatches. [Nightly run](https://github.com/wotjr1649/go-treesitter/actions/runs/45540891798)
+- **Bench: FAIL, recorded as one explicit Preview resource-budget exception.** The failing file is
+  `jetbrains_contracts_good_returnsImplies_conditionLogic-001.in` (2,392 bytes) in the macOS arm64 `kotlin` job. The
+  criterion for a small file is a product median of at most 1 ms or at most 2.5x native. On the first pass the product
+  took 1.547 ms against 0.615 ms native (ratio 2.52). The one paired confirmation pass took 1.631 ms against 0.622 ms
+  (ratio 2.62). Both passes failed, so the file fails. The same job's large-input geomean is 1.631x (per-file medians 1.608x;
+  limit 2.5x) and its memory rows all passed. Two other `kotlin` files failed their first pass and passed their
+  confirmation pass (`jetbrains_annotation_functionalTypes_withParentheses_withParameter-001.in`,
+  `jetbrains_typeParams-001.in`). The v0.6.0 candidate run
+  [45318803258](https://github.com/wotjr1649/go-treesitter/actions/runs/45318803258) passed the same file with product round
+  medians of 0.91 to 1.00 ms. What is known about the difference: the `kotlin` grammar, `internal/engine` and the root's
+  non-test code are unchanged since that candidate; the `bench` product binary hash differs (`3efe48a184b4` to
+  `56eb6375b53b`) because `tools/bench/go.mod` now requires root v0.6.0 instead of v0.5.0; the native binary
+  `b793c26cc847` is identical; and in the same job one native round median for
+  `jetbrains_annotation_functionalTypes_withParentheses_withParameter-001.in` was 2.22 ms where the v0.6.0 run measured about
+  0.55 ms. These facts do not establish the cause, and this board does not name one. Under
+  [validation.md](../specs/validation.md#gates) a benchmark is never repeated until it passes, so the run was not repeated and
+  the FAIL stands. On 2026-11-25 the owner decided to publish this FAIL as one explicit Preview resource-budget exception and
+  continue. The exception covers only this file in the macOS arm64 `kotlin` job; it does not widen the criterion and is not
+  evidence that the bench passed. It is also listed in [limitations](limitations.md), row 34.
 - **Changed source archive.** Only the Swift archive differs from the v0.6.0 release inventory:
   `tree-sitter-swift-fef12360.tar.gz` replaces `tree-sitter-swift-a1d4a7b8.tar.gz`. The XML, CSS, Ruby and PowerShell
   patches change generated files, not source archives. The immutable v0.6.0 release cannot receive the new archive.
 - **Patch evidence.** Each patched module records its own old/new comparison and native agreement in the
   [schema register](../validation/grammar-schemas.md#v070-xml-name-patches) and in [limitations](limitations.md), rows 30
   to 33. Those results are local Windows amd64 E4/E5 on the recorded inputs; they are not candidate-commit evidence.
-- **Source watch.** The `swift` pin moved to `fef1236`, the nvim-treesitter revision named by the v0.6.0 watch. The
+- **Source watch.** The watch run reports 0 unaccepted warnings. The `swift` pin moved to `fef1236`, the nvim-treesitter revision named by the v0.6.0 watch. The
   v0.6.0 board keeps its historical note: the owner accepted the Swift `we are behind` warning until 2027-02-24
   ([#109](https://github.com/wotjr1649/go-treesitter/issues/109), now closed). PR #112 removed that acceptance from
   `accepted-warnings.json` when it moved the pin, so the v0.7.0 candidate has no Swift exception. The candidate watch run
