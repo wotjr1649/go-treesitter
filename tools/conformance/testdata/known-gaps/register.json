@@ -135,7 +135,7 @@
           "URL": "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/expressions#1283-interpolated-string-expressions"
         }
       ],
-      "Upstream": ""
+      "Upstream": "https://github.com/tree-sitter/tree-sitter-c-sharp/issues/497"
     },
     {
       "ID": "csharp-conditional-splits-statement",
