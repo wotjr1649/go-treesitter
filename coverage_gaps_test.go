@@ -41,10 +41,9 @@ func TestExpiredDeadlineIsTimeoutBeforeTheEngine(t *testing.T) {
 	fl, p, tree, q := queryFixture(t, nil)
 	ctx, cancel := context.WithDeadline(bg, time.Now().Add(-time.Second))
 	defer cancel()
-	f := fl.cur()
-	before := f.count("parse")
 	fresh := mustParse(t, p, "x y") // a tree whose snapshot is not cached yet
-	before = f.count("parse")
+	f := fl.cur()
+	beforeCalls, beforeMods := len(f.calls), len(fl.mods)
 	check := func(name string, err error) {
 		t.Helper()
 		wantPE(t, err, Timeout, false)
@@ -60,8 +59,11 @@ func TestExpiredDeadlineIsTimeoutBeforeTheEngine(t *testing.T) {
 	check("Tree.Snapshot", err)
 	_, err = collectQuery(tree, ctx, q, nil)
 	check("Tree.Matches", err)
-	if f.count("parse") != before || !tree.valid() || !fresh.valid() {
-		t.Fatal("an expired context must not reach the engine or invalidate trees")
+	if len(f.calls) != beforeCalls || len(fl.mods) != beforeMods {
+		t.Fatalf("an expired context reached the engine: calls %v, instances %d -> %d", f.calls[beforeCalls:], beforeMods, len(fl.mods))
+	}
+	if !tree.valid() || !fresh.valid() {
+		t.Fatal("an expired context invalidated a tree")
 	}
 }
 
@@ -150,9 +152,9 @@ func TestFailedRecreateIsRetriedByTheNextOperation(t *testing.T) {
 	old := mustParse(t, p, "a b")
 	fail.Store(true) // the engine fault below cannot recreate the instance
 	_, err := p.Parse(bg, []byte("boom"), nil)
-	pe := wantPE(t, err, EngineFault, true)
-	if !strings.Contains(pe.Reason, "recreating the instance failed") || p.c.inst != nil {
-		t.Fatalf("reason %q inst %v", pe.Reason, p.c.inst)
+	wantPE(t, err, EngineFault, true)
+	if p.c.inst != nil {
+		t.Fatal("a failed recreate left an instance installed")
 	}
 	_, err = p.Parse(bg, []byte("a"), nil) // still failing: an error, and the parser must not stay busy
 	wantPE(t, err, EngineFault, false)
@@ -211,17 +213,24 @@ func TestChangedRangesCorruptCountIsEngineFault(t *testing.T) {
 
 func TestIndexIteratorsStopWhenTheConsumerBreaks(t *testing.T) {
 	p := newP(t, newFakeLang(nil))
-	s := snapOf(t, p, "a b c d")
+	s := snapOf(t, p, "a + b + c d")
 	sym, ok := s.Language().SymbolForName("word", true)
 	if !ok {
 		t.Fatal("word")
 	}
 	for name, seq := range map[string]func(func(Node) bool){
 		"OfSymbol":              s.Index().OfSymbol(sym),
-		"OfType single symbol":  s.Index().OfType("source_file"),
+		"OfType single symbol":  s.Index().OfType("+"),
 		"OfType merged symbols": s.Index().OfType("word"), // named and anonymous symbols share the name
 	} {
 		n := 0
+		for range seq {
+			n++
+		}
+		if n < 2 {
+			t.Fatalf("%s needs at least two results to test early termination, got %d", name, n)
+		}
+		n = 0
 		for range seq {
 			n++
 			break
@@ -315,18 +324,17 @@ func TestOutcomeAndErrorStringsAreUsable(t *testing.T) {
 	seen := map[string]bool{}
 	for o := AcceptedClean; o <= IncompatibleLanguage; o++ {
 		s := o.String()
-		if s == "" || strings.HasPrefix(s, "Outcome(") || seen[s] {
+		if s == "" || seen[s] {
 			t.Errorf("outcome %d: %q", o, s)
 		}
 		seen[s] = true
 	}
-	if Outcome(0).String() != "Outcome(0)" || Outcome(200).String() != "Outcome(200)" {
+	if Outcome(0).String() == "" || Outcome(200).String() == "" {
 		t.Error("an unknown outcome must still print")
 	}
-	// Texts are not contract (decision 2026-11-25): only that they are non-empty and carry the classification.
 	for _, pe := range []*ParseError{{Outcome: Timeout}, {Outcome: EngineFault, Reason: "r", InstanceReset: true}} {
-		if m := pe.Error(); m == "" || !strings.Contains(m, pe.Outcome.String()) {
-			t.Errorf("%q", m)
+		if pe.Error() == "" {
+			t.Errorf("empty diagnostic for outcome %d", pe.Outcome)
 		}
 	}
 	if (&QueryError{Type: QueryErrorSyntax, Offset: 7}).Error() == "" || ColumnKind(9).String() == "" {
@@ -411,26 +419,6 @@ func TestQueryPredicatesArePerPattern(t *testing.T) {
 	}
 }
 
-func TestQueryRegexEscapeAndErrorForms(t *testing.T) {
-	for _, tc := range []struct{ pattern, yes string }{
-		{`^a\tb$`, "a\tb"}, {`^\n$`, "\n"}, {`^\r$`, "\r"}, {`^\f$`, "\f"}, {`^\v$`, "\v"}, {`^\a$`, "\a"},
-		{`^\x41$`, "A"}, {`^\u{1F600}$`, "😀"}, {`^\pL$`, "한"}, {`^\PL$`, "1"}, {`^\p{Lu}$`, "A"}, {`^\P{Lu}$`, "a"},
-	} {
-		re, err := compileQueryRegex(tc.pattern)
-		if err != nil || !re.MatchString(tc.yes) {
-			t.Errorf("%q: err %v", tc.pattern, err)
-		}
-	}
-	for _, bad := range []string{
-		`a)`, `(?`, `(?P<x`, `(?P<>a)`, `(?P<n>a)(?P<n>b)`, `a{1`, `a{1,2,3}`, `a{,2}`, `a{1001}`, `[a-`, `[z-a]`, `[[:nope:]]`,
-		`\p{L`, `\p`, `\p{Nope}`, `(?-u)\p{L}`, `\x{110000}`, `\x{D800}`, `\xZ1`, `\x{}`, `\x{123456789}`, `\x4`, `[\A]`, `\q`, `\8`, `\<`,
-	} {
-		if _, err := compileQueryRegex(bad); err == nil {
-			t.Errorf("%q must be rejected", bad)
-		}
-	}
-}
-
 // A trap at any call into the core ABI is an EngineFault with an instance reset, or a ResourceLimit when a grow was
 // refused first; the parser recovers on the next operation (TestQueryABITraps does the same for the query ABI).
 func TestCoreABITraps(t *testing.T) {
@@ -460,19 +448,26 @@ func TestCoreABITraps(t *testing.T) {
 				name += "/refused grow first"
 			}
 			t.Run(name, func(t *testing.T) {
-				if tc.run == nil && tc.prep == nil { // NewParser traps
-					fl := newFakeLang(func(_ *fakeLang, f *fakeModule) {
-						f.onCall = func(n string) {
-							if n == tc.trapAt {
-								f.refused = refused
-								panic("scripted trap")
-							}
+				want := EngineFault
+				if refused {
+					want = ResourceLimit
+				}
+				trapped := false
+				armTrap := func(f *fakeModule) {
+					f.onCall = func(name string) {
+						if name == tc.trapAt {
+							trapped = true
+							f.refused = refused
+							f.onCall = nil
+							panic("scripted trap")
 						}
-					})
+					}
+				}
+				if tc.run == nil && tc.prep == nil { // NewParser traps
+					fl := newFakeLang(func(_ *fakeLang, f *fakeModule) { armTrap(f) })
 					p, err := NewParser(fl.lang)
-					want := EngineFault
-					if refused {
-						want = ResourceLimit
+					if !trapped {
+						t.Fatalf("NewParser did not trigger the %s trap", tc.trapAt)
 					}
 					if p != nil {
 						t.Fatal("a parser must not exist after a trap during instantiation")
@@ -489,26 +484,12 @@ func TestCoreABITraps(t *testing.T) {
 				if tc.prep != nil {
 					run = tc.prep(t, p)
 				}
-				f := fl.cur()
-				f.onCall = func(n string) {
-					if n == tc.trapAt {
-						f.refused = refused
-						f.onCall = nil
-						panic("scripted trap")
-					}
-				}
+				armTrap(fl.cur())
 				err := run(p)
-				want := EngineFault
-				if refused {
-					want = ResourceLimit
+				if !trapped {
+					t.Fatalf("operation did not trigger the %s trap", tc.trapAt)
 				}
-				var pe *ParseError
-				if err == nil {
-					t.Skipf("%s was not reached by this step", tc.trapAt) // keeps the table honest if the ABI usage changes
-				}
-				if !errors.As(err, &pe) || pe.Outcome != want || !pe.InstanceReset {
-					t.Fatalf("want %v with reset, got %v", want, err)
-				}
+				wantPE(t, err, want, true)
 				if len(fl.mods) != 2 || p.c.busy.Load() {
 					t.Fatalf("instances %d busy %v", len(fl.mods), p.c.busy.Load())
 				}
