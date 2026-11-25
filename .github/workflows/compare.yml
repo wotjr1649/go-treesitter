@@ -63,9 +63,9 @@ jobs:
     defaults:
       run:
         shell: bash
-    env:
-      T: ${{ runner.temp }}/cmp
     steps:
+      - name: Set the comparison directory path
+        run: echo "T=$RUNNER_TEMP/cmp" >> "$GITHUB_ENV"
       - name: Refuse any ref but main
         run: '[ "$GITHUB_REF" = refs/heads/main ]'
       - name: Fetch the commit (no token, no action)
@@ -105,9 +105,9 @@ jobs:
     defaults:
       run:
         shell: bash
-    env:
-      T: ${{ runner.temp }}/cmp
     steps:
+      - name: Set the comparison directory path
+        run: echo "T=$RUNNER_TEMP/cmp" >> "$GITHUB_ENV"
       - name: Refuse any ref but main
         run: '[ "$GITHUB_REF" = refs/heads/main ]'
       - name: Fetch the commit (no token, no action)
@@ -156,9 +156,9 @@ jobs:
     defaults:
       run:
         shell: bash
-    env:
-      T: ${{ runner.temp }}/cmp
     steps:
+      - name: Set the comparison directory path
+        run: echo "T=$RUNNER_TEMP/cmp" >> "$GITHUB_ENV"
       - name: Refuse any ref but main
         run: '[ "$GITHUB_REF" = refs/heads/main ]'
       - name: Fetch the commit (no token, no action)
@@ -208,9 +208,9 @@ jobs:
     defaults:
       run:
         shell: bash
-    env:
-      T: ${{ runner.temp }}/cmp
     steps:
+      - name: Set the comparison directory path
+        run: echo "T=$RUNNER_TEMP/cmp" >> "$GITHUB_ENV"
       - name: Refuse any ref but main
         run: '[ "$GITHUB_REF" = refs/heads/main ]'
       # The downloader names the saved file after the blob's Content-Disposition, which a candidate holding this run's
