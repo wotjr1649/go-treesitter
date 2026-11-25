@@ -13,6 +13,9 @@ import (
 	"testing"
 )
 
+// TestAPIInventory checks that the set of exported identifiers (types, functions, constants, variables, exported
+// fields and methods) equals the identifiers in the api-stability.md tables. It does not compare signatures, constant
+// values or the STABLE/EXPERIMENTAL classes of the rows.
 func TestAPIInventory(t *testing.T) {
 	const inventoryPath = "docs/design/api-stability.md"
 	const root = "github.com/wotjr1649/go-treesitter"

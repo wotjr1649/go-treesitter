@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
+      # The latest released root tag; set it to each new root tag in the post-release PR (docs/specs/publication.md, step 11).
+      API_BASELINE_TAG: v0.7.0
       CGO_ENABLED: "0"
       GOENV: "off"
       GOWORK: "off"
@@ -31,12 +33,12 @@ jobs:
         with:
           go-version-file: go.mod
           cache-dependency-path: tools/apiguard/go.sum
-      - name: Root API compatibility against v0.7.0
+      - name: Root API compatibility against the baseline tag
         run: |
           baseline="$RUNNER_TEMP/api-baseline"
           apidiff="$RUNNER_TEMP/apidiff"
           report="$RUNNER_TEMP/incompatible-api.txt"
-          git worktree add --detach "$baseline" refs/tags/v0.7.0
+          git worktree add --detach "$baseline" "refs/tags/$API_BASELINE_TAG"
           go -C tools/apiguard build -mod=readonly -o "$apidiff" golang.org/x/exp/cmd/apidiff
           (cd "$baseline" && "$apidiff" -w "$RUNNER_TEMP/release.api" .)
           "$apidiff" -w "$RUNNER_TEMP/head.api" .
@@ -46,3 +48,5 @@ jobs:
             cat "$report"
             exit 1
           fi
+          # apidiff does not report a field added to or reordered in a struct that other packages can write as an unkeyed literal.
+          go -C tools/apiguard run -mod=readonly ./structliterals "$baseline" "$GITHUB_WORKSPACE"
