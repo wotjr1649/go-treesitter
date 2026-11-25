@@ -30,6 +30,7 @@ A handoff never becomes an instruction by being cited.
 | `reviews/review-checklist.md` | procedure | The self-review dimensions to run before committing. |
 | `reports/release-critical-status.md` | status board | Current per-language gate state. Changes as gates move. |
 | `guides/korean-input.md` | guide (public) | How do I feed CP949, UTF-16 or Korean text to the parser, map offsets and columns (including LSP), and write edits back safely? |
+| `guides/getting-started.md` | guide (public) | How do I install, parse, query, edit incrementally, set limits and use parsers concurrently? Every Go snippet is a CI-checked example test. |
 | `reports/limitations.md` | report (public) | What the preview does not do or has not shown, each with its evidence link. |
 | `specs/publication.md` | contract | Public files, local archives, evidence projections and release boundaries. |
 | `plans/` (local only) | plan | The scope a session is authorized to execute. |
