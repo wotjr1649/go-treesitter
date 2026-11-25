@@ -595,3 +595,17 @@ these, all in strings. The result covers these inputs only. This is a breaking t
 item 5 for those inputs only. The pinned upstream `highlights.scm` and `folds.scm` compiled, and the query lane
 matched the patched native reference on 1980 raw query/input comparisons with no mismatch (E5, Windows amd64).
 [Migration notes](../../MIGRATING.md#powershell-names)
+
+## Unreleased (after v0.6.0): Ruby symbol patch
+
+At Ruby pin `ad907a69da0c`, the strict check of the regenerated `node-types.json` passes with zero findings, and it has the
+same 69862 bytes and SHA-256 `a95d2f382017895771063837dbb959c4e5fde829fc185a2967695c770cc297bf` as before the patch
+(E1, CLI 0.27.2). The patch is a scanner change after generation, so the generated `parser.c` and node types are unchanged
+and a static diff against the previous generated file has nothing to report. Against the fully unpatched native build, the
+291 pinned upstream corpus and kit inputs, 873 seeded edits and the pinned large input (gb18030-tbl.rb) are byte-identical
+(E4, Windows amd64). In the scanner comparison over 360 inputs, only six retained symbol regressions change, all from error
+trees to clean trees; the retained negative inputs (`:+일`, `:@일?`, `:@한글` forms, `"#ŀ일"` and `"#@일"`) are unchanged
+(E4, Windows amd64). No error-free tree changes in the recorded inputs, so the ADR-0023 amendment item 5 breaking-change
+record is limited to error trees becoming clean. The pinned upstream `highlights.scm`, `locals.scm` and `tags.scm` compiled, and
+the query lane matched the patched native reference on 3,783 raw query/input comparisons with no mismatch (E5, Windows amd64).
+[Migration notes](../../MIGRATING.md#ruby-symbol-names)

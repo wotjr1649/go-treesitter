@@ -1,0 +1,39 @@
+--- a/src/scanner.c
++++ b/src/scanner.c
+@@ -350,23 +350,34 @@
+     return memchr(&NON_IDENTIFIER_CHARS, c, sizeof(NON_IDENTIFIER_CHARS)) == NULL;
+ }
+ 
++// A non-ASCII code point continues a plain :symbol name, as in Ruby, instead of its low byte deciding.
++static inline bool is_symbol_name_char(int32_t c, bool plain) {
++    return (plain && c > 0x7F) || is_iden_char((char)c);
++}
++
+ static inline bool scan_symbol_identifier(TSLexer *lexer) {
++    // Plain: no @, @@ or $ prefix and no operator. The other forms keep the low-byte test.
++    bool plain = true;
+     if (lexer->lookahead == '@') {
+         advance(lexer);
++        plain = false;
+         if (lexer->lookahead == '@') {
+             advance(lexer);
+         }
+     } else if (lexer->lookahead == '$') {
+         advance(lexer);
++        plain = false;
+     }
+ 
+-    if (is_iden_char((char)lexer->lookahead)) {
++    if (is_symbol_name_char(lexer->lookahead, plain)) {
+         advance(lexer);
+     } else if (!scan_operator(lexer)) {
+         return false;
++    } else {
++        plain = false;
+     }
+ 
+-    while (is_iden_char((char)lexer->lookahead)) {
++    while (is_symbol_name_char(lexer->lookahead, plain)) {
+         advance(lexer);
+     }
+ 
