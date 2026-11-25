@@ -32,7 +32,9 @@ type QueryMatch struct {
 }
 
 // Matches streams matches against an unedited tree, mapping captures to its immutable snapshot.
-// The parser remains busy until iteration ends (including an early break). Errors terminate the stream.
+// The parser remains busy until iteration ends (including an early break): during the loop other calls on the
+// same parser or tree, including Tree.Snapshot from the same goroutine, fail with ErrInvalidInput.
+// Errors terminate the stream.
 // On match-limit overflow it ends with ErrQueryMatchLimit, discarding any match produced by that
 // same engine call. Earlier matches remain valid; a small limit may produce no matches before the error.
 // Cost: the first match on a different tree indexes the whole tree (O(nodes)), whatever the byte range.
