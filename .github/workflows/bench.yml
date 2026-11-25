@@ -7,7 +7,10 @@ name: Speed and memory lanes (Linux, macOS, Windows)
 # every engine region returned and private bytes within start + 16 MB. A measured breach fails the job; a criterion the
 # platform cannot measure (the region count on macOS) is reported as NOT_RUN. On Windows the native reference is built
 # with the runner's MinGW gcc (-static), which must target the runner's architecture (the job fails otherwise, so a
-# translated x64 build is never compared with the arm64 product binary). Hosted runners are shared machines: the
+# translated x64 build is never compared with the arm64 product binary). The Windows lanes are not yet measured on
+# hosted runners: the windows-11-arm gcc target is unconfirmed (a mismatch fails all 25 arm64 jobs by design), and the
+# 60-minute limit is untested for the largest grammars (csharp, tsql, tsx, typescript: MinGW native build plus the
+# measurement). Run one workflow_dispatch from the branch and record both before relying on the lanes. Hosted runners are shared machines: the
 # ratios are measured in one window, absolute times are not comparable between runs, and a noisy result is reported
 # with its spread, never rerun until it passes. Only small-corpus threshold failures get exactly one per-file paired
 # confirmation with the same rounds/reps; a file fails only if both passes fail. Both passes remain in the output and CSVs.
@@ -62,7 +65,7 @@ jobs:
       CORPUS_ROUNDS: ${{ inputs.corpus_rounds || '3' }}
       CORPUS_REPS: ${{ inputs.corpus_reps || '7' }}
       MEM_RUNS: ${{ inputs.mem_runs || '3' }}
-      EXE: ${{ runner.os == 'Windows' && '.exe' || '' }} # go build -o keeps the name as given; the drivers look for <lang>.exe
+      EXE: ${{ matrix.goos == 'windows' && '.exe' || '' }} # go build -o keeps the name as given; the drivers look for <lang>.exe (the runner context is not available in job-level env)
     defaults:
       run:
         shell: bash
