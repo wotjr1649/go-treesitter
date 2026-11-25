@@ -1,0 +1,57 @@
+--- a/grammar.js
++++ b/grammar.js
+@@ -146,10 +146,10 @@
+       ),
+ 
+     // Simple names
+-    simple_name: ($) => /[a-zA-Z_][a-zA-Z0-9_]*/,
++    simple_name: ($) => /[\p{L}_][\p{L}\p{Nd}_]*/u,
+ 
+     // Type names
+-    type_identifier: ($) => /[a-zA-Z0-9_]+/,
++    type_identifier: ($) => /[\p{L}\p{Nd}_]+/u,
+ 
+     type_name: ($) =>
+       choice($.type_identifier, seq($.type_name, '.', $.type_identifier)),
+@@ -271,12 +271,12 @@
+                   reservedWord('script:'),
+                   reservedWord('using:'),
+                   reservedWord('workflow:'),
+-                  /[a-zA-Z0-9_]+/,
++                  /[\p{L}\p{Nd}_]+/u,
+                 ),
+                 ':',
+               ),
+             ),
+-            /[a-zA-Z0-9_]+|\?/,
++            /[\p{L}\p{Nd}_]+|\?/u,
+           ),
+         ),
+         token(
+@@ -291,12 +291,12 @@
+                   reservedWord('script:'),
+                   reservedWord('using:'),
+                   reservedWord('workflow:'),
+-                  /[a-zA-Z0-9_]+/,
++                  /[\p{L}\p{Nd}_]+/u,
+                 ),
+                 ':',
+               ),
+             ),
+-            /[a-zA-Z0-9_]+|\?/,
++            /[\p{L}\p{Nd}_]+|\?/u,
+           ),
+         ),
+         $.braced_variable,
+@@ -316,9 +316,9 @@
+         token(
+           choice(
+             // `-Name`, `-Name1`, `--long-flag`, `-A5`
+-            /-+[a-zA-Z_?\-`][a-zA-Z0-9_?\-`]*/,
++            /-+[\p{L}_?\-`][\p{L}\p{Nd}_?\-`]*/u,
+             // `--format=%H`, `--pretty=format:"%B"`: a native option with an attached value
+-            /--?[a-zA-Z_][a-zA-Z0-9_\-]*=([^\s"'`;|&(){}]|"[^"\r\n]*"|'[^'\r\n]*')*/,
++            /--?[\p{L}_][\p{L}\p{Nd}_\-]*=([^\s"'`;|&(){}]|"[^"\r\n]*"|'[^'\r\n]*')*/u,
+           ),
+         ),
+         // A bare `--` or `-` argument (see scanner.c).
