@@ -73,8 +73,10 @@ Go versions are immutable once served by a proxy. Each remote write below needs 
 
 - **Root release.** Run steps 1–3 and 6–11. Carry forward the published grammar tags and their minimum root
   requirements. If selected grammars are also ready, publish any required new root first, then run steps 4–6
-  for that subset. For root RC and 1.0, use ADR-0028's root scope, including actual released grammars for
-  engine ABIs 1–4. Document grammar known gaps in the per-grammar support records.
+  for that subset. For root RC and 1.0, use the [root scope](validation.md#root-rc-and-10-scope), including actual released
+  grammars for engine ABIs 1–4. A root RC is a pre-release; a change to root code, contract or inputs cuts a
+  new RC, and 14 days without root defect reports lead to 1.0. Document grammar known gaps in the per-grammar
+  support records.
 - **Grammar-only release.** Run step 1 and steps 4–11 using the already published roots. Keep the existing
   grammar and pin-move gates. Record old and new pins, schema and tree/query changes, and migration examples,
   citing the owner release and owner CHANGELOG where applicable.
