@@ -45,6 +45,7 @@ type instance struct {
 	queries     map[weak.Pointer[Query]]cachedQuery
 	queryQueue  *queryRetirements
 	queryCursor int32
+	cursorLimit uint32
 }
 
 type leakedTree struct {

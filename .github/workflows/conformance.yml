@@ -104,6 +104,7 @@ jobs:
         run: go test -count=1 -timeout 20m -v -run 'TestCorpus|TestEdits|TestFieldLookup|TestParserPoolRealEngine|TestKnownGap|TestHeredocUTF8|TestScannerPatches|TestSymbolLookupNative' .
       # Query raw matches: every grammar's own queries/*.scm (pinned archive, sha256-verified) plus structural probes,
       # over the corpus inputs, byte-identical to `<native exe> query` (docs/design/query-abi.md, "Verification").
+      # The HTML shard also checks per-call match limits on the Go engine.
       # The comparison with the tree-sitter CLI (predicates) is local only: TestQueryCLI skips without TSG_TS_CLI.
       - name: Query raw matches against native C
         if: ${{ !cancelled() }}
@@ -114,7 +115,7 @@ jobs:
           TSG_NATIVE_EXE_DIR: ${{ runner.temp }}/exe
           TSG_QUERY_DIR: ${{ runner.temp }}/queries
           TSG_QUERY_PROBE_STRIDE: "1"
-        run: go test -count=1 -timeout 20m -v -run 'TestStripPredicates|TestQueryNative|TestQueryCLIInvalidUTF8Output' .
+        run: go test -count=1 -timeout 20m -v -run 'TestStripPredicates|TestQueryNative|TestQueryCLIInvalidUTF8Output|TestQueryMatchLimitIsPerCall' .
       # The fuzz targets need no data: this runs their seed corpora once (no fuzzing).
       - name: Fuzz seed corpora
         if: ${{ !cancelled() }}
