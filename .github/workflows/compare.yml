@@ -1,0 +1,173 @@
+name: Comparative benchmark (isolated)
+
+# Compares this library with other Go tree-sitter libraries on identified inputs (tools/compare, plan S7/S10).
+# Isolation: contents: read, no secrets, no id-token; actions pinned by commit SHA; no cache, no self-hosted runner,
+# no environment. Trusted steps (this repository's own Go code and 'go mod download') fetch the pinned inputs and verify
+# them by checksum; every step that compiles or runs third-party code (grammar generation, native references, the
+# adapters, the workers) runs in a digest-pinned container with no network, a read-only root file system, dropped
+# capabilities, process/memory/CPU limits and read-only inputs. Results leave the sandbox as bounded files that a
+# trusted collector validates (tools/compare/cmd/compare/collect.go) before anything is uploaded.
+#
+# Triggers: workflow_dispatch (mode=full: 6 large rounds x 5 reps, 4 small rounds x 7 reps) and pull_request on the
+# paths below (mode=smoke: one round, two reps, a few inputs), so the PR itself proves the workflow runs.
+#
+# Module pins: tools/compare/adapters/*/go.mod. Their go.sum files must come from this workflow: a missing go.sum
+# runs that adapter in BOOTSTRAP mode (module graph resolved with 'go mod tidy' on a copy, proposal uploaded under
+# go-sum-proposal/, measurements still run) and the run FAILS unless dispatched with bootstrap=true. Commit the
+# proposed go.mod/go.sum after review, then the workflow fails if either ever changes. See tools/compare/README.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: full (plan repetitions) or smoke (reduced)
+        type: choice
+        options: [full, smoke]
+        default: full
+      bootstrap:
+        description: Accept a run whose adapters have no committed go.sum (prints the proposal; commits nothing)
+        type: boolean
+        default: false
+  pull_request:
+    paths:
+      - tools/compare/**
+      - .github/workflows/compare.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: compare-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  GOENV: "off"
+  GOWORK: "off"
+  GOTOOLCHAIN: local
+  MODE: ${{ github.event_name == 'pull_request' && 'smoke' || inputs.mode }}
+  ALLOW_BOOTSTRAP: ${{ inputs.bootstrap && 'true' || 'false' }}
+
+jobs:
+  measure:
+    name: measure (${{ matrix.runner }}, ${{ matrix.lang }})
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+        lang: [c, go, javascript, json, python]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 40
+    defaults:
+      run:
+        shell: bash
+    env:
+      T: ${{ runner.temp }}/cmp
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Stage inputs (trusted, network)
+        env:
+          GITHUB_TOKEN: ${{ github.event_name != 'pull_request' && github.token || '' }} # API rate limits for the pinned downloads only
+        run: bash tools/compare/scripts/stage.sh "$T" "${{ matrix.lang }}"
+      - name: Pull the pinned image
+        run: . tools/compare/scripts/pins.env && docker pull --quiet "$IMG_CGO" > /dev/null
+      - name: Build and measure in the sandbox (no network)
+        run: |
+          . tools/compare/scripts/pins.env
+          budget=20; [ "$MODE" = smoke ] && budget=5
+          bash tools/compare/scripts/docker-run.sh "$T" "$IMG_CGO" sandbox-measure.sh LANGK="${{ matrix.lang }}" MODE="$MODE" BUDGET_MIN="$budget"
+      - name: Validate and report (trusted)
+        run: |
+          "$T/bin/compare" collect -in "$T/out" -out "$T/collected"
+          if [ -f "$T/collected/measurements.jsonl" ]; then
+            "$T/bin/compare" report -in "$T/collected"
+            { echo "## ${{ matrix.runner }} / ${{ matrix.lang }} (mode: $MODE)"; echo; cat "$T/collected/summary.md"; } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::error::no measurements were produced"; ls -R "$T/collected" | head -50; exit 1
+          fi
+      - name: Upload the validated results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: compare-${{ matrix.runner }}-${{ matrix.lang }}
+          path: ${{ runner.temp }}/cmp/collected
+          if-no-files-found: error
+          retention-days: 14
+      - name: Require committed go.sum files
+        if: ${{ !cancelled() }}
+        run: |
+          if [ -f "$T/BOOTSTRAP" ]; then
+            cat "$T/BOOTSTRAP"
+            if [ "$ALLOW_BOOTSTRAP" != true ]; then
+              echo "::error::adapters without a committed go.sum ran in bootstrap mode; commit the uploaded go-sum-proposal/ files (tools/compare/README.md)"; exit 1
+            fi
+          fi
+
+  nocc:
+    name: no-C-compiler build (${{ matrix.runner }})
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: bash
+    env:
+      T: ${{ runner.temp }}/cmp
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Stage the module cache and run the orchestrator's unit tests (trusted, network)
+        env:
+          RUN_UNIT: "1"
+        run: bash tools/compare/scripts/stage.sh "$T" none
+      - name: Pull the pinned compiler-free image
+        run: . tools/compare/scripts/pins.env && docker pull --quiet "$IMG_NOCC" > /dev/null
+      - name: Build every adapter without a C compiler (sandbox, no network)
+        run: |
+          . tools/compare/scripts/pins.env
+          bash tools/compare/scripts/docker-run.sh "$T" "$IMG_NOCC" sandbox-nocc.sh
+      - name: Validate (trusted)
+        run: |
+          "$T/bin/compare" collect -in "$T/out" -out "$T/collected"
+          { echo "## No-C-compiler build (${{ matrix.runner }})"; echo; awk -F, 'NR==1{print "| " $1 " | " $2 " | " $3 " | " $5 " | " $8 " |"; print "|---|---|---|---|---|"; next} {print "| " $1 " | " $2 " | " $3 " | " $5 " | " $8 " |"}' "$T/collected/builds.csv"; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload the validated results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: compare-nocc-${{ matrix.runner }}
+          path: ${{ runner.temp }}/cmp/collected
+          if-no-files-found: error
+          retention-days: 14
+      - name: Require committed go.sum files
+        if: ${{ !cancelled() }}
+        run: |
+          if [ -f "$T/BOOTSTRAP" ] && [ "$ALLOW_BOOTSTRAP" != true ]; then
+            echo "::error::adapters without a committed go.sum (bootstrap mode); see tools/compare/README.md"; exit 1
+          fi
+
+  aggregate:
+    name: aggregate (trusted)
+    needs: [measure, nocc]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          path: results
+      - name: Require every expected cell
+        run: |
+          missing=0
+          for r in ubuntu-24.04 ubuntu-24.04-arm; do
+            for l in c go javascript json python; do
+              [ -s "results/compare-$r-$l/measurements.jsonl" ] && [ -s "results/compare-$r-$l/correctness.csv" ] || { echo "::error::missing results for $r/$l"; missing=1; }
+            done
+            [ -s "results/compare-nocc-$r/builds.csv" ] || { echo "::error::missing no-compiler build record for $r"; missing=1; }
+          done
+          { echo "## Result files"; echo; (cd results && find . -type f | sort | head -300 | sed 's/^/- /'); echo; echo "SHA-256 of every file is in each artifact's SHA256SUMS."; } >> "$GITHUB_STEP_SUMMARY"
+          exit $missing

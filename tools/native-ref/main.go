@@ -79,6 +79,15 @@ func readPins(path string) (pins, error) {
 	return p, nil
 }
 
+// driverFile, when set (-driver), replaces c/native_ref.c as the program linked with the runtime and the grammar.
+// tools/compare uses it for its S-expression driver; the shims, flags and pinned sources stay the same.
+var driverFile string
+
+// stageOnly (-stage) downloads and verifies every archive a build would need (runtime, wasi-libc, grammars, the pinned CLI,
+// npm inputs) and extracts the corpora, but compiles and generates nothing, so the trusted fetch step of the isolated
+// comparison workflow executes no third-party code. The sandbox then runs this tool offline.
+var stageOnly bool
+
 func main() {
 	log := flag.String("pins", filepath.Join("tools", "gen", "pins.json"), "pins file")
 	dl := flag.String("dl", "", "directory holding (or receiving, with -fetch) the pinned archives")
@@ -93,9 +102,14 @@ func main() {
 	candidate := flag.Bool("candidate", false, "comparison only: regenerate even a generator exception")
 	unpatched := flag.Bool("unpatched", false, "comparison only: compile the original pinned grammar without its ADR-0023 patches")
 	nobuild := flag.Bool("nobuild", false, "verify and extract only; do not compile (-out is then optional)")
+	stage := flag.Bool("stage", false, "fetch and verify all inputs (implies -fetch -nobuild); generate and compile nothing")
+	flag.StringVar(&driverFile, "driver", "", "link this C driver instead of c/native_ref.c (use a separate -out directory)")
 	scannerStages := flag.String("scanner-stages", "", "directory receiving scanner patch comparison builds and manifests")
 	patchAlert := flag.Int("patch-alert", 3, "warn when a grammar has more than this many patches")
 	flag.Parse()
+	if *stage {
+		stageOnly, *fetch, *nobuild = true, true, true
+	}
 	if *dl == "" || *work == "" || (*out == "" && !*nobuild) {
 		fmt.Fprintln(os.Stderr, "usage: native-ref -dl DIR -work DIR -out DIR [-pins F] [-cc gcc] [-fetch] [-corpus DIR] [-queries DIR] [-nobuild] [lang ...]")
 		os.Exit(2)
@@ -163,6 +177,13 @@ func runMode(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, no
 	here, err := sourceDir()
 	if err != nil {
 		return err
+	}
+	if stageOnly {
+		wasi := p.WasiLibc
+		wasi.Dirs = []string{"libc-top-half/musl/src/ctype"}
+		if err := prepare(wasi, dl, work, fetch, map[string]bool{}); err != nil {
+			return fmt.Errorf("wasi-libc: %w", err)
+		}
 	}
 	var ctypeObjects []string
 	if !nobuild {
@@ -237,7 +258,11 @@ func runMode(pinsFile, dl, work, out, cc, opt, corpus, queries string, fetch, no
 				return scanner.capture(i, filepath.Join(root, filepath.FromSlash(g.GrammarDir)), build)
 			}
 		}
-		if g.Regenerate || (!unpatched && len(g.Patches) > 0) {
+		if stageOnly {
+			if err := stageGrammar(pinsFile, p, g, dl); err != nil {
+				return fmt.Errorf("%s: stage: %w", l, err)
+			}
+		} else if g.Regenerate || (!unpatched && len(g.Patches) > 0) {
 			if unpatched {
 				g.Patches = nil
 			}
@@ -310,7 +335,11 @@ func buildNative(cc, opt, here, lib, gdir, exe string, g source, ctypeObjects []
 		args = append(args, filepath.Join(gdir, "scanner.c"))
 	}
 	args = append(args, ctypeObjects...)
-	args = append(args, filepath.Join(here, "native_ref.c"), "-o", exe)
+	driver := filepath.Join(here, "native_ref.c")
+	if driverFile != "" {
+		driver = driverFile
+	}
+	args = append(args, driver, "-o", exe)
 	fmt.Println(cc, strings.Join(args, " "))
 	cmd := proc.Command(cc, args...)
 	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
