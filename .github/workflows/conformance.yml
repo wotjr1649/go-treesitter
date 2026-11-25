@@ -13,10 +13,11 @@ on:
 permissions:
   contents: read
 
-# A new push to a pull request cancels that PR's earlier unfinished runs; main, manual and other events never cancel.
+# A new push to a pull request cancels that PR's earlier unfinished first-attempt runs; main, scheduled, dispatched and
+# re-run attempts never cancel and are never cancelled (same expressions as engine.yml).
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.run_attempt == 1 && format('pr-{0}', github.event.pull_request.number) || format('run-{0}-{1}', github.run_id, github.run_attempt) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.action == 'synchronize' && github.run_attempt == 1 }}
 
 jobs:
   conformance-grammar:
@@ -37,7 +38,9 @@ jobs:
           - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
           - {runner: ubuntu-24.04-arm, goos: linux, goarch: arm64}
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 60
+    # The step limits (go test 40m, query 40m, fuzz seeds 30m) sum to 110m; the job limit leaves room for setup and the
+    # native build so a hung step fails at its own limit and the later !cancelled() steps still run. Expected: ~9-12m.
+    timeout-minutes: 120
     env:
       GOENV: "off"
       GOWORK: "off"
