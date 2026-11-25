@@ -2,7 +2,6 @@ package conformance
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -103,22 +102,56 @@ func TestQuerySmoke(t *testing.T) {
 	}
 }
 
-// FuzzQueryCompile exercises the real C query compiler when the conformance inputs are available.
+// FuzzQueryCompile exercises the real JSON query compiler without conformance data.
 func FuzzQueryCompile(f *testing.F) {
-	if os.Getenv("TSG_S15_DIR") == "" && os.Getenv("TSG_DATA_DIR") == "" {
-		f.Skip("no conformance inputs selected")
-	}
 	language := languages["json"]
 	if language == nil {
 		f.Skip("json is not linked")
 	}
+	lang := language()
 	for _, s := range []string{"", "(_) @node", "((string) @s (#match? @s \"^x\"))", "(", "\xff"} {
 		f.Add(s)
 	}
 	f.Fuzz(func(t *testing.T, source string) {
-		_, err := treesitter.NewQuery(language(), source)
-		if qe, ok := err.(*treesitter.QueryError); ok && uint64(qe.Offset) > uint64(len(source)) {
-			t.Fatalf("invalid query offset: %v", qe)
+		if len(source) > 512 {
+			t.Skip()
+		}
+		// NewQuery takes no context: run it in a goroutine so a pathological pattern fails the input
+		// (reported with its length) after a fixed budget instead of hanging the run.
+		type result struct {
+			q   *treesitter.Query
+			err error
+		}
+		done := make(chan result, 1)
+		go func() {
+			q, err := treesitter.NewQuery(lang, source)
+			done <- result{q, err}
+		}()
+		var q *treesitter.Query
+		var err error
+		select {
+		case r := <-done:
+			q, err = r.q, r.err
+		case <-time.After(10 * time.Second):
+			t.Fatalf("NewQuery did not finish within 10s for a %d-byte pattern", len(source))
+		}
+		if err != nil {
+			qe, ok := err.(*treesitter.QueryError)
+			if q != nil || !ok || qe.Offset > uint32(len(source)) ||
+				qe.Type < treesitter.QueryErrorSyntax || qe.Type > treesitter.QueryErrorPredicate {
+				t.Fatalf("NewQuery: invalid result for %d-byte pattern: %v", len(source), err)
+			}
+			return
+		}
+		if q == nil || q.Properties(-1) != nil || q.Properties(q.PatternCount()) != nil {
+			t.Fatal("NewQuery: invalid pattern metadata")
+		}
+		if names := q.CaptureNames(); len(names) != 0 {
+			first := names[0]
+			names[0] += "!"
+			if q.CaptureNames()[0] != first {
+				t.Fatal("CaptureNames exposes mutable query metadata")
+			}
 		}
 	})
 }
