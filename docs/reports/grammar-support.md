@@ -10,9 +10,10 @@ version selected by Go alongside the root in the [compatibility table](compatibi
   [`a8af436`](https://github.com/wotjr1649/go-treesitter/commit/a8af4360e4964deb6c0bb62461ee8348be1aa738),
   with root `v0.6.0`. The published [pins](https://github.com/wotjr1649/go-treesitter/blob/a8af4360e4964deb6c0bb62461ee8348be1aa738/tools/gen/pins.json)
   and module provenance record those identities.
-- **`v0.7.0` tag** is prepared and not yet published. It gives new tags `grammars/<dir>/v0.7.0` to `css`, `powershell`,
+- **`v0.7.0` tag** is published. It gives new tags `grammars/<dir>/v0.7.0` to `css`, `powershell`,
   `ruby`, `swift` and `xml`; the other 20 modules keep their `v0.6.0` tags, so for them this column always says
-  “Same”. The table describes main at
+  “Same”. The new tags point to
+  [`2d11c3f`](https://github.com/wotjr1649/go-treesitter/commit/2d11c3fcf592d67de025782a2942ddf1b01af4d5), with root `v0.7.0`. The table describes the candidate main at
   [`7e24331`](https://github.com/wotjr1649/go-treesitter/commit/7e243318b5b1f8223ac0e1f49e06e10a9b107757).
   “Same” carries the `v0.6.0` limit forward. “Fixed” and “Changed” apply to the recorded input in the new tag.
 
