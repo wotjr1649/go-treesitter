@@ -60,22 +60,24 @@ func cmdAggregate(args []string) error {
 	return writeFileAll(filepath.Join(*out, "SHA256SUMS"), []byte(sums))
 }
 
-// bundleFile finds the downloaded bundle of an artifact: the file itself, or the single regular file in a directory of that name.
+// bundleFile finds the downloaded bundle of an artifact: the one plain file directly in the directory of that name (the
+// downloader saves the blob there under a name the blob's Content-Disposition chose). A link, a subdirectory, a second
+// entry or a non-directory in its place is refused.
 func bundleFile(in, name string) (string, error) {
 	p := filepath.Join(in, name)
 	st, err := os.Lstat(p)
 	if err != nil {
 		return "", errors.New("artifact missing")
 	}
-	if st.Mode().IsRegular() {
-		return p, nil
-	}
 	if !st.IsDir() {
-		return "", errors.New("artifact is neither a file nor a directory")
+		return "", errors.New("artifact is not a directory")
 	}
 	ents, err := os.ReadDir(p)
 	if err != nil || len(ents) != 1 {
 		return "", errors.New("artifact directory must hold exactly one file")
+	}
+	if !ents[0].Type().IsRegular() { // ReadDir reports the entry itself, not a link's target
+		return "", errors.New("artifact directory entry is not a plain file")
 	}
 	return filepath.Join(p, ents[0].Name()), nil
 }

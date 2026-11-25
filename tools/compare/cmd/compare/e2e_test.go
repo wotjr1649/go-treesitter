@@ -149,13 +149,13 @@ func TestEndToEndWithFakeWorkers(t *testing.T) {
 	}
 	// the validated directory becomes the one bundle the job uploads; the aggregate job validates it again from scratch
 	bundles := filepath.Join(dir, "bundles")
-	if err := cmdPack([]string{"-dir", col, "-out", filepath.Join(bundles, "compare-r1-c.zip")}); err != nil {
+	if err := cmdPack([]string{"-dir", col, "-out", filepath.Join(bundles, "compare-r1-c.zip", "bundle.zip")}); err != nil {
 		t.Fatal(err)
 	}
 	noccDir := filepath.Join(dir, "nocc")
 	mustWrite(t, filepath.Join(noccDir, "provenance", "workflow.json"), []byte(workflowJSON))
 	mustWrite(t, filepath.Join(noccDir, "builds.csv"), []byte(noccCSV("product,x,ok,0,30,20,1,ok,ok,", "official,x,failed,1,0,0,1,n/a,expected-unsupported,cgo")))
-	if err := cmdPack([]string{"-dir", noccDir, "-out", filepath.Join(bundles, "compare-nocc-r1.zip")}); err != nil {
+	if err := cmdPack([]string{"-dir", noccDir, "-out", filepath.Join(bundles, "compare-nocc-r1.zip", "bundle.zip")}); err != nil {
 		t.Fatal(err)
 	}
 	agg := filepath.Join(dir, "agg")
@@ -168,7 +168,7 @@ func TestEndToEndWithFakeWorkers(t *testing.T) {
 	if ents, _ := os.ReadDir(agg); len(ents) != 2 { // only the summary and the hashes are left to upload
 		t.Fatalf("aggregate output holds %d entries", len(ents))
 	}
-	os.Remove(filepath.Join(bundles, "compare-nocc-r1.zip"))
+	os.RemoveAll(filepath.Join(bundles, "compare-nocc-r1.zip"))
 	agg2 := filepath.Join(dir, "agg2")
 	if err := cmdAggregate([]string{"-in", bundles, "-out", agg2, "-work", filepath.Join(dir, "aggwork2"), "-runners", "r1", "-langs", "c"}); err == nil {
 		t.Fatal("a missing artifact was accepted")
@@ -487,11 +487,45 @@ func TestBundleMustCarryEveryRequiredFile(t *testing.T) {
 	d := filepath.Join(dir, "b")
 	mustWrite(t, filepath.Join(d, "builds.csv"), []byte(noccCSV("product,x,ok,0,30,20,1,ok,ok,", "official,x,failed,1,0,0,1,n/a,expected-unsupported,cgo")))
 	bundles := filepath.Join(dir, "bundles")
-	if err := cmdPack([]string{"-dir", d, "-out", filepath.Join(bundles, "compare-nocc-r1.zip")}); err != nil {
+	if err := cmdPack([]string{"-dir", d, "-out", filepath.Join(bundles, "compare-nocc-r1.zip", "bundle.zip")}); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := aggregateOne(filepath.Join(bundles, "compare-nocc-r1"), filepath.Join(dir, "o"), true); err == nil || !strings.Contains(err.Error(), "workflow.json") {
 		t.Fatalf("a bundle without provenance was accepted: %v", err)
+	}
+}
+
+// The downloader saves each blob as one file, under a name the blob chose, in the directory of its artifact; anything
+// else in that place is refused before a byte is read.
+func TestBundleFileShape(t *testing.T) {
+	root := t.TempDir()
+	mk := func(name string, f func(d string)) {
+		d := filepath.Join(root, name)
+		if err := os.MkdirAll(d, 0o755); err != nil {
+			t.Fatal(err)
+		}
+		f(d)
+	}
+	mk("plain", func(d string) { mustWrite(t, filepath.Join(d, "any-name.zip"), []byte("x")) })
+	mk("two", func(d string) {
+		mustWrite(t, filepath.Join(d, "a"), []byte("x"))
+		mustWrite(t, filepath.Join(d, "b"), []byte("x"))
+	})
+	mk("empty", func(d string) {})
+	mk("subdir", func(d string) { os.MkdirAll(filepath.Join(d, "sub"), 0o755) })
+	mk("link", func(d string) {
+		if err := os.Symlink(filepath.Join(root, "plain", "any-name.zip"), filepath.Join(d, "l.zip")); err != nil {
+			t.Skip("no symlinks here:", err)
+		}
+	})
+	mustWrite(t, filepath.Join(root, "loose"), []byte("x")) // a file where the directory belongs
+	if p, err := bundleFile(root, "plain"); err != nil || filepath.Base(p) != "any-name.zip" {
+		t.Fatal(p, err)
+	}
+	for _, n := range []string{"two", "empty", "subdir", "link", "loose", "absent"} {
+		if _, err := bundleFile(root, n); err == nil {
+			t.Errorf("%s: accepted", n)
+		}
 	}
 }
 

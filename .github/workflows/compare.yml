@@ -213,81 +213,122 @@ jobs:
     steps:
       - name: Refuse any ref but main
         run: '[ "$GITHUB_REF" = refs/heads/main ]'
-      - name: Fetch only the orchestrator's sources (no adapter, no candidate module)
+      # The downloader names the saved file after the blob's Content-Disposition, which a candidate holding this run's
+      # runtime token could choose by pre-uploading an artifact of an expected name. The pinned action takes only the
+      # basename of that name (dist/index.js, streamExtractExternal), but nothing below relies on that alone: the downloads
+      # go into a directory that does not exist yet, before any orchestrator source or binary exists, and the steps after
+      # them fail if anything else under the workspace or the runner temp directory changed.
+      - name: Record the workspace and the runner temp directory before any download
+        run: |
+          set -euo pipefail
+          list() {
+            find "$GITHUB_WORKSPACE" "$RUNNER_TEMP" -regextype posix-extended \
+              \( -path "$RUNNER_TEMP/_runner_file_commands" -o -path "$RUNNER_TEMP/guard" -o -path "$RUNNER_TEMP/artifacts" \
+                 -o -regex "$RUNNER_TEMP/[0-9a-f-]{36}\.sh" \) -prune -o \
+              \( -type d -printf '%p\td\t%m\n' -o -printf '%p\t%y\t%m\t%s\t%T@\t%l\n' \) | LC_ALL=C sort
+          }
+          [ -z "$(ls -A "$GITHUB_WORKSPACE")" ]
+          for p in artifacts src cmp; do [ ! -e "$RUNNER_TEMP/$p" ]; done
+          mkdir "$RUNNER_TEMP/guard"
+          list > "$RUNNER_TEMP/guard/before.txt"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-c.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-c.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-go.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-go.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-javascript.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-javascript.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-json.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-json.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-python.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-python.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-nocc-ubuntu-24.04.zip
+          path: ${{ runner.temp }}/artifacts/compare-nocc-ubuntu-24.04.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-arm-c.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-arm-c.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-arm-go.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-arm-go.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-arm-javascript.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-arm-javascript.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-arm-json.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-arm-json.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-arm-python.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-arm-python.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-nocc-ubuntu-24.04-arm.zip
+          path: ${{ runner.temp }}/artifacts/compare-nocc-ubuntu-24.04-arm.zip
+          skip-decompress: true
+      - name: Nothing but the download directory may have changed; each download is one plain file in its own directory
+        env:
+          EXPECTED: compare-ubuntu-24.04-c.zip compare-ubuntu-24.04-go.zip compare-ubuntu-24.04-javascript.zip compare-ubuntu-24.04-json.zip compare-ubuntu-24.04-python.zip compare-nocc-ubuntu-24.04.zip compare-ubuntu-24.04-arm-c.zip compare-ubuntu-24.04-arm-go.zip compare-ubuntu-24.04-arm-javascript.zip compare-ubuntu-24.04-arm-json.zip compare-ubuntu-24.04-arm-python.zip compare-nocc-ubuntu-24.04-arm.zip
+        run: |
+          set -euo pipefail
+          list() {
+            find "$GITHUB_WORKSPACE" "$RUNNER_TEMP" -regextype posix-extended \
+              \( -path "$RUNNER_TEMP/_runner_file_commands" -o -path "$RUNNER_TEMP/guard" -o -path "$RUNNER_TEMP/artifacts" \
+                 -o -regex "$RUNNER_TEMP/[0-9a-f-]{36}\.sh" \) -prune -o \
+              \( -type d -printf '%p\td\t%m\n' -o -printf '%p\t%y\t%m\t%s\t%T@\t%l\n' \) | LC_ALL=C sort
+          }
+          list > "$RUNNER_TEMP/guard/after.txt"
+          diff -u "$RUNNER_TEMP/guard/before.txt" "$RUNNER_TEMP/guard/after.txt" || { echo "::error::something outside the download directory changed"; exit 1; }
+          cd "$RUNNER_TEMP/artifacts"
+          [ "$(ls -A | LC_ALL=C sort | tr '\n' ' ')" = "$(printf '%s\n' $EXPECTED | LC_ALL=C sort | tr '\n' ' ')" ] || { echo "::error::unexpected set of downloaded artifacts"; exit 1; }
+          for n in $EXPECTED; do
+            [ -d "$n" ] && [ ! -L "$n" ] || { echo "::error::$n is not a plain directory"; exit 1; }
+            [ "$(find "$n" -mindepth 1 | wc -l)" = 1 ] || { echo "::error::$n does not hold exactly one entry"; exit 1; }
+            [ "$(find "$n" -mindepth 1 -maxdepth 1 -type f -size -31457281c | wc -l)" = 1 ] || { echo "::error::$n: the entry is not a plain file within the size cap"; exit 1; }
+          done
+      - name: Fetch only the orchestrator's sources into a new directory (no adapter, no candidate module)
         env:
           GIT_TERMINAL_PROMPT: "0"
         run: |
+          mkdir "$RUNNER_TEMP/src"
+          cd "$RUNNER_TEMP/src"
           git init -q .
           git remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
           git fetch -q --depth 1 origin "$GITHUB_SHA"
           git checkout -q FETCH_HEAD -- tools/compare/cmd tools/compare/harness tools/compare/go.mod tools/compare/scripts/stage.sh tools/compare/scripts/pins.env tools/bench/proc
       - name: Build the aggregator
+        working-directory: ${{ runner.temp }}/src
         env:
           STAGE_MODE: tools
         run: bash tools/compare/scripts/stage.sh "$T" none
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
-        with:
-          name: compare-ubuntu-24.04-c.zip
-          path: results/compare-ubuntu-24.04-c.zip
-          skip-decompress: true
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
-        with:
-          name: compare-ubuntu-24.04-go.zip
-          path: results/compare-ubuntu-24.04-go.zip
-          skip-decompress: true
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
-        with:
-          name: compare-ubuntu-24.04-javascript.zip
-          path: results/compare-ubuntu-24.04-javascript.zip
-          skip-decompress: true
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
-        with:
-          name: compare-ubuntu-24.04-json.zip
-          path: results/compare-ubuntu-24.04-json.zip
-          skip-decompress: true
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
-        with:
-          name: compare-ubuntu-24.04-python.zip
-          path: results/compare-ubuntu-24.04-python.zip
-          skip-decompress: true
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
-        with:
-          name: compare-nocc-ubuntu-24.04.zip
-          path: results/compare-nocc-ubuntu-24.04.zip
-          skip-decompress: true
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
-        with:
-          name: compare-ubuntu-24.04-arm-c.zip
-          path: results/compare-ubuntu-24.04-arm-c.zip
-          skip-decompress: true
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
-        with:
-          name: compare-ubuntu-24.04-arm-go.zip
-          path: results/compare-ubuntu-24.04-arm-go.zip
-          skip-decompress: true
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
-        with:
-          name: compare-ubuntu-24.04-arm-javascript.zip
-          path: results/compare-ubuntu-24.04-arm-javascript.zip
-          skip-decompress: true
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
-        with:
-          name: compare-ubuntu-24.04-arm-json.zip
-          path: results/compare-ubuntu-24.04-arm-json.zip
-          skip-decompress: true
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
-        with:
-          name: compare-ubuntu-24.04-arm-python.zip
-          path: results/compare-ubuntu-24.04-arm-python.zip
-          skip-decompress: true
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
-        with:
-          name: compare-nocc-ubuntu-24.04-arm.zip
-          path: results/compare-nocc-ubuntu-24.04-arm.zip
-          skip-decompress: true
       - name: Validate every bundle (bounded unpack, strict schemas) and report; executes nothing from them
         run: |
-          "$T/bin/compare" aggregate -in results -out "$T/aggregate" -work "$T/aggwork"
+          "$T/bin/compare" aggregate -in "$RUNNER_TEMP/artifacts" -out "$T/aggregate" -work "$T/aggwork"
           cat "$T/aggregate/summary.md" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload the validated summary (only when every bundle was accepted)
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
