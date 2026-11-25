@@ -2,50 +2,65 @@ package treesitter
 
 import (
 	"runtime"
+	"sync"
 	"weak"
 
 	"github.com/wotjr1649/go-treesitter/internal/engine"
 )
 
-type queryRetirement struct {
-	key      weak.Pointer[Query]
-	instance weak.Pointer[instance]
-}
-type queryCleanup struct {
-	owner weak.Pointer[core]
-	queryRetirement
+type cachedQuery struct {
+	ptr     int32
+	cleanup runtime.Cleanup
 }
 
-// The cleanup holds only weak references; neither a Query nor an abandoned parser is kept alive.
-func retireQuery(a queryCleanup) {
-	if c := a.owner.Value(); c != nil {
-		c.mu.Lock()
-		c.leakedQueries = append(c.leakedQueries, a.queryRetirement)
-		c.mu.Unlock()
+// Each instance has its own queue, so a late cleanup cannot enqueue work for its replacement.
+// The callback holds the queue and a weak key without retaining the instance or Query.
+type queryRetirements struct {
+	mu      sync.Mutex
+	pending []weak.Pointer[Query]
+}
+
+type queryRetirement struct {
+	queue *queryRetirements
+	key   weak.Pointer[Query]
+}
+
+func retireQuery(arg queryRetirement) {
+	r := arg.queue
+	r.mu.Lock()
+	r.pending = append(r.pending, arg.key)
+	r.mu.Unlock()
+}
+
+func (in *instance) stopQueryCleanups() {
+	for key, entry := range in.queries {
+		if q := key.Value(); q != nil {
+			entry.cleanup.Stop()
+			runtime.KeepAlive(q)
+		}
 	}
 }
 
 // drainQueries runs under the busy guard on the owner goroutine, never in a GC cleanup.
 func (c *core) drainQueries() error {
-	c.mu.Lock()
-	pending := c.leakedQueries
-	c.leakedQueries = nil
-	c.mu.Unlock()
 	in := c.inst
-	token := weak.Make(in)
-	for _, r := range pending {
-		if r.instance != token {
-			continue
-		}
-		ptr, ok := in.queries[r.key]
+	r := in.queryQueue
+	if r == nil {
+		return nil
+	}
+	r.mu.Lock()
+	pending := r.pending
+	r.pending = nil
+	r.mu.Unlock()
+	for _, key := range pending {
+		entry, ok := in.queries[key]
 		if !ok {
 			continue
 		}
-		delete(in.queries, r.key)
-		if err := c.queryCall("tsg_query_delete", func() { in.m.(engine.QueryModule).Xtsg_query_delete(ptr) }); err != nil {
+		delete(in.queries, key)
+		if err := c.queryCall("tsg_query_delete", func() { in.m.(engine.QueryModule).Xtsg_query_delete(entry.ptr) }); err != nil {
 			return err
 		}
 	}
-	runtime.KeepAlive(in)
 	return nil
 }

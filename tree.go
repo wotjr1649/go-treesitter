@@ -58,7 +58,7 @@ func (t *Tree) Snapshot(ctx context.Context) (*Snapshot, error) {
 		return nil, err
 	}
 	defer c.end()
-	snap, e := c.export(ctx, t.ptr, t.src, t.invalidUTF8)
+	snap, e := c.export(ctx, t.ptr, func() string { return t.src }, t.invalidUTF8)
 	if e != nil {
 		return nil, e
 	}

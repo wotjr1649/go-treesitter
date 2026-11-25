@@ -94,7 +94,7 @@ func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, yield f
 		return perr(InvalidInput, "query byte range is outside the source", nil)
 	}
 	if t.snap == nil {
-		snap, e := c.export(ctx, t.ptr, t.src, t.invalidUTF8)
+		snap, e := c.export(ctx, t.ptr, func() string { return t.src }, t.invalidUTF8)
 		if e != nil {
 			return e
 		}
@@ -107,19 +107,18 @@ func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, yield f
 	stop := watchCtx(ctx, in.h)
 	defer stop()
 	key := weak.Make(q)
-	ptr := in.queries[key]
+	ptr := in.queries[key].ptr
 	if ptr == 0 {
 		ptr, err = c.compileQuery(q)
 		if err != nil {
 			return err
 		}
 		if in.queries == nil {
-			in.queries = map[weak.Pointer[Query]]int32{}
+			in.queries = map[weak.Pointer[Query]]cachedQuery{}
+			in.queryQueue = &queryRetirements{}
 		}
-		in.queries[key] = ptr
-		runtime.AddCleanup(q, retireQuery, queryCleanup{
-			owner: weak.Make(c), queryRetirement: queryRetirement{key: key, instance: weak.Make(in)},
-		})
+		cleanup := runtime.AddCleanup(q, retireQuery, queryRetirement{queue: in.queryQueue, key: key})
+		in.queries[key] = cachedQuery{ptr: ptr, cleanup: cleanup}
 	}
 	if ctx.Err() != nil {
 		return ctxError(ctx, "query compilation stopped by the context")

@@ -34,16 +34,16 @@ type core struct {
 	closed  bool
 	busy    atomic.Bool
 
-	mu            sync.Mutex // guards cleanup queues only: the GC goroutine enqueues, the owner drains
-	leaked        []leakedTree
-	leakedQueries []queryRetirement
+	mu     sync.Mutex // the GC goroutine enqueues leaked trees, the owner drains
+	leaked []leakedTree
 }
 
 type instance struct {
 	m           engine.Module
 	h           *engine.Host
 	mem         *[]byte // dereference at every use: the slice header changes on grow
-	queries     map[weak.Pointer[Query]]int32
+	queries     map[weak.Pointer[Query]]cachedQuery
+	queryQueue  *queryRetirements
 	queryCursor int32
 }
 
@@ -64,11 +64,9 @@ func NewParser(lang *Language, opts ...Option) (*Parser, error) {
 	if lang == nil || lang.g == nil || lang.g.New == nil {
 		return nil, perr(InvalidInput, "nil or empty language", nil)
 	}
-	var cfg config
-	for _, o := range opts {
-		if err := o(&cfg); err != nil {
-			return nil, err
-		}
+	cfg, err := parserConfig(opts)
+	if err != nil {
+		return nil, err
 	}
 	c := &core{lang: lang, cfg: cfg, gen: 1}
 	if err := c.recreate(); err != nil {
@@ -77,7 +75,7 @@ func NewParser(lang *Language, opts ...Option) (*Parser, error) {
 	p := &Parser{c}
 	runtime.AddCleanup(p, func(c *core) { // a leaked Parser still returns its memory; nothing else can use it any more
 		if c.inst != nil && !c.closed {
-			ops.release(c.inst.mem)
+			c.discard()
 		}
 	}, c)
 	return p, nil
@@ -153,6 +151,7 @@ func (c *core) newInstance() (*instance, *ParseError) {
 // discard drops the instance and every tree in it.
 func (c *core) discard() {
 	if c.inst != nil {
+		c.inst.stopQueryCleanups()
 		ops.release(c.inst.mem)
 		c.inst = nil
 	}
@@ -160,7 +159,6 @@ func (c *core) discard() {
 	c.live, c.recycle, c.ptrs = 0, false, nil
 	c.mu.Lock()
 	c.leaked = nil
-	c.leakedQueries = nil
 	c.mu.Unlock()
 }
 
@@ -338,6 +336,9 @@ func (c *core) run(ctx context.Context, src []byte, old *Tree) (ptr int32, inval
 	}
 	in := c.inst
 
+	if ctx.Err() != nil {
+		return 0, false, ctxError(ctx, "context done before allocating parse input")
+	}
 	var buf int32
 	if err := ops.call(func() { buf = in.m.Xmalloc(int32(max(n, 1))) }); err != nil {
 		return 0, false, c.trapped(err, "malloc")
@@ -345,6 +346,12 @@ func (c *core) run(ctx context.Context, src []byte, old *Tree) (ptr int32, inval
 	mem := *in.mem
 	if buf <= 0 || int(buf)+n > len(mem) {
 		return 0, false, c.trapped(errors.New("malloc returned NULL or an out-of-range block"), "malloc")
+	}
+	if ctx.Err() != nil {
+		if err := ops.call(func() { in.m.Xfree(buf) }); err != nil {
+			return 0, false, c.trapped(err, "free")
+		}
+		return 0, false, ctxError(ctx, "context done before copying parse input")
 	}
 	copy(mem[buf:], src)
 
@@ -460,7 +467,7 @@ func (p *Parser) ParseSnapshot(ctx context.Context, src []byte) (*Snapshot, erro
 		return nil, e
 	}
 	gen := c.gen
-	snap, e := c.export(ctx, ptr, string(src), invalid)
+	snap, e := c.export(ctx, ptr, func() string { return string(src) }, invalid)
 	if e != nil {
 		c.abandonTree(ptr, gen)
 		return nil, e
@@ -547,7 +554,7 @@ func parseExportHeader(mem []byte, buf int32, abi uint32) (int, *ParseError) {
 }
 
 // export runs the chunked export of tree t into a Snapshot. Cancellation abandons the export and keeps the tree.
-func (c *core) export(ctx context.Context, t int32, text string, invalid bool) (*Snapshot, *ParseError) {
+func (c *core) export(ctx context.Context, t int32, source func() string, invalid bool) (*Snapshot, *ParseError) {
 	in := c.inst
 	ops.clearRefused(in.mem)
 	call := func(what string, fn func()) *ParseError {
@@ -568,6 +575,9 @@ func (c *core) export(ctx context.Context, t int32, text string, invalid bool) (
 	}
 	if cnt <= 0 || int64(cnt)*8 > int64(len(*in.mem)) { // a node needs at least 8 bytes of tree memory
 		return nil, c.engineFault(fmt.Sprintf("descendant count %d is not plausible", cnt))
+	}
+	if ctx.Err() != nil {
+		return nil, ctxError(ctx, "context done before snapshot export")
 	}
 	stop := watchCtx(ctx, in.h)
 	defer stop()
@@ -595,7 +605,13 @@ func (c *core) export(ctx context.Context, t int32, text string, invalid bool) (
 		}
 		return nil, c.fault(e.Outcome, e.Reason, nil)
 	}
-	b := newSnapshotBuilder(int(n), c.lang, text, invalid)
+	if ctx.Err() != nil {
+		if e := endExport(); e != nil {
+			return nil, e
+		}
+		return nil, ctxError(ctx, "context done before allocating the snapshot")
+	}
+	b := newSnapshotBuilder(int(n), c.lang, source(), invalid)
 	for { // until the engine reports 0: this also catches more nodes than the descendant count, even when n is a multiple of kc
 		if ctx.Err() != nil {
 			if e := endExport(); e != nil {

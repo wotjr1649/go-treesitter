@@ -27,7 +27,7 @@ Transition: the old `syntax` package, `treesitter.New` and `internal/gtsadapter`
 | `Cancelled` (ctx cancel) | no | `*ParseError`, `errors.Is` `ErrCancelled` and `context.Canceled` | kept, parser reset |
 | `ResourceLimit` — input over `WithMaxInputBytes`, snapshot over `WithMaxSnapshotNodes` (checked with the descendant count before export) | no | `ErrResourceLimit` | kept |
 | `ResourceLimit` — a refused `memory.grow` during the call, even if a tree came back | no | `ErrResourceLimit` | recreated (`InstanceReset`) |
-| `InvalidInput` — nil ctx, invalid option value (never clamped), `old` from another parser or invalidated, non-UTF-8 with `WithStrictUTF8` | no | `ErrInvalidInput` | kept |
+| `InvalidInput` — nil ctx or option, invalid option value (never clamped), `old` from another parser or invalidated, non-UTF-8 with `WithStrictUTF8` | no | `ErrInvalidInput` | kept |
 | `EngineFault` — any other trap (including WASI `proc_exit`, which is a trap and never exits the process), root-end mismatch, an ABI violation by the module | no | `ErrEngineFault` | recreated (`InstanceReset`) |
 | `IncompatibleLanguage` — engine ABI version or export-block magic/format mismatch | no parser | `ErrIncompatibleLanguage` | none created |
 
@@ -42,6 +42,9 @@ does not depend on the call's input: it recreates an instance discarded by an ea
 queries whose `Query` values were garbage-collected (decided 2026-11-25). A fault during that housekeeping is
 returned with its usual outcome. Cancellation during the engine call is detected in the progress
 callback; the call returns after the C parser's cleanup.
+
+`ParseSnapshot` checks cancellation before copying input into the engine and before copying the snapshot's source.
+The descendant count and `WithMaxSnapshotNodes` limit are checked before the snapshot source and node columns are allocated.
 
 ## Input
 
@@ -60,6 +63,9 @@ UTF-8 source is not converted and both return the offset unchanged (clamped). Se
 - A `Parser` and its `Tree`s are one confinement unit: one goroutine at a time. Concurrent use is detected and
   rejected, not serialized.
 - `Close`, `Reset`, an instance reset and `ParserPool.Put` invalidate the parser's live trees (`ErrTreeInvalidated`).
+- `NewParserPool` copies its options and rejects a nonzero memory limit below the engine minimum (32 MiB).
+  Closing a pool wakes waiting `Get` calls with `ErrParserClosed` and prevents a parser still being created from
+  being lent. A parser already lent is closed when returned with `Put`.
 - `Tree.Edit` mutates in place (C semantics); the tree is then only valid as `old` of the next parse, and
   `Snapshot` returns `ErrTreeEdited`. Take snapshots before editing.
 - A leaked tree or parser is cleaned up by queueing; only the owning goroutine calls into the engine.

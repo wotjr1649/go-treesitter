@@ -151,8 +151,50 @@ func TestSnapshotNodeCap(t *testing.T) {
 	tr := mustParse(t, p, "a b c")
 	_, err = tr.Snapshot(bg)
 	wantPE(t, err, ResourceLimit, false)
+	_, exportErr := p.c.export(bg, tr.ptr, func() string {
+		t.Fatal("snapshot source requested before checking the node limit")
+		return ""
+	}, false)
+	wantPE(t, exportErr, ResourceLimit, false)
+	tr.Close()
 	if _, err := p.ParseSnapshot(bg, []byte("a b")); err != nil { // 3 nodes fit
 		t.Fatal(err)
+	}
+}
+
+func TestParseSnapshotCancelBeforeCopies(t *testing.T) {
+	for _, tc := range []struct {
+		cancelAt        string
+		parses, exports int
+	}{
+		{cancelAt: "malloc"},
+		{cancelAt: "parse", parses: 1},
+		{cancelAt: "export_begin", parses: 1, exports: 1},
+	} {
+		t.Run(tc.cancelAt, func(t *testing.T) {
+			fl := newFakeLang(nil)
+			p := newP(t, fl)
+			f := fl.cur()
+			ctx, cancel := context.WithCancel(bg)
+			defer cancel()
+			f.onCall = func(name string) {
+				if name == tc.cancelAt {
+					cancel()
+				}
+			}
+			snap, err := p.ParseSnapshot(ctx, []byte("a b"))
+			wantPE(t, err, Cancelled, false)
+			if snap != nil || f.count("free") != 1 || len(f.trees) != 0 || f.count("export_next") != 0 {
+				t.Fatalf("unexpected work or retained tree after cancellation: %v", f.calls)
+			}
+			if f.count("parse") != tc.parses || f.count("export_begin") != tc.exports || f.count("export_end") != tc.exports {
+				t.Fatalf("unexpected parse or export calls: %v", f.calls)
+			}
+			f.onCall = nil
+			if snap, err := p.ParseSnapshot(bg, []byte("next")); err != nil || snap.Source() != "next" || fl.cur() != f {
+				t.Fatalf("reuse after cancellation: snapshot %v, error %v", snap, err)
+			}
+		})
 	}
 }
 
@@ -351,6 +393,7 @@ func TestIncompatibleLanguage(t *testing.T) {
 func TestOptionValidation(t *testing.T) {
 	fl := newFakeLang(nil)
 	for name, o := range map[string]Option{
+		"nil option":                  nil,
 		"input<0":                     WithMaxInputBytes(-1),
 		"input>2GiB":                  WithMaxInputBytes(1 << 31),
 		"memory<0":                    WithMaxMemoryBytes(-1),
@@ -366,6 +409,9 @@ func TestOptionValidation(t *testing.T) {
 		wantPE(t, err, InvalidInput, false)
 		if !errors.Is(err, ErrInvalidInput) {
 			t.Errorf("%s: %v", name, err)
+		}
+		if pool, err := NewParserPool(fl.lang, 1, o); pool != nil || !errors.Is(err, ErrInvalidInput) {
+			t.Errorf("%s: NewParserPool = %p, %v", name, pool, err)
 		}
 	}
 	if _, err := NewParser(nil); !errors.Is(err, ErrInvalidInput) {
