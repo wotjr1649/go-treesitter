@@ -58,13 +58,17 @@ Go selects the highest root that any selected module requires. Each new tag decl
 root `v0.7.0` is the recommended pairing. The [compatibility table](docs/reports/compatibility.md) records the tested combinations and the
 [support table](docs/reports/grammar-support.md) lists known limits by tag.
 
-Install the root and the grammar modules you use, each at the tag in the table above. For example,
+Install the root and the grammar modules you use, each at the tag in the table above. Until v0.7.0 is published, use
+the [v0.6.0 install example](https://github.com/wotjr1649/go-treesitter/blob/v0.6.0/README.md#use) (the root and every
+grammar at `v0.6.0`). After v0.7.0 is published, for example,
 
 ```sh
 go get github.com/wotjr1649/go-treesitter@v0.7.0
 go get github.com/wotjr1649/go-treesitter/grammars/golang@v0.6.0
 go get github.com/wotjr1649/go-treesitter/grammars/swift@v0.7.0
 ```
+
+Upgrading only the root to v0.7.0 keeps your existing grammar tags; a grammar changes only when you request its new tag.
 
 ```go
 import (

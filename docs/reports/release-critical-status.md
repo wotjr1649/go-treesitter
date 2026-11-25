@@ -35,8 +35,8 @@ were not finished when this table was written; the release-form commit records t
 
 | Gate | v0.7.0 candidate result | Scope |
 |---|---|---|
-| Windows product lane | PASS, 4/4 jobs (push run) | Native Windows amd64/arm64 product execution and licence checks. [45540776291](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776291) |
-| Grammar pin move evidence | PASS, 1/1 push job | The push supplies no explicit comparison refs. Swift `fef1236` has its own old/new pin evidence on PR [#112](https://github.com/wotjr1649/go-treesitter/pull/112) (run [45351697893](https://github.com/wotjr1649/go-treesitter/actions/runs/45351697893)). [45540776201](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776201) |
+| Windows product lane | PASS, E3 product (push run): 2 native product jobs, 1 licence job and 1 diagnostic CGO race job, 4/4 | Native Windows amd64/arm64 product execution (CGO 0) and licence checks. The race job contributes diagnostic evidence only. [45540776291](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776291) |
+| Grammar pin move evidence | PASS, 1/1 push job, diff skipped | The push supplies no explicit comparison refs. Swift `fef1236` has its own old/new pin evidence on PR [#112](https://github.com/wotjr1649/go-treesitter/pull/112) (run [45351697893](https://github.com/wotjr1649/go-treesitter/actions/runs/45351697893)). [45540776201](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776201) |
 | Reproducible generation | Pending (push run in progress) | All 25 Linux amd64 grammar shards must match the committed bytes, including the five regenerated patched or moved modules. [45540776220](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776220) |
 | Conformance | Pending (push run queued) | 25 grammar shards and one aggregate per Linux architecture: native dumps, seeded edits and ranges, raw query matches, strict fresh/edited fields, symbol lookups and retained known gaps. [45540776333](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776333) |
 | Engine CI | Pending (push run queued) | Native Linux amd64/arm64, macOS arm64 and Windows amd64/arm64 on Go 1.27.x, plus native Linux amd64 on supported Go 1.26.x, and the consumer-compatibility job. [45540776204](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776204) |
@@ -44,10 +44,12 @@ were not finished when this table was written; the release-form commit records t
 | Balancing cancellation | Pending (dispatched run queued) | Linux amd64 probe builds for every registered grammar. [45540887195](https://github.com/wotjr1649/go-treesitter/actions/runs/45540887195) |
 | Nightly diff | Pending (dispatched run queued) | All 25 grammars on Linux amd64/arm64, seed `20261125`. [45540891798](https://github.com/wotjr1649/go-treesitter/actions/runs/45540891798) |
 | Upstream watch | Pending (dispatched run queued) | Source-age and nvim-treesitter comparison for every pin. [45540895804](https://github.com/wotjr1649/go-treesitter/actions/runs/45540895804) |
-| Windows amd64 local bench of the five new tags | Pending | Maintainer-local paired bench on `css`, `powershell`, `ruby`, `swift` and `xml`. The hosted bench does not run Windows. |
-| Candidate module ZIP rehearsal | NOT_RUN | Runs on the release-form commits (publication steps 1 and 4). |
+| Windows amd64 local bench of the five new tags | PASS, E4, maintainer-local, 5/5 grammars | Candidate `7e24331`, Windows amd64, Go 1.27.4, `CGO_ENABLED=0`, `swift`, `xml`, `css`, `ruby` and `powershell`, with the hosted bench's workflow steps and its declared repetitions (5 rounds x 5 reps for large inputs, 3 x 7 for small files, 3 fresh processes per memory condition). Every measured criterion passed, with no failure or re-check: large-input geomean 1.388 over the 7 registered large files (per-file median 1.376; limit 2.5), small-file medians at most 0.018 ms (Swift 313, XML 16, CSS 40, Ruby 291 and PowerShell 165 files, all passing on the first pass), peaks within their limits, private-byte growth at most 5.6 MiB (limit 16) and every engine region returned. The smallest peak margin is Ruby's snapshot: 183.3 MiB against the 193.5 MiB limit. The evidence covers these inputs and this host only and is not E5 or a release gate. The other 20 grammars on Windows and Windows arm64 are NOT_RUN; the hosted bench has no Windows lane. |
+| Root ZIP rehearsal (step 1) | NOT_RUN | Before the root tag: the exact root version from a file `GOPROXY` with the carried-forward `v0.6.0` grammar tags (empty module and cache, no `replace`, `CGO_ENABLED=0`, a parse smoke test per grammar, `linux/arm64` cross-build). No owner approval needed; the tag push does need it. |
+| New-grammar ZIP rehearsal (steps 1 and 4) | NOT_RUN | After the step-4 release-form commit and before the step-5 grammar tags: each new tag alone at root `v0.6.0`, and mixed with the carried-forward tags at root `v0.7.0`, from a file `GOPROXY`. |
 | Candidate source-row inventory | Listing only, local E1 | `gen -mirror-assets` lists 34 rows: 26 `source` and eight `toolchain`. Draft upload would be the 26 source archives plus `SHA256SUMS`. Downloads and digest checks: NOT_RUN. |
-| Tag/proxy resolution and published mirror assets | NOT_RUN | Publication steps; each needs separate owner authority. |
+| Tag/proxy resolution (steps 3 and 6) | NOT_RUN | After the tags exist: `GOPROXY=direct` and the public proxy, read-only. |
+| Draft assets, publication and published mirror assets (steps 7 to 10) | NOT_RUN | Asset digests, `gh release verify` and anonymous source-archive downloads follow the draft release and publication. |
 
 - **Changed source archive.** Only the Swift archive differs from the v0.6.0 release inventory:
   `tree-sitter-swift-fef12360.tar.gz` replaces `tree-sitter-swift-a1d4a7b8.tar.gz`. The XML, CSS, Ruby and PowerShell
@@ -55,12 +57,19 @@ were not finished when this table was written; the release-form commit records t
 - **Patch evidence.** Each patched module records its own old/new comparison and native agreement in the
   [schema register](../validation/grammar-schemas.md#v070-xml-name-patches) and in [limitations](limitations.md), rows 30
   to 33. Those results are local Windows amd64 E4/E5 on the recorded inputs; they are not candidate-commit evidence.
-- **Source watch.** The `swift` pin moved to `fef1236`, the nvim-treesitter revision named by the v0.6.0 watch. The v0.6.0 acceptance of the Swift
-  `we are behind` warning (until 2027-02-24, [#109](https://github.com/wotjr1649/go-treesitter/issues/109)) stays in
-  `accepted-warnings.json`; the watch run decides whether it is still needed.
+- **Source watch.** The `swift` pin moved to `fef1236`, the nvim-treesitter revision named by the v0.6.0 watch. The
+  v0.6.0 board keeps its historical note: the owner accepted the Swift `we are behind` warning until 2027-02-24
+  ([#109](https://github.com/wotjr1649/go-treesitter/issues/109), now closed). PR #112 removed that acceptance from
+  `accepted-warnings.json` when it moved the pin, so the v0.7.0 candidate has no Swift exception. The candidate watch run
+  is [45540895804](https://github.com/wotjr1649/go-treesitter/actions/runs/45540895804).
 
-The local rehearsal and the public module checks follow the publication procedure after the owner approves tags. The
-[known limitations](limitations.md) describe the scope of this Preview.
+- **Order and approvals.** Per the [publication procedure](../specs/publication.md#multi-module-release): the gates and
+  both local file-`GOPROXY` rehearsals (root before its tag, new grammars after the step-4 commit and before their tags)
+  need no approval. Pushing the root tag, pushing the grammar tags, creating the draft release and publishing it each
+  need separate owner approval. The direct and public-proxy checks and the mirror download check are read-only and run
+  after the tags or the publication they check.
+
+The [known limitations](limitations.md) describe the scope of this Preview.
 
 ## v0.6.0 release scope
 
