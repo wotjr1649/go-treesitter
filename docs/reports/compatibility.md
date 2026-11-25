@@ -6,7 +6,8 @@ grammar record its declared minimum root and engine ABI, and link to the source 
 the release's pins and module provenance. Group modules when their versions, commits, minimum root, ABI and
 evidence scope match. Record minimum-root and recommended-root consumer results with their platform, commands and
 evidence links. The [publication procedure](../specs/publication.md#multi-module-release) defines the checks and
-the [limitations report](limitations.md) tracks known support limits.
+the [per-grammar support table](grammar-support.md) tracks known grammar limits by tag. The
+[limitations report](limitations.md) covers the wider preview scope.
 
 | Requested / selected root (commit) | New grammar tags (commit) | Carried-forward tags | Minimum root | Engine ABI | Source and generator identities | Consumer evidence |
 |---|---|---|---|---|---|---|

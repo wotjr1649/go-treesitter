@@ -357,6 +357,30 @@ func TestKnownGapDocs(t *testing.T) {
 	}
 }
 
+// The support table is maintained by hand. Only its development links track the live register, and each must sit in a table row.
+func TestKnownGapDocsSupportLinks(t *testing.T) {
+	want := map[string]bool{}
+	for _, g := range loadKnownGaps(t).Entries {
+		want[fmt.Sprintf("../known-gaps/%s.md#%s", g.Grammar, g.ID)] = true
+	}
+	path := "../../docs/reports/grammar-support.md"
+	link := regexp.MustCompile(`\]\((\.\./known-gaps/[^#)]+\.md#[^)]+)\)`)
+	for _, line := range strings.Split(string(readFile(t, path)), "\n") {
+		if !strings.HasPrefix(line, "|") {
+			continue
+		}
+		for _, match := range link.FindAllStringSubmatch(line, -1) {
+			if !want[match[1]] {
+				t.Errorf("%s: stale or duplicate register link %s", path, match[1])
+			}
+			delete(want, match[1])
+		}
+	}
+	for _, target := range slices.Sorted(maps.Keys(want)) {
+		t.Errorf("%s: missing register link %s", path, target)
+	}
+}
+
 var taskCode = regexp.MustCompile(`\b[PQ][0-9]{1,2}\b`)
 
 // A tracked file may name a scratch path only where it is a rule (the files below), a frozen record, or a line that also
