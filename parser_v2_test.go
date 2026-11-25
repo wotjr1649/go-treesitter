@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"slices"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 	"unsafe"
@@ -573,6 +574,96 @@ func TestTreeCloseOnce(t *testing.T) {
 	}
 }
 
+func TestTreeBusyGuard(t *testing.T) {
+	fl := newFakeLang(nil)
+	p := newP(t, fl)
+	tr, old := mustParse(t, p, "a"), mustParse(t, p, "b")
+	defer runtime.KeepAlive(old)
+	if _, err := tr.Snapshot(bg); err != nil {
+		t.Fatal(err)
+	}
+	started, resume := make(chan struct{}), make(chan struct{})
+	f := fl.cur()
+	f.onCall = func(name string) {
+		if name == "edit" {
+			close(started)
+			<-resume
+		}
+	}
+	edited := make(chan error, 1)
+	go func() { edited <- tr.Edit(InputEdit{NewEndByte: 1}) }()
+	select {
+	case <-started:
+	case err := <-edited:
+		t.Fatalf("Edit did not reach the engine: %v", err)
+	}
+	snap, snapshotErr := tr.Snapshot(bg)
+	editErr := tr.Edit(InputEdit{})
+	_, rangesErr := tr.ChangedRanges(old)
+
+	var closers sync.WaitGroup
+	for range 2 {
+		closers.Go(tr.Close)
+	}
+	closers.Wait()
+	deletesWhileBusy := f.count("delete")
+
+	inputBytes := make(chan int, 1)
+	go func() {
+		<-resume
+		inputBytes <- tr.InputBytes()
+	}()
+	close(resume)
+	if err := <-edited; err != nil {
+		t.Fatal(err)
+	}
+	if n := <-inputBytes; (n != 1 && n != 2) || tr.InputBytes() != 2 {
+		t.Fatalf("input length during/after Edit: %d/%d", n, tr.InputBytes())
+	}
+	if snap != nil || !errors.Is(snapshotErr, ErrInvalidInput) || !errors.Is(editErr, ErrInvalidInput) ||
+		!errors.Is(rangesErr, ErrInvalidInput) {
+		t.Fatalf("busy Snapshot cache hit = %t, Snapshot error = %v, Edit error = %v, ChangedRanges error = %v",
+			snap != nil, snapshotErr, editErr, rangesErr)
+	}
+	if deletesWhileBusy != 0 {
+		t.Fatal("Close deleted a tree while the parser was busy")
+	}
+	if _, err := tr.Snapshot(bg); !errors.Is(err, ErrTreeInvalidated) {
+		t.Fatalf("Snapshot after Close: %v", err)
+	}
+	mustParse(t, p, "next")
+	if f.count("delete") != 1 {
+		t.Fatalf("deferred Close deleted %d trees, want 1", f.count("delete"))
+	}
+}
+
+func TestParseOldTreeClosedDuringDrain(t *testing.T) {
+	fl := newFakeLang(nil)
+	p := newP(t, fl)
+	old, queued := mustParse(t, p, "a"), mustParse(t, p, "b")
+	if err := old.Edit(InputEdit{}); err != nil {
+		t.Fatal(err)
+	}
+	p.c.busy.Store(true)
+	queued.Close()
+	p.c.end()
+	f := fl.cur()
+	f.onCall = func(name string) {
+		if name == "delete" {
+			old.Close()
+		}
+	}
+	tr, err := p.Parse(bg, []byte("c"), old)
+	if tr != nil || !errors.Is(err, ErrTreeInvalidated) || f.count("parse") != 2 {
+		t.Fatalf("Parse with old tree closed during cleanup: tree %p, error %v, calls %v", tr, err, f.calls)
+	}
+	f.onCall = nil
+	mustParse(t, p, "next")
+	if f.count("delete") != 2 || p.c.live != 1 {
+		t.Fatalf("deferred closes: deletes %d, live trees %d", f.count("delete"), p.c.live)
+	}
+}
+
 func TestRecycle(t *testing.T) {
 	fl := newFakeLang(nil)
 	p := newP(t, fl, WithRecycleAboveBytes(1<<10))
@@ -634,8 +725,8 @@ func TestSnapshotExportCancel(t *testing.T) {
 	if err != nil || snap.Len() != 9 {
 		t.Fatalf("retry: %v", err)
 	}
-	if again, _ := tr.Snapshot(bg); again != snap || f.count("export_begin") != 2 {
-		t.Fatal("snapshot must be cached")
+	if again, err := tr.Snapshot(ctx); err != nil || again != snap || f.count("export_begin") != 2 {
+		t.Fatalf("cached snapshot with a canceled context: %v", err)
 	}
 }
 

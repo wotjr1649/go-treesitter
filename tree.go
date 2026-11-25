@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"runtime"
+	"sync/atomic"
 )
 
 // Tree is a complete parse tree living in its Parser's engine instance. It belongs to the Parser's confinement unit.
@@ -16,16 +17,17 @@ type Tree struct {
 	gen         uint64
 	ptr         int32
 	src         string
-	inputLen    int // current input length; Edit keeps it in step
+	inputLen    atomic.Int64 // current input length; Edit keeps it in step
 	outcome     Outcome
 	invalidUTF8 bool
 	edited      bool
-	closed      bool
+	closed      atomic.Bool
 	snap        *Snapshot
 	cleanup     runtime.Cleanup
 }
 
-func (t *Tree) valid() bool { return !t.closed && t.gen == t.p.c.gen && !t.p.c.closed }
+// valid reads the parser's generation under the busy guard.
+func (t *Tree) valid() bool { return !t.closed.Load() && t.gen == t.p.c.gen && !t.p.c.closed }
 
 // Outcome is AcceptedClean or AcceptedWithErrors.
 func (t *Tree) Outcome() Outcome { return t.outcome }
@@ -34,7 +36,7 @@ func (t *Tree) Outcome() Outcome { return t.outcome }
 func (t *Tree) HasInvalidUTF8() bool { return t.invalidUTF8 }
 
 // InputBytes is the length of the source the tree describes (updated by Edit).
-func (t *Tree) InputBytes() int { return t.inputLen }
+func (t *Tree) InputBytes() int { return int(t.inputLen.Load()) }
 
 // Snapshot exports the tree into an immutable Snapshot. The result is cached; the export is chunked and checks ctx
 // between chunks (Timeout/Cancelled leave the tree intact). An edited tree returns ErrTreeEdited: take snapshots
@@ -45,6 +47,10 @@ func (t *Tree) Snapshot(ctx context.Context) (*Snapshot, error) {
 	if ctx == nil {
 		return nil, perr(InvalidInput, "nil context", nil)
 	}
+	if !c.busy.CompareAndSwap(false, true) {
+		return nil, perr(InvalidInput, "parser is in use by another goroutine", nil)
+	}
+	defer c.end()
 	if !t.valid() {
 		return nil, ErrTreeInvalidated
 	}
@@ -54,10 +60,12 @@ func (t *Tree) Snapshot(ctx context.Context) (*Snapshot, error) {
 	if t.snap != nil {
 		return t.snap, nil
 	}
-	if err := c.begin(ctx); err != nil {
+	if ctx.Err() != nil {
+		return nil, ctxError(ctx, "context done before the call")
+	}
+	if err := c.drainQueries(); err != nil {
 		return nil, err
 	}
-	defer c.end()
 	snap, e := c.export(ctx, t.ptr, func() string { return t.src }, t.invalidUTF8)
 	if e != nil {
 		return nil, e
@@ -78,21 +86,22 @@ type InputEdit struct {
 func (t *Tree) Edit(e InputEdit) error {
 	c := t.p.c
 	defer runtime.KeepAlive(t)
-	if !t.valid() {
-		return ErrTreeInvalidated
-	}
-	switch {
-	case e.StartByte > e.OldEndByte || e.StartByte > e.NewEndByte:
-		return fmt.Errorf("%w: edit start %d is after an end (%d, %d)", ErrInvalidInput, e.StartByte, e.OldEndByte, e.NewEndByte)
-	case int64(e.OldEndByte) > int64(t.inputLen):
-		return fmt.Errorf("%w: edit old end %d is beyond the %d-byte input", ErrInvalidInput, e.OldEndByte, t.inputLen)
-	case e.StartPoint.key() > e.OldEndPoint.key() || e.StartPoint.key() > e.NewEndPoint.key():
-		return fmt.Errorf("%w: edit start point is after an end point", ErrInvalidInput)
-	}
 	if !c.busy.CompareAndSwap(false, true) {
 		return perr(InvalidInput, "parser is in use by another goroutine", nil)
 	}
 	defer c.end()
+	if !t.valid() {
+		return ErrTreeInvalidated
+	}
+	inputLen := t.InputBytes()
+	switch {
+	case e.StartByte > e.OldEndByte || e.StartByte > e.NewEndByte:
+		return fmt.Errorf("%w: edit start %d is after an end (%d, %d)", ErrInvalidInput, e.StartByte, e.OldEndByte, e.NewEndByte)
+	case int64(e.OldEndByte) > int64(inputLen):
+		return fmt.Errorf("%w: edit old end %d is beyond the %d-byte input", ErrInvalidInput, e.OldEndByte, inputLen)
+	case e.StartPoint.key() > e.OldEndPoint.key() || e.StartPoint.key() > e.NewEndPoint.key():
+		return fmt.Errorf("%w: edit start point is after an end point", ErrInvalidInput)
+	}
 	in := c.inst
 	if err := ops.call(func() {
 		in.m.Xtsg_tree_edit(t.ptr, int32(e.StartByte), int32(e.OldEndByte), int32(e.NewEndByte),
@@ -102,7 +111,7 @@ func (t *Tree) Edit(e InputEdit) error {
 		return c.trapped(err, "tsg_tree_edit")
 	}
 	t.edited, t.snap = true, nil
-	t.inputLen += int(e.NewEndByte) - int(e.OldEndByte)
+	t.inputLen.Store(int64(inputLen + int(e.NewEndByte) - int(e.OldEndByte)))
 	return nil
 }
 
@@ -115,16 +124,16 @@ func (t *Tree) ChangedRanges(old *Tree) ([]Range, error) {
 	if old == nil || old.p == nil || old.p.c != c {
 		return nil, perr(InvalidInput, "old tree is nil or belongs to another parser", nil)
 	}
+	if !c.busy.CompareAndSwap(false, true) {
+		return nil, perr(InvalidInput, "parser is in use by another goroutine", nil)
+	}
+	defer c.end()
 	if !t.valid() || !old.valid() {
 		return nil, ErrTreeInvalidated
 	}
 	if t.edited {
 		return nil, ErrTreeEdited
 	}
-	if !c.busy.CompareAndSwap(false, true) {
-		return nil, perr(InvalidInput, "parser is in use by another goroutine", nil)
-	}
-	defer c.end()
 	in := c.inst
 	var blk int32
 	if err := ops.call(func() { blk = in.m.Xtsg_changed_ranges(old.ptr, t.ptr) }); err != nil {
@@ -162,24 +171,23 @@ func (t *Tree) ChangedRanges(old *Tree) ([]Range, error) {
 	return out, nil
 }
 
-// Close frees the tree. It is idempotent and never fails; if the parser is busy on another goroutine the free is
-// queued for the owner.
+// Close marks the tree closed and frees its handle. It is idempotent. If the parser is busy, Close queues the
+// handle for the owner to free.
 func (t *Tree) Close() {
-	if t.closed {
+	if !t.closed.CompareAndSwap(false, true) {
 		return
 	}
 	defer runtime.KeepAlive(t)
-	t.closed = true
 	t.cleanup.Stop()
 	c := t.p.c
-	if t.gen != c.gen || c.closed || c.inst == nil {
-		return // the instance (and the tree with it) is already gone
-	}
 	if !c.busy.CompareAndSwap(false, true) {
 		c.enqueueLeak(leakedTree{t.ptr, t.gen})
 		return
 	}
 	defer c.end()
+	if t.gen != c.gen || c.closed || c.inst == nil {
+		return // the instance (and the tree with it) is already gone
+	}
 	c.live--
 	delete(c.ptrs, t.ptr)
 	if c.deleteTree(t.ptr) == nil {

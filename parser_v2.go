@@ -225,7 +225,7 @@ func (c *core) enqueueLeak(l leakedTree) {
 	c.mu.Unlock()
 }
 
-// drainLeaked frees trees whose owners were garbage collected. Owner goroutine only.
+// drainLeaked frees trees queued by GC or by Close while the parser was busy. Owner goroutine only.
 func (c *core) drainLeaked() *ParseError {
 	c.mu.Lock()
 	q := c.leaked
@@ -328,6 +328,10 @@ func (c *core) run(ctx context.Context, src []byte, old *Tree) (ptr int32, inval
 	if e := c.drainLeaked(); e != nil {
 		return 0, false, e
 	}
+	// Close can queue old between its validity check and the drain.
+	if old != nil && old.closed.Load() {
+		return 0, false, perr(InvalidInput, "old tree is closed or invalidated", ErrTreeInvalidated)
+	}
 	c.maybeRecycle()
 	if c.inst == nil {
 		if err := c.recreate(); err != nil {
@@ -396,7 +400,8 @@ func (p *Parser) Parse(ctx context.Context, src []byte, old *Tree) (*Tree, error
 	return p.parse(ctx, src, old, false)
 }
 
-// ParseOwned is Parse without the source copy: the caller transfers ownership of src and must never modify it again.
+// ParseOwned is Parse without the source copy. The caller transfers ownership of src and must never modify its bytes
+// again, including through any other slice that shares the backing array.
 func (p *Parser) ParseOwned(ctx context.Context, src []byte, old *Tree) (*Tree, error) {
 	return p.parse(ctx, src, old, true)
 }
@@ -426,7 +431,8 @@ func (p *Parser) parse(ctx context.Context, src []byte, old *Tree, owned bool) (
 	if e != nil {
 		return nil, e
 	}
-	t := &Tree{p: p, gen: gen, ptr: ptr, src: text, inputLen: len(src), outcome: outcome, invalidUTF8: invalid}
+	t := &Tree{p: p, gen: gen, ptr: ptr, src: text, outcome: outcome, invalidUTF8: invalid}
+	t.inputLen.Store(int64(len(src)))
 	t.cleanup = runtime.AddCleanup(t, func(a leakArg) { a.c.enqueueLeak(leakedTree{a.ptr, a.gen}) }, leakArg{c, ptr, gen})
 	c.live++
 	if c.ptrs == nil {

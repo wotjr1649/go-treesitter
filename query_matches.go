@@ -86,11 +86,12 @@ func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, yield f
 	if c.lang.g.ABI < 2 {
 		return ErrQueryUnsupported
 	}
+	inputLen := t.InputBytes()
 	end := opts.EndByte
 	if end == 0 {
-		end = uint32(t.inputLen)
+		end = uint32(inputLen)
 	}
-	if opts.StartByte > end || uint64(end) > uint64(t.inputLen) {
+	if opts.StartByte > end || uint64(end) > uint64(inputLen) {
 		return perr(InvalidInput, "query byte range is outside the source", nil)
 	}
 	if t.snap == nil {

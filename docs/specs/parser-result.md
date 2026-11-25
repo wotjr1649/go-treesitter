@@ -60,8 +60,9 @@ UTF-8 source is not converted and both return the offset unchanged (clamped). Se
 
 ## Ownership, lifetime, concurrency
 
-- A `Parser` and its `Tree`s are one confinement unit: one goroutine at a time. Concurrent use is detected and
-  rejected, not serialized.
+- A `Parser` and its `Tree`s are one confinement unit: use them from one goroutine at a time. Operations that need
+  the parser's busy guard, including cached `Tree.Snapshot`, reject overlapping operations with `ErrInvalidInput`
+  when the guard is held. `Tree.Close` marks the tree closed once and queues its handle if the guard is held.
 - `Close`, `Reset`, an instance reset and `ParserPool.Put` invalidate the parser's live trees (`ErrTreeInvalidated`).
 - `NewParserPool` copies its options and rejects a nonzero memory limit below the engine minimum (32 MiB).
   Closing a pool wakes waiting `Get` calls with `ErrParserClosed` and prevents a parser still being created from
@@ -70,8 +71,11 @@ UTF-8 source is not converted and both return the offset unchanged (clamped). Se
   `Snapshot` returns `ErrTreeEdited`. Take snapshots before editing.
 - A leaked tree or parser is cleaned up by queueing; only the owning goroutine calls into the engine.
 - `Snapshot`, `Node`, `Index`, `LineIndex` are immutable and safe for any number of goroutines. A snapshot owns its
-  source (one copy; none with `ParseOwned`, whose caller must never modify the bytes again) and stays valid after the
-  parser is closed. `Node.Text` is a zero-allocation substring of that source.
+  source and stays valid after the parser is closed. `ParseOwned` transfers ownership of the input bytes to avoid
+  a copy. The caller must never modify them again, including through any alias. `Node.Text` is a zero-allocation
+  substring of that source.
+- `Source.Bytes` and `Source.Original` return read-only views. The caller must leave their bytes and the original
+  input unchanged, including through any alias.
 - Snapshot arrays retain 25 B/node (previously 41), plus sparse field exceptions and source. Node points derive
   LF-counted rows and byte columns from source offsets using a shared, lazy `sync.Once` line index:
   `[]uint32` line starts cost `4 * (LF count + 1)` bytes plus fixed object/allocator overhead, with at most
