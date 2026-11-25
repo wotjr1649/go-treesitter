@@ -4,14 +4,16 @@ name: Comparative benchmark
 #
 # Trigger: workflow_dispatch only, and only for the reviewed main branch: every job refuses any other ref.
 #
-# Threat model (tools/compare/README.md): the isolation boundary is the ephemeral GitHub-hosted runner VM of each job.
-# The job protects the repository and its credentials: top-level permissions are empty and no job asks for any, there are no
-# secrets, no id-token, no caches and no environment, the commit is fetched anonymously (the repository is public; checkout
-# would need contents: read only for its token), actions are pinned by commit SHA, and nothing an artifact contains is ever
-# executed or fed to a later privileged step. Candidates and the product run as the runner user in the same VM, which paired
-# timing needs; the integrity of a number against a malicious candidate is NOT protected (it could falsify its own job's rows).
-# Correctness is cross-checked against the native C reference, and the aggregate job validates every artifact with strict
-# schemas and bounded reads.
+# Threat model (tools/compare/README.md): the isolation boundary is the ephemeral GitHub-hosted runner VM of each job. The
+# workflow protects the repository: top-level permissions are empty and no job asks for any (GITHUB_TOKEN has none), there are no
+# secrets, no id-token, no caches and no environment, the commit is fetched anonymously (the repository is public; checkout would
+# need contents: read only for its token), and actions are pinned by commit SHA. It does NOT protect the job's own Actions runtime
+# credentials or the integrity of numbers against a malicious candidate: candidates run as the runner user in the same VM as the
+# product (paired timing needs it), so they can reach the artifact-service credential of that run and could forge or add artifacts
+# of this run, the same class as falsifying their own numbers (owner decision 2026-11-25). Each measuring job uploads exactly one
+# explicitly named bundle file, written by the measurer after validating the results; the aggregate job (no candidate code) downloads
+# only the 12 expected names undecompressed, checks each bundle's size, entry count and paths before extracting a byte, parses with
+# strict typed schemas, and uploads only its validated summary, and only when every bundle was accepted.
 #
 # Module pins: tools/compare/adapters/*/go.mod. Their go.sum files must be committed before a measuring run:
 #   1. Dispatch once with bootstrap=true. Only the proposal job runs: it resolves each module graph on a copy with
@@ -71,11 +73,13 @@ jobs:
         env:
           STAGE_MODE: bootstrap
         run: bash tools/compare/scripts/stage.sh "$T" none
-      - name: Upload the proposal
+      - name: Bundle the proposal
+        run: '"$T/bin/compare" pack -dir "$T/out" -out "$T/pack/compare-go-sum-proposal.zip"'
+      - name: Upload the proposal (one explicit file)
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
-          name: compare-go-sum-proposal
-          path: ${{ runner.temp }}/cmp/out
+          path: ${{ runner.temp }}/cmp/pack/compare-go-sum-proposal.zip
+          archive: false
           if-no-files-found: error
           retention-days: 14
 
@@ -115,12 +119,18 @@ jobs:
       - name: Record the run's identity
         if: ${{ !cancelled() }}
         run: bash tools/compare/scripts/identity.sh "$T" "$MODE"
-      - name: Upload the results (validated later, never executed)
+      - name: Validate the results and write the one bundle (the measurer)
+        id: bundle
         if: ${{ !cancelled() }}
+        run: |
+          "$T/bin/compare" collect -in "$T/out" -out "$T/validated"
+          "$T/bin/compare" pack -dir "$T/validated" -out "$T/pack/compare-${{ matrix.runner }}-${{ matrix.lang }}.zip"
+      - name: Upload the bundle (one explicit file; nothing is uploaded unless validation succeeded)
+        if: ${{ !cancelled() && steps.bundle.outcome == 'success' }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
-          name: compare-${{ matrix.runner }}-${{ matrix.lang }}
-          path: ${{ runner.temp }}/cmp/out
+          path: ${{ runner.temp }}/cmp/pack/compare-${{ matrix.runner }}-${{ matrix.lang }}.zip
+          archive: false
           if-no-files-found: error
           retention-days: 14
 
@@ -161,12 +171,18 @@ jobs:
       - name: Record the run's identity
         if: ${{ !cancelled() }}
         run: bash tools/compare/scripts/identity.sh "$T" "$MODE"
-      - name: Upload the results (validated later, never executed)
+      - name: Validate the results and write the one bundle (the measurer)
+        id: bundle
         if: ${{ !cancelled() }}
+        run: |
+          "$T/bin/compare" collect -in "$T/out" -out "$T/validated"
+          "$T/bin/compare" pack -dir "$T/validated" -out "$T/pack/compare-nocc-${{ matrix.runner }}.zip"
+      - name: Upload the bundle (one explicit file; nothing is uploaded unless validation succeeded)
+        if: ${{ !cancelled() && steps.bundle.outcome == 'success' }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
-          name: compare-nocc-${{ matrix.runner }}
-          path: ${{ runner.temp }}/cmp/out
+          path: ${{ runner.temp }}/cmp/pack/compare-nocc-${{ matrix.runner }}.zip
+          archive: false
           if-no-files-found: error
           retention-days: 14
       - name: The product must build and parse without a C compiler
@@ -201,17 +217,79 @@ jobs:
         run: bash tools/compare/scripts/stage.sh "$T" none
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
+          name: compare-ubuntu-24.04-c.zip
           path: results
-      - name: Validate every artifact with strict schemas and report (executes nothing from them)
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-go.zip
+          path: results
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-javascript.zip
+          path: results
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-json.zip
+          path: results
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-python.zip
+          path: results
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-nocc-ubuntu-24.04.zip
+          path: results
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-arm-c.zip
+          path: results
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-arm-go.zip
+          path: results
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-arm-javascript.zip
+          path: results
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-arm-json.zip
+          path: results
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-arm-python.zip
+          path: results
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-nocc-ubuntu-24.04-arm.zip
+          path: results
+          skip-decompress: true
+      - name: Validate every bundle (bounded unpack, strict schemas) and report; executes nothing from them
         run: |
-          "$T/bin/compare" aggregate -in results -out "$T/aggregate" || rc=$?
-          [ -f "$T/aggregate/summary.md" ] && cat "$T/aggregate/summary.md" >> "$GITHUB_STEP_SUMMARY"
-          exit ${rc:-0}
-      - name: Upload the validated summary
-        if: ${{ !cancelled() }}
+          "$T/bin/compare" aggregate -in results -out "$T/aggregate" -work "$T/aggwork"
+          cat "$T/aggregate/summary.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload the validated summary (only when every bundle was accepted)
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
-          name: compare-summary
-          path: ${{ runner.temp }}/cmp/aggregate
+          path: ${{ runner.temp }}/cmp/aggregate/summary.md
+          archive: false
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload the hashes of what the summary was built from
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          path: ${{ runner.temp }}/cmp/aggregate/SHA256SUMS
+          archive: false
           if-no-files-found: error
           retention-days: 14

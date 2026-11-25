@@ -15,23 +15,39 @@ cd tools/compare/harness && go test .                  # worker protocol, edits,
 
 ## Threat model
 
-The isolation boundary is the **ephemeral GitHub-hosted runner VM of each job**. The workflow protects the repository and
-its credentials; it does **not** protect the integrity of the numbers against a malicious candidate.
+The isolation boundary is the **ephemeral GitHub-hosted runner VM of each job**. The workflow protects the repository; it does
+**not** protect that job's own Actions runtime credentials, and it does not protect the integrity of the numbers against a malicious
+candidate.
 
 * The workflow runs on `workflow_dispatch` only and every job refuses any ref but `main`. There is no pull-request or scheduled
   trigger, so a change to this directory is measured only after it has landed.
-* Top-level `permissions` are empty and no job asks for any: no `contents: read`, no secrets, no `id-token`, no caches, no
-  environment. `actions/checkout` would need `contents: read` only for its default token (its README recommends it), so the jobs
-  fetch the commit with `git fetch` instead (anonymous; the repository is public). If the repository ever became private, add
-  `contents: read` to those jobs and use the pinned checkout action. Actions that remain (artifact upload/download) are pinned by SHA.
-* Candidates and the product run as the runner user in the same VM, one after the other, because paired timing needs the same
-  machine. A malicious candidate could therefore falsify the measurements and files of **its own job**, or interfere with the
-  product's process in that job. Nothing it can reach carries a credential, and nothing it writes is executed afterwards: the
-  aggregate job downloads the artifacts, parses them with bounded, link-refusing reads and strict schemas, and runs no code
-  from them; no later privileged step consumes them.
+* Repository permissions: top-level `permissions` are empty and no job asks for any, so `GITHUB_TOKEN` has no permissions (no
+  `contents: read`), and there are no secrets, no `id-token`/OIDC, no caches and no environment. `actions/checkout` would need
+  `contents: read` only for its default token (its README recommends it), so the jobs fetch the commit with `git fetch` instead
+  (anonymous; the repository is public). If the repository ever became private, add `contents: read` to those jobs and use the pinned
+  checkout action. The actions that remain (artifact upload/download) are pinned by SHA.
+* **Residual exposure, accepted by the owner (2026-11-25).** In the `measure` and `nocc` jobs, candidate code runs as the runner user in
+  the same VM as the runner's own step processes (and GitHub-hosted Linux VMs give that user passwordless `sudo`). It can therefore
+  reach the job's Actions runtime credentials: the artifact-service token and URL that the runner hands to JavaScript actions
+  (`ACTIONS_RUNTIME_TOKEN`, `ACTIONS_RESULTS_URL`), the runner's files, and the VM. These credentials carry no repository permission.
+  The worst case is that a candidate forges or adds artifacts **of this workflow run**, which is the same class as a candidate
+  falsifying its own numbers; it cannot write to the repository, read a secret or mint an OIDC token. No claim is made that candidate code is kept
+  away from these credentials.
+* Candidates and the product run side by side in that VM, one after the other, because paired timing needs the same machine; a
+  malicious candidate could also falsify the measurements and files of its own job, or interfere with the product's process in it.
+* How results leave a job: the measurer validates its output directory with the strict collector and writes **one** explicitly
+  named bundle file (`compare-<runner>-<lang>.zip`, built by this repository's Go code); only that file is uploaded (`archive: false`),
+  and only after validation succeeded. No directory that a candidate could have filled with links is ever passed to the uploader.
+* The aggregate job runs no candidate code and checks out only the orchestrator's sources. It downloads **only the 12 expected artifact
+  names**, undecompressed (`skip-decompress`), and its Go code checks each bundle before extracting a byte: a regular file within the size
+  cap, at most 300 entries, only allowlisted unique relative paths, no links or directories, declared sizes within the per-file and total
+  caps, every stream read through a limit equal to its declared size. The extracted files then pass the strict collector (typed schemas that
+  refuse unknown fields and trailing data, exact CSV headers and value sets, rows checked against the run's own plan) before anything is
+  reported. It uploads only its summary and the hashes of what it was built from, and only when every bundle was accepted. Nothing an
+  artifact contains is ever executed or consumed by a later privileged step.
 * What is still checked: every candidate's tree is compared with a native C reference (built from that candidate's own vendored
   runtime and grammar where this implementation can, else from the product's reference as a labelled diagnostic), only
-  tree-equal results enter the ratios, and the aggregate rejects artifacts that do not match their own plan or schema.
+  tree-equal results enter the ratios, and the aggregate rejects bundles that do not match their own plan or schema.
 * Evidence: timings are at most **E4**, and only for a pair whose grammar bytes, runtime and API work are controlled
   (docs/specs/validation.md); the libraries here ship different grammars and runtimes, so the rows are descriptive observations
   of identified consumer artifacts. S-expression agreement is at most E2. No E5 claim is made anywhere.
@@ -41,7 +57,7 @@ its credentials; it does **not** protect the integrity of the numbers against a 
 | Path | Module | Role |
 | --- | --- | --- |
 | `harness/` | own | Worker command line and `Result` schema, edit construction (`MakeEdit`), S-expression comparison profiles. No candidate imports. |
-| `cmd/compare/` | `tools/compare` | `select` freezes inputs and edits, `run` measures, `check` compares trees with the native references, `nocc` builds without a C compiler, `collect`/`report`/`seal`/`aggregate` validate and summarize. |
+| `cmd/compare/` | `tools/compare` | `select` freezes inputs and edits, `run` measures, `check` compares trees with the native references, `nocc` builds without a C compiler, `collect` validates, `pack` writes the one upload bundle, `report`/`seal`/`aggregate` summarize. |
 | `adapters/<name>/` | one each | One worker binary per candidate (`product`, `official`, `smacker`, `gotreesitter`, `bonsai`, `malivvan`), each pinned by its own `go.mod`/`go.sum`. Separate modules because the two cgo bindings carry colliding C symbols. `empty` is the size baseline. |
 | `native/sexp_ref.c` | | One C driver (`sexp`, `edit-sexp`: `ts_node_string` of a fresh or incremental parse) linked with each candidate's own runtime and grammar C. The product's build uses `native-ref -driver`. |
 | `scripts/` | | `pins.env` (Go version and checksums), `stage.sh` (pinned downloads, module graphs), `measure.sh` (one measurement job), `identity.sh`. |
@@ -98,6 +114,9 @@ operation and the control.
 ## Known gaps (also listed in the implementation report)
 
 * A malicious candidate can falsify numbers in its own job (see the threat model); only the tree comparison with the native reference is independent of its answers.
+* The aggregate recounts every scheduled round pair from the rows before a cell enters a ratio, but a cell's plan (`cells.json`) comes from the same job as its rows, so a malicious candidate's job could forge both.
+* Snapshot-operation cells (product, Bonsai) are graded through the fresh parse; a large input has no edit grade, so large edit cells never enter a ratio.
+* Measurement rows are written one JSON line each; a write error marks the affected cells failed, but a row that was never attempted is not detectable beyond the round recount.
 * The check does not compare root coverage, byte ranges or points (only the S-expression structure), so a binding that gets a range wrong but prints the same tree is not caught. The snapshot operation is graded through the live-tree fresh parse of the product.
 * A single operation has a 30 s watchdog inside the worker (it prints a partial result with status `timeout`); the measurer adds a per-process ceiling. No allocation baseline for the harness itself is subtracted from the Go-heap counters.
 * The grammar C, ABI and patch identity of each library is not recorded beyond the module graph, the native references' hashes and each library's self-reported dependency versions.

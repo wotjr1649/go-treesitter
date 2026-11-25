@@ -80,17 +80,21 @@ type runOpts struct {
 }
 
 // readiness is the preflight verdict of one adapter on one language.
-type readiness struct{ kind, reason string } // kind: "" ready, "unsupported", "failed"
+type readiness struct {
+	Kind   string `json:"kind"` // "" ready, "unsupported", "failed"
+	Reason string `json:"reason"`
+}
 
 type runner struct {
-	sb    *sandbox
-	o     runOpts
-	w     Workload
-	rows  *os.File
-	enc   *json.Encoder
-	cells []Cell
-	until time.Time
-	over  bool
+	rowsLost bool
+	sb       *sandbox
+	o        runOpts
+	w        Workload
+	rows     *os.File
+	enc      *json.Encoder
+	cells    []Cell
+	until    time.Time
+	over     bool
 }
 
 func cmdRun(args []string) error {
@@ -154,12 +158,12 @@ func run(o runOpts) error {
 		for _, lang := range o.langs {
 			row := r.exec(Row{Pass: "preflight", Cell: a + "/" + lang, Role: roleOf(a), Adapter: a, Lang: lang, Op: "ctl"}, []string{"-lang", lang, "-op", "ctl", "-mode", "rss"}, 1)
 			switch {
-			case row.Res == nil || row.Exit != 0 || row.TimedOut:
-				ready[a][lang] = readiness{"failed", "worker failed: " + row.Err}
+			case row.Res == nil || row.Exit != 0 || row.TimedOut || row.Failed:
+				ready[a][lang] = readiness{Kind: "failed", Reason: "worker failed: " + row.Err}
 			case row.Res.Status == "unsupported":
-				ready[a][lang] = readiness{"unsupported", row.Res.Error}
+				ready[a][lang] = readiness{Kind: "unsupported", Reason: row.Res.Error}
 			case row.Res.Status != "ok":
-				ready[a][lang] = readiness{"failed", row.Res.Status + ": " + row.Res.Error}
+				ready[a][lang] = readiness{Kind: "failed", Reason: row.Res.Status + ": " + row.Res.Error}
 			default:
 				ident[a][lang] = row.Res.Identity
 			}
@@ -179,6 +183,9 @@ func run(o runOpts) error {
 	r.finalize()
 	r.memory()
 	r.finish(ident, ready, start)
+	if r.rowsLost {
+		return errors.New("some measurement rows could not be written; their cells are marked failed")
+	}
 	return nil
 }
 
@@ -207,12 +214,12 @@ func (r *runner) planCells(lang, cand, op string, ready map[string]map[string]re
 	for _, in := range append(small, large...) {
 		c := Cell{Key: strings.Join([]string{lang, cand, op, in.ID}, "|"), Lang: lang, Cand: cand, Op: op, Group: in.Group, Input: in.ID, State: "planned", OK: map[string]int{}, Want: r.rounds(in.Group)}
 		switch {
-		case ready[refAdapter][lang].kind != "":
-			c.State, c.Reason = "unavailable", "product: "+ready[refAdapter][lang].reason
-		case ready[cand][lang].kind == "unsupported":
-			c.State, c.Reason = "unsupported", ready[cand][lang].reason
-		case ready[cand][lang].kind == "failed":
-			c.State, c.Reason = "failed", ready[cand][lang].reason
+		case ready[refAdapter][lang].Kind != "":
+			c.State, c.Reason = "unavailable", "product: "+ready[refAdapter][lang].Reason
+		case ready[cand][lang].Kind == "unsupported":
+			c.State, c.Reason = "unsupported", ready[cand][lang].Reason
+		case ready[cand][lang].Kind == "failed":
+			c.State, c.Reason = "failed", ready[cand][lang].Reason
 		case !has(declared[cand], op):
 			c.State, c.Reason = "unsupported", "public API has no such operation (declared)"
 		case !has(declared[refAdapter], op):
@@ -301,7 +308,7 @@ func (r *runner) pairs(pass string) {
 					row = r.exec(row, r.args(pass, c.Op, in, pass, reps), reps)
 					if !complete(row, pass, reps) {
 						ok = false
-						if row.Res != nil && row.Res.Status == "unsupported" && ad == c.Cand {
+						if row.Res != nil && row.Res.Status == "unsupported" && ad == c.Cand && row.Exit == 0 && !row.TimedOut && !row.Failed {
 							c.State, c.Reason = "unsupported", row.Res.Error
 						}
 					}
@@ -322,6 +329,10 @@ func (r *runner) pairs(pass string) {
 func (r *runner) finalize() {
 	for i := range r.cells {
 		c := &r.cells[i]
+		if r.rowsLost && (c.State == "planned" || c.State == "measured") {
+			c.State, c.Reason = "failed", "measurement rows could not be written"
+			continue
+		}
 		if c.State != "planned" {
 			continue
 		}
@@ -388,7 +399,9 @@ func (r *runner) exec(row Row, args []string, reps int) Row {
 	} else if row.Err == "" {
 		row.Err = "no valid result line on stdout"
 	}
-	_ = r.enc.Encode(row)
+	if err := r.enc.Encode(row); err != nil {
+		r.rowsLost = true // a row that could not be written means the plan can no longer be recounted from the file
+	}
 	return row
 }
 
@@ -415,24 +428,44 @@ func boundResult(res *harness.Result) bool {
 	return true
 }
 
+// runInfo is run.json: a typed, closed schema (the aggregate decodes it with unknown fields refused).
+type runInfo struct {
+	Schema          int                                     `json:"schema"`
+	Seed            string                                  `json:"seed"`
+	Smoke           bool                                    `json:"smoke"`
+	Rounds          map[string]int                          `json:"rounds"`
+	Reps            map[string]int                          `json:"reps"`
+	RSSRuns         int                                     `json:"rss_runs"`
+	BudgetSeconds   float64                                 `json:"budget_seconds"`
+	OpWatchdogSecs  float64                                 `json:"op_watchdog_seconds"`
+	Started         string                                  `json:"started"`
+	Ended           string                                  `json:"ended"`
+	BudgetExhausted bool                                    `json:"budget_exhausted"`
+	RowsLost        bool                                    `json:"rows_lost"`
+	CellStates      map[string]int                          `json:"cell_states"`
+	Identity        map[string]map[string]map[string]string `json:"identity"`
+	Unavailable     map[string]map[string]readiness         `json:"unavailable"`
+	Env             map[string]string                       `json:"env"`
+	Host            map[string]string                       `json:"host"`
+	Go              string                                  `json:"go"`
+}
+
 func (r *runner) finish(ident map[string]map[string]map[string]string, ready map[string]map[string]readiness, start time.Time) {
 	must(writeJSON(filepath.Join(r.o.out, "cells.json"), r.cells))
 	counts := map[string]int{}
 	for _, c := range r.cells {
 		counts[c.State]++
 	}
-	host, _ := os.Hostname()
-	_ = host // the host name is not recorded: it identifies the runner, not the experiment
-	must(writeJSON(filepath.Join(r.o.out, "run.json"), map[string]any{
-		"schema": harness.Schema, "seed": r.o.seed, "smoke": r.o.smoke,
-		"rounds": map[string]int{"large": r.o.lRounds, "small": r.o.sRounds},
-		"reps":   map[string]int{"large": r.o.lReps, "small": r.o.sReps}, "rss_runs": r.o.rssRuns,
-		"budget_seconds": r.o.budget.Seconds(), "op_watchdog_seconds": r.o.perOp.Seconds(),
-		"started": start.UTC().Format(time.RFC3339), "ended": time.Now().UTC().Format(time.RFC3339),
-		"budget_exhausted": r.over, "cell_states": counts,
-		"identity": ident, "unavailable": ready,
-		"env":  map[string]string{"GOMAXPROCS": "1", "GOGC": "100", "LC_ALL": "C"},
-		"host": hostInfo(), "go": runtime.Version(),
+	must(writeJSON(filepath.Join(r.o.out, "run.json"), runInfo{
+		Schema: harness.Schema, Seed: r.o.seed, Smoke: r.o.smoke,
+		Rounds: map[string]int{"large": r.o.lRounds, "small": r.o.sRounds},
+		Reps:   map[string]int{"large": r.o.lReps, "small": r.o.sReps}, RSSRuns: r.o.rssRuns,
+		BudgetSeconds: r.o.budget.Seconds(), OpWatchdogSecs: r.o.perOp.Seconds(),
+		Started: start.UTC().Format(time.RFC3339), Ended: time.Now().UTC().Format(time.RFC3339),
+		BudgetExhausted: r.over, RowsLost: r.rowsLost, CellStates: counts,
+		Identity: ident, Unavailable: ready,
+		Env:  map[string]string{"GOMAXPROCS": "1", "GOGC": "100", "LC_ALL": "C"},
+		Host: hostInfo(), Go: runtime.Version(),
 	}))
 }
 

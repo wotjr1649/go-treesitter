@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/wotjr1649/go-treesitter/tools/compare/harness"
@@ -28,7 +29,7 @@ const (
 
 // allowed lists the file names a sandbox may leave in its result volume. Anything else (links, binaries, module
 // caches, environment dumps, unexpected paths) is rejected, not copied.
-var allowed = regexp.MustCompile("^(measurements\\.jsonl|cells\\.json|run\\.json|correctness\\.csv|builds\\.csv|workload\\.json|fixtures-(time|alloc)\\.csv|summary\\.md|provenance/[A-Za-z0-9._-]{1,80}\\.(json|txt|csv)|failures/[A-Za-z0-9._-]{1,80}\\.txt|go-sum-proposal/[a-z]{3,20}/go\\.(mod|sum))$")
+var allowed = regexp.MustCompile("^(measurements\\.jsonl|cells\\.json|run\\.json|correctness\\.csv|builds\\.csv|workload\\.json|provenance/workflow\\.json|provenance/[A-Za-z0-9._-]{1,80}\\.(txt|csv)|failures/[A-Za-z0-9._-]{1,80}\\.txt|go-sum-proposal/[a-z]{3,20}/go\\.(mod|sum))$")
 
 var (
 	knownPass   = map[string]bool{"preflight": true, "time": true, "alloc": true, "rss": true, "ctl": true}
@@ -166,8 +167,8 @@ func prefixHash(p string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-// writeSums writes SHA256SUMS over every regular file under dir (except itself) and refuses links and special files.
-func writeSums(dir string) error {
+// sumsOf returns the SHA256SUMS text for every regular file under dir (except SHA256SUMS itself); links and special files are errors.
+func sumsOf(dir string) (string, error) {
 	var lines []string
 	err := filepath.WalkDir(dir, func(p string, d os.DirEntry, err error) error {
 		if err != nil {
@@ -195,10 +196,19 @@ func writeSums(dir string) error {
 		return nil
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 	sort.Slice(lines, func(i, j int) bool { return lines[i][66:] < lines[j][66:] })
-	return writeFileAll(filepath.Join(dir, "SHA256SUMS"), []byte(strings.Join(lines, "\n")+"\n"))
+	return strings.Join(lines, "\n") + "\n", nil
+}
+
+// writeSums writes SHA256SUMS over dir.
+func writeSums(dir string) error {
+	s, err := sumsOf(dir)
+	if err != nil {
+		return err
+	}
+	return writeFileAll(filepath.Join(dir, "SHA256SUMS"), []byte(s))
 }
 
 // cmdSeal is the last step before upload: the final file set (collected files plus the report) gets its total size
@@ -290,16 +300,35 @@ func validate(p, rel string, exp *expectation) error {
 		if st.Size() > 1<<20 {
 			return errors.New("module file over 1 MiB")
 		}
-	case strings.HasSuffix(rel, ".json"):
-		b, err := readBounded(p, maxFile)
-		if err != nil {
+	case rel == "cells.json":
+		var v []Cell
+		return strictFile(p, &v)
+	case rel == "workload.json":
+		var v Workload
+		if err := strictFile(p, &v); err != nil {
 			return err
 		}
-		if !visible(b) {
-			return errors.New("non-printable bytes")
+		if v.Schema != harness.Schema {
+			return errors.New("workload schema")
 		}
-		var v any
-		return json.Unmarshal(b, &v)
+	case rel == "run.json":
+		var v runInfo
+		if err := strictFile(p, &v); err != nil {
+			return err
+		}
+		if v.Schema != harness.Schema {
+			return errors.New("run schema")
+		}
+	case rel == "provenance/workflow.json":
+		var v workflowInfo
+		if err := strictFile(p, &v); err != nil {
+			return err
+		}
+		for _, s := range []string{v.Repository, v.RunID, v.RunAttempt, v.SHA, v.Ref, v.Workflow, v.RunnerArch, v.RunnerImage, v.Mode} {
+			if len(s) > 200 {
+				return errors.New("workflow.json field over 200 bytes")
+			}
+		}
 	case strings.HasSuffix(rel, ".csv"):
 		b, err := readBounded(p, maxFile)
 		if err != nil {
@@ -312,16 +341,64 @@ func validate(p, rel string, exp *expectation) error {
 		if err != nil {
 			return err
 		}
-		return checkCSVShape(rel, recs)
+		return checkCSVShape(rel, recs, exp)
 	}
 	return nil
 }
 
-// checkCSVShape pins the column count and the value sets the report relies on.
-func checkCSVShape(rel string, recs [][]string) error {
+// workflowInfo is provenance/workflow.json.
+type workflowInfo struct {
+	Repository  string `json:"repository"`
+	RunID       string `json:"run_id"`
+	RunAttempt  string `json:"run_attempt"`
+	SHA         string `json:"sha"`
+	Ref         string `json:"ref"`
+	Workflow    string `json:"workflow"`
+	RunnerArch  string `json:"runner_arch"`
+	RunnerImage string `json:"runner_image"`
+	Mode        string `json:"mode"`
+}
+
+// strictFile decodes one JSON value into a typed destination: unknown fields and trailing data are errors, and the read is bounded.
+func strictFile(p string, v any) error {
+	b, err := readBounded(p, maxFile)
+	if err != nil {
+		return err
+	}
+	if !visible(b) {
+		return errors.New("non-printable bytes")
+	}
+	dec := json.NewDecoder(strings.NewReader(string(b)))
+	dec.DisallowUnknownFields()
+	if err := dec.Decode(v); err != nil {
+		return err
+	}
+	if dec.More() {
+		return errors.New("trailing data after the JSON value")
+	}
+	return nil
+}
+
+var (
+	correctnessHeader = "lang,adapter,input,group,case,edit_kind,ref_kind,status,level,first_diff,missing,extra,cand_has_error,ref_has_error,cand_sha256,ref_sha256,compat,reason"
+	buildsHeaders     = map[string]bool{
+		"adapter,mode,status,exit,bytes,delta_vs_empty_bytes,seconds,diagnostics":                     true,
+		"adapter,mode,status,exit,bytes,delta_vs_empty_bytes,seconds,smoke_parse,outcome,diagnostics": true,
+	}
+	hex64 = regexp.MustCompile("^[0-9a-f]{64}$")
+)
+
+func isUint(s string) bool {
+	n, err := strconv.ParseUint(s, 10, 63)
+	return err == nil && strconv.FormatUint(n, 10) == s
+}
+
+// checkCSVShape pins the exact header and the value set of every column the report relies on.
+func checkCSVShape(rel string, recs [][]string, exp *expectation) error {
 	if len(recs) == 0 {
 		return errors.New("empty csv")
 	}
+	header := strings.Join(recs[0], ",")
 	for _, r := range recs {
 		if len(r) != len(recs[0]) {
 			return errors.New("ragged csv")
@@ -332,51 +409,46 @@ func checkCSVShape(rel string, recs [][]string) error {
 			}
 		}
 	}
-	idx := func(name string) int {
-		for i, h := range recs[0] {
-			if h == name {
-				return i
-			}
-		}
-		return -1
+	col := map[string]int{}
+	for i, h := range recs[0] {
+		col[h] = i
 	}
 	switch rel {
 	case "correctness.csv":
-		for _, c := range []struct {
-			col string
-			ok  func(string) bool
-		}{
-			{"adapter", func(s string) bool { return knownAdapt[s] }},
-			{"lang", func(s string) bool { return knownLang[s] }},
-			{"status", func(s string) bool {
-				return s == "compared" || s == "unsupported" || s == "error" || s == "ref-unavailable"
-			}},
-			{"level", func(s string) bool {
-				switch s {
-				case "", harness.LevelExact, harness.LevelTree, harness.LevelLossy, harness.LevelShape, harness.LevelMismatch, harness.LevelUnparsed:
-					return true
-				}
-				return false
-			}},
-		} {
-			i := idx(c.col)
-			if i < 0 {
-				return fmt.Errorf("column %s missing", c.col)
+		if header != correctnessHeader {
+			return errors.New("correctness.csv header differs from the schema")
+		}
+		oneOf := func(s string, set ...string) bool { return has(set, s) }
+		for _, r := range recs[1:] {
+			ok := knownLang[r[col["lang"]]] && knownAdapt[r[col["adapter"]]] &&
+				oneOf(r[col["group"]], "small", "large") && oneOf(r[col["case"]], "fresh", "fresh-new", "incremental") &&
+				oneOf(r[col["edit_kind"]], "", "token", "newline", "insert", "delete", "replace") &&
+				oneOf(r[col["ref_kind"]], "own", "diagnostic-product", "unavailable") &&
+				oneOf(r[col["status"]], "compared", "unsupported", "error", "ref-unavailable") &&
+				oneOf(r[col["level"]], "", harness.LevelExact, harness.LevelTree, harness.LevelLossy, harness.LevelShape, harness.LevelMismatch, harness.LevelUnparsed) &&
+				isUint(r[col["missing"]]) && isUint(r[col["extra"]]) &&
+				oneOf(r[col["cand_has_error"]], "", "true", "false") && oneOf(r[col["ref_has_error"]], "", "true", "false") &&
+				(r[col["cand_sha256"]] == "" || hex64.MatchString(r[col["cand_sha256"]])) && (r[col["ref_sha256"]] == "" || hex64.MatchString(r[col["ref_sha256"]])) &&
+				oneOf(r[col["compat"]], "", "rejects-input-the-product-reference-accepts-cleanly")
+			if !ok {
+				return errors.New("correctness.csv: a value outside its column's set")
 			}
-			for _, r := range recs[1:] {
-				if !c.ok(r[i]) {
-					return fmt.Errorf("column %s: unexpected value", c.col)
-				}
+			if exp != nil && !exp.inputs[r[col["input"]]] {
+				return errors.New("correctness.csv: unknown input")
+			}
+			if (r[col["status"]] == "compared") != (r[col["level"]] != "") {
+				return errors.New("correctness.csv: level and status disagree")
 			}
 		}
 	case "builds.csv":
-		if i := idx("adapter"); i < 0 {
-			return errors.New("column adapter missing")
-		} else {
-			for _, r := range recs[1:] {
-				if !knownAdapt[r[i]] && r[i] != "empty" {
-					return errors.New("column adapter: unexpected value")
-				}
+		if !buildsHeaders[header] {
+			return errors.New("builds.csv header differs from the schema")
+		}
+		for _, r := range recs[1:] {
+			if !(knownAdapt[r[col["adapter"]]] || r[col["adapter"]] == "empty") || !isUint(r[col["exit"]]) || !isUint(r[col["bytes"]]) ||
+				!isUint(r[col["delta_vs_empty_bytes"]]) || !isUint(r[col["seconds"]]) || (r[col["status"]] != "ok" && r[col["status"]] != "failed") ||
+				(r[col["status"]] == "ok") != (r[col["exit"]] == "0") || (r[col["status"]] == "ok") != (r[col["bytes"]] != "0") {
+				return errors.New("builds.csv: a value outside its column's set or inconsistent")
 			}
 		}
 	}
@@ -413,7 +485,7 @@ func validateRow(r Row, exp *expectation) error {
 }
 
 // cmdGateNocc fails when the product's compiler-free build or smoke parse did not succeed, and checks the file against
-// the exact expected adapter set, one row each, with consistent status, exit and outcome values.
+// the exact expected adapter set (one row each) with numerically consistent status, exit, size, delta and outcome values.
 func cmdGateNocc(args []string) error {
 	fs := flag.NewFlagSet("gate-nocc", flag.ExitOnError)
 	file := fs.String("builds", "", "builds.csv of the no-compiler job")
@@ -426,48 +498,67 @@ func cmdGateNocc(args []string) error {
 	if err != nil || len(recs) < 2 {
 		return fmt.Errorf("builds.csv unreadable: %v", err)
 	}
+	if err := checkCSVShape("builds.csv", recs, nil); err != nil {
+		return err
+	}
 	col := map[string]int{}
 	for i, h := range recs[0] {
 		col[h] = i
 	}
-	for _, need := range []string{"adapter", "status", "exit", "bytes", "smoke_parse", "outcome"} {
+	for _, need := range []string{"smoke_parse", "outcome"} {
 		if _, ok := col[need]; !ok {
 			return fmt.Errorf("column %s missing", need)
 		}
 	}
-	seen := map[string]bool{}
+	type row struct {
+		status, smoke, outcome string
+		exit, bytes, delta     uint64
+	}
+	rows := map[string]row{}
 	for _, r := range recs[1:] {
-		if len(r) != len(recs[0]) {
-			return errors.New("ragged builds.csv")
-		}
 		a := r[col["adapter"]]
-		if seen[a] || !has(noccAdapters, a) {
+		if _, dup := rows[a]; dup || !has(noccAdapters, a) {
 			return fmt.Errorf("unexpected or repeated adapter %q", a)
 		}
-		seen[a] = true
-		st, exit, out := r[col["status"]], r[col["exit"]], r[col["outcome"]]
-		switch out {
-		case "ok", "expected-unsupported", "build-failure", "smoke-failure":
+		x := row{status: r[col["status"]], smoke: r[col["smoke_parse"]], outcome: r[col["outcome"]]}
+		x.exit, _ = strconv.ParseUint(r[col["exit"]], 10, 63)
+		x.bytes, _ = strconv.ParseUint(r[col["bytes"]], 10, 63)
+		x.delta, _ = strconv.ParseUint(r[col["delta_vs_empty_bytes"]], 10, 63)
+		built := x.status == "ok" && x.exit == 0 && x.bytes > 0
+		switch x.outcome {
+		case "ok":
+			if !built || (a == "empty") != (x.smoke == "n/a") || a != "empty" && x.smoke != "ok" {
+				return fmt.Errorf("%s: outcome ok without a successful build and smoke parse", a)
+			}
+		case "smoke-failure":
+			if !built || a == "empty" || x.smoke == "ok" || x.smoke == "n/a" {
+				return fmt.Errorf("%s: smoke-failure inconsistent with its build and smoke fields", a)
+			}
+		case "expected-unsupported", "build-failure":
+			if x.status != "failed" || x.exit == 0 || x.bytes != 0 || x.smoke != "n/a" {
+				return fmt.Errorf("%s: %s inconsistent with a failed build", a, x.outcome)
+			}
+			if x.outcome == "expected-unsupported" && a != "official" && a != "smacker" {
+				return fmt.Errorf("%s: only the cgo adapters may be expected-unsupported", a)
+			}
 		default:
-			return fmt.Errorf("%s: unknown outcome %q", a, out)
+			return fmt.Errorf("%s: unknown outcome %q", a, x.outcome)
 		}
-		if (st == "ok") != (exit == "0") || (st != "ok" && st != "failed") {
-			return fmt.Errorf("%s: status %q and exit %q disagree", a, st, exit)
-		}
-		if out == "ok" && (st != "ok" || r[col["bytes"]] == "0" || a != "empty" && r[col["smoke_parse"]] != "ok") {
-			return fmt.Errorf("%s: outcome ok without a successful build and smoke parse", a)
-		}
-		if out == "expected-unsupported" && a != "official" && a != "smacker" {
-			return fmt.Errorf("%s: only the cgo adapters may be expected-unsupported", a)
-		}
-		if a == refAdapter && out != "ok" {
-			return fmt.Errorf("the product's compiler-free build or smoke parse failed: outcome=%s smoke=%s", out, r[col["smoke_parse"]])
-		}
+		rows[a] = x
 	}
 	for _, a := range noccAdapters {
-		if !seen[a] {
+		if _, ok := rows[a]; !ok {
 			return fmt.Errorf("no row for %s", a)
 		}
+	}
+	empty := rows["empty"]
+	for a, x := range rows {
+		if a != "empty" && x.bytes > 0 && empty.bytes > 0 && x.delta != x.bytes-min(x.bytes, empty.bytes) {
+			return fmt.Errorf("%s: size delta does not match bytes minus the empty consumer", a)
+		}
+	}
+	if p := rows[refAdapter]; p.outcome != "ok" {
+		return fmt.Errorf("the product's compiler-free build or smoke parse failed: outcome=%s smoke=%s", p.outcome, p.smoke)
 	}
 	return nil
 }

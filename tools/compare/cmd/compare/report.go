@@ -40,7 +40,7 @@ func readRows(p string) ([]Row, error) {
 }
 
 func okRes(r Row) *harness.Result {
-	if r.Res != nil && r.Res.Status == "ok" && r.Exit == 0 && !r.TimedOut && (r.Pass != "time" || len(r.Res.SamplesNs) == r.Res.Reps) {
+	if r.Res != nil && r.Res.Status == "ok" && r.Exit == 0 && !r.TimedOut && !r.Failed && (r.Pass != "time" || len(r.Res.SamplesNs) == r.Res.Reps) {
 		return r.Res
 	}
 	return nil
@@ -114,7 +114,7 @@ type CellStat struct {
 }
 
 // pairStats groups the rows of a pass by cell and round and forms the per-round candidate/product ratios.
-func pairStats(rows []Row, cells map[string]Cell, pass string, include func(Cell) bool) []CellStat {
+func pairStats(rows []Row, cells map[string]Cell, pass string, reps map[string]int, include func(Cell) bool) []CellStat {
 	type key struct {
 		cell  string
 		round int
@@ -124,7 +124,9 @@ func pairStats(rows []Row, cells map[string]Cell, pass string, include func(Cell
 		if r.Pass != pass {
 			continue
 		}
-		if res := okRes(r); res != nil {
+		// a block counts only when it is complete for its own call (clean exit, scheduled sample count, matching adapter,
+		// language, operation and mode) and has the scheduled number of repetitions
+		if res := okRes(r); res != nil && complete(r, pass, reps[r.Group]) {
 			if r.Role == "product" {
 				prod[key{r.Cell, r.Round}] = res
 			} else {
@@ -142,7 +144,9 @@ func pairStats(rows []Row, cells map[string]Cell, pass string, include func(Cell
 	for ck, rounds := range byCell {
 		sort.Ints(rounds)
 		c := cells[ck]
-		if !include(c) { // only complete, graded cells enter a summary; their raw rows stay in measurements.jsonl
+		// only complete, graded cells enter a summary: every scheduled pair is recounted from the rows themselves rather
+		// than trusting the cell's state, and the grade must allow it; the raw rows stay in measurements.jsonl
+		if !include(c) || len(rounds) != c.Want || c.Want == 0 {
 			continue
 		}
 		s := CellStat{Lang: c.Lang, Cand: c.Cand, Op: c.Op, Group: c.Group, Input: c.Input, Rounds: len(rounds)}
@@ -199,8 +203,8 @@ func cmdReport(args []string) error {
 	if err := readJSON(filepath.Join(*in, "cells.json"), &cellList); err != nil {
 		return err
 	}
-	var runInfo map[string]any
-	if err := readJSON(filepath.Join(*in, "run.json"), &runInfo); err != nil {
+	var info runInfo
+	if err := readJSON(filepath.Join(*in, "run.json"), &info); err != nil {
 		return err
 	}
 	cells := map[string]Cell{}
@@ -214,7 +218,8 @@ func cmdReport(args []string) error {
 	include := func(c Cell) bool {
 		return c.State == "measured" && gradedEqual(graded, refAdapter, c) && gradedEqual(graded, c.Cand, c)
 	}
-	timing, alloc := pairStats(rows, cells, "time", include), pairStats(rows, cells, "alloc", include)
+	repsOf := info.Reps
+	timing, alloc := pairStats(rows, cells, "time", repsOf, include), pairStats(rows, cells, "alloc", repsOf, include)
 
 	var md strings.Builder
 	w := func(f string, a ...any) { fmt.Fprintf(&md, f+"\n", a...) }
@@ -226,7 +231,7 @@ func cmdReport(args []string) error {
 	if gerr != nil {
 		w("**correctness.csv is missing or unreadable (%s): no cell is graded, so no timing row is shown.**\n", mdEscape(gerr.Error()))
 	}
-	writeRunInfo(&md, runInfo)
+	writeRunInfo(&md, info)
 
 	w("\n## Cell coverage\n")
 	w("| candidate | op | measured and graded | measured, not tree-equal | partial | failed | incomplete | unsupported | unavailable |")
@@ -264,10 +269,7 @@ func cmdReport(args []string) error {
 	writeAllocTable(&md, alloc, cellList)
 
 	w("\n## Peak RSS (large inputs, KiB, worker VmHWM): operation minus no-parse control\n")
-	want := 3
-	if v, ok := runInfo["rss_runs"].(float64); ok {
-		want = int(v)
-	}
+	want := info.RSSRuns
 	w("A delta is shown only when both the operation and its control have the %d scheduled fresh-process samples; otherwise the row says n/a.\n", want)
 	w("| lang | input | op | adapter | samples | peak | control | delta |")
 	w("|---|---|---|---|---:|---:|---:|---:|")
@@ -312,7 +314,7 @@ func sortedKeys[K comparable, V any](m map[K]V, less func(a, b K) bool) []K {
 	return ks
 }
 
-func writeRunInfo(md *strings.Builder, info map[string]any) {
+func writeRunInfo(md *strings.Builder, info runInfo) {
 	b, _ := json.MarshalIndent(info, "", "  ")
 	md.WriteString("<details><summary>run.json (identities, parameters, host)</summary>\n\n~~~json\n")
 	md.WriteString(strings.ReplaceAll(string(b), "~~~", "~_~"))

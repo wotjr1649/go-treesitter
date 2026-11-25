@@ -10,7 +10,8 @@
 //	compare seal    -dir D                                      cap the final artifact set and hash it
 //	compare gate-nocc -builds F                                 fail unless the product's compiler-free build and smoke parse succeeded
 //	compare nocc    -adapters D -go-bin B -modcache M -out F    build every adapter with CGO_ENABLED=0 and no compiler on PATH, smoke-parse
-//	compare aggregate -in A -out O                              validate every downloaded artifact, report, seal (executes nothing from them)
+//	compare pack    -dir D -out F.zip                           bundle a validated directory into the one file a job uploads
+//	compare aggregate -in A -out O -work W                              validate every downloaded artifact, report, seal (executes nothing from them)
 package main
 
 import (
@@ -20,10 +21,10 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Fprintln(os.Stderr, "usage: compare select|run|check|collect|report|seal|gate-nocc|nocc|aggregate [flags]")
+		fmt.Fprintln(os.Stderr, "usage: compare select|run|check|collect|report|seal|gate-nocc|nocc|aggregate|pack [flags]")
 		os.Exit(2)
 	}
-	cmds := map[string]func([]string) error{"select": cmdSelect, "run": cmdRun, "check": cmdCheck, "collect": cmdCollect, "report": cmdReport, "seal": cmdSeal, "gate-nocc": cmdGateNocc, "nocc": cmdNocc, "aggregate": cmdAggregate}
+	cmds := map[string]func([]string) error{"select": cmdSelect, "run": cmdRun, "check": cmdCheck, "collect": cmdCollect, "report": cmdReport, "seal": cmdSeal, "gate-nocc": cmdGateNocc, "nocc": cmdNocc, "aggregate": cmdAggregate, "pack": cmdPack}
 	f, ok := cmds[os.Args[1]]
 	if !ok {
 		fmt.Fprintln(os.Stderr, "unknown command", os.Args[1])

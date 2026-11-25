@@ -1,6 +1,7 @@
 package main
 
 import (
+	"archive/zip"
 	"fmt"
 	"os"
 	"os/exec"
@@ -143,6 +144,34 @@ func TestEndToEndWithFakeWorkers(t *testing.T) {
 	col := filepath.Join(dir, "collected")
 	if err := cmdCollect([]string{"-in", res, "-out", col}); err != nil {
 		t.Fatal(err)
+	}
+	// the validated directory becomes the one bundle the job uploads; the aggregate job validates it again from scratch
+	bundles := filepath.Join(dir, "bundles")
+	if err := cmdPack([]string{"-dir", col, "-out", filepath.Join(bundles, "compare-r1-c.zip")}); err != nil {
+		t.Fatal(err)
+	}
+	noccDir := filepath.Join(dir, "nocc")
+	mustWrite(t, filepath.Join(noccDir, "builds.csv"), []byte(noccCSV("product,x,ok,0,30,20,1,ok,ok,", "official,x,failed,1,0,0,1,n/a,expected-unsupported,cgo")))
+	if err := cmdPack([]string{"-dir", noccDir, "-out", filepath.Join(bundles, "compare-nocc-r1.zip")}); err != nil {
+		t.Fatal(err)
+	}
+	agg := filepath.Join(dir, "agg")
+	if err := cmdAggregate([]string{"-in", bundles, "-out", agg, "-work", filepath.Join(dir, "aggwork"), "-runners", "r1", "-langs", "c"}); err != nil {
+		t.Fatalf("aggregate: %v", err)
+	}
+	if b, _ := os.ReadFile(filepath.Join(agg, "summary.md")); !strings.Contains(string(b), "## r1 / c") || !strings.Contains(string(b), "Build outcomes") {
+		t.Fatalf("aggregate summary:\n%s", b)
+	}
+	if ents, _ := os.ReadDir(agg); len(ents) != 2 { // only the summary and the hashes are left to upload
+		t.Fatalf("aggregate output holds %d entries", len(ents))
+	}
+	os.Remove(filepath.Join(bundles, "compare-nocc-r1.zip"))
+	agg2 := filepath.Join(dir, "agg2")
+	if err := cmdAggregate([]string{"-in", bundles, "-out", agg2, "-work", filepath.Join(dir, "aggwork2"), "-runners", "r1", "-langs", "c"}); err == nil {
+		t.Fatal("a missing artifact was accepted")
+	}
+	if _, err := os.Stat(filepath.Join(agg2, "summary.md")); err == nil {
+		t.Fatal("a failed aggregation left a summary to upload")
 	}
 	if err := cmdReport([]string{"-in", col}); err != nil {
 		t.Fatal(err)
@@ -339,5 +368,79 @@ func TestMeasuredNeedsEveryRound(t *testing.T) {
 	r.finalize()
 	if r.cells[0].State != "measured" {
 		t.Fatalf("%s", r.cells[0].State)
+	}
+}
+
+func zipOf(t *testing.T, entries func(zw *zip.Writer)) string {
+	t.Helper()
+	p := filepath.Join(t.TempDir(), "b.zip")
+	f, _ := os.Create(p)
+	zw := zip.NewWriter(f)
+	entries(zw)
+	zw.Close()
+	f.Close()
+	return p
+}
+
+func TestUnpackRefusesHostileBundles(t *testing.T) {
+	add := func(zw *zip.Writer, name string, body []byte) {
+		w, _ := zw.Create(name)
+		w.Write(body)
+	}
+	cases := map[string]func(zw *zip.Writer){
+		"traversal":  func(zw *zip.Writer) { add(zw, "../evil.txt", []byte("x")) },
+		"not listed": func(zw *zip.Writer) { add(zw, "scripts/run.sh", []byte("x")) },
+		"duplicate":  func(zw *zip.Writer) { add(zw, "failures/a.txt", []byte("x")); add(zw, "failures/a.txt", []byte("y")) },
+		"too many": func(zw *zip.Writer) {
+			for i := 0; i <= maxEntries; i++ {
+				add(zw, fmt.Sprintf("failures/f%d.txt", i), []byte("x"))
+			}
+		},
+		"oversize": func(zw *zip.Writer) { add(zw, "failures/a.txt", make([]byte, maxFile+1)) },
+		"symlink": func(zw *zip.Writer) {
+			h := &zip.FileHeader{Name: "failures/a.txt"}
+			h.SetMode(os.ModeSymlink | 0o777)
+			w, _ := zw.CreateHeader(h)
+			w.Write([]byte("/etc/passwd"))
+		},
+		"directory": func(zw *zip.Writer) { zw.Create("failures/") },
+	}
+	for name, f := range cases {
+		dst := t.TempDir()
+		if _, err := unpackBounded(zipOf(t, f), dst); err == nil {
+			t.Errorf("%s: accepted", name)
+		} else if ents, _ := os.ReadDir(dst); len(ents) != 0 {
+			t.Errorf("%s: extracted before refusing", name)
+		}
+	}
+	good := zipOf(t, func(zw *zip.Writer) { add(zw, "failures/a.txt", []byte("ok")) })
+	dst := t.TempDir()
+	if n, err := unpackBounded(good, dst); err != nil || n != 1 {
+		t.Fatal(n, err)
+	}
+	if b, _ := os.ReadFile(filepath.Join(dst, "failures", "a.txt")); string(b) != "ok" {
+		t.Fatal("round trip")
+	}
+}
+
+// Typed schemas: unknown fields and trailing data are refused instead of decoded into an open type.
+func TestStrictSchemas(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "run.json")
+	mustWrite(t, p, []byte(`{"schema":1,"seed":"s","surprise":true}`))
+	var v runInfo
+	if err := strictFile(p, &v); err == nil {
+		t.Fatal("unknown field accepted")
+	}
+	mustWrite(t, p, []byte(`{"schema":1} {"schema":2}`))
+	if err := strictFile(p, &v); err == nil {
+		t.Fatal("trailing data accepted")
+	}
+	mustWrite(t, p, []byte(`{"schema":1,"seed":"s"}`))
+	if err := strictFile(p, &v); err != nil {
+		t.Fatal(err)
+	}
+	if err := checkCSVShape("correctness.csv", [][]string{{"lang", "adapter"}}, nil); err == nil {
+		t.Fatal("a wrong correctness header was accepted")
 	}
 }
