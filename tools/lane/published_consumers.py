@@ -14,7 +14,6 @@ from consumer_compat import ENV, PUBLIC_PROXY, REPO, ROOT, grammar_path
 VERSION = re.compile(r"v[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?")
 PSEUDO_VERSION_SUFFIX = re.compile(r"[.-][0-9]{14}-[0-9a-f]{12}$")
 NAME = re.compile(r"[a-z][a-z0-9]*")
-SAMPLE = re.compile(r'^const sample = ("(?:[^"\\\n]|\\.)*")$', re.MULTILINE)
 MODULE = "example.com/published-consumer"
 SMOKE = """
 func parse(language *treesitter.Language, source string) (string, error) {
@@ -77,6 +76,10 @@ def combinations(root, profile):
         version(spec["minimum_root"])
     if not inherited:
         raise ValueError("a combination needs inherited grammar tags")
+    samples = profile["samples"]
+    needed = {f"{name}@{tag}" for name, tag in inherited.items()} | {f"{name}@{spec['version']}" for name, spec in released.items()}
+    if missing := sorted(needed - samples.keys()):
+        raise ValueError(f"profile has no sample for {missing}")
     yield "root-only", root, inherited, None
     if released:
         mixed = inherited | {name: spec["version"] for name, spec in released.items()}
@@ -85,18 +88,16 @@ def combinations(root, profile):
             yield f"single-{name}", spec["minimum_root"], {name: spec["version"]}, name
 
 
-def write_consumer(cwd, expected, grammars):
+def write_consumer(cwd, expected, grammars, samples):
     requires = "".join(f"\t{path} {tag}\n" for path, tag in expected.items())
     (cwd / "go.mod").write_text(f"module {MODULE}\n\ngo 1.26.0\n\nrequire (\n{requires})\n", encoding="utf-8")
     imports = ['"context"', '"fmt"', '"os"', f'treesitter "{ROOT}"']
     fixtures = []
-    for name in grammars:
-        module_test = REPO / "grammars" / name / "module_test.go"
-        samples = SAMPLE.findall(module_test.read_text(encoding="utf-8"))
-        if len(samples) != 1:
-            raise ValueError(f"{name}: expected one sample string in module_test.go")
+    for name, tag in sorted(grammars.items()):
+        # The input is the Go string literal that the grammar's own tag tested, stored in the release profile.
+        sample = samples[f"{name}@{tag}"]
         imports.append(f'g_{name} "{grammar_path(name)}"')
-        fixtures.append(f'{{"{name}", g_{name}.Language, {samples[0]}}},')
+        fixtures.append(f'{{"{name}", g_{name}.Language, {sample}}},')
     source = (
         "package main\n\nimport (\n\t" + "\n\t".join(imports) + "\n)\n\n"
         "var cases = []struct {\n\tname string\n\tlanguage func() *treesitter.Language\n\tsource string\n}{\n\t"
@@ -115,7 +116,7 @@ def run(cwd, env, log, *args):
     return proc.stdout.decode("utf-8")
 
 
-def exercise(scratch, out, env, root, grammars, single):
+def exercise(scratch, out, env, root, grammars, single, samples):
     out.mkdir()
     cwd = scratch / out.name
     cwd.mkdir()
@@ -124,7 +125,7 @@ def exercise(scratch, out, env, root, grammars, single):
     env = dict(env, GOPATH=str(scratch), GOMODCACHE=str(cache))
     expected = {ROOT: root, **{grammar_path(name): tag for name, tag in sorted(grammars.items())}}
     try:
-        write_consumer(cwd, expected, sorted(grammars))
+        write_consumer(cwd, expected, grammars, samples)
         run(cwd, env, out / "download.log", "go", "mod", "download", "all")
         graph = run(cwd, env, out / "go-list-m-all.txt", "go", "list", "-mod=readonly", "-m", "all")
         selected = {}
@@ -137,14 +138,16 @@ def exercise(scratch, out, env, root, grammars, single):
             selected[path] = fields[0]
         if any(selected.get(path) != tag for path, tag in expected.items()):
             raise ValueError(f"MVS selected {selected}, expected {expected}")
-        if single:
-            tag = grammars[single]
-            mod = cache / "cache" / "download" / grammar_path(single) / "@v" / f"{tag}.mod"
-            grammar = json.loads(run(cwd, env, out / "grammar-go-mod.json", "go", "mod", "edit", "-json", str(mod)))
-            if grammar.get("Replace") or not any(
+        # Go ignores a dependency's replace directives, so check each published grammar's own go.mod for them.
+        for name, tag in sorted(grammars.items()):
+            mod = cache / "cache" / "download" / grammar_path(name) / "@v" / f"{tag}.mod"
+            grammar = json.loads(run(cwd, env, out / f"go-mod-{name}.json", "go", "mod", "edit", "-json", str(mod)))
+            if grammar.get("Replace"):
+                raise ValueError(f"{name}@{tag}: published go.mod has replace directives")
+            if name == single and not any(
                 req["Path"] == ROOT and req["Version"] == root for req in grammar.get("Require") or []
             ):
-                raise ValueError(f"{single}@{tag}: expected declared minimum root {root} without replacements")
+                raise ValueError(f"{single}@{tag}: expected declared minimum root {root}")
         binary = cwd / ("smoke.exe" if sys.platform == "win32" else "smoke")
         run(cwd, env, out / "build.log", "go", "build", "-trimpath", "-mod=readonly", "-o", str(binary), ".")
         run(cwd, env, out / "smoke.log", str(binary))
@@ -164,7 +167,8 @@ def main():
     args = parser.parse_args()
     profile_path = Path(__file__).with_name("published-consumers") / f"{args.combination}.json"
     try:
-        cases = list(combinations(args.root, json.loads(profile_path.read_text(encoding="utf-8"))))
+        profile = json.loads(profile_path.read_text(encoding="utf-8"))
+        cases = list(combinations(args.root, profile))
     except (OSError, KeyError, ValueError, argparse.ArgumentTypeError) as exc:
         parser.error(str(exc))
 
@@ -192,7 +196,7 @@ def main():
             result = "PASS"
             try:
                 with tempfile.TemporaryDirectory(prefix="tsg-pub-") as folder:
-                    exercise(Path(folder).resolve(), out / label, env, root, grammars, single)
+                    exercise(Path(folder).resolve(), out / label, env, root, grammars, single, profile["samples"])
             except (OSError, subprocess.CalledProcessError, ValueError) as exc:
                 print(f"{label}: {exc}", flush=True)
                 failures.append(label)
