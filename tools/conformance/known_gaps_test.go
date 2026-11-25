@@ -357,7 +357,7 @@ func TestKnownGapDocs(t *testing.T) {
 	}
 }
 
-// The support table is maintained by hand. Only its development links track the live register.
+// The support table is maintained by hand. Only its development links track the live register, and each must sit in a table row.
 func TestKnownGapDocsSupportLinks(t *testing.T) {
 	want := map[string]bool{}
 	for _, g := range loadKnownGaps(t).Entries {
@@ -365,11 +365,16 @@ func TestKnownGapDocsSupportLinks(t *testing.T) {
 	}
 	path := "../../docs/reports/grammar-support.md"
 	link := regexp.MustCompile(`\]\((\.\./known-gaps/[^#)]+\.md#[^)]+)\)`)
-	for _, match := range link.FindAllStringSubmatch(string(readFile(t, path)), -1) {
-		if !want[match[1]] {
-			t.Errorf("%s: stale or duplicate register link %s", path, match[1])
+	for _, line := range strings.Split(string(readFile(t, path)), "\n") {
+		if !strings.HasPrefix(line, "|") {
+			continue
 		}
-		delete(want, match[1])
+		for _, match := range link.FindAllStringSubmatch(line, -1) {
+			if !want[match[1]] {
+				t.Errorf("%s: stale or duplicate register link %s", path, match[1])
+			}
+			delete(want, match[1])
+		}
 	}
 	for _, target := range slices.Sorted(maps.Keys(want)) {
 		t.Errorf("%s: missing register link %s", path, target)
