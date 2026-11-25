@@ -1,0 +1,48 @@
+name: API guard
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  api-guard:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      CGO_ENABLED: "0"
+      GOENV: "off"
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: tools/apiguard/go.sum
+      - name: Root API compatibility against v0.7.0
+        run: |
+          baseline="$RUNNER_TEMP/api-baseline"
+          apidiff="$RUNNER_TEMP/apidiff"
+          report="$RUNNER_TEMP/incompatible-api.txt"
+          git worktree add --detach "$baseline" refs/tags/v0.7.0
+          go -C tools/apiguard build -mod=readonly -o "$apidiff" golang.org/x/exp/cmd/apidiff
+          (cd "$baseline" && "$apidiff" -w "$RUNNER_TEMP/release.api" .)
+          "$apidiff" -w "$RUNNER_TEMP/head.api" .
+          # apidiff reports incompatibilities on stdout and exits successfully.
+          "$apidiff" -incompatible "$RUNNER_TEMP/release.api" "$RUNNER_TEMP/head.api" > "$report"
+          if [ -s "$report" ]; then
+            cat "$report"
+            exit 1
+          fi
