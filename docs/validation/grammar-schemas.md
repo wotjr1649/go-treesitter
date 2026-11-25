@@ -11,7 +11,8 @@ The historical v0.5.0 candidate pin set contained 24 grammars, including the 202
 tree-identical T-SQL pin move and the C maintained-fork move below; `tools/gen/pins.json` SHA-256 is
 `5467afce00a76529acf5dd13243a51d8218fa164c595ce171fc7fe6d78ea9913`. All 24 archived schemas passed the
 strict check at that pin set (Windows amd64, Go 1.27.4).
-The 25-grammar v0.6.0 release adds Swift. Its first baseline is recorded below.
+The 25-grammar v0.6.0 release adds Swift. Its first baseline is recorded below. The v0.7.0 entries at the end record
+the Swift pin move and the XML, CSS, PowerShell and Ruby patches; the other 20 grammars keep their v0.6.0 entries.
 The tables below record each schema once, grouped by the release that first recorded it; archive SHA-256
 values identify the pinned source inputs. `tsx` and `typescript` share one archive. Schema bytes come from
 `<grammarDir>/node-types.json` in that archive, after checking its digest, and match the generator's extracted input.
@@ -524,10 +525,10 @@ The strict diff records 30 additions. The six new kinds are `#:`, `directive_kin
 `body` fields and additional child and field alternatives. The previous pin already included
 `extension_declaration`, `receiver_parameter` and `slice_pattern`.
 
-## Unreleased (after v0.6.0): Swift fef1236
+## v0.7.0: Swift fef1236
 
 The tier-3 [Swift upstream revision](https://github.com/alex-pinkus/tree-sitter-swift/commit/fef1236022ccde2d2bc5c32d4db8947c87a7f848)
-moves the development module from `a1d4a7b8` to `fef12360`. The archive SHA-256 is
+moves the `swift` module from the v0.6.0 pin `a1d4a7b8` to `fef12360` in v0.7.0. The archive SHA-256 is
 `121cddea55b524c2a6dc4b29efe56ccea756d42a52dee88d9700e4377c077d48`. The pinned CLI 0.27.2 generates C and the schema
 from the archived `src/grammar.json`. The candidate's archived and generated schemas are byte-identical.
 
@@ -540,7 +541,7 @@ Both schemas pass the strict check with zero findings. The static diff records o
 `FIELD_MULTIPLE_CHANGED` / `CARDINALITY_WIDENED` change. The `catch_block.error` field changes from
 `multiple: false` to `multiple: true`. See the [Swift migration notes](../../MIGRATING.md#swift-grammar-fef1236).
 
-## Unreleased (after v0.6.0): XML name patches
+## v0.7.0: XML name patches
 
 At XML pin `5000ae8f22d1`, the strict check of the regenerated `node-types.json` passes with zero findings, and
 it has the same 17444 bytes and SHA-256 `3b63e111187a0f9b2282e1748db2dd6b10e968f0cdb3676772def93bf89f2a7b` as the
@@ -555,7 +556,7 @@ item 5 for those inputs only. The pinned upstream `highlights.scm` compiled, and
 native reference on 220 raw query/input comparisons with no mismatch (E5, Windows amd64).
 [Migration notes](../../MIGRATING.md#xml-names-and-tag-names)
 
-## Unreleased (after v0.6.0): CSS name patch
+## v0.7.0: CSS name patch
 
 The [temporary grammar-input patch](../../tools/gen/patches/css) independently addresses the name defect
 reported in [upstream PR #105](https://github.com/tree-sitter/tree-sitter-css/pull/105) at CSS commit
@@ -572,7 +573,7 @@ The patched engine and pinned native reference agree on the corpus, seeded edits
 (E5, Windows amd64). The pinned `highlights.scm` compiles and runs on the repaired inputs.
 See the [migration notes](../../MIGRATING.md#css-non-latin-1-names) for the new captures.
 
-## Unreleased (after v0.6.0): PowerShell name patch
+## v0.7.0: PowerShell name patch
 
 At PowerShell pin `65ea6919e816`, the strict check of the regenerated `node-types.json` passes with zero findings, and
 it has the same 72778 bytes and SHA-256 `db02c7bdba010b518e4fa12b3ba045d0156d475f414b3ff4622eb30f51281c4e` as the
@@ -596,7 +597,7 @@ item 5 for those inputs only. The pinned upstream `highlights.scm` and `folds.sc
 matched the patched native reference on 1980 raw query/input comparisons with no mismatch (E5, Windows amd64).
 [Migration notes](../../MIGRATING.md#powershell-names)
 
-## Unreleased (after v0.6.0): Ruby symbol patch
+## v0.7.0: Ruby symbol patch
 
 At Ruby pin `ad907a69da0c`, the strict check of the regenerated `node-types.json` passes with zero findings, and it has the
 same 69862 bytes and SHA-256 `a95d2f382017895771063837dbb959c4e5fde829fc185a2967695c770cc297bf` as before the patch

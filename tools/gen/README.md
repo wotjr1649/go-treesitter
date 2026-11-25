@@ -347,15 +347,18 @@ kind `source`/`toolchain`; no header):
 awk -F '\t' '$4 == "source"' release-assets.tsv > release-source-assets.tsv
 ```
 
-The command lists 34 rows for the v0.6.0 pins. The v0.6.0 release mirrors all 26 `source` archives plus
-`SHA256SUMS`. The eight `toolchain` rows are excluded. The v0.5.0 release mirrors its original 25 source
-archives plus `SHA256SUMS`.
+The command lists 34 rows for the current pins. The v0.6.0 release mirrors all 26 `source` archives plus
+`SHA256SUMS`, and the v0.7.0 candidate inventory is again all 26 `source` archives plus `SHA256SUMS`. The eight
+`toolchain` rows are excluded. The v0.5.0 release mirrors its original 25 source archives plus `SHA256SUMS`.
 The v0.6.0 inventory adds the Swift archive, the T-SQL owner release v2.8.0 archive `tree-sitter-mssql-3d42c1a55fb5.tar.gz`,
 the Java v3.0.3 archive `tree-sitter-java-358048c1c6f9.tar.gz`, the shared TypeScript/TSX owner release v3.1.0 archive
 `tree-sitter-typescript-c37edc69610d.tar.gz`, the JavaScript v4.4.0 archive `tree-sitter-javascript-e5ada307a6f1.tar.gz`,
 the PostgreSQL upstream v19.0.0 archive `tree-sitter-postgres-83c0cc2f.tar.gz`, the PHP upstream v0.25.2 archive
 `php-c1e13490bd65.tar.gz` and the C# upstream v0.24.0 archive `tree-sitter-c-sharp-d4bbe18103c3.tar.gz`.
-The v0.6.0 base supplies fallback downloads for those archives.
+The v0.6.0 base supplies fallback downloads for those archives. The v0.7.0 inventory changes one row: the Swift
+archive `tree-sitter-swift-fef12360.tar.gz` replaces `tree-sitter-swift-a1d4a7b8.tar.gz`. The XML, CSS, Ruby and
+PowerShell patches change generated files, not archives. The immutable v0.6.0 release cannot receive the new Swift
+archive, so it has no fallback until v0.7.0 is published and its base is configured.
 Check the selected filenames against `runtime.archive`,
 `wasiLibc.archive`, and each grammar's `archive` in `pins.json`, deduplicating TypeScript/TSX's shared archive;
 the [publication procedure](../../docs/specs/publication.md#pinned-archive-release-assets) specifies the inventory
@@ -365,7 +368,8 @@ established. Those tools are fetched from their official releases with pinned SH
 in this release to provide mirror fallback, even if the fetch plan lists URLs at the configured bases.
 
 The pins use v0.6.0 and then v0.5.0 as mirror bases. All 26 source archives downloaded anonymously from the
-published v0.6.0 base matched the pinned SHA-256 hashes.
+published v0.6.0 base matched the pinned SHA-256 hashes. After publishing v0.7.0 and checking all 26 source rows at its
+release base, update `mirrors` to v0.7.0 and then v0.6.0 in the follow-up PR that restores the development module form.
 A configured base can supply only the exact files already published there. A new source archive gains fallback coverage when a
 carrying release is published and its base is configured. Published releases are immutable. This command does not
 upload anything. `wasm2go` remains a Go module installed through Go's checksum-verified module mechanism

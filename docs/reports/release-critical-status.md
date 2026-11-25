@@ -1,8 +1,66 @@
 # Release-Critical status board
 
-Updated 2026-11-24 for the v0.6.0 Preview release (25 grammar modules, engine ABI 4).
-Historical gate tables retain their original commits, pins and scope.
+Updated 2026-11-25 for the v0.7.0 Preview candidate (25 grammar modules, five of them with new tags, engine ABI 4).
+The latest published release is v0.6.0 (see [Released](#released)). Historical gate tables retain their original commits, pins and scope.
 The previous board for the `gotreesitter` carrier is in Git history at main `9ad82eb`.
+
+## v0.7.0 release scope
+
+- **Release-Critical scope.** Root v0.7.0 and 25 grammar modules. Five modules get new `grammars/<dir>/v0.7.0` tags:
+  `swift` (pin move `a1d4a7b` to `fef1236`, PR [#112](https://github.com/wotjr1649/go-treesitter/pull/112)), `xml`
+  (two ADR-0023 patches, [#114](https://github.com/wotjr1649/go-treesitter/pull/114)), `css` (one patch,
+  [#118](https://github.com/wotjr1649/go-treesitter/pull/118)), `ruby` (a third patch,
+  [#120](https://github.com/wotjr1649/go-treesitter/pull/120)) and `powershell` (one patch,
+  [#122](https://github.com/wotjr1649/go-treesitter/pull/122)). The other 20 modules keep their `v0.6.0` tags. Since
+  v0.6.0 the root changed only in tests, the engine CI workflow, the license manifest and documentation; it has no API,
+  engine or behavior change. The release also documents the consumer-compatibility job
+  ([#117](https://github.com/wotjr1649/go-treesitter/pull/117)), the API contract decisions
+  ([#119](https://github.com/wotjr1649/go-treesitter/pull/119)) and the per-tag support table
+  ([#121](https://github.com/wotjr1649/go-treesitter/pull/121)). The [README](../../README.md#use) lists
+  modules and tags and the [migration notes](../../MIGRATING.md#upgrading-from-v060-to-v070) describe consumer-visible
+  changes.
+- **Release policy (ADR-0022).** The [publication procedure](../specs/publication.md#multi-module-release) governs
+  this Preview pre-release. The owner chose on 2026-11-25 to release the merged scope. Tags, tag pushes, the GitHub
+  release and publication each require separate owner authority.
+
+## v0.7.0 preparation gates
+
+Candidate: [`7e243318b5b1f8223ac0e1f49e06e10a9b107757`](https://github.com/wotjr1649/go-treesitter/commit/7e243318b5b1f8223ac0e1f49e06e10a9b107757),
+main after PRs #117 to #123 merged. The release-preparation commit differs from this candidate only in documentation.
+The grammar release-form commit (publication step 4) will additionally change only the selected modules' `go.mod` and
+`go.sum`. Every hosted run below reports the candidate as its head SHA. The pins SHA-256 is
+`538a27f991d48a81d7958b23f8d148ba492e1df75110fcf39586720b6fb406a8`. The candidate uses tree-sitter runtime and CLI
+0.27.2, pins schema 3, recipe `v2-O3` and engine ABI 4. Product results use `CGO_ENABLED=0`. Outcomes marked pending
+were not finished when this table was written; the release-form commit records them.
+
+| Gate | v0.7.0 candidate result | Scope |
+|---|---|---|
+| Windows product lane | PASS, 4/4 jobs (push run) | Native Windows amd64/arm64 product execution and licence checks. [45540776291](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776291) |
+| Grammar pin move evidence | PASS, 1/1 push job | The push supplies no explicit comparison refs. Swift `fef1236` has its own old/new pin evidence on PR [#112](https://github.com/wotjr1649/go-treesitter/pull/112) (run [45351697893](https://github.com/wotjr1649/go-treesitter/actions/runs/45351697893)). [45540776201](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776201) |
+| Reproducible generation | Pending (push run in progress) | All 25 Linux amd64 grammar shards must match the committed bytes, including the five regenerated patched or moved modules. [45540776220](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776220) |
+| Conformance | Pending (push run queued) | 25 grammar shards and one aggregate per Linux architecture: native dumps, seeded edits and ranges, raw query matches, strict fresh/edited fields, symbol lookups and retained known gaps. [45540776333](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776333) |
+| Engine CI | Pending (push run queued) | Native Linux amd64/arm64, macOS arm64 and Windows amd64/arm64 on Go 1.27.x, plus native Linux amd64 on supported Go 1.26.x, and the consumer-compatibility job. [45540776204](https://github.com/wotjr1649/go-treesitter/actions/runs/45540776204) |
+| Speed / memory bench | Pending (dispatched run queued) | Paired product/native speed and memory on hashed large inputs and the pinned small corpora, all 25 grammars, Linux amd64/arm64 and macOS arm64. [45540883659](https://github.com/wotjr1649/go-treesitter/actions/runs/45540883659) |
+| Balancing cancellation | Pending (dispatched run queued) | Linux amd64 probe builds for every registered grammar. [45540887195](https://github.com/wotjr1649/go-treesitter/actions/runs/45540887195) |
+| Nightly diff | Pending (dispatched run queued) | All 25 grammars on Linux amd64/arm64, seed `20261125`. [45540891798](https://github.com/wotjr1649/go-treesitter/actions/runs/45540891798) |
+| Upstream watch | Pending (dispatched run queued) | Source-age and nvim-treesitter comparison for every pin. [45540895804](https://github.com/wotjr1649/go-treesitter/actions/runs/45540895804) |
+| Windows amd64 local bench of the five new tags | Pending | Maintainer-local paired bench on `css`, `powershell`, `ruby`, `swift` and `xml`. The hosted bench does not run Windows. |
+| Candidate module ZIP rehearsal | NOT_RUN | Runs on the release-form commits (publication steps 1 and 4). |
+| Candidate source-row inventory | Listing only, local E1 | `gen -mirror-assets` lists 34 rows: 26 `source` and eight `toolchain`. Draft upload would be the 26 source archives plus `SHA256SUMS`. Downloads and digest checks: NOT_RUN. |
+| Tag/proxy resolution and published mirror assets | NOT_RUN | Publication steps; each needs separate owner authority. |
+
+- **Changed source archive.** Only the Swift archive differs from the v0.6.0 release inventory:
+  `tree-sitter-swift-fef12360.tar.gz` replaces `tree-sitter-swift-a1d4a7b8.tar.gz`. The XML, CSS, Ruby and PowerShell
+  patches change generated files, not source archives. The immutable v0.6.0 release cannot receive the new archive.
+- **Patch evidence.** Each patched module records its own old/new comparison and native agreement in the
+  [schema register](../validation/grammar-schemas.md#v070-xml-name-patches) and in [limitations](limitations.md), rows 30
+  to 33. Those results are local Windows amd64 E4/E5 on the recorded inputs; they are not candidate-commit evidence.
+- **Source watch.** The `swift` pin moved to `fef1236`, the nvim-treesitter revision named by the v0.6.0 watch. The v0.6.0 acceptance of the Swift
+  `we are behind` warning (until 2027-02-24, [#109](https://github.com/wotjr1649/go-treesitter/issues/109)) stays in
+  `accepted-warnings.json`; the watch run decides whether it is still needed.
+
+The local rehearsal and the public module checks follow the publication procedure after the owner approves tags. The
+[known limitations](limitations.md) describe the scope of this Preview.
 
 ## v0.6.0 release scope
 

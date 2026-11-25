@@ -6,13 +6,15 @@ releases still use the [grammar gates](../specs/validation.md#gates) and, for pi
 [pin-move CI evidence](../../tools/gen/README.md#pin-move-ci-evidence). Check the grammar
 version selected by Go alongside the root in the [compatibility table](compatibility.md).
 
-- **Published** uses Go module tags `grammars/<dir>/v0.6.0`. All 25 tags point to
+- **`v0.6.0` tag** is published. The Go module tags are `grammars/<dir>/v0.6.0`. All 25 tags point to
   [`a8af436`](https://github.com/wotjr1649/go-treesitter/commit/a8af4360e4964deb6c0bb62461ee8348be1aa738),
   with root `v0.6.0`. The published [pins](https://github.com/wotjr1649/go-treesitter/blob/a8af4360e4964deb6c0bb62461ee8348be1aa738/tools/gen/pins.json)
   and module provenance record those identities.
-- **Development** describes main at
-  [`297131d`](https://github.com/wotjr1649/go-treesitter/commit/297131d74234c061164149615ca4ce79cba07a2e).
-  “Same” carries the published limit forward. “Fixed” applies to the recorded input in the unreleased tree.
+- **`v0.7.0` tag** is prepared and not yet published. It gives new tags `grammars/<dir>/v0.7.0` to `css`, `powershell`,
+  `ruby`, `swift` and `xml`; the other 20 modules keep their `v0.6.0` tags, so for them this column always says
+  “Same”. The table describes main at
+  [`7e24331`](https://github.com/wotjr1649/go-treesitter/commit/7e243318b5b1f8223ac0e1f49e06e10a9b107757).
+  “Same” carries the `v0.6.0` limit forward. “Fixed” and “Changed” apply to the recorded input in the new tag.
 
 The inputs below are illustrative excerpts. Linked records give the exact fixtures and scope. The error
 column refers to the root's syntax error flag (`HasError()`). An error-free tree can still have the
@@ -28,7 +30,7 @@ changes a case, recheck its exact fixture, neighboring valid inputs and affected
 Keep the old tag's limit linked to its published record and retain a regression with the evidence
 required by the grammar release gate.
 
-| Grammar module | Input | Published | Development | Root error | Consumer impact | Re-review when | Register ID |
+| Grammar module | Input | `v0.6.0` tag | `v0.7.0` tag | Root error | Consumer impact | Re-review when | Register ID |
 |---|---|---|---|---|---|---|---|
 | `csharp` | Override with `where T : default` | `v0.6.0` | Same | No | Type-constraint queries see `default` as a type identifier. | A candidate includes the upstream constraint fix and distinguishes `default` from a type name. | [csharp-default-constraint](../known-gaps/csharp.md#csharp-default-constraint) |
 | `csharp` | `#define A` without a final newline | `v0.6.0` | Same | Yes, anonymous missing token | A valid directive can trigger diagnostics or be skipped by error-sensitive tools. | A candidate includes the directive EOF fix. Check the final directive and edit recovery. | [csharp-directive-eof](../known-gaps/csharp.md#csharp-directive-eof) |
@@ -38,20 +40,20 @@ required by the grammar release gate.
 | `html` | `<x-걁>body</x-굁>` or an end tag of `</x-A>` | `v0.6.0` | Same | No | The wrong end tag closes the element, misleading structure-sensitive edits and queries. | A scanner candidate compares full names. Check matching and mismatched tags in fresh and incremental trees. | [html-hangul-tag-low-byte-mismatch](../known-gaps/html.md#html-hangul-tag-low-byte-mismatch) |
 | `python` | `a ^ b & c` | `v0.6.0` | Same | No | The tree groups `(a ^ b) & c`, changing what an analysis infers about the expression. | A candidate groups it as `a ^ (b & c)` and preserves the parenthesized controls. | [python-bitwise-precedence](../known-gaps/python.md#python-bitwise-precedence) |
 | `python` | `await f() ** 2` inside an async function | `v0.6.0` | Same | No | The power expression is inside the await operand, changing expression analysis. | A candidate groups it as `(await f()) ** 2` and preserves explicitly parenthesized operands. | [python-await-power](../known-gaps/python.md#python-await-power) |
-| `swift` | `끝: for _ in 0..<1 { }` | [`v0.6.0` record](https://github.com/wotjr1649/go-treesitter/blob/a8af4360e4964deb6c0bb62461ee8348be1aa738/docs/known-gaps/swift.md#swift-non-ascii-statement-label) | Same on the newer pin | Yes | A valid label definition becomes an error and the loop has no label. | A candidate changes the label production. Check definitions and references. | [swift-non-ascii-statement-label](../known-gaps/swift.md#swift-non-ascii-statement-label) |
+| `swift` | `끝: for _ in 0..<1 { }` | [`v0.6.0` record](https://github.com/wotjr1649/go-treesitter/blob/a8af4360e4964deb6c0bb62461ee8348be1aa738/docs/known-gaps/swift.md#swift-non-ascii-statement-label) | Same on the `v0.7.0` tag's `fef1236` pin | Yes | A valid label definition becomes an error and the loop has no label. | A candidate changes the label production. Check definitions and references. | [swift-non-ascii-statement-label](../known-gaps/swift.md#swift-non-ascii-statement-label) |
 
-## Fixed in the development tree
+## Fixed in the v0.7.0 tags
 
-These IDs remain in the published register. The development patches cover the recorded inputs: XML under
+These IDs remain in the published register. The `v0.7.0` patches cover the recorded inputs: XML under
 upstream issue [#40](https://github.com/tree-sitter-grammars/tree-sitter-xml/issues/40)
 ([migration](../../MIGRATING.md#xml-names-and-tag-names)), CSS names ([row 31](limitations.md),
 [migration](../../MIGRATING.md#css-non-latin-1-names)), PowerShell names ([row 32](limitations.md),
 [migration](../../MIGRATING.md#powershell-names)) and Ruby plain symbols ([row 33](limitations.md),
-[migration](../../MIGRATING.md#ruby-symbol-names)). The first grammar tag containing each patch should record the
+[migration](../../MIGRATING.md#ruby-symbol-names)). The `v0.7.0` tag of each grammar contains its patch; the release notes record the
 change and its release evidence. Rows with a published register ID link its record on `v0.6.0`. Rows that say
 None changed without a root error on either tag and have no register entry. Cases the patches leave open are in the other tables.
 
-| Grammar module | Input | Published | Development | Root error on published tag | Consumer impact on published tag | Re-review when | Published register ID |
+| Grammar module | Input | `v0.6.0` tag | `v0.7.0` tag | Root error on `v0.6.0` tag | Consumer impact on `v0.6.0` tag | Re-review when | Register ID on `v0.6.0` |
 |---|---|---|---|---|---|---|---|
 | `xml` | `<a 속성="1"/>` | `v0.6.0` | Fixed, no root error | Yes | An error replaces the attribute node. | A tag includes the name fix. Keep the attribute fixture and recheck it on the next pin. | [xml-non-ascii-attribute-name](https://github.com/wotjr1649/go-treesitter/blob/a8af4360e4964deb6c0bb62461ee8348be1aa738/docs/known-gaps/xml.md#xml-non-ascii-attribute-name) |
 | `xml` | `<a xmlns:접두="u"/>` | `v0.6.0` | Fixed, no root error | Yes | The namespace prefix enters recovery. | A tag includes the name fix. Check namespace prefixes and name-start boundaries. | [xml-non-ascii-namespace-prefix](https://github.com/wotjr1649/go-treesitter/blob/a8af4360e4964deb6c0bb62461ee8348be1aa738/docs/known-gaps/xml.md#xml-non-ascii-namespace-prefix) |
@@ -63,16 +65,16 @@ None changed without a root error on either tag and have no register entry. Case
 | `powershell` | `$a.속성` | `v0.6.0` | Fixed, no root error | Yes | The member-access node is lost. | A tag includes the patch ([row 32](limitations.md)). Keep the fixture and recheck it on the next pin. | [powershell-non-ascii-member-name](https://github.com/wotjr1649/go-treesitter/blob/a8af4360e4964deb6c0bb62461ee8348be1aa738/docs/known-gaps/powershell.md#powershell-non-ascii-member-name) |
 | `powershell` | `[한글]$a` | `v0.6.0` | Fixed, no root error | Yes | A cast or type literal goes into recovery. | A tag includes the patch ([row 32](limitations.md)). Keep the fixture and recheck it on the next pin. | [powershell-non-ascii-type-name](https://github.com/wotjr1649/go-treesitter/blob/a8af4360e4964deb6c0bb62461ee8348be1aa738/docs/known-gaps/powershell.md#powershell-non-ascii-type-name) |
 | `ruby` | `a = :한글` | `v0.6.0` | Fixed, no root error | Yes | The colon errors and the identifier is separate. The recorded `%s(한글)` form parses as a symbol. | A tag includes the patch ([row 33](limitations.md)). Keep the fixture and recheck it on the next pin. | [ruby-non-ascii-symbol](https://github.com/wotjr1649/go-treesitter/blob/a8af4360e4964deb6c0bb62461ee8348be1aa738/docs/known-gaps/ruby.md#ruby-non-ascii-symbol) |
-| `powershell` | `$값` or `$한` inside an expandable here-string, and `"$한글"` | `v0.6.0` | Changed, no root error | No | The published tree has no separate `variable` node for the interpolation. Development adds one. | A tag includes the patch ([row 32](limitations.md)). Keep the fixture and recheck it on the next pin. | None; [Korean input evidence](../guides/korean-input.md#which-grammars-take-korean), [fixture](../../tools/conformance/testdata/korean/powershell/str-here-string.in) |
-| `powershell` | `"$name님 환영합니다"` | `v0.6.0` | Changed, no root error | No | The published tree reads the variable `$name` followed by text. Development reads one `variable`, `$name님`, so variable captures and ranges differ between the tags. | A tag includes the patch ([row 32](limitations.md)). Keep the fixture and recheck variable ranges on the next pin. | None; [migration](../../MIGRATING.md#powershell-names), [row 32](limitations.md) |
-| `powershell` | `echo $env:한글` | `v0.6.0` | Changed, no root error | No | The published tree reads the variable `$env`, a `:` token and a word. Development reads one `variable`, `$env:한글`. | A tag includes the patch ([row 32](limitations.md)). Keep the fixture and recheck scoped names on the next pin. | None; [migration](../../MIGRATING.md#powershell-names), [row 32](limitations.md) |
+| `powershell` | `$값` or `$한` inside an expandable here-string, and `"$한글"` | `v0.6.0` | Changed, no root error | No | The `v0.6.0` tree has no separate `variable` node for the interpolation. The `v0.7.0` tag adds one. | A tag includes the patch ([row 32](limitations.md)). Keep the fixture and recheck it on the next pin. | None; [Korean input evidence](../guides/korean-input.md#which-grammars-take-korean), [fixture](../../tools/conformance/testdata/korean/powershell/str-here-string.in) |
+| `powershell` | `"$name님 환영합니다"` | `v0.6.0` | Changed, no root error | No | The `v0.6.0` tree reads the variable `$name` followed by text. The `v0.7.0` tag reads one `variable`, `$name님`, so variable captures and ranges differ between the tags. | A tag includes the patch ([row 32](limitations.md)). Keep the fixture and recheck variable ranges on the next pin. | None; [migration](../../MIGRATING.md#powershell-names), [row 32](limitations.md) |
+| `powershell` | `echo $env:한글` | `v0.6.0` | Changed, no root error | No | The `v0.6.0` tree reads the variable `$env`, a `:` token and a word. The `v0.7.0` tag reads one `variable`, `$env:한글`. | A tag includes the patch ([row 32](limitations.md)). Keep the fixture and recheck scoped names on the next pin. | None; [migration](../../MIGRATING.md#powershell-names), [row 32](limitations.md) |
 
 ## Other documented grammar limits
 
 These cases have no active register ID. Numbered references point to the [preview limitations](limitations.md).
 “Unrecorded” means the cited record gives no root flag for that example.
 
-| Grammar module | Input or scope | Published | Development | Root error | Consumer impact | Re-review when | Source |
+| Grammar module | Input or scope | `v0.6.0` tag | `v0.7.0` tag | Root error | Consumer impact | Re-review when | Source |
 |---|---|---|---|---|---|---|---|
 | `bash` | A leading space or tab before the terminator of plain `<<EOF`, or U+3000 before the terminator of `<<-` | `v0.6.0` | Same | No on the retained cases | Heredoc content ends early and later text is parsed outside the body. | A scanner candidate changes leading whitespace. Check plain and tab-stripping forms separately. | [Row 16](limitations.md), [heredoc tests](../../tools/conformance/scanner_patches_test.go) |
 | `bash`, `ruby` | Open heredoc end words and metadata exceed the 1,024-byte scanner state buffer | `v0.6.0` | Same | Yes in the Bash fixture. No in the Ruby fixture. | State is lost and the real closing line can disappear from the tree. UTF-8 end words reach the limit sooner. | State storage or serialization changes. Recheck the last fitting and first overflowing inputs. | [Row 16](limitations.md), [heredoc tests](../../tools/conformance/scanner_patches_test.go) |
