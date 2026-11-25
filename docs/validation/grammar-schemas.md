@@ -582,16 +582,16 @@ each pass the strict check and have the same 43,620 bytes and SHA-256
 `fbbf8d22d82608f6d2f61cfdb374e6758779754fb2f42643e9dc5af6ead0d5d2`.
 The strict diffs against both baselines have zero changes.
 
-Native A/B on Windows amd64 (E4) compares 56 corpus trees and 168 seeded edits plus the pinned
-`bootstrap.css`. Against 0001 alone, 0002 changes seven patch-corpus trees and twenty seeded edits.
-Two fresh trees in the value corpus become clean. The other five still report errors with different
-recovery. The 40 upstream corpus trees, their 120 edits and the large input remain byte-identical
-against both baselines. In a separate 89-input fresh comparison including fixed fuzz inputs,
-29 trees differ from the unpatched baseline and eleven from 0001 alone. No previously error-free
-tree changes in either comparison.
+Native A/B on Windows amd64 (E4) compares 62 corpus trees and 186 seeded edits plus the pinned
+`bootstrap.css`. Against 0001 alone, 0002 changes eleven patch-corpus trees and thirty seeded edits.
+Three fresh trees in the value corpus become clean and eight retain errors with different recovery.
+The 40 upstream corpus trees, their 120 edits and the large input remain byte-identical
+against both baselines. In a separate 101-input fresh comparison including fixed fuzz inputs,
+37 trees differ from the unpatched baseline and 19 from 0001 alone. No previously error-free
+tree changes against either baseline on these inputs.
 
 The CGO-free engine and patched native reference agree on the corpus and seeded edits, including
-changed ranges, and on 616 raw query comparisons (E5, Windows amd64). The pinned `highlights.scm`
+changed ranges, and on 682 raw query comparisons (E5, Windows amd64). The pinned `highlights.scm`
 compiles. The Korean regression checks that `plain_value` spans the complete identifier.
 See the [migration notes](../../MIGRATING.md#css-non-latin-1-declaration-values).
 

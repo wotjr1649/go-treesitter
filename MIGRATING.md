@@ -526,9 +526,12 @@ Unreleased after `grammars/css/v0.7.0`. The ADR-0023 value patch adapts the wide
 `a { b: 한글 }` now has a `declaration` with a `plain_value` spanning `한글`. Queries for those nodes
 can capture the repaired declaration and value. The syntax tree uses the existing node types and fields.
 
-The fix covers a single unquoted identifier as the entire value when it starts with a code point beyond
-Latin-1, optionally after a hyphen. It also covers declarations ending in `;` or marked `!important`. Non-Latin-1 identifiers inside value lists and function arguments, unquoted
-`url()` arguments, bare attribute values, and units such as `1한` remain outside its scope.
+The fix covers a single unquoted, unescaped identifier as the entire value when it starts with a code
+point beyond Latin-1, optionally after a hyphen. It also covers declarations ending in `;` or marked
+`!important`. Escaped identifiers such as `한\+글`, non-Latin-1 identifiers inside value lists and
+function arguments, unquoted `url()` arguments, bare attribute values, and units such as `1한`
+remain outside its scope. For out-of-scope inputs with parse errors, recovery nodes and query capture
+ranges can change. For example, a `plain_value` can appear under `ERROR` in `foo(한글)`.
 Both published CSS tags, `v0.6.0` and `v0.7.0`, retain the
 [original gap](https://github.com/wotjr1649/go-treesitter/blob/grammars/css/v0.7.0/docs/known-gaps/css.md#css-non-latin1-value).
 

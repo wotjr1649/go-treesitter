@@ -13,7 +13,7 @@
 -      )),
 +      $._declaration_values,
        optional($.important),
-@@ -319,9 +316,14 @@
+@@ -319,9 +316,15 @@
        ':',
 -      $._value,
 -      repeat(seq(
@@ -31,5 +31,6 @@
 +    ),
 +
 +    // The existing plain_value token must keep mixed values that start in Latin-1.
-+    _non_latin1_value_name: _ => new RegExp(`-?[${non_latin1}][${name_continue}]*`, 'u'),
++    // Use the CSS Syntax 3 Latin-1 ranges for the new value token.
++    _non_latin1_value_name: _ => new RegExp(String.raw`-?[${non_latin1}][a-zA-Z_0-9\-\xB7\xC0-\xD6\xD8-\xF6\xF8-\xFF${non_latin1}]*`, 'u'),
  

@@ -69,3 +69,89 @@ a { b: a한, é, 12px, var(--한글), "한글"; }
     (selectors (tag_name))
     (block
       (declaration (property_name) (plain_value) (plain_value) (integer_value (unit)) (call_expression (function_name) (arguments (plain_value))) (string_value (string_content))))))
+
+================================================================================
+Multiplication sign ends the identifier
+================================================================================
+
+a { animation-name: 한×글 }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors (tag_name))
+    (block
+      (declaration (property_name) (plain_value))
+      (ERROR (attribute_name)))))
+
+================================================================================
+Division sign ends the identifier
+================================================================================
+
+a { animation-name: 한÷글; }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors (tag_name))
+    (block
+      (declaration (property_name) (plain_value) (ERROR (attribute_name))))))
+
+================================================================================
+No-break space ends the identifier
+================================================================================
+
+a { animation-name: 한 글 }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors (tag_name))
+    (block
+      (declaration (property_name) (plain_value))
+      (ERROR (attribute_name)))))
+
+================================================================================
+Latin-1 continuation in a non-Latin-1 value
+================================================================================
+
+a { animation-name: 한é글; }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors (tag_name))
+    (block
+      (declaration (property_name) (plain_value)))))
+
+================================================================================
+Standalone Latin-1 value
+================================================================================
+
+a { animation-name: é }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors (tag_name))
+    (block
+      (declaration (property_name) (plain_value)))))
+
+================================================================================
+Existing ASCII-first mixed value
+================================================================================
+
+a { animation-name: a한; }
+
+--------------------------------------------------------------------------------
+
+(stylesheet
+  (rule_set
+    (selectors (tag_name))
+    (block
+      (declaration (property_name) (plain_value)))))

@@ -23,8 +23,9 @@ If PR #105 closes without a fix or the patch has been on main for 12 months, the
 The owner approved this temporary ADR-0023 patch on 2026-11-25 at 20:15 KST.
 [The report on upstream PR #105](https://github.com/tree-sitter/tree-sitter-css/pull/105#issuecomment-7140588000) records the bare Hangul value failure.
 Apply `0002-non-latin1-value.patch` to `grammar.js` after 0001. This adapts the PR's identifier
-extension to the pinned declaration grammar using 0001's code-point ranges. The added token starts
-beyond Latin-1, optionally after a hyphen, so existing mixed tokens such as `a한` keep their lexer path.
+extension to the pinned declaration grammar. The added token starts beyond Latin-1, optionally after
+a hyphen, and continues with CSS Syntax Level 3 identifier code points. Existing values such as `é`
+and `a한` keep their lexer path. Escapes in the added token are outside the patch scope.
 `a { b: 한글 }` now contains a `declaration` with a `plain_value`. The separate alternative keeps
 `1한` from becoming a number followed by a value, and `한글(abc)` from becoming a value followed by a
 parenthesized expression. The retained corpus also covers the terminated form, `!important`,
