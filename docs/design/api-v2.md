@@ -247,4 +247,5 @@ See the [regex subset](query-abi.md#regex-predicate-subset-v060) and
 
 The original design excluded live per-node navigation over the instance, included ranges, shared-runtime linking,
 legacy encodings beyond the documented converters, and a compatibility package for other Go tree-sitter APIs.
+Included ranges are proposed in [ADR-0029](decisions/ADR-0029-included-ranges.md); implementation is deferred until after 1.0.
 See the [migration name map](../../MIGRATING.md) and [current limitations](../reports/limitations.md).
