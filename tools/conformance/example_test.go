@@ -1,4 +1,4 @@
-//go:build !no_golang
+//go:build !no_go
 
 package conformance_test
 
@@ -88,7 +88,8 @@ func Example_incrementalEdit() {
 	defer oldTree.Close()
 
 	// The edit inserts "a int" at byte 18, between the parentheses of "F()".
-	// useful as the old tree of the next parse, so take any Snapshot before editing.
+	// An edited tree is only useful as the old tree of the next parse (Snapshot returns ErrTreeEdited), so take any
+	// Snapshot before editing.
 	edit := treesitter.EditFor(oldSrc, newSrc, 18, 18, 23)
 	if err := oldTree.Edit(edit); err != nil {
 		log.Fatal(err)

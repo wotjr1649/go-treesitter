@@ -21,8 +21,9 @@
 //
 // Close every Tree and every Parser. Closing or resetting a Parser invalidates its live trees, but snapshots stay
 // valid. A Parser and its trees are one confinement unit: use them from one goroutine at a time. NewParserPool
-// lends parsers to concurrent goroutines. Options such as WithMaxInputBytes, WithMaxSnapshotNodes and
-// WithMaxMemoryBytes bound the cost of untrusted input.
+// lends parsers to concurrent goroutines. Options bound the cost of untrusted input: WithMaxInputBytes the input,
+// WithMaxSnapshotNodes the node count of an exported Snapshot, and WithMaxMemoryBytes the linear memory of one
+// Parser instance (not the Go heap of sources and snapshots).
 //
 // # Input and positions
 //
@@ -32,11 +33,12 @@
 //
 // # Stability
 //
-// This package follows the root 1.x compatibility rules in docs/design/api-stability.md: a grammar module can
-// change trees and captures when its source pin moves, while the API and its documented behavior with a fixed
+// From root 1.0 this package follows the compatibility rules in docs/design/api-stability.md (the v0.x Preview and
+// release candidates propose them and promise nothing yet): a grammar module can change trees and captures when its source pin moves, while the API and its documented behavior with a fixed
 // grammar stay compatible. Package github.com/wotjr1649/go-treesitter/experimental/match is EXPERIMENTAL and is
 // outside that promise; it may change or be removed in any release.
 //
-// Runnable examples are in tools/conformance/example_test.go, because a grammar module requires this module and
-// so this package cannot import one.
+// Runnable examples are in tools/conformance/example_test.go (https://github.com/wotjr1649/go-treesitter/blob/main/tools/conformance/example_test.go).
+// They live in that module because a grammar module requires this one: importing a grammar here would make an import
+// cycle, and an external test package would add a grammar dependency to this module.
 package treesitter

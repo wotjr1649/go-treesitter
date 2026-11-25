@@ -37,7 +37,7 @@ This includes a local merge into main, whatever the branch size (ADR-0019).
 No publication workflow may infer those permissions from a passing test, and
 no one acting under this contract uses a ruleset administrator bypass.
 
-Rulesets (2026-11-21): `main-protection` (no deletion or non-fast-forward; 13 required CI checks), `tag-protection`
+Rulesets (2026-11-25): `main-protection` (no deletion or non-fast-forward; 13 required CI checks), `tag-protection`
 (no tag update or deletion) and `tag-creation` (tags other than `v*` and `grammars/*/v*` only by the owner). Task
 branches need no ruleset; what is pushed is checked before the push (`AGENTS.md`), because the always-on owner bypass
 made the former `branch-creation` ruleset a warning, not a guard. Version tags therefore need authority, not a bypass, and stay immutable.
