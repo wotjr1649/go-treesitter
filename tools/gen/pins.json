@@ -373,6 +373,14 @@
           "beforeSHA256": "c6d9efdeaf3a4902f026849e08a103a6d1ec1f015c5f396d3fe92dc57ce034ae",
           "afterSHA256": "8ae6785b70c26bb95ce59a9770cf9974e5c65346bc85744a8f45ca520e32cce1",
           "upstreamReport": "https://github.com/tree-sitter/tree-sitter-css/pull/105"
+        },
+        {
+          "file": "patches/css/0002-non-latin1-value.patch",
+          "sha256": "4bd4f20670365b949068ee184eaea8605ea3c57191b22c97d7e8911fcb63f014",
+          "source": "grammar.js",
+          "beforeSHA256": "8ae6785b70c26bb95ce59a9770cf9974e5c65346bc85744a8f45ca520e32cce1",
+          "afterSHA256": "68ca531ea4d1ea662b5a0d858a9dfe0d735713ef5a48325ee1fa329c72e518ca",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-css/pull/105#issuecomment-7140588000"
         }
       ]
     },

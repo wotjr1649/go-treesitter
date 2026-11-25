@@ -450,9 +450,9 @@ An independently implemented ADR-0023 patch addresses the name defect reported i
 exercise type, ID, attribute and property names, `var(--변수)` references, keyframe names, combinators and nesting.
 Node types and fields are unchanged. Queries for `class_name`, `identifier`, `tag_name`, `id_name`,
 `attribute_name`, `property_name` and `keyframes_name` can now capture these names on the repaired inputs.
-The patch leaves bare identifier attribute values, unquoted `url()` arguments, bare declaration values,
-units, and at-rule names and arguments outside its scope. `a { b: 한글 }` remains a
-[known gap](docs/known-gaps/css.md#css-non-latin1-value). An unprefixed type selector can still produce an
+The name patch leaves bare identifier attribute values, unquoted `url()` arguments, units, and at-rule
+names and arguments outside its scope. See [CSS non-Latin-1 declaration values](#css-non-latin-1-declaration-values)
+for the separate unreleased value fix. An unprefixed type selector can still produce an
 error after whitespace when the pinned scanner does not recognize its first character. For example,
 `.a 🙂 {}` remains an error. Extended class names require adjacency, including at escapes.
 
@@ -518,3 +518,19 @@ A temporary ADR-0023 scanner patch carries [upstream issue #292](https://github.
   taken for a short interpolation (see [limitations](docs/reports/limitations.md), rows 27 and 33).
 
 The pinned upstream Ruby queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#v070-ruby-symbol-patch)).
+
+## CSS non-Latin-1 declaration values
+
+Unreleased after `grammars/css/v0.7.0`. The ADR-0023 value patch adapts the widened identifier in
+[upstream PR #105](https://github.com/tree-sitter/tree-sitter-css/pull/105#issuecomment-7140588000) to the pinned declaration rules.
+`a { b: 한글 }` now has a `declaration` with a `plain_value` spanning `한글`. Queries for those nodes
+can capture the repaired declaration and value. The syntax tree uses the existing node types and fields.
+
+The fix covers a single unquoted identifier as the entire value when it starts with a code point beyond
+Latin-1, optionally after a hyphen. It also covers declarations ending in `;` or marked `!important`. Non-Latin-1 identifiers inside value lists and function arguments, unquoted
+`url()` arguments, bare attribute values, and units such as `1한` remain outside its scope.
+Both published CSS tags, `v0.6.0` and `v0.7.0`, retain the
+[original gap](https://github.com/wotjr1649/go-treesitter/blob/grammars/css/v0.7.0/docs/known-gaps/css.md#css-non-latin1-value).
+
+Retire this patch in the approved pin move to a source that correctly parses the retained declaration
+fixture. Review the affected corpus expectations and known-gap records in the same change.

@@ -573,6 +573,28 @@ The patched engine and pinned native reference agree on the corpus, seeded edits
 (E5, Windows amd64). The pinned `highlights.scm` compiles and runs on the repaired inputs.
 See the [migration notes](../../MIGRATING.md#css-non-latin-1-names) for the new captures.
 
+## Unreleased after v0.7.0: CSS declaration value patch
+
+The [second grammar-input patch](../../tools/gen/patches/css#0002-non-latin-1-declaration-value)
+fixes the failure reported in the [comment on upstream PR #105](https://github.com/tree-sitter/tree-sitter-css/pull/105#issuecomment-7140588000).
+It uses the same CSS commit and CLI 0.27.2. The generated schemas with zero, one and two patches
+each pass the strict check and have the same 43,620 bytes and SHA-256
+`fbbf8d22d82608f6d2f61cfdb374e6758779754fb2f42643e9dc5af6ead0d5d2`.
+The strict diffs against both baselines have zero changes.
+
+Native A/B on Windows amd64 (E4) compares 56 corpus trees and 168 seeded edits plus the pinned
+`bootstrap.css`. Against 0001 alone, 0002 changes seven patch-corpus trees and twenty seeded edits.
+Two fresh trees in the value corpus become clean. The other five still report errors with different
+recovery. The 40 upstream corpus trees, their 120 edits and the large input remain byte-identical
+against both baselines. In a separate 89-input fresh comparison including fixed fuzz inputs,
+29 trees differ from the unpatched baseline and eleven from 0001 alone. No previously error-free
+tree changes in either comparison.
+
+The CGO-free engine and patched native reference agree on the corpus and seeded edits, including
+changed ranges, and on 616 raw query comparisons (E5, Windows amd64). The pinned `highlights.scm`
+compiles. The Korean regression checks that `plain_value` spans the complete identifier.
+See the [migration notes](../../MIGRATING.md#css-non-latin-1-declaration-values).
+
 ## v0.7.0: PowerShell name patch
 
 At PowerShell pin `65ea6919e816`, the strict check of the regenerated `node-types.json` passes with zero findings, and

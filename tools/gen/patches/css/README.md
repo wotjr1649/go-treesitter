@@ -1,4 +1,6 @@
-# Temporary CSS name patch
+# Temporary CSS grammar patches
+
+## 0001: Non-Latin-1 names
 
 `0001-non-latin1-names.patch` changes only `grammar.js` at the pinned source. It independently addresses
 the name defect reported in [upstream PR #105](https://github.com/tree-sitter/tree-sitter-css/pull/105).
@@ -12,7 +14,24 @@ ASCII and Latin-1 controls. The [migration notes](../../../../MIGRATING.md#css-n
 positions outside the patch scope.
 
 Retire the patch in the approved pin move to an upstream source containing a fix for the reported name defect.
-Review and update the affected corpus expectations and known-gap register in that pin move, including the
-[bare Hangul declaration value](../../../../docs/known-gaps/css.md#css-non-latin1-value) if the new pin fixes it.
+Review and update the affected corpus expectations and known-gap register in that pin move.
 If PR #105 closes without a fix or the patch has been on main for 12 months, the owner reviews it under
 [ADR-0023](../../../../docs/design/decisions/ADR-0023-temporary-upstream-grammar-patches.md).
+
+## 0002: Non-Latin-1 declaration value
+
+The owner approved this temporary ADR-0023 patch on 2026-11-25 at 20:15 KST.
+[The report on upstream PR #105](https://github.com/tree-sitter/tree-sitter-css/pull/105#issuecomment-7140588000) records the bare Hangul value failure.
+Apply `0002-non-latin1-value.patch` to `grammar.js` after 0001. This adapts the PR's identifier
+extension to the pinned declaration grammar using 0001's code-point ranges. The added token starts
+beyond Latin-1, optionally after a hyphen, so existing mixed tokens such as `a한` keep their lexer path.
+`a { b: 한글 }` now contains a `declaration` with a `plain_value`. The separate alternative keeps
+`1한` from becoming a number followed by a value, and `한글(abc)` from becoming a value followed by a
+parenthesized expression. The retained corpus also covers the terminated form, `!important`,
+supplementary-plane characters, and controls for the existing value lexer.
+
+Retire 0002 on an approved pin move that correctly parses the retained declaration fixture. Review
+0001 and 0002 independently and update the affected corpus expectations and known-gap records.
+If 0001 retires first, adapt 0002 to the new pinned identifier ranges.
+If PR #105 closes without the value fix or 12 months pass after the value patch first reaches main,
+the owner re-decides it under ADR-0023.
