@@ -2,6 +2,7 @@ package treesitter
 
 import (
 	"fmt"
+	"math"
 	"regexp"
 	"regexp/syntax"
 	"sort"
@@ -21,52 +22,136 @@ type queryRegex struct {
 }
 
 func (re *queryRegex) MatchString(text string) bool {
-	if !re.boundary && utf8.ValidString(text) {
+	if re.re != nil && !re.boundary && utf8.ValidString(text) {
 		return re.re.MatchString(text)
 	}
 	return regexVMMatch(re.prog, text, re.asciiBoundaries)
 }
 
 func compileQueryRegex(pattern string) (*queryRegex, error) {
-	p := regexTranslator{src: pattern}
-	canonical, err := p.expression(regexFlags{unicode: true}, false)
-	if err != nil {
+	return compileQueryRegexWithMeter(pattern, nil)
+}
+
+func compileQueryRegexWithMeter(pattern string, meter *queryMeter) (*queryRegex, error) {
+	p := regexTranslator{src: pattern, meter: meter}
+	var out strings.Builder
+	if err := p.expression(&out, regexFlags{unicode: true}, false); err != nil {
 		return nil, err
 	}
+	canonical := out.String()
+	// Canonical syntax has explicit ranges and no implicit Unicode or fold tables.
+	// Allow for parser nodes, literal/range runes and alternation factoring.
+	if meter != nil {
+		units := int64(-1)
+		if int64(len(canonical)) < math.MaxInt64/16 {
+			units = 16 * (int64(len(canonical)) + 1)
+		}
+		if !meter.charge(units) {
+			return nil, meter.err
+		}
+	}
 	ast, err := syntax.Parse(canonical, syntax.Perl)
+	if !meter.charge(0) {
+		return nil, meter.err
+	}
 	if err != nil {
 		return nil, fmt.Errorf("query regex: %w", err)
+	}
+	if meter != nil && meter.limited {
+		cost := expandedRegexUnits(ast, meter.remaining, meter)
+		if !meter.charge(cost) {
+			return nil, meter.err
+		}
 	}
 	asciiCaps := map[uint32]bool{}
 	var visit func(*syntax.Regexp)
 	visit = func(r *syntax.Regexp) {
+		if !meter.charge(0) {
+			return
+		}
 		if r.Op == syntax.OpCapture && strings.HasPrefix(r.Name, "tsgAsciiBoundary") {
 			asciiCaps[uint32(2*r.Cap)] = true
 		}
 		for _, sub := range r.Sub {
 			visit(sub)
+			if meter != nil && meter.err != nil {
+				return
+			}
 		}
 	}
 	visit(ast)
-	prog, err := syntax.Compile(ast.Simplify())
+	if !meter.charge(0) {
+		return nil, meter.err
+	}
+	simplified := ast.Simplify()
+	if !meter.charge(0) {
+		return nil, meter.err
+	}
+	prog, err := syntax.Compile(simplified)
+	if !meter.charge(0) {
+		return nil, meter.err
+	}
 	if err != nil {
 		return nil, fmt.Errorf("query regex: %w", err)
 	}
 	asciiPC := map[uint32]bool{}
 	for _, inst := range prog.Inst {
+		if !meter.charge(0) {
+			return nil, meter.err
+		}
 		if inst.Op == syntax.InstCapture && asciiCaps[inst.Arg] {
 			asciiPC[inst.Out] = true
 		}
 	}
-	re, err := regexp.Compile(canonical)
-	if err != nil {
-		return nil, fmt.Errorf("query regex: %w", err)
+	var re *regexp.Regexp
+	if meter == nil {
+		re, err = regexp.Compile(canonical)
+		if err != nil {
+			return nil, fmt.Errorf("query regex: %w", err)
+		}
 	}
 	return &queryRegex{re: re, prog: prog, boundary: p.boundary, asciiBoundaries: asciiPC}, nil
 }
 
+// expandedRegexUnits bounds the simplified tree and program as if shared subtrees
+// and rune slices were copied at each use. A negative result denotes overflow.
+func expandedRegexUnits(ast *syntax.Regexp, limit int64, meter *queryMeter) int64 {
+	var size func(*syntax.Regexp) int64
+	size = func(r *syntax.Regexp) int64 {
+		if !meter.charge(0) {
+			return -1
+		}
+		// One node, up to two instructions, and up to four implicit runes.
+		// Concatenation and alternation allow control instructions per child.
+		cost := 7 + 2*int64(len(r.Rune)) + 2*int64(len(r.Sub))
+		for _, sub := range r.Sub {
+			n := size(sub)
+			if n < 0 || n > limit-cost {
+				return -1
+			}
+			cost += n
+		}
+		if r.Op == syntax.OpRepeat {
+			// Each optional repetition may add a concat, a question and an
+			// instruction. The unbounded form uses a final plus or star.
+			copies := max(1, int64(r.Min), int64(r.Max))
+			if cost > limit/copies-4 {
+				return -1
+			}
+			cost = copies * (cost + 4)
+		}
+		return cost
+	}
+	cost := size(ast)
+	if cost < 0 || cost > limit-2 {
+		return -1
+	}
+	return cost + 2 // leading fail and final match
+}
+
 type regexFlags struct{ fold, multi, dot, unicode bool }
 type regexTranslator struct {
+	meter               *queryMeter
 	src                 string
 	pos, asciiID, depth int
 	boundary            bool
@@ -77,33 +162,36 @@ func (p *regexTranslator) fail(construct string) error {
 	return fmt.Errorf("query regex at byte %d: unsupported or invalid %s", p.pos, construct)
 }
 
-func (p *regexTranslator) expression(flags regexFlags, grouped bool) (string, error) {
+func (p *regexTranslator) expression(out *strings.Builder, flags regexFlags, grouped bool) error {
 	p.depth++
 	defer func() { p.depth-- }()
 	if p.depth > 100 {
-		return "", p.fail("group nesting (limit 100)")
+		return p.fail("group nesting (limit 100)")
 	}
-	var out strings.Builder
 	lastFlags := false
 	for p.pos < len(p.src) {
+		if !p.meter.charge(0) {
+			return p.meter.err
+		}
 		c := p.src[p.pos]
 		p.pos++
 		if lastFlags && strings.ContainsRune("*+?{", rune(c)) {
-			return "", p.fail("repetition immediately after flags")
+			return p.fail("repetition immediately after flags")
 		}
 		lastFlags = false
+		var token string
 		switch c {
 		case ')':
 			if !grouped {
-				return "", p.fail("unmatched )")
+				return p.fail("unmatched )")
 			}
-			return out.String(), nil
+			return nil
 		case '(':
 			next := flags
 			if p.pos < len(p.src) && p.src[p.pos] == '?' {
 				p.pos++
 				if p.pos == len(p.src) {
-					return "", p.fail("group")
+					return p.fail("group")
 				}
 				if p.src[p.pos] == ':' {
 					p.pos++
@@ -114,26 +202,35 @@ func (p *regexTranslator) expression(flags regexFlags, grouped bool) (string, er
 					p.pos++
 					start := p.pos
 					for p.pos < len(p.src) && p.src[p.pos] != '>' {
+						if !p.meter.charge(1) {
+							return p.meter.err
+						}
 						p.pos++
 					}
 					if p.pos == len(p.src) {
-						return "", p.fail("named group")
+						return p.fail("named group")
 					}
 					name := p.src[start:p.pos]
 					p.pos++
 					if name == "" {
-						return "", p.fail("empty group name")
+						return p.fail("empty group name")
+					}
+					if !p.meter.charge(1) {
+						return p.meter.err
 					}
 					if p.names == nil {
 						p.names = map[string]bool{}
 					}
 					if p.names[name] {
-						return "", p.fail("duplicate group name " + name)
+						return p.fail("duplicate group name " + name)
 					}
 					p.names[name] = true
 					for i, r := range name {
+						if !p.meter.charge(0) {
+							return p.meter.err
+						}
 						if !(r == '_' || r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' || i > 0 && r >= '0' && r <= '9') {
-							return "", p.fail("named group " + name + " (use ASCII letters, digits and _)")
+							return p.fail("named group " + name + " (use ASCII letters, digits and _)")
 						}
 					}
 				} else {
@@ -147,7 +244,7 @@ func (p *regexTranslator) expression(flags regexFlags, grouped bool) (string, er
 							continue
 						}
 						if f >= 128 || used[f] {
-							return "", p.fail("duplicate or invalid flag")
+							return p.fail("duplicate or invalid flag")
 						}
 						used[f] = true
 						seen = true
@@ -162,14 +259,14 @@ func (p *regexTranslator) expression(flags regexFlags, grouped bool) (string, er
 							next.unicode = !negative
 						case 'U': // Greed changes no boolean match result.
 						default:
-							return "", p.fail("flag (?" + string(f) + ")")
+							return p.fail("flag (?" + string(f) + ")")
 						}
 					}
 					if !seen || p.pos == len(p.src) || p.src[p.pos-1] == '-' {
-						return "", p.fail("flags")
+						return p.fail("flags")
 					}
 					if next.fold && !next.unicode {
-						return "", p.fail("(?i-u) byte case folding")
+						return p.fail("(?i-u) byte case folding")
 					}
 					if p.src[p.pos] == ')' {
 						p.pos++
@@ -180,109 +277,121 @@ func (p *regexTranslator) expression(flags regexFlags, grouped bool) (string, er
 					p.pos++
 				}
 			}
-			sub, err := p.expression(next, true)
-			if err != nil {
-				return "", err
+			if !p.meter.charge(3) {
+				return p.meter.err
 			}
-			out.WriteString("(?:" + sub + ")")
+			out.WriteString("(?:")
+			if err := p.expression(out, next, true); err != nil {
+				return err
+			}
+			token = ")"
 		case '[':
 			set, err := p.class(flags)
 			if err != nil {
-				return "", err
+				return err
 			}
-			emitted, err := p.emit(set, regexFlags{unicode: flags.unicode})
-			if err != nil {
-				return "", err
+			if err := p.emit(out, set, regexFlags{unicode: flags.unicode}); err != nil {
+				return err
 			}
-			out.WriteString(emitted)
 		case '\\':
 			set, assertion, err := p.escape(flags, false)
 			if err != nil {
-				return "", err
+				return err
 			}
 			if assertion != "" {
-				out.WriteString(assertion)
-			} else {
-				emitted, err := p.emit(set, flags)
-				if err != nil {
-					return "", err
-				}
-				out.WriteString(emitted)
+				token = assertion
+			} else if err := p.emit(out, set, flags); err != nil {
+				return err
 			}
 		case '.':
 			if !flags.unicode {
-				return "", p.fail("(?-u:.) byte wildcard")
+				return p.fail("(?-u:.) byte wildcard")
 			}
 			set := regexUniverse(true)
 			if !flags.dot {
-				set = regexNegate([]regexRange{{'\n', '\n'}}, true)
+				set = p.negate([]regexRange{{'\n', '\n'}}, true)
 			}
-			out.WriteString(regexClass(set))
+			if err := p.writeClass(out, set); err != nil {
+				return err
+			}
 		case '^', '$':
 			if flags.multi {
-				out.WriteString("(?m:" + string(c) + ")")
+				token = "(?m:" + string(c) + ")"
 			} else {
-				out.WriteByte(c)
+				token = string(c)
 			}
 		case '|', '*', '+', '?':
-			out.WriteByte(c)
+			token = string(c)
 		case '{':
-			start := p.pos
+			var counts [2]int
+			part, digits := 0, 0
 			for p.pos < len(p.src) && p.src[p.pos] != '}' {
-				if p.src[p.pos] != ',' && (p.src[p.pos] < '0' || p.src[p.pos] > '9') {
-					return "", p.fail("repetition")
+				if !p.meter.charge(1) {
+					return p.meter.err
 				}
+				digit := p.src[p.pos]
 				p.pos++
-			}
-			if p.pos == len(p.src) {
-				return "", p.fail("unclosed repetition")
-			}
-			spec := p.src[start:p.pos]
-			p.pos++
-			parts := strings.Split(spec, ",")
-			if len(parts) > 2 || parts[0] == "" {
-				return "", p.fail("repetition")
-			}
-			for i, part := range parts {
-				if part == "" {
+				if digit == ',' && part == 0 && digits > 0 {
+					part, digits = 1, 0
 					continue
 				}
-				n, e := strconv.Atoi(part)
-				if e != nil || n > 1000 {
-					return "", p.fail("repetition count (limit 1000; Rust may accept larger counts)")
+				if digit < '0' || digit > '9' {
+					return p.fail("repetition")
 				}
-				parts[i] = strconv.Itoa(n)
+				digits++
+				counts[part] = counts[part]*10 + int(digit-'0')
+				if counts[part] > 1000 {
+					return p.fail("repetition count (limit 1000; Rust may accept larger counts)")
+				}
 			}
-			out.WriteString("{" + strings.Join(parts, ",") + "}")
+			if p.pos == len(p.src) {
+				return p.fail("unclosed repetition")
+			}
+			p.pos++
+			if part == 0 && digits == 0 {
+				return p.fail("repetition")
+			}
+			token = "{" + strconv.Itoa(counts[0])
+			if part == 1 {
+				token += ","
+				if digits > 0 {
+					token += strconv.Itoa(counts[1])
+				}
+			}
+			token += "}"
 		default:
 			p.pos--
 			r, size := utf8.DecodeRuneInString(p.src[p.pos:])
 			if r == utf8.RuneError && size == 1 {
-				return "", p.fail("invalid UTF-8 pattern")
+				return p.fail("invalid UTF-8 pattern")
 			}
 			p.pos += size
-			emitted, err := p.emit([]regexRange{{r, r}}, flags)
-			if err != nil {
-				return "", err
+			if err := p.emit(out, []regexRange{{r, r}}, flags); err != nil {
+				return err
 			}
-			out.WriteString(emitted)
+		}
+		if token != "" {
+			if !p.meter.charge(int64(len(token))) {
+				return p.meter.err
+			}
+			out.WriteString(token)
 		}
 	}
 	if grouped {
-		return "", p.fail("unclosed group")
+		return p.fail("unclosed group")
 	}
-	return out.String(), nil
+	return nil
 }
 
-func (p *regexTranslator) emit(set []regexRange, flags regexFlags) (string, error) {
-	set = regexNormalize(set)
+func (p *regexTranslator) emit(out *strings.Builder, set []regexRange, flags regexFlags) error {
+	set = p.normalize(set)
 	if !flags.unicode && len(set) > 0 && set[len(set)-1].hi > 127 {
-		return "", p.fail("(?-u:...) non-ASCII byte class")
+		return p.fail("(?-u:...) non-ASCII byte class")
 	}
 	if flags.fold {
-		set = regexFoldSet(set)
+		set = p.fold(set)
 	}
-	return regexClass(set), nil
+	return p.writeClass(out, set)
 }
 
 func (p *regexTranslator) class(flags regexFlags) ([]regexRange, error) {
@@ -294,14 +403,17 @@ func (p *regexTranslator) class(flags regexFlags) ([]regexRange, error) {
 	var set []regexRange
 	first := true
 	for p.pos < len(p.src) {
+		if !p.meter.charge(0) {
+			return nil, p.meter.err
+		}
 		if p.src[p.pos] == ']' && !first {
 			p.pos++
-			set = regexNormalize(set)
+			set = p.normalize(set)
 			if flags.fold {
-				set = regexFoldSet(set)
+				set = p.fold(set)
 			}
 			if negate {
-				set = regexNegate(set, flags.unicode)
+				set = p.negate(set, flags.unicode)
 			}
 			return set, nil
 		}
@@ -327,6 +439,9 @@ func (p *regexTranslator) class(flags regexFlags) ([]regexRange, error) {
 			}
 			left = []regexRange{{left[0].lo, right[0].lo}}
 		}
+		if !p.meter.charge(int64(len(left))) {
+			return nil, p.meter.err
+		}
 		set = append(set, left...)
 	}
 	return nil, p.fail("unclosed character class")
@@ -340,17 +455,28 @@ func (p *regexTranslator) classItem(flags regexFlags) ([]regexRange, error) {
 		if !strings.HasPrefix(p.src[p.pos:], "[:") {
 			return nil, p.fail("nested character class")
 		}
-		end := strings.Index(p.src[p.pos+2:], ":]") + 2
-		if end < 2 {
-			return nil, p.fail("unclosed POSIX class")
+		start := p.pos + 2
+		p.pos = start
+		for !strings.HasPrefix(p.src[p.pos:], ":]") {
+			if p.pos == len(p.src) {
+				return nil, p.fail("unclosed POSIX class")
+			}
+			if !p.meter.charge(1) {
+				return nil, p.meter.err
+			}
+			p.pos++
 		}
-		name := p.src[p.pos+2 : p.pos+end]
-		p.pos += end + 2
+		name := p.src[start:p.pos]
+		p.pos += 2
 		name, negate := strings.CutPrefix(name, "^")
 		switch name {
 		case "alnum", "alpha", "ascii", "blank", "cntrl", "digit", "graph", "lower", "print", "punct", "space", "upper", "word", "xdigit":
 		default:
 			return nil, p.fail("POSIX class " + name)
+		}
+		// POSIX class names above have a fixed alphabet and size.
+		if !p.meter.charge(64) {
+			return nil, p.meter.err
 		}
 		ast, err := syntax.Parse("[[:"+name+":]]", syntax.Perl)
 		if err != nil {
@@ -361,10 +487,10 @@ func (p *regexTranslator) classItem(flags regexFlags) ([]regexRange, error) {
 			set = append(set, regexRange{ast.Rune[i], ast.Rune[i+1]})
 		}
 		if flags.fold {
-			set = regexFoldSet(set)
+			set = p.fold(set)
 		}
 		if negate {
-			set = regexNegate(set, flags.unicode)
+			set = p.negate(set, flags.unicode)
 		}
 		return set, nil
 	}
@@ -411,9 +537,9 @@ func (p *regexTranslator) escape(flags regexFlags, inClass bool) ([]regexRange, 
 		}
 		if c == 'W' || c == 'D' || c == 'S' {
 			if flags.fold {
-				set = regexFoldSet(set)
+				set = p.fold(set)
 			}
-			set = regexNegate(set, flags.unicode)
+			set = p.negate(set, flags.unicode)
 		}
 	case 'b', 'B':
 		if inClass {
@@ -443,6 +569,9 @@ func (p *regexTranslator) escape(flags regexFlags, inClass bool) ([]regexRange, 
 			p.pos++
 			start = p.pos
 			for p.pos < len(p.src) && p.src[p.pos] != '}' {
+				if !p.meter.charge(1) {
+					return nil, "", p.meter.err
+				}
 				p.pos++
 			}
 			if p.pos == len(p.src) {
@@ -467,10 +596,10 @@ func (p *regexTranslator) escape(flags regexFlags, inClass bool) ([]regexRange, 
 			}
 		}
 		if flags.fold {
-			set = regexFoldSet(set)
+			set = p.fold(set)
 		}
 		if c == 'P' {
-			set = regexNegate(set, true)
+			set = p.negate(set, true)
 		}
 	case 'x', 'u', 'U':
 		n := 2
@@ -484,6 +613,9 @@ func (p *regexTranslator) escape(flags regexFlags, inClass bool) ([]regexRange, 
 			p.pos++
 			start = p.pos
 			for p.pos < len(p.src) && p.src[p.pos] != '}' {
+				if !p.meter.charge(1) {
+					return nil, "", p.meter.err
+				}
 				p.pos++
 			}
 			if p.pos == len(p.src) {
@@ -538,10 +670,16 @@ func (p *regexTranslator) property(name string) ([]regexRange, error) {
 	var set []regexRange
 	for _, r := range tab.R16 {
 		if r.Stride == 1 {
+			if !p.meter.charge(1) {
+				return nil, p.meter.err
+			}
 			set = append(set, regexRange{rune(r.Lo), rune(r.Hi)})
 			continue
 		}
 		for v := r.Lo; v <= r.Hi; {
+			if !p.meter.charge(1) {
+				return nil, p.meter.err
+			}
 			set = append(set, regexRange{rune(v), rune(v)})
 			if r.Hi-v < r.Stride {
 				break
@@ -551,24 +689,39 @@ func (p *regexTranslator) property(name string) ([]regexRange, error) {
 	}
 	for _, r := range tab.R32 {
 		if r.Stride == 1 {
+			if !p.meter.charge(1) {
+				return nil, p.meter.err
+			}
 			set = append(set, regexRange{rune(r.Lo), rune(r.Hi)})
 			continue
 		}
 		for v := r.Lo; v <= r.Hi; v += r.Stride {
+			if !p.meter.charge(1) {
+				return nil, p.meter.err
+			}
 			set = append(set, regexRange{rune(v), rune(v)})
 		}
 	}
-	return regexNormalize(set), nil
+	return p.normalize(set), nil
 }
 
-func regexNormalize(set []regexRange) []regexRange {
+func (p *regexTranslator) normalize(set []regexRange) []regexRange {
+	if !p.meter.charge(int64(len(set))) {
+		return nil
+	}
 	clean := make([]regexRange, 0, len(set))
 	for _, r := range set {
+		if !p.meter.charge(0) {
+			return nil
+		}
 		if r.lo < 0 || r.hi > utf8.MaxRune || r.lo > r.hi {
 			continue
 		}
 		if r.lo <= 0xDFFF && r.hi >= 0xD800 {
 			if r.lo < 0xD800 {
+				if !p.meter.charge(1) {
+					return nil
+				}
 				clean = append(clean, regexRange{r.lo, 0xD7FF})
 			}
 			if r.hi <= 0xDFFF {
@@ -582,6 +735,9 @@ func regexNormalize(set []regexRange) []regexRange {
 	sort.Slice(set, func(i, j int) bool { return set[i].lo < set[j].lo || set[i].lo == set[j].lo && set[i].hi < set[j].hi })
 	out := set[:0]
 	for _, r := range set {
+		if !p.meter.charge(0) {
+			return nil
+		}
 		if len(out) > 0 && r.lo <= out[len(out)-1].hi+1 {
 			if r.hi > out[len(out)-1].hi {
 				out[len(out)-1].hi = r.hi
@@ -598,15 +754,24 @@ func regexContains(set []regexRange, r rune) bool {
 	return i < len(set) && set[i].lo <= r
 }
 func regexIsWord(r rune) bool { return regexContains(rustWord, r) }
-func regexFoldSet(set []regexRange) []regexRange {
-	set = regexNormalize(set)
+func (p *regexTranslator) fold(set []regexRange) []regexRange {
+	set = p.normalize(set)
+	if !p.meter.charge(int64(len(set))) {
+		return nil
+	}
 	out := append([]regexRange(nil), set...)
 	for _, f := range rustFold {
+		if !p.meter.charge(0) {
+			return nil
+		}
 		if regexContains(set, f.from) {
+			if !p.meter.charge(1) {
+				return nil
+			}
 			out = append(out, regexRange{f.to, f.to})
 		}
 	}
-	return regexNormalize(out)
+	return p.normalize(out)
 }
 func regexUniverse(unicode bool) []regexRange {
 	if !unicode {
@@ -614,12 +779,15 @@ func regexUniverse(unicode bool) []regexRange {
 	}
 	return []regexRange{{0, 0xD7FF}, {0xE000, utf8.MaxRune}}
 }
-func regexNegate(set []regexRange, unicode bool) []regexRange {
-	set = regexNormalize(set)
+func (p *regexTranslator) negate(set []regexRange, unicode bool) []regexRange {
+	set = p.normalize(set)
 	var out []regexRange
 	for _, u := range regexUniverse(unicode) {
 		start := u.lo
 		for _, r := range set {
+			if !p.meter.charge(0) {
+				return nil
+			}
 			if r.hi < start {
 				continue
 			}
@@ -627,6 +795,9 @@ func regexNegate(set []regexRange, unicode bool) []regexRange {
 				break
 			}
 			if r.lo > start {
+				if !p.meter.charge(1) {
+					return nil
+				}
 				out = append(out, regexRange{start, r.lo - 1})
 			}
 			if r.hi >= start {
@@ -637,26 +808,49 @@ func regexNegate(set []regexRange, unicode bool) []regexRange {
 			}
 		}
 		if start <= u.hi {
+			if !p.meter.charge(1) {
+				return nil
+			}
 			out = append(out, regexRange{start, u.hi})
 		}
 	}
 	return out
 }
-func regexClass(set []regexRange) string {
+func (p *regexTranslator) writeClass(out *strings.Builder, set []regexRange) error {
 	if len(set) == 1 && set[0].lo == set[0].hi {
-		return regexp.QuoteMeta(string(set[0].lo))
+		s := regexp.QuoteMeta(string(set[0].lo))
+		if !p.meter.charge(int64(len(s))) {
+			return p.meter.err
+		}
+		out.WriteString(s)
+		return nil
 	}
 	if len(set) == 0 {
-		return `[^\x{0}-\x{10FFFF}]`
+		const empty = `[^\x{0}-\x{10FFFF}]`
+		if !p.meter.charge(int64(len(empty))) {
+			return p.meter.err
+		}
+		out.WriteString(empty)
+		return nil
 	}
-	var b strings.Builder
-	b.WriteString("(?-i:[")
+	if !p.meter.charge(int64(len("(?-i:[])"))) {
+		return p.meter.err
+	}
+	out.WriteString("(?-i:[")
 	for _, r := range set {
-		fmt.Fprintf(&b, `\x{%X}`, r.lo)
+		// A scalar escape takes at most ten bytes for each endpoint.
+		n := int64(10)
 		if r.hi != r.lo {
-			fmt.Fprintf(&b, `-\x{%X}`, r.hi)
+			n = 21
+		}
+		if !p.meter.charge(n) {
+			return p.meter.err
+		}
+		fmt.Fprintf(out, `\x{%X}`, r.lo)
+		if r.hi != r.lo {
+			fmt.Fprintf(out, `-\x{%X}`, r.hi)
 		}
 	}
-	b.WriteString("])")
-	return b.String()
+	out.WriteString("])")
+	return nil
 }

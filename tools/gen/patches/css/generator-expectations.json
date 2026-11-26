@@ -2,8 +2,8 @@
   "identity": {
     "grammarCommit": "dda5cfc5722c429eaba1c910ca32c2c0c5bb1a3f",
     "seed": 1,
-    "corpusManifestSHA256": "49e4bd92c0f26b98f576ca84d2cb168d5808371cd33ae3c84a725f871458e82a",
-    "editsManifestSHA256": "43b17ff53b656704b04a3d859306f6efba71a825739c1545e83c368f98c52045",
+    "corpusManifestSHA256": "581384e658e96ddd56f906ffe79f4157d7ab2c161bc70759f0624a26d7cec3eb",
+    "editsManifestSHA256": "6340f964bebb2281d3f9a3f4c50c0eb96c5e9706eeb5f6dc7be1f478b0a23445",
     "largeEntries": [
       {
         "lang": "css",
@@ -17,7 +17,8 @@
       }
     ],
     "patchCorpusFilesSHA256": {
-      "non-latin1-names.txt": "1a1836720a9cb104b39bfaa437725ccdb39b71d30114c06c6baa35b51f537358"
+      "non-latin1-names.txt": "1a1836720a9cb104b39bfaa437725ccdb39b71d30114c06c6baa35b51f537358",
+      "non-latin1-value.txt": "63470662d28e7145071fdaf526dcc7f00e0bf3a3cdc2306f38ed8f9f9c7a6c59"
     },
     "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
     "cli": "0.27.2",
@@ -30,11 +31,19 @@
         "beforeSHA256": "c6d9efdeaf3a4902f026849e08a103a6d1ec1f015c5f396d3fe92dc57ce034ae",
         "afterSHA256": "8ae6785b70c26bb95ce59a9770cf9974e5c65346bc85744a8f45ca520e32cce1",
         "upstreamReport": "https://github.com/tree-sitter/tree-sitter-css/pull/105"
+      },
+      {
+        "file": "patches/css/0002-non-latin1-value.patch",
+        "sha256": "614b0398834206ffbb012fded5a2503cada24805a95c8936730d46b1b25867de",
+        "source": "grammar.js",
+        "beforeSHA256": "8ae6785b70c26bb95ce59a9770cf9974e5c65346bc85744a8f45ca520e32cce1",
+        "afterSHA256": "b79565ed151b27ea27cf55e6a0612e8a5dcf306fd34e03bb703b87befb087318",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-css/pull/105#issuecomment-7140588000"
       }
     ]
   },
-  "reason": "Accept non-Latin-1 selector, property and keyframe names and custom property references. Seven patch corpus trees and eighteen of their seeded edits exercise the repaired names. Edit 011-e1 duplicates a ZWNJ-started segment immediately after a block, so the recovery tree changes and the descendant error remains. Every previously error-free tree in this comparison is unchanged.",
-  "retireWhen": "An approved CSS pin contains a fix for the name defect reported in upstream PR #105. The pin move updates affected corpus expectations and known-gap records.",
+  "reason": "Accept non-Latin-1 names and single bare declaration values. The combined patches change 19 patch-corpus trees and 47 seeded edits against committed C. Cases non-latin1-value-001, 002 and 009 repair lone identifier values. Case 005 differs because 0001 recognizes the dashed custom-property reference. The dimension and function cases (003 and 004), the excluded identifier continuations (006 through 008), and the scanner boundary controls (non-latin1-names-009 through 011) retain errors with changed recovery. The edit signatures cover the name and value fixes and their boundaries. No previously error-free tree changes in this comparison.",
+  "retireWhen": "An approved CSS pin contains a fix for the name defect in upstream PR #105 or for the declaration-value defect reported in its comment. On that pin move, retire each covered patch and update the affected corpus expectations and known-gap records.",
   "differences": [
     {
       "id": "corpus/css/grammar-patch-non-latin1-names-001",
@@ -84,6 +93,90 @@
       "inputSHA256": "5ca4061eaaf5cdd47927984eedbdfe81657933a402acd56f4992a00ee65eba61",
       "referenceDumpSHA256": "05ee71d06af18b21b550e10f21f2a7bc24c5b0f06e4f92f90a9ed5310606c44c",
       "candidateDumpSHA256": "b9c2f993cc306351340308fd00decefc383a8320066d6308d459e1173552dd56"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-names-009",
+      "kind": "corpus",
+      "inputSHA256": "b9700cf064121a50ddad48e1789ea48f24016710dba5dfcd576b4fc05c582100",
+      "referenceDumpSHA256": "b21a8eeaa0c952e1c1efedc0de2da477ece550871ae89dedf89efb3ee76834fe",
+      "candidateDumpSHA256": "a28553a49cc7070f974a1094a167009222242be00dd493dd1efea8db90c7883c"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-names-010",
+      "kind": "corpus",
+      "inputSHA256": "710dd238bf291310b07e632c0f035563ad2f128fd0524f1b61a5c4792d945374",
+      "referenceDumpSHA256": "ded19dd8219a36b99e3ae93b4886c94a48db8339e693a272f3f43f95adab0059",
+      "candidateDumpSHA256": "6edf08c0b9e08ea53b2ee6c5d2463069cb60db7beadd1c2a883dce87612bab28"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-names-011",
+      "kind": "corpus",
+      "inputSHA256": "ba3acdf227d4c168908f7320c4c90f4b13a0f6013c57e329b6b92b799ad64b80",
+      "referenceDumpSHA256": "b21a8eeaa0c952e1c1efedc0de2da477ece550871ae89dedf89efb3ee76834fe",
+      "candidateDumpSHA256": "a28553a49cc7070f974a1094a167009222242be00dd493dd1efea8db90c7883c"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-value-001",
+      "kind": "corpus",
+      "inputSHA256": "4c2a4cfda19de0348e4a9f0813e2d53fbb0a6a7b5124f1e866e28579e5ea876f",
+      "referenceDumpSHA256": "37f6b2e290daf4287b9dd8d14867f720631493496fa5135e4187964342e38ca1",
+      "candidateDumpSHA256": "b7e71836627b3258fa662c0bcbfb7f9a09eb2bb0de3bd8c8bb09bc35a7666159"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-value-002",
+      "kind": "corpus",
+      "inputSHA256": "6025ea11cfbea39a592d8468d1048fb4919b3eb0960ec459ed317f917095ab18",
+      "referenceDumpSHA256": "5c1f3a151bcd34bda1e9e27ac2d23468c05b7971c31c24a90481d7ef91c85949",
+      "candidateDumpSHA256": "8278d9764ff3fdce92851b4d6f714559201058c7441878aed2ef283c66b279f2"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-value-003",
+      "kind": "corpus",
+      "inputSHA256": "a4a2c659fdf0acae24ecfb11712dd0aedc098fec0f92a14d275b768a0ec381e6",
+      "referenceDumpSHA256": "b3b691c0160dc2df85cd8186cbff4a3c5d3fa5957f4aa44758dd971f3c195432",
+      "candidateDumpSHA256": "89fcb60bedd6e58b6a873c257264d294102d0bb01feb0a13a65b3c3c5adaed46"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-value-004",
+      "kind": "corpus",
+      "inputSHA256": "f15580495e7a5bbf559b3dd5ba469273e586fb27e63adeb3b2e8c06a8b9aa57b",
+      "referenceDumpSHA256": "f536423caafbae3f82144e57c40115097a6588a71c28687941b0f2a678f266bd",
+      "candidateDumpSHA256": "8e9f46f511c9fe42c92088a32cd45be65b489f221f07e200f85303672c906819"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-value-005",
+      "kind": "corpus",
+      "inputSHA256": "9d2275375b3b86824f173c1011e76f11d6a16504c07735bcaf85c84cc9b32ea7",
+      "referenceDumpSHA256": "4ad46c1dee8ff1b557ee64f0a6c515ea8df2a9a80977058c40d157ad7eb3336a",
+      "candidateDumpSHA256": "cbd50da3a1b9e8a2d6cd014700fc1c371cb3908e5a5c0cf1fba8c0a62edeaf72"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-value-006",
+      "kind": "corpus",
+      "inputSHA256": "f3359f7010b59bf6a8ff61b71331c134482d6eb6bfb37926c08cbced4ad1b247",
+      "referenceDumpSHA256": "abe5630c8c5017df3ef07ed57aaf900267f8eb4ba191bc49afe8216afab03f74",
+      "candidateDumpSHA256": "065aaf63a6cbb4453d71ad96d0a226a1272f223cc5e12675322b93f0ad7ede30"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-value-007",
+      "kind": "corpus",
+      "inputSHA256": "ad793033abe5118c3e145d6167ab07efaa9d5e470ac5178fde087ffd3b981660",
+      "referenceDumpSHA256": "0ecaceda0fc7d5d22a5d95e43b279142d9037323798ba708595fa084d99249fb",
+      "candidateDumpSHA256": "8b049a301b7dddfb5a69a12acd0ae20be8efac5ca479e9efea3241b6863e51fb"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-value-008",
+      "kind": "corpus",
+      "inputSHA256": "51433d21b920f7e08e5cce4234e9b5856a8dce2e2f81f647c3afe613ec618f43",
+      "referenceDumpSHA256": "abe5630c8c5017df3ef07ed57aaf900267f8eb4ba191bc49afe8216afab03f74",
+      "candidateDumpSHA256": "065aaf63a6cbb4453d71ad96d0a226a1272f223cc5e12675322b93f0ad7ede30"
+    },
+    {
+      "id": "corpus/css/grammar-patch-non-latin1-value-009",
+      "kind": "corpus",
+      "inputSHA256": "57d8eebfed237833d0711f539ce2f98f0da1e01e5f827424e81a70a59597c0f9",
+      "referenceDumpSHA256": "0ecaceda0fc7d5d22a5d95e43b279142d9037323798ba708595fa084d99249fb",
+      "candidateDumpSHA256": "4b1db0d303836e048a0ad27d476fb48d2b0966f3c8e51b98f14ea306cf0cafca"
     },
     {
       "id": "edits/css/grammar-patch-non-latin1-names-001-e1",
@@ -142,7 +235,7 @@
       "oldSHA256": "21c1d4bcdfa54b01f8706f129bd955aa7f544afc974c8c49d1fc1254b40b1426",
       "newSHA256": "a072bb06cc2980aa6ab38680c428bc2583cd218868e5fb6710f247482757aef6",
       "referenceDumpSHA256": "3b869caa7545a350dad6828d50c46d2ff8488468db0d95f3884e5bb858844c44",
-      "candidateDumpSHA256": "be7d684b328f3e87aac703d825e7b10efced9d42aabf5c87e6b90f0a54533b13"
+      "candidateDumpSHA256": "b6d1cc9b0081cf0715eeb0947aab5a9a64ae878610aaef61386556b99be06389"
     },
     {
       "id": "edits/css/grammar-patch-non-latin1-names-002-e2",
@@ -185,7 +278,7 @@
       "oldSHA256": "63f340c71d6596b727ee820947108a6936d75f1fa6d243d2ad4441f0041aab24",
       "newSHA256": "e07b808c960b935b896381ec1cd9fdda7b3eb1e12f6523683eb720d5b735572f",
       "referenceDumpSHA256": "ddd7ae406b62758ace7e6ccc69479c5219d9ac82008cb9ed1c262d024171b572",
-      "candidateDumpSHA256": "941a6ecdb3a0559f2ab3bff8ceed92be487ba9699eacbf7960d09422d22a87fb"
+      "candidateDumpSHA256": "f603a21c7a72827ebd485c6e187f89ba4c876f281fe38c80fcf6cd5facce8b93"
     },
     {
       "id": "edits/css/grammar-patch-non-latin1-names-003-e2",
@@ -230,7 +323,7 @@
       "oldSHA256": "60c549edc0bc36cc670dec0075c322ec05e63f92b5b05f771d79efa6acbfa9a6",
       "newSHA256": "e2c38d4754b9474144381aa20d7fc76000f2cd7e6f80350868d4f05f779a2121",
       "referenceDumpSHA256": "419dc0e6debc4c634384207367f475fe851b68799da4ae74e5ffeaffe1029032",
-      "candidateDumpSHA256": "d94df8c6253e2e010d7b12d6e590ee932584e37b6a2b1130accaddce634c370f"
+      "candidateDumpSHA256": "da21844cc824438b8051f82628a11e54ab79469c1e81f62016a483a20d23510f"
     },
     {
       "id": "edits/css/grammar-patch-non-latin1-names-005-e2",
@@ -251,12 +344,14 @@
       "id": "edits/css/grammar-patch-non-latin1-names-005-e3",
       "kind": "edit",
       "changed": [
+        "edit_sha256",
+        "fresh_sha256",
         "ranges"
       ],
       "oldSHA256": "60c549edc0bc36cc670dec0075c322ec05e63f92b5b05f771d79efa6acbfa9a6",
       "newSHA256": "1acf8ad09d4a92ddc26f9b6c38314b0e7aa1b321b76975424fe4463cc34b3ab7",
       "referenceDumpSHA256": "55b942e91d25355b9bf0654323c25cede2b0e0d656596d9003d7641549c49311",
-      "candidateDumpSHA256": "04a1960315eeca29f3582fa6d646b061999aad421587c4eb515f65fef7f55dc4"
+      "candidateDumpSHA256": "eed020f17527db3c26499e7f6bbb8b8e31a6980dec128ebe25c98b4480c181cc"
     },
     {
       "id": "edits/css/grammar-patch-non-latin1-names-006-e1",
@@ -340,6 +435,54 @@
       "candidateDumpSHA256": "228b094382f7b95c0675144930253ea8dbd315d37d1b59400895c83ebaa62833"
     },
     {
+      "id": "edits/css/grammar-patch-non-latin1-names-009-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256"
+      ],
+      "oldSHA256": "b9700cf064121a50ddad48e1789ea48f24016710dba5dfcd576b4fc05c582100",
+      "newSHA256": "0fb95804207590655c3cbc13fb9bb6ee1e246e19c705934284b0eba081ce115a",
+      "referenceDumpSHA256": "40a6420f92a47a9e780ed8b22ef5e199c9ac5c8550cfbc3fda60deaa7ff97116",
+      "candidateDumpSHA256": "25f2e7c6d4f4d89e88df2d75744316e2bb2786541b609bca6e9ef9a20ba83e22"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-009-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256"
+      ],
+      "oldSHA256": "b9700cf064121a50ddad48e1789ea48f24016710dba5dfcd576b4fc05c582100",
+      "newSHA256": "a97f6976324c050cd8f02ebcff7c398bd3c1268ff93f8101ac3a3a8934ad10a6",
+      "referenceDumpSHA256": "d7c4318d60754a8a83dbdd3678fae5a32506929823598e9aab2e1d6f0af5c4df",
+      "candidateDumpSHA256": "47b6c6d1643e985f5ca2e0a03fa5f8a3534c526d500979a38eb8989d670a242c"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-010-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256"
+      ],
+      "oldSHA256": "710dd238bf291310b07e632c0f035563ad2f128fd0524f1b61a5c4792d945374",
+      "newSHA256": "1cfebd44a17e39cbb6671ef6fdc04474e0f48e38790c68f57b172a93a4938e0e",
+      "referenceDumpSHA256": "1e8243708cf2fbbc22c2f5f72e2ae6a39482c7af467514d08de797c45851a1f0",
+      "candidateDumpSHA256": "bb7bfcbed9727224768214bf1c4bcaaf2e33ffd9c62ecdca6955880c0d35bded"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-names-010-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256"
+      ],
+      "oldSHA256": "710dd238bf291310b07e632c0f035563ad2f128fd0524f1b61a5c4792d945374",
+      "newSHA256": "071eb3a0e7ff880e704fec5ad5ac2eea3da99e96608014d0eb3576d83aa428f0",
+      "referenceDumpSHA256": "042abe16f455afb99f100aa810f148e2f0538767c07ea5f6ce8ad3fb14dde058",
+      "candidateDumpSHA256": "55fabf1f9b7db4a7b3ccf2646cecfd8dd8c34b05c7daf683ffcd60c7ec37d57c"
+    },
+    {
       "id": "edits/css/grammar-patch-non-latin1-names-011-e1",
       "kind": "edit",
       "changed": [
@@ -349,7 +492,339 @@
       "oldSHA256": "ba3acdf227d4c168908f7320c4c90f4b13a0f6013c57e329b6b92b799ad64b80",
       "newSHA256": "9952feb6bb4b2848d4e3a34958d4c10be4d4b8a6371e5eae73a683f50ad1e923",
       "referenceDumpSHA256": "7cea69038c55734c160eb807c41f9e3cd93968ef4b2b9d53ae20158fcbcc00fa",
-      "candidateDumpSHA256": "184c1fb32884f366af5f94d3a6ef5c35013dd4db834f2c58a62f666ecbac58f5"
+      "candidateDumpSHA256": "970429d2c071837e94cc3ec29d814370931b856841cf31bf5c3212acb8e02b33"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-001-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "4c2a4cfda19de0348e4a9f0813e2d53fbb0a6a7b5124f1e866e28579e5ea876f",
+      "newSHA256": "36a574fcbf83debdea94729479ab3a8759c9fb821ed2cf25497eeedaa75c8349",
+      "referenceDumpSHA256": "5661b19129c854db6e6c42aea22d2fdc0f15599e579a2f58a7b2c5c0c850328a",
+      "candidateDumpSHA256": "fcb39c742db3dfb7d9c64feb9507041c3506e0940b60ea170a749adfa617f30a"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-001-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256"
+      ],
+      "oldSHA256": "4c2a4cfda19de0348e4a9f0813e2d53fbb0a6a7b5124f1e866e28579e5ea876f",
+      "newSHA256": "22a17cb43e5f1cd98d0f10811abfcb7120b8aae1341cf950a566fbcc5c7028d1",
+      "referenceDumpSHA256": "4c678b1ddf2e199753c3151179431a5e37b4ae472e805673981341d7e2ed0605",
+      "candidateDumpSHA256": "40e99fac403addffad77c7df88e7065495861b39f8521e2ecf4c624d65240727"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-001-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256"
+      ],
+      "oldSHA256": "4c2a4cfda19de0348e4a9f0813e2d53fbb0a6a7b5124f1e866e28579e5ea876f",
+      "newSHA256": "261d909088d036f5f1e44ca1feed3848aa2488598dc25bb27198ddcc9a57e9ef",
+      "referenceDumpSHA256": "737254aef11abf575b03bcede56f744bf80f8aeebb53713d138187957d4c9251",
+      "candidateDumpSHA256": "0480f3d576d81538c40461eb994e370e16371dd447f6a9f4a6c962b9b748ea58"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-002-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "6025ea11cfbea39a592d8468d1048fb4919b3eb0960ec459ed317f917095ab18",
+      "newSHA256": "f2759934c9f06e1bee773d97bd67526e924bac2f005b038f1d724bbf5fe44bba",
+      "referenceDumpSHA256": "fff7a888a3575c4095a24611a66c3839c0024cc5a1ed7741a8395a50a441e832",
+      "candidateDumpSHA256": "d4f2cd74f8ec42b762b6e3c5df2fee7232a324752a13657ebf994fee66f10f78"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-002-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "6025ea11cfbea39a592d8468d1048fb4919b3eb0960ec459ed317f917095ab18",
+      "newSHA256": "4965220a7976716ccfc87cc0d6876f280d8033df50d9d662939467997dc96b9b",
+      "referenceDumpSHA256": "056061528c0b96221b9a8983a8df35e704d329d9aa4b38b97dcc19935c271520",
+      "candidateDumpSHA256": "94396058bb77ee1fa2dd6e9ce7af83980268ab6a6cced3ba8ca1e27af3f74bca"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-002-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "6025ea11cfbea39a592d8468d1048fb4919b3eb0960ec459ed317f917095ab18",
+      "newSHA256": "63bedb5138a27e13260b898139c973698245609732382b0c14d8b332a0aaf84a",
+      "referenceDumpSHA256": "6e1547c33242898ece399bb4a6b2b821053fd771548f9de826fba1572a19a614",
+      "candidateDumpSHA256": "2b3b9235a2c1eac58f6f7b6aa472d625dfbae550991319f5dc7e331a88b8cb41"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-003-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "a4a2c659fdf0acae24ecfb11712dd0aedc098fec0f92a14d275b768a0ec381e6",
+      "newSHA256": "fadfa510664cd77b7a87be3062e394dc97cc2955a5c9f954725071c31a03022e",
+      "referenceDumpSHA256": "ecd1466c3b82fc7d0c4bae251a79bddae458801d34e872a1853bc56bc7dd8d02",
+      "candidateDumpSHA256": "b44a8b2d39087a43815ff07630953822eedb7ce89a7d495dfc495f73eec1918b"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-003-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256"
+      ],
+      "oldSHA256": "a4a2c659fdf0acae24ecfb11712dd0aedc098fec0f92a14d275b768a0ec381e6",
+      "newSHA256": "91b3b9a081bfdc0dd7b35417bb5d981869efc941a6b2f8893d3dc1632518822b",
+      "referenceDumpSHA256": "21c7f62d9c21b10bad1fbcda64e5173add92e374c4a7f5850a4be12f76bec265",
+      "candidateDumpSHA256": "1e31aef22c0128620df95efc6ec9b74db2f67e2ca2a6b3e5d83bca344e03e2d8"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-004-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "f15580495e7a5bbf559b3dd5ba469273e586fb27e63adeb3b2e8c06a8b9aa57b",
+      "newSHA256": "b6ddb324453145d1dfad37a9a6d99959c5b96779895ba6dc47351beb980d236c",
+      "referenceDumpSHA256": "9aef984cfe7c48a003943794a502429ed88f2e7c03f8b9d1a8cce721aa629015",
+      "candidateDumpSHA256": "fd43ec934a7fd38aaf27530eb504527724f16c8a1e9cb6119b8c89ac605d1d69"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-004-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "f15580495e7a5bbf559b3dd5ba469273e586fb27e63adeb3b2e8c06a8b9aa57b",
+      "newSHA256": "7b01ef51da202843e74c784156a0331f5e288ea9a3dae3e62ec03882d088730f",
+      "referenceDumpSHA256": "669ff7c646494457569d9d2e9ecc3717cd6c6d1b8d17e3b5c985dfdd0a9520e0",
+      "candidateDumpSHA256": "4afd213de7daeddcbcd4eb538042baa06d826dda700846ffc6aae49fbb3e93fa"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-005-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "9d2275375b3b86824f173c1011e76f11d6a16504c07735bcaf85c84cc9b32ea7",
+      "newSHA256": "f413757083f8e2e18aaf9f94842774ba6a97e80491285817901212e57b63571b",
+      "referenceDumpSHA256": "27b27db52a461d98c55ce673bcb67a808c5d0fb0a134a7cbdcab5a468b67c151",
+      "candidateDumpSHA256": "297bdc40016efdb286563421f1863cf59e4f2a20197989dee31dbb7c698b5368"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-005-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "9d2275375b3b86824f173c1011e76f11d6a16504c07735bcaf85c84cc9b32ea7",
+      "newSHA256": "9129a435f6c48b23289b8307c9a7293ebe7f74f846f0b150c2a154a92095f3b5",
+      "referenceDumpSHA256": "f0f3076b43bde5d6e29ca823b43ea190172bcfdce6f311b78a50344f2abd0544",
+      "candidateDumpSHA256": "9fbd6afd16514e1377e43767d3f464c974491400509046c617e316e8dc36f0fc"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-005-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "9d2275375b3b86824f173c1011e76f11d6a16504c07735bcaf85c84cc9b32ea7",
+      "newSHA256": "5d26bae846f5ac104a03902a90549cab62a1ed6e36e805dd386cdb4b6c3deeec",
+      "referenceDumpSHA256": "daf91e88a65234941d7131507e5ad2423003621966e945bb3a6e1eaa99d48752",
+      "candidateDumpSHA256": "e6a8a249df1384fcb60954ff29c0bf2dd2d1a50381e94594102819926ce93824"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-006-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "f3359f7010b59bf6a8ff61b71331c134482d6eb6bfb37926c08cbced4ad1b247",
+      "newSHA256": "994a628ccc891c1a9d01c574e76e4038a8431434c6fe2788824f9037c7b08b43",
+      "referenceDumpSHA256": "2be63f37895c155cd1a0de38287c4b59eaf625791714fda75463d869e1fc72d7",
+      "candidateDumpSHA256": "ccb9dd7baedbaec2407e90f3683375b153fed319310cedb54fc081b4c0465e4b"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-006-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "f3359f7010b59bf6a8ff61b71331c134482d6eb6bfb37926c08cbced4ad1b247",
+      "newSHA256": "4a9b7d843e5f57aa23bac99ac85d0c0f938f30d744b3784cb5a26106ab3fadde",
+      "referenceDumpSHA256": "2b7b38b384fc062df178d90b73437a1af3a4c01ced6cf0fa532124ed0d2f7d92",
+      "candidateDumpSHA256": "798cef8fbb6154a235ce34e61ce3298de289e3e061bc58fb470c31aeb7c4f2e6"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-007-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "ad793033abe5118c3e145d6167ab07efaa9d5e470ac5178fde087ffd3b981660",
+      "newSHA256": "c1592a3ace3f349d11e2066acd07561f91e10f81f1162ee6cfabadc691409f4e",
+      "referenceDumpSHA256": "ed401b4856fda011616d869477d64e78527c14970c9e800bd4dc85cd6bf54c1d",
+      "candidateDumpSHA256": "f038e039340fea632c218e61a53ca544d7f8d454d163303b405d06c1163f6a59"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-007-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "ad793033abe5118c3e145d6167ab07efaa9d5e470ac5178fde087ffd3b981660",
+      "newSHA256": "5fa714afdda32e90666cb5d63ecffedb33f59a427b8cba06477a9ecf536013d2",
+      "referenceDumpSHA256": "c9a25b8808ab2aaee5f5739b69945b15f00db713b351ba654c211747581b5c16",
+      "candidateDumpSHA256": "27684a5bd3c0904b7a98f43d2a10762141aa25384b858ba4175c96b7a3c6932c"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-007-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "ad793033abe5118c3e145d6167ab07efaa9d5e470ac5178fde087ffd3b981660",
+      "newSHA256": "12d43dc59fc8b2d64a1bd611ce9dd4993c7a27ad91266754b5571c8907662cfd",
+      "referenceDumpSHA256": "490c8218bd4b8c37a1317b833790e486033b859266a219398dfa0ce7e193d64a",
+      "candidateDumpSHA256": "036aef9b10482675162a94c7d8eeb6ea5b1a53e6c15b6d941a27b628f7f3a5a5"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-008-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "51433d21b920f7e08e5cce4234e9b5856a8dce2e2f81f647c3afe613ec618f43",
+      "newSHA256": "96122e8617e8a845417122c320d717166f6cb9887f26a9d6ccb592d06022d5c8",
+      "referenceDumpSHA256": "25f11eb795cb890845802c1c5ae53cdcee5dbddfb8e1ace10e4bd2274aac3a98",
+      "candidateDumpSHA256": "89faa843a40f2ed5f3bd66331804b4dc1a1cc2aab9e6ecb38bccfb783b07f8da"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-008-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "51433d21b920f7e08e5cce4234e9b5856a8dce2e2f81f647c3afe613ec618f43",
+      "newSHA256": "574e5ba3048bf73ca6c9789379d532afa2224cd9fff7ca1d188c2938b73d8b10",
+      "referenceDumpSHA256": "5e6c57d76a6ded983a7e63c41b04c445f276f27fd53776a843e0f49c4dd08bcb",
+      "candidateDumpSHA256": "a8dc54bf6eac957e7a957e24bd762dbe6db90bf54045a967338b43c3f4acfb11"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-008-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "51433d21b920f7e08e5cce4234e9b5856a8dce2e2f81f647c3afe613ec618f43",
+      "newSHA256": "cf85889cf2de51b1277d17269cfb3fb7090d8f00496c264f4240b5e2745b1a33",
+      "referenceDumpSHA256": "ffbac388b78ba55d4451e89b73971aab4b945ad4772f6b5c76674074dccb5cfa",
+      "candidateDumpSHA256": "c50b77e4ac004a061747d7707d60b0ad18fb9f17cde12da096325995e137cadb"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-009-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256"
+      ],
+      "oldSHA256": "57d8eebfed237833d0711f539ce2f98f0da1e01e5f827424e81a70a59597c0f9",
+      "newSHA256": "ac8d0ab6cf0186088149a0058410b7b33df540756aa88aca0b64bfca9bf9cde0",
+      "referenceDumpSHA256": "9c07a03d3ec43b815b72bea32435c66903c03b2714382fc0ab75909c6a8ab9fe",
+      "candidateDumpSHA256": "597776487a51dcd865076c8578104332d2b5a1d646ecc94639c935c17e9c94c7"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-009-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "ranges"
+      ],
+      "oldSHA256": "57d8eebfed237833d0711f539ce2f98f0da1e01e5f827424e81a70a59597c0f9",
+      "newSHA256": "4319152808f2cc459e3b52875a3f84ed26783455fb23903c06e5b0e5e3bf87b4",
+      "referenceDumpSHA256": "57234d420493fbde5da2e8b6d5d42caa01f652dd2e549d5865770e960db5426e",
+      "candidateDumpSHA256": "076121ff00c536231625f9e8f4df6b9970a2b6abfe300a7e06a91a0f059442b2"
+    },
+    {
+      "id": "edits/css/grammar-patch-non-latin1-value-011-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "507bde785320e58ea7087caec21aa143a258f9236f258a28bf2979af2963c8b3",
+      "newSHA256": "cecd954baf5646a2a5cd11607150b5d9d2129afd89edeb572e4cf3815d0a0bf0",
+      "referenceDumpSHA256": "dde4dd1f9a300e1281ce1546c42fd76d461bdbffd657fd424ddf82d4a09b98f9",
+      "candidateDumpSHA256": "aab2b50f4d5583d64b36638ff1da1780dd4d243f5eef8bd40e3f1b27a0a9113c"
     }
   ]
 }

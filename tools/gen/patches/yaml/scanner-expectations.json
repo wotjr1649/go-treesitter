@@ -8,7 +8,8 @@
       "darwin-arm64": "5a08b66e5713b0c69691611250b2191d07139647a3c6e39ba85954284b634d2d",
       "linux-amd64": "7ed56d152c52437397b9fcaa43cf341f49933cecc1ca291843f0d347c6e2cb3a",
       "linux-arm64": "34fcc5c4fa7bdd2058a2a45a03b6eb9a49b03a93b6d52ec750f99b1516d98d33",
-      "windows-amd64": "230779ee4a729e3044d4a8ed57490b776ea1bac0671d12afbd6f5b4d1878f1d0"
+      "windows-amd64": "230779ee4a729e3044d4a8ed57490b776ea1bac0671d12afbd6f5b4d1878f1d0",
+      "windows-arm64": "45be92c6537758f7c9a880f4598d45b435b6fa0b5a4ab5d48284b1e9b2225a11"
     },
     "compileFlags": [
       "-std=c11",

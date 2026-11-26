@@ -35,7 +35,7 @@ may change in any release.
 
 ## Exported identifiers
 
-Inventory at root commit `6674446f03c6004520567683e5b202881deb4559`. Run `GOWORK=off go list ./...`
+Inventory for this checkout. Run `GOWORK=off go list ./...`
 at the root and `GOWORK=off go doc -all <package>` for each listed path outside `internal/`. The root
 module exposes two such packages. The grammar and tool packages belong to separate Go modules.
 Struct fields have their own rows, receiver names are omitted, and the table resolves implicit
@@ -46,8 +46,8 @@ exported methods available through the error variables.
 
 The supported consumer entry point for a language is the grammar module's `Language() *treesitter.Language`.
 `NewLanguage` accepts a descriptor from the root's internal engine and is reserved for generated code.
-The public `Option` type is passed to parser constructors. Consumers obtain values from the exported
-`With…` functions because `config` is package-private. Nine sentinel variables have the inferred
+The parser and query constructors and the budgeted match entry point accept functional options.
+Consumers obtain option values from the exported `With…` functions. Nine sentinel variables have the inferred
 unexported type `*sentinel`. Their identity via `errors.Is` is part of the contract.
 The method `(*queryRegex).MatchString(text string) bool` is reachable only inside the package.
 
@@ -189,6 +189,12 @@ The method `(*queryRegex).MatchString(text string) bool` is reachable only insid
 | `Position.RuneCol` | `RuneCol uint32` | STABLE |
 | `Query` | `type Query struct` | STABLE |
 | `NewQuery` | `func NewQuery(lang *Language, pattern string) (*Query, error)` | STABLE |
+| `NewQueryWithOptions` | `func NewQueryWithOptions(ctx context.Context, lang *Language, pattern string, opts ...QueryCompileOption) (*Query, error)` | STABLE |
+| `QueryCompileOption` | `type QueryCompileOption func(*queryCompileConfig) error` | STABLE |
+| `WithMaxQuerySourceBytes` | `func WithMaxQuerySourceBytes(n int64) QueryCompileOption` | STABLE |
+| `WithMaxQueryMemoryBytes` | `func WithMaxQueryMemoryBytes(n int64) QueryCompileOption` | STABLE |
+| `WithMaxQueryMetadataBytes` | `func WithMaxQueryMetadataBytes(n int64) QueryCompileOption` | STABLE |
+| `WithMaxQueryRegexUnits` | `func WithMaxQueryRegexUnits(n int64) QueryCompileOption` | STABLE |
 | `Query.CaptureNames` | `func (*Query) CaptureNames() []string` | STABLE |
 | `Query.PatternCount` | `func (*Query) PatternCount() int` | STABLE |
 | `Query.Properties` | `func (*Query) Properties(pattern int) map[string]string` | STABLE |
@@ -210,6 +216,10 @@ The method `(*queryRegex).MatchString(text string) bool` is reachable only insid
 | `QueryMatch` | `type QueryMatch struct` | STABLE |
 | `QueryMatch.Pattern` | `Pattern int` | STABLE |
 | `QueryMatch.Captures` | `Captures []QueryCapture` | STABLE |
+| `QueryMatchOption` | `type QueryMatchOption func(*queryMatchConfig) error` | STABLE |
+| `WithMaxQueryCaptures` | `func WithMaxQueryCaptures(n int64) QueryMatchOption` | STABLE |
+| `WithMaxQueryResults` | `func WithMaxQueryResults(n int64) QueryMatchOption` | STABLE |
+| `WithMaxQueryPredicateWork` | `func WithMaxQueryPredicateWork(n int64) QueryMatchOption` | STABLE |
 | `QueryOptions` | `type QueryOptions struct` | STABLE |
 | `QueryOptions.StartByte` | `StartByte uint32` | STABLE |
 | `QueryOptions.EndByte` | `EndByte uint32` | STABLE |
@@ -253,6 +263,7 @@ The method `(*queryRegex).MatchString(text string) bool` is reachable only insid
 | `Tree.HasInvalidUTF8` | `func (*Tree) HasInvalidUTF8() bool` | STABLE |
 | `Tree.InputBytes` | `func (*Tree) InputBytes() int` | STABLE |
 | `Tree.Matches` | `func (*Tree) Matches(ctx context.Context, q *Query, opts *QueryOptions) iter.Seq2[QueryMatch, error]` | STABLE |
+| `Tree.MatchesWithOptions` | `func (*Tree) MatchesWithOptions(ctx context.Context, q *Query, opts *QueryOptions, budgets ...QueryMatchOption) iter.Seq2[QueryMatch, error]` | STABLE |
 | `Tree.Outcome` | `func (*Tree) Outcome() Outcome` | STABLE |
 | `Tree.Snapshot` | `func (*Tree) Snapshot(ctx context.Context) (*Snapshot, error)` | STABLE |
 | `WalkAction` | `type WalkAction uint8` | STABLE |

@@ -37,7 +37,7 @@ This includes a local merge into main, whatever the branch size (ADR-0019).
 No publication workflow may infer those permissions from a passing test, and
 no one acting under this contract uses a ruleset administrator bypass.
 
-Rulesets (2026-11-21): `main-protection` (no deletion or non-fast-forward; 12 required CI checks), `tag-protection`
+Rulesets (2026-11-25): `main-protection` (no deletion or non-fast-forward; 13 required CI checks), `tag-protection`
 (no tag update or deletion) and `tag-creation` (tags other than `v*` and `grammars/*/v*` only by the owner). Task
 branches need no ruleset; what is pushed is checked before the push (`AGENTS.md`), because the always-on owner bypass
 made the former `branch-creation` ruleset a warning, not a guard. Version tags therefore need authority, not a bypass, and stay immutable.
@@ -73,8 +73,10 @@ Go versions are immutable once served by a proxy. Each remote write below needs 
 
 - **Root release.** Run steps 1–3 and 6–11. Carry forward the published grammar tags and their minimum root
   requirements. If selected grammars are also ready, publish any required new root first, then run steps 4–6
-  for that subset. For root RC and 1.0, use ADR-0028's root scope, including actual released grammars for
-  engine ABIs 1–4. Document grammar known gaps in the per-grammar support records.
+  for that subset. For root RC and 1.0, use the [root scope](validation.md#root-rc-and-10-scope), including actual released
+  grammars for engine ABIs 1–4. A root RC is a pre-release; a change to root code, contract or inputs cuts a
+  new RC, and 14 days without root defect reports lead to 1.0. Document grammar known gaps in the per-grammar
+  support records.
 - **Grammar-only release.** Run step 1 and steps 4–11 using the already published roots. Keep the existing
   grammar and pin-move gates. Record old and new pins, schema and tree/query changes, and migration examples,
   citing the owner release and owner CHANGELOG where applicable.
@@ -98,7 +100,7 @@ the declared contract may take a patch.
 | 8 | Before publication, compare the uploaded asset digests (`gh release view <tag> --json assets`) with local `SHA256SUMS`. The inventory is exactly the source rows in `gen -mirror-assets` for the release pins, plus `SHA256SUMS`. Stop on missing, extra or differing assets. | no (read-only) |
 | 9 | Publish the draft after step 8 passes. Publication makes the assets immutable. Then run `gh release verify <tag>` and retain its attestation result. | **yes** (publish); verification is read-only |
 | 10 | From the published new release base (the intended first mirror base), download **every row with column 4 equal to `source`** in `gen -mirror-assets` by its exact filename into an empty directory and check its SHA-256 against the row and `SHA256SUMS`. Listing assets alone is insufficient. Record the base, pins identity and every result. | no (read-only) |
-| 11 | In **one PR** after step 10, set `pins.json` `mirrors` to `[new release base, previous release base]` (for v0.6.0: `[v0.6.0 base, v0.5.0 base]`; for v0.7.0: `[v0.7.0 base, v0.6.0 base]`). Restore the selected grammar `go.mod` files from before step 4 and remove their release-generated `go.sum` files. After a root release, keep the new root `require` with `replace ../..` in `tools/conformance` and `tools/bench`, as in v0.5.0 and v0.6.0. Set it here if the root release preparation did not already set it. Confirm the paths and engine-byte hashes, and update the status board. | local preparation; remote integration needs authority |
+| 11 | In **one PR** after step 10, set `pins.json` `mirrors` to `[new release base, previous release base]` (for v0.6.0: `[v0.6.0 base, v0.5.0 base]`; for v0.7.0: `[v0.7.0 base, v0.6.0 base]`). Restore the selected grammar `go.mod` files from before step 4 and remove their release-generated `go.sum` files. After a root release, keep the new root `require` with `replace ../..` in `tools/conformance` and `tools/bench`, as in v0.5.0 and v0.6.0. Set it here if the root release preparation did not already set it. Set `API_BASELINE_TAG` in `.github/workflows/api-guard.yml` to the new root tag. Confirm the paths and engine-byte hashes, and update the status board. | local preparation; remote integration needs authority |
 
 **Consumer checks.** For each selected grammar release, test its declared minimum root with that grammar alone
 and test the recommended root in a mixed consumer using the new tags and carried-forward tags. For root releases,
@@ -112,7 +114,7 @@ the highest root requirement in the graph wins. Upgrading one grammar can raise 
   the selected grammar tags point at their step-4 commit.
 - The root ZIP is built by `golang.org/x/mod/zip` from the tagged tree: it contains the root package, `internal/engine`,
   `testdata/`, `LICENSE`/`LICENSES/`, `docs/`, `.github/`, `AGENTS.md` and `tools/lane` (no `go.mod` there). It omits
-  every nested module: `grammars/*`, `tools/gen`, `tools/bench`, `tools/conformance`, `tools/modulezip`, `artifacts`.
+  every nested module: `grammars/*`, `tools/gen`, `tools/bench`, `tools/conformance`, `tools/modulezip`, `tools/compare`, `artifacts`.
   Local-only paths (`docs/plans`, `docs/prompts`, `artifacts/handoff`, `.scratch`) must not be tracked, because a
   tracked file is published by the tag; check `git ls-files` before step 2.
 - Between releases `main` keeps grammar modules in development form (`require` root `v0.0.0` with `replace ../..`
@@ -126,7 +128,7 @@ the highest root requirement in the graph wins. Upgrading one grammar can raise 
 
 Under the [2026-11-15 ADR-0026 amendment](../design/decisions/ADR-0026-never-block-on-upstream.md#amendment-2026-11-15),
 immutable releases mirror source archives plus `SHA256SUMS` (v0.4.0: 24 source archives; v0.6.0: 26 source archives; v0.7.0: 26).
-`(cd tools/gen && CGO_ENABLED=0 go run . -mirror-assets)` lists the candidate rows for the current pins (34) as
+`(cd tools/gen && CGO_ENABLED=0 go run . -mirror-assets)` lists the candidate rows for the current pins (35) as
 headerless TSV: filename, SHA-256, primary download URL, kind (`source`/`toolchain`). Select column 4 equal to `source`
 (for example, `awk -F '\t' '$4 == "source"' release-assets.tsv`), excluding the `toolchain` rows.
 Check the selected filenames equal `runtime.archive`, `wasiLibc.archive`, or a
@@ -134,7 +136,7 @@ Check the selected filenames equal `runtime.archive`, `wasiLibc.archive`, or a
 (TypeScript and TSX share one), the runtime and wasi-libc. Check that every selected row is present, that every
 row's hash equals its pin, and that no other row is attached.
 
-The excluded rows are `binaryen-version_133-x86_64-linux.tar.gz`, `binaryen-version_133-x86_64-windows.tar.gz`, `tree-sitter-linux-arm64.gz`, `tree-sitter-linux-x64.gz`, `tree-sitter-macos-arm64.gz`, `tree-sitter-windows-x64.gz`, `wasi-sdk-34.0-x86_64-linux.tar.gz`, `wasi-sdk-34.0-x86_64-windows.tar.gz`, because the exact toolchain archives' bundled licence/notice inventory is incomplete.
+The excluded rows are `binaryen-version_133-x86_64-linux.tar.gz`, `binaryen-version_133-x86_64-windows.tar.gz`, `tree-sitter-linux-arm64.gz`, `tree-sitter-linux-x64.gz`, `tree-sitter-macos-arm64.gz`, `tree-sitter-windows-arm64.gz`, `tree-sitter-windows-x64.gz`, `wasi-sdk-34.0-x86_64-linux.tar.gz`, `wasi-sdk-34.0-x86_64-windows.tar.gz`, because the exact toolchain archives' bundled licence/notice inventory is incomplete.
 Toolchains continue to be fetched from their official releases with pinned SHA-256 checks; releases supply no
 toolchain fallback assets until the complete notices can be established, for example from an SBOM of the exact
 archives. Preserve the collected upstream licence texts as maintainer-local evidence for that later work.

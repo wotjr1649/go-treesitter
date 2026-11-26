@@ -62,5 +62,7 @@ understand whether the contract is still right.
 | 0024 | Grammar source tiers: one upstream per language | Accepted; Consequences amended by ADR-0025; rule 6 (follow a maintained fork) added 2026-11-16; rule 7 (owner-maintained repositories) added 2026-11-18; rule 7.7 (vendored owner JavaScript input) amended 2026-11-21 |
 | 0025 | Absorbing tree-sitter-grammar-kit | Accepted; amends ADR-0020 (decision 6), ADR-0024; decisions 4 and 5 amended 2026-11-16; decision 5 amended again 2026-11-19 (agents draft, owner posts, one-line disclosure) and 2026-11-23 (agents post under an owner decision; disclosure follows the target's policy) |
 | 0026 | Never block on upstream: mirrors, grammar patches, health watch | Accepted; extends ADR-0023, ADR-0024; S1 amended 2026-11-15: sources mirrored, toolchains deferred until complete bundled notices |
-| 0027 | One pinned generator CLI for every grammar | Accepted 2026-11-16, implementation pending; amends ADR-0020 decision 1 |
-| 0028 | Root 1.x stability and independent grammar versioning | Accepted 2026-11-24 |
+| 0027 | One pinned generator CLI for every grammar | Accepted 2026-11-16, implemented in `tools/gen`; amends ADR-0020 decision 1 |
+| 0028 | Root 1.x stability and independent grammar versioning | Accepted 2026-11-24; decisions 1 and 3 amended 2026-11-25 (root scope, RC bench, RC exit, Windows resources) |
+| 0029 | Included ranges for multi-language documents | Proposed 2026-11-25; implementation deferred until after 1.0 |
+| 0030 | Opt-in Go query budgets | Accepted 2026-11-25 |

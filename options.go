@@ -13,9 +13,22 @@ type config struct {
 	strictUTF8                                          bool
 }
 
-// Option configures NewParser. Negative or out-of-range values make NewParser fail with InvalidInput; they are never
-// clamped. Zero means "no explicit limit" (the engine's own bounds still apply).
+// Option configures NewParser and NewParserPool. A nil option or a negative or out-of-range value returns
+// ErrInvalidInput. Zero means "no explicit limit" (the engine's own bounds still apply).
 type Option func(*config) error
+
+func parserConfig(opts []Option) (config, error) {
+	var cfg config
+	for _, opt := range opts {
+		if opt == nil {
+			return config{}, perr(InvalidInput, "nil parser option", nil)
+		}
+		if err := opt(&cfg); err != nil {
+			return config{}, err
+		}
+	}
+	return cfg, nil
+}
 
 func nonNegative(name string, n int64) error {
 	if n < 0 {
@@ -39,7 +52,8 @@ func WithMaxInputBytes(n int64) Option {
 }
 
 // WithMaxMemoryBytes limits the linear memory of this parser's instance (a refused grow becomes ResourceLimit).
-// Values the engine cannot honor make NewParser fail.
+// A nonzero limit must be within the engine range (32 MiB through 4 GiB, inclusive).
+// Zero keeps the engine default (1 GiB). Out-of-range values return ErrInvalidInput.
 func WithMaxMemoryBytes(n int64) Option {
 	return func(c *config) error {
 		if err := nonNegative("WithMaxMemoryBytes", n); err != nil {

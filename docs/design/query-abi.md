@@ -1,8 +1,8 @@
-# Queries (v0.1): engine ABI 2–4 and Go API — design draft
+# Queries — engine ABI 2–4 and Go API
 
-Status: draft by the main session, 2026-11-14. Inputs: `docs/design/api-v2.md` §8 (signatures fixed), `engine-abi.md`
-(current ABI), tree-sitter v0.27.2 `api.h` (query and query-cursor API, `ts_query_cursor_exec_with_options` progress
-callback, `ts_tree_cursor_current_descendant_index`).
+The query contract covers validation, matching, and opt-in budgets.
+[Engine ABI layouts](engine-abi.md#6-query-additions-abi-2) · [API inventory](api-stability.md) ·
+[ADR-0030](decisions/ADR-0030-query-budgets.md)
 
 ## Goals and non-goals
 - Run the unmodified C query engine inside the instance; map every capture to a snapshot `Node` exactly.
@@ -46,11 +46,54 @@ type QueryMatch struct{ Pattern int; Captures []QueryCapture }   // Captures[i].
   match limit exceeded → reported on the iterator (`QueryMatch` stream ends with `ErrQueryMatchLimit`), traps →
   `EngineFault` + instance reset.
 
+## Opt-in Go budgets
+
+`NewQueryWithOptions(ctx, lang, pattern, ...QueryCompileOption)` validates a query in a scratch
+instance. `Tree.MatchesWithOptions(ctx, query, opts, ...QueryMatchOption)` resolves the budgets
+and copies `QueryOptions` at sequence creation. Each iteration has fresh counters. Query values
+can be shared across independent parsers. Both entry points accept zero for an unset limit,
+apply repeated options in order, and reject nil options and out-of-range values.
+
+| Option | What it caps and when |
+| --- | --- |
+| `WithMaxQuerySourceBytes` | Entire pattern in bytes, including comments and whitespace. Checked before scratch allocation, with a maximum of 2 GiB − 1. |
+| `WithMaxQueryMemoryBytes` | Scratch linear memory using the parser's memory limit path (32 MiB to 4 GiB for a positive cap). Lazy compilation on the live parser uses its own `WithMaxMemoryBytes`. |
+| `WithMaxQueryMetadataBytes` | TSGQ block bytes and, independently, cumulative bytes written into derived property strings. Checked before Go decoding and before constructing derived strings, respectively. The engine already allocated TSGQ. The option accepts at most 2³² − 1. |
+| `WithMaxQueryRegexUnits` | Cumulative translation, parsing and expansion cost of all validated regexes, including opaque predicates. Reservations precede variable-size growth or standard-library calls. Units include translated bytes, syntax nodes, instructions and rune entries and can vary with implementation and toolchain. |
+| `WithMaxQueryCaptures` | Entries across raw candidates, including rejected candidates. Checked after the engine returns the match buffer and before allocating the Go capture slice. |
+| `WithMaxQueryResults` | Accepted matches, including zero-capture matches. At N matches, iteration succeeds if there are no more accepted matches. The first excess match ends the sequence with `ResourceLimit` before yielding it. Early consumer break finishes immediately. |
+| `WithMaxQueryPredicateWork` | Cumulative Go candidate, capture and predicate work, including failed alternatives. Charges include length checks, chunks of string bytes compared, and regex VM scratch setup, positions, state pops and character-class lookups. |
+
+Budgets permit exact fit. An observed done context takes precedence at Go budget checkpoints.
+The opt-in iterator polls within predicate evaluation and uses the instrumented regex VM, including
+for valid UTF-8. The legacy iterator can use a query built with the new constructor via its VM
+fallback. The opt-in iterator also accepts queries built with the legacy constructor.
+
+C query compilation observes cancellation at Go call boundaries. The capture and metadata caps
+apply on the Go side after ABI 2–4 shim allocation. Engine traversal, cursor advances, snapshot
+export, and the first whole-tree index remain subject to parser limits and cooperative engine
+cancellation. See [query outcomes](../specs/parser-result.md#query-results-and-limits) for errors and lifetimes.
+
+### Running untrusted queries
+
+Use the parser input, snapshot-node and linear-memory limits together with the cursor's
+`MatchLimit`, query budgets and a context deadline. For a hard deadline or total memory bound,
+run the request in an independently killable worker. Cap query, source, and IPC frame sizes
+before buffering, and limit concurrency and response bytes. Apply an OS memory limit to the
+worker and all its descendants. The supervisor deadline covers startup, compile, parse,
+iteration and output. On expiry, terminate and reap the process tree and discard the partial
+response. Replace reusable workers after forced stops and bound retained results and caches.
+
+The worker's memory limit includes Go heap, snapshots, results and engine memory. The parser's
+linear-memory limit covers one engine instance. The supervisor enforces process-wide memory and
+elapsed time independently of cooperative checks and Go heap targets.
+
 ## Verification (pre-declared)
 - Native reference: `tools/native-ref` gains `query <query-file> <source>` printing raw matches (pattern, capture,
   node descendant index, symbol, range) without predicates. Inputs: each grammar repository's own `queries/*.scm`
   (highlights, tags, locals, injections where present; pinned and sha256-verified) over the corpus inputs. Gate: raw
-  matches byte-identical to native for every query file and input.
+  matches byte-identical to native for every query file and input. `TestQueryNative` runs this comparison
+  with both query APIs and compares the two Go-filtered result streams under nonbinding budgets.
 - Predicates: retained CLI v0.27.2 `query` outputs record pattern/input boolean results with CLI identity and hashes;
   product-lane tests compare against that matrix (E3). This is separate from native C raw-query evidence (E5).
 - Cancellation-then-parse regression and fuzzing of `NewQuery` (no panics, errors carry offsets).
@@ -86,17 +129,19 @@ type QueryMatch struct{ Pattern int; Captures []QueryCapture }   // Captures[i].
   records each node's descendant index on the first returned match; later captures, including backward captures, use
   expected constant-time lookups. Mapping costs expected O(nodes + captures), with 8 bytes per slot in wasm32 and fewer
   than four slots per node. The table is freed with the query cursor. Building it polls should_stop every 256 nodes.
-  The host lazily allocates one cursor per parser instance and reuses it across Matches calls, queries and ranges.
-  Its index covers the whole tree: the first match on a different tree costs O(nodes), even for a narrow range;
-  consecutive execs on the same tree reuse it. Switching trees frees the old table. The shim registers its cursors
+  The host lazily allocates one cursor per parser instance. It replaces the cursor when the effective MatchLimit
+  decreases because C can reuse capture lists allocated under a higher limit. Zero and UINT32_MAX are equivalent.
+  Its index covers the whole tree: the first match after switching trees or replacing the cursor costs O(nodes),
+  even for a narrow range. Other execs on the same tree reuse it. The shim registers its cursors
   and drops tables referencing a tree before deleting that tree, so allocator reuse of a TSTree address cannot reuse
   stale indices. A cancelled index build frees its partial table before the next exec. Tree edits are rejected by
   Matches. Reset, Close and traps release the whole instance, including its cursor and table.
   For N nodes, the index allocation is `8 * 2^ceil(log2(2*N))` bytes in wasm32: less than 32 bytes per
   node, excluding allocator overhead. At most the last queried live tree's index is retained per instance,
-  until that tree is deleted (Tree.Close, leak drain or ParserPool.Put), a different tree is queried, or the
-  instance is discarded. The query-dependent TSQueryCursor arrays and match buffer remain allocated until
-  instance discard (Parser.Reset, Parser.Close, recycling or a trap), even after the tree is deleted or switched.
+  until that tree is deleted (Tree.Close, leak drain or ParserPool.Put), a different tree is queried, the cursor
+  is replaced, or the instance is discarded. The query-dependent TSQueryCursor arrays and match buffer remain
+  allocated until cursor replacement or instance discard (Parser.Reset, Parser.Close, recycling or a trap),
+  even after the tree is deleted or switched.
   These retained allocations count against WithMaxMemoryBytes, leaving less room for subsequent parsing;
   neither a narrow byte range nor MatchLimit bounds the whole-tree index. Freeing the index makes its space
   reusable inside the instance; linear memory is returned to the OS only on instance discard.
@@ -113,7 +158,7 @@ type QueryMatch struct{ Pattern int; Captures []QueryCapture }   // Captures[i].
   weak owner/instance identities; no generated engine call runs on the GC goroutine. The next owner engine operation
   deletes the corresponding TSQuery. Retirements from a replaced instance are ignored. Reset/Close release the entire
   instance. Reuse Query values to avoid repeatedly allocating validation instances and compiling the same source.
-- MatchLimit bounds in-progress states, not returned results. On overflow the iterator reports ErrQueryMatchLimit
+- MatchLimit bounds in-progress states for each Matches call. On overflow the iterator reports ErrQueryMatchLimit
   and discards any match produced by that same next call. Previously yielded matches remain valid; small limits may
   yield no matches at all. The public doc comments state this explicitly.
 
