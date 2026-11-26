@@ -169,6 +169,12 @@ for review, even when expired; they do not count as current warnings. Tool/runti
 when the workflow closes the issue. `-state FILE` writes `warn`, `clean` or `error`; hard errors remove the body and
 leave the issue unchanged. The issue job uses that state rather than inferring warnings from the body's existence.
 
+`-candidates FILE` writes the pins that could move as JSON (`{"version":1,"candidates":[...]}`, sorted by component, kind,
+newest; fields `component`, `pinned`, `newest`, `kind` = `release`|`head`, `repo`, `owner`, `tagOnly`, `grammar`,
+`accepted`) and removes the file after a hard error. The issue body lists the unaccepted candidates, with a
+`gh workflow run` line for each owner-repository grammar release and "no dispatch" for the others (names restricted to
+`[A-Za-z0-9._+-]`); the watch job dispatches nothing, and the workflow uploads the file as the `upstream-watch-candidates` artifact.
+
 ## Recorded grammar patches
 
 Both builders support `regenerate: true` without patches (for example PostgreSQL LFS source) and use the ADR-0023 patch records in `pins.json`; grammar-input patches with `regenerate: true` use

@@ -214,6 +214,7 @@ func writeIssue(path string, report *bytes.Buffer, api *githubAPI, failed bool) 
 	fmt.Fprintf(&b, "Updated %s by the weekly upstream-watch workflow. Replaced on every run; closed automatically when no unaccepted warning remains.\n\n",
 		api.now.Format("2006-01-02 15:04 UTC"))
 	warningSummary(&b, api)
+	candidatesSection(&b, api)
 	var full []string
 	for _, line := range strings.Split(report.String(), "\n") {
 		if !strings.HasPrefix(line, "::") {

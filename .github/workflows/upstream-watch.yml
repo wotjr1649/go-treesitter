@@ -6,7 +6,8 @@ name: Upstream release watch
 # compared with nvim-treesitter's registry (information). Missing repos/orphan pins/API failures fail the job; rename,
 # archive, age, newer stable release and nvim-treesitter differences are warnings: the job stays green and the
 # "issue" job creates/updates ONE tracking issue (label upstream-watch), closing it when no unaccepted warning
-# remains. Accepted warnings retain their expiry in a separate table.
+# remains. The issue body also lists the pin-move candidates; the same list is the upstream-watch-candidates artifact
+# (JSON with a version field). Nothing here dispatches a workflow. Accepted warnings retain their expiry in a separate table.
 # Only runs on the default branch update the issue (manual runs elsewhere still write the step summary).
 # It changes nothing else: pins move only with explicit authority (AGENTS.md).
 
@@ -48,10 +49,11 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           out="$RUNNER_TEMP/watch-out"
-          mkdir -p "$out"
+          cand="$RUNNER_TEMP/watch-candidates"
+          mkdir -p "$out" "$cand"
           go build -o "$RUNNER_TEMP/upstreamwatch" ./upstreamwatch # `go run` would flatten the exit code to 1
           rc=0
-          "$RUNNER_TEMP/upstreamwatch" -pins ../gen/pins.json -issue "$out/body.md" -state "$out/state" > "$RUNNER_TEMP/watch.md" || rc=$?
+          "$RUNNER_TEMP/upstreamwatch" -pins ../gen/pins.json -issue "$out/body.md" -state "$out/state" -candidates "$cand/candidates.json" > "$RUNNER_TEMP/watch.md" || rc=$?
           grep '^::' "$RUNNER_TEMP/watch.md" || true # error and warning annotations
           grep -v '^::' "$RUNNER_TEMP/watch.md" | tee -a "$GITHUB_STEP_SUMMARY"
           # A complete body also includes accepted/stale warnings; only unaccepted warnings prevent auto-close.
@@ -65,6 +67,15 @@ jobs:
           path: ${{ runner.temp }}/watch-out
           if-no-files-found: warn
           retention-days: 1
+      # Data only, for the owner or a later auto-PR workflow to read; this job dispatches nothing and gains no permission.
+      - name: Upload the pin-move candidates
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: upstream-watch-candidates
+          path: ${{ runner.temp }}/watch-candidates
+          if-no-files-found: warn
+          retention-days: 14
 
   # Separate job so that only it holds issues: write; it runs no repository code, only the gh CLI.
   issue:
