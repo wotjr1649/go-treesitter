@@ -107,17 +107,29 @@ jobs:
           done
           (cd B/tools/bench && go build -o "$RUNNER_TEMP/benchci$EXE" ./ci)
       # The tsql large input is derived from the pinned grammar's corpus (kind "concat"), and corpus mode reads that corpus.
-      - name: Corpus extraction (tsql large input, corpus mode)
+      - name: Build the repository's own native-ref and ciconf tools (tsql large input, corpus mode)
         if: ${{ matrix.lang == 'tsql' || inputs.mode == 'corpus' }}
         working-directory: B/tools/native-ref
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
         run: |
           go build -o "$RUNNER_TEMP/native-ref$EXE" .
           go build -o "$RUNNER_TEMP/ciconf$EXE" ./ciconf
-          cd "$GITHUB_WORKSPACE/B"
-          "$RUNNER_TEMP/native-ref$EXE" -pins tools/gen/pins.json -fetch -cc gcc \
-            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" "${{ matrix.lang }}"
+      # Same split as bench.yml: the only step with a token downloads and sha256-verifies the pinned archives (-stage) and
+      # extracts the corpus; it compiles and runs nothing.
+      - name: Fetch and verify pinned sources, extract the corpus
+        if: ${{ matrix.lang == 'tsql' || inputs.mode == 'corpus' }}
+        working-directory: B
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          "$RUNNER_TEMP/native-ref$EXE" -pins tools/gen/pins.json -stage -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/stage-work" \
+            -corpus "$RUNNER_TEMP/corpus" "${{ matrix.lang }}"
+      # Offline and without the token: the native build and the first run of the native executable (ciconf) happen here.
+      - name: Build the native executable (offline), extract the corpus inputs
+        if: ${{ matrix.lang == 'tsql' || inputs.mode == 'corpus' }}
+        working-directory: B
+        run: |
+          "$RUNNER_TEMP/native-ref$EXE" -pins tools/gen/pins.json -cc gcc \
+            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" "${{ matrix.lang }}"
           "$RUNNER_TEMP/ciconf$EXE" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "${{ matrix.lang == 'golang' && 'go' || matrix.lang }}"
       - name: Fetch the large inputs (sha256-verified)
         if: ${{ inputs.mode == 'large' }}
