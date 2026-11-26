@@ -72,6 +72,15 @@ jobs:
           go env GOOS GOARCH
           test "$(go env GOOS)" = "${{ matrix.goos }}" && test "$(go env GOARCH)" = "${{ matrix.goarch }}" || { echo "native target mismatch"; exit 1; }
           gcc --version | head -1
+      # Verified pinned archives (about 10 MB per group and architecture) are cached once per pins.json content: only a push to main
+      # saves, pull requests restore. native-ref checks every archive in dl against its pinned sha256 before use, so a restored
+      # file can only be accepted when its bytes equal the pin. The npm subdirectory is not cached.
+      - name: Restore the verified archive cache
+        id: dl-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ runner.temp }}/dl/*.gz
+          key: conformance-dl-${{ runner.os }}-${{ runner.arch }}-${{ matrix.group.name }}-${{ hashFiles('tools/gen/pins.json') }}
       - name: Select the group's grammars for conformance builds
         run: |
           list=""
@@ -187,6 +196,12 @@ jobs:
             ${{ runner.temp }}/data/corpus/skipped.csv
           if-no-files-found: ignore
           retention-days: 90
+      - name: Save the verified archive cache
+        if: ${{ success() && github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.dl-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ runner.temp }}/dl/*.gz
+          key: conformance-dl-${{ runner.os }}-${{ runner.arch }}-${{ matrix.group.name }}-${{ hashFiles('tools/gen/pins.json') }}
 
   # Required check names kept until the ruleset requires conformance-gate. They no longer prove that the arm64 jobs ran on a
   # reduced pull request (see the matrix above); conformance-gate is the single check that carries the meaning.

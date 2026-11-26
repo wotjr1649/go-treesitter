@@ -62,10 +62,28 @@ jobs:
           go-version: 1.27.x # newest supported; go.mod states the floor (1.26.0)
       - name: Transient fetch retry regression checks
         run: bash tools/gen/fetch_test.sh
+      # Verified archives (wasi-sdk, binaryen, the CLI, the runtime, wasi-libc and the 25 grammars, a few hundred MB) are cached
+      # once per pins.json content. Only a push to main saves; pull requests restore. fetch.sh still checks every restored
+      # file against its pinned sha256 (TSG_DL_CACHE), so the key selects files, never their bytes.
+      - name: Restore the verified archive cache
+        id: dl-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ runner.temp }}/dl-cache
+          key: regen-dl-${{ runner.os }}-${{ hashFiles('tools/gen/pins.json') }}
       # Downloads each pinned archive into a new empty directory and checks its sha256 before extracting;
       # builds wasm2go from its pinned module version; regenerates the selected module into grammars/.
       - name: Regenerate grammar modules
+        env:
+          TSG_DL_CACHE: ${{ runner.temp }}/dl-cache
         run: /usr/bin/time -v -o "$RUNNER_TEMP/regen-cost.txt" bash tools/gen/regen.sh "$RUNNER_TEMP/regen" "${{ matrix.lang }}"
+      # One shard saves (every shard downloads the same set), and only when main's pins.json has no cache yet.
+      - name: Save the verified archive cache
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.lang == 'json' && steps.dl-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ runner.temp }}/dl-cache
+          key: regen-dl-${{ runner.os }}-${{ hashFiles('tools/gen/pins.json') }}
       - name: Build generator behaviour gate tools
         run: |
           (cd tools/native-ref && go build -trimpath -o "$RUNNER_TEMP/native-ref" . && go build -trimpath -o "$RUNNER_TEMP/ciconf" ./ciconf)

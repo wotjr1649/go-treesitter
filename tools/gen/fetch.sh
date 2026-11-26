@@ -22,16 +22,29 @@ fetch_archive() {
 }
 
 # Both upstream and mirrors must satisfy the same archive pin before extraction.
+# TSG_DL_CACHE (optional): a directory of archives named like their destinations. CI restores it with actions/cache and only
+# pushes to main save it. A cached file is used only when its sha256 equals the pin after it was copied to the destination;
+# a missing or mismatching file is downloaded as usual, and only a verified download is stored, so the cache never changes bytes.
 fetch_verified_archive() {
-  local dst=$1 sum=$2 upstream=$3 mirrors=${4:--} url
+  local dst=$1 sum=$2 upstream=$3 mirrors=${4:--} url cache=""
   local -a urls=("$upstream") fallback=()
+  if [ -n "${TSG_DL_CACHE:-}" ]; then
+    cache=$TSG_DL_CACHE/$(basename "$dst")
+    if [ -f "$cache" ] && cp -- "$cache" "$dst" && echo "$sum  $dst" | sha256sum -c --status -; then return 0; fi
+    rm -f -- "$dst"
+  fi
   if [ "$mirrors" != - ]; then
     IFS=',' read -r -a fallback <<<"$mirrors"
     urls+=("${fallback[@]}")
   fi
   for url in "${urls[@]}"; do
     if fetch_archive "$dst" "$url"; then
-      if echo "$sum  $dst" | sha256sum -c -; then return 0; fi
+      if echo "$sum  $dst" | sha256sum -c -; then
+        if [ -n "$cache" ]; then # best effort: a read-only or full cache directory must not fail the fetch
+          { mkdir -p -- "$TSG_DL_CACHE" && cp -- "$dst" "$cache.$$" && mv -f -- "$cache.$$" "$cache"; } || rm -f -- "$cache.$$"
+        fi
+        return 0
+      fi
       echo "fetch: sha256 mismatch from $url" >&2
     fi
     rm -f -- "$dst"
