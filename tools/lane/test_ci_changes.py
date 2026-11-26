@@ -307,6 +307,39 @@ class MatrixCountTest(unittest.TestCase):
         self.assertIn("fromJSON(needs.changes.outputs.regen_matrix)", workflow_text("regen"))
         self.assertEqual(cc.CONFORMANCE_MATRIX_JOB, "conformance (%s, %s)")
 
+    MATRIX_OUTPUT = {("conformance", "conformance-grammar"): "conformance_matrix", ("regen", "regen-grammar"): "regen_matrix"}
+
+    def rendered_names(self, wf, event="push"):
+        """The names GitHub gives the matrix jobs: each job's name template with matrix.<key> taken from the classifier's matrix entries."""
+        out = flags(wf, ["README.md"], event)
+        text = workflow_text(wf)
+        parts = re.split(r"^  ([A-Za-z0-9_-]+):\s*$", text[text.index("\njobs:\n"):], flags=re.M)
+        job_text = {parts[i]: parts[i + 1] for i in range(1, len(parts), 2)}
+        jobs = {j: key for j, (_, key) in cc.ENGINE_MATRIX_JOBS.items()} if wf == "engine" else \
+            {j: k for (w, j), k in self.MATRIX_OUTPUT.items() if w == wf}
+        names = []
+        for job, key in jobs.items():
+            template = re.search(r"^    name: (.*)$", job_text[job], flags=re.M).group(1)
+            for entry in json.loads(out[key])["include"]:
+                def value(m):
+                    v = entry
+                    for part in m.group(1).split("."):
+                        self.assertIsInstance(v, dict, "%s %s: matrix.%s is not in the matrix entry %s" % (wf, job, m.group(1), entry))
+                        self.assertIn(part, v, "%s %s: matrix.%s is not in the matrix entry %s" % (wf, job, m.group(1), entry))
+                        v = v[part]
+                    self.assertNotIsInstance(v, (dict, list), "%s %s: matrix.%s is not a scalar" % (wf, job, m.group(1)))
+                    return str(v)
+                names.append(re.sub(r"\$\{\{\s*matrix\.([A-Za-z0-9_.]+)\s*\}\}", value, template))
+        return sorted(names)
+
+    def test_rendered_job_names_are_the_expected_instances(self):
+        # A job name that uses a matrix key the entries do not have renders with an empty part, and the gate's name comparison fails.
+        for wf in ("engine", "conformance", "regen"):
+            for event in ("push", "workflow_dispatch"):
+                self.assertEqual(self.rendered_names(wf, event), sorted(self.names(wf, ["README.md"], event)), (wf, event))
+            for names in (self.rendered_names(wf),):
+                self.assertTrue(all(n.strip() and "  " not in n for n in names), (wf, names))
+
     def test_pattern_selects_only_the_matrix_jobs(self):
         for wf, files, others in (("engine", ["tools/conformance/x.go"], ["engine (ubuntu-24.04)", "engine, oldest supported Go (ubuntu-24.04)", "engine-gate", "engine-changes"]),
                                   ("conformance", ["tools/conformance/x.go"], ["conformance (ubuntu-24.04)", "conformance (ubuntu-24.04-arm)", "conformance-gate", "conformance-changes"]),

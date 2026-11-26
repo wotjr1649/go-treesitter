@@ -199,7 +199,7 @@ def decide(workflow, files, event, root=None):
         out["conformance_matrix"] = json.dumps({"include": include}, separators=(",", ":"))
         names = [CONFORMANCE_MATRIX_JOB % (e["runner"], e["group"]["name"]) for e in include]
     if workflow == "regen":
-        out["regen_matrix"] = json.dumps({"include": REGEN_GROUPS}, separators=(",", ":"))
+        out["regen_matrix"] = json.dumps({"include": [{"group": g} for g in REGEN_GROUPS]}, separators=(",", ":"))  # matrix.group.name, as in conformance
         names = [REGEN_MATRIX_JOB % g["name"] for g in REGEN_GROUPS if "regen-grammar" in expect]
     if workflow in ("engine", "conformance", "regen"):
         out["expect_matrix"] = json.dumps(names, separators=(",", ":"))
