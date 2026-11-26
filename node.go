@@ -124,21 +124,29 @@ func (n Node) Parent() (Node, bool) {
 	return n.at(p), true
 }
 
+// ChildCount costs O(children): the snapshot keeps no per-node count (4 B/node saved).
 func (n Node) ChildCount() int {
 	if n.s == nil {
 		return 0
 	}
-	return int(n.s.childCount[n.i])
+	k := 0
+	for c, ok := n.s.firstChild(n.i); ok; c, ok = n.s.nextSibling(c) {
+		k++
+	}
+	return k
 }
 
 // Child returns the i-th child; it walks the siblings, so it costs O(i).
 func (n Node) Child(i int) (Node, bool) {
-	if i < 0 || i >= n.ChildCount() {
+	if i < 0 || n.s == nil {
 		return Node{}, false
 	}
-	c, _ := n.s.firstChild(n.i)
-	for ; i > 0; i-- {
-		c, _ = n.s.nextSibling(c)
+	c, ok := n.s.firstChild(n.i)
+	for ; ok && i > 0; i-- {
+		c, ok = n.s.nextSibling(c)
+	}
+	if !ok {
+		return Node{}, false
 	}
 	return n.at(c), true
 }

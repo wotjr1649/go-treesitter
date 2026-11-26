@@ -92,7 +92,7 @@ UTF-8 source is not converted and both return the offset unchanged (clamped). Se
   substring of that source.
 - `Source.Bytes` and `Source.Original` return read-only views. The caller must leave their bytes and the original
   input unchanged, including through any alias.
-- Snapshot arrays retain 25 B/node (previously 41), plus sparse field exceptions and source. Node points derive
+- Snapshot arrays retain 21 B/node (previously 25, and 41 before that), plus sparse field exceptions and source. Node points derive
   LF-counted rows and byte columns from source offsets using a shared, lazy `sync.Once` line index:
   `[]uint32` line starts cost `4 * (LF count + 1)` bytes plus fixed object/allocator overhead, with at most
   `len(source) + 1` entries and no extra source copy. Only `LineIndex.Pos` adds its lazy non-ASCII bitset
@@ -110,9 +110,12 @@ UTF-8 source is not converted and both return the offset unchanged (clamped). Se
 ## Field lookup and grammar compatibility
 
 The root accepts engine ABI 1-4 grammar modules. ABI 1 supports parsing, ABI 2 adds queries, ABI 3 adds snapshot
-field-lookup exceptions and ABI 4 adds public symbol IDs to language metadata (`SymbolForName`). With ABI 3 or 4, `Node.ChildByFieldName` follows C's `ts_node_child_by_field_id`,
-including inherited fields whose result is inside a visible alias rather than a direct child. The snapshot owns
-the exception table; lookup remains valid after parser closure and never calls into the engine.
+field-lookup exceptions and ABI 4 adds public symbol IDs to language metadata (`SymbolForName`). With ABI 3 or 4, `Node.ChildByFieldName` follows the `ts_node_child_by_field_id` of the grammar module's pinned
+runtime (`identity.Runtime` in its `provenance.json`), which can return a descendant rather than a direct child.
+With the v0.27.x runtimes an inherited field can resolve inside a visible alias; the contract does not promise that
+shape, and a module on another runtime can resolve such a field differently. For a given tree the result is thus
+fixed by the grammar module version, not by the root version. The snapshot owns the exception table; lookup remains
+valid after parser closure and never calls into the engine.
 
 ABI 1/2 snapshots have no exception table: `ChildByFieldName` keeps the first direct child with the requested
 cursor field, which can differ from C on alias-inherited fields. Regenerate or upgrade the grammar module to get
@@ -123,7 +126,7 @@ does not change the exported tree or cursor metadata.
 
 `ChildrenByFieldName` yields a recorded C target first, then matching direct children in order without duplicating
 that target. A recorded C no-node result yields nothing; without an exception it retains the direct-child
-iteration. Its first result is `ChildByFieldName`, even when that result is inside a visible alias.
+iteration. Its first result is `ChildByFieldName`, even when that result is not a direct child.
 This iterator is not a C-verified API: v0.27.2 has no children-by-field API. Its ordering and explicit-null behavior
 are Go API semantics covered by retained tests (E3).
 

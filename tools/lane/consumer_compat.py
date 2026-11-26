@@ -14,14 +14,20 @@ REPO = Path(__file__).resolve().parents[2]
 FIXTURES = REPO / "testdata" / "consumer-compat"
 ROOT = "github.com/wotjr1649/go-treesitter"
 PUBLIC_PROXY = "https://proxy.golang.org"
+# Go's semantic version grammar: no leading zeros, no empty identifiers, no build metadata. Keep in step with
+# rootVersionRx in tools/gen/main.go (RE2); test_consumer_compat.py and the accept/reject lists in tools/gen/gen_test.go must keep the same cases.
+_NUM = r"(?:0|[1-9][0-9]*)"
+_PRE = r"(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)"
+SEMVER = re.compile(rf"v{_NUM}\.{_NUM}\.{_NUM}(?:-{_PRE}(?:\.{_PRE})*)?")
 
-# The tag's go.mod and language.go supply its minimum root and embedded ABI.
+# (name, tag, ABI, tag commit, minimum root). The tag's go.mod and language.go supply its minimum root and embedded ABI;
+# the minimum root equals the tag for these rows but not in general (an RC root can sit under a lower grammar tag).
 GRAMMARS = {
-    "abi1-json": ("json", "v0.1.0", 1, "2b0c9ec9996e50ed63313f6da5d4ddec98d2b70d"),
-    "abi2-json": ("json", "v0.2.0", 2, "b4af8ceed73af69796578191e7574dc07f7926bb"),
-    "abi2-cpp": ("cpp", "v0.3.0", 2, "ee25291cbff710a1c8174592a71aa7dcfcfa19c2"),
-    "abi3-cpp": ("cpp", "v0.4.0", 3, "eb1fbd5e3da81e648061b19cffd50aa846c8ea82"),
-    "abi4-go": ("golang", "v0.6.0", 4, "a8af4360e4964deb6c0bb62461ee8348be1aa738"),
+    "abi1-json": ("json", "v0.1.0", 1, "2b0c9ec9996e50ed63313f6da5d4ddec98d2b70d", "v0.1.0"),
+    "abi2-json": ("json", "v0.2.0", 2, "b4af8ceed73af69796578191e7574dc07f7926bb", "v0.2.0"),
+    "abi2-cpp": ("cpp", "v0.3.0", 2, "ee25291cbff710a1c8174592a71aa7dcfcfa19c2", "v0.3.0"),
+    "abi3-cpp": ("cpp", "v0.4.0", 3, "eb1fbd5e3da81e648061b19cffd50aa846c8ea82", "v0.4.0"),
+    "abi4-go": ("golang", "v0.6.0", 4, "a8af4360e4964deb6c0bb62461ee8348be1aa738", "v0.6.0"),
 }
 ENV = dict(
     os.environ, CGO_ENABLED="0", GOENV="off", GOWORK="off", GOTOOLCHAIN="local",
@@ -52,9 +58,32 @@ def grammar_path(name):
     return f"{ROOT}/grammars/{name}"
 
 
+def semver_key(version):
+    """Sort key for a version that matches SEMVER (semver.org precedence, no build metadata)."""
+    core, _, pre = version[1:].partition("-")
+    ids = tuple((0, int(i), "") if i.isdigit() else (1, 0, i) for i in pre.split("."))
+    return tuple(int(n) for n in core.split(".")), not pre, ids if pre else ()
+
+
+def candidate_version(base, commit, minimum=None):
+    """BASE + a consumercompat identifier: v1.0.0-rc.1 gives v1.0.0-rc.1.consumercompat.X, above rc.1 and below rc.2.
+
+    A release base gives v0.7.0-consumercompat.X, which sorts BELOW v0.7.0 (a pre-release). When MINIMUM (the highest
+    minimum root of the rows) is given, a candidate below it fails here instead of in check_graph after MVS picks MINIMUM.
+    """
+    if not SEMVER.fullmatch(base):
+        raise ValueError(f"CANDIDATE_BASE {base!r} is not a semantic version")
+    # Only a dot keeps an RC base's own identifiers in front: rc.1.consumercompat.X < rc.2 but rc.1-consumercompat.X > rc.2.
+    version = f"{base}{'.' if '-' in base else '-'}consumercompat.{commit}"
+    if minimum and semver_key(version) < semver_key(minimum):
+        raise ValueError(f"candidate {version} sorts below minimum root {minimum}; set CANDIDATE_BASE to {minimum} or a later RC")
+    return version
+
+
 def candidate_zip(scratch, evidence):
     commit = run(REPO, ENV, "git", "rev-parse", "HEAD", capture=True).decode().strip()
-    version = f"v0.7.0-consumercompat.{commit}"
+    minimum = max((row[4] for row in GRAMMARS.values()), key=semver_key)
+    version = candidate_version(os.environ.get("CANDIDATE_BASE", "v0.7.0"), commit, minimum)
     proxy = scratch / "proxy"
     versions = proxy / ROOT / "@v"
     versions.mkdir(parents=True)
@@ -122,9 +151,9 @@ def exercise(cwd, env, out, root, rows, cross=False):
     try:
         run(cwd, env, "go", "mod", "tidy")
         check_graph(cwd, env, out / "graph.json", {
-            ROOT: root, **{grammar_path(name): version for name, version, _, _ in rows},
+            ROOT: root, **{grammar_path(name): version for name, version, _, _, _ in rows},
         })
-        for name, version, abi, commit in rows:
+        for name, version, abi, commit, min_root in rows:
             path = grammar_path(name)
             module = json.loads(run(cwd, env, "go", "mod", "download", "-json", f"{path}@{version}", capture=True))
             go_mod = json.loads(run(cwd, env, "go", "mod", "edit", "-json", module["GoMod"], capture=True))
@@ -143,8 +172,8 @@ def exercise(cwd, env, out, root, rows, cross=False):
             embedded = re.search(r"(?m)^\s*ABI:\s*(\d+),", (source / "language.go").read_text(encoding="utf-8"))
             if not embedded or int(embedded[1]) != abi or json.loads(provenance)["abi"] != abi:
                 raise ValueError(f"{path}@{version}: expected ABI {abi}")
-            if go_mod["Replace"] or go_mod["Require"] != [{"Path": ROOT, "Version": version}]:
-                raise ValueError(f"{path}@{version}: expected root minimum {version} without replacements")
+            if go_mod.get("Replace") or go_mod.get("Require") != [{"Path": ROOT, "Version": min_root}]:
+                raise ValueError(f"{path}@{version}: expected root minimum {min_root} without replacements")
             env[f"TSG_{name.upper()}_ABI"] = str(abi)
         run(cwd, env, "go", "test", "-mod=readonly", "-v", "-count=1", "-timeout=90s", ".")
         if cross:
@@ -174,7 +203,7 @@ def main(evidence, scratch):
     for label, row in GRAMMARS.items():
         cwd = consumer(scratch, label, candidate, [row])
         env = dict(isolated(scratch, f"{label}-cache"), GOPROXY=proxy)
-        name, tag, _, _ = row
+        name, tag = row[:2]
         run(cwd, env, "go", "mod", "edit", f"-require={grammar_path(name)}@{tag}")
         (cwd / "go.sum").write_text(sums, encoding="utf-8")
         try:
@@ -183,16 +212,17 @@ def main(evidence, scratch):
             print(f"{label}: {exc}", flush=True)
             failures.append(label)
 
+    # rows[0][4] (lowest minimum root) starts the module graph; rows[1][4] (the highest, golang) is the published root MVS picks.
     rows = [GRAMMARS["abi1-json"], GRAMMARS["abi4-go"]]
-    cwd = consumer(scratch, "mixed", "v0.1.0", rows)
+    cwd = consumer(scratch, "mixed", rows[0][4], rows)
     base = isolated(scratch, "mixed-published-cache")
     json_path, go_path = grammar_path("json"), grammar_path("golang")
     run(cwd, base, "go", "mod", "edit", f"-require={json_path}@v0.1.0")
-    run(cwd, base, "go", "mod", "download", f"{ROOT}@v0.1.0", f"{json_path}@v0.1.0")
-    check_graph(cwd, base, evidence / "mixed-initial-graph.json", {ROOT: "v0.1.0", json_path: "v0.1.0"})
+    run(cwd, base, "go", "mod", "download", f"{ROOT}@{rows[0][4]}", f"{json_path}@v0.1.0")
+    check_graph(cwd, base, evidence / "mixed-initial-graph.json", {ROOT: rows[0][4], json_path: "v0.1.0"})
     run(cwd, base, "go", "mod", "edit", f"-require={go_path}@v0.6.0")
     try:
-        exercise(cwd, base, evidence / "mixed-published", "v0.6.0", rows)
+        exercise(cwd, base, evidence / "mixed-published", rows[1][4], rows)
     except (subprocess.CalledProcessError, ValueError) as exc:
         print(f"mixed-published: {exc}", flush=True)
         failures.append("mixed-published")

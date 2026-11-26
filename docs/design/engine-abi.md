@@ -69,9 +69,9 @@ Columns follow the header (offsets relative to `buf+16`), as validated in the sp
 `symbol u16[KC] @0`, `field u16[KC] @2KC`, `flags u8[KC] @4KC`, `startByte @5KC`, `endByte @9KC`, `startRow @13KC`,
 `startCol @17KC`, `endRow @21KC`, `endCol @25KC` (`u32[KC]` each), `parent i32[KC] @29KC` (global preorder index,
 `-1` = root). Flags: `1` named, `2` extra, `4` missing, `8` error, `16` has_error. `symbol 65535` = ERROR.
-The header is written by `tsg_init`; `NewParser` checks magic and format once (mismatch = `ErrIncompatibleLanguage`) and the Go side checks them again after every `tsg_export_begin` and nonempty chunk, and derives `descendantEnd`/`childCount`/siblings.
+The header is written by `tsg_init`; `NewParser` checks magic and format once (mismatch = `ErrIncompatibleLanguage`) and the Go side checks them again after every `tsg_export_begin` and nonempty chunk, and derives `descendantEnd`/siblings.
 
-The Go snapshot retains 25 B/node (previously 41 B/node), plus its owned source and sparse field exceptions.
+The Go snapshot retains 21 B/node (previously 25, and 41 before that), plus its owned source and sparse field exceptions.
 It skips the four exported point columns without changing either block format or engine ABI 1-4.
 Node points and point-range lookups derive LF-counted rows and byte columns from byte offsets. The snapshot's
 existing `Lines()` index builds once with `sync.Once`, on first use: `[]uint32` line starts occupy exactly
@@ -122,13 +122,15 @@ hidden-field summary to a fixed point. A step's field is a single `Option<StrId>
 each field's increasing step indices and matching field-ID order. The runtime binds the reduce production ID
 to the subtree (`parser.c`/`subtree.c`). The invariant needed for empty-map skips and fields absent from a map is
 that every hidden child's field is propagated into its parent's production map as inherited; the source inspection
-supports this for the pinned generator, not every possible upstream-generated `parser.c`. For `plan > 0`, the
+supports this for the pinned generator, not every possible upstream-generated `parser.c`. This filter argument and the
+generator invariant describe the pinned v0.27.2 runtime and CLI; a runtime or CLI move must re-inspect and re-measure them. For `plan > 0`, the
 filter additionally rejects field collisions, decreasing per-field child indices and absent positions at runtime,
 and every hidden child remains in the comparison, including the non-inherited hidden-child case found in the 2026-11-15 independent review of the field-lookup ABI, whose first
 visible descendant is an extra.
 
-`ChildByFieldName` consults this table first, then falls back to the direct-child rule. A C result can lie inside
-a visible alias instead of being a direct child. `ChildrenByFieldName` yields an exception target first, followed
+`ChildByFieldName` consults this table first, then falls back to the direct-child rule. The table records whatever the
+module's pinned runtime returns, so a C result need not be a direct child (with the v0.27.x runtimes it can lie inside
+a visible alias) and the recorded results follow the runtime, not the root. `ChildrenByFieldName` yields an exception target first, followed
 by matching direct children in their original order, omitting a duplicate target; an explicit no-node exception
 yields nothing. Without an exception it yields the matching direct children as before. Both methods return
 nothing on ERROR nodes, unknown field names and the zero `Node`, for all supported ABIs. Cursor fields exported
@@ -203,13 +205,19 @@ func Refused(mem *[]byte) bool                       // a grow was refused since
 func ClearRefused(mem *[]byte)
 func Committed(mem *[]byte) int64                    // for WithRecycleAboveBytes
 func Release(mem *[]byte)                            // return the region to the OS; idempotent
+func InitMemory(mem *[]byte, size int, segs ...Segment) // records an initial memory (no copy); for a generated New that calls it
+func StartMemory(mem *[]byte)                        // creates the region and writes the segments once; first statement of X_initialize
 func Call(fn func()) error                           // runs fn; a trap (any panic from generated code) becomes *Trap
 ```
 
 Memory provider: reserve-then-commit, `VirtualAlloc` on Windows, `mmap` on Unix (standard library `syscall` first;
 `golang.org/x/sys` only with a stated reason). The generated `memory_grow` body is replaced by
 `return engine.MemoryGrow(mem, delta, max)` in a deterministic, sha256-checked step (expected original body hash
-recorded in the generator; mismatch = generation failure).
+recorded in the generator; mismatch = generation failure). `InitMemory`/`StartMemory` are additive provider API for a
+generator step that copies the data segments once, straight into the reserved region (after `SetLimit`, with no
+initial-size Go-heap slice); no generated module calls them yet, and `MemoryGrow` keeps its Go-heap-slice path, so modules
+generated before this API still work unchanged. `StartMemory` does nothing when no `InitMemory` is pending; an initial
+size above the limit traps with `Refused` set (a refused grow).
 
 Instance sequence (the `treesitter` package): `m := g.New(h)` → `SetLimit(m.Xmemory().Slice(), limit)` →
 `engine.Call(m.X_initialize)` → `Xtsg_abi_version() == g.ABI` (accepted: 1–4) → `Xtsg_init() == 0` → export header magic/format (format 1 for ABI 1/2, format 2 for ABI 3/4); any failure =

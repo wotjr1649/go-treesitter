@@ -1,6 +1,8 @@
 // Command upstreamwatch compares the pins of tools/gen/pins.json with upstream (.github/workflows/upstream-watch.yml):
 // release freshness and repository health of every pinned source and tool. A newer tool/runtime release exits 1;
-// a missing repository, unreachable pin or API failure exits 2. Renames, archives and age are warnings. Stdlib only;
+// a tag newer than the latest release (a tag without a GitHub Release) counts as a newer release; a missing repository,
+// unreachable pin or API failure exits 2. A grammar pin behind its repository's default branch is reported for every
+// grammar and warned about only for owner repositories (ADR-0024 rule 7; tags.go). Renames, archives and age are warnings. Stdlib only;
 // GITHUB_TOKEN lifts the API rate limit. Requests are cached for shared repositories and pins are never changed.
 //
 // Every grammar pin is also compared with nvim-treesitter's parsers.lua (information, never a failure; see nvim.go).
@@ -134,14 +136,16 @@ func report(p *pins, w io.Writer, api *githubAPI) (stale, failed bool) {
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "| component | pinned | newest stable | status |")
 	fmt.Fprintln(w, "|---|---|---|---|")
-	tools := []struct{ name, pinned, repo, ref string }{
-		{"tree-sitter runtime", p.Runtime.Release, repoOf(p.Runtime.Repo), p.Runtime.Commit},
-		{"wasi-sdk", p.Tools.WasiSDK, "WebAssembly/wasi-sdk", "wasi-sdk-" + strings.Split(p.Tools.WasiSDK, ".")[0]},
-		{"binaryen", p.Tools.Binaryen, "WebAssembly/binaryen", "version_" + p.Tools.Binaryen},
-		{"wasm2go", p.Tools.Wasm2go, repoOf("https://" + p.Tools.Module), p.Tools.Wasm2go},
+	// tag is an example of the repository's tag naming for the pinned version (its prefix selects the tags to compare).
+	tools := []struct{ name, pinned, repo, ref, tag string }{
+		{"tree-sitter runtime", p.Runtime.Release, repoOf(p.Runtime.Repo), p.Runtime.Commit, p.Runtime.Release},
+		{"wasi-sdk", p.Tools.WasiSDK, "WebAssembly/wasi-sdk", "wasi-sdk-" + strings.Split(p.Tools.WasiSDK, ".")[0], "wasi-sdk-" + strings.Split(p.Tools.WasiSDK, ".")[0]},
+		{"binaryen", p.Tools.Binaryen, "WebAssembly/binaryen", "version_" + p.Tools.Binaryen, "version_" + p.Tools.Binaryen},
+		{"wasm2go", p.Tools.Wasm2go, repoOf("https://" + p.Tools.Module), p.Tools.Wasm2go, p.Tools.Wasm2go},
 	}
 	if p.Tools.CLI != "" {
-		tools = append(tools, struct{ name, pinned, repo, ref string }{"tree-sitter CLI", p.Tools.CLI, repoOf(p.Runtime.Repo), "v" + strings.TrimPrefix(p.Tools.CLI, "v")})
+		v := "v" + strings.TrimPrefix(p.Tools.CLI, "v")
+		tools = append(tools, struct{ name, pinned, repo, ref, tag string }{"tree-sitter CLI", p.Tools.CLI, repoOf(p.Runtime.Repo), v, v})
 	}
 	srcs := []source{{"wasi-libc", repoOf(p.WasiLibc.Repo), p.WasiLibc.Commit, false}}
 	if p.Tools.LLVM != "" {
@@ -161,13 +165,24 @@ func report(p *pins, w io.Writer, api *githubAPI) (stale, failed bool) {
 			failed = true
 			continue
 		}
-		status := "current"
-		if newer(t.pinned, rel.Tag) {
-			status, stale = "**NEWER STABLE RELEASE**", true
-			fmt.Fprintf(w, "::error::%s: pinned %s, newest stable release %s\n", t.name, t.pinned, rel.Tag)
-			api.findings = append(api.findings, finding{component: t.name, text: "newer stable release " + rel.Tag + " than pinned " + t.pinned})
+		// A tag without a GitHub Release (wasm2go v0.4.22) is invisible to releases/latest.
+		latest, what := rel.Tag, "release"
+		tag, err := newestTag(api, t.repo, t.tag)
+		if err != nil {
+			fmt.Fprintf(w, "| %s | %s | %s | **ERROR** tags: %v |\n", t.name, t.pinned, rel.Tag, err)
+			failed = true
+			continue
 		}
-		fmt.Fprintf(w, "| %s | %s | %s | %s |\n", t.name, t.pinned, rel.Tag, status)
+		if newer(latest, tag) {
+			latest, what = tag, "tag without a release"
+		}
+		status := "current"
+		if newer(t.pinned, latest) {
+			status, stale = "**NEWER STABLE "+strings.ToUpper(what)+"**", true
+			fmt.Fprintf(w, "::error::%s: pinned %s, newest stable %s %s\n", t.name, t.pinned, what, latest)
+			api.findings = append(api.findings, finding{component: t.name, text: "newer stable " + what + " " + latest + " than pinned " + t.pinned})
+		}
+		fmt.Fprintf(w, "| %s | %s | %s | %s |\n", t.name, t.pinned, latest, status)
 	}
 	names := make([]string, 0, len(p.Grammars))
 	for n := range p.Grammars {
@@ -274,6 +289,12 @@ func health(api *githubAPI, w io.Writer, s source) (failed bool) {
 				api.warn(w, s.name, "newer stable release "+release.Tag+" than pin", fmt.Sprintf("newer stable release %s than pin %.12s", release.Tag, s.pin))
 			}
 		}
+	}
+	if headOK && s.grammar {
+		pinBehind(api, w, base, s, repo.Branch, head.SHA, &health)
+	}
+	if s.grammar && isOwner(s.repo) {
+		tagOnlyRelease(api, w, base, s, release.Tag, &health, &failed)
 	}
 	if headOK {
 		where, err := pinReachability(api, base, s.pin, repo.Branch, head.SHA, release.Tag)

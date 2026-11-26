@@ -10,4 +10,6 @@ require (
 	github.com/wotjr1649/go-treesitter/tools/compare/harness v0.0.0
 )
 
+require github.com/tetratelabs/wazero v1.8.2 // indirect
+
 replace github.com/wotjr1649/go-treesitter/tools/compare/harness => ../../harness

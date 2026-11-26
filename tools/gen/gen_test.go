@@ -144,12 +144,12 @@ func TestGoModModes(t *testing.T) {
 	if strings.Contains(rel, "replace") || strings.Contains(rel, "v0.0.0") {
 		t.Fatal("release go.mod must have neither replace nor the placeholder version")
 	}
-	for _, ok := range []string{"v0.1.0", "v1.22.333", "v0.1.0-rc.1"} {
+	for _, ok := range []string{"v0.1.0", "v1.22.333", "v0.1.0-rc.1", "v1.0.0-rc.10", "v1.0.0-0a.b-c.1"} {
 		if !rootVersionRx.MatchString(ok) {
 			t.Errorf("%s rejected", ok)
 		}
 	}
-	for _, bad := range []string{"", "0.1.0", "v0.1", "v0.1.0 ", "v0.1.0\nreplace x => y", "latest", "v0.0.0+incompatible"} {
+	for _, bad := range []string{"", "0.1.0", "v0.1", "v0.1.0 ", "v0.1.0\nreplace x => y", "latest", "v0.0.0+incompatible", "v01.0.0", "v1.0.0-", "v1.0.0-.", "v1.0.0--.", "v1.0.0-rc..1", "v1.0.0-rc.1.", "v1.0.0-rc.01", "v1.0.0-rc.1+meta"} {
 		if rootVersionRx.MatchString(bad) {
 			t.Errorf("%q accepted", bad)
 		}
