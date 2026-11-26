@@ -4,9 +4,12 @@
 Every PR-required workflow starts with a cheap "changes" job that runs this script and feeds its outputs to job-level
 "if" conditions (a job skipped by "if" counts as passing for a required check; a workflow-level paths filter would leave
 the check pending forever) and, for engine.yml and conformance.yml, to dynamic matrices. A gate job per workflow then
-fails when "changes" or any needed job failed or was cancelled.
+fails when "changes" or any needed job failed or was cancelled, or when a job the "expect" output lists did not succeed.
 
     ci_changes.py --workflow engine|regen|conformance|windows|api-guard|pin-move [--files FILE]
+
+The workflow runs the copy of this script from the pull request's base commit (git show HEAD^1:tools/lane/ci_changes.py), so a pull
+request that edits it is classified by the old rules and hits the "lib" rule; a base without the script runs everything.
 
 Changed files come from "git diff --name-only --no-renames HEAD^1 HEAD" on the pull request's merge commit (the default
 checkout of a pull_request event; fetch-depth 2), or from --files ("-" is stdin; tests). Anything unknown, an empty or
@@ -109,6 +112,27 @@ WORKFLOW_OF = {
 }
 
 
+# Every job whose job-level "if" reads needs.changes.outputs: the output keys that must all be "true" for it to run. The gate fails when
+# a job listed in "expect" did not succeed, which catches a misspelled output name (it evaluates to '' and skips the job silently).
+# test_ci_changes.py compares this table with the "if" of every job in the workflows.
+JOB_IF = {
+    "engine": {
+        "engine-linux-amd64": ["engine_core"], "engine-linux-arm64": ["engine_platforms", "full"],
+        "engine-macos-arm64": ["engine_platforms", "full"], "engine-windows-amd64": ["engine_platforms"],
+        "engine-windows-arm64": ["engine_platforms", "full"], "engine-go126": ["engine_floor"],
+        "engine-consumer-compat": ["engine_compat"], "grammar-linux-amd64": ["engine_grammars"],
+        "grammar-linux-arm64": ["engine_grammars", "full"], "grammar-macos-arm64": ["engine_grammars", "full"],
+        "grammar-windows-amd64": ["engine_grammars"], "grammar-windows-arm64": ["engine_grammars", "full"],
+        "grammar-go126": ["engine_floor"],
+    },
+    "regen": {"regen-grammar": ["regen"]},
+    "conformance": {},
+    "windows": {"product": ["windows_product"], "licenses": ["windows_licenses"], "race": ["windows_race"]},
+    "api-guard": {"api-guard": ["api_guard"]},
+    "pin-move": {"pin-move": ["pin_move"]},
+}
+
+
 def partition_ok(root):
     present = sorted(p.name for p in (Path(root) / "grammars").iterdir() if p.is_dir())
     for name, table in (("engine shards", [s["grammars"] for s in ENGINE_SHARDS]),
@@ -135,6 +159,7 @@ def decide(workflow, files, event, root=None):
         out["engine_shards"] = json.dumps({"include": ENGINE_SHARDS}, separators=(",", ":"))
         floor = ENGINE_SHARDS if out["full"] == "true" else ENGINE_SHARDS[:1]
         out["floor_shards"] = json.dumps({"include": floor}, separators=(",", ":"))
+    out["expect"] = json.dumps([j for j, keys in JOB_IF[workflow].items() if all(out[k] == "true" for k in keys)], separators=(",", ":"))
     if workflow == "conformance":
         groups = CONFORMANCE_GROUPS if out["conformance_full"] == "true" else CONFORMANCE_GROUPS[:1]
         runners = RUNNERS if out["conformance_full"] == "true" else RUNNERS[:1]

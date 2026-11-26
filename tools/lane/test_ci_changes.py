@@ -145,8 +145,20 @@ class RepoTest(unittest.TestCase):
 
 # The gate step shared by every PR-required workflow. It must appear verbatim in each of them (windows.yml is JSON, the others YAML;
 # the command has no double quote or backslash, so it is the same text in both).
+# A job the classifier expects (changes.outputs.expect, a JSON list of job ids) must have succeeded: a skip there is a wiring error.
 GATE_CMD = "jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped " \
-           "'all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok' <<<$NEEDS"
+           "'. as $n | all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok " \
+           "and all(.changes.outputs.expect | fromjson[]; $n[.].result == $ok)' <<<$NEEDS"
+# The classify step of every changes job: the lane tests first, then the classifier of the base commit (a pull request that edits the
+# classifier is judged by the old one and hits its "lib" rule; a base without it runs everything). Same text in each, apart from the workflow.
+CHANGES_CMD = """python3 -m unittest discover -s tools/lane -p test_ci_changes.py
+cc=tools/lane/ci_changes.py ev=$GITHUB_EVENT_NAME
+if [ $ev = pull_request ]; then git show HEAD^1:$cc > $RUNNER_TEMP/base_ci_changes.py 2>/dev/null && cc=$RUNNER_TEMP/base_ci_changes.py || ev=workflow_dispatch; fi
+python3 $cc --workflow %s --event $ev"""
+
+
+def norm(s):  # YAML block scalar or JSON string with \n escapes -> one whitespace-collapsed line
+    return " ".join(s.replace("\\n", "\n").split())
 GATE_WORKFLOWS = {"engine": "engine-gate", "regen": "regen-gate", "conformance": "conformance-gate", "windows": "windows-gate",
                   "api-guard": "api-guard-gate", "pin-move": "pin-move-gate"}
 
@@ -163,6 +175,18 @@ def job_ids(wf):
     return re.findall(r"^  ([A-Za-z0-9_-]+):\s*$", body, flags=re.M)
 
 
+def job_conditions(wf):
+    """{job id: output keys its job-level "if" requires to be 'true'} for the jobs that have such a condition."""
+    text = workflow_text(wf)
+    if wf == "windows":
+        conds = {j: job.get("if", "") for j, job in json.loads(text)["jobs"].items()}
+    else:
+        parts = re.split(r"^  ([A-Za-z0-9_-]+):\s*$", text[text.index("\njobs:\n"):], flags=re.M)
+        conds = {parts[i]: (re.search(r"^ {4}if: (.*)$", parts[i + 1], flags=re.M) or [None, ""])[1] for i in range(1, len(parts), 2)}
+    found = {j: set(re.findall(r"needs\.changes\.outputs\.([A-Za-z_]+) == 'true'", c)) for j, c in conds.items()}
+    return {j: keys for j, keys in found.items() if keys}
+
+
 class WiringTest(unittest.TestCase):
     """A misspelled output name would evaluate to '' and skip a job silently, and the gate would stay green."""
 
@@ -174,6 +198,7 @@ class WiringTest(unittest.TestCase):
             exported = set(re.findall(r"steps\.classify\.outputs\.([A-Za-z_]+)", text))
             self.assertLessEqual(used, produced, wf)
             self.assertLessEqual(exported, produced, wf)
+            self.assertIn("expect", exported, wf)  # the gate reads it
             # conformance_full only shapes conformance_matrix (matrix.group.name), no job reads it.
             flags = {k for k in produced if (k in cc.NEEDS and k != "conformance_full") or k in ("engine_shards", "floor_shards", "conformance_matrix")}
             self.assertLessEqual(flags, used, "%s: produced but never used: %s" % (wf, flags - used))
@@ -197,7 +222,25 @@ class WiringTest(unittest.TestCase):
             self.assertEqual(needs, set(ids) - {gate}, wf)
 
 
+    def test_expect_table_matches_the_job_conditions(self):
+        for wf in cc.WORKFLOWS:
+            self.assertEqual({j: set(k) for j, k in cc.JOB_IF[wf].items()}, job_conditions(wf), wf)
+            self.assertLessEqual(set(cc.JOB_IF[wf]), set(job_ids(wf)), wf)
+
+    def test_expect_lists_the_jobs_that_must_run(self):
+        self.assertEqual(json.loads(flags("engine", ["README.md"])["expect"]), ["engine-linux-amd64"])
+        self.assertEqual(json.loads(flags("regen", ["README.md"])["expect"]), [])
+        self.assertEqual(json.loads(flags("engine", ["query.go"])["expect"]),
+                         [j for j in cc.JOB_IF["engine"] if "full" not in cc.JOB_IF["engine"][j]])
+        self.assertEqual(json.loads(flags("engine", ["README.md"], "push")["expect"]), list(cc.JOB_IF["engine"]))
+        self.assertEqual(json.loads(flags("windows", None)["expect"]), ["product", "licenses", "race"])
+
+
 class GateTest(unittest.TestCase):
+    def test_every_changes_job_runs_the_lane_tests_and_the_base_classifier(self):
+        for wf in GATE_WORKFLOWS:
+            self.assertIn(norm(CHANGES_CMD % wf), norm(workflow_text(wf)), wf)
+
     def test_every_required_workflow_has_the_gate_and_a_changes_job(self):
         for wf, gate in GATE_WORKFLOWS.items():
             text = (ROOT / ".github" / "workflows" / (wf + ".yml")).read_text(encoding="utf-8")
@@ -206,12 +249,15 @@ class GateTest(unittest.TestCase):
             self.assertIn("--workflow %s" % wf, text, wf)
             self.assertEqual(text.count(GATE_CMD), 1, wf)
 
-    def run_cmd(self, cmd, needs):
+    def run_cmd(self, cmd, needs, expect="[]"):
         import shutil
         bash, jq = shutil.which("bash"), shutil.which("jq")
         if not bash or not jq:
+            if sys.platform.startswith("linux"):  # the gate runs on ubuntu: a runner without them must not pass silently
+                self.fail("bash and jq are needed to run the gate step")
             self.skipTest("bash and jq are needed to run the gate step")
-        env = dict(os.environ, NEEDS=json.dumps({k: {"result": v, "outputs": {}} for k, v in needs.items()}))
+        outputs = {} if expect is None else {"expect": expect}
+        env = dict(os.environ, NEEDS=json.dumps({k: {"result": v, "outputs": outputs if k == "changes" else {}} for k, v in needs.items()}))
         return subprocess.run([bash, "-c", cmd], env=env, capture_output=True, text=True).returncode
 
     def test_gate_logic(self):
@@ -229,6 +275,21 @@ class GateTest(unittest.TestCase):
         ]
         for needs, want in cases:
             self.assertEqual(self.run_cmd(GATE_CMD, needs), want, needs)
+
+    def test_gate_expect(self):
+        ok = {"changes": "success", "a": "success", "b": "skipped"}
+        cases = [
+            (ok, '["a"]', 0),
+            (ok, '["a","b"]', 1),  # b was expected to run but was skipped: a misspelled condition
+            (dict(ok, a="skipped"), '["a"]', 1),
+            (dict(ok, a="failure"), '["a"]', 1),
+            (ok, '["a","gone"]', 1),  # an expected job that is not in needs
+            (ok, "[]", 0),
+            (ok, "", 1),  # classifier output missing or empty
+            (ok, None, 1),
+        ]
+        for needs, expect, want in cases:
+            self.assertEqual(self.run_cmd(GATE_CMD, needs, expect) != 0, bool(want), (needs, expect))  # jq exits 5 on bad JSON
 
 
 if __name__ == "__main__":

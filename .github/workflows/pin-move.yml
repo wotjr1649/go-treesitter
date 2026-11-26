@@ -30,6 +30,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       pin_move: ${{ steps.classify.outputs.pin_move }}
+      expect: ${{ steps.classify.outputs.expect }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -38,7 +39,11 @@ jobs:
           fetch-depth: 2
       - id: classify
         name: Classify the changed files (tools/lane/ci_changes.py)
-        run: python3 tools/lane/ci_changes.py --workflow pin-move
+        run: |
+          python3 -m unittest discover -s tools/lane -p test_ci_changes.py
+          cc=tools/lane/ci_changes.py ev=$GITHUB_EVENT_NAME
+          if [ $ev = pull_request ]; then git show HEAD^1:$cc > $RUNNER_TEMP/base_ci_changes.py 2>/dev/null && cc=$RUNNER_TEMP/base_ci_changes.py || ev=workflow_dispatch; fi
+          python3 $cc --workflow pin-move --event $ev
 
   pin-move:
     needs: changes
@@ -167,4 +172,4 @@ jobs:
       - name: Every needed job passed or was skipped on purpose
         env:
           NEEDS: ${{ toJSON(needs) }}
-        run: jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped 'all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok' <<<$NEEDS
+        run: jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped '. as $n | all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok and all(.changes.outputs.expect | fromjson[]; $n[.].result == $ok)' <<<$NEEDS
