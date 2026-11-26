@@ -164,8 +164,10 @@ namedness. With ABI 4 grammar modules it returns that symbol's public ID, in the
 retain the raw ID lookup. A name can have multiple public IDs or be shared by named and anonymous nodes.
 `Index.OfType` yields all nodes with the requested `Kind()`, in preorder.
 
-With an ABI 3 or 4 grammar module, `ChildByFieldName` follows C's `ts_node_child_by_field_id`: an inherited field may
-refer to a descendant inside a visible alias rather than a direct child. The snapshot stores only the exceptions
+With an ABI 3 or 4 grammar module, `ChildByFieldName` follows the `ts_node_child_by_field_id` of the module's pinned
+runtime: the result may be a descendant rather than a direct child (with the v0.27.x runtimes, inside a visible alias),
+and a module on another runtime can resolve such a field differently, so the result is fixed by the grammar module
+version, not the root version. The snapshot stores only the exceptions
 to selecting the first direct child with the matching cursor field. ABI 1/2 snapshots have no exception table and
 retain that direct-child rule, so they can differ from C on alias-inherited fields. `Node.Field()` continues to
 report the cursor field in the visible parent; it does not imply that C field lookup selects that node.

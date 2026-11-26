@@ -57,6 +57,8 @@ The exported Go API signatures are unchanged. Field lookup has these behaviour c
 - **Alias-inherited fields:** with ABI 3 grammar modules (v0.4.0), `ChildByFieldName` can return a descendant inside a
   visible alias rather than a direct child. `ChildrenByFieldName` yields that result first, then other matching direct
   children without duplicates; an explicit null result yields nothing. Only its first result has a C counterpart.
+  Which descendant (or none) a module returns follows the `ts_node_child_by_field_id` of that module's pinned
+  runtime, so a later grammar module release on another runtime can resolve the same field differently.
 - **Older modules:** the root accepts ABI 1, 2 and 3. ABI 1/2 modules have no field-exception table and retain
   direct-child lookup for alias-inherited fields; upgrade the grammar as well as the root to change this behaviour.
   ABI 1 (v0.1.0) still parses but `NewQuery` returns `ErrQueryUnsupported`; ABI 2/3 support queries.

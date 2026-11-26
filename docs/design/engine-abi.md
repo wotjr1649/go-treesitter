@@ -122,13 +122,15 @@ hidden-field summary to a fixed point. A step's field is a single `Option<StrId>
 each field's increasing step indices and matching field-ID order. The runtime binds the reduce production ID
 to the subtree (`parser.c`/`subtree.c`). The invariant needed for empty-map skips and fields absent from a map is
 that every hidden child's field is propagated into its parent's production map as inherited; the source inspection
-supports this for the pinned generator, not every possible upstream-generated `parser.c`. For `plan > 0`, the
+supports this for the pinned generator, not every possible upstream-generated `parser.c`. This filter argument and the
+generator invariant describe the pinned v0.27.2 runtime and CLI; a runtime or CLI move must re-inspect and re-measure them. For `plan > 0`, the
 filter additionally rejects field collisions, decreasing per-field child indices and absent positions at runtime,
 and every hidden child remains in the comparison, including the non-inherited hidden-child case found in the 2026-11-15 independent review of the field-lookup ABI, whose first
 visible descendant is an extra.
 
-`ChildByFieldName` consults this table first, then falls back to the direct-child rule. A C result can lie inside
-a visible alias instead of being a direct child. `ChildrenByFieldName` yields an exception target first, followed
+`ChildByFieldName` consults this table first, then falls back to the direct-child rule. The table records whatever the
+module's pinned runtime returns, so a C result need not be a direct child (with the v0.27.x runtimes it can lie inside
+a visible alias) and the recorded results follow the runtime, not the root. `ChildrenByFieldName` yields an exception target first, followed
 by matching direct children in their original order, omitting a duplicate target; an explicit no-node exception
 yields nothing. Without an exception it yields the matching direct children as before. Both methods return
 nothing on ERROR nodes, unknown field names and the zero `Node`, for all supported ABIs. Cursor fields exported
