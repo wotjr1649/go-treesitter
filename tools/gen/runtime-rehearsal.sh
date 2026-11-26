@@ -34,7 +34,7 @@ if [[ "$REF" =~ ^[0-9a-f]{40}$ ]]; then
   LABEL=${RUNTIME_LABEL:-rehearsal-${REF:0:12}}
 elif [[ "$REF" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]]; then
   # annotated tags list the commit on the peeled line
-  COMMIT=$(git ls-remote "https://github.com/$UPSTREAM" "refs/tags/$REF^{}" "refs/tags/$REF" | awk 'NR == 1 { print $1 }')
+  COMMIT=$(git ls-remote "https://github.com/$UPSTREAM" "refs/tags/$REF^{}" "refs/tags/$REF" | awk '/\^\{\}$/ { peeled = $1 } !/\^\{\}$/ { tag = $1 } END { print peeled ? peeled : tag }')
   LABEL=${RUNTIME_LABEL:-$REF}
 else
   echo "runtime-rehearsal: runtime-ref must be a vX.Y.Z tag or a full commit sha" >&2
