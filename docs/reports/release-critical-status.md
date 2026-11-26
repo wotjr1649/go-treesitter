@@ -16,7 +16,9 @@ The previous board for the `gotreesitter` carrier is in Git history at main `9ad
 - **Root changes since v0.7.0** (verify against `git diff v0.7.0..<C>` at the candidate): parser, pool and tree guards ([#141](https://github.com/wotjr1649/go-treesitter/pull/141)), per-call
   `MatchLimit` ([#145](https://github.com/wotjr1649/go-treesitter/pull/145)), opt-in query budgets, an additive API ([#143](https://github.com/wotjr1649/go-treesitter/pull/143), [ADR-0030](../design/decisions/ADR-0030-query-budgets.md)),
   the snapshot `childCount` column removed ([#152](https://github.com/wotjr1649/go-treesitter/pull/152)), `ChildByFieldName` wording tied to the module's pinned runtime ([#153](https://github.com/wotjr1649/go-treesitter/pull/153)), and
-  single-copy initial engine memory in `internal/engine` ([#154](https://github.com/wotjr1649/go-treesitter/pull/154)). `<ROOT-CHANGE-REVIEW>`
+  single-copy initial engine memory ([#154](https://github.com/wotjr1649/go-treesitter/pull/154)), engine live-state cleanup on address
+  reuse ([#166](https://github.com/wotjr1649/go-treesitter/pull/166)), and `ErrQueryMatchLimit` matching `ErrResourceLimit`
+  ([#168](https://github.com/wotjr1649/go-treesitter/pull/168)). `<ROOT-CHANGE-REVIEW>`
 - **Release policy (ADR-0028, [publication.md](../specs/publication.md#multi-module-release)).** The candidate `C` is a single main commit
   (`<C>`), frozen after the declaration (`<DECLARATION-PR-URL>`, SHA-256 `<DECLARATION-SHA256>`). The owner set no fixed date for `C`.
   The release commit `<r-commit>` has `C` as an ancestor and differs from it only in these paths: `MIGRATING.md`, `README.md`,
@@ -30,16 +32,18 @@ The previous board for the `gotreesitter` carrier is in Git history at main `9ad
 
 Candidate: `<C>` (main after the merges listed above). Every hosted run below reports `<C>` as its head SHA. The pins SHA-256 is
 `<PINS-SHA256>`; the candidate uses tree-sitter runtime and CLI 0.27.2, recipe `v2-O3` and engine ABI 4. Product results use
-`CGO_ENABLED=0`. The declared gate runs are listed with their counts. A push-run gate counts as passed only when its `*-gate` job (`windows-gate`, `regen-gate`,
-`conformance-gate`, `engine-gate`, `api-guard-gate`, `pin-move-gate`) succeeded, the job list equals the one in the declaration and no job was skipped:
-a reduced pull-request matrix is not a pass. A failed or unstarted gate keeps its first result, is never repeated
-until it passes, and is classified as the declaration says (`<RESULT>`: all gates `<N>` of `<N>` passed, or the failures named below).
+`CGO_ENABLED=0`. The declared gate runs are listed with their counts. The six CI gates use the first-attempt push runs on C.
+If a push run was superseded or main moved past C, the declaration records a full dispatch at C for the missing workflow
+([validation contract](../specs/validation.md#main-push-runs)). Each CI gate counts as passed only when its `*-gate` job
+(`windows-gate`, `regen-gate`, `conformance-gate`, `engine-gate`, `api-guard-gate`, `pin-move-gate`) succeeded, the job list equals
+the one in the declaration and no job was skipped. Failed or unstarted runs keep their first results. The declaration classifies
+them and records the outcome (`<RESULT>`: all gates `<N>` of `<N>` passed, or the failures named below).
 
 | Gate | v1.0.0-rc.1 candidate result | Scope |
 |---|---|---|
-| Windows product lane | `<RESULT>`, E3 product (push run): `<N>/<N>` jobs | Native Windows amd64/arm64 product execution (CGO 0) and licence checks; the CGO race job is diagnostic. [<RUN-ID-WINDOWS>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-WINDOWS>) |
+| Windows CI | `<RESULT>`, `<N>/<N>` jobs | Licence checks and the diagnostic CGO race job. Native Windows amd64/arm64 product execution (CGO 0) is in Engine CI. [<RUN-ID-WINDOWS>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-WINDOWS>) |
 | Grammar pin move evidence | `<RESULT>`, `<N>/<N>` push jobs, diff skipped | The push supplies no explicit comparison refs. The CSS value patch and the Python `await` patch have their own old/new evidence in the [schema register](../validation/grammar-schemas.md). [<RUN-ID-PIN-MOVE>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-PIN-MOVE>) |
-| Reproducible generation | `<RESULT>`, E3, attempt `<N>`, `<N>/<N>` jobs | Each of the 25 Linux amd64 grammar shards regenerates its module and compares it with the committed bytes, including the regenerated `css` and `python`. `internal/engine` changed since v0.7.0 ([#154](https://github.com/wotjr1649/go-treesitter/pull/154)), so this run is where a change in the generated module bytes would show. [<RUN-ID-REGEN>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-REGEN>) |
+| Reproducible generation | `<RESULT>`, E3, attempt `<N>`, `<N>/<N>` jobs | Four Linux amd64 groups regenerate all 25 grammar modules and compare them with the committed bytes, including `css` and `python`. [<RUN-ID-REGEN>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-REGEN>) |
 | Conformance | `<RESULT>`, E5, `<N>/<N>` jobs | Five grammar groups on each Linux architecture (amd64 and arm64) and one aggregate per architecture: native dumps, seeded edits and ranges, raw query matches, strict fresh/edited fields, symbol lookups and retained known gaps. The group filters select and run their tests (`<RESULT>`). [<RUN-ID-CONFORMANCE>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-CONFORMANCE>) |
 | Engine CI | `<RESULT>`, E3, `<N>/<N>` jobs | Grammar shard jobs, the engine jobs (native Linux amd64/arm64, macOS arm64, Windows amd64/arm64 on Go 1.27.x, Linux amd64 on the oldest supported Go 1.26.x; their `Engine and root package` step also runs the root `TestAPIInventory`) and `engine-consumer-compat`, which is not the exact-version ZIP rehearsal. [<RUN-ID-ENGINE>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-ENGINE>) |
 | API compatibility | `<RESULT>`, E3 | `api-guard` runs `apidiff` of the root API against `v0.7.0` and the struct-literal check; the first column says whether either reported an incompatible change (the query budgets are additions by design, [ADR-0030](../design/decisions/ADR-0030-query-budgets.md)). `TestAPIInventory` belongs to the engine row. [<RUN-ID-API-GUARD>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-API-GUARD>) |
