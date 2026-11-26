@@ -132,6 +132,7 @@ type fakeModule struct {
 	dcDelta          int32
 	badExportMagic   bool // header is wrong at every export_begin (badMagic: wrong from tsg_init on)
 	nullRanges       bool
+	badRangeCount    bool // changed_ranges reports a count that does not fit the block
 	committed        int64
 	limit            int64
 	refused          bool
@@ -266,6 +267,9 @@ func (f *fakeModule) Xtsg_changed_ranges(old, neu int32) int32 {
 	p := f.Xmalloc(int32(4 + 24*len(f.ranges)))
 	le := binary.LittleEndian
 	le.PutUint32(f.mem()[p:], uint32(len(f.ranges)))
+	if f.badRangeCount {
+		le.PutUint32(f.mem()[p:], 0x00FFFFFF)
+	}
 	for i, r := range f.ranges {
 		for j, v := range []uint32{r.StartByte, r.EndByte, r.StartPoint.Row, r.StartPoint.Column, r.EndPoint.Row, r.EndPoint.Column} {
 			le.PutUint32(f.mem()[int(p)+4+24*i+4*j:], v)

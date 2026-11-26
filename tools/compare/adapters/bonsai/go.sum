@@ -1,0 +1,10 @@
+github.com/msuozzo/bonsai v0.4.1 h1:KPcATUNkbjk46XoKv6/NxZKiIS3GfP3kz+xQ7eYE1zQ=
+github.com/msuozzo/bonsai v0.4.1/go.mod h1:LDo0Dmp6qaeEoJAG83UuLDHtwHn6H1knSYKqoXMxm4M=
+github.com/msuozzo/bonsai/bonsai-c v0.4.1 h1:EPZ3k2HnPTWjrYjsgPUdf7mkYz/cbg7pSHdtda5KMFo=
+github.com/msuozzo/bonsai/bonsai-c v0.4.1/go.mod h1:lC0rmOy3ELjZVpPMsSXls3uSKZVlM0O0VcPlU/qOhNM=
+github.com/msuozzo/bonsai/bonsai-go v0.4.1 h1:rUIIpLpydzsk4XS4Bk6mmGfYl6eCf/auB3WsHjrsNMs=
+github.com/msuozzo/bonsai/bonsai-go v0.4.1/go.mod h1:u8FHfSmlZ6Ulo9pxlpcSW/Q6WDC89o4Wxx/d+ma6lT8=
+github.com/msuozzo/bonsai/bonsai-javascript v0.4.1 h1:IC6UUS0CVEYwHGbuV/6tQuD7Ci1EjzsyGB+bWPIz1iA=
+github.com/msuozzo/bonsai/bonsai-javascript v0.4.1/go.mod h1:fj/7/5TioayRGCS3apOuysrOIgXwrJJtSiBcGNep70k=
+github.com/msuozzo/bonsai/bonsai-python v0.4.1 h1:xYBabMOEeGs4fmxzHHU2NzL680T13MFNDuTH6fNP4og=
+github.com/msuozzo/bonsai/bonsai-python v0.4.1/go.mod h1:E7jypZIPIROw3hA+cqELh3u5a0mJTlTvO2Q06KFSe8k=

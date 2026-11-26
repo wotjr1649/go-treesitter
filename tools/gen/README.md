@@ -94,6 +94,15 @@ python3 tools/gen/pin-move.py --base OLD_COMMIT --head NEW_COMMIT \
 python3 -m unittest discover -s tools/gen -p pin_move_test.py
 ```
 
+A move of any other pin (runtime, CLI, wasi-sdk, wasi-libc, binaryen, wasm2go, shim, memory_grow, abi, recipe; `mirrors` and
+`localBinarySHA256` excepted) has no native comparison. The job fails closed with a "Toolchain move" summary until the PR
+body carries one line `PIN-MOVE-TOOLCHAIN-OK <component>` per moved component (component names are in the summary; code fences and
+comments do not count). That line records that the evidence the job cannot produce is green: the `regen.yml` drift check
+for every grammar, the `engine.yml` module tests, and the component's extra check listed in the summary. The job itself
+verifies that every `grammars/<name>/provenance.json` at the head already carries the new pin values of the moved
+components (a move without regeneration fails). One PR moves one pin; a PR that moves a grammar entry too still runs the
+grammar comparison.
+
 Only changed `grammars` entries in `tools/gen/pins.json` run. `ADDED` entries receive a strict new-schema check;
 `REMOVED` entries are listed. Changed entries receive strict old and new schema checks and a diff with its
 codes/risks, then fresh `tools/native-ref` builds for both pins using the current wasi-libc ctype shims,
@@ -245,7 +254,7 @@ Compare raw format-2 field-exception records with `python tools/gen/check-field-
 ## go.mod forms
 
 - default (development): `require github.com/wotjr1649/go-treesitter v0.0.0` and `replace … => ../..`;
-- `-root-version vX.Y.Z` (release, ADR-0022): `require github.com/wotjr1649/go-treesitter vX.Y.Z`, no `replace`, and a `go.sum` with the root module's two `h1:` lines taken from
+- `-root-version vX.Y.Z` or `vX.Y.Z-prerelease` such as `v1.0.0-rc.1` (release, ADR-0022; no build metadata): `require github.com/wotjr1649/go-treesitter vX.Y.Z`, no `replace`, and a `go.sum` with the root module's two `h1:` lines taken from
   `go mod download -json` through the default GOPROXY/GOSUMDB (generation fails if they are unavailable). The development
   form writes no `go.sum` and removes a stale one. `go.mod` and `go.sum` are not listed in `provenance.json`.
 

@@ -611,10 +611,10 @@ func TestQueryPredicateCaptureLists(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			q := &Query{source: "query"}
-			if err := q.readMeta(fakeQueryMeta([]string{tc.op}, [][2]uint32{{2, 0}, {1, 0}, {1, 1}, {0, 0}})); err != nil {
+			if err := q.readMeta(fakeQueryMeta([]string{tc.op}, [][2]uint32{{2, 0}, {1, 0}, {1, 1}, {0, 0}}), nil, nil); err != nil {
 				t.Fatal(err)
 			}
-			if got := q.accepts(QueryMatch{Captures: tc.captures}); got != tc.want {
+			if got := q.accepts(QueryMatch{Captures: tc.captures}, nil); got != tc.want {
 				t.Fatalf("%v want %v", got, tc.want)
 			}
 		})
@@ -684,7 +684,7 @@ func TestQueryCLIPredicateValidation(t *testing.T) {
 			}
 			steps = append(steps, [2]uint32{0, 0})
 			q := &Query{source: strings.Repeat(" ", 100)}
-			err := q.readMeta(fakeQueryMeta(literals, steps))
+			err := q.readMeta(fakeQueryMeta(literals, steps), nil, nil)
 			if (err == nil) != tc.ok {
 				t.Fatalf("%v want accepted=%v", err, tc.ok)
 			}

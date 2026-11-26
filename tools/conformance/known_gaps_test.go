@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"maps"
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"runtime"
 	"slices"
@@ -22,6 +24,7 @@ import (
 //go:generate go test -run ^TestKnownGapDocs$ -args -update-known-gap-docs
 
 var updateKnownGapDocs = flag.Bool("update-known-gap-docs", false, "regenerate docs/known-gaps from the defect register")
+var updateKnownGapProvenance = flag.Bool("update-known-gap-provenance", false, "rewrite the register's ProvenanceSHA256 values from grammars/<lang>/provenance.json (never EvidenceBase or EvidencePlatform)")
 
 const knownGapDir = "testdata/known-gaps"
 
@@ -82,32 +85,82 @@ func loadKnownGaps(t *testing.T) knownGapRegister {
 	return r
 }
 
+type pinsFile struct {
+	Runtime, WasiLibc map[string]any
+	Grammars          map[string]map[string]any
+}
+
+func loadPins(t *testing.T) pinsFile {
+	t.Helper()
+	var pins pinsFile
+	if err := json.Unmarshal(readFile(t, "../gen/pins.json"), &pins); err != nil {
+		t.Fatal(err)
+	}
+	return pins
+}
+
+func runtimePin(t *testing.T) map[string]any { t.Helper(); return loadPins(t).Runtime }
+
+// currentPinIdentity is the source identity of one grammar as the register records it.
+func currentPinIdentity(t *testing.T, lang string) (commit string, patchCount int, pinSHA string) {
+	t.Helper()
+	pins := loadPins(t)
+	pin := pins.Grammars[lang]
+	patches, _ := pin["patches"].([]any)
+	identity, err := json.Marshal([]any{pins.Runtime, pins.WasiLibc, pin})
+	if err != nil {
+		t.Fatal(err)
+	}
+	commit, _ = pin["commit"].(string)
+	return commit, len(patches), sha(identity)
+}
+
+// rewriteKnownGapProvenance replaces each listed grammar's ProvenanceSHA256 in register.json text and nothing else:
+// EvidenceBase and EvidencePlatform record where the native evidence was gathered and move only by decision.
+var sha256Hex = regexp.MustCompile("^[0-9a-f]{64}$")
+
+func rewriteKnownGapProvenance(raw []byte, want map[string]string) ([]byte, error) {
+	out := raw
+	for _, lang := range slices.Sorted(maps.Keys(want)) {
+		if !sha256Hex.MatchString(want[lang]) {
+			return nil, fmt.Errorf("%s: %q is not a sha256", lang, want[lang])
+		}
+		re := regexp.MustCompile(`("` + regexp.QuoteMeta(lang) + `": \{[^{}]*?"ProvenanceSHA256": ")[0-9a-f]{64}(")`)
+		if len(re.FindAllIndex(out, -1)) != 1 {
+			return nil, fmt.Errorf("%s: expected exactly one ProvenanceSHA256 in its Grammars entry", lang)
+		}
+		out = re.ReplaceAll(out, []byte("${1}"+want[lang]+"${2}"))
+	}
+	var before, after knownGapRegister
+	if err := errors.Join(json.Unmarshal(raw, &before), json.Unmarshal(out, &after)); err != nil {
+		return nil, err
+	}
+	for _, r := range []*knownGapRegister{&before, &after} { // everything but the rewritten values must be equal
+		for lang, id := range r.Grammars {
+			id.ProvenanceSHA256 = ""
+			r.Grammars[lang] = id
+		}
+	}
+	if !reflect.DeepEqual(before, after) {
+		return nil, fmt.Errorf("rewrite changed more than ProvenanceSHA256")
+	}
+	return out, nil
+}
+
 // verifyKnownGaps checks source/module identity and fixture hashes of the given grammars only, so an identity move
 // of one grammar fails that grammar's shard and the documents test, not every shard.
 func verifyKnownGaps(t *testing.T, r knownGapRegister, grammars []string) {
 	t.Helper()
-	var pins struct {
-		Runtime, WasiLibc map[string]any
-		Grammars          map[string]map[string]any
-	}
-	if err := json.Unmarshal(readFile(t, "../gen/pins.json"), &pins); err != nil {
-		t.Fatal(err)
-	}
-	if pins.Runtime["release"] != r.Runtime {
+	if runtimePin(t)["release"] != r.Runtime {
 		t.Fatal("known-gap runtime identity drift")
 	}
 	for _, lang := range grammars {
 		id := r.Grammars[lang]
-		pin := pins.Grammars[lang]
-		patches, _ := pin["patches"].([]any)
-		identity, err := json.Marshal([]any{pins.Runtime, pins.WasiLibc, pin})
-		if err != nil {
-			t.Fatal(err)
-		}
+		commit, patchCount, pinSHA := currentPinIdentity(t, lang)
 		provenance := sha(readFile(t, filepath.Join("../../grammars", lang, "provenance.json")))
-		if pin["commit"] != id.Commit || len(patches) != id.PatchCount || sha(identity) != id.PinSHA256 || provenance != id.ProvenanceSHA256 {
-			t.Fatalf("%s: known-gap source/module identity drift (pin sha256 %s, provenance sha256 %s); reproduce every entry on the engine and native C, then update this grammar's register identity",
-				lang, sha(identity), provenance)
+		if commit != id.Commit || patchCount != id.PatchCount || pinSHA != id.PinSHA256 || provenance != id.ProvenanceSHA256 {
+			t.Fatalf("%s: known-gap source/module identity drift (pin sha256 %s, provenance sha256 %s); reproduce every entry on the engine and native C, then update this grammar's register identity (the provenance value alone: go test -run ^TestKnownGapProvenanceUpdate$ -args -update-known-gap-provenance)",
+				lang, pinSHA, provenance)
 		}
 		for _, g := range r.Entries {
 			if g.Grammar == lang && (sha([]byte(g.Input)) != g.InputSHA256 || sha(knownGapDump(t, g)) != g.DumpSHA256) {
@@ -321,6 +374,66 @@ func TestKnownGapFence(t *testing.T) {
 	if got, want := jsonFence("x ``` y"), "````json\n\"x ``` y\"\n````"; got != want {
 		t.Fatalf("got %q, want %q", got, want)
 	}
+}
+
+func TestKnownGapProvenanceRewrite(t *testing.T) {
+	raw := readFile(t, filepath.Join(knownGapDir, "register.json"))
+	r := loadKnownGaps(t)
+	same := map[string]string{}
+	for lang, id := range r.Grammars {
+		same[lang] = id.ProvenanceSHA256
+	}
+	if got, err := rewriteKnownGapProvenance(raw, same); err != nil || !bytes.Equal(got, raw) {
+		t.Fatalf("rewriting a register with its own values must be a no-op: %v", err)
+	}
+	fresh := strings.Repeat("ab", 32)
+	changed, err := rewriteKnownGapProvenance(raw, map[string]string{"swift": fresh})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var after knownGapRegister
+	if err := json.Unmarshal(changed, &after); err != nil {
+		t.Fatal(err)
+	}
+	if after.Grammars["swift"].ProvenanceSHA256 != fresh || after.Grammars["python"] != r.Grammars["python"] ||
+		after.EvidenceBase != r.EvidenceBase || after.EvidencePlatform != r.EvidencePlatform {
+		t.Fatal("rewrite touched more than the requested provenance")
+	}
+	for name, want := range map[string]map[string]string{"unknown grammar": {"nope": fresh}, "not a sha256": {"swift": "xyz"}} {
+		if _, err := rewriteKnownGapProvenance(raw, want); err == nil {
+			t.Errorf("%s: want an error", name)
+		}
+	}
+}
+
+// TestKnownGapProvenanceUpdate is the -update-known-gap-provenance tool. It runs only with the flag, rewrites
+// register.json for the grammars whose source identity (commit, patches, pins hash) still matches, and refuses any other
+// drift: a grammar pin move needs the evidence reproduced by hand. It does not reproduce anything itself, so run the
+// engine and native E5 checks afterwards (TSG_NATIVE_EXE_DIR, TSG_REQUIRE_FIELD_LOOKUP=1), then go generate.
+func TestKnownGapProvenanceUpdate(t *testing.T) {
+	if !*updateKnownGapProvenance {
+		t.Skip("set -update-known-gap-provenance to rewrite the register's provenance hashes")
+	}
+	r := loadKnownGaps(t)
+	if runtimePin(t)["release"] != r.Runtime {
+		t.Fatal("known-gap runtime identity drift: not a provenance-only change")
+	}
+	want := map[string]string{}
+	for lang, id := range r.Grammars {
+		if commit, patchCount, pinSHA := currentPinIdentity(t, lang); commit != id.Commit || patchCount != id.PatchCount || pinSHA != id.PinSHA256 {
+			t.Fatalf("%s: source identity drift (pin sha256 %s); not a provenance-only change", lang, pinSHA)
+		}
+		want[lang] = sha(readFile(t, filepath.Join("../../grammars", lang, "provenance.json")))
+	}
+	path := filepath.Join(knownGapDir, "register.json")
+	out, err := rewriteKnownGapProvenance(readFile(t, path), want)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, out, 0644); err != nil {
+		t.Fatal(err)
+	}
+	t.Log("register provenance updated; EvidenceBase and EvidencePlatform are unchanged. Next: native E5 for these grammars, then go generate")
 }
 
 func TestKnownGapDocs(t *testing.T) {
