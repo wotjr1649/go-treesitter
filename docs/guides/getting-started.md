@@ -183,7 +183,7 @@ for m, err := range tree.Matches(ctx, q, nil) {
 ```
 
 `QueryOptions` restricts the byte range or the match-state limit. Two costs to know: the first `Matches` call on a
-tree indexes the whole tree, and the parser stays busy until you finish (or break out of) the iteration. Text
+tree (or after a lower `MatchLimit` replaces the cursor) indexes the whole tree, and the parser stays busy until you finish (or break out of) the iteration. Text
 predicates use a regex subset; `#any-*` predicates are validated but do not filter. See [query-abi.md](../design/query-abi.md)
 and [limitations](../reports/limitations.md) row 5. Queries need a grammar module of engine ABI 2 or later.
 
@@ -246,6 +246,10 @@ Options bound the cost of untrusted input. A value of 0 means no explicit limit 
 
 Every parse takes a `context.Context`; a deadline or cancellation ends the parse between parser steps with
 `Timeout` or `Cancelled`, and the parser stays usable afterwards.
+
+Query cost has its own opt-in caps: `NewQueryWithOptions` and `Tree.MatchesWithOptions` take Go-side limits on query source,
+scratch memory, regex work, captures, results and predicate work, and report `ResourceLimit` when one is exhausted. See
+[query-abi.md](../design/query-abi.md#opt-in-go-budgets).
 
 <!-- snippet:limits -->
 ```go

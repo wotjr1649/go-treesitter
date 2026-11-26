@@ -77,6 +77,9 @@ UTF-8 source is not converted and both return the offset unchanged (clamped). Se
 - A `Parser` and its `Tree`s are one confinement unit: use them from one goroutine at a time. Operations that need
   the parser's busy guard, including cached `Tree.Snapshot`, reject overlapping operations with `ErrInvalidInput`
   when the guard is held. `Tree.Close` marks the tree closed once and queues its handle if the guard is held.
+  Closing a tree from another goroutine counts as use under this rule: if `Close` takes the guard while the owning
+  goroutine calls `Parse`, that `Parse` can fail with `ErrInvalidInput` ("parser is in use by another goroutine");
+  there is no data race, and the call can be repeated.
 - `Tree.Matches` applies `QueryOptions.MatchLimit` to in-progress states on each call and reports
   `ErrQueryMatchLimit` on overflow. See the [query contract](../design/query-abi.md) for cursor and memory lifetimes.
 - `Close`, `Reset`, an instance reset and `ParserPool.Put` invalidate the parser's live trees (`ErrTreeInvalidated`).

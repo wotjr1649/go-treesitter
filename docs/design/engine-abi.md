@@ -205,6 +205,7 @@ func Refused(mem *[]byte) bool                       // a grow was refused since
 func ClearRefused(mem *[]byte)
 func Committed(mem *[]byte) int64                    // for WithRecycleAboveBytes
 func Release(mem *[]byte)                            // return the region to the OS; idempotent
+type Segment struct{ Dest int; Data string }          // one active data segment: Data goes to byte offset Dest of the initial memory
 func InitMemory(mem *[]byte, size int, segs ...Segment) // records an initial memory (no copy); for a generated New that calls it
 func StartMemory(mem *[]byte)                        // creates the region and writes the segments once; first statement of X_initialize
 func Call(fn func()) error                           // runs fn; a trap (any panic from generated code) becomes *Trap
@@ -217,7 +218,8 @@ recorded in the generator; mismatch = generation failure). `InitMemory`/`StartMe
 generator step that copies the data segments once, straight into the reserved region (after `SetLimit`, with no
 initial-size Go-heap slice); no generated module calls them yet, and `MemoryGrow` keeps its Go-heap-slice path, so modules
 generated before this API still work unchanged. `StartMemory` does nothing when no `InitMemory` is pending; an initial
-size above the limit traps with `Refused` set (a refused grow).
+size above the limit traps with `Refused` set (a refused grow), as does a refused reservation; a `Segment` outside the
+initial memory traps without it.
 
 Instance sequence (the `treesitter` package): `m := g.New(h)` → `SetLimit(m.Xmemory().Slice(), limit)` →
 `engine.Call(m.X_initialize)` → `Xtsg_abi_version() == g.ABI` (accepted: 1–4) → `Xtsg_init() == 0` → export header magic/format (format 1 for ABI 1/2, format 2 for ABI 3/4); any failure =
