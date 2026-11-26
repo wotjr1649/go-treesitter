@@ -1,0 +1,63 @@
+name: Published module consumers
+
+on:
+  workflow_dispatch:
+    inputs:
+      root_version:
+        description: Published root version for the root-only and mixed consumers
+        type: string
+        default: v0.7.0
+      combination:
+        description: Release profile in tools/lane/published-consumers
+        type: string
+        default: v0.7.0
+
+permissions:
+  contents: read
+
+jobs:
+  published-consumers:
+    name: Published consumers (${{ matrix.platform }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {runner: ubuntu-24.04, platform: linux/amd64}
+          - {runner: ubuntu-24.04-arm, platform: linux/arm64}
+          - {runner: macos-latest, platform: darwin/arm64}
+          - {runner: windows-latest, platform: windows/amd64}
+          - {runner: windows-11-arm, platform: windows/arm64}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7
+        with:
+          go-version: 1.27.x
+          cache: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
+      - name: Build and run published consumers
+        shell: bash
+        env:
+          ROOT_VERSION: ${{ inputs.root_version }}
+          COMBINATION: ${{ inputs.combination }}
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          out="$RUNNER_TEMP/published-consumers"
+          rc=0
+          python -B tools/lane/published_consumers.py "$out" --root "$ROOT_VERSION" --combination "$COMBINATION" \
+            --platform "$PLATFORM" || rc=$?
+          if [ -f "$out/summary.md" ]; then
+            cat "$out/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit "$rc"
+      - name: Consumer evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: published-consumers-${{ matrix.runner }}
+          path: ${{ runner.temp }}/published-consumers/
