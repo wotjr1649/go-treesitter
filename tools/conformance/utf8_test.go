@@ -11,14 +11,27 @@ import (
 	proc "github.com/wotjr1649/go-treesitter/tools/bench/proc"
 )
 
-// nativeDump runs the native reference dumper (native/exe2/<lang>.exe dump <file>).
-func nativeDump(t *testing.T, root, lang string, src []byte) []byte {
+// utf8NativeExe finds the native reference dumper: TSG_NATIVE_EXE_DIR (the native-ref -out directory, as every other native
+// test) or else the local session-15 tree's native/exe2/<lang>.exe; "" when neither has it.
+func utf8NativeExe(root, lang string) string {
+	if exe, ok := nativeExe(lang); ok {
+		return exe
+	}
+	exe := filepath.Join(root, "native", "exe2", lang+".exe")
+	if _, err := os.Stat(exe); err == nil {
+		return exe
+	}
+	return ""
+}
+
+// nativeDump runs the native reference dumper `<exe> dump <file>`.
+func nativeDump(t *testing.T, exe string, src []byte) []byte {
 	t.Helper()
 	f := filepath.Join(t.TempDir(), "in.bin")
 	if err := os.WriteFile(f, src, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	out, err := proc.Command(filepath.Join(root, "native", "exe2", lang+".exe"), "dump", f).Output()
+	out, err := proc.Command(exe, "dump", f).Output()
 	if err != nil {
 		t.Fatalf("native dump of a %d-byte input: %v", len(src), err)
 	}
@@ -41,6 +54,10 @@ func TestInvalidUTF8VsNative(t *testing.T) {
 	}
 	for _, lang := range langs(t) {
 		t.Run(lang, func(t *testing.T) {
+			exe := utf8NativeExe(root, lang)
+			if exe == "" {
+				skipConformance(t, "no native executable for "+lang+" (TSG_NATIVE_EXE_DIR or <data>/native/exe2)")
+			}
 			base, _ := smallReference(t, root, lang)
 			p := newParser(t, lang)
 			strict := newParser(t, lang, treesitter.WithStrictUTF8())
@@ -78,7 +95,7 @@ func TestInvalidUTF8VsNative(t *testing.T) {
 						tree.Close()
 						continue
 					}
-					got, want := Dump(snap), nativeDump(t, root, lang, src)
+					got, want := Dump(snap), nativeDump(t, exe, src)
 					if string(got) != string(want) {
 						mism++
 						t.Errorf("%s: dump differs from native C: %s", id, firstDiff(got, want))
@@ -99,5 +116,44 @@ func TestInvalidUTF8VsNative(t *testing.T) {
 			}
 			summary(t, map[string]any{"lang": lang, "inputs": run, "mismatches": mism, "flagDisagreements": flagDiff})
 		})
+	}
+}
+
+func TestUTF8NativeExe(t *testing.T) {
+	root, exeDir := t.TempDir(), t.TempDir()
+	touch := func(p string) {
+		t.Helper()
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, nil, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	t.Setenv("TSG_NATIVE_EXE_DIR", "")
+	if got := utf8NativeExe(root, "json"); got != "" {
+		t.Fatalf("nothing available: got %q", got)
+	}
+	legacy := filepath.Join(root, "native", "exe2", "json.exe")
+	touch(legacy)
+	if got := utf8NativeExe(root, "json"); got != legacy {
+		t.Fatalf("legacy layout: got %q want %q", got, legacy)
+	}
+	t.Setenv("TSG_NATIVE_EXE_DIR", exeDir)
+	want, _ := nativeExe("json") // the path, whether or not the file exists yet
+	touch(want)
+	if got := utf8NativeExe(root, "json"); got != want {
+		t.Fatalf("TSG_NATIVE_EXE_DIR wins: got %q want %q", got, want)
+	}
+}
+
+func TestRequiredName(t *testing.T) {
+	for name, want := range map[string]bool{
+		"TestSnapshotPointsNative": true, "TestSnapshotPointsNative/json": true, "TestInvalidUTF8VsNative/go": true,
+		"TestQuerySmoke/c": true, "TestFieldLookupEdits/python": true, "TestQuerySmokeX": false, "TestCorpus/json": false,
+	} {
+		if requiredName(name) != want {
+			t.Errorf("requiredName(%q) != %v", name, want)
+		}
 	}
 }

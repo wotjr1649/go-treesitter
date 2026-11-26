@@ -22,10 +22,16 @@ import (
 
 var bg = context.Background()
 
+// requiredTests are the tests whose missing prerequisites fail instead of skipping when TSG_REQUIRE_FIELD_LOOKUP=1
+// (CI); locally they skip. conformance.yml runs all of them with the variable set.
+var requiredTests = []string{"TestFieldLookup", "TestFieldLookupEdits", "TestSnapshotPointsNative", "TestInvalidUTF8VsNative", "TestQuerySmoke"}
+
+func requiredName(name string) bool {
+	return slices.ContainsFunc(requiredTests, func(r string) bool { return name == r || strings.HasPrefix(name, r+"/") })
+}
+
 func requireFieldLookup(t *testing.T) bool {
-	return os.Getenv("TSG_REQUIRE_FIELD_LOOKUP") == "1" &&
-		(t.Name() == "TestFieldLookup" || strings.HasPrefix(t.Name(), "TestFieldLookup/") ||
-			t.Name() == "TestFieldLookupEdits" || strings.HasPrefix(t.Name(), "TestFieldLookupEdits/"))
+	return os.Getenv("TSG_REQUIRE_FIELD_LOOKUP") == "1" && requiredName(t.Name())
 }
 
 func skipConformance(t *testing.T, reason string) {

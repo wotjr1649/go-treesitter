@@ -237,6 +237,9 @@ func TestCancelDuringSnapshot(t *testing.T) {
 	for _, lang := range langs(t) {
 		t.Run(lang, func(t *testing.T) {
 			files := largeFiles(t, root, lang)
+			if len(files) == 0 { // ciconf data has no large/ inputs (only the local session-15 tree does)
+				skipConformance(t, "no large inputs for "+lang+" under "+filepath.Join(root, "large"))
+			}
 			file := files[len(files)-1] // the biggest one
 			big := readFile(t, file)
 			p := newParser(t, lang)
