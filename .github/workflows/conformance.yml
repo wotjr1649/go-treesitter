@@ -139,13 +139,13 @@ jobs:
           TSG_QUERY_DIR: ${{ runner.temp }}/queries
           TSG_QUERY_PROBE_STRIDE: "1"
         run: go test -count=1 -timeout 40m -v -run 'TestStripPredicates|TestQueryNative|TestQueryCLIInvalidUTF8Output' .
-      # The fuzz targets need no data: this runs their seed corpora once (no fuzzing).
+      # Run fuzz seed corpora once without fuzzing. Go examples build in g2 (!no_go).
       - name: Fuzz seed corpora
         if: ${{ !cancelled() }}
         working-directory: tools/conformance
         env:
           CGO_ENABLED: "0"
-        run: go test -count=1 -timeout 1800s -run Fuzz .
+        run: go test -count=1 -timeout 1800s -run 'Fuzz|^Example' .
       - name: Check reviewed native scanner patch differences (ADR-0023)
         if: ${{ !cancelled() && steps.native-inputs.outcome == 'success' }}
         working-directory: tools/native-ref
