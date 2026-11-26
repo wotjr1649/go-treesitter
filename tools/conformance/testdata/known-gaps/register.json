@@ -8,28 +8,28 @@
       "Name": "Python",
       "Commit": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64",
       "PinSHA256": "8fb2d425ba28d52f392ecc16852ccb8d71075d48455b39be5dc2b3bdfbcdf1c2",
-      "ProvenanceSHA256": "be4a924f1af1217319b3139723df00a25accb334d2af92814b5e6adc47a2e640",
+      "ProvenanceSHA256": "f4f4349e4ab01d6cd36d790223299ccbe53694c337a938543c0463cb8b93e423",
       "PatchCount": 2
     },
     "csharp": {
       "Name": "C#",
       "Commit": "d4bbe18103c3380c6454085e589d2610938da142",
       "PinSHA256": "00d265b8a944364d2891b3b38c99498c04b857ce79304e4ed5bd613cdc4d1a27",
-      "ProvenanceSHA256": "d3aece8a0ae235e60b8435d0f7ec825074dd72f5f67f9c9edc821bb416eb8905",
+      "ProvenanceSHA256": "2e7b1760f5a498e00af4317d6a38615fa4055a09c60eff38043089032014ba11",
       "PatchCount": 0
     },
     "html": {
       "Name": "HTML",
       "Commit": "73a3947324f6efddf9e17c0ea58d454843590cc0",
       "PinSHA256": "ff08eeb173be1f3df2ba3c4d3d831556de49cfaa77059d8823a91a97bbc860f0",
-      "ProvenanceSHA256": "73c2914d5605bf0c7a537c440136ea752face8aa1f98daab1391235b061fddb7",
+      "ProvenanceSHA256": "09b9f8e808e8ae35d7a0254017ab2694b303108ce55e3f649f957039b33ecf2e",
       "PatchCount": 2
     },
     "swift": {
       "Name": "Swift",
       "Commit": "fef1236022ccde2d2bc5c32d4db8947c87a7f848",
       "PinSHA256": "9b2bbb6f6acb4150147c21ccd2ddb2e38a4c24aaa189432f0ce1442b6ec2731f",
-      "ProvenanceSHA256": "7bbd1af7cf6ff5a8df77af34dc94e6133620939eaea27b2e9e8ead6040dc66cb",
+      "ProvenanceSHA256": "b145c841cd9af3d53ce6a2dba8d87ef8c86801a82b244755402d41c9f4f55c04",
       "PatchCount": 0
     }
   },

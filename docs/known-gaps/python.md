@@ -15,7 +15,7 @@ The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/python/provenance.json).
 
 - Source identity SHA-256: `8fb2d425ba28d52f392ecc16852ccb8d71075d48455b39be5dc2b3bdfbcdf1c2`
-- Module provenance SHA-256: `be4a924f1af1217319b3139723df00a25accb334d2af92814b5e6adc47a2e640`
+- Module provenance SHA-256: `f4f4349e4ab01d6cd36d790223299ccbe53694c337a938543c0463cb8b93e423`
 
 ## python-bitwise-precedence
 

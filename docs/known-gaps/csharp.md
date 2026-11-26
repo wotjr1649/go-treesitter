@@ -15,7 +15,7 @@ The source identity hashes canonical JSON `[runtime, wasiLibc, grammar]` from [`
 including source hashes and patch records. The module identity hashes its [`provenance.json`](../../grammars/csharp/provenance.json).
 
 - Source identity SHA-256: `00d265b8a944364d2891b3b38c99498c04b857ce79304e4ed5bd613cdc4d1a27`
-- Module provenance SHA-256: `d3aece8a0ae235e60b8435d0f7ec825074dd72f5f67f9c9edc821bb416eb8905`
+- Module provenance SHA-256: `2e7b1760f5a498e00af4317d6a38615fa4055a09c60eff38043089032014ba11`
 
 ## csharp-default-constraint
 
