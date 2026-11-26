@@ -130,6 +130,20 @@ Contracts: [`docs/specs/parser-result.md`](docs/specs/parser-result.md), [`docs/
 
 Preview [limitations](docs/reports/limitations.md); coming from the removed `syntax` API: [MIGRATING.md](MIGRATING.md).
 
+## Support
+
+The support policy takes effect at 1.0; until then this is a Preview. From 1.0, security and defect fixes cover the
+latest 1.x minor and the preceding 1.x minor (if any) of the root module, and the latest tag of each grammar module.
+Response time is best-effort. Details: [SECURITY.md](SECURITY.md).
+
+- **Go:** the two Go releases the Go team supports; the floor is Go 1.26 (`go.mod`), tested on 1.26.x and 1.27.x. When the Go team's window moves, the floor and CI follow in the next root
+  minor, so a release the Go team no longer supports can stay buildable until then
+  ([ADR-0028](docs/design/decisions/ADR-0028-root-stability-and-independent-grammar-versioning.md) decision 5).
+- **Platforms:** Windows amd64 is Tier-1 and decides product gates
+  ([ADR-0003](docs/design/decisions/ADR-0003-windows-tier1-cgo-free-production.md)). Linux amd64/arm64, macOS arm64 and
+  Windows arm64 are claimed because the engine CI lane executes there; any other platform is not claimed
+  ([validation](docs/specs/validation.md)). All use `CGO_ENABLED=0`.
+
 ## Develop
 
 ```sh

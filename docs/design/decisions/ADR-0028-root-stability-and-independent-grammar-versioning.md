@@ -94,14 +94,14 @@ queries depend on. [ADR-0022 decision 2](ADR-0022-wave1-preview-versioning-and-r
 This defines "that root scope" in decision 3 and the RC to 1.0 conditions in decision 1. It replaces no other
 text. [Validation contract](../../specs/validation.md#root-rc-and-10-scope) holds the gate rules.
 
-1. **Root scope.** The scope of the root RC and 1.0 Release-Critical and Release gates is the current CI
-   matrix: all 25 grammar modules on the hosted Linux amd64, Linux arm64 and macOS arm64 lanes, plus the
-   Windows lanes. A grammar's resource-budget failure (bench) is a root gate failure, not a grammar known gap.
+1. **Root scope.** The Release-Critical and Release gates for the root RC and 1.0 cover all 25 grammar
+   modules. Hosted engine and bench CI cover Linux amd64/arm64, macOS arm64 and Windows amd64/arm64.
+   Hosted conformance covers Linux amd64/arm64. A grammar's resource-budget failure (bench) fails the root gate.
    A smaller scope exists only as a per-case exception that the owner records.
 2. **RC bench.** Run the hosted bench exactly once on the RC candidate commit, and declare the run before it
    starts. If it fails, fix the cause and cut a new RC, or the owner decides a new per-case exception. The
    criteria do not change. The v0.7.0 Preview macOS kotlin exception does not carry into an RC or 1.0.
 3. **RC exit.** Any change to root code, contract or inputs during an RC cuts a new RC. Without such a
    change, 14 days without root defect reports lead to 1.0.
-4. **Windows resources.** For the RC, run the Windows amd64 local bench for all 25 grammars on the RC
-   candidate commit. Before 1.0, add a hosted Windows bench lane.
+4. **Windows resources.** The hosted Windows bench required before 1.0 is in place for amd64 and arm64.
+   For the RC, also run the Windows amd64 local bench for all 25 grammars on the candidate commit.

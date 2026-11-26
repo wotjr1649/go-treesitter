@@ -10,12 +10,13 @@ Definition of Done.
 | **product** | `CGO_ENABLED=0`, Windows native | **yes** | The only lane that can pass or fail a product gate. |
 | **race** | CGO + `-race` | no | Data-race and concurrency diagnostics. |
 | **engine CI** | `CGO_ENABLED=0` on hosted Linux/macOS/Windows, amd64 and arm64 (`.github/workflows/engine.yml`) | yes, for the platform it ran on | Execution evidence per platform; a platform is claimed only after this lane ran there. |
+| **API guard** | `CGO_ENABLED=0` on hosted Linux amd64 (`.github/workflows/api-guard.yml`, `tools/apiguard`) | no | Fails on incompatible root Go API changes between the latest released root tag (`API_BASELINE_TAG` in the workflow, moved at each root release by the post-release PR) and the checked-out commit, using pinned `apidiff`. `apidiff` does not report a field added to or reordered in a struct whose fields are all exported (other packages can write it as an unkeyed literal); `tools/apiguard/structliterals` checks that field list against the baseline. The root tests in the product and engine CI lanes check the documented identifier inventory (the set of exported identifiers, fields and methods, not their signatures, values or classes) for the root and `experimental/match`. |
 | **cross** | `CGO_ENABLED=0`, other `GOOS/GOARCH` | scope-limited | Link-only proof that no C toolchain is required. |
 | **native reference** | C compiler, same runtime release and grammar sources (ADR-0020), with the engine's pinned wasi-libc character semantics; `tools/native-ref` | yes, for C-agreement claims | Produces the reference dumps. See `docs/specs/oracle.md`. |
 | **conformance** | `CGO_ENABLED=0`, `tools/conformance` with reference data: local (`TSG_S15_DIR`) or built in CI from the pinned grammars' own `test/corpus` plus seeded edits (`.github/workflows/conformance.yml`, `TSG_DATA_DIR`) | yes, for C-agreement claims on the inputs used | Byte-for-byte comparison of the public API's dumps, edits and changed ranges with the native reference. The strict field-lookup shard also compares `ChildByFieldName` on fresh corpus trees and on C's incremental tree for every seeded edit; `TSG_REQUIRE_FIELD_LOOKUP=1` fails missing prerequisites or zero inputs. Per post-generation scanner patch, it also compares the native build before and after the patch over the pinned corpus, fixed fuzz and shared regression inputs against `tools/gen/patches/<grammar>/scanner-expectations.json` (ADR-0023 decision 4; `E4` for those inputs on hosted Linux amd64/arm64). |
 | **bench** | `CGO_ENABLED=0`, `tools/bench` paired with native executables | yes, for resource gates | Speed and memory gates on the product build. |
 | **nightly diff** | `CGO_ENABLED=0` on hosted Linux amd64/arm64; native reference from the pins (`.github/workflows/nightly-diff.yml`, `TestNightlyDiff`) | no, finds regressions | Daily time-budgeted random mutations and edits of the CI corpora, compared byte-for-byte with the native reference (dumps, incremental dumps, changed ranges), plus a short run of the Go fuzz targets. A mismatch uploads a shrunk reproducer with seed and commands. It is `E5` evidence only for the cases it ran, bound to the date seed and commit; absence of a finding is not parity. |
-| **bench CI** | `CGO_ENABLED=0` on hosted Linux amd64/arm64 and macOS arm64 (`.github/workflows/bench.yml`, `tools/bench/ci`) | yes, for the platform it ran on | Weekly paired-window speed and memory measurement against the native executables on sha256-pinned large inputs and the CI corpora, with the criteria of the Release gate (private bytes on macOS: the ADR-0022 macOS amendment gate, reported next to the raw delta; a missing measurement field there is a FAIL). On macOS, bench CI measures engine-region counts with `vmmap`. A criterion the platform cannot measure is `NOT_RUN`. Shared runners: ratios only, never absolute times. |
+| **bench CI** | `CGO_ENABLED=0` on hosted Linux amd64/arm64, macOS arm64 and Windows amd64/arm64 (`.github/workflows/bench.yml`, `tools/bench/ci`) | yes, for the platform it ran on | Weekly paired-window speed and memory measurement against the native executables on sha256-pinned large inputs and the CI corpora, with the criteria of the Release gate (private bytes on macOS: the ADR-0022 macOS amendment gate, reported next to the raw delta; a missing measurement field there is a FAIL). On macOS, bench CI measures engine-region counts with `vmmap`. On Windows, the same criteria apply without adjustment: private bytes from `GetProcessMemoryInfo` (`PrivateUsage`) and engine regions from `VirtualQuery` (private reservations of at least 512 MiB that were not present at process start), as in the local Windows measurement; the native reference is the runner's MinGW `gcc -static` build (native-ref), and the job fails when that gcc does not target the runner's architecture. A criterion the platform cannot measure is `NOT_RUN`. Shared runners: ratios only, never absolute times. |
 | **upstream watch** | none (`.github/workflows/upstream-watch.yml`, `tools/native-ref/upstreamwatch`) | no | Weekly comparison of `tools/gen/pins.json` with newest stable runtime/tool releases (a newer one fails), plus repository health for all source/tool pins: rename/transfer, archive, default-head age >12 months and latest release are reported; missing repositories or pins unreachable from every branch and published tag fail the job; a containing default branch, release tag or other branch is named in the report. Rename, archive and age are warnings. It never changes a pin. |
 | **nightly CLI rehearsal** | none, hosted Linux amd64 (`.github/workflows/nightly-cli-rehearsal.yml`, `gen nightly-rehearsal`) | no, report only | Weekly regeneration of every grammar with the unpinned tree-sitter `nightly` CLI beside the pinned CLI, from the same inputs and patches: which generated files differ, the node-types schema diff summary, the nightly CLI identity. It is `E2`-level evidence bound to the recorded nightly identity and run; it never gates, never moves a pin and does not run the conformance corpus. See ADR-0027, "Nightly rehearsal". |
 
@@ -99,16 +100,16 @@ A language with an open known regression keeps the **Development gate green** an
 [ADR-0028](../design/decisions/ADR-0028-root-stability-and-independent-grammar-versioning.md#amendment-2026-11-25-decisions-1-and-3-root-scope-rc-bench-rc-exit-and-windows-resources)
 decides these rules for the root RC and 1.0.
 
-- **Scope.** The Release-Critical and Release gates cover all 25 grammar modules on the hosted Linux amd64,
-  Linux arm64 and macOS arm64 lanes (engine CI, conformance, bench CI) and the Windows lanes. Grammar known
-  gaps stay documented limits. A grammar's resource-budget failure fails the root gate. Only an
+- **Scope.** The Release-Critical and Release gates cover all 25 grammar modules. Hosted engine and bench CI
+  cover Linux amd64/arm64, macOS arm64 and Windows amd64/arm64. Hosted conformance covers Linux amd64/arm64.
+  Grammar known gaps stay documented limits. A grammar's resource-budget failure fails the root gate. Only an
   owner-recorded per-case exception narrows the scope; the v0.7.0 Preview macOS kotlin exception covers
   that Preview only.
 - **RC bench.** Run the bench CI exactly once on the RC candidate commit, and declare that run before it
   starts. A failure is kept and classified. Fix it and cut a new RC, or the owner decides a new per-case
   exception. The Release gate criteria stay as written above.
-- **Windows resources.** The bench CI has no Windows lane. For the RC, run the Windows amd64 local bench of
-  all 25 grammars on the candidate commit. Before 1.0, add a hosted Windows bench lane.
+- **Windows resources.** Bench CI includes hosted Windows amd64 and arm64. For the RC, also run the Windows
+  amd64 local bench of all 25 grammars on the same candidate commit.
 - **RC exit.** A change to root code, contract or inputs during an RC cuts a new RC and repeats the affected
   gates. Otherwise 14 days without root defect reports lead to 1.0.
 
@@ -131,6 +132,10 @@ a fixture in the record is missing -> provenance failure: fail before interpreti
 Never widen a record to absorb a new failure. Open a new record.
 
 ## Failure and iteration policy
+
+A push to a PR may cancel superseded automatic `pull_request` runs of the same workflow for that PR. Main push,
+scheduled, dispatched, pin-move evidence and release runs are exempt. Keep completed results under their original
+commit. Work canceled before execution is `NOT_RUN`.
 
 | Situation | Required action |
 |---|---|
