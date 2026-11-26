@@ -33,6 +33,7 @@ func TestScannerPatchesGrammarText(t *testing.T) {
 		"javascript": {"jsx_text", "html_character_reference", "string", "binary_expression"},
 		"html":       {"text", "entity", "attribute_value"},
 		"css":        {"class_selector", "class_name", "identifier", "escape_sequence", "plain_value"},
+		"python":     {"binary_operator", "await", "unary_operator", "not_operator", "call"},
 		"xml":        {"element", "Attribute", "EntityRef"},
 		"powershell": {"variable", "command_parameter", "simple_name", "member_name", "type_identifier", "label"},
 	}

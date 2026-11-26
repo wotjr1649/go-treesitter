@@ -414,7 +414,7 @@ func readme(lang string, pins *Pins, g GrammarPin, id Identity) string {
 		case "golang":
 			result += "\nThe Go 1.26 patch accepts expressions as the first argument to `new` and prefers the type interpretation when ambiguous. The first argument to `make` still uses the type rule (adapted from upstream PR #202).\n"
 		case "python":
-			result += "\nThe indentation patch bounds serialization by bytes written, preventing the state-buffer overrun that deep indentation causes when an odd number of string delimiters is open, e.g. inside one string literal (upstream PR #351).\n"
+			result += "\nThe indentation patch bounds serialization by bytes written, preventing the state-buffer overrun that deep indentation causes when an odd number of string delimiters is open, e.g. inside one string literal (upstream PR #351). The `await` patch binds `await` tighter than `**`, so `await f() ** 2` groups as `(await f()) ** 2`; previously error-free trees change where an `await` operand was followed by `**` (upstream PR #360, see MIGRATING.md).\n"
 		}
 		for _, p := range g.Patches {
 			if p.File == "patches/ruby/0002-global-variable-non-ascii.patch" {

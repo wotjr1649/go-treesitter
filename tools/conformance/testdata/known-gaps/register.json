@@ -7,9 +7,9 @@
     "python": {
       "Name": "Python",
       "Commit": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64",
-      "PinSHA256": "fe37ad83c6804c3f5a4aad3405bfaeb510dbaa5eda22714dc077abdd9786597f",
-      "ProvenanceSHA256": "16c80f55a44a26b4781473df6a69dc8f84caf967ad9a0967d48b6f242df27a76",
-      "PatchCount": 1
+      "PinSHA256": "8fb2d425ba28d52f392ecc16852ccb8d71075d48455b39be5dc2b3bdfbcdf1c2",
+      "ProvenanceSHA256": "be4a924f1af1217319b3139723df00a25accb334d2af92814b5e6adc47a2e640",
+      "PatchCount": 2
     },
     "csharp": {
       "Name": "C#",
@@ -50,27 +50,6 @@
       ],
       "Upstream": "https://github.com/tree-sitter/tree-sitter-python/issues/358",
       "UpstreamNote": "Issue [#358](https://github.com/tree-sitter/tree-sitter-python/issues/358) was closed on 2026-11-21 by its reporter, who pointed to a community fork; the fix is not in upstream `master`."
-    },
-    {
-      "ID": "python-await-power",
-      "Grammar": "python",
-      "Input": "async def g():\n    await f() ** 2\n",
-      "InputSHA256": "cd893c4c0e887b6f60b5b21dc8d9b61bdd2b8c01787f314ae4ad69b45e3e065e",
-      "DumpSHA256": "28cca2fdede80ce83a60920a29c26db0f0f2f8d29e1e6f7f212e3cdfbc87e021",
-      "Observed": "The named await node spans [19,33), containing the ** binary_operator over [25,33): await (f() ** 2), without errors.",
-      "Expected": "await_expr takes a primary; power takes await_expr on its left. Group as (await f()) ** 2; the await operand ends at byte 28.",
-      "Specs": [
-        {
-          "Title": "Python reference 6.4: Await expression",
-          "URL": "https://docs.python.org/3/reference/expressions.html#await-expression"
-        },
-        {
-          "Title": "Python reference 6.5: The power operator",
-          "URL": "https://docs.python.org/3/reference/expressions.html#the-power-operator"
-        }
-      ],
-      "Upstream": "https://github.com/tree-sitter/tree-sitter-python/pull/360",
-      "UpstreamNote": "Open as of 2026-11-25, with no comments or reviews."
     },
     {
       "ID": "csharp-default-constraint",
