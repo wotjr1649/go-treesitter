@@ -1,11 +1,16 @@
-name: Speed and memory lanes (Linux, macOS)
+name: Speed and memory lanes (Linux, macOS, Windows)
 
 # Weekly: the product bench binaries against the native C executables in the same time window (paired rounds, order
 # alternating), on the large inputs listed in tools/bench/ci/large.json (pinned sources, sha256-verified) and on the
 # pinned grammars' own test/corpus inputs. The pre-declared criteria of docs/specs/validation.md decide: large geomean
 # <= 2.5x native; small files (<= 25 KB) median <= 1 ms or <= 2.5x native; peak <= 100 x input + 64 MB; after Close
 # every engine region returned and private bytes within start + 16 MB. A measured breach fails the job; a criterion the
-# platform cannot measure (the region count on macOS) is reported as NOT_RUN. Hosted runners are shared machines: the
+# platform cannot measure (the region count on macOS) is reported as NOT_RUN. On Windows the native reference is built
+# with the runner's MinGW gcc (-static), which must target the runner's architecture (the job fails otherwise, so a
+# translated x64 build is never compared with the arm64 product binary). The Windows lanes are not yet measured on
+# hosted runners: the windows-11-arm gcc target is unconfirmed (a mismatch fails all 25 arm64 jobs by design), and the
+# 60-minute limit is untested for the largest grammars (csharp, tsql, tsx, typescript: MinGW native build plus the
+# measurement). Run one workflow_dispatch from the branch and record both before relying on the lanes. Hosted runners are shared machines: the
 # ratios are measured in one window, absolute times are not comparable between runs, and a noisy result is reported
 # with its spread, never rerun until it passes. Only small-corpus threshold failures get exactly one per-file paired
 # confirmation with the same rounds/reps; a file fails only if both passes fail. Both passes remain in the output and CSVs.
@@ -41,11 +46,13 @@ jobs:
       fail-fast: false
       matrix:
         lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin, postgres, swift]
-        runner: [ubuntu-24.04, ubuntu-24.04-arm, macos-latest]
+        runner: [ubuntu-24.04, ubuntu-24.04-arm, macos-latest, windows-latest, windows-11-arm]
         include:
           - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
           - {runner: ubuntu-24.04-arm, goos: linux, goarch: arm64}
           - {runner: macos-latest, goos: darwin, goarch: arm64}
+          - {runner: windows-latest, goos: windows, goarch: amd64}
+          - {runner: windows-11-arm, goos: windows, goarch: arm64}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     env:
@@ -58,6 +65,7 @@ jobs:
       CORPUS_ROUNDS: ${{ inputs.corpus_rounds || '3' }}
       CORPUS_REPS: ${{ inputs.corpus_reps || '7' }}
       MEM_RUNS: ${{ inputs.mem_runs || '3' }}
+      EXE: ${{ matrix.goos == 'windows' && '.exe' || '' }} # go build -o keeps the name as given; the drivers look for <lang>.exe (the runner context is not available in job-level env)
     defaults:
       run:
         shell: bash
@@ -75,22 +83,27 @@ jobs:
             [[ "$v" =~ ^[0-9]{1,3}$ ]] || { echo "::error::round, rep and run counts must be digits"; exit 1; }
           done
           go version; gcc --version | head -1
+          if [ "$RUNNER_OS" = Windows ]; then
+            m="$(gcc -dumpmachine)"; echo "gcc target: $m"
+            case "$m" in x86_64-*) a=amd64 ;; aarch64-*) a=arm64 ;; *) a="$m" ;; esac
+            [ "$a" = "${{ matrix.goarch }}" ] || { echo "::error::gcc targets $m, not the runner's ${{ matrix.goarch }}"; exit 1; }
+          fi
       - name: Fetch pinned sources, build the native executables, extract the corpus inputs
         working-directory: tools/native-ref
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          go build -o "$RUNNER_TEMP/native-ref" .
-          go build -o "$RUNNER_TEMP/ciconf" ./ciconf
+          go build -o "$RUNNER_TEMP/native-ref$EXE" .
+          go build -o "$RUNNER_TEMP/ciconf$EXE" ./ciconf
           cd "$GITHUB_WORKSPACE"
-          "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -fetch -cc gcc \
+          "$RUNNER_TEMP/native-ref$EXE" -pins tools/gen/pins.json -fetch -cc gcc \
             -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" "${{ matrix.lang }}"
-          "$RUNNER_TEMP/ciconf" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "${{ matrix.lang == 'golang' && 'go' || matrix.lang }}"
+          "$RUNNER_TEMP/ciconf$EXE" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "${{ matrix.lang == 'golang' && 'go' || matrix.lang }}"
       - name: Build the product bench binaries and the driver
         working-directory: tools/bench
         run: |
           for l in "${{ matrix.lang }}"; do
-            go build -trimpath -tags "lang_$l" -o "$RUNNER_TEMP/bench/$l" .
+            go build -trimpath -tags "lang_$l" -o "$RUNNER_TEMP/bench/$l$EXE" .
             if [ "$l" = postgres ]; then
               go test -count=1 -tags lang_postgres -run '^TestPostgresSmallWorkload$' .
             fi
@@ -98,14 +111,14 @@ jobs:
               go test -count=1 -tags lang_swift -run '^TestSwiftSmallWorkload$' .
             fi
           done
-          go build -o "$RUNNER_TEMP/benchci" ./ci
+          go build -o "$RUNNER_TEMP/benchci$EXE" ./ci
       - name: Fetch the large inputs (sha256-verified)
         run: |
-          "$RUNNER_TEMP/benchci" fetch -manifest tools/bench/ci/large.json -data "$RUNNER_TEMP/data" -out "$RUNNER_TEMP/large" -langs "${{ matrix.lang }}"
+          "$RUNNER_TEMP/benchci$EXE" fetch -manifest tools/bench/ci/large.json -data "$RUNNER_TEMP/data" -out "$RUNNER_TEMP/large" -langs "${{ matrix.lang }}"
       - name: Measure and apply the criteria
         run: |
           rc=0
-          "$RUNNER_TEMP/benchci" run -bench "$RUNNER_TEMP/bench" -native "$RUNNER_TEMP/exe" -data "$RUNNER_TEMP/data" \
+          "$RUNNER_TEMP/benchci$EXE" run -bench "$RUNNER_TEMP/bench" -native "$RUNNER_TEMP/exe" -data "$RUNNER_TEMP/data" \
             -large "$RUNNER_TEMP/large" -out "$RUNNER_TEMP/bench-out" -langs "${{ matrix.lang }}" \
             -large-rounds "$LARGE_ROUNDS" -large-reps "$LARGE_REPS" -corpus-rounds "$CORPUS_ROUNDS" -corpus-reps "$CORPUS_REPS" \
             -mem-runs "$MEM_RUNS" || rc=$?

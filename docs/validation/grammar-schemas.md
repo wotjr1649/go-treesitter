@@ -573,6 +573,28 @@ The patched engine and pinned native reference agree on the corpus, seeded edits
 (E5, Windows amd64). The pinned `highlights.scm` compiles and runs on the repaired inputs.
 See the [migration notes](../../MIGRATING.md#css-non-latin-1-names) for the new captures.
 
+## Unreleased after v0.7.0: CSS declaration value patch
+
+The [second grammar-input patch](../../tools/gen/patches/css/README.md#0002-non-latin-1-declaration-value)
+fixes the failure reported in the [comment on upstream PR #105](https://github.com/tree-sitter/tree-sitter-css/pull/105#issuecomment-7140588000).
+It uses the same CSS commit and CLI 0.27.2. The generated schemas with zero, one and two patches
+each pass the strict check and have the same 43,620 bytes and SHA-256
+`fbbf8d22d82608f6d2f61cfdb374e6758779754fb2f42643e9dc5af6ead0d5d2`.
+The strict diffs against both baselines have zero changes.
+
+Native A/B on Windows amd64 (E4) compares 62 corpus trees and 186 seeded edits plus the pinned
+`bootstrap.css`. Against 0001 alone, 0002 changes eleven patch-corpus trees and thirty seeded edits.
+Three fresh trees in the value corpus become clean and eight retain errors with different recovery.
+The 40 upstream corpus trees, their 120 edits and the large input remain byte-identical
+against both baselines. In a separate 101-input fresh comparison including fixed fuzz inputs,
+37 trees differ from the unpatched baseline and 19 from 0001 alone. No previously error-free
+tree changes against either baseline on these inputs.
+
+The CGO-free engine and patched native reference agree on the corpus and seeded edits, including
+changed ranges, and on 682 raw query comparisons (E5, Windows amd64). The pinned `highlights.scm`
+compiles. The Korean regression checks that `plain_value` spans the complete identifier.
+See the [migration notes](../../MIGRATING.md#css-non-latin-1-declaration-values).
+
 ## v0.7.0: PowerShell name patch
 
 At PowerShell pin `65ea6919e816`, the strict check of the regenerated `node-types.json` passes with zero findings, and
@@ -610,3 +632,26 @@ trees to clean trees; the retained negative inputs (`:+일`, `:@일?`, `:@한글
 record is limited to error trees becoming clean. The pinned upstream `highlights.scm`, `locals.scm` and `tags.scm` compiled, and
 the query lane matched the patched native reference on 3,783 raw query/input comparisons with no mismatch (E5, Windows amd64).
 [Migration notes](../../MIGRATING.md#ruby-symbol-names)
+
+## Unreleased after v0.7.0: Python await patch
+
+The [temporary grammar-input patch](../../tools/gen/patches/python) carries the grammar change of
+[upstream PR #360](https://github.com/tree-sitter/tree-sitter-python/pull/360) at Python commit
+`26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64`. The `node-types.json` files produced with the pinned CLI with and without the
+patch both pass the strict schema check. They are byte-identical (67,804 bytes, SHA-256
+`01ef9e39132daf7b77d3eda7db0897a2bc854a41d52a52c9f8f92a0b369e898d`), and the strict diff has zero changes (E1, CLI 0.27.2).
+
+Node types and fields do not change, but previously error-free trees do: the documented fix moves the `binary_operator`
+that held `**` out of the `await` operand. The Windows amd64 generator gate's native A/B comparison (E4) of the unpatched and patched builds (both keep the existing scanner patch `0001`)
+covered 171 corpus inputs (the pinned upstream corpus, the pinned kit inputs and the eleven patch-corpus cases), 419 seeded edits and
+the pinned large inputs `topics.py`, `_pydecimal.py` and `typing.py`. It changed six patch-corpus trees, one kit input (`r = await f() ** 2`)
+and fourteen seeded edits of patch-corpus inputs. Each changed error-free tree is an `await` whose operand held a `**`
+expression. All other trees, edits and large dumps were byte-identical. A separate check that the fully unpatched build matches the committed C ran before the last three patch-corpus cases were added and covered 168 corpus inputs and 410 seeded edits.
+A separate fresh-parse comparison, made before the last three patch-corpus cases were added, covered 188 inputs (the 168 corpus inputs of that time and 20 fixed fuzz seeds and variants) and changed the same six trees (five patch-corpus trees and the kit input).
+The existing scanner patch `0001` keeps its 16 reviewed cases; only the build identity of its expectations changed.
+Python 3.14.8 groups every expression of two sets (3,640 two-operand and 3,759 random multi-operand expressions it accepts) as the patched
+grammar does; the unpatched grammar differs on 450 and 918 of them (one-off check, E2).
+The patched engine and pinned native reference agree (E5, Windows amd64) on the 160 pinned upstream and kit inputs, their 386 seeded edits and
+1,920 raw query comparisons over those inputs (no mismatch), and on eleven grammar-text fixtures for most of the patch-corpus constructs (not `(await f()) ** 2` of case 007, which has the native comparison only)
+(`TestScannerPatchesGrammarText`). The patch-corpus edits and the three large inputs have only the native comparison above (E4). The pinned `highlights.scm` and `tags.scm` compile and run on the
+repaired inputs. See the [migration notes](../../MIGRATING.md#python-await-and-the-power-operator).

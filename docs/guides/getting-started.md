@@ -3,8 +3,8 @@
 How to parse source code with go-treesitter, from install to concurrent use. The root module has no grammar: you add
 one grammar module per language. Everything below runs as a test (`tools/conformance/getting_started_test.go`),
 and each Go snippet is that test's text. A test compares them, so a drift between the guide and the code fails it. The
-conformance workflow runs these tests once its step selects `^Example` (the change in PR #127); until that is on main,
-run them yourself: `cd tools/conformance && go test -run Example .`.
+conformance workflow runs these examples in group g2.
+To run them locally, use `cd tools/conformance && go test -run '^Example' .`.
 
 This is a Preview (v0.x): the compatibility rules of [api-stability.md](../design/api-stability.md) start at root 1.0.
 For the exact contracts read [parser-result.md](../specs/parser-result.md) and the package documentation
@@ -240,8 +240,8 @@ Options bound the cost of untrusted input. A value of 0 means no explicit limit 
 |---|---|
 | `WithMaxInputBytes` | source length, checked before any parsing (`ResourceLimit`) |
 | `WithMaxSnapshotNodes` | node count of an exported snapshot, checked before the export (`ResourceLimit`) |
-| `WithMaxMemoryBytes` | the linear memory of **this parser's** engine instance, including query indexes and match buffers; from 32 MiB to 4 GiB, anything else fails `NewParser`. It does not cover the Go heap of sources, snapshots and line indexes. A refused growth is `ResourceLimit` |
-| `WithRecycleAboveBytes` | not a limit: recreates the instance after a large parse so its memory returns to the OS. It waits while the parser holds a live `Tree` (`ParseSnapshot` recycles at once), so close your trees |
+| `WithMaxMemoryBytes` | the linear memory of **this parser's** engine instance, including query indexes and match buffers; `0` uses the 1 GiB default, and explicit limits from 32 MiB to 4 GiB are accepted. Other values fail `NewParser`. It does not cover the Go heap of sources, snapshots and line indexes. A refused growth is `ResourceLimit` |
+| `WithRecycleAboveBytes` | not a limit: recreates the instance after a large parse so its memory returns to the OS. It waits while the parser holds a live `Tree` (`ParseSnapshot` can recycle immediately when no other tree is live), so close your trees |
 | `WithStrictUTF8` | rejects invalid UTF-8 (`InvalidInput`) instead of parsing it as C tree-sitter does |
 
 Every parse takes a `context.Context`; a deadline or cancellation ends the parse between parser steps with
