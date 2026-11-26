@@ -382,6 +382,12 @@ func prepare(s source, dl, work string, fetch bool, done map[string]bool) error 
 		return nil
 	}
 	arc := filepath.Join(dl, s.Archive)
+	if got, err := fileSHA(arc); fetch && err == nil && got != s.ArchiveSHA256 {
+		// A restored cache file that does not match the pin is dropped and downloaded again; its bytes are never used.
+		if err := os.Remove(arc); err != nil {
+			return err
+		}
+	}
 	if _, err := os.Stat(arc); errors.Is(err, os.ErrNotExist) && fetch {
 		const gh = "https://github.com/"
 		if !strings.HasPrefix(s.Repo, gh) || len(s.Commit) != 40 {

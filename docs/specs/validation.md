@@ -9,7 +9,7 @@ Definition of Done.
 |---|---|---|---|
 | **product** | `CGO_ENABLED=0`, Windows native | **yes** | The only lane that can pass or fail a product gate. |
 | **race** | CGO + `-race` | no | Data-race and concurrency diagnostics. |
-| **engine CI** | `CGO_ENABLED=0` on hosted Linux/macOS/Windows, amd64 and arm64 (`.github/workflows/engine.yml`) | yes, for the platform it ran on | Execution evidence per platform; a platform is claimed only after this lane ran there. |
+| **engine CI** | `CGO_ENABLED=0` on hosted Linux/macOS/Windows, amd64 and arm64 (`.github/workflows/engine.yml`) | yes, for the platform it ran on | Execution evidence per platform; a platform is claimed only after this lane ran there. A pull request runs Linux amd64 and Windows amd64 (and the Go 1.26 floor on the root and shard 1); a push to `main`, a dispatch and a change to `engine.yml` run all five platforms and the floor on every shard, so the evidence for Linux arm64, macOS arm64 and Windows arm64 is the `main` run of the commit, not the pull request run. |
 | **API guard** | `CGO_ENABLED=0` on hosted Linux amd64 (`.github/workflows/api-guard.yml`, `tools/apiguard`) | no | Fails on incompatible root Go API changes between the latest released root tag (`API_BASELINE_TAG` in the workflow, moved at each root release by the post-release PR) and the checked-out commit, using pinned `apidiff`. `apidiff` does not report a field added to or reordered in a struct whose fields are all exported (other packages can write it as an unkeyed literal); `tools/apiguard/structliterals` checks that field list against the baseline. The root tests in the product and engine CI lanes check the documented identifier inventory (the set of exported identifiers, fields and methods, not their signatures, values or classes) for the root and `experimental/match`. |
 | **cross** | `CGO_ENABLED=0`, other `GOOS/GOARCH` | scope-limited | Link-only proof that no C toolchain is required. |
 | **native reference** | C compiler, same runtime release and grammar sources (ADR-0020), with the engine's pinned wasi-libc character semantics; `tools/native-ref` | yes, for C-agreement claims | Produces the reference dumps. See `docs/specs/oracle.md`. |
@@ -19,6 +19,18 @@ Definition of Done.
 | **bench CI** | `CGO_ENABLED=0` on hosted Linux amd64/arm64, macOS arm64 and Windows amd64/arm64 (`.github/workflows/bench.yml`, `tools/bench/ci`) | yes, for the platform it ran on | Weekly paired-window speed and memory measurement against the native executables on sha256-pinned large inputs and the CI corpora, with the criteria of the Release gate (private bytes on macOS: the ADR-0022 macOS amendment gate, reported next to the raw delta; a missing measurement field there is a FAIL). On macOS, bench CI measures engine-region counts with `vmmap`. On Windows, the same criteria apply without adjustment: private bytes from `GetProcessMemoryInfo` (`PrivateUsage`) and engine regions from `VirtualQuery` (private reservations of at least 512 MiB that were not present at process start), as in the local Windows measurement; the native reference is the runner's MinGW `gcc -static` build on Windows amd64 and MSYS2 CLANGARM64 `clang -static` on Windows arm64 (native-ref `-cc`; the arm64 image's gcc is x86_64), and the job fails when that compiler does not target the runner's architecture. The arm64 clang is installed from the rolling MSYS2 repository at run time and is not version-pinned, so each run's `summary.md` records the compiler's `--version` line and target; the amd64 (gcc) and arm64 (clang) ratios have different native denominators and are judged only against their own platform's criteria, never compared with each other. The `-static` link and the 60-minute limit on windows-11-arm are unmeasured until the first `workflow_dispatch` rehearsal, which is not an RC bench run (record it as a rehearsal and keep its failures). A criterion the platform cannot measure is `NOT_RUN`. Shared runners: ratios only, never absolute times. |
 | **upstream watch** | none (`.github/workflows/upstream-watch.yml`, `tools/native-ref/upstreamwatch`) | no | Weekly comparison of `tools/gen/pins.json` with newest stable runtime/tool releases (a newer one fails), plus repository health for all source/tool pins: rename/transfer, archive, default-head age >12 months and latest release are reported; missing repositories or pins unreachable from every branch and published tag fail the job; a containing default branch, release tag or other branch is named in the report. Rename, archive and age are warnings. It never changes a pin. |
 | **nightly CLI rehearsal** | none, hosted Linux amd64 (`.github/workflows/nightly-cli-rehearsal.yml`, `gen nightly-rehearsal`) | no, report only | Weekly regeneration of every grammar with the unpinned tree-sitter `nightly` CLI beside the pinned CLI, from the same inputs and patches: which generated files differ, the node-types schema diff summary, the nightly CLI identity. It is `E2`-level evidence bound to the recorded nightly identity and run; it never gates, never moves a pin and does not run the conformance corpus. See ADR-0027, "Nightly rehearsal". |
+
+**Change detection.** Each PR-required workflow (engine, regen, conformance, windows, API guard, pin move) starts with a
+`<name>-changes` job that classifies the pull request's changed files (`tools/lane/ci_changes.py`) and skips the jobs the
+change cannot affect; a job skipped that way passes its required check. Unknown paths, an empty diff, a change to the workflow
+itself or to the classifier (the classifier of the base commit is the one that runs, so a pull request cannot switch its own
+classification off), and every event except `pull_request` run the whole workflow. Documentation is not skipped
+blindly: `TestKnownGap*` reads every tracked file and the root `TestAPIInventory` reads `docs/design/api-stability.md`, so a
+pull request always keeps the engine job on Linux amd64 and conformance group g1 on Linux amd64. The required checks are the
+six gates (`engine-gate`, `regen-gate`, `conformance-gate`, `windows-gate`, `api-guard-gate`, `pin-move-gate`): a gate fails
+when its `changes` job or any job it needs failed or was cancelled, or when a job the classifier expected to run was skipped (a
+misspelled condition); every `changes` job also runs the classifier's unit tests. A green gate on a pull request says only that the lanes
+the change could affect passed; the full matrix result of a commit is its `main` run.
 
 Rules:
 
@@ -101,7 +113,7 @@ A language with an open known regression keeps the **Development gate green** an
 decides these rules for the root RC and 1.0.
 
 - **Scope.** The Release-Critical and Release gates cover all 25 grammar modules. Hosted engine and bench CI
-  cover Linux amd64/arm64, macOS arm64 and Windows amd64/arm64. Hosted conformance covers Linux amd64/arm64.
+  cover Linux amd64/arm64, macOS arm64 and Windows amd64/arm64. Hosted conformance covers Linux amd64/arm64 (on `main`; a pull request that changes nothing the lane builds runs g1 on amd64).
   Grammar known gaps stay documented limits. A grammar's resource-budget failure fails the root gate. Only an
   owner-recorded per-case exception narrows the scope; the v0.7.0 Preview macOS kotlin exception covers
   that Preview only.
@@ -133,8 +145,8 @@ Never widen a record to absorb a new failure. Open a new record.
 
 ## Failure and iteration policy
 
-A push to a PR may cancel superseded automatic `pull_request` runs of the same workflow for that PR. Main push,
-scheduled, dispatched, pin-move evidence and release runs are exempt. Keep completed results under their original
+A push to a PR may cancel superseded automatic `pull_request` runs of the same workflow for that PR (engine, regen,
+conformance, windows, API guard and pin move alike). Main push, scheduled, dispatched, re-run and release runs are exempt. Keep completed results under their original
 commit. Work canceled before execution is `NOT_RUN`.
 
 | Situation | Required action |

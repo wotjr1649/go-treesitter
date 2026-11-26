@@ -2,7 +2,7 @@
 set -euo pipefail
 source "$(dirname "$0")/fetch.sh"
 work=$(mktemp -d)
-trap 'rm -f -- "$work/calls" "$work/archive"; rmdir -- "$work"' EXIT
+trap 'rm -rf -- "$work/cache"; rm -f -- "$work/calls" "$work/archive"; rmdir -- "$work"' EXIT
 
 curl() {
   local call result
@@ -63,3 +63,25 @@ if fetch_verified_archive "$work/archive" "$sum" https://upstream.invalid/blocke
 fi
 [ ! -e "$work/archive" ]
 echo "fetch mirror checks passed"
+
+# TSG_DL_CACHE: a hit needs no download, a wrong cached file is replaced by a verified download, and a corrupt download is never stored.
+export TSG_DL_CACHE="$work/cache"
+: >"$work/calls"
+fetch_verified_archive "$work/archive" "$sum" https://upstream.invalid/good
+[ "$(wc -l <"$work/calls")" = 1 ] && [ "$(cat "$work/cache/archive")" = 'pinned archive' ]
+rm -f -- "$work/archive"
+: >"$work/calls"
+fetch_verified_archive "$work/archive" "$sum" https://upstream.invalid/blocked
+[ ! -s "$work/calls" ] && [ "$(cat "$work/archive")" = 'pinned archive' ]
+printf 'poisoned' >"$work/cache/archive"
+rm -f -- "$work/archive"
+: >"$work/calls"
+fetch_verified_archive "$work/archive" "$sum" https://upstream.invalid/good
+[ "$(wc -l <"$work/calls")" = 1 ] && [ "$(cat "$work/archive")" = 'pinned archive' ] && [ "$(cat "$work/cache/archive")" = 'pinned archive' ]
+rm -rf -- "$work/cache"
+if fetch_verified_archive "$work/archive" "$sum" https://upstream.invalid/blocked https://mirror.invalid/corrupt; then
+  echo "accepted corrupt mirror with cache" >&2; exit 1
+fi
+[ ! -e "$work/archive" ] && [ ! -e "$work/cache/archive" ]
+unset TSG_DL_CACHE
+echo "fetch cache checks passed"

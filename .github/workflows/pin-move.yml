@@ -17,8 +17,38 @@ on:
 permissions:
   contents: read
 
+# A new push to a pull request cancels that PR's earlier unfinished first-attempt runs; main, dispatched, edited and re-run
+# attempts of other kinds never cancel (same expressions as engine.yml).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.run_attempt == 1 && format('pr-{0}', github.event.pull_request.number) || format('run-{0}-{1}', github.run_id, github.run_attempt) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.action == 'synchronize' && github.run_attempt == 1 }}
+
 jobs:
+  changes:
+    name: pin-move-changes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      pin_move: ${{ steps.classify.outputs.pin_move }}
+      expect: ${{ steps.classify.outputs.expect }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          # A pull request is checked out as its merge commit; HEAD^1..HEAD is exactly the files the pull request changes.
+          fetch-depth: 2
+      - id: classify
+        name: Classify the changed files (tools/lane/ci_changes.py)
+        run: |
+          python3 -m unittest discover -s tools/lane -p test_ci_changes.py
+          cc=tools/lane/ci_changes.py ev=$GITHUB_EVENT_NAME
+          if [ $ev = pull_request ]; then git show HEAD^1:$cc > $RUNNER_TEMP/base_ci_changes.py 2>/dev/null && cc=$RUNNER_TEMP/base_ci_changes.py || ev=workflow_dispatch; fi
+          python3 $cc --workflow pin-move --event $ev
+
   pin-move:
+    needs: changes
+    # Runs when the pull request touches the generator, its pins, patches or native-ref (pin-move.py --detect then decides whether pins moved).
+    if: ${{ needs.changes.outputs.pin_move == 'true' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
@@ -129,3 +159,17 @@ jobs:
             !${{ runner.temp }}/pin-move-out/**/bin/**
           if-no-files-found: warn
           retention-days: 30
+
+  # The one required check of this workflow: red when the classifier or any job failed or was cancelled, green when every
+  # job succeeded or was skipped on purpose (a skipped required check would otherwise pass even when its dependency failed).
+  pin-move-gate:
+    name: pin-move-gate
+    if: ${{ always() }}
+    needs: [changes, pin-move]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Every needed job passed or was skipped on purpose
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped '. as $n | all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok and all(.changes.outputs.expect | fromjson[]; $n[.].result == $ok)' <<<$NEEDS

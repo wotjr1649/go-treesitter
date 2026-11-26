@@ -36,7 +36,7 @@ func TestWasiLibcMirrorFallback(t *testing.T) {
 	}
 	hash := sha256.Sum256(archive.Bytes())
 	sum := hex.EncodeToString(hash[:])
-	for _, mode := range []string{"unavailable", "wrong-upstream-hash", "wrong-mirror-hash", "upstream-ok"} {
+	for _, mode := range []string{"unavailable", "wrong-upstream-hash", "wrong-mirror-hash", "upstream-ok", "corrupt-cache"} {
 		t.Run(mode, func(t *testing.T) {
 			var calls []string
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -67,6 +67,11 @@ func TestWasiLibcMirrorFallback(t *testing.T) {
 			defer server.Close()
 			t.Setenv("GITHUB_TOKEN", "test-placeholder")
 			dl, work := t.TempDir(), t.TempDir()
+			if mode == "corrupt-cache" { // a poisoned restored cache file is replaced by a verified download
+				if err := os.WriteFile(filepath.Join(dl, archiveName), []byte("poisoned"), 0600); err != nil {
+					t.Fatal(err)
+				}
+			}
 			raw, err := json.Marshal(pins{
 				Mirrors: []string{server.URL + "/mirror"},
 				WasiLibc: source{
@@ -108,7 +113,7 @@ func TestWasiLibcMirrorFallback(t *testing.T) {
 				}
 			}
 			want := "/upstream,/mirror/" + archiveName
-			if mode == "upstream-ok" {
+			if mode == "upstream-ok" || mode == "corrupt-cache" {
 				want = "/upstream"
 			}
 			if strings.Join(calls, ",") != want {

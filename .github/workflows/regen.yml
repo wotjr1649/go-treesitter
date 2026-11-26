@@ -18,8 +18,31 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.action == 'synchronize' && github.run_attempt == 1 }}
 
 jobs:
+  changes:
+    name: regen-changes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      regen: ${{ steps.classify.outputs.regen }}
+      expect: ${{ steps.classify.outputs.expect }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          # A pull request is checked out as its merge commit; HEAD^1..HEAD is exactly the files the pull request changes.
+          fetch-depth: 2
+      - id: classify
+        name: Classify the changed files (tools/lane/ci_changes.py)
+        run: |
+          python3 -m unittest discover -s tools/lane -p test_ci_changes.py
+          cc=tools/lane/ci_changes.py ev=$GITHUB_EVENT_NAME
+          if [ $ev = pull_request ]; then git show HEAD^1:$cc > $RUNNER_TEMP/base_ci_changes.py 2>/dev/null && cc=$RUNNER_TEMP/base_ci_changes.py || ev=workflow_dispatch; fi
+          python3 $cc --workflow regen --event $ev
+
   regen-grammar:
     name: regenerate ${{ matrix.lang }} and diff (ubuntu-24.04)
+    needs: changes
+    if: ${{ needs.changes.outputs.regen == 'true' }}
     strategy:
       fail-fast: false
       matrix:
@@ -44,10 +67,28 @@ jobs:
           go-version: 1.27.x # newest supported; go.mod states the floor (1.26.0)
       - name: Transient fetch retry regression checks
         run: bash tools/gen/fetch_test.sh
+      # Verified archives (wasi-sdk, binaryen, the CLI, the runtime, wasi-libc and the 25 grammars, a few hundred MB) are cached
+      # once per pins.json content. Only a push to main saves; pull requests restore. fetch.sh still checks every restored
+      # file against its pinned sha256 (TSG_DL_CACHE), so the key selects files, never their bytes.
+      - name: Restore the verified archive cache
+        id: dl-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ runner.temp }}/dl-cache
+          key: regen-dl-${{ runner.os }}-${{ hashFiles('tools/gen/pins.json') }}
       # Downloads each pinned archive into a new empty directory and checks its sha256 before extracting;
       # builds wasm2go from its pinned module version; regenerates the selected module into grammars/.
       - name: Regenerate grammar modules
+        env:
+          TSG_DL_CACHE: ${{ runner.temp }}/dl-cache
         run: /usr/bin/time -v -o "$RUNNER_TEMP/regen-cost.txt" bash tools/gen/regen.sh "$RUNNER_TEMP/regen" "${{ matrix.lang }}"
+      # One shard saves (every shard downloads the same set), and only when main's pins.json has no cache yet.
+      - name: Save the verified archive cache
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.lang == 'json' && steps.dl-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ runner.temp }}/dl-cache
+          key: regen-dl-${{ runner.os }}-${{ hashFiles('tools/gen/pins.json') }}
       - name: Build generator behaviour gate tools
         run: |
           (cd tools/native-ref && go build -trimpath -o "$RUNNER_TEMP/native-ref" . && go build -trimpath -o "$RUNNER_TEMP/ciconf" ./ciconf)
@@ -90,13 +131,36 @@ jobs:
           git diff --exit-code --stat -- grammars/
           test -z "$(git status --porcelain -- grammars/)"
 
+  # Required check name kept until the ruleset requires regen-gate; skipped shards (docs-only and similar pull requests) pass.
   regen:
     name: regenerate and diff (ubuntu-24.04)
     if: ${{ always() }}
-    needs: regen-grammar
+    needs: [changes, regen-grammar]
     runs-on: ubuntu-24.04
     steps:
       - name: All grammar shards matched
         env:
-          RESULT: ${{ needs.regen-grammar.result }}
-        run: test "$RESULT" = success
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+          WANTED: ${{ needs.changes.outputs.regen }}
+        run: |
+          for r in $RESULTS; do
+            case "$r" in
+              success) ;;
+              skipped) [ "$WANTED" != true ] || { echo "grammar shards were skipped but are needed"; exit 1; } ;;
+              *) echo "a needed job ended $r"; exit 1 ;;
+            esac
+          done
+
+  # The one required check of this workflow: red when the classifier or any job failed or was cancelled, green when every
+  # job succeeded or was skipped on purpose (a skipped required check would otherwise pass even when its dependency failed).
+  regen-gate:
+    name: regen-gate
+    if: ${{ always() }}
+    needs: [changes, regen-grammar, regen]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Every needed job passed or was skipped on purpose
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped '. as $n | all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok and all(.changes.outputs.expect | fromjson[]; $n[.].result == $ok)' <<<$NEEDS

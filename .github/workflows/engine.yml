@@ -23,10 +23,41 @@ defaults:
     shell: bash
 
 jobs:
+  changes:
+    name: engine-changes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      full: ${{ steps.classify.outputs.full }}
+      engine_core: ${{ steps.classify.outputs.engine_core }}
+      engine_platforms: ${{ steps.classify.outputs.engine_platforms }}
+      engine_grammars: ${{ steps.classify.outputs.engine_grammars }}
+      engine_floor: ${{ steps.classify.outputs.engine_floor }}
+      engine_compat: ${{ steps.classify.outputs.engine_compat }}
+      engine_shards: ${{ steps.classify.outputs.engine_shards }}
+      floor_shards: ${{ steps.classify.outputs.floor_shards }}
+      expect: ${{ steps.classify.outputs.expect }}
+      expect_matrix: ${{ steps.classify.outputs.expect_matrix }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          # A pull request is checked out as its merge commit; HEAD^1..HEAD is exactly the files the pull request changes.
+          fetch-depth: 2
+      - id: classify
+        name: Classify the changed files (tools/lane/ci_changes.py)
+        run: |
+          python3 -m unittest discover -s tools/lane -p test_ci_changes.py
+          cc=tools/lane/ci_changes.py ev=$GITHUB_EVENT_NAME
+          if [ $ev = pull_request ]; then git show HEAD^1:$cc > $RUNNER_TEMP/base_ci_changes.py 2>/dev/null && cc=$RUNNER_TEMP/base_ci_changes.py || ev=workflow_dispatch; fi
+          python3 $cc --workflow engine --event $ev
+
+  # Pull requests run ubuntu-24.04 and windows-latest (engine and grammar shards), the Go 1.26 floor on the root and one shard,
+  # and the cross-compat lane; pushes to main, dispatch and a change to this file run all five platforms and the floor on every shard.
   engine-linux-amd64:
-    needs: grammar-linux-amd64
-    # Always start: the first step fails the job unless every grammar shard succeeded (a skipped job would satisfy the required check).
-    if: &check_grammar_result ${{ always() }}
+    needs: [changes, grammar-linux-amd64]
+    # Always start when selected: the first step fails the job unless every grammar shard succeeded or was skipped on purpose.
+    if: ${{ always() && needs.changes.outputs.engine_core == 'true' }}
     name: engine (ubuntu-24.04)
     runs-on: ubuntu-24.04
     timeout-minutes: 45
@@ -38,8 +69,16 @@ jobs:
     steps: &engine_steps
       - name: Grammar shards passed
         env:
-          RESULT: ${{ join(needs.*.result) }}
-        run: test "$RESULT" = success
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+          SHARDS_WANTED: ${{ needs.changes.outputs.engine_grammars }}
+        run: &shards_passed |
+          for r in $RESULTS; do
+            case "$r" in
+              success) ;;
+              skipped) [ "$SHARDS_WANTED" != true ] || { echo "grammar shards were skipped but are needed"; exit 1; } ;;
+              *) echo "a needed job ended $r"; exit 1 ;;
+            esac
+          done
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
@@ -79,8 +118,8 @@ jobs:
         run: go vet ./...
 
   engine-linux-arm64:
-    needs: grammar-linux-arm64
-    if: *check_grammar_result
+    needs: [changes, grammar-linux-arm64]
+    if: ${{ always() && needs.changes.outputs.engine_platforms == 'true' && needs.changes.outputs.full == 'true' }}
     name: engine (ubuntu-24.04-arm)
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 45
@@ -92,8 +131,8 @@ jobs:
     steps: *engine_steps
 
   engine-macos-arm64:
-    needs: grammar-macos-arm64
-    if: *check_grammar_result
+    needs: [changes, grammar-macos-arm64]
+    if: ${{ always() && needs.changes.outputs.engine_platforms == 'true' && needs.changes.outputs.full == 'true' }}
     name: engine (macos-latest)
     runs-on: macos-latest
     timeout-minutes: 45
@@ -105,8 +144,8 @@ jobs:
     steps: *engine_steps
 
   engine-windows-amd64:
-    needs: grammar-windows-amd64
-    if: *check_grammar_result
+    needs: [changes, grammar-windows-amd64]
+    if: ${{ always() && needs.changes.outputs.engine_platforms == 'true' }}
     name: engine (windows-latest)
     runs-on: windows-latest
     timeout-minutes: 45
@@ -118,8 +157,8 @@ jobs:
     steps: *engine_steps
 
   engine-windows-arm64:
-    needs: grammar-windows-arm64
-    if: *check_grammar_result
+    needs: [changes, grammar-windows-arm64]
+    if: ${{ always() && needs.changes.outputs.engine_platforms == 'true' && needs.changes.outputs.full == 'true' }}
     name: engine (windows-11-arm)
     runs-on: windows-11-arm
     timeout-minutes: 45
@@ -131,9 +170,10 @@ jobs:
     steps: *engine_steps
 
   # The oldest supported Go (go.mod floor 1.26): engine, root package and grammar modules must build and pass there too.
+  # Pull requests run the root plus shard 1; main runs every shard (floor_shards).
   engine-go126:
-    needs: grammar-go126
-    if: *check_grammar_result
+    needs: [changes, grammar-go126]
+    if: ${{ always() && needs.changes.outputs.engine_floor == 'true' }}
     name: engine, oldest supported Go (ubuntu-24.04)
     runs-on: ubuntu-24.04
     timeout-minutes: 45
@@ -145,8 +185,9 @@ jobs:
     steps:
       - name: Grammar shards passed
         env:
-          RESULT: ${{ needs.grammar-go126.result }}
-        run: test "$RESULT" = success
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+          SHARDS_WANTED: ${{ needs.changes.outputs.engine_floor }}
+        run: *shards_passed
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
@@ -161,6 +202,8 @@ jobs:
           go test -count=1 -timeout 600s ./internal/engine ./experimental/... .
 
   engine-consumer-compat:
+    needs: changes
+    if: ${{ needs.changes.outputs.engine_compat == 'true' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
@@ -184,17 +227,14 @@ jobs:
           name: engine-consumer-compat
           path: ${{ runner.temp }}/engine-consumer-compat/
 
+  # The shard lists live in tools/lane/ci_changes.py (ENGINE_SHARDS); the classifier fails unless they name every grammars/* directory once.
   grammar-linux-amd64:
     name: grammar (ubuntu-24.04, Go 1.27.x, shard ${{ matrix.shard }})
+    needs: changes
+    if: ${{ needs.changes.outputs.engine_grammars == 'true' }}
     strategy: &grammar_strategy
       fail-fast: false
-      matrix:
-        include:
-          - {shard: 1, grammars: "powershell golang json python html"}
-          - {shard: 2, grammars: "swift javascript java xml r"}
-          - {shard: 3, grammars: "tsql bash typescript php dart"}
-          - {shard: 4, grammars: "cpp css tsx csharp yaml"}
-          - {shard: 5, grammars: "postgres kotlin rust ruby c"}
+      matrix: ${{ fromJSON(needs.changes.outputs.engine_shards) }}
     runs-on: ubuntu-24.04
     # Allow all five grammar test timeouts plus checkout and Go setup.
     timeout-minutes: 90
@@ -208,12 +248,6 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
       - name: Native architecture
         run: test "$(go env GOOS)" = "$EXPECTED_GOOS" && test "$(go env GOARCH)" = "$EXPECTED_GOARCH"
-      # The shard lists below must name every grammars/* directory exactly once.
-      - name: Shard lists equal grammars/*
-        run: |
-          listed="$(grep -oE 'shard: [0-9]+, grammars: "[^"]*"' .github/workflows/engine.yml | sed -E 's/.*grammars: "([^"]*)"/\1/' | tr ' ' '\n' | sort)"
-          present="$(for d in grammars/*/; do basename "$d"; done | sort)"
-          [ -n "$listed" ] && [ "$listed" = "$present" ] || { echo "::error::engine.yml shard lists differ from grammars/*"; diff <(echo "$listed") <(echo "$present"); exit 1; }
       - name: Grammar module embedded sample tests
         env:
           GRAMMARS: ${{ matrix.grammars }}
@@ -231,6 +265,8 @@ jobs:
 
   grammar-linux-arm64:
     name: grammar (ubuntu-24.04-arm, Go 1.27.x, shard ${{ matrix.shard }})
+    needs: changes
+    if: ${{ needs.changes.outputs.engine_grammars == 'true' && needs.changes.outputs.full == 'true' }}
     strategy: *grammar_strategy
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 90
@@ -239,6 +275,8 @@ jobs:
 
   grammar-macos-arm64:
     name: grammar (macos-latest, Go 1.27.x, shard ${{ matrix.shard }})
+    needs: changes
+    if: ${{ needs.changes.outputs.engine_grammars == 'true' && needs.changes.outputs.full == 'true' }}
     strategy: *grammar_strategy
     runs-on: macos-latest
     timeout-minutes: 90
@@ -247,6 +285,8 @@ jobs:
 
   grammar-windows-amd64:
     name: grammar (windows-latest, Go 1.27.x, shard ${{ matrix.shard }})
+    needs: changes
+    if: ${{ needs.changes.outputs.engine_grammars == 'true' }}
     strategy: *grammar_strategy
     runs-on: windows-latest
     timeout-minutes: 90
@@ -255,6 +295,8 @@ jobs:
 
   grammar-windows-arm64:
     name: grammar (windows-11-arm, Go 1.27.x, shard ${{ matrix.shard }})
+    needs: changes
+    if: ${{ needs.changes.outputs.engine_grammars == 'true' && needs.changes.outputs.full == 'true' }}
     strategy: *grammar_strategy
     runs-on: windows-11-arm
     timeout-minutes: 90
@@ -263,8 +305,42 @@ jobs:
 
   grammar-go126:
     name: grammar (ubuntu-24.04, Go 1.26.x, shard ${{ matrix.shard }})
-    strategy: *grammar_strategy
+    needs: changes
+    if: ${{ needs.changes.outputs.engine_floor == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.changes.outputs.floor_shards) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     env: *go126_env
     steps: *grammar_steps
+
+  # The one required check of this workflow: red when the classifier or any job failed or was cancelled, green when every
+  # job succeeded or was skipped on purpose (a skipped required check would otherwise pass even when its dependency failed).
+  engine-gate:
+    name: engine-gate
+    permissions:
+      actions: read # list the jobs of this run
+    if: ${{ always() }}
+    needs: [changes, engine-linux-amd64, engine-linux-arm64, engine-macos-arm64, engine-windows-amd64, engine-windows-arm64, engine-go126, engine-consumer-compat, grammar-linux-amd64, grammar-linux-arm64, grammar-macos-arm64, grammar-windows-amd64, grammar-windows-arm64, grammar-go126]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Every needed job passed or was skipped on purpose
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped '. as $n | all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok and all(.changes.outputs.expect | fromjson[]; $n[.].result == $ok)' <<<$NEEDS
+      # The needed jobs above are one result per matrix, so a matrix that came out smaller than it should (a classifier regression) stays green.
+      # Count the successful instances in the run: they must be exactly the ones the classifier listed and, outside pull requests, the full
+      # matrix (30 jobs; test_ci_changes.py ties the number to the partitions).
+      - name: The successful matrix jobs are the expected instances
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECT: ${{ needs.changes.outputs.expect_matrix }}
+          MATRIX_RE: '^grammar \('
+          FULL: ${{ github.event_name != 'pull_request' && '30' || '' }}
+        run: |
+          want=$(jq -nr --argjson e "$EXPECT" '$e[]' | tr -d '\r' | sort)
+          [ -z "$FULL" ] || [ "$(jq -n --argjson e "$EXPECT" '$e | length')" = "$FULL" ] || { echo "::error::the classifier listed $(jq -n --argjson e "$EXPECT" '$e | length') matrix jobs, the full run has $FULL"; exit 1; }
+          ok=$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs?per_page=100" --jq '.jobs[] | select(.conclusion == "success") | .name' | { grep -E "$MATRIX_RE" || true; } | sort)
+          [ "$ok" = "$want" ] || { echo "::error::the successful matrix jobs differ from the expected ones (< successful, > expected)"; diff <(echo "$ok") <(echo "$want"); exit 1; }
