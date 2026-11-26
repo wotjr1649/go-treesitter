@@ -9,9 +9,12 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"testing/synctest"
 	"time"
 	"unicode/utf16"
 	"unicode/utf8"
+
+	"github.com/wotjr1649/go-treesitter/internal/engine"
 )
 
 // randSource builds a source in the fake language from a seeded generator.
@@ -527,6 +530,97 @@ func TestParserPoolClosedParserAndPoolClose(t *testing.T) {
 	if _, err := r.Parse(bg, []byte("a"), nil); !errors.Is(err, ErrParserClosed) {
 		t.Fatalf("a lent parser is closed when Put into a closed pool: %v", err)
 	}
+}
+
+func TestParserPoolCloseWakesWaiters(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		fl := newFakeLang(nil)
+		pl, err := NewParserPool(fl.lang, 1)
+		if err != nil {
+			t.Fatal(err)
+		}
+		p, err := pl.Get(bg)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer pl.Put(p)
+		ctx, cancel := context.WithCancel(bg)
+		defer cancel()
+		results := make(chan error, 2)
+		for range cap(results) {
+			go func() {
+				q, err := pl.Get(ctx)
+				pl.Put(q)
+				results <- err
+			}()
+		}
+		synctest.Wait()
+		pl.Close()
+		pl.Close()
+		synctest.Wait()
+		for range cap(results) {
+			select {
+			case err := <-results:
+				if !errors.Is(err, ErrParserClosed) {
+					t.Fatalf("waiting Get: %v", err)
+				}
+			default:
+				t.Fatal("Get stayed blocked after Close")
+			}
+		}
+		if fl.cur().released.Load() {
+			t.Fatal("Close released a lent parser before Put")
+		}
+	})
+}
+
+func TestParserPoolCloseDuringCreation(t *testing.T) {
+	started, resume := make(chan struct{}), make(chan struct{})
+	fl := newFakeLang(func(_ *fakeLang, f *fakeModule) {
+		f.onCall = func(name string) {
+			if name == "initialize" {
+				close(started)
+				<-resume
+			}
+		}
+	})
+	pl, err := NewParserPool(fl.lang, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	done := make(chan error, 1)
+	var p *Parser
+	go func() {
+		var err error
+		p, err = pl.Get(bg)
+		done <- err
+	}()
+	<-started
+	pl.Close()
+	close(resume)
+	if err := <-done; p != nil || !errors.Is(err, ErrParserClosed) {
+		pl.Put(p)
+		t.Fatalf("Get during Close: %p, %v", p, err)
+	}
+	if !fl.cur().released.Load() || len(pl.lent) != 0 || len(pl.slots) != 0 {
+		t.Fatal("Get retained a parser or slot after Close")
+	}
+}
+
+func TestParserPoolCopiesOptions(t *testing.T) {
+	opts := []Option{WithMaxMemoryBytes(engine.MinLimit), WithMaxInputBytes(4)}
+	pl, err := NewParserPool(newFakeLang(nil).lang, 1, opts...)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer pl.Close()
+	opts[0], opts[1] = nil, WithMaxInputBytes(1)
+	p, err := pl.Get(bg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer pl.Put(p)
+	mustParse(t, p, "word")
 }
 
 func TestParserPoolConcurrent(t *testing.T) {

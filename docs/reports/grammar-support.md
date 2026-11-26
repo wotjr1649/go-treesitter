@@ -13,14 +13,14 @@ version selected by Go alongside the root in the [compatibility table](compatibi
 - **`v0.7.0` tag** is published. It gives new tags `grammars/<dir>/v0.7.0` to `css`, `powershell`,
   `ruby`, `swift` and `xml`; the other 20 modules keep their `v0.6.0` tags, so for them this column always says
   “Same”. The new tags point to
-  [`2d11c3f`](https://github.com/wotjr1649/go-treesitter/commit/2d11c3fcf592d67de025782a2942ddf1b01af4d5), with root `v0.7.0`. The table describes the candidate main at
+  [`2d11c3f`](https://github.com/wotjr1649/go-treesitter/commit/2d11c3fcf592d67de025782a2942ddf1b01af4d5), with root `v0.7.0`. The published tag comparison uses the candidate at
   [`7e24331`](https://github.com/wotjr1649/go-treesitter/commit/7e243318b5b1f8223ac0e1f49e06e10a9b107757).
   “Same” carries the `v0.6.0` limit forward. “Fixed” and “Changed” apply to the recorded input in the new tag.
 
 The inputs below are illustrative excerpts. Linked records give the exact fixtures and scope. The error
 column refers to the root's syntax error flag (`HasError()`). An error-free tree can still have the
-wrong structure. The four error-free **registered** cases on main are the C# default constraint,
-the HTML end tag and the two Python precedence cases. The support table summarizes recorded evidence
+wrong structure. The three error-free **registered** cases on main are the C# default constraint,
+the HTML end tag and the Python bitwise precedence case. The support table summarizes recorded evidence
 at the linked identities. See the [evidence levels](../specs/validation.md#evidence-levels).
 
 ## Registered on main
@@ -37,10 +37,8 @@ required by the grammar release gate.
 | `csharp` | `#define A` without a final newline | `v0.6.0` | Same | Yes, anonymous missing token | A valid directive can trigger diagnostics or be skipped by error-sensitive tools. | A candidate includes the directive EOF fix. Check the final directive and edit recovery. | [csharp-directive-eof](../known-gaps/csharp.md#csharp-directive-eof) |
 | `csharp` | `var s = $"";` | `v0.6.0` | Same | Yes | The interpolation prefix errors and the quotes are parsed as an ordinary string. | A candidate recognizes empty interpolation as an interpolated string. | [csharp-empty-interpolation](../known-gaps/csharp.md#csharp-empty-interpolation) |
 | `csharp` | `#if` and `#else` supply different `if` heads for one shared block | `v0.6.0` | Same | Yes | The shared block is detached from its conditional statement. | A candidate changes directive handling. Check the body association, captures and incremental edits. | [csharp-conditional-splits-statement](../known-gaps/csharp.md#csharp-conditional-splits-statement) |
-| `css` | `a { b: 한글 }` | `v0.6.0` | Same | Yes | Declaration-value queries lose the bare identifier. | A candidate extends value identifier handling. Check the `plain_value` node independently of selectors. | [css-non-latin1-value](../known-gaps/css.md#css-non-latin1-value) |
 | `html` | `<x-걁>body</x-굁>` or an end tag of `</x-A>` | `v0.6.0` | Same | No | The wrong end tag closes the element, misleading structure-sensitive edits and queries. | A scanner candidate compares full names. Check matching and mismatched tags in fresh and incremental trees. | [html-hangul-tag-low-byte-mismatch](../known-gaps/html.md#html-hangul-tag-low-byte-mismatch) |
 | `python` | `a ^ b & c` | `v0.6.0` | Same | No | The tree groups `(a ^ b) & c`, changing what an analysis infers about the expression. | A candidate groups it as `a ^ (b & c)` and preserves the parenthesized controls. | [python-bitwise-precedence](../known-gaps/python.md#python-bitwise-precedence) |
-| `python` | `await f() ** 2` inside an async function | `v0.6.0` | Same | No | The power expression is inside the await operand, changing expression analysis. | A candidate groups it as `(await f()) ** 2` and preserves explicitly parenthesized operands. | [python-await-power](../known-gaps/python.md#python-await-power) |
 | `swift` | `끝: for _ in 0..<1 { }` | [`v0.6.0` record](https://github.com/wotjr1649/go-treesitter/blob/a8af4360e4964deb6c0bb62461ee8348be1aa738/docs/known-gaps/swift.md#swift-non-ascii-statement-label) | Same on the `v0.7.0` tag's `fef1236` pin | Yes | A valid label definition becomes an error and the loop has no label. | A candidate changes the label production. Check definitions and references. | [swift-non-ascii-statement-label](../known-gaps/swift.md#swift-non-ascii-statement-label) |
 
 ## Fixed in the v0.7.0 tags
@@ -69,6 +67,15 @@ None changed without a root error on either tag and have no register entry. Case
 | `powershell` | `$값` or `$한` inside an expandable here-string, and `"$한글"` | `v0.6.0` | Changed, no root error | No | The `v0.6.0` tree has no separate `variable` node for the interpolation. The `v0.7.0` tag adds one. | A tag includes the patch ([row 32](limitations.md)). Keep the fixture and recheck it on the next pin. | None; [Korean input evidence](../guides/korean-input.md#which-grammars-take-korean), [fixture](../../tools/conformance/testdata/korean/powershell/str-here-string.in) |
 | `powershell` | `"$name님 환영합니다"` | `v0.6.0` | Changed, no root error | No | The `v0.6.0` tree reads the variable `$name` followed by text. The `v0.7.0` tag reads one `variable`, `$name님`, so variable captures and ranges differ between the tags. | A tag includes the patch ([row 32](limitations.md)). Keep the fixture and recheck variable ranges on the next pin. | None; [migration](../../MIGRATING.md#powershell-names), [row 32](limitations.md) |
 | `powershell` | `echo $env:한글` | `v0.6.0` | Changed, no root error | No | The `v0.6.0` tree reads the variable `$env`, a `:` token and a word. The `v0.7.0` tag reads one `variable`, `$env:한글`. | A tag includes the patch ([row 32](limitations.md)). Keep the fixture and recheck scoped names on the next pin. | None; [migration](../../MIGRATING.md#powershell-names), [row 32](limitations.md) |
+
+## Fixed in the development tree after v0.7.0
+
+The CSS declaration value and Python `await` fixes are in the development tree. Their two IDs leave the register, and the inputs stay as regression fixtures.
+
+| Grammar module | Input | Published behavior | Development tree | Consumer impact | Evidence |
+|---|---|---|---|---|---|
+| `css` | `a { b: 한글 }` | Both `v0.6.0` and `v0.7.0` report a root error | Fixed, no root error | Queries can capture the declaration and the complete `plain_value`. | [Published gap](https://github.com/wotjr1649/go-treesitter/blob/grammars/css/v0.7.0/docs/known-gaps/css.md#css-non-latin1-value), [regression input](../../tools/conformance/testdata/korean/css/probe-ident-value.in), [migration](../../MIGRATING.md#css-non-latin-1-declaration-values) |
+| `python` | `await f() ** 2` inside an async function | The carried-forward `v0.6.0` tag puts the power expression inside the await operand without a root error | Groups as `(await f()) ** 2` | Expression analysis sees a different grouping. | [Published gap](https://github.com/wotjr1649/go-treesitter/blob/grammars/python/v0.6.0/docs/known-gaps/python.md#python-await-power), [row 35](limitations.md), [migration](../../MIGRATING.md#python-await-and-the-power-operator) |
 
 ## Other documented grammar limits
 

@@ -285,10 +285,14 @@ Recorded C-only patches exist for bash and ruby (`0001-heredoc-utf8`), yaml (`00
 Go applies `0001-new-value-argument` before generation to accept Go 1.26 expression arguments to `new`.
 Ruby applies `0002-global-variable-non-ascii` before generation to accept non-ASCII global-variable names, and
 `0003-non-ascii-symbol` (`src/scanner.c`, after generation) so the scanner compares whole code points in plain `:symbol` names.
-CSS applies `0001-non-latin1-names` before generation to accept non-Latin-1 names.
+CSS applies `0001-non-latin1-names` and then `0002-non-latin1-value` before generation to accept non-Latin-1 names and
+a single unquoted, unescaped identifier as a declaration value when it starts with a code point beyond Latin-1,
+optionally after a hyphen. See the [migration notes](../../MIGRATING.md#css-non-latin-1-declaration-values)
+for recovery and query capture changes.
 XML applies `0001-non-ascii-names` (`common/common.mjs`) before generation and `0002-tag-name-code-points` (`xml/src/scanner.c`) after it.
 PowerShell applies `0001-non-ascii-names` (`grammar.js`) before generation to accept non-ASCII variable, parameter, hash-key, member and type names (statement labels stay ASCII-only).
-`gen -patch-status` lists 16 records in total, including three for Ruby, two for XML and one each for CSS and PowerShell. Retire each with an approved pin move to a source that contains the fix (for an owner-maintained repository, an owner release; ADR-0024 rule 7.6).
+Python applies `0002-await-power-precedence` (`grammar.js`) before generation so that `await` binds tighter than `**`; its `0001` scanner patch applies after generation.
+`gen -patch-status` lists 18 records in total: three each for Ruby and YAML, two each for CSS, HTML, Python and XML, and one each for Bash, Go, PowerShell and Rust. Retire each with an approved pin move to a source that contains the fix (for an owner-maintained repository, an owner release; ADR-0024 rule 7.6).
 JavaScript retired `0001-jsx-bare-ampersand` with its owner v4.4.0 pin (`e5ada307a6f1741a573d5c8d4dafee9234330b1f`).
 The fix first shipped in [owner v2.0.0](https://github.com/wotjr1649/tree-sitter-javascript/releases/tag/v2.0.0)
 ([fix commit](https://github.com/wotjr1649/tree-sitter-javascript/commit/4765cd79603fa478da221da50500162757859e20)).
@@ -347,8 +351,8 @@ kind `source`/`toolchain`; no header):
 awk -F '\t' '$4 == "source"' release-assets.tsv > release-source-assets.tsv
 ```
 
-The command lists 34 rows for the current pins. The v0.6.0 and v0.7.0 releases each mirror all 26 `source` archives plus
-`SHA256SUMS`. The eight `toolchain` rows are excluded. The v0.5.0 release mirrors its original 25 source archives plus `SHA256SUMS`.
+The command lists 35 rows for the current pins (the `windows-arm64` CLI adds a `toolchain` row; the pre-add count was 34). The v0.6.0 and v0.7.0 releases each mirror all 26 `source` archives plus
+`SHA256SUMS`. The nine `toolchain` rows are excluded (the v0.6.0 and v0.7.0 releases predate the ninth). The v0.5.0 release mirrors its original 25 source archives plus `SHA256SUMS`.
 The v0.6.0 inventory adds the Swift archive, the T-SQL owner release v2.8.0 archive `tree-sitter-mssql-3d42c1a55fb5.tar.gz`,
 the Java v3.0.3 archive `tree-sitter-java-358048c1c6f9.tar.gz`, the shared TypeScript/TSX owner release v3.1.0 archive
 `tree-sitter-typescript-c37edc69610d.tar.gz`, the JavaScript v4.4.0 archive `tree-sitter-javascript-e5ada307a6f1.tar.gz`,
