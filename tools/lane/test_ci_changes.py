@@ -86,7 +86,7 @@ class DecideTest(unittest.TestCase):
         # A change to the workflow itself runs all of that workflow (and only that one).
         eng = [".github/workflows/engine.yml"]
         self.assertEqual(flags("engine", eng)["full"], "true")
-        self.assertEqual(len(json.loads(flags("engine", eng)["floor_shards"])["include"]), 5)
+        self.assertEqual(len(json.loads(flags("engine", eng)["floor_shards"])["include"]), len(cc.ENGINE_SHARDS))
         self.assertEqual(len(on("engine", eng)), 5)
         self.assertEqual(on("regen", eng), [])
         reg = [".github/workflows/regen.yml"]
@@ -109,7 +109,7 @@ class DecideTest(unittest.TestCase):
                 self.assertTrue(all(v == "true" for k, v in out.items() if k[:3] in ("eng", "reg", "win", "api", "pin", "con") and v in ("true", "false")), (wf, f, ev, out))
             self.assertEqual(flags("engine", f, ev)["full"], "true" if ev != "pull_request" else "false")
         self.assertEqual(len(json.loads(flags("conformance", ["README.md"], "push")["conformance_matrix"])["include"]), 10)
-        self.assertEqual(len(json.loads(flags("engine", ["README.md"], "push")["floor_shards"])["include"]), 5)
+        self.assertEqual(len(json.loads(flags("engine", ["README.md"], "push")["floor_shards"])["include"]), len(cc.ENGINE_SHARDS))
 
     def test_every_job_flag_is_covered(self):
         got = set()
@@ -262,7 +262,7 @@ class MatrixCountTest(unittest.TestCase):
         self.assertEqual(self.names("engine", ["README.md"]), [])  # only engine (ubuntu-24.04), which has no matrix
         self.assertEqual(self.names("engine", ["tools/gen/pins.json"]), [])  # no grammar shards: drift is regen's
         pr = self.names("engine", ["query.go"])
-        self.assertEqual(len(pr), 5 + 5 + 1)  # linux-amd64 and windows-amd64 shards, one floor shard
+        self.assertEqual(len(pr), 2 + 2 + 1)  # linux-amd64 and windows-amd64 shards, one floor shard
         self.assertIn("grammar (ubuntu-24.04, Go 1.26.x, shard 1)", pr)
         self.assertNotIn("grammar (ubuntu-24.04, Go 1.26.x, shard 2)", pr)
         for wf in cc.WORKFLOWS:
@@ -276,7 +276,7 @@ class MatrixCountTest(unittest.TestCase):
                 size = int(re.search(r"'(\d+)'", env["FULL"]).group(1))
                 self.assertEqual(len(self.names(wf, files, ev)), size, (wf, ev))
         self.assertEqual(len(cc.CONFORMANCE_GROUPS) * len(cc.RUNNERS), 10)
-        self.assertEqual(len(cc.ENGINE_MATRIX_JOBS) * len(cc.ENGINE_SHARDS), 30)
+        self.assertEqual(len(cc.ENGINE_MATRIX_JOBS) * len(cc.ENGINE_SHARDS), 12)
 
     def test_names_match_the_workflows(self):
         text = workflow_text("engine")
@@ -335,9 +335,9 @@ class MatrixCountTest(unittest.TestCase):
         for bad in ("", "null", "{}", "conformance"):
             self.assertNotEqual(self.run_step("conformance", bad, c + other, "push"), 0, bad)
         e = self.names("engine", ["README.md"], "push")
-        self.assertEqual(len(e), 30)
+        self.assertEqual(len(e), 12)
         self.assertEqual(self.run_step("engine", j(e), e + ["engine (ubuntu-24.04)"], "push"), 0)
-        self.assertNotEqual(self.run_step("engine", j(e[:25]), e[:25], "push"), 0)  # floor shards dropped on a push
+        self.assertNotEqual(self.run_step("engine", j(e[:10]), e[:10], "push"), 0)  # floor shards dropped on a push
         self.assertNotEqual(self.run_step("engine", j(e), e[:-1], "push"), 0)
 
 

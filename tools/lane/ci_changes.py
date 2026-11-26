@@ -31,12 +31,11 @@ from pathlib import Path
 WORKFLOWS = ("engine", "regen", "conformance", "windows", "api-guard", "pin-move")
 
 # Grammar partitions. They must name every grammars/* directory exactly once (checked here and in the unit test).
+# Two shards balanced by the measured per-grammar test time of main push runs (powershell and swift take most of it; the other 23 grammars
+# are a few seconds each), so each job pays checkout and Go setup once instead of five times.
 ENGINE_SHARDS = [
-    {"shard": 1, "grammars": "powershell golang json python html"},
-    {"shard": 2, "grammars": "swift javascript java xml r"},
-    {"shard": 3, "grammars": "tsql bash typescript php dart"},
-    {"shard": 4, "grammars": "cpp css tsx csharp yaml"},
-    {"shard": 5, "grammars": "postgres kotlin rust ruby c"},
+    {"shard": 1, "grammars": "powershell cpp css postgres php golang dart typescript tsx rust r json"},
+    {"shard": 2, "grammars": "swift bash kotlin tsql csharp ruby c xml javascript html java python yaml"},
 ]
 # Split by measured run time; g1 also runs the repository-wide checks once per architecture.
 CONFORMANCE_GROUPS = [

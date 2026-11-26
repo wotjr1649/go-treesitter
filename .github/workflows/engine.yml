@@ -247,8 +247,9 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.changes.outputs.engine_shards) }}
     runs-on: ubuntu-24.04
-    # Allow all five grammar test timeouts plus checkout and Go setup.
-    timeout-minutes: 90
+    # A shard takes about 3-7 minutes. A hung grammar fails at its own 900 s go test limit and the loop goes on, so this limit only bounds a
+    # shard in which many of its 12-13 grammars hang (13 x 900 s would be 195 minutes).
+    timeout-minutes: 120
     env: *linux_amd64_env
     steps: &grammar_steps
       - uses: actions/checkout@v7
@@ -280,7 +281,7 @@ jobs:
     if: ${{ needs.changes.outputs.engine_grammars == 'true' && needs.changes.outputs.full == 'true' }}
     strategy: *grammar_strategy
     runs-on: ubuntu-24.04-arm
-    timeout-minutes: 90
+    timeout-minutes: 120
     env: *linux_arm64_env
     steps: *grammar_steps
 
@@ -290,7 +291,7 @@ jobs:
     if: ${{ needs.changes.outputs.engine_grammars == 'true' && needs.changes.outputs.full == 'true' }}
     strategy: *grammar_strategy
     runs-on: macos-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     env: *macos_arm64_env
     steps: *grammar_steps
 
@@ -300,7 +301,7 @@ jobs:
     if: ${{ needs.changes.outputs.engine_grammars == 'true' }}
     strategy: *grammar_strategy
     runs-on: windows-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     env: *windows_amd64_env
     steps: *grammar_steps
 
@@ -310,7 +311,7 @@ jobs:
     if: ${{ needs.changes.outputs.engine_grammars == 'true' && needs.changes.outputs.full == 'true' }}
     strategy: *grammar_strategy
     runs-on: windows-11-arm
-    timeout-minutes: 90
+    timeout-minutes: 120
     env: *windows_arm64_env
     steps: *grammar_steps
 
@@ -322,7 +323,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.changes.outputs.floor_shards) }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 120
     env: *go126_env
     steps: *grammar_steps
 
@@ -343,13 +344,13 @@ jobs:
         run: jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped '. as $n | all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok and all(.changes.outputs.expect | fromjson[]; $n[.].result == $ok)' <<<$NEEDS
       # The needed jobs above are one result per matrix, so a matrix that came out smaller than it should (a classifier regression) stays green.
       # Count the successful instances in the run: they must be exactly the ones the classifier listed and, outside pull requests, the full
-      # matrix (30 jobs; test_ci_changes.py ties the number to the partitions).
+      # matrix (12 jobs; test_ci_changes.py ties the number to the partitions).
       - name: The successful matrix jobs are the expected instances
         env:
           GH_TOKEN: ${{ github.token }}
           EXPECT: ${{ needs.changes.outputs.expect_matrix }}
           MATRIX_RE: '^grammar \('
-          FULL: ${{ github.event_name != 'pull_request' && '30' || '' }}
+          FULL: ${{ github.event_name != 'pull_request' && '12' || '' }}
         run: |
           want=$(jq -nr --argjson e "$EXPECT" '$e[]' | tr -d '\r' | sort)
           [ -z "$FULL" ] || [ "$(jq -n --argjson e "$EXPECT" '$e | length')" = "$FULL" ] || { echo "::error::the classifier listed $(jq -n --argjson e "$EXPECT" '$e | length') matrix jobs, the full run has $FULL"; exit 1; }
