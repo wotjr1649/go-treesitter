@@ -546,7 +546,9 @@ capture lists allocated under the higher limit, so a later low limit did not alw
 states for each call, and overflow ends the sequence with `ErrQueryMatchLimit`. Zero and `math.MaxUint32` are both
 unlimited. Lowering the effective limit replaces the cursor, so the next `Matches` rebuilds the whole-tree capture
 index (O(nodes), even for a narrow byte range). Raising it does not. Handle `ErrQueryMatchLimit` wherever you use a
-low limit. [Query contract](docs/design/query-abi.md)
+low limit. `errors.Is(err, ErrQueryMatchLimit)` is also true for `ErrResourceLimit` checks now, so code that checks
+`ErrResourceLimit` first also catches it; put the `ErrQueryMatchLimit` check before it to tell them apart. The error
+is still not a `*ParseError`. [Query contract](docs/design/query-abi.md)
 
 ### CSS non-Latin-1 declaration values
 

@@ -53,7 +53,10 @@ A malformed query returns `InvalidInput` with a `*QueryError` available through 
 `NewQuery` returns that query error directly. Context cancellation or expiration uses `Cancelled`
 or `Timeout`. Go-side budget exhaustion returns `ResourceLimit` with `InstanceReset == false`.
 Engine growth refusal can require an instance reset. The cursor's in-progress `MatchLimit`
-reports `ErrQueryMatchLimit` and discards any result produced by the same engine call.
+reports `ErrQueryMatchLimit` and discards any result produced by the same engine call. That error is a plain
+sentinel, not a `*ParseError` (`errors.As` finds none, so there is no `Outcome`), but `errors.Is` matches both
+`ErrQueryMatchLimit` and `ErrResourceLimit`: one `ErrResourceLimit` check covers every limit. The reverse does not
+hold (a `ResourceLimit` `*ParseError` is not `ErrQueryMatchLimit`), so test `ErrQueryMatchLimit` first to tell them apart.
 
 A stopped match sequence emits at most one terminal error and releases the parser's busy guard.
 Previously yielded capture nodes retain their snapshots. An iteration that ends cleanly, stops
@@ -78,7 +81,7 @@ UTF-8 source is not converted and both return the offset unchanged (clamped). Se
   the parser's busy guard, including cached `Tree.Snapshot`, reject overlapping operations with `ErrInvalidInput`
   when the guard is held. `Tree.Close` marks the tree closed once and queues its handle if the guard is held.
 - `Tree.Matches` applies `QueryOptions.MatchLimit` to in-progress states on each call and reports
-  `ErrQueryMatchLimit` on overflow. See the [query contract](../design/query-abi.md) for cursor and memory lifetimes.
+  `ErrQueryMatchLimit` on overflow (`errors.Is` also matches `ErrResourceLimit`). See the [query contract](../design/query-abi.md) for cursor and memory lifetimes.
 - `Close`, `Reset`, an instance reset and `ParserPool.Put` invalidate the parser's live trees (`ErrTreeInvalidated`).
 - `NewParserPool` copies its options and rejects a nonzero memory limit below the engine minimum (32 MiB).
   Closing a pool wakes waiting `Get` calls with `ErrParserClosed` and prevents a parser still being created from

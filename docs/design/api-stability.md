@@ -48,7 +48,8 @@ The supported consumer entry point for a language is the grammar module's `Langu
 `NewLanguage` accepts a descriptor from the root's internal engine and is reserved for generated code.
 The parser and query constructors and the budgeted match entry point accept functional options.
 Consumers obtain option values from the exported `With…` functions. Nine sentinel variables have the inferred
-unexported type `*sentinel`. Their identity via `errors.Is` is part of the contract.
+unexported type `*sentinel`. Their identity via `errors.Is` is part of the contract, including the alias pairs: `ErrTimeout` also matches
+`context.DeadlineExceeded`, `ErrCancelled` `context.Canceled` and `ErrQueryMatchLimit` `ErrResourceLimit`.
 The method `(*queryRegex).MatchString(text string) bool` is reachable only inside the package.
 
 | Identifier | Go declaration or signature | Class |

@@ -12,7 +12,9 @@ import (
 
 var (
 	ErrQueryUnsupported = &sentinel{msg: "treesitter: queries require engine ABI 2 or later"}
-	ErrQueryMatchLimit  = &sentinel{msg: "treesitter: query match limit exceeded"}
+	// ErrQueryMatchLimit ends a match stream that exceeded QueryOptions.MatchLimit. It is not a *ParseError, and
+	// errors.Is also matches ErrResourceLimit, so one ErrResourceLimit check covers every limit.
+	ErrQueryMatchLimit = &sentinel{msg: "treesitter: query match limit exceeded", also: ErrResourceLimit}
 )
 
 // QueryErrorType identifies a C query compilation error, or a Go text-predicate error.
