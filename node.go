@@ -261,8 +261,10 @@ func (n Node) NamedChildren() iter.Seq[Node] {
 	}
 }
 
-// ChildByFieldName returns C's first node filling the named field (possibly an alias's descendant).
-// ERROR nodes and unknown fields return nothing. ABI 1/2 grammars retain direct-child lookup.
+// ChildByFieldName returns the node filling the named field as the grammar module's pinned tree-sitter runtime
+// (ts_node_child_by_field_id) resolves it; with an ABI 3 or 4 module that need not be a direct child. The contract does
+// not promise where such a result lies (with the v0.27.x runtimes it can be inside a visible alias); a module on another
+// runtime can resolve it differently. ERROR nodes and unknown fields return nothing. ABI 1/2 grammars retain direct-child lookup.
 func (n Node) ChildByFieldName(name string) (Node, bool) {
 	for c := range n.ChildrenByFieldName(name) {
 		return c, true
