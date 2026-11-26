@@ -95,6 +95,24 @@ A language with an open known regression keeps the **Development gate green** an
 
 `development baseline usable` ≠ `release approved`. Never compress that into "it works".
 
+## Root RC and 1.0 scope
+
+[ADR-0028](../design/decisions/ADR-0028-root-stability-and-independent-grammar-versioning.md#amendment-2026-11-25-decisions-1-and-3-root-scope-rc-bench-rc-exit-and-windows-resources)
+decides these rules for the root RC and 1.0.
+
+- **Scope.** The Release-Critical and Release gates cover all 25 grammar modules. Hosted engine and bench CI
+  cover Linux amd64/arm64, macOS arm64 and Windows amd64/arm64. Hosted conformance covers Linux amd64/arm64.
+  Grammar known gaps stay documented limits. A grammar's resource-budget failure fails the root gate. Only an
+  owner-recorded per-case exception narrows the scope; the v0.7.0 Preview macOS kotlin exception covers
+  that Preview only.
+- **RC bench.** Run the bench CI exactly once on the RC candidate commit, and declare that run before it
+  starts. A failure is kept and classified. Fix it and cut a new RC, or the owner decides a new per-case
+  exception. The Release gate criteria stay as written above.
+- **Windows resources.** Bench CI includes hosted Windows amd64 and arm64. For the RC, also run the Windows
+  amd64 local bench of all 25 grammars on the same candidate commit.
+- **RC exit.** A change to root code, contract or inputs during an RC cuts a new RC and repeats the affected
+  gates. Otherwise 14 days without root defect reports lead to 1.0.
+
 ## Known-regression ratchet
 
 Not an `xfail`. A loose skip hides both fixes and regressions in the pinned source.
