@@ -46,6 +46,8 @@ jobs:
         name: Classify the changed files (tools/lane/ci_changes.py)
         run: python3 tools/lane/ci_changes.py --workflow engine
 
+  # Pull requests run ubuntu-24.04 and windows-latest (engine and grammar shards), the Go 1.26 floor on the root and one shard,
+  # and the cross-compat lane; pushes to main, dispatch and a change to this file run all five platforms and the floor on every shard.
   engine-linux-amd64:
     needs: [changes, grammar-linux-amd64]
     # Always start when selected: the first step fails the job unless every grammar shard succeeded or was skipped on purpose.
@@ -111,7 +113,7 @@ jobs:
 
   engine-linux-arm64:
     needs: [changes, grammar-linux-arm64]
-    if: ${{ always() && needs.changes.outputs.engine_platforms == 'true' }}
+    if: ${{ always() && needs.changes.outputs.engine_platforms == 'true' && needs.changes.outputs.full == 'true' }}
     name: engine (ubuntu-24.04-arm)
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 45
@@ -124,7 +126,7 @@ jobs:
 
   engine-macos-arm64:
     needs: [changes, grammar-macos-arm64]
-    if: ${{ always() && needs.changes.outputs.engine_platforms == 'true' }}
+    if: ${{ always() && needs.changes.outputs.engine_platforms == 'true' && needs.changes.outputs.full == 'true' }}
     name: engine (macos-latest)
     runs-on: macos-latest
     timeout-minutes: 45
@@ -150,7 +152,7 @@ jobs:
 
   engine-windows-arm64:
     needs: [changes, grammar-windows-arm64]
-    if: ${{ always() && needs.changes.outputs.engine_platforms == 'true' }}
+    if: ${{ always() && needs.changes.outputs.engine_platforms == 'true' && needs.changes.outputs.full == 'true' }}
     name: engine (windows-11-arm)
     runs-on: windows-11-arm
     timeout-minutes: 45
@@ -162,6 +164,7 @@ jobs:
     steps: *engine_steps
 
   # The oldest supported Go (go.mod floor 1.26): engine, root package and grammar modules must build and pass there too.
+  # Pull requests run the root plus shard 1; main runs every shard (floor_shards).
   engine-go126:
     needs: [changes, grammar-go126]
     if: ${{ always() && needs.changes.outputs.engine_floor == 'true' }}
@@ -257,7 +260,7 @@ jobs:
   grammar-linux-arm64:
     name: grammar (ubuntu-24.04-arm, Go 1.27.x, shard ${{ matrix.shard }})
     needs: changes
-    if: ${{ needs.changes.outputs.engine_grammars == 'true' }}
+    if: ${{ needs.changes.outputs.engine_grammars == 'true' && needs.changes.outputs.full == 'true' }}
     strategy: *grammar_strategy
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 90
@@ -267,7 +270,7 @@ jobs:
   grammar-macos-arm64:
     name: grammar (macos-latest, Go 1.27.x, shard ${{ matrix.shard }})
     needs: changes
-    if: ${{ needs.changes.outputs.engine_grammars == 'true' }}
+    if: ${{ needs.changes.outputs.engine_grammars == 'true' && needs.changes.outputs.full == 'true' }}
     strategy: *grammar_strategy
     runs-on: macos-latest
     timeout-minutes: 90
@@ -287,7 +290,7 @@ jobs:
   grammar-windows-arm64:
     name: grammar (windows-11-arm, Go 1.27.x, shard ${{ matrix.shard }})
     needs: changes
-    if: ${{ needs.changes.outputs.engine_grammars == 'true' }}
+    if: ${{ needs.changes.outputs.engine_grammars == 'true' && needs.changes.outputs.full == 'true' }}
     strategy: *grammar_strategy
     runs-on: windows-11-arm
     timeout-minutes: 90
@@ -300,7 +303,7 @@ jobs:
     if: ${{ needs.changes.outputs.engine_floor == 'true' }}
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.changes.outputs.engine_shards) }}
+      matrix: ${{ fromJSON(needs.changes.outputs.floor_shards) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     env: *go126_env
