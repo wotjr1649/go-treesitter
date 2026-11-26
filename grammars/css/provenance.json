@@ -88,8 +88,8 @@
       "recipe": "v2-O3",
       "tree-sitter-cli": "0.27.2",
       "wasi-sdk": "34.0",
-      "wasm2go": "v0.4.21",
-      "wasm2go-sum": "h1:F9xQyNnXIjWesQgt7tLxqVUg2pmxwBOrRCLpEFv3QUc="
+      "wasm2go": "v0.4.22",
+      "wasm2go-sum": "h1:qNt3P+1WxlxeZ37ngigrTe0i5IYjFH1n2evF4J4ZGLc="
     }
   },
   "outputs": {
@@ -102,7 +102,7 @@
     "LICENSES/wasi-libc/dlmalloc-CC0-notice.txt": "f80aba12fcd278868e69814d5b42e93fe91567ae4fd77a774f832162030986b8",
     "LICENSES/wasi-libc/musl-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
     "engine_gen.dat": "11bf8d4ee77b2a22623a8a602085bb83f151741ce3e933c989482facc12fd197",
-    "engine_gen.go": "6ec85998e6cdb397712cdb0fc85b99ba2d4471f9b8f99b53f2b93cf513bef866",
+    "engine_gen.go": "ef9e5ff7f8b180d5f4f56e7e17d062134b0c1a40cc8c107c057cab551f0d32c1",
     "wasm": "000059c859910bd10c2f4c260df07de6df1df3f885b90730ef3dcfe45092b479",
     "wasm.clang": "a3ab2b3bf808f620d7b3408ea5cef36f4f3d08be1eecf0d4054c55056dfc657c"
   }

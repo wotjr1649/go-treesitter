@@ -490,8 +490,8 @@ var grammar = engine.Grammar{
 			"recipe":          "v2-O3",
 			"tree-sitter-cli": "0.27.2",
 			"wasi-sdk":        "34.0",
-			"wasm2go":         "v0.4.21",
-			"wasm2go-sum":     "h1:F9xQyNnXIjWesQgt7tLxqVUg2pmxwBOrRCLpEFv3QUc=",
+			"wasm2go":         "v0.4.22",
+			"wasm2go-sum":     "h1:qNt3P+1WxlxeZ37ngigrTe0i5IYjFH1n2evF4J4ZGLc=",
 		},
 	},
 }
