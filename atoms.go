@@ -14,7 +14,7 @@ func (s *Snapshot) buildAtoms() {
 	t := atomTable{col: make([]Atom, s.n), off: make([]uint32, 2, 64)}
 	seen := make(map[string]Atom) // transient: dropped after the build
 	for i := 0; i < s.n; i++ {
-		if s.flags[i]&flagNamed == 0 || s.childCount[i] != 0 || s.endByte[i] == s.startByte[i] {
+		if s.flags[i]&flagNamed == 0 || s.descEnd[i] != int32(i)+1 || s.endByte[i] == s.startByte[i] {
 			continue
 		}
 		a, e := s.startByte[i], s.endByte[i]

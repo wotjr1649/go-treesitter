@@ -128,7 +128,7 @@ func EditFor(old, new []byte, start, oldEnd, newEnd uint32) InputEdit  // O(n); 
 
 A snapshot owns its Go data and stays valid after the tree or parser closes. `Parse` and `ParseSnapshot`
 make one copy for the snapshot's source. `ParseOwned` avoids that copy by taking ownership of the input.
-The snapshot's struct-of-arrays layout retains 25 B/node, plus source and sparse ABI 3/4 field exceptions.
+The snapshot's struct-of-arrays layout retains 21 B/node, plus source and sparse ABI 3/4 field exceptions.
 `StartPoint`, `EndPoint` and point-range lookups derive LF rows and byte columns from the byte offsets using the
 snapshot's shared `Lines()` index: O(source bytes) on first use, O(log lines) per point. Its lazy `[]uint32` line
 starts cost `4 * (LF count + 1)` bytes (at most `len(source) + 1` entries), plus fixed object/allocator overhead;
