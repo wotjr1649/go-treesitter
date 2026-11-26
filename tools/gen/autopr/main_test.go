@@ -18,7 +18,10 @@ func moved(s string) string {
 }
 
 func TestCheckPins(t *testing.T) {
-	bad := func(c candidate, f func(string) string) error { return checkPins([]byte(base), prop(f), c) }
+	bad := func(c candidate, f func(string) string) error {
+		_, err := checkPins([]byte(base), prop(f), c)
+		return err
+	}
 	if err := bad(good, moved); err != nil {
 		t.Fatalf("good proposal refused: %v", err)
 	}
@@ -63,7 +66,7 @@ func TestCheckFiles(t *testing.T) {
 		"backslash":      {[]file{{Path: "grammars/c/a\\b", Regular: true}}, true},
 		"prefix sibling": {[]file{{Path: "grammars/cpp/a", Regular: true}}, true},
 	} {
-		if err := checkFiles(tc.f, "c", read); (err != nil) != tc.fail {
+		if err := checkFiles(tc.f, []string{"c"}, read); (err != nil) != tc.fail {
 			t.Errorf("%s: err=%v, want failure=%v", name, err, tc.fail)
 		}
 	}
@@ -83,14 +86,38 @@ func TestRunApply(t *testing.T) {
 	must(filepath.Join(prop, "pins.json"), moved(base))
 	must(filepath.Join(prop, "candidate.json"), `{"Kind":"grammar","Name":"c","Tag":"v1.2.3","Commit":"`+good.Commit+`"}`)
 	must(filepath.Join(reg, "grammars/c/engine_gen.go"), "package c\n")
-	if _, err := run(root, prop, reg, true); err != nil {
+	if _, _, err := run(root, prop, reg, true); err != nil {
 		t.Fatal(err)
 	}
 	if b, _ := os.ReadFile(filepath.Join(root, "grammars/c/engine_gen.go")); string(b) != "package c\n" {
 		t.Fatal("regenerated file not applied")
 	}
 	must(filepath.Join(reg, "grammars/json/x.go"), "package j\n")
-	if _, err := run(root, prop, reg, true); err == nil {
+	if _, _, err := run(root, prop, reg, true); err == nil {
 		t.Fatal("a file of another module was accepted")
+	}
+}
+
+// Grammars that share one repository commit (typescript and tsx) are one pin: they move together or not at all.
+func TestCheckPinsGroup(t *testing.T) {
+	a, b := strings.Repeat("a", 40), strings.Repeat("c", 40)
+	main := `{"grammars":{"ts":{"repo":"https://github.com/o/t","commit":"` + a + `"},"tsx":{"repo":"https://github.com/o/t","commit":"` + a + `"},"j":{"repo":"https://github.com/o/j","commit":"` + a + `"}}}`
+	both := strings.ReplaceAll(main, a, b)
+	c := candidate{"grammar", "ts", "v1.0.0", b}
+	// j is another repository: it must not move even though its commit text is the same.
+	jKept := strings.Replace(both, "https://github.com/o/j\",\"commit\":\""+b, "https://github.com/o/j\",\"commit\":\""+a, 1)
+	names, err := checkPins([]byte(main), []byte(jKept), c)
+	if err != nil || strings.Join(names, " ") != "ts tsx" {
+		t.Fatalf("group move: names %v, err %v", names, err)
+	}
+	if _, err := checkPins([]byte(main), []byte(both), c); err == nil {
+		t.Fatal("moving an unrelated repository's entry was accepted")
+	}
+	onlyTS := strings.Replace(main, `"commit":"`+a, `"commit":"`+b, 1)
+	if _, err := checkPins([]byte(main), []byte(onlyTS), c); err == nil {
+		t.Fatal("moving ts without tsx was accepted")
+	}
+	if err := checkFiles([]file{{Path: "grammars/tsx/x.go", Regular: true}, {Path: "grammars/ts/x.go", Regular: true}}, names, func(string) ([]byte, error) { return nil, nil }); err != nil {
+		t.Fatal(err)
 	}
 }

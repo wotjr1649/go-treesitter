@@ -223,6 +223,44 @@ pinned CLI for grammars without a committed parser) in it after a token-holding 
 every input; the native executables built there still run unsandboxed in `ciconf` and `go test`. `bench.yml` and `nightly-diff.yml` split their fetch the same way (a token step with `native-ref -stage`, then an offline build step without the token) but are not sandboxed. Linux only; there is no local
 equivalent on Windows.
 
+## Owner-local pin move (pinbump)
+
+For the owner-repository grammars (ADR-0024 rule 7: java, javascript, typescript with tsx, tsql) a pin move to a newer owner
+release tag is mechanical, and CI produces the evidence while the owner opens the PR. Nothing here pushes, comments or
+opens a PR by itself.
+
+```
+cd tools/gen && go run ./pinbump -pins pins.json -grammar java -tag v3.0.4 [-out DIR]
+```
+
+`pinbump` resolves the tag to a commit (read-only GitHub API; an annotated tag is followed), requires the commit to be ahead of
+the pinned one and the tag to be a stable release or a release-less tag, downloads the API tarball of that commit and computes
+what the Pins table below requires: `archiveSHA256` of the tarball bytes, `extractDir`/`archive` (`<repo>-<commit12>`),
+`treeSHA256` and the `files` hashes over the unchanged `dirs`/`grammarDir`, `licenseSHA256` and `noticeSHA256`. It edits only
+those lines of `pins.json` (grammars that share the commit, typescript and tsx, move together) and prints the PR body
+skeleton with the owner CHANGELOG link. It refuses a repository outside `https://github.com/wotjr1649/`, an entry with patches,
+npm inputs, an archive URL or any other extra field, a pinned file missing from the new tree, a new unpinned `scanner.c` or
+`NOTICE`, a repository without `CHANGELOG.md`, and anything that is not one pin. It never writes the archive to disk and runs
+nothing from it. `TSG_PINBUMP_LIVE=1 go test -run TestLive ./pinbump` (network) re-derives the committed owner pins from their
+real archives and requires them to be equal.
+
+Runbook (the workflow is `upstream-autopr.yml`; it is dispatched by the owner and holds no write token):
+
+1. `gh workflow run upstream-autopr.yml -f grammar=<name> -f tag=<tag>`. The `propose` job summary shows the move (commits,
+   compare URL, release and CHANGELOG links, licence hash change). Approve Environment `autopr-untrusted` for the run only
+   after reading it: the `evidence` job then runs third-party code (`tree-sitter generate`, wasm2go, native C builds; not
+   sandboxed yet, no token) and uploads `autopr-regenerated` and `autopr-evidence` (regen cost, pin-move summary).
+2. On a new branch from `origin/main` download into new empty directories: `gh run download <run> -n autopr-proposal -D P`
+   and `-n autopr-regenerated -D G`.
+3. Verify, then apply: `cd tools/gen && go run ./autopr -main ../.. -proposal P -regenerated G` (add `-apply` to copy). The
+   guard refuses a `pins.json` change outside the candidate's entries, files outside `grammars/<name>/`, links, and changed
+   `go.mod`/`go.sum`. For an independent check run `pinbump -out Q` locally and compare `Q/pins.json` with `P/pins.json`;
+   for the bytes run `bash tools/gen/regen.sh <new-empty-dir> <name>…` and `git diff --exit-code grammars/`.
+4. Commit `tools/gen/pins.json` and `grammars/<name>` only; before pushing check `git diff --stat origin/main...HEAD`
+   (AGENTS.md). Open the PR with `gh pr create --body-file` from the printed skeleton: fill the evidence links, cite the owner
+   CHANGELOG. The required checks (`regen`, `pin-move` evidence, conformance) re-derive everything on other jobs; a tampered
+   artifact shows as regenerate drift. Merge needs the owner's explicit authority (merge commit).
+
 ## Pins (`pins.json`)
 
 Everything a generation consumes is pinned, and the identity of a generated module never depends on the host:
