@@ -13,23 +13,40 @@ on:
 permissions:
   contents: read
 
+# A new push to a pull request cancels that PR's earlier unfinished first-attempt runs; main, scheduled, dispatched and
+# re-run attempts never cancel and are never cancelled (same expressions as engine.yml).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.run_attempt == 1 && format('pr-{0}', github.event.pull_request.number) || format('run-{0}-{1}', github.run_id, github.run_attempt) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.action == 'synchronize' && github.run_attempt == 1 }}
+
 jobs:
   conformance-grammar:
-    name: conformance (${{ matrix.runner }}, ${{ matrix.lang }})
+    name: conformance (${{ matrix.runner }}, ${{ matrix.group.name }})
     strategy:
       fail-fast: false
       matrix:
-        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin, postgres, swift]
+        # Each job runs several grammars (one native build and one go test per job); the 25 grammars are split by measured
+        # run time. g1 also runs the repository-wide checks once per architecture (native-ref unit tests, TestKnownGap*).
+        group:
+          - {name: g1, docs: true, langs: "tsql css c"}
+          - {name: g2, langs: "postgres ruby golang php"}
+          - {name: g3, langs: "swift yaml dart tsx json r"}
+          - {name: g4, langs: "powershell typescript java javascript rust xml"}
+          - {name: g5, langs: "kotlin csharp cpp bash python html"}
         runner: [ubuntu-24.04, ubuntu-24.04-arm]
         include:
           - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
           - {runner: ubuntu-24.04-arm, goos: linux, goarch: arm64}
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 60
+    # The step limits (go test 40m, query 40m, fuzz seeds 30m) sum to 110m; the job limit leaves room for setup and the
+    # native build so a hung step fails at its own limit and the later !cancelled() steps still run. Expected: ~9-12m.
+    timeout-minutes: 120
     env:
       GOENV: "off"
       GOWORK: "off"
       GOTOOLCHAIN: local
+      GROUP_LANGS: ${{ matrix.group.langs }}
+      GROUP_DOCS: ${{ matrix.group.docs }}
     defaults:
       run:
         shell: bash
@@ -45,14 +62,17 @@ jobs:
           go env GOOS GOARCH
           test "$(go env GOOS)" = "${{ matrix.goos }}" && test "$(go env GOARCH)" = "${{ matrix.goarch }}" || { echo "native target mismatch"; exit 1; }
           gcc --version | head -1
-      - name: Select one grammar for conformance builds
+      - name: Select the group's grammars for conformance builds
         run: |
-          lang="${{ matrix.lang }}"
-          [ "$lang" != golang ] || lang=go
-          echo "TSG_S15_LANGS=$lang" >> "$GITHUB_ENV"
+          list=""
+          for lang in $GROUP_LANGS; do
+            [ "$lang" != golang ] || lang=go
+            list="${list:+$list,}$lang"
+          done
+          echo "TSG_S15_LANGS=$list" >> "$GITHUB_ENV"
           tags=""
           for other in csharp go json python tsql tsx typescript javascript html css java c rust bash cpp yaml php powershell r dart xml ruby kotlin postgres swift; do
-            [ "$other" = "$lang" ] || tags="${tags:+$tags,}no_$other"
+            case ",$list," in *",$other,"*) ;; *) tags="${tags:+$tags,}no_$other" ;; esac
           done
           echo "GOFLAGS=-tags=$tags" >> "$GITHUB_ENV"
       # Archives are fetched from the pinned commits and their sha256 checked against tools/gen/pins.json before use.
@@ -62,13 +82,13 @@ jobs:
           CGO_ENABLED: "0"
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          go test -count=1 ./...
+          [ "$GROUP_DOCS" != true ] || go test -count=1 ./...
           go build -o "$RUNNER_TEMP/native-ref" .
           go build -o "$RUNNER_TEMP/ciconf" ./ciconf
           cd "$GITHUB_WORKSPACE"
           "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -fetch -cc gcc \
             -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" -queries "$RUNNER_TEMP/queries" \
-            -scanner-stages "$RUNNER_TEMP/scanner-stages" "${{ matrix.lang }}"
+            -scanner-stages "$RUNNER_TEMP/scanner-stages" $GROUP_LANGS
       - name: Extract inputs and edits, record native results
         id: native-inputs
         env:
@@ -76,7 +96,7 @@ jobs:
         run: |
           "$RUNNER_TEMP/ciconf" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "$TSG_S15_LANGS" -kit tools/conformance/testdata/kit
       - name: YAML patch comparison against the original upstream grammar
-        if: ${{ matrix.lang == 'yaml' }}
+        if: ${{ contains(matrix.group.langs, 'yaml') }}
         working-directory: tools/native-ref
         env:
           CGO_ENABLED: "0"
@@ -87,7 +107,7 @@ jobs:
             -corpus "$RUNNER_TEMP/data/corpus/yaml" -fuzz-source ../conformance/fuzz_test.go \
             -fuzz-target FuzzParseYAML -allow-nul-truncation -out "$RUNNER_TEMP/patch-comparison"
       - name: Upload YAML patch comparison
-        if: ${{ always() && matrix.lang == 'yaml' }}
+        if: ${{ always() && contains(matrix.group.langs, 'yaml') }}
         uses: actions/upload-artifact@v7
         with:
           name: yaml-patch-comparison-${{ matrix.runner }}
@@ -101,7 +121,11 @@ jobs:
           TSG_DATA_DIR: ${{ runner.temp }}/data
           TSG_NATIVE_EXE_DIR: ${{ runner.temp }}/exe
           TSG_REQUIRE_FIELD_LOOKUP: "1"
-        run: go test -count=1 -timeout 20m -v -run 'TestCorpus|TestEdits|TestFieldLookup|TestParserPoolRealEngine|TestKnownGap|TestHeredocUTF8|TestScannerPatches|TestSymbolLookupNative' .
+        # TestKnownGaps is per grammar; the other TestKnownGap* tests (register documents, links, ratchet) are repository-wide and run in g1 only.
+        run: |
+          known=TestKnownGaps
+          [ "$GROUP_DOCS" != true ] || known=TestKnownGap
+          go test -count=1 -timeout 40m -v -run "TestCorpus|TestEdits|TestFieldLookup|TestParserPoolRealEngine|$known|TestHeredocUTF8|TestScannerPatches|TestSymbolLookupNative" .
       # Query raw matches: every grammar's own queries/*.scm (pinned archive, sha256-verified) plus structural probes,
       # over the corpus inputs, byte-identical to `<native exe> query` (docs/design/query-abi.md, "Verification").
       # The comparison with the tree-sitter CLI (predicates) is local only: TestQueryCLI skips without TSG_TS_CLI.
@@ -114,9 +138,8 @@ jobs:
           TSG_NATIVE_EXE_DIR: ${{ runner.temp }}/exe
           TSG_QUERY_DIR: ${{ runner.temp }}/queries
           TSG_QUERY_PROBE_STRIDE: "1"
-        run: go test -count=1 -timeout 20m -v -run 'TestStripPredicates|TestQueryNative|TestQueryCLIInvalidUTF8Output' .
-      # The fuzz targets need no data: this runs their seed corpora once (no fuzzing), and the package examples (their
-      # // Output: is compared; they build only in the shard that includes the Go grammar, tag !no_go).
+        run: go test -count=1 -timeout 40m -v -run 'TestStripPredicates|TestQueryNative|TestQueryCLIInvalidUTF8Output' .
+      # Run fuzz seed corpora once without fuzzing. Go examples build in g2 (!no_go).
       - name: Fuzz seed corpora
         if: ${{ !cancelled() }}
         working-directory: tools/conformance
@@ -128,18 +151,25 @@ jobs:
         working-directory: tools/native-ref
         env:
           CGO_ENABLED: "0"
-          PATCH_GRAMMAR: ${{ matrix.lang }}
         run: |
           ulimit -c 0
-          go run ./patchcompare -scanner-build "$RUNNER_TEMP/scanner-stages/$PATCH_GRAMMAR.json" \
-            -expectations "../gen/patches/$PATCH_GRAMMAR/scanner-expectations.json" \
-            -corpus "$RUNNER_TEMP/data/corpus/$TSG_S15_LANGS" -fuzz-source ../conformance/fuzz_test.go \
-            -regressions ../conformance/testdata -out "$RUNNER_TEMP/scanner-comparison"
+          status=0
+          for lang in $GROUP_LANGS; do
+            corpus=$lang
+            [ "$corpus" != golang ] || corpus=go
+            echo "::group::scanner patch comparison: $lang"
+            go run ./patchcompare -scanner-build "$RUNNER_TEMP/scanner-stages/$lang.json" \
+              -expectations "../gen/patches/$lang/scanner-expectations.json" \
+              -corpus "$RUNNER_TEMP/data/corpus/$corpus" -fuzz-source ../conformance/fuzz_test.go \
+              -regressions ../conformance/testdata -out "$RUNNER_TEMP/scanner-comparison/$lang" || { echo "::error::scanner patch comparison failed: $lang"; status=1; }
+            echo "::endgroup::"
+          done
+          exit $status
       - name: Upload native scanner patch comparison
         if: ${{ !cancelled() && steps.native-inputs.outcome == 'success' }}
         uses: actions/upload-artifact@v7
         with:
-          name: scanner-patch-comparison-${{ matrix.runner }}-${{ matrix.lang }}
+          name: scanner-patch-comparison-${{ matrix.runner }}-${{ matrix.group.name }}
           path: |
             ${{ runner.temp }}/scanner-comparison
             ${{ runner.temp }}/data/corpus/manifest.csv

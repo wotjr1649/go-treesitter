@@ -64,3 +64,4 @@ understand whether the contract is still right.
 | 0026 | Never block on upstream: mirrors, grammar patches, health watch | Accepted; extends ADR-0023, ADR-0024; S1 amended 2026-11-15: sources mirrored, toolchains deferred until complete bundled notices |
 | 0027 | One pinned generator CLI for every grammar | Accepted 2026-11-16, implementation pending; amends ADR-0020 decision 1 |
 | 0028 | Root 1.x stability and independent grammar versioning | Accepted 2026-11-24 |
+| 0029 | Included ranges for multi-language documents | Proposed 2026-11-25; implementation deferred until after 1.0 |

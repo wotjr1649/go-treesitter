@@ -9,45 +9,47 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.run_attempt == 1 && format('pr-{0}', github.event.pull_request.number) || format('run-{0}-{1}', github.run_id, github.run_attempt) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.action == 'synchronize' && github.run_attempt == 1 }}
+
+env:
+  GOENV: "off"
+  GOWORK: "off"
+  GOTOOLCHAIN: local
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
-  engine:
-    needs: grammar
-    if: ${{ always() }}
-    name: engine (${{ matrix.runner }})
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
-          - {runner: ubuntu-24.04-arm, goos: linux, goarch: arm64}
-          - {runner: macos-latest, goos: darwin, goarch: arm64}
-          - {runner: windows-latest, goos: windows, goarch: amd64}
-          - {runner: windows-11-arm, goos: windows, goarch: arm64}
-    runs-on: ${{ matrix.runner }}
+  engine-linux-amd64:
+    needs: grammar-linux-amd64
+    # Always start: the first step fails the job unless every grammar shard succeeded (a skipped job would satisfy the required check).
+    if: &check_grammar_result ${{ always() }}
+    name: engine (ubuntu-24.04)
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
-    env:
+    env: &linux_amd64_env
       CGO_ENABLED: "0"
-      GOENV: "off"
-      GOWORK: "off"
-      GOTOOLCHAIN: local
-    defaults:
-      run:
-        shell: bash
-    steps:
+      EXPECTED_GOOS: linux
+      EXPECTED_GOARCH: amd64
+      GO_VERSION: 1.27.x
+    steps: &engine_steps
       - name: Grammar shards passed
         env:
-          RESULT: ${{ needs.grammar.result }}
+          RESULT: ${{ join(needs.*.result) }}
         run: test "$RESULT" = success
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-go@v7
         with:
-          go-version: 1.27.x # newest supported; go.mod now states the floor (1.26.0), see engine-go126
+          go-version: ${{ env.GO_VERSION }} # newest supported; go.mod now states the floor (1.26.0), see engine-go126
       - name: Native architecture
         run: |
           go env GOOS GOARCH CGO_ENABLED
-          test "$(go env GOOS)" = "${{ matrix.goos }}" && test "$(go env GOARCH)" = "${{ matrix.goarch }}" || { echo "native target mismatch"; exit 1; }
+          test "$(go env GOOS)" = "$EXPECTED_GOOS" && test "$(go env GOARCH)" = "$EXPECTED_GOARCH" || { echo "native target mismatch"; exit 1; }
       - name: Engine and root package
         run: |
           go vet ./internal/engine ./internal/langid ./experimental/... .
@@ -76,32 +78,81 @@ jobs:
         working-directory: tools/conformance
         run: go vet ./...
 
+  engine-linux-arm64:
+    needs: grammar-linux-arm64
+    if: *check_grammar_result
+    name: engine (ubuntu-24.04-arm)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 45
+    env: &linux_arm64_env
+      CGO_ENABLED: "0"
+      EXPECTED_GOOS: linux
+      EXPECTED_GOARCH: arm64
+      GO_VERSION: 1.27.x
+    steps: *engine_steps
+
+  engine-macos-arm64:
+    needs: grammar-macos-arm64
+    if: *check_grammar_result
+    name: engine (macos-latest)
+    runs-on: macos-latest
+    timeout-minutes: 45
+    env: &macos_arm64_env
+      CGO_ENABLED: "0"
+      EXPECTED_GOOS: darwin
+      EXPECTED_GOARCH: arm64
+      GO_VERSION: 1.27.x
+    steps: *engine_steps
+
+  engine-windows-amd64:
+    needs: grammar-windows-amd64
+    if: *check_grammar_result
+    name: engine (windows-latest)
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env: &windows_amd64_env
+      CGO_ENABLED: "0"
+      EXPECTED_GOOS: windows
+      EXPECTED_GOARCH: amd64
+      GO_VERSION: 1.27.x
+    steps: *engine_steps
+
+  engine-windows-arm64:
+    needs: grammar-windows-arm64
+    if: *check_grammar_result
+    name: engine (windows-11-arm)
+    runs-on: windows-11-arm
+    timeout-minutes: 45
+    env: &windows_arm64_env
+      CGO_ENABLED: "0"
+      EXPECTED_GOOS: windows
+      EXPECTED_GOARCH: arm64
+      GO_VERSION: 1.27.x
+    steps: *engine_steps
+
   # The oldest supported Go (go.mod floor 1.26): engine, root package and grammar modules must build and pass there too.
   engine-go126:
-    needs: grammar
-    if: ${{ always() }}
+    needs: grammar-go126
+    if: *check_grammar_result
     name: engine, oldest supported Go (ubuntu-24.04)
     runs-on: ubuntu-24.04
     timeout-minutes: 45
-    env:
+    env: &go126_env
       CGO_ENABLED: "0"
-      GOENV: "off"
-      GOWORK: "off"
-      GOTOOLCHAIN: local
-    defaults:
-      run:
-        shell: bash
+      EXPECTED_GOOS: linux
+      EXPECTED_GOARCH: amd64
+      GO_VERSION: 1.26.x
     steps:
       - name: Grammar shards passed
         env:
-          RESULT: ${{ needs.grammar.result }}
+          RESULT: ${{ needs.grammar-go126.result }}
         run: test "$RESULT" = success
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-go@v7
         with:
-          go-version: 1.26.x
+          go-version: ${{ env.GO_VERSION }}
       - name: Go version
         run: go version | grep -q 'go1\.26\.' || { echo "expected Go 1.26.x"; exit 1; }
       - name: Engine and root package
@@ -112,10 +163,6 @@ jobs:
   engine-consumer-compat:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
-    env:
-      GOENV: "off"
-      GOWORK: "off"
-      GOTOOLCHAIN: local
     steps:
       - uses: actions/checkout@v7
         with:
@@ -125,7 +172,6 @@ jobs:
           go-version: '1.26.0'
           cache: false
       - name: Published grammar consumers
-        shell: bash
         run: |
           test "$(go env GOHOSTOS)/$(go env GOHOSTARCH)" = linux/amd64
           dir="$RUNNER_TEMP/engine-consumer-compat"
@@ -138,41 +184,87 @@ jobs:
           name: engine-consumer-compat
           path: ${{ runner.temp }}/engine-consumer-compat/
 
-  grammar:
-    name: grammar (${{ matrix.runner }}, Go ${{ matrix.go }}, ${{ matrix.lang }})
-    strategy:
+  grammar-linux-amd64:
+    name: grammar (ubuntu-24.04, Go 1.27.x, shard ${{ matrix.shard }})
+    strategy: &grammar_strategy
       fail-fast: false
       matrix:
-        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin, postgres, swift]
-        target: [linux-amd64, linux-arm64, macos-arm64, windows-amd64, windows-arm64, go126]
         include:
-          - {target: linux-amd64, runner: ubuntu-24.04, goos: linux, goarch: amd64, go: 1.27.x}
-          - {target: linux-arm64, runner: ubuntu-24.04-arm, goos: linux, goarch: arm64, go: 1.27.x}
-          - {target: macos-arm64, runner: macos-latest, goos: darwin, goarch: arm64, go: 1.27.x}
-          - {target: windows-amd64, runner: windows-latest, goos: windows, goarch: amd64, go: 1.27.x}
-          - {target: windows-arm64, runner: windows-11-arm, goos: windows, goarch: arm64, go: 1.27.x}
-          - {target: go126, runner: ubuntu-24.04, goos: linux, goarch: amd64, go: 1.26.x}
-    runs-on: ${{ matrix.runner }}
-    timeout-minutes: 30
-    env:
-      CGO_ENABLED: "0"
-      GOENV: "off"
-      GOWORK: "off"
-      GOTOOLCHAIN: local
-    defaults:
-      run:
-        shell: bash
-    steps:
+          - {shard: 1, grammars: "powershell golang json python html"}
+          - {shard: 2, grammars: "swift javascript java xml r"}
+          - {shard: 3, grammars: "tsql bash typescript php dart"}
+          - {shard: 4, grammars: "cpp css tsx csharp yaml"}
+          - {shard: 5, grammars: "postgres kotlin rust ruby c"}
+    runs-on: ubuntu-24.04
+    # Allow all five grammar test timeouts plus checkout and Go setup.
+    timeout-minutes: 90
+    env: *linux_amd64_env
+    steps: &grammar_steps
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-go@v7
         with:
-          go-version: ${{ matrix.go }}
+          go-version: ${{ env.GO_VERSION }}
       - name: Native architecture
-        run: test "$(go env GOOS)" = "${{ matrix.goos }}" && test "$(go env GOARCH)" = "${{ matrix.goarch }}"
-      - name: Grammar module embedded sample tests
-        working-directory: grammars/${{ matrix.lang }}
+        run: test "$(go env GOOS)" = "$EXPECTED_GOOS" && test "$(go env GOARCH)" = "$EXPECTED_GOARCH"
+      # The shard lists below must name every grammars/* directory exactly once.
+      - name: Shard lists equal grammars/*
         run: |
+          listed="$(grep -oE 'shard: [0-9]+, grammars: "[^"]*"' .github/workflows/engine.yml | sed -E 's/.*grammars: "([^"]*)"/\1/' | tr ' ' '\n' | sort)"
+          present="$(for d in grammars/*/; do basename "$d"; done | sort)"
+          [ -n "$listed" ] && [ "$listed" = "$present" ] || { echo "::error::engine.yml shard lists differ from grammars/*"; diff <(echo "$listed") <(echo "$present"); exit 1; }
+      - name: Grammar module embedded sample tests
+        env:
+          GRAMMARS: ${{ matrix.grammars }}
+        run: |
+          [ -n "$GRAMMARS" ] || { echo "::error::empty grammar shard"; exit 1; }
           unset TSG_CORPUS
-          go test -count=1 -timeout 900s .
+          read -r -a grammars <<< "$GRAMMARS"
+          result=0
+          for lang in "${grammars[@]}"; do
+            echo "::group::$lang"
+            (cd "grammars/$lang" && go test -count=1 -timeout 900s .) || result=1
+            echo "::endgroup::"
+          done
+          exit "$result"
+
+  grammar-linux-arm64:
+    name: grammar (ubuntu-24.04-arm, Go 1.27.x, shard ${{ matrix.shard }})
+    strategy: *grammar_strategy
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 90
+    env: *linux_arm64_env
+    steps: *grammar_steps
+
+  grammar-macos-arm64:
+    name: grammar (macos-latest, Go 1.27.x, shard ${{ matrix.shard }})
+    strategy: *grammar_strategy
+    runs-on: macos-latest
+    timeout-minutes: 90
+    env: *macos_arm64_env
+    steps: *grammar_steps
+
+  grammar-windows-amd64:
+    name: grammar (windows-latest, Go 1.27.x, shard ${{ matrix.shard }})
+    strategy: *grammar_strategy
+    runs-on: windows-latest
+    timeout-minutes: 90
+    env: *windows_amd64_env
+    steps: *grammar_steps
+
+  grammar-windows-arm64:
+    name: grammar (windows-11-arm, Go 1.27.x, shard ${{ matrix.shard }})
+    strategy: *grammar_strategy
+    runs-on: windows-11-arm
+    timeout-minutes: 90
+    env: *windows_arm64_env
+    steps: *grammar_steps
+
+  grammar-go126:
+    name: grammar (ubuntu-24.04, Go 1.26.x, shard ${{ matrix.shard }})
+    strategy: *grammar_strategy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env: *go126_env
+    steps: *grammar_steps
