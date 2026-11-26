@@ -23,7 +23,7 @@ import (
 var bg = context.Background()
 
 // requiredTests are the tests whose missing prerequisites fail instead of skipping when TSG_REQUIRE_FIELD_LOOKUP=1
-// (CI); locally they skip. The last three are not in the CI -run lists yet: adding them there needs no further change.
+// (CI); locally they skip. conformance.yml runs all of them with the variable set.
 var requiredTests = []string{"TestFieldLookup", "TestFieldLookupEdits", "TestSnapshotPointsNative", "TestInvalidUTF8VsNative", "TestQuerySmoke"}
 
 func requiredName(name string) bool {

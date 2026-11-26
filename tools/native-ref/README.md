@@ -87,7 +87,7 @@ it is discarded and the build runs as usual.
 | `TestQuerySmoke`, `TestQueryNative` | queries: `TSG_QUERY_DIR` (`native-ref -queries`) or `<data>/src` | skip (`TestQueryNative` fails when its executable exists but the queries do not) |
 
 `TSG_REQUIRE_FIELD_LOOKUP=1` (CI) turns the skips of the field, snapshot-point, invalid-UTF-8 and query-smoke tests into failures.
-CI's `-run` lists do not include `TestSnapshotPointsNative`, `TestInvalidUTF8VsNative` or `TestQuerySmoke`.
+CI runs `TestSnapshotPointsNative` and `TestInvalidUTF8VsNative` in the Go conformance step of every group and `TestQuerySmoke` in its query step (`.github/workflows/conformance.yml`).
 
 `-lang` limits corpus preparation to the comma-separated conformance language names (default: all 25). JSX inputs use the JavaScript corpus and parser. PHP selects the PHP parser; XML selects XML, not DTD.
 Nested corpus directories follow each pin's `grammarDir`; XML upstream queries are under `queries/xml`.
