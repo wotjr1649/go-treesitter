@@ -15,4 +15,6 @@ require (
 	github.com/wotjr1649/go-treesitter/tools/compare/harness v0.0.0
 )
 
+require github.com/mattn/go-pointer v0.0.1 // indirect
+
 replace github.com/wotjr1649/go-treesitter/tools/compare/harness => ../../harness

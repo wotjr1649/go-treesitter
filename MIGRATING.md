@@ -57,6 +57,8 @@ The exported Go API signatures are unchanged. Field lookup has these behaviour c
 - **Alias-inherited fields:** with ABI 3 grammar modules (v0.4.0), `ChildByFieldName` can return a descendant inside a
   visible alias rather than a direct child. `ChildrenByFieldName` yields that result first, then other matching direct
   children without duplicates; an explicit null result yields nothing. Only its first result has a C counterpart.
+  Which descendant (or none) a module returns follows the `ts_node_child_by_field_id` of that module's pinned
+  runtime, so a later grammar module release on another runtime can resolve the same field differently.
 - **Older modules:** the root accepts ABI 1, 2 and 3. ABI 1/2 modules have no field-exception table and retain
   direct-child lookup for alias-inherited fields; upgrade the grammar as well as the root to change this behaviour.
   ABI 1 (v0.1.0) still parses but `NewQuery` returns `ErrQueryUnsupported`; ABI 2/3 support queries.
@@ -521,6 +523,31 @@ The pinned upstream Ruby queries compile and match the patched native reference 
 
 ## Unreleased after v0.7.0
 
+### Parser, pool and tree guards
+
+Root behaviour changes with unchanged signatures ([#141](https://github.com/wotjr1649/go-treesitter/pull/141)). Contracts:
+[parser result](docs/specs/parser-result.md).
+
+- **Nil options.** A `nil` `Option` passed to `NewParser` or `NewParserPool` now returns `ErrInvalidInput`; it used to panic.
+- **Pool construction.** `NewParserPool` copies its options, so changing the slice afterwards has no effect. A nonzero
+  `WithMaxMemoryBytes` below 32 MiB is rejected there with `ErrInvalidInput`, not at the first `Get`.
+- **Closing a pool wakes waiting `Get` calls.** A `Get` blocked on a full pool now returns an error matching
+  `ErrParserClosed` when `Close` runs, instead of waiting for a `Put` or its context. A `Get` that was still creating a
+  parser when the pool closed closes it and returns the same error. Parsers still lent are closed when they are `Put` back.
+- **`Tree.Snapshot` while the parser is busy.** It returns `ErrInvalidInput` when another operation on the same parser is
+  running, including a `Tree.Matches` loop on the same goroutine, even if the snapshot is already cached. Take the
+  snapshot before the loop or after it ends. Captures already yielded keep their snapshot.
+
+### Per-call `MatchLimit` on a reused parser
+
+A lower `QueryOptions.MatchLimit` now applies after calls with a higher or no limit on the same parser
+([#145](https://github.com/wotjr1649/go-treesitter/pull/145)). Before, the parser's reused query cursor could keep
+capture lists allocated under the higher limit, so a later low limit did not always overflow. Now it bounds in-progress
+states for each call, and overflow ends the sequence with `ErrQueryMatchLimit`. Zero and `math.MaxUint32` are both
+unlimited. Lowering the effective limit replaces the cursor, so the next `Matches` rebuilds the whole-tree capture
+index (O(nodes), even for a narrow byte range). Raising it does not. Handle `ErrQueryMatchLimit` wherever you use a
+low limit. [Query contract](docs/design/query-abi.md)
+
 ### CSS non-Latin-1 declaration values
 
 Unreleased after `grammars/css/v0.7.0`. The ADR-0023 value patch adapts the widened identifier in
@@ -562,3 +589,17 @@ Node types and fields are unchanged (`node-types.json` is byte-identical with an
 
 Retire the patch in the approved pin move to an upstream source containing a fix for the reported defect. That move updates the
 patch corpus expectations. See the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v070-python-await-patch).
+
+### Snapshot node storage: `Node.ChildCount` is O(children)
+
+The snapshot no longer stores a per-node child count (25 to 21 B/node of Go heap; the count was redundant because a node
+has children exactly when its descendant range extends past itself). Results and signatures are unchanged. Two costs move:
+
+- `Node.ChildCount` walks the children, so it costs O(children) instead of O(1). A loop condition such as
+  `for i := 0; i < n.ChildCount(); i++` now adds a full walk of the children to every iteration. Call it once and keep the value, or
+  iterate with `Node.Children` where that fits.
+- `Node.Child(i)` still costs O(i); it no longer calls `ChildCount` first, and an out-of-range index still returns `false`.
+
+Snapshots of the same input retain less memory (the Ruby `gb18030-tbl.rb` snapshot export keeps about 2.5 MB less Go heap).
+The earlier 25 B/node figure in the v0.5.0 entry is a historical record. See
+[`parser-result.md`](docs/specs/parser-result.md).

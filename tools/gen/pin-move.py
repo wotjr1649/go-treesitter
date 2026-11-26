@@ -31,6 +31,87 @@ def changed_grammars(old, new):
             for name in sorted(a.keys() | b.keys()) if a.get(name) != b.get(name)]
 
 
+# Non-grammar pins group into components; a key not listed is its own component, so a new pin fails closed.
+# localBinarySHA256 is a host check, never an identity (README), and mirrors is metadata.
+IGNORED_PINS = {"grammars", "mirrors"}
+TOOL_COMPONENT = {
+    "treeSitterCLI": "tree-sitter-cli", "treeSitterCLIArchives": "tree-sitter-cli",
+    "wasi-sdk": "wasi-sdk", "clang": "wasi-sdk", "wasiSDKArchives": "wasi-sdk", "llvmCommit": "wasi-sdk",
+    "binaryen": "binaryen", "binaryenArchives": "binaryen",
+    "wasm2go": "wasm2go", "wasm2goModule": "wasm2go", "wasm2goSum": "wasm2go", "localBinarySHA256": None,
+}
+TOP_COMPONENT = {"wasiLibc": "wasi-libc", "shimSHA256": "shim", "memoryGrowSHA256": "memory-grow"}
+# (component, path in pins.json, path in grammars/<name>/provenance.json): the identity every regenerated module records.
+PROVENANCE = [
+    ("runtime", ("runtime", "release"), ("identity", "Runtime")),
+    ("runtime", ("runtime", "treeSHA256"), ("identity", "SourceSHA256", "runtime.tree")),
+    ("shim", ("shimSHA256",), ("identity", "SourceSHA256", "shim.tsg_abi.c")),
+    ("abi", ("abi",), ("abi",)),
+    ("recipe", ("recipe",), ("identity", "Tools", "recipe")),
+    ("tree-sitter-cli", ("tools", "treeSitterCLI"), ("identity", "Tools", "tree-sitter-cli")),
+    ("wasi-sdk", ("tools", "wasi-sdk"), ("identity", "Tools", "wasi-sdk")),
+    ("wasi-sdk", ("tools", "clang"), ("identity", "Tools", "clang")),
+    ("wasi-sdk", ("tools", "llvmCommit"), ("identity", "Tools", "llvm")),
+    ("binaryen", ("tools", "binaryen"), ("identity", "Tools", "binaryen")),
+    ("wasm2go", ("tools", "wasm2go"), ("identity", "Tools", "wasm2go")),
+    ("wasm2go", ("tools", "wasm2goSum"), ("identity", "Tools", "wasm2go-sum")),
+]
+# What the owner must have seen besides the two gates every toolchain move has (regen drift, module tests).
+TOOLCHAIN_EXTRA = {
+    "runtime": "root and engine tests, native conformance on the new runtime C",
+    "tree-sitter-cli": "generator gate (ADR-0027) for the regenerated grammars",
+    "wasi-sdk": "generator gate; wasm byte changes reviewed",
+    "wasi-libc": "generator gate; license notices reviewed",
+    "binaryen": "generator gate; wasm byte changes reviewed",
+    "wasm2go": "engine and memory_grow checks; generated Go diff reviewed",
+}
+TOOLCHAIN_ACK = "PIN-MOVE-TOOLCHAIN-OK"
+
+
+def pin_path(value, path):
+    for key in path:
+        value = value.get(key) if isinstance(value, dict) else None
+    return value
+
+
+def toolchain_changes(old, new):
+    """Components whose non-grammar pins differ, sorted."""
+    found = set()
+    for key in sorted((old.keys() | new.keys()) - IGNORED_PINS):
+        if key == "tools":
+            a, b = old.get(key) or {}, new.get(key) or {}
+            names = [TOOL_COMPONENT.get(k, k) for k in sorted(a.keys() | b.keys()) if a.get(k) != b.get(k)]
+            found.update(n for n in names if n)
+        elif old.get(key) != new.get(key):
+            found.add(TOP_COMPONENT.get(key, key))
+    return sorted(found)
+
+
+def provenance_gaps(repo, head, pins, components):
+    """Modules whose committed provenance.json does not carry the new pin value of a moved component."""
+    gaps = []
+    for lang in sorted(pins["grammars"]):
+        done = proctree.run(["git", "show", f"{head}:grammars/{lang}/provenance.json"], cwd=repo, capture_output=True, timeout=120)
+        if done.returncode != 0:
+            gaps.append(f"{lang}: provenance.json missing")
+            continue
+        prov = json.loads(done.stdout)
+        for component, source, target in PROVENANCE:
+            want = pin_path(pins, source)
+            if component in components and want is not None and pin_path(prov, target) != want:
+                gaps.append(f"{lang}: {'.'.join(target)} is not the pinned {want}")
+    return gaps
+
+
+def toolchain_review(repo, head, old, new, acks):
+    """Evidence this script cannot produce: fail closed unless every moved component is acknowledged and every module was regenerated."""
+    components = toolchain_changes(old, new)
+    review = {"components": components, "missing_ack": [c for c in components if c not in acks],
+              "unused_ack": sorted(acks - set(components)), "provenance_gaps": provenance_gaps(repo, head, new, components) if components else []}
+    review["pass"] = not (review["missing_ack"] or review["provenance_gaps"])
+    return review
+
+
 def commits(repo, base, head, merge_base=False):
     """Resolve both refs; with merge_base, compare from the merge base so a stale branch is not judged against pins it lacks."""
     def git(*args):
@@ -85,7 +166,7 @@ def classify(old, new):
     return "IDENTICAL" if old == new else "CHANGED"
 
 
-def overrides(body):
+def overrides(body, keyword="PIN-MOVE-ALLOW-OK-TO-ERROR"):
     allowed = set()
     fence = None
     comment = False
@@ -104,7 +185,7 @@ def overrides(body):
             for marker in re.finditer(r"<!--|-->", line):
                 comment = marker[0] == "<!--"
             continue
-        match = re.fullmatch(r"PIN-MOVE-ALLOW-OK-TO-ERROR ([^\s`<>]+)", line)
+        match = re.fullmatch(re.escape(keyword) + r" ([^\s`<>]+)", line)
         if fence is None and match:
             allowed.add(match[1])
     return allowed
@@ -348,6 +429,18 @@ def summarize(report):
         for result in row.get("results", []):
             if result["classification"] in ("OK_TO_ERROR", "UNPARSABLE"):
                 lines += ["", f"- `{result['id']}`: {result['classification']}; override={result['override']}"]
+    tc = report.get("toolchain")
+    if tc and tc["components"]:
+        lines += ["", "## Toolchain move: " + ", ".join(tc["components"]), "",
+                  "Native comparison does not apply. Evidence is regen drift (all grammar shards) + module tests (engine.yml) + "
+                  + "; ".join(f"{c}: {TOOLCHAIN_EXTRA.get(c, 'owner review of the release notes')}" for c in tc["components"]) + ".", "",
+                  f"Add one PR-body line per component once those are green: `{TOOLCHAIN_ACK} <component>`."]
+        lines += [f"- missing `{TOOLCHAIN_ACK} {c}`" for c in tc["missing_ack"]]
+        lines += [f"- provenance: {g}" for g in tc["provenance_gaps"][:20]]
+        if len(tc["provenance_gaps"]) > 20:
+            lines.append(f"- … {len(tc['provenance_gaps']) - 20} more provenance gaps in report.json")
+        if tc["unused_ack"]:
+            lines.append("- unused acknowledgements: " + ", ".join(f"`{x}`" for x in tc["unused_ack"]))
     if report.get("error"):
         lines += ["", "Failure: " + report["error"]]
     if report.get("unused_overrides"):
@@ -371,10 +464,12 @@ def main():
             parser.error("--detect needs --base and --head")
         try:
             base, head = commits(ROOT, args.base, args.head, args.merge_base)
-            changed = bool(changed_grammars(pins_at(ROOT, base), pins_at(ROOT, head)))
+            old, new = pins_at(ROOT, base), pins_at(ROOT, head)
+            changed = bool(changed_grammars(old, new))
+            toolchain = ",".join(toolchain_changes(old, new))
         except (ValueError, OSError, subprocess.SubprocessError) as error:
             parser.exit(1, f"pin-move: {error}\n")
-        print(f"base={base}\nhead={head}\nchanged={str(changed).lower()}")
+        print(f"base={base}\nhead={head}\nchanged={str(changed).lower()}\ntoolchain={toolchain}")
         return 0
     if not args.out or not args.cache:
         parser.error("--out and --cache are required")
@@ -414,7 +509,9 @@ def main():
                 write_json(out / "report.json", report)
             used = {r["id"] for g in report["grammars"] for r in g.get("results", []) if r["override"]}
             report["unused_overrides"] = sorted(allowed - used)
-            report["status"] = "PASS" if all(g["pass"] for g in report["grammars"]) else "FAIL"
+            report["toolchain"] = toolchain_review(ROOT, refs[1], *pins, overrides(
+                args.pr_body_file.read_text(encoding="utf-8") if args.pr_body_file else "", TOOLCHAIN_ACK))
+            report["status"] = "PASS" if report["toolchain"]["pass"] and all(g["pass"] for g in report["grammars"]) else "FAIL"
     except (ValueError, OSError, KeyError) as error:
         report["error"] = str(error)
     finally:

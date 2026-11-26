@@ -48,13 +48,36 @@ type QueryMatch struct {
 // All of this memory counts against WithMaxMemoryBytes, leaving less room for subsequent parsing.
 // Freeing the index allows reuse within the instance; linear memory shrinks only on instance discard.
 func (t *Tree) Matches(ctx context.Context, q *Query, opts *QueryOptions) iter.Seq2[QueryMatch, error] {
+	return t.matchSequence(ctx, q, opts, nil)
+}
+
+// MatchesWithOptions streams matches with opt-in Go budgets and cooperative predicate cancellation.
+// Budgets and opts are resolved when the sequence is created. Each iteration has fresh counters.
+// The engine cursor, index and snapshot still use the parser's limits, including opts.MatchLimit.
+func (t *Tree) MatchesWithOptions(ctx context.Context, q *Query, opts *QueryOptions, budgets ...QueryMatchOption) iter.Seq2[QueryMatch, error] {
+	var cfg queryMatchConfig
+	for _, budget := range budgets {
+		var err error
+		if budget == nil {
+			err = perr(InvalidInput, "nil query match option", nil)
+		} else {
+			err = budget(&cfg)
+		}
+		if err != nil {
+			return func(yield func(QueryMatch, error) bool) { yield(QueryMatch{}, err) }
+		}
+	}
+	return t.matchSequence(ctx, q, opts, &cfg)
+}
+
+func (t *Tree) matchSequence(ctx context.Context, q *Query, opts *QueryOptions, cfg *queryMatchConfig) iter.Seq2[QueryMatch, error] {
 	var options QueryOptions
 	if opts != nil {
 		options = *opts
 	}
 	return func(yield func(QueryMatch, error) bool) {
 		stopped := false
-		err := t.matches(ctx, q, options, func(m QueryMatch) bool {
+		err := t.matches(ctx, q, options, cfg, func(m QueryMatch) bool {
 			if !yield(m, nil) {
 				stopped = true
 				return false
@@ -67,7 +90,7 @@ func (t *Tree) Matches(ctx context.Context, q *Query, opts *QueryOptions) iter.S
 	}
 }
 
-func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, yield func(QueryMatch) bool) (err error) {
+func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, cfg *queryMatchConfig, yield func(QueryMatch) bool) (err error) {
 	defer runtime.KeepAlive(t)
 	defer runtime.KeepAlive(q)
 	if t == nil || t.p == nil {
@@ -98,6 +121,13 @@ func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, yield f
 	if opts.StartByte > end || uint64(end) > uint64(inputLen) {
 		return perr(InvalidInput, "query byte range is outside the source", nil)
 	}
+	var captures, results, work *queryMeter
+	if cfg != nil {
+		cm := newQueryMeter(ctx, cfg.captures, "query captures")
+		rm := newQueryMeter(ctx, cfg.results, "query results")
+		wm := newQueryMeter(ctx, cfg.work, "query predicate work")
+		captures, results, work = &cm, &rm, &wm
+	}
 	if t.snap == nil {
 		snap, e := c.export(ctx, t.ptr, func() string { return t.src }, t.invalidUTF8)
 		if e != nil {
@@ -114,9 +144,15 @@ func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, yield f
 	key := weak.Make(q)
 	ptr := in.queries[key].ptr
 	if ptr == 0 {
-		ptr, err = c.compileQuery(q)
+		ptr, err = c.compileQuery(ctx, q)
 		if err != nil {
 			return err
+		}
+		if ctx.Err() != nil {
+			if err = c.queryCall("cancelled query cleanup", func() { m.Xtsg_query_delete(ptr) }); err != nil {
+				return err
+			}
+			return ctxError(ctx, "query compilation stopped by the context")
 		}
 		if in.queries == nil {
 			in.queries = map[weak.Pointer[Query]]cachedQuery{}
@@ -194,26 +230,37 @@ func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, yield f
 		if count == 0 {
 			return nil
 		}
-		matches, e := decodeQueryMatches(*in.mem, buf, count, q, t.snap)
+		matches, e := decodeQueryMatches(*in.mem, buf, count, q, t.snap, captures)
 		if e != nil {
+			if _, ok := e.(*ParseError); ok {
+				return e
+			}
 			return c.engineFault(e.Error())
 		}
 		for _, match := range matches {
 			if ctx.Err() != nil {
 				return ctxError(ctx, "query stopped during predicate evaluation")
 			}
-			accepted := q.accepts(match)
+			accepted := q.accepts(match, work)
+			if work != nil && work.err != nil {
+				return work.err
+			}
 			if ctx.Err() != nil {
 				return ctxError(ctx, "query stopped during predicate evaluation")
 			}
-			if accepted && !yield(match) {
-				return nil
+			if accepted {
+				if !results.charge(1) {
+					return results.err
+				}
+				if !yield(match) {
+					return nil
+				}
 			}
 		}
 	}
 }
 
-func decodeQueryMatches(mem []byte, ptr, count int32, q *Query, s *Snapshot) ([]QueryMatch, error) {
+func decodeQueryMatches(mem []byte, ptr, count int32, q *Query, s *Snapshot, captures *queryMeter) ([]QueryMatch, error) {
 	bad := func() ([]QueryMatch, error) { return nil, fmt.Errorf("invalid query match buffer or capture mapping") }
 	if ptr <= 0 || uint64(uint32(ptr))+16 > uint64(len(mem)) {
 		return bad()
@@ -235,8 +282,14 @@ func decodeQueryMatches(mem []byte, ptr, count int32, q *Query, s *Snapshot) ([]
 		if uint64(pattern) >= uint64(len(q.patterns)) || uint64(nc)*20 > uint64(len(b)) {
 			return bad()
 		}
+		if !captures.charge(int64(nc)) {
+			return nil, captures.err
+		}
 		m := QueryMatch{Pattern: int(pattern), Captures: make([]QueryCapture, int(nc))}
 		for i := range m.Captures {
+			if i%256 == 0 && !captures.charge(0) {
+				return nil, captures.err
+			}
 			capture, index, sym, sb, eb := le.Uint32(b), le.Uint32(b[4:]), le.Uint32(b[8:]), le.Uint32(b[12:]), le.Uint32(b[16:])
 			b = b[20:]
 			if uint64(capture) >= uint64(len(q.names)) || uint64(index) >= uint64(s.n) || sym != uint32(s.symbol[index]) || sb != s.startByte[index] || eb != s.endByte[index] {

@@ -150,7 +150,7 @@ jobs:
         run: |
           known=TestKnownGaps
           [ "$GROUP_DOCS" != true ] || known=TestKnownGap
-          go test -count=1 -timeout 40m -v -run "TestCorpus|TestEdits|TestFieldLookup|TestParserPoolRealEngine|$known|TestHeredocUTF8|TestScannerPatches|TestSymbolLookupNative|TestMemoryLimitRealEngine" .
+          go test -count=1 -timeout 40m -v -run "TestCorpus|TestEdits|TestFieldLookup|TestParserPoolRealEngine|TestMemoryLimitRealEngine|$known|TestHeredocUTF8|TestScannerPatches|TestSymbolLookupNative" .
       # Query raw matches: every grammar's own queries/*.scm (pinned archive, sha256-verified) plus structural probes,
       # over the corpus inputs, byte-identical to `<native exe> query` (docs/design/query-abi.md, "Verification").
       # The HTML grammar in g5 also checks per-call match limits on the Go engine.
