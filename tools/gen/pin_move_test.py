@@ -72,6 +72,87 @@ class PinsDiffTest(unittest.TestCase):
         ), [])
 
 
+class ToolchainTest(unittest.TestCase):
+    PINS = json.loads(Path(__file__).with_name("pins.json").read_bytes())
+
+    def moved(self, edit):
+        new = json.loads(json.dumps(self.PINS))
+        edit(new)
+        return pin_move.toolchain_changes(self.PINS, new)
+
+    def test_every_non_grammar_pin_is_classified(self):
+        cases = [
+            (lambda p: p["runtime"].update(commit="x"), ["runtime"]),
+            (lambda p: p["tools"].update(treeSitterCLI="9"), ["tree-sitter-cli"]),
+            (lambda p: p["tools"]["treeSitterCLIArchives"]["linux-amd64"].update(sha256="x"), ["tree-sitter-cli"]),
+            (lambda p: p["tools"].update(clang="9"), ["wasi-sdk"]),
+            (lambda p: p["tools"]["binaryenArchives"]["linux-amd64"].update(sha256="x"), ["binaryen"]),
+            (lambda p: p["tools"].update(wasm2go="v9", wasm2goSum="h1:x"), ["wasm2go"]),
+            (lambda p: p["wasiLibc"].update(commit="x"), ["wasi-libc"]),
+            (lambda p: p.update(shimSHA256="x"), ["shim"]),
+            (lambda p: p.update(memoryGrowSHA256="x"), ["memory-grow"]),
+            (lambda p: p.update(abi=5, recipe="v3"), ["abi", "recipe"]),
+            (lambda p: p["tools"].update(newTool="1"), ["newTool"]),  # unknown pins fail closed
+            (lambda p: p.update(newTop=1), ["newTop"]),
+            (lambda p: p["tools"].pop("wasm2go"), ["wasm2go"]),
+        ]
+        for edit, want in cases:
+            with self.subTest(want=want):
+                self.assertEqual(self.moved(edit), want)
+
+    def test_grammar_mirror_and_host_hash_changes_are_not_toolchain_moves(self):
+        for edit in (lambda p: p["grammars"]["json"].update(commit="x"), lambda p: p.update(mirrors=["m"]),
+                     lambda p: p["tools"].update(localBinarySHA256={}), lambda p: None):
+            self.assertEqual(self.moved(edit), [])
+
+    def test_ack_lines_use_the_override_parser(self):
+        body = "x\nPIN-MOVE-TOOLCHAIN-OK wasm2go\n```\nPIN-MOVE-TOOLCHAIN-OK runtime\n```\nPIN-MOVE-ALLOW-OK-TO-ERROR c/new/x.in\n"
+        self.assertEqual(pin_move.overrides(body, pin_move.TOOLCHAIN_ACK), {"wasm2go"})
+        self.assertEqual(pin_move.overrides(body), {"c/new/x.in"})
+
+    def test_current_pins_agree_with_every_committed_provenance(self):
+        # A half-done move (pins edited, modules not regenerated) fails here; skip where the checkout lacks git history.
+        try:
+            gaps = pin_move.provenance_gaps(pin_move.ROOT, "HEAD", self.PINS, {c for c, _, _ in pin_move.PROVENANCE})
+        except (OSError, ValueError, subprocess.SubprocessError):
+            self.skipTest("no git checkout")
+        self.assertEqual(gaps, [])
+
+    def review_repo(self, temp, tool="v1"):
+        repo = Path(temp)
+        MergeBaseTest().git(repo, "init", "-q")
+        (repo / "grammars/c").mkdir(parents=True)
+        (repo / "grammars/c/provenance.json").write_text(json.dumps(
+            {"abi": 4, "identity": {"Runtime": "r", "SourceSHA256": {}, "Tools": {"wasm2go": tool, "wasm2go-sum": "s"}}}), encoding="utf-8")
+        MergeBaseTest().git(repo, "add", "-A")
+        MergeBaseTest().git(repo, "commit", "-qm", "m")
+        return repo
+
+    def test_review_fails_closed_until_acknowledged_and_regenerated(self):
+        old = {"grammars": {"c": {}}, "tools": {"wasm2go": "v0", "wasm2goSum": "s"}}
+        new = {"grammars": {"c": {}}, "tools": {"wasm2go": "v1", "wasm2goSum": "s"}}
+        with tempfile.TemporaryDirectory() as temp:
+            repo = self.review_repo(temp)
+            ok = pin_move.toolchain_review(repo, "HEAD", old, new, {"wasm2go"})
+            self.assertEqual((ok["components"], ok["pass"]), (["wasm2go"], True))
+            silent = pin_move.toolchain_review(repo, "HEAD", old, new, set())
+            self.assertEqual((silent["missing_ack"], silent["pass"]), (["wasm2go"], False))
+            stale = pin_move.toolchain_review(repo, "HEAD", old, {**new, "tools": {**new["tools"], "wasm2go": "v2"}}, {"wasm2go", "runtime"})
+            self.assertEqual((stale["pass"], stale["unused_ack"]), (False, ["runtime"]))
+            self.assertEqual(stale["provenance_gaps"], ["c: identity.Tools.wasm2go is not the pinned v2"])
+            self.assertEqual(pin_move.toolchain_review(repo, "HEAD", old, old, set())["pass"], True)
+            missing = pin_move.toolchain_review(repo, "HEAD", old, {**new, "grammars": {"c": {}, "d": {}}}, {"wasm2go"})
+            self.assertEqual(missing["provenance_gaps"], ["d: provenance.json missing"])
+
+    def test_summary_names_the_evidence(self):
+        report = {"status": "FAIL", "grammars": [], "toolchain": {"components": ["wasm2go"], "missing_ack": ["wasm2go"],
+                                                                  "provenance_gaps": [], "unused_ack": [], "pass": False}}
+        text = pin_move.summarize(report)
+        self.assertIn("Toolchain move: wasm2go", text)
+        self.assertIn("regen drift", text)
+        self.assertIn("PIN-MOVE-TOOLCHAIN-OK wasm2go", text)
+
+
 class ClassificationTest(unittest.TestCase):
     def test_raw_token_names_do_not_split_native_records(self):
         for token in ("\n", "\t"):
