@@ -13,7 +13,7 @@ import (
 func TestBalanceProbeOutputBoundary(t *testing.T) {
 	repo := t.TempDir()
 	base := opts{repo: repo, out: filepath.Join(repo, "scratch", "json"), work: filepath.Join(repo, "work")}
-	if err := validateBalanceProbe(base); err != nil {
+	if err := validateTestOnlyOutput(base, "-balance-probe"); err != nil {
 		t.Fatal(err)
 	}
 	for _, tc := range []struct{ name, out, work, version string }{
@@ -25,7 +25,7 @@ func TestBalanceProbeOutputBoundary(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			o := base
 			o.out, o.work, o.rootVersion = tc.out, tc.work, tc.version
-			if err := validateBalanceProbe(o); err == nil {
+			if err := validateTestOnlyOutput(o, "-balance-probe"); err == nil {
 				t.Fatal("unsafe probe output accepted")
 			}
 		})
@@ -36,7 +36,7 @@ func TestBalanceProbeOutputBoundary(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(base.out, "keep"), []byte("unrelated"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if err := validateBalanceProbe(base); err == nil {
+	if err := validateTestOnlyOutput(base, "-balance-probe"); err == nil {
 		t.Fatal("nonempty probe output accepted")
 	}
 }

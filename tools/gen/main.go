@@ -53,6 +53,7 @@ type opts struct {
 	hash, noAPI, verifyBinaries                                                            bool
 	keepModuleForm                                                                         bool
 	balanceProbe                                                                           bool
+	runtimeRehearsal                                                                       string
 	mirrorAssets                                                                           bool
 }
 
@@ -67,6 +68,13 @@ func main() {
 	if len(os.Args) > 1 && os.Args[1] == "nightly-rehearsal" {
 		if err := runRehearsalCommand(os.Args[2:], os.Stdout); err != nil {
 			fmt.Fprintln(os.Stderr, "gen nightly-rehearsal:", err)
+			os.Exit(1)
+		}
+		return
+	}
+	if len(os.Args) > 1 && os.Args[1] == "runtime-pins" {
+		if err := runRuntimePinsCommand(os.Args[2:], os.Stdout); err != nil {
+			fmt.Fprintln(os.Stderr, "gen runtime-pins:", err)
 			os.Exit(1)
 		}
 		return
@@ -97,6 +105,7 @@ func main() {
 	flag.BoolVar(&o.hash, "hash", false, "print the computed values of every pin and exit")
 	flag.BoolVar(&o.noAPI, "no-api", false, "do not emit language_api.go (Language() needs the root treesitter package)")
 	flag.BoolVar(&o.balanceProbe, "balance-probe", false, "TEST ONLY: add balancing/reset observations and a deterministic conformance test; output must be a new directory outside grammars/")
+	flag.StringVar(&o.runtimeRehearsal, "runtime-rehearsal", "", "TEST ONLY: pins copy (from `gen runtime-pins`) that differs from <root>/pins.json only in its runtime block; output must be a new directory outside grammars/")
 	flag.BoolVar(&o.mirrorAssets, "mirror-assets", false, "list pinned archives for every platform: file, sha256, primary download URL, kind (source/toolchain)")
 	flag.BoolVar(&o.fetchNPM, "fetch-npm", false, "download missing lockfile-pinned npm grammar tarballs (no install scripts)")
 	flag.StringVar(&o.treeSitter, "tree-sitter", "", "pinned tree-sitter CLI (needed for regenerate: true)")
@@ -110,7 +119,14 @@ func main() {
 }
 
 func run(o opts) error {
-	pins, err := loadPins(filepath.Join(o.root, "pins.json"))
+	pinsPath := filepath.Join(o.root, "pins.json")
+	if o.runtimeRehearsal != "" {
+		if err := checkRuntimeOnlyPins(pinsPath, o.runtimeRehearsal); err != nil {
+			return err
+		}
+		pinsPath = o.runtimeRehearsal
+	}
+	pins, err := loadPins(pinsPath)
 	if err != nil {
 		return err
 	}
@@ -164,7 +180,15 @@ func run(o opts) error {
 		}
 	}
 	if o.balanceProbe {
-		if err := validateBalanceProbe(o); err != nil {
+		if err := validateTestOnlyOutput(o, "-balance-probe"); err != nil {
+			return err
+		}
+	}
+	if o.runtimeRehearsal != "" {
+		if o.balanceProbe || o.keepModuleForm {
+			return fmt.Errorf("-runtime-rehearsal cannot be combined with -balance-probe or -keep-module-form")
+		}
+		if err := validateTestOnlyOutput(o, "-runtime-rehearsal"); err != nil {
 			return err
 		}
 	}
@@ -292,6 +316,9 @@ func run(o opts) error {
 		id.RecipeSHA256 = sumBytes([]byte(id.RecipeSHA256 + "\nbalancing-cancel=" + probeHash + "\nexports=" + strings.Join(balanceProbeExports, " ")))
 		id.Tools["test-only"] = "balancing-cancel"
 	}
+	if o.runtimeRehearsal != "" {
+		id.Tools["test-only"] = testOnlyRuntimeRehearsal
+	}
 	if rc.opt != "" {
 		id.Tools["binaryen"] = pins.Tools.Binaryen
 	}
@@ -324,6 +351,8 @@ func run(o opts) error {
 	prov.Patches, prov.GrammarGeneration = g.Patches, patchProvenance
 	if o.balanceProbe {
 		prov.TestOnly = "balancing-cancel"
+	} else if o.runtimeRehearsal != "" {
+		prov.TestOnly = testOnlyRuntimeRehearsal
 	}
 	provJSON, err := marshal(prov)
 	if err != nil {

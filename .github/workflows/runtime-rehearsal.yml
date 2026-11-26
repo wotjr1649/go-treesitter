@@ -1,0 +1,128 @@
+name: Runtime-only rehearsal
+
+# DRAFT, TEST ONLY, report only. Answers "what changes in the engine's results if the pinned tree-sitter runtime (lib/) moves
+# to <runtime_ref> and nothing else moves?" before a pin move (Phase 3; ADR-0027, tools/gen/README.md "Runtime-only
+# rehearsal"). It generates the selected grammars against that runtime into a directory outside grammars/ (tools/gen/runtime-rehearsal.sh:
+# the pinned CLI, wasm2go, wasi-sdk and grammar sources are unchanged; the runtime archive and tree hashes go into a pins copy,
+# never into tools/gen/pins.json), then parses the CI conformance inputs (corpus, seeded edits; no large inputs) with the committed
+# modules and with the generated ones and classifies the per-input differences (tools/conformance/runtime-rehearsal.sh).
+# The tables are measurements on this run's inputs and identity, not parity evidence (docs/specs/validation.md); nothing is
+# committed, pushed or commented, and a difference is a result, not a failure.
+#
+# Isolation: the ephemeral GitHub-hosted runner VM. No token (permissions: {}, the commit is fetched anonymously as in
+# compare.yml), no secrets, no caches, no id-token. The native C reference (gcc) is built only inside this runner, from the
+# pinned sha256-verified sources, only to record the seeded edits; the Go side stays CGO_ENABLED=0. The runtime source is
+# compiled to wasm by the pinned wasi-sdk clang inside gen and never run natively.
+#
+# actionlint (the repository's build) does not know the cache-mode key (compare.yml has the same finding); it is the only one.
+
+on:
+  workflow_dispatch:
+    inputs:
+      runtime_ref:
+        description: tree-sitter/tree-sitter tag (v0.27.3) or full 40-hex commit
+        type: string
+        required: true
+      grammars:
+        description: Space-separated pins.json grammar names
+        type: string
+        default: json python typescript rust tsql
+
+permissions: {}
+
+cache-mode: none
+
+concurrency:
+  group: runtime-rehearsal
+  cancel-in-progress: false
+
+jobs:
+  rehearse:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    permissions: {}
+    cache-mode: none
+    env:
+      GOENV: "off"
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+      CGO_ENABLED: "0"
+      RUNTIME_REF: ${{ inputs.runtime_ref }}
+      GRAMMARS_INPUT: ${{ inputs.grammars }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Refuse any ref but main
+        run: '[ "$GITHUB_REF" = refs/heads/main ]'
+      - name: Fetch the commit (no token)
+        env:
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          git init -q .
+          git remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
+          git fetch -q --depth 1 origin "$GITHUB_SHA"
+          git checkout -q --detach FETCH_HEAD
+      - uses: actions/setup-go@v7
+        with:
+          go-version: 1.27.x # newest supported; go.mod states the floor (1.26.0)
+          cache: false
+      - name: Check the inputs
+        run: |
+          [[ "$RUNTIME_REF" =~ ^([0-9a-f]{40}|v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?)$ ]] || { echo "runtime_ref must be a vX.Y.Z tag or a full commit"; exit 1; }
+          all=" postgres bash c cpp csharp css dart golang html java javascript json php powershell python r ruby rust tsql tsx typescript xml yaml kotlin swift "
+          list=""
+          for g in $GRAMMARS_INPUT; do
+            case "$all" in *" $g "*) ;; *) echo "unknown grammar: $g"; exit 1 ;; esac
+            list="${list:+$list }$g"
+          done
+          [ -n "$list" ] || { echo "no grammar selected"; exit 1; }
+          echo "GRAMMARS=$list" >> "$GITHUB_ENV"
+          conf=""
+          for g in $list; do
+            [ "$g" != golang ] || g=go
+            conf="${conf:+$conf,}$g"
+          done
+          echo "CONF_LANGS=$conf" >> "$GITHUB_ENV"
+          echo "RT=$RUNNER_TEMP/rt" >> "$GITHUB_ENV"
+      - name: Record identity and native architecture
+        run: |
+          git rev-parse HEAD
+          go version
+          gcc --version | head -1
+          sha256sum tools/gen/pins.json tools/gen/shim/tsg_abi.c
+      # Same steps as conformance.yml: pinned sources, native references, corpus, seeded edits recorded with native C.
+      - name: Fetch pinned sources, build native references, extract corpus
+        working-directory: tools/native-ref
+        run: |
+          go build -o "$RUNNER_TEMP/native-ref" .
+          go build -o "$RUNNER_TEMP/ciconf" ./ciconf
+          cd "$GITHUB_WORKSPACE"
+          "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -fetch -cc gcc \
+            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" -queries "$RUNNER_TEMP/queries" \
+            -scanner-stages "$RUNNER_TEMP/scanner-stages" $GRAMMARS
+      - name: Extract inputs and edits
+        run: '"$RUNNER_TEMP/ciconf" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "$CONF_LANGS" -kit tools/conformance/testdata/kit'
+      - name: Generate the grammars against the candidate runtime (test-only output)
+        run: bash tools/gen/runtime-rehearsal.sh "$RT" "$RUNTIME_REF" $GRAMMARS 2>&1 | tee "$RUNNER_TEMP/rehearsal-gen.log"
+      - name: Parse the inputs with both module sets and classify the differences
+        run: bash tools/conformance/runtime-rehearsal.sh "$RUNNER_TEMP/data" "$RT" "$RUNNER_TEMP/result" $GRAMMARS
+      - name: Job summary
+        if: ${{ !cancelled() }}
+        run: '[ ! -f "$RUNNER_TEMP/result/summary.md" ] || cat "$RUNNER_TEMP/result/summary.md" >> "$GITHUB_STEP_SUMMARY"'
+      - name: Check that the repository is unchanged
+        if: ${{ !cancelled() }}
+        run: test -z "$(git status --porcelain)"
+      - name: Upload the tables and the identity
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: runtime-rehearsal
+          path: |
+            ${{ runner.temp }}/result
+            ${{ runner.temp }}/rt/pins.runtime.json
+            ${{ runner.temp }}/rt/runtime-identity.json
+            ${{ runner.temp }}/rt/out/*/provenance.json
+            ${{ runner.temp }}/rehearsal-gen.log
+          if-no-files-found: warn
+          retention-days: 90
