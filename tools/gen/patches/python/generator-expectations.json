@@ -1,0 +1,303 @@
+{
+  "identity": {
+    "grammarCommit": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64",
+    "seed": 1,
+    "corpusManifestSHA256": "bdf13fb158e83a87011ba1b0d35689d14c995bbdc5ddf735c2c9f3476dd6556f",
+    "editsManifestSHA256": "bdf24b8a2cb0afe763c434b86bb77af48d5809ddf49ebb95411d24828e5cfcc1",
+    "largeEntries": [
+      {
+        "lang": "python",
+        "file": "topics.py",
+        "kind": "url",
+        "url": "https://raw.githubusercontent.com/python/cpython/v3.14.0/Lib/pydoc_data/topics.py",
+        "sha256": "3247a7690ac0439ac98f0e9be0a9595896c73ad426143ade7e44e4a56d53654a"
+      },
+      {
+        "lang": "python",
+        "file": "_pydecimal.py",
+        "kind": "url",
+        "url": "https://raw.githubusercontent.com/python/cpython/v3.14.0/Lib/_pydecimal.py",
+        "sha256": "40df667a04926a73cb8b02001def578369a52d4f595068076d9b7e2dba382f7c"
+      },
+      {
+        "lang": "python",
+        "file": "typing.py",
+        "kind": "url",
+        "url": "https://raw.githubusercontent.com/python/cpython/v3.14.0/Lib/typing.py",
+        "sha256": "b7b20c5180b6be1dd5f17f3f5be5f1a77540802f360ccea8ebf4ecc35ce8a0b5"
+      }
+    ],
+    "patchCorpusFilesSHA256": {
+      "await-power.txt": "bb4c9abd12c07b9849ede6ea0143591e9bf4c4fedda28b3bb07aee07edd89bd8"
+    },
+    "runtimeCommit": "3fb7be49145acfb07e33b61ed5689e2b6771b2e9",
+    "cli": "0.27.2",
+    "grammarArchiveSHA256": "5b9c8cd9f184a016321b7b06135b189d66d7e71f6d8fcab114506900b3601819",
+    "patches": [
+      {
+        "file": "patches/python/0001-bound-serialized-indent-bytes.patch",
+        "sha256": "00163049bb971eb8a24d1f6a3bb9445259dffb68202992676a84b792d379c598",
+        "source": "src/scanner.c",
+        "beforeSHA256": "6db82134ac2d4c90a1a1475487a625cface02662ebda9b7478cad9c7147e9afe",
+        "afterSHA256": "7a0c6bb9e0c121ff3e25f9180dd6625526725c2ddb62321ccc2cf35adaf488eb",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-python/issues/350"
+      },
+      {
+        "file": "patches/python/0002-await-power-precedence.patch",
+        "sha256": "3c827a59538f70cfc088e6f47969de068e6a054cdb08512468eea2bf51086e02",
+        "source": "grammar.js",
+        "beforeSHA256": "5071cb77def12a276ec71c2c584ef276b1266df720e16f642530bac35c5c2560",
+        "afterSHA256": "5fb8ae873dae0767d4ac0b75bd528cc663f2e932e54afc8eee1196b546c820ca",
+        "upstreamReport": "https://github.com/tree-sitter/tree-sitter-python/pull/360"
+      }
+    ]
+  },
+  "reason": "Bind await tighter than the power operator, so `await f() ** 2` groups as `(await f()) ** 2` instead of `await (f() ** 2)`. Six patch corpus trees, one pinned kit input (`r = await f() ** 2`, alt-python-B02-05 step 0) and fourteen seeded edits of the patch corpus change. Each previously error-free fresh tree changes only by the documented fix: an `await` whose operand held the following `**` expression now ends before the operator, and that `binary_operator` takes the `await` as its left operand. Of the fourteen edits, three (001-e1, 006-e2, 009-e3) are error-free before and after, and eleven have an error tree in both builds (003-e1 differs only in its changed ranges). Every other pinned upstream corpus tree and edit, the three pinned large inputs and every other previously error-free tree in this comparison are unchanged.",
+  "retireWhen": "An approved Python pin contains a fix for the await and power-operator binding defect reported in upstream PR #360. The pin move updates the patch corpus expectations.",
+  "differences": [
+    {
+      "id": "corpus/python/grammar-patch-await-power-001",
+      "kind": "corpus",
+      "inputSHA256": "22b6e96a9e549316aaa4fc646e42cb02c82879a1a8c42e1f9cba04528ec0b394",
+      "referenceDumpSHA256": "162c17c37fa5616a77fab691c2037d3bc175cbf6f10bb1ad89b07001f5506e6d",
+      "candidateDumpSHA256": "3ff7cfb6656b1304db563aace499a9e00bde619a6d4c79fd02f0ae41152021d2"
+    },
+    {
+      "id": "corpus/python/grammar-patch-await-power-002",
+      "kind": "corpus",
+      "inputSHA256": "07a93ab44d6cefc584457c374dd78588a58a3df19134b06e3c9b3b9fedc87c5d",
+      "referenceDumpSHA256": "4c5cca0507abf359c3f714fb60b672c59b07e52c3d31822642b4bc1954e9c057",
+      "candidateDumpSHA256": "abe0a0f80cf36a4a8e82b574bd477ec4d250fb61a01a5c1fa116fb13284310e7"
+    },
+    {
+      "id": "corpus/python/grammar-patch-await-power-003",
+      "kind": "corpus",
+      "inputSHA256": "9308e7e4579deabf4df28c1dd76ac9caebf1928659f9cb6a262ab4fc605889c0",
+      "referenceDumpSHA256": "18de435d3fa79ad0a32f419d0c0b6b176055753cb6792bb362cd33725d9d37f5",
+      "candidateDumpSHA256": "ad906fbe7246700be31090d9a3e106128deb7c35b861ebe09737d5af6f03e0ce"
+    },
+    {
+      "id": "corpus/python/grammar-patch-await-power-005",
+      "kind": "corpus",
+      "inputSHA256": "068b61aedf685f52cc2c7d99c2ad9c0ee56be64a3a2673c8225fcb44460e12a0",
+      "referenceDumpSHA256": "4fb435e275317a37a51a7404f99f63a859ebebdb6f18bd061cc4ed56c37f0520",
+      "candidateDumpSHA256": "876d7c591a67c8a40e905d524cdcb641435e4de454b7f272ea110927b29a1ec0"
+    },
+    {
+      "id": "corpus/python/grammar-patch-await-power-006",
+      "kind": "corpus",
+      "inputSHA256": "912f322bf00387e848ca47629ee5387b27126bc0b9ae89ad57143ba66fd75256",
+      "referenceDumpSHA256": "01e8ca45730a2c9d7b5336e78f8e7d212dd6799920b28356828fd99d1a0b946f",
+      "candidateDumpSHA256": "b66ed538e258064cb09ad74bc78a6ee0da68b0d1d625ce123e1512d3b0b3b106"
+    },
+    {
+      "id": "corpus/python/grammar-patch-await-power-009",
+      "kind": "corpus",
+      "inputSHA256": "eff7dd965cde906dfae3357513769b4a078d3d451b45ed01e0a1ef71e2c6fb39",
+      "referenceDumpSHA256": "0d4ef1b0e796816fb5ec9d786cee55b4d821a81bc7405634ac101c8ce048fda5",
+      "candidateDumpSHA256": "eb69026c408f855fc0bc050edf0808c25b2038239ad91ab0bf984581ba4e1018"
+    },
+    {
+      "id": "corpus/python/kit-c51d3e90977f470902153aec1082db31e19cf5950bcebd64c802660ac1816861",
+      "kind": "corpus",
+      "inputSHA256": "c51d3e90977f470902153aec1082db31e19cf5950bcebd64c802660ac1816861",
+      "referenceDumpSHA256": "e6c5163cdc8f42941d62f1bcf3b69811dd679fdd6a5b9f44bf3bdd8b0832156b",
+      "candidateDumpSHA256": "6dfdeaf887b6aaa0c0191631c3df7fce69052b657aa3ed64cd480e3ba1b939b2"
+    },
+    {
+      "id": "edits/python/grammar-patch-await-power-001-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "22b6e96a9e549316aaa4fc646e42cb02c82879a1a8c42e1f9cba04528ec0b394",
+      "newSHA256": "d8bfa452632029565a43301ad7b4bfe17feabf33c0955ecb5e020eb1635712b5",
+      "referenceDumpSHA256": "69899702e276439169b96944ab2c9b3a5be9c4cf8383334e31156b4982e981a4",
+      "candidateDumpSHA256": "75aaf42d61e26b40c502ffe011d36c17d11ef97d4fbbe10f7a58e0ae68ff8338"
+    },
+    {
+      "id": "edits/python/grammar-patch-await-power-002-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "07a93ab44d6cefc584457c374dd78588a58a3df19134b06e3c9b3b9fedc87c5d",
+      "newSHA256": "b0a53f266cbd4a95d023e98333ac8d64eeffd47502fbbf615fe1d0a2c7ec5259",
+      "referenceDumpSHA256": "a2a96136a9246e347de504b0159632fccd03380c7b9d726a8eacb4273034a2e2",
+      "candidateDumpSHA256": "cf6ffeb07754d69cb665a40138b0277f62c38bbd039e2fbdcf3c80945dbddc62"
+    },
+    {
+      "id": "edits/python/grammar-patch-await-power-002-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "07a93ab44d6cefc584457c374dd78588a58a3df19134b06e3c9b3b9fedc87c5d",
+      "newSHA256": "a2706aa47546f035400297adc86b79aecd3fb2e34921a0fe141573be14c62dae",
+      "referenceDumpSHA256": "b3d77da1664af0e749624493a043877902b2e13eb8aeb0abce7740bf48ecdd6c",
+      "candidateDumpSHA256": "9eb21173b4f798bbd904d760f835d5ab8555304e41b691696963da4e3e7bc8fe"
+    },
+    {
+      "id": "edits/python/grammar-patch-await-power-002-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "07a93ab44d6cefc584457c374dd78588a58a3df19134b06e3c9b3b9fedc87c5d",
+      "newSHA256": "015675e163ab0830fa054ee53d627a7eac0bbf8393ac344b746e430632a97bf8",
+      "referenceDumpSHA256": "06d8cc8a6cb77e3bc198922c5720944e98136534da358e0e0bfe843b62369ef9",
+      "candidateDumpSHA256": "9cad69294e471648b26afe4e8681f4291ff693e75cae6f4dbdd227b7dbc9149e"
+    },
+    {
+      "id": "edits/python/grammar-patch-await-power-003-e1",
+      "kind": "edit",
+      "changed": [
+        "ranges"
+      ],
+      "oldSHA256": "9308e7e4579deabf4df28c1dd76ac9caebf1928659f9cb6a262ab4fc605889c0",
+      "newSHA256": "1abb5a915a70314df2d868b0bb82c3d5ed1990d142e62c947728e57bbafacee4",
+      "referenceDumpSHA256": "f325baae356e4efba66ca2788bb78ece46d36800ba1605ce7d1907cfbcb1f97e",
+      "candidateDumpSHA256": "2438c7d688ba0a9870699f869f4ea3af18bde72adbc7d7a8a970e0ff037ab135"
+    },
+    {
+      "id": "edits/python/grammar-patch-await-power-003-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "9308e7e4579deabf4df28c1dd76ac9caebf1928659f9cb6a262ab4fc605889c0",
+      "newSHA256": "5f4bd4952a0b6a00ca42d9a1ca6ad3808b650cfc6384631736bcf56393ff897a",
+      "referenceDumpSHA256": "fa56480bcc05d16f3fe3936670477b24bad4bc5af53a97c8a8910380c50a5e2d",
+      "candidateDumpSHA256": "13f7bd6e94ed9bb7890d4e333788fafc5a0ba452ca60caf196148567489d2622"
+    },
+    {
+      "id": "edits/python/grammar-patch-await-power-003-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "9308e7e4579deabf4df28c1dd76ac9caebf1928659f9cb6a262ab4fc605889c0",
+      "newSHA256": "1df9500e4a78ed08c073fac8a9fe0eb8bcab175d87980520a8e520d7a14f7044",
+      "referenceDumpSHA256": "6ed911dd6233d457c114df63398ad7707a15a2fc8a9a11b8127349f43743373d",
+      "candidateDumpSHA256": "02de819f6476dbf640e6eee75f2833990f45c7a36c833aa4252fa594dea0a6ff"
+    },
+    {
+      "id": "edits/python/grammar-patch-await-power-005-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "ranges",
+        "fields"
+      ],
+      "oldSHA256": "068b61aedf685f52cc2c7d99c2ad9c0ee56be64a3a2673c8225fcb44460e12a0",
+      "newSHA256": "63cbdc7b712329cd090fe9985fa3672d04cb741e14c3fbbfab091dfd413e0597",
+      "referenceDumpSHA256": "5ae4a8b16f98384ddee043bf8e7ed8342509e58c0832e04b2c5bcc45b3afc5c6",
+      "candidateDumpSHA256": "5520152975c574ae515bc78eb3819b0c36e4d314f2096fc26d1ca87de4b2b062"
+    },
+    {
+      "id": "edits/python/grammar-patch-await-power-005-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "068b61aedf685f52cc2c7d99c2ad9c0ee56be64a3a2673c8225fcb44460e12a0",
+      "newSHA256": "f6e93de811121ed583c139c8124b1fefc09d7c1b81ccdc632c6eb335a16053a0",
+      "referenceDumpSHA256": "09ffc836856146964136c57071a80c80208fe5de3b5d99731298e55bdbfd43ef",
+      "candidateDumpSHA256": "4c3b749a0d6616fc778a1a1b2ae593adcf7332c9f904ca788fe297ca3db4dc00"
+    },
+    {
+      "id": "edits/python/grammar-patch-await-power-005-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "068b61aedf685f52cc2c7d99c2ad9c0ee56be64a3a2673c8225fcb44460e12a0",
+      "newSHA256": "87a1c5e29197bcdc817fbca6d9005089f8fa63eb426fe762f4a0790bc8a881e3",
+      "referenceDumpSHA256": "fcf7a221ea1ab97945d56d8dc1ffed46f96a67a62653e889b7fb2c9d146c3dc5",
+      "candidateDumpSHA256": "ecd4c2c3be55b7ae658b2cd34594e8c65051f321222a5859d705e2ea43ce6565"
+    },
+    {
+      "id": "edits/python/grammar-patch-await-power-006-e1",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "912f322bf00387e848ca47629ee5387b27126bc0b9ae89ad57143ba66fd75256",
+      "newSHA256": "103496ad5f073d4455e947a44f3149d9b670435a808a540c8882c54a4bd5dd2d",
+      "referenceDumpSHA256": "d750fe11f8220425cea1f1dd353af08c83cddf4f14c359301d4756587b146709",
+      "candidateDumpSHA256": "af2d179cf8d53a41c5ae0ccff76cdcf9ce9fa8d2edd90a83a24154009a268685"
+    },
+    {
+      "id": "edits/python/grammar-patch-await-power-006-e2",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "912f322bf00387e848ca47629ee5387b27126bc0b9ae89ad57143ba66fd75256",
+      "newSHA256": "23131a31664b21212ea5bb847c5e75422fd3f4370cb04cecafe6244629f743f4",
+      "referenceDumpSHA256": "2e8eb67a46f3c5e7c07f98e27d9f0791c191b799e91706a087907e35210d0153",
+      "candidateDumpSHA256": "67f58d5f7572fb73d3c122c2ed7969e694e787052e50a38d9b42e81f2f953f49"
+    },
+    {
+      "id": "edits/python/grammar-patch-await-power-006-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "912f322bf00387e848ca47629ee5387b27126bc0b9ae89ad57143ba66fd75256",
+      "newSHA256": "3fe8117acd094e875db57b2b965d8ff174e5e1c3514ce88adca61c4b20f939d8",
+      "referenceDumpSHA256": "ec174337318c96332e2dfc7be54d1471936259a290f7bad41be3d989d4685c18",
+      "candidateDumpSHA256": "c5795239c7621de3d89f2a3ebabb48dafcf161e7b623fd63213816578759fa71"
+    },
+    {
+      "id": "edits/python/grammar-patch-await-power-009-e3",
+      "kind": "edit",
+      "changed": [
+        "edit_sha256",
+        "fresh_sha256",
+        "edit_fields_sha256",
+        "fields"
+      ],
+      "oldSHA256": "eff7dd965cde906dfae3357513769b4a078d3d451b45ed01e0a1ef71e2c6fb39",
+      "newSHA256": "b94eb476b5356ef7f95d66ddcbb2d097d41a0fafbc5d219a3a43f4c4fe21d410",
+      "referenceDumpSHA256": "dd1de92b74786efb88688e5554feb9252afbdd55b3e8d2082f0228459f34e4ae",
+      "candidateDumpSHA256": "234e4af4507a240191f8f3ad2ba028c0c8eb896d10222ef2bcf09d7fb213314b"
+    }
+  ]
+}

@@ -104,3 +104,27 @@ func referenceCPatches(all []patches.Pin) []patches.Pin {
 	}
 	return result
 }
+
+// stageGrammar fetches what prepareGrammarPatches would need for a regenerated grammar (the pinned CLI archive and the
+// npm inputs) without unpacking or running the CLI: grammarpatch.CheckInputs only extracts and patches sources.
+func stageGrammar(pinsFile string, p pins, g source, dl string) error {
+	if !g.Regenerate {
+		return nil
+	}
+	cli, ok := p.Tools.TreeSitterCLIArchives[runtime.GOOS+"-"+runtime.GOARCH]
+	if !ok {
+		return fmt.Errorf("no tree-sitter CLI archive for this platform")
+	}
+	arc := filepath.Join(dl, path.Base(cli.URL))
+	if _, err := os.Stat(arc); errors.Is(err, os.ErrNotExist) {
+		if err := downloadVerified(cli.URL, arc, cli.SHA256, p.Mirrors); err != nil {
+			return err
+		}
+	}
+	if sum, err := fileSHA(arc); err != nil || sum != cli.SHA256 {
+		return fmt.Errorf("CLI archive sha256 %s, pinned %s (%v)", sum, cli.SHA256, err)
+	}
+	return grammarpatch.CheckInputs(grammarpatch.Config{Archive: filepath.Join(dl, g.Archive), ArchiveSHA256: g.ArchiveSHA256,
+		PatchRoot: filepath.Dir(pinsFile), GrammarDir: g.GrammarDir, Patches: g.Patches, Regenerate: true,
+		GenerateFrom: g.GenerateFrom, NPMDependencies: g.NPMDependencies, FetchNPM: true, NPMCache: filepath.Join(dl, "npm")})
+}

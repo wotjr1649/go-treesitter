@@ -4,8 +4,8 @@ Normative for the `treesitter` package (API v2, ADR-0021). Signatures and ration
 side: `docs/design/engine-abi.md`. Where this document and the code disagree, the code is a defect or this document
 is; fix one of them, never leave both.
 
-Transition: the old `syntax` package, `treesitter.New` and `internal/gtsadapter` remain until their approved removal
-(ADR-0020 §7). They follow the previous contract, kept in Git history at commit `9ad82eb`; nothing below applies to them.
+The old `syntax` package, `treesitter.New` and `internal/gtsadapter` were removed (ADR-0022). Their contract is in Git
+history at commit `9ad82eb`; nothing below applies to them.
 
 ## The traps this contract prevents
 
@@ -27,7 +27,7 @@ Transition: the old `syntax` package, `treesitter.New` and `internal/gtsadapter`
 | `Cancelled` (ctx cancel) | no | `*ParseError`, `errors.Is` `ErrCancelled` and `context.Canceled` | kept, parser reset |
 | `ResourceLimit` — input over `WithMaxInputBytes`, snapshot over `WithMaxSnapshotNodes` (checked with the descendant count before export) | no | `ErrResourceLimit` | kept |
 | `ResourceLimit` — a refused `memory.grow` during the call, even if a tree came back | no | `ErrResourceLimit` | recreated (`InstanceReset`) |
-| `InvalidInput` — nil ctx, invalid option value (never clamped), `old` from another parser or invalidated, non-UTF-8 with `WithStrictUTF8` | no | `ErrInvalidInput` | kept |
+| `InvalidInput` — nil ctx or option, invalid option value (never clamped), `old` from another parser or invalidated, non-UTF-8 with `WithStrictUTF8` | no | `ErrInvalidInput` | kept |
 | `EngineFault` — any other trap (including WASI `proc_exit`, which is a trap and never exits the process), root-end mismatch, an ABI violation by the module | no | `ErrEngineFault` | recreated (`InstanceReset`) |
 | `IncompatibleLanguage` — engine ABI version or export-block magic/format mismatch | no parser | `ErrIncompatibleLanguage` | none created |
 
@@ -42,6 +42,9 @@ does not depend on the call's input: it recreates an instance discarded by an ea
 queries whose `Query` values were garbage-collected (decided 2026-11-25). A fault during that housekeeping is
 returned with its usual outcome. Cancellation during the engine call is detected in the progress
 callback; the call returns after the C parser's cleanup.
+
+`ParseSnapshot` checks cancellation before copying input into the engine and before copying the snapshot's source.
+The descendant count and `WithMaxSnapshotNodes` limit are checked before the snapshot source and node columns are allocated.
 
 ## Query results and limits
 
@@ -71,15 +74,24 @@ UTF-8 source is not converted and both return the offset unchanged (clamped). Se
 
 ## Ownership, lifetime, concurrency
 
-- A `Parser` and its `Tree`s are one confinement unit: one goroutine at a time. Concurrent use is detected and
-  rejected, not serialized.
+- A `Parser` and its `Tree`s are one confinement unit: use them from one goroutine at a time. Operations that need
+  the parser's busy guard, including cached `Tree.Snapshot`, reject overlapping operations with `ErrInvalidInput`
+  when the guard is held. `Tree.Close` marks the tree closed once and queues its handle if the guard is held.
+- `Tree.Matches` applies `QueryOptions.MatchLimit` to in-progress states on each call and reports
+  `ErrQueryMatchLimit` on overflow. See the [query contract](../design/query-abi.md) for cursor and memory lifetimes.
 - `Close`, `Reset`, an instance reset and `ParserPool.Put` invalidate the parser's live trees (`ErrTreeInvalidated`).
+- `NewParserPool` copies its options and rejects a nonzero memory limit below the engine minimum (32 MiB).
+  Closing a pool wakes waiting `Get` calls with `ErrParserClosed` and prevents a parser still being created from
+  being lent. A parser already lent is closed when returned with `Put`.
 - `Tree.Edit` mutates in place (C semantics); the tree is then only valid as `old` of the next parse, and
   `Snapshot` returns `ErrTreeEdited`. Take snapshots before editing.
 - A leaked tree or parser is cleaned up by queueing; only the owning goroutine calls into the engine.
 - `Snapshot`, `Node`, `Index`, `LineIndex` are immutable and safe for any number of goroutines. A snapshot owns its
-  source (one copy; none with `ParseOwned`, whose caller must never modify the bytes again) and stays valid after the
-  parser is closed. `Node.Text` is a zero-allocation substring of that source.
+  source and stays valid after the parser is closed. `ParseOwned` transfers ownership of the input bytes to avoid
+  a copy. The caller must never modify them again, including through any alias. `Node.Text` is a zero-allocation
+  substring of that source.
+- `Source.Bytes` and `Source.Original` return read-only views. The caller must leave their bytes and the original
+  input unchanged, including through any alias.
 - Snapshot arrays retain 25 B/node (previously 41), plus sparse field exceptions and source. Node points derive
   LF-counted rows and byte columns from source offsets using a shared, lazy `sync.Once` line index:
   `[]uint32` line starts cost `4 * (LF count + 1)` bytes plus fixed object/allocator overhead, with at most

@@ -191,6 +191,14 @@
           "beforeSHA256": "6db82134ac2d4c90a1a1475487a625cface02662ebda9b7478cad9c7147e9afe",
           "afterSHA256": "7a0c6bb9e0c121ff3e25f9180dd6625526725c2ddb62321ccc2cf35adaf488eb",
           "upstreamReport": "https://github.com/tree-sitter/tree-sitter-python/issues/350"
+        },
+        {
+          "file": "patches/python/0002-await-power-precedence.patch",
+          "sha256": "3c827a59538f70cfc088e6f47969de068e6a054cdb08512468eea2bf51086e02",
+          "source": "grammar.js",
+          "beforeSHA256": "5071cb77def12a276ec71c2c584ef276b1266df720e16f642530bac35c5c2560",
+          "afterSHA256": "5fb8ae873dae0767d4ac0b75bd528cc663f2e932e54afc8eee1196b546c820ca",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-python/pull/360"
         }
       ],
       "regenerate": true
@@ -373,6 +381,14 @@
           "beforeSHA256": "c6d9efdeaf3a4902f026849e08a103a6d1ec1f015c5f396d3fe92dc57ce034ae",
           "afterSHA256": "8ae6785b70c26bb95ce59a9770cf9974e5c65346bc85744a8f45ca520e32cce1",
           "upstreamReport": "https://github.com/tree-sitter/tree-sitter-css/pull/105"
+        },
+        {
+          "file": "patches/css/0002-non-latin1-value.patch",
+          "sha256": "614b0398834206ffbb012fded5a2503cada24805a95c8936730d46b1b25867de",
+          "source": "grammar.js",
+          "beforeSHA256": "8ae6785b70c26bb95ce59a9770cf9974e5c65346bc85744a8f45ca520e32cce1",
+          "afterSHA256": "b79565ed151b27ea27cf55e6a0612e8a5dcf306fd34e03bb703b87befb087318",
+          "upstreamReport": "https://github.com/tree-sitter/tree-sitter-css/pull/105#issuecomment-7140588000"
         }
       ]
     },

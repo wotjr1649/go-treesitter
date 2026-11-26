@@ -34,8 +34,30 @@
     {"name":"non-ascii-space-in-symbol","source":"x = :a　b\n","nodes":["assignment x = :a　b","simple_symbol :a　b"]}
   ],
   "css": [
-    {"name":"hangul-class-selector","source":".한글 { a: b }\n","nodes":["class_selector .한글","class_name 한글","identifier 한글"]},
-    {"name":"mixed-script-class-name","source":".기본𠀀-état\\+한글2, .ascii_2 {}\n","nodes":["class_selector .기본𠀀-état\\+한글2","class_name 기본𠀀-état\\+한글2","identifier 기본𠀀-état","escape_sequence \\+","identifier 한글2","class_selector .ascii_2","class_name ascii_2","identifier ascii_2"]}
+    {"name":"hangul-class-selector","source":".한글 { a: b }\n","nodes":["class_selector .한글","class_name 한글","identifier 한글","plain_value b"]},
+    {"name":"mixed-script-class-name","source":".기본𠀀-état\\+한글2, .ascii_2 {}\n","nodes":["class_selector .기본𠀀-état\\+한글2","class_name 기본𠀀-état\\+한글2","identifier 기본𠀀-état","escape_sequence \\+","identifier 한글2","class_selector .ascii_2","class_name ascii_2","identifier ascii_2"]},
+    {"name":"hangul-declaration-value","source":"a { b: 한글 }\n","nodes":["plain_value 한글"]},
+    {"name":"non-latin1-dimension-boundary","source":"a { b: 1한 }\n","nodes":["plain_value 한"],"errors":["ERROR 1"]},
+    {"name":"non-latin1-function-boundary","source":"a { b: 한글(abc) }\n","nodes":["plain_value 한글"],"errors":["ERROR (abc)"]},
+    {"name":"non-latin1-multiplication-sign-boundary","source":"a { animation-name: 한×글 }\n","nodes":["plain_value 한"],"errors":["ERROR ×글"]},
+    {"name":"non-latin1-division-sign-boundary","source":"a { animation-name: 한÷글; }\n","nodes":["plain_value 한"],"errors":["ERROR ÷글"]},
+    {"name":"non-latin1-nbsp-boundary","source":"a { animation-name: 한\u00a0글 }\n","nodes":["plain_value 한"],"errors":["ERROR \u00a0글"]},
+    {"name":"non-latin1-latin1-continuation","source":"a { animation-name: 한é글; }\n","nodes":["plain_value 한é글"]},
+    {"name":"latin1-declaration-value","source":"a { animation-name: é }\n","nodes":["plain_value é"]},
+    {"name":"ascii-first-mixed-declaration-value","source":"a { animation-name: a한; }\n","nodes":["plain_value a한"]}
+  ],
+  "python": [
+    {"name":"await-power","source":"async def g():\n    await f() ** 2\n","nodes":["binary_operator await f() ** 2","await await f()","await await","call f()"]},
+    {"name":"await-power-right-associative","source":"async def g():\n    x = await a ** b ** c\n","nodes":["binary_operator await a ** b ** c","await await a","await await","binary_operator b ** c"]},
+    {"name":"await-power-unary-minus","source":"async def g():\n    x = -await a ** 2\n","nodes":["unary_operator -await a ** 2","binary_operator await a ** 2","await await a","await await"]},
+    {"name":"await-power-call-attribute-subscript","source":"async def g():\n    return await f().x[0] ** 2\n","nodes":["binary_operator await f().x[0] ** 2","await await f().x[0]","await await","call f()"]},
+    {"name":"await-power-argument-comprehension-fstring","source":"async def g():\n    print(await f() ** 2, [await x ** 2 for x in xs], f\"{await x ** 2}\")\n","nodes":["call print(await f() ** 2, [await x ** 2 for x in xs], f\"{await x ** 2}\")","binary_operator await f() ** 2","await await f()","await await","call f()","binary_operator await x ** 2","await await x","await await","binary_operator await x ** 2","await await x","await await"]},
+    {"name":"await-power-not","source":"async def g():\n    x = not await x ** 2\n","nodes":["not_operator not await x ** 2","binary_operator await x ** 2","await await x","await await"]},
+    {"name":"await-other-operators-unchanged","source":"async def g():\n    a = await x + 1\n    b = await x * 2\n    c = await x.y - await z\n","nodes":["binary_operator await x + 1","await await x","await await","binary_operator await x * 2","await await x","await await","binary_operator await x.y - await z","await await x.y","await await","await await z","await await"]},
+    {"name":"await-power-await-on-both-sides","source":"async def g():\n    x = await a ** await b\n","nodes":["binary_operator await a ** await b","await await a","await await","await await b","await await"]},
+    {"name":"unary-minus-power-unchanged","source":"async def g():\n    x = -a ** b\n","nodes":["unary_operator -a ** b","binary_operator a ** b"]},
+    {"name":"await-unary-operand-unchanged","source":"async def g():\n    x = await -a\n","nodes":["await await -a","await await","unary_operator -a"]},
+    {"name":"parenthesized-await-power-unchanged","source":"async def g():\n    x = await (f() ** 2)\n    y = 2 ** await f()\n","nodes":["await await (f() ** 2)","await await","binary_operator f() ** 2","call f()","binary_operator 2 ** await f()","await await f()","await await","call f()"]}
   ],
   "xml": [
     {"name":"hangul-attribute","source":"<a 속성=\"1\"/>\n","nodes":["element <a 속성=\"1\"/>","Attribute 속성=\"1\""]},

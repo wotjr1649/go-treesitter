@@ -112,6 +112,37 @@ func TestQueryStreamingAndCache(t *testing.T) {
 	}
 }
 
+func TestQueryCursorMatchLimitReuse(t *testing.T) {
+	fl, _, tree, q := queryFixture(t, nil)
+	f := fl.cur()
+	for _, tc := range []struct {
+		limit   uint32
+		deleted int
+	}{
+		{0, 0},
+		{^uint32(0), 0},
+		{64, 1},
+		{64, 1},
+		{128, 1},
+		{8, 2},
+		{0, 2},
+		{1, 3},
+	} {
+		if _, err := collectQuery(tree, context.Background(), q, &QueryOptions{MatchLimit: tc.limit}); err != nil {
+			t.Fatal(err)
+		}
+		if got := f.count("qcursor_delete"); got != tc.deleted {
+			t.Errorf("limit %d: deleted %d cursors, want %d", tc.limit, got, tc.deleted)
+		}
+		if got := f.count("qcursor_new"); got != tc.deleted+1 {
+			t.Errorf("limit %d: allocated %d cursors, want %d", tc.limit, got, tc.deleted+1)
+		}
+	}
+	if got := f.count("query_new"); got != 1 {
+		t.Errorf("compiled %d queries, want 1", got)
+	}
+}
+
 func TestQueryCursorSharedAcrossQueriesAndTrees(t *testing.T) {
 	fl, p, tree, q := queryFixture(t, nil)
 	f := p.c.inst.m.(*fakeModule)
@@ -685,11 +716,12 @@ func TestQueryCleanupQueue(t *testing.T) {
 		return weak.Make(temp)
 	}()
 	deadline := time.Now().Add(5 * time.Second)
+	queue := p.c.inst.queryQueue
 	for {
 		runtime.GC()
-		p.c.mu.Lock()
-		pending := len(p.c.leakedQueries)
-		p.c.mu.Unlock()
+		queue.mu.Lock()
+		pending := len(queue.pending)
+		queue.mu.Unlock()
 		if pending > 0 {
 			break
 		}
@@ -720,6 +752,45 @@ func TestQueryCleanupQueue(t *testing.T) {
 	}
 }
 
+func TestQueryCleanupsStopOnInstanceDiscard(t *testing.T) {
+	_, p, tree, q := queryFixture(t, nil)
+	var discarded []weak.Pointer[queryRetirements]
+	for range 8 {
+		for range 2 {
+			if _, err := collectQuery(tree, bg, q, nil); err != nil {
+				t.Fatal(err)
+			}
+		}
+		discarded = append(discarded, weak.Make(p.c.inst.queryQueue))
+		if err := p.Reset(); err != nil {
+			t.Fatal(err)
+		}
+		tree = mustParse(t, p, "next")
+	}
+	if _, err := collectQuery(tree, bg, q, nil); err != nil {
+		t.Fatal(err)
+	}
+	last := weak.Make(p.c.inst.queryQueue)
+	runtime.GC()
+	// A registered cleanup keeps its queue alive even after the instance has been discarded.
+	for i, queue := range discarded {
+		if queue.Value() != nil {
+			t.Errorf("query still holds the queue of discarded instance %d", i)
+		}
+	}
+	if last.Value() == nil {
+		t.Fatal("live instance lost its queue")
+	}
+	if err := p.Close(); err != nil {
+		t.Fatal(err)
+	}
+	runtime.GC()
+	if last.Value() != nil {
+		t.Fatal("query still holds the queue of the closed instance")
+	}
+	runtime.KeepAlive(q)
+}
+
 func TestQueryCleanupGenerationAndTrap(t *testing.T) {
 	for _, stale := range []bool{false, true} {
 		t.Run(fmt.Sprint("stale=", stale), func(t *testing.T) {
@@ -727,9 +798,13 @@ func TestQueryCleanupGenerationAndTrap(t *testing.T) {
 			if _, err := collectQuery(tree, context.Background(), q, nil); err != nil {
 				t.Fatal(err)
 			}
-			arg := queryCleanup{owner: weak.Make(p.c), queryRetirement: queryRetirement{key: weak.Make(q), instance: weak.Make(p.c.inst)}}
+			arg := queryRetirement{queue: p.c.inst.queryQueue, key: weak.Make(q)}
 			if stale {
 				if err := p.Reset(); err != nil {
+					t.Fatal(err)
+				}
+				tree = mustParse(t, p, "replacement")
+				if _, err := collectQuery(tree, bg, q, nil); err != nil {
 					t.Fatal(err)
 				}
 			} else {

@@ -129,17 +129,19 @@ elapsed time independently of cooperative checks and Go heap targets.
   records each node's descendant index on the first returned match; later captures, including backward captures, use
   expected constant-time lookups. Mapping costs expected O(nodes + captures), with 8 bytes per slot in wasm32 and fewer
   than four slots per node. The table is freed with the query cursor. Building it polls should_stop every 256 nodes.
-  The host lazily allocates one cursor per parser instance and reuses it across Matches calls, queries and ranges.
-  Its index covers the whole tree: the first match on a different tree costs O(nodes), even for a narrow range;
-  consecutive execs on the same tree reuse it. Switching trees frees the old table. The shim registers its cursors
+  The host lazily allocates one cursor per parser instance. It replaces the cursor when the effective MatchLimit
+  decreases because C can reuse capture lists allocated under a higher limit. Zero and UINT32_MAX are equivalent.
+  Its index covers the whole tree: the first match after switching trees or replacing the cursor costs O(nodes),
+  even for a narrow range. Other execs on the same tree reuse it. The shim registers its cursors
   and drops tables referencing a tree before deleting that tree, so allocator reuse of a TSTree address cannot reuse
   stale indices. A cancelled index build frees its partial table before the next exec. Tree edits are rejected by
   Matches. Reset, Close and traps release the whole instance, including its cursor and table.
   For N nodes, the index allocation is `8 * 2^ceil(log2(2*N))` bytes in wasm32: less than 32 bytes per
   node, excluding allocator overhead. At most the last queried live tree's index is retained per instance,
-  until that tree is deleted (Tree.Close, leak drain or ParserPool.Put), a different tree is queried, or the
-  instance is discarded. The query-dependent TSQueryCursor arrays and match buffer remain allocated until
-  instance discard (Parser.Reset, Parser.Close, recycling or a trap), even after the tree is deleted or switched.
+  until that tree is deleted (Tree.Close, leak drain or ParserPool.Put), a different tree is queried, the cursor
+  is replaced, or the instance is discarded. The query-dependent TSQueryCursor arrays and match buffer remain
+  allocated until cursor replacement or instance discard (Parser.Reset, Parser.Close, recycling or a trap),
+  even after the tree is deleted or switched.
   These retained allocations count against WithMaxMemoryBytes, leaving less room for subsequent parsing;
   neither a narrow byte range nor MatchLimit bounds the whole-tree index. Freeing the index makes its space
   reusable inside the instance; linear memory is returned to the OS only on instance discard.
@@ -156,7 +158,7 @@ elapsed time independently of cooperative checks and Go heap targets.
   weak owner/instance identities; no generated engine call runs on the GC goroutine. The next owner engine operation
   deletes the corresponding TSQuery. Retirements from a replaced instance are ignored. Reset/Close release the entire
   instance. Reuse Query values to avoid repeatedly allocating validation instances and compiling the same source.
-- MatchLimit bounds in-progress states, not returned results. On overflow the iterator reports ErrQueryMatchLimit
+- MatchLimit bounds in-progress states for each Matches call. On overflow the iterator reports ErrQueryMatchLimit
   and discards any match produced by that same next call. Previously yielded matches remain valid; small limits may
   yield no matches at all. The public doc comments state this explicitly.
 
