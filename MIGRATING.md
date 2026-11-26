@@ -548,6 +548,45 @@ unlimited. Lowering the effective limit replaces the cursor, so the next `Matche
 index (O(nodes), even for a narrow byte range). Raising it does not. Handle `ErrQueryMatchLimit` wherever you use a
 low limit. [Query contract](docs/design/query-abi.md)
 
+### Opt-in query budgets
+
+Additive: existing code needs no change. `NewQuery`, `Tree.Matches` and `QueryOptions` literals keep their signatures and behavior, and no
+cap applies unless you pass one. Queries built with either constructor work with either match iterator. [#143](https://github.com/wotjr1649/go-treesitter/pull/143)
+
+- **Compile caps.** `NewQueryWithOptions(ctx, lang, pattern, opts...)` takes `WithMaxQuerySourceBytes`, `WithMaxQueryMemoryBytes`,
+  `WithMaxQueryMetadataBytes` and `WithMaxQueryRegexUnits`. The memory cap bounds the scratch engine instance (32 MiB to 4 GiB when
+  positive); the lazy compile on each parser still uses that parser's `WithMaxMemoryBytes`. Regex units are an implementation-dependent
+  measure, not bytes.
+- **Match caps.** `Tree.MatchesWithOptions(ctx, q, opts, budgets...)` takes `WithMaxQueryCaptures`, `WithMaxQueryResults` and
+  `WithMaxQueryPredicateWork`. Captures and predicate work count candidates that a predicate rejects. The results cap stops the sequence
+  before it yields the first excess match. Counters start fresh on every iteration.
+- **Zero and invalid values.** Zero leaves a cap unset. A nil option or an out-of-range value returns `ErrInvalidInput`.
+- **Errors.** Exhausting a Go budget returns `ErrResourceLimit` with `InstanceReset == false` (`errors.As` to `*ParseError`) and keeps
+  earlier yields usable. A refused `memory.grow` can also return `ErrResourceLimit`; check `InstanceReset` to learn whether the instance
+  was reset. A done context takes precedence at budget checkpoints. A malformed query from `NewQueryWithOptions` matches `ErrInvalidInput` and wraps
+  a `*QueryError` (`NewQuery` still returns the `*QueryError` directly). The cursor's `QueryOptions.MatchLimit` is a separate limit and
+  still reports `ErrQueryMatchLimit`.
+- **What the caps do not bound.** C query compilation checks the context only at Go call boundaries, the capture and metadata caps apply
+  after the engine has allocated the data, and the first whole-tree index and engine traversal stay under the parser's limits. For a hard
+  deadline or a total memory bound on untrusted queries, run the work in a separate process with an OS memory limit and a supervisor timeout.
+
+See the [query contract](docs/design/query-abi.md#opt-in-go-budgets), [query outcomes](docs/specs/parser-result.md#query-results-and-limits)
+and [ADR-0030](docs/design/decisions/ADR-0030-query-budgets.md).
+
+### Snapshot node storage: `Node.ChildCount` is O(children)
+
+The snapshot no longer stores a per-node child count (25 to 21 B/node of Go heap; the count was redundant because a node
+has children exactly when its descendant range extends past itself). Results and signatures are unchanged. Two costs move:
+
+- `Node.ChildCount` walks the children, so it costs O(children) instead of O(1). A loop condition such as
+  `for i := 0; i < n.ChildCount(); i++` now adds a full walk of the children to every iteration. Call it once and keep the value, or
+  iterate with `Node.Children` where that fits.
+- `Node.Child(i)` still costs O(i); it no longer calls `ChildCount` first, and an out-of-range index still returns `false`.
+
+Snapshots of the same input retain less memory (the Ruby `gb18030-tbl.rb` snapshot export keeps about 2.5 MB less Go heap).
+The earlier 25 B/node figure in the v0.5.0 entry is a historical record. See
+[`parser-result.md`](docs/specs/parser-result.md).
+
 ### CSS non-Latin-1 declaration values
 
 Unreleased after `grammars/css/v0.7.0`. The ADR-0023 value patch adapts the widened identifier in
@@ -589,17 +628,3 @@ Node types and fields are unchanged (`node-types.json` is byte-identical with an
 
 Retire the patch in the approved pin move to an upstream source containing a fix for the reported defect. That move updates the
 patch corpus expectations. See the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v070-python-await-patch).
-
-### Snapshot node storage: `Node.ChildCount` is O(children)
-
-The snapshot no longer stores a per-node child count (25 to 21 B/node of Go heap; the count was redundant because a node
-has children exactly when its descendant range extends past itself). Results and signatures are unchanged. Two costs move:
-
-- `Node.ChildCount` walks the children, so it costs O(children) instead of O(1). A loop condition such as
-  `for i := 0; i < n.ChildCount(); i++` now adds a full walk of the children to every iteration. Call it once and keep the value, or
-  iterate with `Node.Children` where that fits.
-- `Node.Child(i)` still costs O(i); it no longer calls `ChildCount` first, and an out-of-range index still returns `false`.
-
-Snapshots of the same input retain less memory (the Ruby `gb18030-tbl.rb` snapshot export keeps about 2.5 MB less Go heap).
-The earlier 25 B/node figure in the v0.5.0 entry is a historical record. See
-[`parser-result.md`](docs/specs/parser-result.md).
