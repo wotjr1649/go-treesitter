@@ -399,6 +399,89 @@ class MatrixCountTest(unittest.TestCase):
         self.assertNotEqual(self.run_step("engine", j(e), e[:-1], "push"), 0)
 
 
+class MatrixKeysTest(unittest.TestCase):
+    """Every matrix.<path> a job reads must exist in every matrix entry the classifier emits: a missing key renders as an empty string
+    (an empty job name; an empty GROUP_LANGS that a loop or regen.sh then treats as 'nothing' or 'everything')."""
+
+    OUTPUTS = {"engine": ("engine_shards", "floor_shards"), "conformance": ("conformance_matrix",), "regen": ("regen_matrix",)}
+    OPTIONAL = {("conformance", "group.docs")}  # only g1 carries it; the others read it as empty on purpose
+    SAMPLES = [(["README.md"], "push"), (["README.md"], "workflow_dispatch"), (["README.md"], "pull_request"), (["query.go"], "pull_request"),
+               (["grammars/c/parser.go"], "pull_request"), (["tools/gen/pins.json"], "pull_request"),
+               (["tools/conformance/a_test.go"], "pull_request"), ([".github/workflows/engine.yml"], "pull_request"),
+               ([".github/workflows/regen.yml"], "pull_request"), ([".github/workflows/conformance.yml"], "pull_request")]
+
+    def matrix_paths(self, wf):
+        text = workflow_text(wf)
+        parts = re.split(r"^  ([A-Za-z0-9_-]+):\s*$", text[text.index("\njobs:\n"):], flags=re.M)
+        found = {}
+        for i in range(1, len(parts), 2):
+            job, body = parts[i], parts[i + 1]
+            uses_matrix_output = any("needs.changes.outputs.%s" % k in body for k in self.OUTPUTS[wf]) or (wf == "engine" and job.startswith("grammar-"))
+            if not uses_matrix_output:
+                continue  # a static matrix (the conformance aggregate job) is not the classifier's
+            code = "\n".join(l for l in body.splitlines() if not l.lstrip().startswith("#"))
+            paths = set()
+            for expr in re.findall(r"\$\{\{.*?\}\}", code):
+                paths |= set(re.findall(r"\bmatrix\.([A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+)*)", expr))
+            found[job] = paths
+        return found
+
+    @staticmethod
+    def has(entry, path):
+        for part in path.split("."):
+            if not isinstance(entry, dict) or part not in entry:
+                return False
+            entry = entry[part]
+        return True
+
+    def test_every_matrix_path_exists_in_every_entry(self):
+        for wf, keys in self.OUTPUTS.items():
+            by_job = self.matrix_paths(wf)
+            self.assertTrue(by_job, wf)
+            entries = []
+            for files, event in self.SAMPLES:
+                out = flags(wf, files, event)
+                for key in keys:
+                    entries += [(key, e) for e in json.loads(out[key])["include"]]
+            self.assertTrue(entries, wf)
+            for job, paths in by_job.items():
+                self.assertTrue(paths, "%s %s reads no matrix path: the scan matched nothing" % (wf, job))
+                for path in paths:
+                    holders = [self.has(e, path) for _, e in entries]
+                    if (wf, path) in self.OPTIONAL:
+                        self.assertTrue(any(holders), "%s %s: matrix.%s is in no entry" % (wf, job, path))
+                    elif not all(holders):
+                        self.fail("%s %s: matrix.%s is missing from a matrix entry (%s)" % (
+                            wf, job, path, next(e for _, e in entries if not self.has(e, path))))
+
+    def test_loops_over_matrix_lists_check_them_first(self):
+        # tools/lane/check_langs.sh fails on an empty or unknown list; regen.sh and native-ref take every grammar when given none.
+        for wf, n in (("regen", 2), ("conformance", 2), ("engine", 1)):
+            self.assertEqual(workflow_text(wf).count("tools/lane/check_langs.sh"), n, wf)
+
+    def run_check(self, *args):
+        import shutil
+        bash = shutil.which("bash")
+        if not bash or "system32" in bash.lower().replace("/", "\\"):
+            if sys.platform.startswith("linux"):
+                self.fail("bash is needed")
+            self.skipTest("bash (not the WSL launcher) is needed")
+        return subprocess.run([bash, str(ROOT / "tools/lane/check_langs.sh"), *args], capture_output=True, text=True, cwd=ROOT)
+
+    def test_check_langs(self):
+        self.assertEqual(self.run_check("c", "golang").returncode, 0)
+        for bad in ((), ("",), ("c", "nope"), ("../tools",)):
+            res = self.run_check(*bad)
+            self.assertNotEqual(res.returncode, 0, bad)
+            self.assertIn("::error::", res.stdout, bad)
+        for wf in ("regen", "conformance"):  # the matrix lists are the table the check relies on
+            for files, event in MatrixKeysTest.SAMPLES[:1]:
+                key = MatrixKeysTest.OUTPUTS[wf][0]
+                for entry in json.loads(flags(wf, files, event)[key])["include"]:
+                    group = entry["group"]
+                    self.assertEqual(self.run_check(*group["langs"].split()).returncode, 0, group["name"])
+
+
 class GateTest(unittest.TestCase):
     def test_every_changes_job_runs_the_lane_tests_and_the_classifier(self):
         for wf in GATE_WORKFLOWS:

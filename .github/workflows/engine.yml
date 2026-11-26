@@ -269,9 +269,9 @@ jobs:
         env:
           GRAMMARS: ${{ matrix.grammars }}
         run: |
-          [ -n "$GRAMMARS" ] || { echo "::error::empty grammar shard"; exit 1; }
           unset TSG_CORPUS
           read -r -a grammars <<< "$GRAMMARS"
+          bash tools/lane/check_langs.sh "${grammars[@]}"  # fails on an empty or unknown list
           result=0
           for lang in "${grammars[@]}"; do
             echo "::group::$lang"

@@ -88,7 +88,10 @@ jobs:
         env:
           TSG_DL_CACHE: ${{ runner.temp }}/dl-cache
           REGEN_KEEP_GOING: "1"
-        run: /usr/bin/time -v -o "$RUNNER_TEMP/regen-cost.txt" bash tools/gen/regen.sh "$RUNNER_TEMP/regen" $GROUP_LANGS
+        # regen.sh regenerates every grammar when given none, so the list is checked first.
+        run: |
+          bash tools/lane/check_langs.sh $GROUP_LANGS
+          /usr/bin/time -v -o "$RUNNER_TEMP/regen-cost.txt" bash tools/gen/regen.sh "$RUNNER_TEMP/regen" $GROUP_LANGS
       # One group saves (every group downloads the same set), and only when main's pins.json has no cache yet.
       - name: Save the verified archive cache
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.group.name == 'g1' && steps.dl-cache.outputs.cache-hit != 'true' }}
@@ -106,6 +109,7 @@ jobs:
       - name: Compare regenerated and reference C behaviour (ADR-0027)
         if: ${{ !cancelled() }}
         run: |
+          bash tools/lane/check_langs.sh $GROUP_LANGS
           status=0
           for lang in $GROUP_LANGS; do
             echo "::group::generator gate: $lang"

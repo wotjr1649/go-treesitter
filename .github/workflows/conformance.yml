@@ -90,6 +90,7 @@ jobs:
           key: conformance-dl-${{ runner.os }}-${{ runner.arch }}-${{ matrix.group.name }}-${{ hashFiles('tools/gen/pins.json') }}
       - name: Select the group's grammars for conformance builds
         run: |
+          bash tools/lane/check_langs.sh $GROUP_LANGS
           list=""
           for lang in $GROUP_LANGS; do
             [ "$lang" != golang ] || lang=go
@@ -231,6 +232,7 @@ jobs:
         env:
           CGO_ENABLED: "0"
         run: |
+          bash "$GITHUB_WORKSPACE/tools/lane/check_langs.sh" $GROUP_LANGS
           ulimit -c 0
           status=0
           for lang in $GROUP_LANGS; do
