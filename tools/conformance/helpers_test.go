@@ -25,7 +25,8 @@ var bg = context.Background()
 func requireFieldLookup(t *testing.T) bool {
 	return os.Getenv("TSG_REQUIRE_FIELD_LOOKUP") == "1" &&
 		(t.Name() == "TestFieldLookup" || strings.HasPrefix(t.Name(), "TestFieldLookup/") ||
-			t.Name() == "TestFieldLookupEdits" || strings.HasPrefix(t.Name(), "TestFieldLookupEdits/"))
+			t.Name() == "TestFieldLookupEdits" || strings.HasPrefix(t.Name(), "TestFieldLookupEdits/") ||
+			t.Name() == "TestNavigation" || strings.HasPrefix(t.Name(), "TestNavigation/"))
 }
 
 func skipConformance(t *testing.T, reason string) {

@@ -38,9 +38,10 @@ jobs:
           - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
           - {runner: ubuntu-24.04-arm, goos: linux, goarch: arm64}
     runs-on: ${{ matrix.runner }}
-    # The step limits (go test 40m, query 40m, fuzz seeds 30m) sum to 110m; the job limit leaves room for setup and the
-    # native build so a hung step fails at its own limit and the later !cancelled() steps still run. Expected: ~9-12m.
-    timeout-minutes: 120
+    # The step limits (go test 40m, query 40m, navigation 10m, fuzz seeds 30m) sum to 120m; the job limit leaves room for
+    # setup and the native build so a hung step fails at its own limit and the later !cancelled() steps still run.
+    # Expected: ~9-12m (navigation: a few minutes at most, see the step).
+    timeout-minutes: 130
     env:
       GOENV: "off"
       GOWORK: "off"
@@ -140,6 +141,38 @@ jobs:
           TSG_QUERY_DIR: ${{ runner.temp }}/queries
           TSG_QUERY_PROBE_STRIDE: "1"
         run: go test -count=1 -timeout 40m -v -run 'TestStripPredicates|TestQueryNative|TestQueryCLIInvalidUTF8Output|TestQueryMatchLimitIsPerCall' .
+      # Navigation (Parent, siblings, DescendantForByteRange) against ts_node_* in native C, over the corpus inputs. First
+      # comparison of these functions with C, so a difference is recorded, not gated: TSG_NAV_REPORT=1 keeps the byte
+      # comparison but logs a mismatch (NAV-MISMATCH, a warning here) and uploads the per-cell list instead of failing the
+      # step. Native failures, header or input-identity mismatches and the native-free TestNavigationSelfConsistent still
+      # fail. Drop TSG_NAV_REPORT once the recorded differences are fixed or registered (tools/conformance nav_test.go).
+      - name: Navigation against native C (report only)
+        if: ${{ !cancelled() }}
+        working-directory: tools/conformance
+        env:
+          CGO_ENABLED: "0"
+          TSG_DATA_DIR: ${{ runner.temp }}/data
+          TSG_NATIVE_EXE_DIR: ${{ runner.temp }}/exe
+          TSG_REQUIRE_FIELD_LOOKUP: "1"
+          TSG_NAV_REPORT: "1"
+          TSG_CONF_OUT: ${{ runner.temp }}/nav-out
+        timeout-minutes: 10
+        run: |
+          set +e
+          go test -count=1 -timeout 9m -v -run 'TestNav' . 2>&1 | tee "$RUNNER_TEMP/nav.log"
+          status=${PIPESTATUS[0]}
+          grep -h 'NAV-MISMATCH' "$RUNNER_TEMP/nav.log" | sed 's/^ *//; s/^/::warning::/'
+          exit $status
+      - name: Upload navigation comparison
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: nav-comparison-${{ matrix.runner }}-${{ matrix.group.name }}
+          path: |
+            ${{ runner.temp }}/nav-out
+            ${{ runner.temp }}/nav.log
+          if-no-files-found: ignore
+          retention-days: 90
       # Run fuzz seed corpora once without fuzzing. Go examples build in g2 (!no_go).
       - name: Fuzz seed corpora
         if: ${{ !cancelled() }}

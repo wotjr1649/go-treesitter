@@ -13,6 +13,7 @@
  *                                                      never does): "#tsg-query/1 patterns=<n> captures=<n>", then per match "m\t<pattern>\t<n>"
  *                                                      and per capture "c\t<capture>\t<node preorder index>\t<symbol>\t<start>\t<end>";
  *                                                      a rejected query prints "#tsg-query/1 error offset=<o> type=<t>" (exit 0)
+ *   <exe> nav <file>                                     parent, (named) siblings and (named) descendant_for_byte_range per node, see nav_tree
  *   <exe> symbols                                      visible/supertype symbol rows: raw ID, public ID, lookup ID, named, hex name
  *   <exe> fields <file>                                ts_node_child_by_field_name for every visible node (cursor preorder) and every
  *                                                      field name of the language: "#tsg-fields/1 nodes=<n> fields=<f>", then one line per
@@ -334,6 +335,80 @@ done:
   return out;
 }
 
+/* nav: parent / next / prev / next-named / prev-named sibling of every visible node, and ts_node_(named_)descendant_for_byte_range
+ * on the root for three byte ranges per node (its span, the zero-width range at its start, at its end). Results are the
+ * preorder index (by node id, like fields), "-" for the null node, or "?<symbol>:<start>:<end>" for a node that is not a
+ * visible node of the tree. "#tsg-nav/1 nodes=<n>", then per node, in preorder, two lines:
+ *   "n\t<i>\t<parent>\t<next>\t<prev>\t<next named>\t<prev named>"
+ *   "r\t<i>\t<span>\t<span named>\t<start>\t<start named>\t<end>\t<end named>"
+ * The Go twin is conformance.Nav (tools/conformance/nav.go); the two must agree byte for byte. */
+static void nav_ref(Buf *out, const NodeRef *refs, uint32_t n, TSNode node) {
+  if (ts_node_is_null(node)) { str(out, "-"); return; }
+  NodeRef key = {node.id, 0};
+  const NodeRef *hit = bsearch(&key, refs, n, sizeof *refs, cmp_ref);
+  if (hit) { u32(out, hit->index); return; }
+  str(out, "?"); u32(out, ts_node_symbol(node)); str(out, ":"); u32(out, ts_node_start_byte(node));
+  str(out, ":"); u32(out, ts_node_end_byte(node));
+}
+
+static void nav_range(Buf *out, const NodeRef *refs, uint32_t n, TSNode root, uint32_t a, uint32_t b) {
+  str(out, "\t"); nav_ref(out, refs, n, ts_node_descendant_for_byte_range(root, a, b));
+  str(out, "\t"); nav_ref(out, refs, n, ts_node_named_descendant_for_byte_range(root, a, b));
+}
+
+static Buf nav_tree(TSTree *tree) {
+  uint32_t n;
+  NodeRef *refs = index_nodes(tree, &n);
+  TSNode root = ts_tree_root_node(tree);
+  Buf out = {0}, body = {0};
+  TSTreeCursor cur = ts_tree_cursor_new(root);
+  uint32_t i = 0;
+  for (;;) {
+    TSNode node = ts_tree_cursor_current_node(&cur);
+    str(&body, "n\t"); u32(&body, i);
+    str(&body, "\t"); nav_ref(&body, refs, n, ts_node_parent(node));
+    str(&body, "\t"); nav_ref(&body, refs, n, ts_node_next_sibling(node));
+    str(&body, "\t"); nav_ref(&body, refs, n, ts_node_prev_sibling(node));
+    str(&body, "\t"); nav_ref(&body, refs, n, ts_node_next_named_sibling(node));
+    str(&body, "\t"); nav_ref(&body, refs, n, ts_node_prev_named_sibling(node));
+    str(&body, "\n");
+    uint32_t s = ts_node_start_byte(node), e = ts_node_end_byte(node);
+    str(&body, "r\t"); u32(&body, i);
+    nav_range(&body, refs, n, root, s, e);
+    nav_range(&body, refs, n, root, s, s);
+    nav_range(&body, refs, n, root, e, e);
+    str(&body, "\n");
+    i++;
+    if (ts_tree_cursor_goto_first_child(&cur)) continue;
+    for (;;) {
+      if (ts_tree_cursor_goto_next_sibling(&cur)) break;
+      if (!ts_tree_cursor_goto_parent(&cur)) goto done;
+    }
+  }
+done:
+  ts_tree_cursor_delete(&cur);
+  str(&out, "#tsg-nav/1 nodes="); u32(&out, n); str(&out, "\n");
+  if (body.len) put(&out, body.p, body.len);
+  free(body.p);
+  free(refs);
+  return out;
+}
+
+static int nav_cmd(const char *spath) {
+  uint32_t sn;
+  char *src = slurp(spath, &sn);
+  if (!src) { fputs("open failed\n", stderr); return 3; }
+  TSParser *p = new_parser();
+  if (!p) { fputs("set language failed\n", stderr); return 4; }
+  TSTree *tree = ts_parser_parse_string(p, NULL, src, sn);
+  free(src);
+  if (!tree) { fputs("parse failed\n", stderr); ts_parser_delete(p); return 4; }
+  Buf out = nav_tree(tree);
+  ts_tree_delete(tree);
+  ts_parser_delete(p);
+  return emit(out);
+}
+
 static int fields_cmd(const char *spath) {
   uint32_t sn;
   char *src = slurp(spath, &sn);
@@ -384,10 +459,11 @@ int main(int argc, char **argv) {
   }
   if (argc == 4 && !strcmp(cmd, "query")) return query_cmd(argv[2], argv[3]);
   if (argc == 3 && !strcmp(cmd, "fields")) return fields_cmd(argv[2]);
+  if (argc == 3 && !strcmp(cmd, "nav")) return nav_cmd(argv[2]);
   if (argc == 2 && !strcmp(cmd, "symbols")) return symbols_cmd();
   int edit = !strcmp(cmd, "edit"), cr = !strcmp(cmd, "changed-ranges"), ef = !strcmp(cmd, "edit-fields");
   if (!((argc == 3 && !strcmp(cmd, "dump")) || (argc == 7 && (edit || cr || ef)))) {
-    fputs("usage: <exe> dump <file> | edit|changed-ranges|edit-fields <old> <new> <start> <old_end> <new_end> | speed <file> <reps> | corpus <list> <reps> | query <query-file> <source> | fields <file> | symbols\n", stderr);
+    fputs("usage: <exe> dump <file> | edit|changed-ranges|edit-fields <old> <new> <start> <old_end> <new_end> | speed <file> <reps> | corpus <list> <reps> | query <query-file> <source> | fields <file> | nav <file> | symbols\n", stderr);
     return 2;
   }
   uint32_t n1, n2 = 0;
