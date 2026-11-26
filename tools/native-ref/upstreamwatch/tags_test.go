@@ -176,6 +176,7 @@ func TestOwnerPinBehindDocsOnly(t *testing.T) {
 		{"parser.c changed", `[{"filename":"README.md"},{"filename":"src/parser.c"}]`, true, true},
 		{"mixed: docs plus grammar.js", `[{"filename":"docs/a.md"},{"filename":"grammar.js"}]`, true, true},
 		{"mixed: docs plus a file under a hashed dir", `[{"filename":"docs/a.md"},{"filename":"common/define-grammar.js"}]`, true, true},
+		{"grammar/ imported by grammar.js changed", `[{"filename":"grammar/select.js"}]`, true, true},
 		{"queries changed", `[{"filename":"queries/highlights.scm"}]`, true, true},
 		{"renamed out of a hashed dir", `[{"filename":"old/scanner.c","previous_filename":"src/scanner.c"}]`, true, true},
 		{"empty list is no proof", `[]`, true, true},
