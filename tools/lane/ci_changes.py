@@ -9,8 +9,12 @@ conformance gates also count the matrix instances that succeeded against "expect
 
     ci_changes.py --workflow engine|regen|conformance|windows|api-guard|pin-move [--files FILE]
 
-The workflow runs the copy of this script from the pull request's base commit (git show HEAD^1:tools/lane/ci_changes.py), so a pull
-request that edits it is classified by the old rules and hits the "lib" rule; a base without the script runs everything.
+A pull request that does not edit this script is classified by it (it is the base commit's copy, since HEAD^1 and HEAD hold the same
+bytes), so a pull request cannot change its own classification by any other file. A pull request that edits it (git diff --quiet
+HEAD^1 HEAD -- tools/lane/ci_changes.py is false, or HEAD^1 cannot be read) runs this script of the pull request in run-everything mode
+(--event workflow_dispatch): every job, the whole matrices, the full gate sizes, described by the pull request's own tables and workflows,
+whose agreement the lane tests (run first in every changes job) check. The base copy cannot be used there: its expect lists and matrix
+outputs name the base's jobs, which the pull request's workflows may not have.
 
 Changed files come from "git diff --name-only --no-renames HEAD^1 HEAD" on the pull request's merge commit (the default
 checkout of a pull_request event; fetch-depth 2), or from --files ("-" is stdin; tests). Anything unknown, an empty or

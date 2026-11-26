@@ -38,7 +38,7 @@ jobs:
         run: |
           python3 -m unittest discover -s tools/lane -p test_ci_changes.py
           cc=tools/lane/ci_changes.py ev=$GITHUB_EVENT_NAME
-          if [ $ev = pull_request ]; then git show HEAD^1:$cc > $RUNNER_TEMP/base_ci_changes.py 2>/dev/null && cc=$RUNNER_TEMP/base_ci_changes.py || ev=workflow_dispatch; fi
+          if [ $ev = pull_request ] && ! git diff --quiet HEAD^1 HEAD -- $cc; then ev=workflow_dispatch; fi
           python3 $cc --workflow regen --event $ev
 
   regen-grammar:

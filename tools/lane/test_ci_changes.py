@@ -162,11 +162,11 @@ class RepoTest(unittest.TestCase):
 GATE_CMD = "jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped " \
            "'. as $n | all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok " \
            "and all(.changes.outputs.expect | fromjson[]; $n[.].result == $ok)' <<<$NEEDS"
-# The classify step of every changes job: the lane tests first, then the classifier of the base commit (a pull request that edits the
-# classifier is judged by the old one and hits its "lib" rule; a base without it runs everything). Same text in each, apart from the workflow.
+# The classify step of every changes job: the lane tests first, then the classifier (the base's own when the pull request does not edit it;
+# when it does, or HEAD^1 cannot be read, the pull request's classifier runs everything). Same text in each, apart from the workflow.
 CHANGES_CMD = """python3 -m unittest discover -s tools/lane -p test_ci_changes.py
 cc=tools/lane/ci_changes.py ev=$GITHUB_EVENT_NAME
-if [ $ev = pull_request ]; then git show HEAD^1:$cc > $RUNNER_TEMP/base_ci_changes.py 2>/dev/null && cc=$RUNNER_TEMP/base_ci_changes.py || ev=workflow_dispatch; fi
+if [ $ev = pull_request ] && ! git diff --quiet HEAD^1 HEAD -- $cc; then ev=workflow_dispatch; fi
 python3 $cc --workflow %s --event $ev"""
 
 
@@ -367,9 +367,49 @@ class MatrixCountTest(unittest.TestCase):
 
 
 class GateTest(unittest.TestCase):
-    def test_every_changes_job_runs_the_lane_tests_and_the_base_classifier(self):
+    def test_every_changes_job_runs_the_lane_tests_and_the_classifier(self):
         for wf in GATE_WORKFLOWS:
             self.assertIn(norm(CHANGES_CMD % wf), norm(workflow_text(wf)), wf)
+
+    def classify_event(self, event, edit_classifier, parents=2):
+        """Runs the classify step's shell lines in a scratch git repository, with the classifier replaced by an echo of its arguments,
+        and returns the --event the classifier would get."""
+        import shutil
+        import tempfile
+        bash, git = shutil.which("bash"), shutil.which("git")
+        if not bash or not git or "system32" in bash.lower().replace("/", "\\"):
+            if sys.platform.startswith("linux"):
+                self.fail("bash and git are needed")
+            self.skipTest("bash (not the WSL launcher) and git are needed")
+        script = (CHANGES_CMD % "engine").split("\n", 1)[1].replace("python3 $cc", "echo $cc")  # without the unittest line
+        with tempfile.TemporaryDirectory() as d:
+            def git_(*args):
+                subprocess.run([git, "-c", "user.name=t", "-c", "user.email=t@invalid", *args], cwd=d, check=True, capture_output=True)
+            git_("init", "-q")
+            lane = Path(d, "tools/lane")
+            lane.mkdir(parents=True)
+            (lane / "ci_changes.py").write_text("base\n", newline="\n")
+            git_("add", "-A")
+            git_("commit", "-q", "-m", "base")
+            if parents == 2:  # a pull request's merge commit: HEAD^1 is the base
+                git_("checkout", "-q", "-b", "pr")
+                Path(d, "other.txt").write_text("x")
+                if edit_classifier:
+                    (lane / "ci_changes.py").write_text("changed\n", newline="\n")
+                git_("add", "-A")
+                git_("commit", "-q", "-m", "pr")
+                git_("checkout", "-q", "-")
+                git_("merge", "-q", "--no-ff", "-m", "merge", "pr")
+            env = dict(os.environ, GITHUB_EVENT_NAME=event, RUNNER_TEMP=d)
+            res = subprocess.run([bash, "-e", "-c", script], cwd=d, env=env, capture_output=True, text=True)
+            self.assertEqual(res.returncode, 0, res.stderr)
+            return res.stdout.split("--event")[1].strip()
+
+    def test_a_pull_request_that_edits_the_classifier_runs_everything_with_its_own_classifier(self):
+        self.assertEqual(self.classify_event("pull_request", edit_classifier=True), "workflow_dispatch")
+        self.assertEqual(self.classify_event("pull_request", edit_classifier=False), "pull_request")  # every other pull request: unchanged
+        self.assertEqual(self.classify_event("pull_request", edit_classifier=False, parents=1), "workflow_dispatch")  # HEAD^1 unreadable
+        self.assertEqual(self.classify_event("push", edit_classifier=True), "push")
 
     def test_every_required_workflow_has_the_gate_and_a_changes_job(self):
         for wf, gate in GATE_WORKFLOWS.items():

@@ -18,7 +18,7 @@
       },
       "steps": [
         {"uses": "actions/checkout@v7", "with": {"persist-credentials": false, "fetch-depth": 2}},
-        {"id": "classify", "name": "Classify the changed files (tools/lane/ci_changes.py)", "run": "python3 -m unittest discover -s tools/lane -p test_ci_changes.py\ncc=tools/lane/ci_changes.py ev=$GITHUB_EVENT_NAME\nif [ $ev = pull_request ]; then git show HEAD^1:$cc > $RUNNER_TEMP/base_ci_changes.py 2>/dev/null && cc=$RUNNER_TEMP/base_ci_changes.py || ev=workflow_dispatch; fi\npython3 $cc --workflow windows --event $ev"}
+        {"id": "classify", "name": "Classify the changed files (tools/lane/ci_changes.py)", "run": "python3 -m unittest discover -s tools/lane -p test_ci_changes.py\ncc=tools/lane/ci_changes.py ev=$GITHUB_EVENT_NAME\nif [ $ev = pull_request ] && ! git diff --quiet HEAD^1 HEAD -- $cc; then ev=workflow_dispatch; fi\npython3 $cc --workflow windows --event $ev"}
       ]
     },
     "licenses": {

@@ -23,8 +23,8 @@ Definition of Done.
 **Change detection.** Each PR-required workflow (engine, regen, conformance, windows, API guard, pin move) starts with a
 `<name>-changes` job that classifies the pull request's changed files (`tools/lane/ci_changes.py`) and skips the jobs the
 change cannot affect; a job skipped that way passes its required check. Unknown paths, an empty diff, a change to the workflow
-itself or to the classifier (the classifier of the base commit is the one that runs, so a pull request cannot switch its own
-classification off), and every event except `pull_request` run the whole workflow. Documentation is not skipped
+itself or to the classifier (a pull request that edits `ci_changes.py` runs its own classifier in run-everything mode, so it cannot select
+fewer jobs than the full run; any other pull request is classified by the unchanged base copy), and every event except `pull_request` run the whole workflow. Documentation is not skipped
 blindly: `TestKnownGap*` reads every tracked file and the root `TestAPIInventory` reads `docs/design/api-stability.md`, so a
 pull request always keeps the engine job on Linux amd64 and conformance group g1 on Linux amd64. The required checks are the
 six gates (`engine-gate`, `regen-gate`, `conformance-gate`, `windows-gate`, `api-guard-gate`, `pin-move-gate`): a gate fails
