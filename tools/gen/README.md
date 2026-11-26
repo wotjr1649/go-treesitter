@@ -253,6 +253,12 @@ development module keeps `replace ../..`. A release module keeps its minimum roo
 check therefore also works on a mixed tree. `ROOT_VERSION` (`gen -root-version`) applies to every grammar in that
 invocation. Pass an explicit language list for a subset and use a separate invocation for each minimum root version.
 
+A stopped run continues with `REGEN_RESUME=1 bash tools/gen/regen.sh <same-work-dir> [remaining langs ...]`: the work directory
+may be non-empty, an archive already in it is downloaded again only if its sha256 does not match the pin (the check before
+extraction is unchanged and applies to every reused file), and every extraction directory is replaced by a fresh extraction.
+The language list is the only unit of resumption: the `== <lang>` lines of the stopped run's log show the last one reached, and
+that language runs again from the start. `runtime-rehearsal.sh` still needs a new directory.
+
 The modules are `bash`, `c`, `cpp`, `csharp`, `css`, `dart`, `golang`, `html`, `java`, `javascript` (including JSX), `json`,
 `kotlin`, `php`, `postgres`, `powershell`, `python`, `r`, `ruby`, `rust`, `swift`, `tsql`, `tsx`, `typescript`, `xml`, and `yaml`. Each has a grammar-specific generated smoke-test sample.
 Downloads allow three attempts with 1s/2s backoff only for transient transport failures. HTTP, certificate and local
