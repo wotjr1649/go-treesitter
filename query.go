@@ -84,7 +84,9 @@ func (q *Query) Properties(pattern int) map[string]string {
 	return out
 }
 
-// NewQuery validates pattern using a scratch instance; each parser compiles it once per instance on first use.
+// NewQuery validates pattern on a scratch Parser that it creates and closes on every call, so each call costs at least
+// a NewParser plus the compile. Create a Query once and reuse it rather than calling NewQuery per file or request.
+// Each parser compiles the Query once more, on its first Tree.Matches.
 func NewQuery(lang *Language, pattern string) (*Query, error) {
 	return newQuery(context.Background(), lang, pattern, nil)
 }
