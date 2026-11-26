@@ -38,8 +38,8 @@ type Snapshot struct {
 	symbol, field      []uint16
 	flags              []uint8
 	startByte, endByte []uint32
-	parent             []int32  // -1 for the root
-	descEnd            []int32  // exclusive end of the subtree in preorder (i+1 for a leaf; a node has children iff descEnd > i+1)
+	parent             []int32 // -1 for the root
+	descEnd            []int32 // exclusive end of the subtree in preorder (i+1 for a leaf; a node has children iff descEnd > i+1)
 
 	fieldLookups []fieldLookup // sorted by node, then field; target -1 is an explicit null
 

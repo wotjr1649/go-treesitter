@@ -13,8 +13,9 @@ import (
 
 // QueryOptions restricts matches to nodes intersecting [StartByte, EndByte).
 // EndByte zero is unlimited, including zero-width nodes at EOF. An explicit EndByte equal to the
-// source length excludes those EOF nodes. MatchLimit zero uses C's default (unlimited); a nonzero
-// limit bounds in-progress match states, not the number of results.
+// source length excludes those EOF nodes. MatchLimit bounds in-progress match states for each call.
+// The number of results may exceed MatchLimit.
+// Zero and the maximum uint32 value both use C's default (unlimited).
 // Neither the byte range nor MatchLimit bounds the retained whole-tree capture index (less than
 // 32 bytes per node in wasm32, excluding allocator overhead) or query-dependent cursor arrays.
 // Both count against WithMaxMemoryBytes. See Tree.Matches for their release lifetimes.
@@ -32,15 +33,18 @@ type QueryMatch struct {
 }
 
 // Matches streams matches against an unedited tree, mapping captures to its immutable snapshot.
-// The parser remains busy until iteration ends (including an early break). Errors terminate the stream.
+// The parser remains busy until iteration ends (including an early break): during the loop other calls on the
+// same parser or tree, including Tree.Snapshot from the same goroutine, fail with ErrInvalidInput.
+// Errors terminate the stream.
 // On match-limit overflow it ends with ErrQueryMatchLimit, discarding any match produced by that
 // same engine call. Earlier matches remain valid; a small limit may produce no matches before the error.
-// Cost: the first match on a different tree indexes the whole tree (O(nodes)), whatever the byte range.
-// Consecutive calls on the same tree reuse that index, including calls with a different query or range.
+// Cost: the first match after switching trees or lowering the effective match limit indexes the whole
+// tree (O(nodes)), whatever the byte range. Other calls on the same tree reuse that index.
 // The last queried live tree's index retains less than 32 bytes per node in wasm32, excluding allocator
 // overhead, until that tree is deleted (Close, leak drain or ParserPool.Put), another tree is queried,
-// or the instance is discarded. Query-dependent cursor arrays and the match buffer remain allocated
-// until the instance is discarded (Reset, parser Close, recycling or a trap).
+// the effective match limit is lowered, or the instance is discarded. Query-dependent cursor arrays
+// and the match buffer remain allocated until the cursor is replaced or the instance is discarded
+// (Reset, parser Close, recycling or a trap).
 // All of this memory counts against WithMaxMemoryBytes, leaving less room for subsequent parsing.
 // Freeing the index allows reuse within the instance; linear memory shrinks only on instance discard.
 func (t *Tree) Matches(ctx context.Context, q *Query, opts *QueryOptions) iter.Seq2[QueryMatch, error] {
@@ -86,15 +90,16 @@ func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, yield f
 	if c.lang.g.ABI < 2 {
 		return ErrQueryUnsupported
 	}
+	inputLen := t.InputBytes()
 	end := opts.EndByte
 	if end == 0 {
-		end = uint32(t.inputLen)
+		end = uint32(inputLen)
 	}
-	if opts.StartByte > end || uint64(end) > uint64(t.inputLen) {
+	if opts.StartByte > end || uint64(end) > uint64(inputLen) {
 		return perr(InvalidInput, "query byte range is outside the source", nil)
 	}
 	if t.snap == nil {
-		snap, e := c.export(ctx, t.ptr, t.src, t.invalidUTF8)
+		snap, e := c.export(ctx, t.ptr, func() string { return t.src }, t.invalidUTF8)
 		if e != nil {
 			return e
 		}
@@ -107,22 +112,32 @@ func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, yield f
 	stop := watchCtx(ctx, in.h)
 	defer stop()
 	key := weak.Make(q)
-	ptr := in.queries[key]
+	ptr := in.queries[key].ptr
 	if ptr == 0 {
 		ptr, err = c.compileQuery(q)
 		if err != nil {
 			return err
 		}
 		if in.queries == nil {
-			in.queries = map[weak.Pointer[Query]]int32{}
+			in.queries = map[weak.Pointer[Query]]cachedQuery{}
+			in.queryQueue = &queryRetirements{}
 		}
-		in.queries[key] = ptr
-		runtime.AddCleanup(q, retireQuery, queryCleanup{
-			owner: weak.Make(c), queryRetirement: queryRetirement{key: key, instance: weak.Make(in)},
-		})
+		cleanup := runtime.AddCleanup(q, retireQuery, queryRetirement{queue: in.queryQueue, key: key})
+		in.queries[key] = cachedQuery{ptr: ptr, cleanup: cleanup}
 	}
 	if ctx.Err() != nil {
 		return ctxError(ctx, "query compilation stopped by the context")
+	}
+	limit := opts.MatchLimit
+	if limit == 0 {
+		limit = ^uint32(0)
+	}
+	// C reuses already allocated capture lists even when the new limit is smaller.
+	if in.queryCursor != 0 && limit < in.cursorLimit {
+		if err = c.queryCall("tsg_qcursor_delete", func() { m.Xtsg_qcursor_delete(in.queryCursor) }); err != nil {
+			return err
+		}
+		in.queryCursor = 0
 	}
 	if in.queryCursor == 0 {
 		if err = c.queryCall("tsg_qcursor_new", func() { in.queryCursor = m.Xtsg_qcursor_new() }); err != nil {
@@ -132,6 +147,7 @@ func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, yield f
 			return c.engineFault("query cursor allocation returned NULL")
 		}
 	}
+	in.cursorLimit = limit
 	cursor := in.queryCursor
 	defer func() {
 		if c.gen != gen || c.inst != in {

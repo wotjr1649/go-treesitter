@@ -2,7 +2,11 @@ package treesitter
 
 import (
 	"context"
+	"fmt"
+	"slices"
 	"sync"
+
+	"github.com/wotjr1649/go-treesitter/internal/engine"
 )
 
 // ParserPool lends Parsers of one Language to many goroutines. Each lent Parser belongs to its borrower alone (one
@@ -16,11 +20,13 @@ type ParserPool struct {
 	idle   []*Parser
 	lent   map[*Parser]struct{}
 	closed bool
+	done   chan struct{}
 	slots  chan struct{} // nil = unbounded
 }
 
 // NewParserPool creates a pool; maxParsers > 0 bounds the number of Parsers alive at once (Get then waits for a Put or
-// for its context), 0 means unbounded. Options are validated now and applied to every Parser the pool creates.
+// pool closure or context cancellation), 0 means unbounded. Options are validated now and applied to every Parser the
+// pool creates.
 func NewParserPool(lang *Language, maxParsers int, opts ...Option) (*ParserPool, error) {
 	if lang == nil || lang.g == nil || lang.g.New == nil {
 		return nil, perr(InvalidInput, "nil or empty language", nil)
@@ -28,20 +34,22 @@ func NewParserPool(lang *Language, maxParsers int, opts ...Option) (*ParserPool,
 	if maxParsers < 0 {
 		return nil, perr(InvalidInput, "NewParserPool: negative maxParsers", nil)
 	}
-	var cfg config
-	for _, o := range opts {
-		if err := o(&cfg); err != nil {
-			return nil, err
-		}
+	cfg, err := parserConfig(opts)
+	if err != nil {
+		return nil, err
 	}
-	pl := &ParserPool{lang: lang, opts: opts, lent: map[*Parser]struct{}{}}
+	if cfg.maxMemory > 0 && cfg.maxMemory < engine.MinLimit {
+		return nil, perr(InvalidInput, fmt.Sprintf("WithMaxMemoryBytes: below the %d-byte engine minimum", engine.MinLimit), engine.ErrLimitRange)
+	}
+	pl := &ParserPool{lang: lang, opts: slices.Clone(opts), lent: map[*Parser]struct{}{}, done: make(chan struct{})}
 	if maxParsers > 0 {
 		pl.slots = make(chan struct{}, maxParsers)
 	}
 	return pl, nil
 }
 
-// Get lends an idle Parser or creates one. With a bound it waits for a free slot until ctx is done (Timeout/Cancelled).
+// Get lends an idle Parser or creates one. A bounded pool waits for a free slot, pool closure (ErrParserClosed),
+// or ctx to end (Timeout/Cancelled).
 // Return the Parser with Put; do not Close it.
 func (pl *ParserPool) Get(ctx context.Context) (*Parser, error) {
 	if ctx == nil {
@@ -53,6 +61,8 @@ func (pl *ParserPool) Get(ctx context.Context) (*Parser, error) {
 	if pl.slots != nil {
 		select {
 		case pl.slots <- struct{}{}:
+		case <-pl.done:
+			return nil, poolClosedError()
 		case <-ctx.Done():
 			return nil, ctxError(ctx, "Get: waiting for a free parser")
 		}
@@ -61,7 +71,7 @@ func (pl *ParserPool) Get(ctx context.Context) (*Parser, error) {
 	if pl.closed {
 		pl.mu.Unlock()
 		pl.release()
-		return nil, perr(InvalidInput, "parser pool is closed", ErrParserClosed)
+		return nil, poolClosedError()
 	}
 	var p *Parser
 	if n := len(pl.idle); n > 0 {
@@ -79,9 +89,19 @@ func (pl *ParserPool) Get(ctx context.Context) (*Parser, error) {
 		return nil, err
 	}
 	pl.mu.Lock()
+	if pl.closed {
+		pl.mu.Unlock()
+		p.Close()
+		pl.release()
+		return nil, poolClosedError()
+	}
 	pl.lent[p] = struct{}{}
 	pl.mu.Unlock()
 	return p, nil
+}
+
+func poolClosedError() error {
+	return perr(InvalidInput, "parser pool is closed", ErrParserClosed)
 }
 
 func (pl *ParserPool) release() {
@@ -125,9 +145,13 @@ func (pl *ParserPool) Put(p *Parser) {
 	p.Close()
 }
 
-// Close closes the idle Parsers and refuses further Get calls; Parsers still lent are closed when they are Put back.
+// Close closes the idle Parsers, wakes waiting Get calls and refuses further Get calls.
+// Parsers still lent are closed when they are Put back.
 func (pl *ParserPool) Close() {
 	pl.mu.Lock()
+	if !pl.closed && pl.done != nil {
+		close(pl.done)
+	}
 	pl.closed = true
 	idle := pl.idle
 	pl.idle = nil

@@ -562,3 +562,17 @@ Node types and fields are unchanged (`node-types.json` is byte-identical with an
 
 Retire the patch in the approved pin move to an upstream source containing a fix for the reported defect. That move updates the
 patch corpus expectations. See the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v070-python-await-patch).
+
+### Snapshot node storage: `Node.ChildCount` is O(children)
+
+The snapshot no longer stores a per-node child count (25 to 21 B/node of Go heap; the count was redundant because a node
+has children exactly when its descendant range extends past itself). Results and signatures are unchanged. Two costs move:
+
+- `Node.ChildCount` walks the children, so it costs O(children) instead of O(1). A loop condition such as
+  `for i := 0; i < n.ChildCount(); i++` now adds a full walk of the children to every iteration. Call it once and keep the value, or
+  iterate with `Node.Children` where that fits.
+- `Node.Child(i)` still costs O(i); it no longer calls `ChildCount` first, and an out-of-range index still returns `false`.
+
+Snapshots of the same input retain less memory (the Ruby `gb18030-tbl.rb` snapshot export keeps about 2.5 MB less Go heap).
+The earlier 25 B/node figure in the v0.5.0 entry is a historical record. See
+[`parser-result.md`](docs/specs/parser-result.md).
