@@ -1,8 +1,8 @@
 // Command autopr is the trust boundary of the upstream auto-PR workflow (.github/workflows/upstream-autopr.yml).
 //
-// The privileged job (contents: write) never executes what earlier jobs produced; it only copies data, and only after
+// The workflow's evidence job (no token, owner approval) takes what the propose job produced only as data, and only after
 // this check: the proposed tools/gen/pins.json equals the checked-out one except for ONE existing grammar entry that keeps
-// its repository and moves to the candidate commit (grammars that share that repository commit, such as typescript and tsx,
+// its repository and its set of fields and moves to the candidate commit (grammars that share that repository commit, such as typescript and tsx,
 // move together: one pin), and the regenerated files are regular files under grammars/<name>/
 // (go.mod and go.sum unchanged). Everything else is refused. Stdlib only.
 //
@@ -19,11 +19,13 @@ import (
 	"flag"
 	"fmt"
 	"io/fs"
+	"maps"
 	"os"
 	"path"
 	"path/filepath"
 	"reflect"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 )
@@ -88,6 +90,9 @@ func checkPins(mainPins, proposal []byte, c candidate) ([]string, error) {
 		}
 		if cur["repo"] != old["repo"] || cur["commit"] != c.Commit || old["commit"] == c.Commit {
 			return nil, fmt.Errorf("entry %s must keep its repo and move to the candidate commit", n)
+		}
+		if !slices.Equal(slices.Sorted(maps.Keys(cur)), slices.Sorted(maps.Keys(old))) { // no new archiveURL, patches, npmDependencies...
+			return nil, fmt.Errorf("entry %s must keep its set of fields", n)
 		}
 		if err := checkURLs(cur); err != nil {
 			return nil, err

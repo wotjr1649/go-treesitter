@@ -32,7 +32,10 @@ func TestCheckPins(t *testing.T) {
 		"other grammar moved": {good, func(s string) string {
 			return moved(strings.Replace(s, strings.Repeat("b", 40), strings.Repeat("d", 40), 1))
 		}},
-		"tool pin moved":       {good, func(s string) string { return moved(strings.Replace(s, `"x":"1"`, `"x":"2"`, 1)) }},
+		"tool pin moved": {good, func(s string) string { return moved(strings.Replace(s, `"x":"1"`, `"x":"2"`, 1)) }},
+		"field added": {good, func(s string) string {
+			return moved(strings.Replace(s, `"archive":"c.tgz"`, `"archive":"c.tgz","archiveURL":"https://github.com/evil/x/a.tgz"`, 1))
+		}},
 		"repo switched":        {good, func(s string) string { return moved(strings.Replace(s, "o/c", "evil/c", 1)) }},
 		"commit not candidate": {good, func(s string) string { return s }},
 		"unknown grammar":      {candidate{"grammar", "zig", "v1.0.0", good.Commit}, moved},
