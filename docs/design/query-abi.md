@@ -1,6 +1,6 @@
-# Queries (v0.1): engine ABI 2–4 and Go API — design draft
+# Queries: engine ABI 2–4 and Go API
 
-Status: draft by the main session, 2026-11-14. Inputs: `docs/design/api-v2.md` §8 (signatures fixed), `engine-abi.md`
+Status: the query contract for engine ABI 2–4 (first written 2026-11-14, extended through v0.6.0). Inputs: `docs/design/api-v2.md` §8 (signatures fixed), `engine-abi.md`
 (current ABI), tree-sitter v0.27.2 `api.h` (query and query-cursor API, `ts_query_cursor_exec_with_options` progress
 callback, `ts_tree_cursor_current_descendant_index`).
 

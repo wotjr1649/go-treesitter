@@ -36,6 +36,7 @@ grammars/<name>/       one generated Go module per entry in tools/gen/pins.json 
 tools/gen/             generator and its pins (pins.json); regenerates modules reproducibly
 tools/conformance/     compares the public API with native C reference dumps (needs the local reference data)
 tools/bench/           speed and memory measurements
+tools/compare/         comparative benchmark against other Go tree-sitter libraries (dispatch-only workflow compare.yml)
 tools/modulezip/       builds official module ZIPs; tools/lane/ records command receipts
 
 testdata/              external fixtures and corpus inputs, LF-pinned, hashed in docs/validation/workloads.md

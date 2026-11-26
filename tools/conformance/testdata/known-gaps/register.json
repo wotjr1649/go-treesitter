@@ -48,7 +48,8 @@
           "URL": "https://docs.python.org/3/reference/expressions.html#binary-bitwise-operations"
         }
       ],
-      "Upstream": "https://github.com/tree-sitter/tree-sitter-python/issues/358"
+      "Upstream": "https://github.com/tree-sitter/tree-sitter-python/issues/358",
+      "UpstreamNote": "Issue [#358](https://github.com/tree-sitter/tree-sitter-python/issues/358) was closed on 2026-11-21 by its reporter, who pointed to a community fork; the fix is not in upstream `master`."
     },
     {
       "ID": "python-await-power",
@@ -68,7 +69,8 @@
           "URL": "https://docs.python.org/3/reference/expressions.html#the-power-operator"
         }
       ],
-      "Upstream": ""
+      "Upstream": "https://github.com/tree-sitter/tree-sitter-python/pull/360",
+      "UpstreamNote": "Open as of 2026-11-25, with no comments or reviews."
     },
     {
       "ID": "csharp-default-constraint",
@@ -126,7 +128,7 @@
           "URL": "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/expressions#1283-interpolated-string-expressions"
         }
       ],
-      "Upstream": ""
+      "Upstream": "https://github.com/tree-sitter/tree-sitter-c-sharp/issues/497"
     },
     {
       "ID": "csharp-conditional-splits-statement",
@@ -162,7 +164,8 @@
           "URL": "https://html.spec.whatwg.org/multipage/syntax.html#end-tags"
         }
       ],
-      "Upstream": ""
+      "Upstream": "https://github.com/tree-sitter/tree-sitter-html/issues/148",
+      "UpstreamNote": "Open as of 2026-11-25, with no comments."
     },
     {
       "ID": "swift-non-ascii-statement-label",
