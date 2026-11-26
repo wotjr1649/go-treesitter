@@ -9,6 +9,7 @@ import (
 	"runtime/debug"
 	"sync"
 	"unsafe"
+	"weak"
 )
 
 // Linear-memory provider (docs/design/engine-abi.md §4). Each wasm instance keeps its memory in an address-space
@@ -35,6 +36,7 @@ type state struct {
 	refused   bool
 	pending   *initMem // set by InitMemory, consumed by StartMemory
 	cleanup   runtime.Cleanup
+	obj       weak.Pointer[[]byte] // the module that owns this state; nil once it was collected
 }
 
 // Segment is one active data segment of the initial linear memory.
@@ -49,6 +51,9 @@ type initMem struct {
 }
 
 // live maps uintptr(mem) -> *state. A uintptr key keeps the module collectable so the AddCleanup safety net can fire.
+// A collected module's state stays in the map until its cleanup runs, and a new module can get the same address in that
+// time: state.obj tells the two apart, so the new module never inherits a dead one's flags, limit or region (and its
+// cleanup, which would free the new module's region).
 var live sync.Map
 
 type dropArg struct {
@@ -77,10 +82,7 @@ func stateOf(mem *[]byte, create bool) *state {
 	key := uintptr(unsafe.Pointer(mem))
 	if v, ok := live.Load(key); ok {
 		st := v.(*state)
-		st.mu.Lock()
-		stale := st.reserved && st.reg.addr() != uintptr(unsafe.Pointer(unsafe.SliceData(*mem)))
-		st.mu.Unlock()
-		if !stale {
+		if st.obj.Value() == mem {
 			return st
 		}
 		// the module that owned this address was collected and the address reused; its own cleanup frees its region
@@ -89,7 +91,7 @@ func stateOf(mem *[]byte, create bool) *state {
 	if !create {
 		return nil
 	}
-	st := new(state)
+	st := &state{obj: weak.Make(mem)}
 	live.Store(key, st)
 	st.cleanup = runtime.AddCleanup(mem, drop, dropArg{key, st})
 	return st
