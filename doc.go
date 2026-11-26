@@ -15,7 +15,8 @@
 // A nil error means a complete tree, which can still contain syntax errors: check Node.HasError, or
 // Tree.Outcome (AcceptedClean or AcceptedWithErrors). Any other result is a *ParseError, which carries the
 // Outcome; match failures with errors.Is against the Err sentinels (ErrTimeout, ErrCancelled, ErrResourceLimit,
-// and so on) and use errors.As for the diagnostic fields. Error message text may change in any release.
+// and so on) and use errors.As for the diagnostic fields. ErrQueryMatchLimit, the one sentinel that is not a
+// *ParseError, also matches ErrResourceLimit. Error message text may change in any release.
 //
 // # Lifetimes and concurrency
 //

@@ -36,7 +36,8 @@ type QueryMatch struct {
 // The parser remains busy until iteration ends (including an early break): during the loop other calls on the
 // same parser or tree, including Tree.Snapshot from the same goroutine, fail with ErrInvalidInput.
 // Errors terminate the stream.
-// On match-limit overflow it ends with ErrQueryMatchLimit, discarding any match produced by that
+// On match-limit overflow it ends with ErrQueryMatchLimit (errors.Is also matches ErrResourceLimit; the error is
+// not a *ParseError), discarding any match produced by that
 // same engine call. Earlier matches remain valid; a small limit may produce no matches before the error.
 // Cost: the first match after switching trees or lowering the effective match limit indexes the whole
 // tree (O(nodes)), whatever the byte range. Other calls on the same tree reuse that index.

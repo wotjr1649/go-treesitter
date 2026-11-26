@@ -40,7 +40,8 @@ type sentinel struct {
 func (s *sentinel) Error() string        { return s.msg }
 func (s *sentinel) Is(target error) bool { return s.also != nil && target == s.also }
 
-// Sentinels for errors.Is. ErrTimeout also matches context.DeadlineExceeded, ErrCancelled context.Canceled.
+// Sentinels for errors.Is. ErrTimeout also matches context.DeadlineExceeded, ErrCancelled context.Canceled,
+// and ErrQueryMatchLimit ErrResourceLimit.
 var (
 	ErrTimeout              error = &sentinel{"treesitter: timeout", context.DeadlineExceeded}
 	ErrCancelled            error = &sentinel{"treesitter: cancelled", context.Canceled}

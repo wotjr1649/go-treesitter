@@ -161,7 +161,7 @@ elapsed time independently of cooperative checks and Go heap targets.
   (`Reset`, `Close`, recycling) stops the cleanups of its cached queries (`stopQueryCleanups`) and releases the entire
   instance. Reuse Query values to avoid repeatedly allocating validation instances and compiling the same source.
 - MatchLimit bounds in-progress states for each Matches call. On overflow the iterator reports ErrQueryMatchLimit
-  and discards any match produced by that same next call. Previously yielded matches remain valid; small limits may
+  (errors.Is also matches ErrResourceLimit) and discards any match produced by that same next call. Previously yielded matches remain valid; small limits may
   yield no matches at all. The public doc comments state this explicitly.
 
 ## Regex predicate subset (v0.6.0)

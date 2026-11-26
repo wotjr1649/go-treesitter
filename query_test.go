@@ -272,6 +272,28 @@ func TestQueryPredicates(t *testing.T) {
 	}
 }
 
+func TestQueryMatchLimitAlsoResourceLimit(t *testing.T) {
+	fl, _, tree, q := queryFixture(t, nil)
+	fl.cur().qs().exceeded = 1
+	_, err := collectQuery(tree, context.Background(), q, nil)
+	var pe *ParseError
+	for name, ok := range map[string]bool{
+		"ErrQueryMatchLimit": errors.Is(err, ErrQueryMatchLimit), "ErrResourceLimit": errors.Is(err, ErrResourceLimit),
+		"wrapped": errors.Is(fmt.Errorf("x: %w", err), ErrResourceLimit),
+	} {
+		if !ok {
+			t.Errorf("errors.Is(%v, %s) is false", err, name)
+		}
+	}
+	if errors.As(err, &pe) || errors.Is(err, ErrTimeout) || errors.Is(err, ErrEngineFault) {
+		t.Errorf("unexpected match: %v", err)
+	}
+	// The alias is one way: a ResourceLimit ParseError is not a match-limit overflow.
+	if errors.Is(perr(ResourceLimit, "x", nil), ErrQueryMatchLimit) || errors.Is(ErrResourceLimit, ErrQueryMatchLimit) {
+		t.Error("ErrQueryMatchLimit matched by a plain resource limit")
+	}
+}
+
 func TestQueryOutcomes(t *testing.T) {
 	for _, tc := range []struct {
 		name  string
