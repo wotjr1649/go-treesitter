@@ -218,3 +218,88 @@ func TestProcExitTrapsAndRegionIsReleased(t *testing.T) {
 		t.Fatal("state map entry not dropped")
 	}
 }
+
+// newInitMem mimics the generated New after the single-copy patch: nothing is allocated or copied yet.
+func newInitMem(t *testing.T, size int, segs ...Segment) *[]byte {
+	t.Helper()
+	m := new([]byte)
+	InitMemory(m, size, segs...)
+	t.Cleanup(func() { Release(m) })
+	if *m != nil || Committed(m) != 0 {
+		t.Fatalf("InitMemory must only record: len=%d committed=%d", len(*m), Committed(m))
+	}
+	return m
+}
+
+func TestStartMemoryWritesSegmentsIntoRegion(t *testing.T) {
+	m := newInitMem(t, 0x20000, Segment{Dest: 0x10000, Data: "hello"}, Segment{Dest: 0x100, Data: "ab"})
+	if err := SetLimit(m, MinLimit); err != nil {
+		t.Fatal(err)
+	}
+	StartMemory(m)
+	if len(*m) != 0x20000 || cap(*m) != MinLimit || Committed(m) != 0x20000 {
+		t.Fatalf("len=%d cap=%d committed=%d", len(*m), cap(*m), Committed(m))
+	}
+	if string((*m)[0x10000:0x10005]) != "hello" || string((*m)[0x100:0x102]) != "ab" || (*m)[0] != 0 || (*m)[0x10005] != 0 {
+		t.Fatal("segments not written exactly")
+	}
+	if err := SetLimit(m, 2*MinLimit); err == nil {
+		t.Fatal("SetLimit after StartMemory must fail")
+	}
+	p := base(m)
+	if got := MemoryGrow(m, 2, 65536); got != 2 || base(m) != p {
+		t.Fatalf("grow after StartMemory = %d, base moved=%v (the region must be reused, never copied)", got, base(m) != p)
+	}
+	if string((*m)[0x10000:0x10005]) != "hello" {
+		t.Fatal("content lost by grow")
+	}
+	StartMemory(m) // second call: nothing pending
+	if len(*m) != 4<<16 {
+		t.Fatalf("second StartMemory changed the memory: len=%d", len(*m))
+	}
+	checkRelease(t, m)
+}
+
+func TestStartMemoryDefaultLimit(t *testing.T) {
+	m := newInitMem(t, 0x20000)
+	StartMemory(m)
+	if cap(*m) != DefaultLimit {
+		t.Fatalf("cap=%d, want DefaultLimit", cap(*m))
+	}
+	checkRelease(t, m)
+}
+
+func TestStartMemoryWithoutInitIsNoop(t *testing.T) {
+	m := new([]byte)
+	StartMemory(m)
+	if *m != nil || Refused(m) {
+		t.Fatal("StartMemory without InitMemory must do nothing")
+	}
+}
+
+func TestStartMemoryTraps(t *testing.T) {
+	for _, c := range []struct {
+		name    string
+		size    int
+		segs    []Segment
+		refused bool
+	}{
+		{"above limit", 2 * MinLimit, nil, true},
+		{"segment past end", 0x20000, []Segment{{Dest: 0x1ffff, Data: "ab"}}, false},
+		{"negative dest", 0x20000, []Segment{{Dest: -1, Data: "a"}}, false},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			m := newInitMem(t, c.size, c.segs...)
+			if err := SetLimit(m, MinLimit); err != nil {
+				t.Fatal(err)
+			}
+			var trap *Trap
+			if err := Call(func() { StartMemory(m) }); !errors.As(err, &trap) {
+				t.Fatalf("want *Trap, got %v", err)
+			}
+			if Refused(m) != c.refused || *m != nil || Committed(m) != 0 {
+				t.Fatalf("refused=%v mem=%v committed=%d", Refused(m), *m != nil, Committed(m))
+			}
+		})
+	}
+}
