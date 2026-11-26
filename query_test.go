@@ -685,11 +685,12 @@ func TestQueryCleanupQueue(t *testing.T) {
 		return weak.Make(temp)
 	}()
 	deadline := time.Now().Add(5 * time.Second)
+	queue := p.c.inst.queryQueue
 	for {
 		runtime.GC()
-		p.c.mu.Lock()
-		pending := len(p.c.leakedQueries)
-		p.c.mu.Unlock()
+		queue.mu.Lock()
+		pending := len(queue.pending)
+		queue.mu.Unlock()
 		if pending > 0 {
 			break
 		}
@@ -720,6 +721,45 @@ func TestQueryCleanupQueue(t *testing.T) {
 	}
 }
 
+func TestQueryCleanupsStopOnInstanceDiscard(t *testing.T) {
+	_, p, tree, q := queryFixture(t, nil)
+	var discarded []weak.Pointer[queryRetirements]
+	for range 8 {
+		for range 2 {
+			if _, err := collectQuery(tree, bg, q, nil); err != nil {
+				t.Fatal(err)
+			}
+		}
+		discarded = append(discarded, weak.Make(p.c.inst.queryQueue))
+		if err := p.Reset(); err != nil {
+			t.Fatal(err)
+		}
+		tree = mustParse(t, p, "next")
+	}
+	if _, err := collectQuery(tree, bg, q, nil); err != nil {
+		t.Fatal(err)
+	}
+	last := weak.Make(p.c.inst.queryQueue)
+	runtime.GC()
+	// A registered cleanup keeps its queue alive even after the instance has been discarded.
+	for i, queue := range discarded {
+		if queue.Value() != nil {
+			t.Errorf("query still holds the queue of discarded instance %d", i)
+		}
+	}
+	if last.Value() == nil {
+		t.Fatal("live instance lost its queue")
+	}
+	if err := p.Close(); err != nil {
+		t.Fatal(err)
+	}
+	runtime.GC()
+	if last.Value() != nil {
+		t.Fatal("query still holds the queue of the closed instance")
+	}
+	runtime.KeepAlive(q)
+}
+
 func TestQueryCleanupGenerationAndTrap(t *testing.T) {
 	for _, stale := range []bool{false, true} {
 		t.Run(fmt.Sprint("stale=", stale), func(t *testing.T) {
@@ -727,9 +767,13 @@ func TestQueryCleanupGenerationAndTrap(t *testing.T) {
 			if _, err := collectQuery(tree, context.Background(), q, nil); err != nil {
 				t.Fatal(err)
 			}
-			arg := queryCleanup{owner: weak.Make(p.c), queryRetirement: queryRetirement{key: weak.Make(q), instance: weak.Make(p.c.inst)}}
+			arg := queryRetirement{queue: p.c.inst.queryQueue, key: weak.Make(q)}
 			if stale {
 				if err := p.Reset(); err != nil {
+					t.Fatal(err)
+				}
+				tree = mustParse(t, p, "replacement")
+				if _, err := collectQuery(tree, bg, q, nil); err != nil {
 					t.Fatal(err)
 				}
 			} else {

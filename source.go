@@ -69,6 +69,7 @@ func NewSource(raw []byte) (*Source, error) {
 
 // NewSourceUTF16 converts UTF-16 (big-endian when bigEndian) to UTF-8. A leading BOM of the matching order is dropped.
 // An unpaired surrogate becomes U+FFFD. An odd byte count is an error (ErrInvalidInput).
+// The original bytes are retained for offset mapping and must not be modified.
 func NewSourceUTF16(raw []byte, bigEndian bool) (*Source, error) {
 	if len(raw)%2 != 0 {
 		return nil, fmt.Errorf("%w: UTF-16 input has an odd number of bytes (%d)", ErrInvalidInput, len(raw))
@@ -112,10 +113,10 @@ func NewSourceUTF16(raw []byte, bigEndian bool) (*Source, error) {
 	return s, nil
 }
 
-// Bytes is the UTF-8 text to pass to Parse. Do not modify it.
+// Bytes returns a read-only view of the UTF-8 text to pass to Parse. The caller must not modify its bytes.
 func (s *Source) Bytes() []byte { return s.utf8 }
 
-// Original is the input as given.
+// Original returns a read-only view of the original input. The caller must not modify its bytes.
 func (s *Source) Original() []byte { return s.orig }
 
 // Encoding is the detected or given encoding.

@@ -32,7 +32,9 @@ type QueryMatch struct {
 }
 
 // Matches streams matches against an unedited tree, mapping captures to its immutable snapshot.
-// The parser remains busy until iteration ends (including an early break). Errors terminate the stream.
+// The parser remains busy until iteration ends (including an early break): during the loop other calls on the
+// same parser or tree, including Tree.Snapshot from the same goroutine, fail with ErrInvalidInput.
+// Errors terminate the stream.
 // On match-limit overflow it ends with ErrQueryMatchLimit, discarding any match produced by that
 // same engine call. Earlier matches remain valid; a small limit may produce no matches before the error.
 // Cost: the first match on a different tree indexes the whole tree (O(nodes)), whatever the byte range.
@@ -86,15 +88,16 @@ func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, yield f
 	if c.lang.g.ABI < 2 {
 		return ErrQueryUnsupported
 	}
+	inputLen := t.InputBytes()
 	end := opts.EndByte
 	if end == 0 {
-		end = uint32(t.inputLen)
+		end = uint32(inputLen)
 	}
-	if opts.StartByte > end || uint64(end) > uint64(t.inputLen) {
+	if opts.StartByte > end || uint64(end) > uint64(inputLen) {
 		return perr(InvalidInput, "query byte range is outside the source", nil)
 	}
 	if t.snap == nil {
-		snap, e := c.export(ctx, t.ptr, t.src, t.invalidUTF8)
+		snap, e := c.export(ctx, t.ptr, func() string { return t.src }, t.invalidUTF8)
 		if e != nil {
 			return e
 		}
@@ -107,19 +110,18 @@ func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, yield f
 	stop := watchCtx(ctx, in.h)
 	defer stop()
 	key := weak.Make(q)
-	ptr := in.queries[key]
+	ptr := in.queries[key].ptr
 	if ptr == 0 {
 		ptr, err = c.compileQuery(q)
 		if err != nil {
 			return err
 		}
 		if in.queries == nil {
-			in.queries = map[weak.Pointer[Query]]int32{}
+			in.queries = map[weak.Pointer[Query]]cachedQuery{}
+			in.queryQueue = &queryRetirements{}
 		}
-		in.queries[key] = ptr
-		runtime.AddCleanup(q, retireQuery, queryCleanup{
-			owner: weak.Make(c), queryRetirement: queryRetirement{key: key, instance: weak.Make(in)},
-		})
+		cleanup := runtime.AddCleanup(q, retireQuery, queryRetirement{queue: in.queryQueue, key: key})
+		in.queries[key] = cachedQuery{ptr: ptr, cleanup: cleanup}
 	}
 	if ctx.Err() != nil {
 		return ctxError(ctx, "query compilation stopped by the context")
