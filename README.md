@@ -117,6 +117,32 @@ for m, err := range tree.Matches(ctx, q, nil) {
   `Parse` returns a `*Tree` for incremental work (`Edit`, then `Parse(ctx, src, old)`); close every `Tree`.
 - A `Parser` and its `Tree`s are one confinement unit: use them from one goroutine at a time. `NewParserPool` lends parsers
   to concurrent goroutines.
+### Performance guidance
+
+- **Create a `Parser` once and reuse it.** `NewParser` instantiates the grammar's linear memory, which is far more
+  expensive than a parse of a typical file. Do not call it per file or per request: keep one `Parser` per goroutine, or
+  use a `ParserPool` when goroutines come and go. Reuse keeps the warm instance.
+- **`ParserPool` is for concurrency, not speed.** Its `Get`/`Put` add a few percent over reusing one `Parser`.
+  A single goroutine should hold a `Parser` directly.
+- **`Parse` + `Close` is cheaper than `ParseSnapshot`.** `ParseSnapshot` also exports the whole tree into an
+  immutable `*Snapshot`. Use `Parse` when you query or walk the `*Tree` and then close it, or edit incrementally;
+  use `ParseSnapshot` when the result must outlive the parser or be shared between goroutines.
+- The first parse on a new instance is slower than later ones (memory pages are committed on first use), another
+  reason to reuse instances.
+
+A local Windows measurement, not a release guarantee: Windows amd64 on a developer machine under 63–97% load, commit
+`e5e4b29`, warm instances, 2026-11-26. It is an E4 local diagnostic in the terms of
+[docs/specs/validation.md](docs/specs/validation.md) and says nothing about other platforms; results depend on
+grammar, input and machine:
+
+| Operation | Measured cost |
+|---|---|
+| `NewParser` | about 7–9 ms (tsql), 1.4 ms (typescript), 0.12 ms (json) |
+| New `Parser` for every file instead of reuse | 13–380 times slower, depending on grammar and file size |
+| `ParserPool` `Get`/`Put` instead of one reused `Parser` | +3–11% |
+| `ParseSnapshot` instead of `Parse` + `Close` | +33–76% (large inputs), +18–48% (small files) |
+| First parse on a new instance | +15–20% |
+
 - Input is UTF-8. `NewSource` converts UTF-16 that starts with a byte order mark; for UTF-16 without one, call
   `NewSourceUTF16` with the byte order; for CP949 (Korean), call `NewSourceCP949`. The library never guesses an
   encoding, and no other legacy code page (for example Shift_JIS) is built in: convert it to UTF-8 first. See the
