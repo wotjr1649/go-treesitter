@@ -34,8 +34,17 @@
     {"name":"non-ascii-space-in-symbol","source":"x = :a　b\n","nodes":["assignment x = :a　b","simple_symbol :a　b"]}
   ],
   "css": [
-    {"name":"hangul-class-selector","source":".한글 { a: b }\n","nodes":["class_selector .한글","class_name 한글","identifier 한글"]},
-    {"name":"mixed-script-class-name","source":".기본𠀀-état\\+한글2, .ascii_2 {}\n","nodes":["class_selector .기본𠀀-état\\+한글2","class_name 기본𠀀-état\\+한글2","identifier 기본𠀀-état","escape_sequence \\+","identifier 한글2","class_selector .ascii_2","class_name ascii_2","identifier ascii_2"]}
+    {"name":"hangul-class-selector","source":".한글 { a: b }\n","nodes":["class_selector .한글","class_name 한글","identifier 한글","plain_value b"]},
+    {"name":"mixed-script-class-name","source":".기본𠀀-état\\+한글2, .ascii_2 {}\n","nodes":["class_selector .기본𠀀-état\\+한글2","class_name 기본𠀀-état\\+한글2","identifier 기본𠀀-état","escape_sequence \\+","identifier 한글2","class_selector .ascii_2","class_name ascii_2","identifier ascii_2"]},
+    {"name":"hangul-declaration-value","source":"a { b: 한글 }\n","nodes":["plain_value 한글"]},
+    {"name":"non-latin1-dimension-boundary","source":"a { b: 1한 }\n","nodes":["plain_value 한"],"errors":["ERROR 1"]},
+    {"name":"non-latin1-function-boundary","source":"a { b: 한글(abc) }\n","nodes":["plain_value 한글"],"errors":["ERROR (abc)"]},
+    {"name":"non-latin1-multiplication-sign-boundary","source":"a { animation-name: 한×글 }\n","nodes":["plain_value 한"],"errors":["ERROR ×글"]},
+    {"name":"non-latin1-division-sign-boundary","source":"a { animation-name: 한÷글; }\n","nodes":["plain_value 한"],"errors":["ERROR ÷글"]},
+    {"name":"non-latin1-nbsp-boundary","source":"a { animation-name: 한\u00a0글 }\n","nodes":["plain_value 한"],"errors":["ERROR \u00a0글"]},
+    {"name":"non-latin1-latin1-continuation","source":"a { animation-name: 한é글; }\n","nodes":["plain_value 한é글"]},
+    {"name":"latin1-declaration-value","source":"a { animation-name: é }\n","nodes":["plain_value é"]},
+    {"name":"ascii-first-mixed-declaration-value","source":"a { animation-name: a한; }\n","nodes":["plain_value a한"]}
   ],
   "python": [
     {"name":"await-power","source":"async def g():\n    await f() ** 2\n","nodes":["binary_operator await f() ** 2","await await f()","await await","call f()"]},

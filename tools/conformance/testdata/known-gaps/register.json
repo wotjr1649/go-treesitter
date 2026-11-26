@@ -18,13 +18,6 @@
       "ProvenanceSHA256": "d3aece8a0ae235e60b8435d0f7ec825074dd72f5f67f9c9edc821bb416eb8905",
       "PatchCount": 0
     },
-    "css": {
-      "Name": "CSS",
-      "Commit": "dda5cfc5722c429eaba1c910ca32c2c0c5bb1a3f",
-      "PinSHA256": "5396081629b52157f4813d97914bc1955341e8ed8dc277b2b2a3eeb63f0bac2e",
-      "ProvenanceSHA256": "df7598196c394f7766c8ecd563bbf5823a22421d2362c3705ec44f8a2ce3c953",
-      "PatchCount": 1
-    },
     "html": {
       "Name": "HTML",
       "Commit": "73a3947324f6efddf9e17c0ea58d454843590cc0",
@@ -55,7 +48,8 @@
           "URL": "https://docs.python.org/3/reference/expressions.html#binary-bitwise-operations"
         }
       ],
-      "Upstream": "https://github.com/tree-sitter/tree-sitter-python/issues/358"
+      "Upstream": "https://github.com/tree-sitter/tree-sitter-python/issues/358",
+      "UpstreamNote": "Issue [#358](https://github.com/tree-sitter/tree-sitter-python/issues/358) was closed on 2026-11-21 by its reporter, who pointed to a community fork; the fix is not in upstream `master`."
     },
     {
       "ID": "csharp-default-constraint",
@@ -113,7 +107,7 @@
           "URL": "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/expressions#1283-interpolated-string-expressions"
         }
       ],
-      "Upstream": ""
+      "Upstream": "https://github.com/tree-sitter/tree-sitter-c-sharp/issues/497"
     },
     {
       "ID": "csharp-conditional-splits-statement",
@@ -127,22 +121,6 @@
         {
           "Title": "C# specification 6.5.5: Conditional compilation directives",
           "URL": "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#655-conditional-compilation-directives"
-        }
-      ],
-      "Upstream": ""
-    },
-    {
-      "ID": "css-non-latin1-value",
-      "Grammar": "css",
-      "Input": "a { b: 한글 }\n",
-      "InputSHA256": "9e72dd72130d55d7d5294e143ea1fbd1656ec0c3a7879e306db4fb46d9c730a1",
-      "DumpSHA256": "1e2f75f20d41affef8fa61e82f8570e8b5432cabbd307af2b2b93048e5ea58f3",
-      "Observed": "The root has errors: the declaration is an ERROR over [4,13) and the Hangul value [7,13) is a nested ERROR. The value token for bare identifiers retains the pinned Latin-1 range; a { b: abc } parses without errors.",
-      "Expected": "한글 is an identifier value (plain_value) of the declaration b, with no error.",
-      "Specs": [
-        {
-          "Title": "CSS Syntax Module Level 3 (2026-10-01): ident-start code point",
-          "URL": "https://www.w3.org/TR/2026/CRD-css-syntax-3-20261001/#ident-start-code-point"
         }
       ],
       "Upstream": ""
@@ -165,7 +143,8 @@
           "URL": "https://html.spec.whatwg.org/multipage/syntax.html#end-tags"
         }
       ],
-      "Upstream": ""
+      "Upstream": "https://github.com/tree-sitter/tree-sitter-html/issues/148",
+      "UpstreamNote": "Open as of 2026-11-25, with no comments."
     },
     {
       "ID": "swift-non-ascii-statement-label",
