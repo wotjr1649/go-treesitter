@@ -154,9 +154,11 @@ elapsed time independently of cooperative checks and Go heap targets.
 - #any-eq?, #any-not-eq?, #any-match?, #any-not-match? validate the corresponding eq/match argument shapes (and regex)
   but do not filter, matching the CLI 0.27.2 behavior recorded in the session-15 independent query review. They are exposed as properties. This statement
   concerns that CLI version; it is not a claim about all Rust binding consumers.
-- The per-instance cache now uses weak Query keys. An unreachable Query's runtime cleanup enqueues a retirement with
-  weak owner/instance identities; no generated engine call runs on the GC goroutine. The next owner engine operation
-  deletes the corresponding TSQuery. Retirements from a replaced instance are ignored. Reset/Close release the entire
+- The per-instance cache uses weak Query keys. Each instance owns a `queryRetirements` queue; an unreachable Query's
+  runtime cleanup appends its weak key to that queue only (no generated engine call runs on the GC goroutine), and the
+  next owner engine operation, under the busy guard, deletes the corresponding TSQuery. A late cleanup of a replaced
+  instance can only touch that instance's own queue, so it cannot affect its replacement. Discarding an instance
+  (`Reset`, `Close`, recycling) stops the cleanups of its cached queries (`stopQueryCleanups`) and releases the entire
   instance. Reuse Query values to avoid repeatedly allocating validation instances and compiling the same source.
 - MatchLimit bounds in-progress states for each Matches call. On overflow the iterator reports ErrQueryMatchLimit
   and discards any match produced by that same next call. Previously yielded matches remain valid; small limits may
