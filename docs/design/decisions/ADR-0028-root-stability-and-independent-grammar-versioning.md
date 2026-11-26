@@ -14,8 +14,9 @@ queries depend on. [ADR-0022 decision 2](ADR-0022-wave1-preview-versioning-and-r
 1. **Release path (D).** Ship `v0.7.0` Preview with the proposed stable contract, version policy and
    support tables, then root `v1.0.0-rc.N` for migration against named grammar tags, then root
    `v1.0.0`. Plan about six weeks. The applicable release gates and owner approval determine when
-   each release ships. Changes to the root candidate contract, code or inputs require a new RC and
-   evidence for the affected claims. Grammar modules stay on `v0.x` throughout this transition.
+   each release ships. A change to root code, the public API or contracts requires a new RC and
+   evidence for the affected claims. Changes to grammar modules, `pins.json` and CI workflows are classified
+   separately and recorded with the candidate-to-release diff. Grammar modules stay on `v0.x` throughout this transition.
 
 2. **Root 1.x contract.** Preserve source compatibility of the stable public Go API and its
    documented behavior with a fixed released grammar. This covers parsing, errors, edits and changed
@@ -101,7 +102,8 @@ text. [Validation contract](../../specs/validation.md#root-rc-and-10-scope) hold
 2. **RC bench.** Run the hosted bench exactly once on the RC candidate commit, and declare the run before it
    starts. If it fails, fix the cause and cut a new RC, or the owner decides a new per-case exception. The
    criteria do not change. The v0.7.0 Preview macOS kotlin exception does not carry into an RC or 1.0.
-3. **RC exit.** Any change to root code, contract or inputs during an RC cuts a new RC. Without such a
-   change, 14 days without root defect reports lead to 1.0.
+3. **RC exit.** Any change to root code, the public API or contracts during an RC cuts a new RC. Changes to
+   grammar modules, `pins.json` and CI workflows are classified separately and recorded with the candidate-to-release
+   diff. Without a root change, 14 days without root defect reports lead to 1.0.
 4. **Windows resources.** The hosted Windows bench required before 1.0 is in place for amd64 and arm64.
    For the RC, also run the Windows amd64 local bench for all 25 grammars on the candidate commit.
