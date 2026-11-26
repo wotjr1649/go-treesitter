@@ -122,9 +122,11 @@ jobs:
         if: ${{ !cancelled() }}
         working-directory: tools/gen
         run: go run ./queryunicode -root ../.. -check
-      # Its tests need the local session data tree (TSG_S15_DIR) and skip, so only vet runs here.
+      # Its tests need the local session data tree (TSG_S15_DIR) and skip, so only vet runs here. The module has no platform-specific code
+      # (only lang_* tags and runtime.GOOS values), imports the public API, and everything it compiles is vetted on every platform by the steps
+      # above and the grammar shards, so one platform suffices; it costs 2-12 minutes per platform (it compiles all 25 grammar modules).
       - name: Conformance module (vet only)
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && env.EXPECTED_GOOS == 'linux' && env.EXPECTED_GOARCH == 'amd64' }}
         working-directory: tools/conformance
         run: go vet ./...
 
