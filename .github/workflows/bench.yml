@@ -12,7 +12,8 @@ name: Speed and memory lanes (Linux, macOS, Windows)
 # translated x64 build is never compared with the arm64 product binary). The Windows lanes are not yet measured on
 # hosted runners: the clang install and its -static link on windows-11-arm are untested, and the
 # 60-minute limit is untested for the largest grammars (csharp, tsql, tsx, typescript: native build plus the
-# measurement). Run one workflow_dispatch from the branch and record both before relying on the lanes. Hosted runners are shared machines: the
+# measurement). Run one workflow_dispatch from the branch and record both before relying on the lanes; that rehearsal is not
+# an RC bench run. Each run's summary.md records the compiler's --version line and target (the arm64 clang is not version-pinned). Hosted runners are shared machines: the
 # ratios are measured in one window, absolute times are not comparable between runs, and a noisy result is reported
 # with its spread, never rerun until it passes. Only small-corpus threshold failures get exactly one per-file paired
 # confirmation with the same rounds/reps; a file fails only if both passes fail. Both passes remain in the output and CSVs.
@@ -67,7 +68,7 @@ jobs:
       CORPUS_ROUNDS: ${{ inputs.corpus_rounds || '3' }}
       CORPUS_REPS: ${{ inputs.corpus_reps || '7' }}
       MEM_RUNS: ${{ inputs.mem_runs || '3' }}
-      NATIVE_CC: ${{ matrix.runner == 'windows-11-arm' && 'C:/msys64/clangarm64/bin/clang.exe' || 'gcc' }} # the windows-11-arm gcc is x86_64
+      NATIVE_CC: ${{ matrix.runner == 'windows-11-arm' && 'C:/msys64/clangarm64/bin/clang.exe' || 'gcc' }} # the windows-11-arm gcc is x86_64; the clang path assumes the image's C:\msys64 (Install-Msys2.ps1 --root)
       EXE: ${{ matrix.goos == 'windows' && '.exe' || '' }} # go build -o keeps the name as given; the drivers look for <lang>.exe (the runner context is not available in job-level env)
     defaults:
       run:
@@ -81,7 +82,7 @@ jobs:
           go-version: 1.27.x
       - name: Native C compiler (windows-11-arm)
         if: ${{ matrix.runner == 'windows-11-arm' }}
-        run: MSYSTEM=CLANGARM64 /c/msys64/usr/bin/bash.exe -lc 'pacman -Sy --noconfirm --needed mingw-w64-clang-aarch64-clang'
+        run: MSYSTEM=CLANGARM64 /c/msys64/usr/bin/bash.exe -lc 'pacman -Sy --noconfirm --noprogressbar --needed mingw-w64-clang-aarch64-clang && pacman -Q mingw-w64-clang-aarch64-clang'
       - name: Native architecture and parameters
         run: |
           test "$(go env GOOS)" = "${{ matrix.goos }}" && test "$(go env GOARCH)" = "${{ matrix.goarch }}" || { echo "native target mismatch"; exit 1; }
@@ -90,7 +91,7 @@ jobs:
           done
           go version; "$NATIVE_CC" --version | head -1
           if [ "$RUNNER_OS" = Windows ]; then
-            m="$("$NATIVE_CC" -dumpmachine)"; echo "gcc target: $m"
+            m="$("$NATIVE_CC" -dumpmachine)"; echo "compiler target: $m"
             case "$m" in x86_64-*) a=amd64 ;; aarch64-*) a=arm64 ;; *) a="$m" ;; esac
             [ "$a" = "${{ matrix.goarch }}" ] || { echo "::error::$NATIVE_CC targets $m, not the runner's ${{ matrix.goarch }}"; exit 1; }
           fi
@@ -125,7 +126,7 @@ jobs:
         run: |
           rc=0
           "$RUNNER_TEMP/benchci$EXE" run -bench "$RUNNER_TEMP/bench" -native "$RUNNER_TEMP/exe" -data "$RUNNER_TEMP/data" \
-            -large "$RUNNER_TEMP/large" -out "$RUNNER_TEMP/bench-out" -langs "${{ matrix.lang }}" \
+            -large "$RUNNER_TEMP/large" -out "$RUNNER_TEMP/bench-out" -langs "${{ matrix.lang }}" -cc "$NATIVE_CC" \
             -large-rounds "$LARGE_ROUNDS" -large-reps "$LARGE_REPS" -corpus-rounds "$CORPUS_ROUNDS" -corpus-reps "$CORPUS_REPS" \
             -mem-runs "$MEM_RUNS" || rc=$?
           [ -f "$RUNNER_TEMP/bench-out/summary.md" ] && cat "$RUNNER_TEMP/bench-out/summary.md" >> "$GITHUB_STEP_SUMMARY"

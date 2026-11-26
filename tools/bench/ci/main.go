@@ -86,12 +86,13 @@ func main() {
 	cr := fs.Int("corpus-rounds", 3, "paired rounds over the small corpus")
 	creps := fs.Int("corpus-reps", 7, "timed reps per file")
 	mruns := fs.Int("mem-runs", 3, "fresh processes per memory measurement")
+	cc := fs.String("cc", "", "run: the native reference's C compiler, recorded in summary.md (--version and -dumpmachine)")
 	fs.Parse(os.Args[2:])
 	switch os.Args[1] {
 	case "fetch":
 		must(fetch(*manifest, *data, *out, *printOnly, strings.Split(*langsFlag, ",")))
 	case "run":
-		ok, err := run(*benchDir, *nativeDir, *data, *large, *out, strings.Split(*langsFlag, ","), *lr, *lreps, *cr, *creps, *mruns)
+		ok, err := run(*benchDir, *nativeDir, *data, *large, *out, strings.Split(*langsFlag, ","), *lr, *lreps, *cr, *creps, *mruns, *cc)
 		must(err)
 		if !ok {
 			os.Exit(1)
@@ -331,6 +332,24 @@ func runCmd(timeout time.Duration, name string, args ...string) result {
 	return r
 }
 
+// compilerIdentity records which compiler built the native reference, so the evidence carries it (the denominator of every
+// ratio); a compiler that cannot be queried is recorded as such, never omitted.
+func compilerIdentity(cc string) string {
+	if cc == "" {
+		return "not recorded (no -cc)"
+	}
+	v, m := runCmd(time.Minute, cc, "--version"), runCmd(time.Minute, cc, "-dumpmachine")
+	if v.code != 0 || m.code != 0 {
+		return fmt.Sprintf("%s: query failed (--version exit %d, -dumpmachine exit %d)", cc, v.code, m.code)
+	}
+	return fmt.Sprintf("`%s`, target `%s`", firstLine(v.out), firstLine(m.out))
+}
+
+func firstLine(s string) string {
+	l, _, _ := strings.Cut(strings.TrimSpace(s), "\n")
+	return strings.TrimSpace(l)
+}
+
 func med(xs []float64) float64 {
 	if len(xs) == 0 {
 		return math.NaN()
@@ -372,7 +391,7 @@ type large struct {
 	sha              string
 }
 
-func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lrounds, lreps, crounds, creps, mruns int) (bool, error) {
+func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lrounds, lreps, crounds, creps, mruns int, cc string) (bool, error) {
 	if benchDir == "" || nativeDir == "" || data == "" || largeDir == "" || out == "" {
 		return false, fmt.Errorf("run needs -bench -native -data -large -out")
 	}
@@ -400,6 +419,8 @@ func run(benchDir, nativeDir, data, largeDir, out string, langs []string, lround
 	P("")
 	P("commit `%s`, pins.json sha256 `%s`, %d CPUs, rounds large=%d x %d reps, corpus=%d x %d reps, mem runs=%d",
 		os.Getenv("GITHUB_SHA"), fileSum(filepath.Join("tools", "gen", "pins.json")), runtime.NumCPU(), lrounds, lreps, crounds, creps, mruns)
+	P("")
+	P("native compiler: %s", compilerIdentity(cc))
 	P("")
 	P("| lang | product binary sha256 | native binary sha256 |")
 	P("|---|---|---|")
