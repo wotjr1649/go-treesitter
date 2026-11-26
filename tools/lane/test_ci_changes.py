@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -148,6 +149,52 @@ GATE_CMD = "jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg 
            "'all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok' <<<$NEEDS"
 GATE_WORKFLOWS = {"engine": "engine-gate", "regen": "regen-gate", "conformance": "conformance-gate", "windows": "windows-gate",
                   "api-guard": "api-guard-gate", "pin-move": "pin-move-gate"}
+
+
+def workflow_text(wf):
+    return (ROOT / ".github" / "workflows" / (wf + ".yml")).read_text(encoding="utf-8")
+
+
+def job_ids(wf):
+    text = workflow_text(wf)
+    if wf == "windows":  # JSON in a .yml file
+        return list(json.loads(text)["jobs"])
+    body = text[text.index("\njobs:\n"):]
+    return re.findall(r"^  ([A-Za-z0-9_-]+):\s*$", body, flags=re.M)
+
+
+class WiringTest(unittest.TestCase):
+    """A misspelled output name would evaluate to '' and skip a job silently, and the gate would stay green."""
+
+    def test_outputs_used_are_outputs_produced(self):
+        for wf in cc.WORKFLOWS:
+            produced = {k for k in cc.decide(wf, ["Makefile"], "pull_request") if k != "classes"}
+            text = workflow_text(wf)
+            used = set(re.findall(r"needs\.changes\.outputs\.([A-Za-z_]+)", text))
+            exported = set(re.findall(r"steps\.classify\.outputs\.([A-Za-z_]+)", text))
+            self.assertLessEqual(used, produced, wf)
+            self.assertLessEqual(exported, produced, wf)
+            # conformance_full only shapes conformance_matrix (matrix.group.name), no job reads it.
+            flags = {k for k in produced if (k in cc.NEEDS and k != "conformance_full") or k in ("engine_shards", "floor_shards", "conformance_matrix")}
+            self.assertLessEqual(flags, used, "%s: produced but never used: %s" % (wf, flags - used))
+
+    def test_every_job_waits_for_changes_and_the_gate_waits_for_every_job(self):
+        for wf, gate in GATE_WORKFLOWS.items():
+            ids = job_ids(wf)
+            self.assertIn("changes", ids, wf)
+            self.assertIn(gate, ids, wf)
+            text = workflow_text(wf)
+            if wf == "windows":
+                jobs = json.loads(text)["jobs"]
+                needs = set(jobs[gate]["needs"])
+                for jid, job in jobs.items():
+                    if jid not in ("changes", gate):
+                        self.assertIn("changes", job["needs"] if isinstance(job["needs"], list) else [job["needs"]], (wf, jid))
+            else:
+                m = re.search(r"^  %s:\n(?:.*\n)*?    needs: \[([^\]]*)\]" % re.escape(gate), text, flags=re.M)
+                self.assertIsNotNone(m, wf)
+                needs = {n.strip() for n in m.group(1).split(",")}
+            self.assertEqual(needs, set(ids) - {gate}, wf)
 
 
 class GateTest(unittest.TestCase):
