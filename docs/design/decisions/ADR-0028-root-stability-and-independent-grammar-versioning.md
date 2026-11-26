@@ -92,7 +92,7 @@ queries depend on. [ADR-0022 decision 2](ADR-0022-wave1-preview-versioning-and-r
 ## Amendment (2026-11-25): decisions 1 and 3, root scope, RC bench, RC exit and Windows resources
 
 This defines "that root scope" in decision 3 and the RC to 1.0 conditions in decision 1. It replaces no other
-text. [Validation contract](../../specs/validation.md#root-rc-and-10-scope) holds the gate rules.
+text, except as item 5 states. [Validation contract](../../specs/validation.md#root-rc-and-10-scope) holds the gate rules.
 
 1. **Root scope.** The Release-Critical and Release gates for the root RC and 1.0 cover all 25 grammar
    modules. Hosted engine and bench CI cover Linux amd64/arm64, macOS arm64 and Windows amd64/arm64.
@@ -105,3 +105,6 @@ text. [Validation contract](../../specs/validation.md#root-rc-and-10-scope) hold
    change, 14 days without root defect reports lead to 1.0.
 4. **Windows resources.** The hosted Windows bench required before 1.0 is in place for amd64 and arm64.
    For the RC, also run the Windows amd64 local bench for all 25 grammars on the candidate commit.
+5. **RC change classification (owner decision, 2026-11-26).** In decision 1 and in item 3, "root code, contract
+   or inputs" reads "root code, the public API or contracts". Changes to grammar modules, `pins.json` and CI
+   workflows are classified separately and recorded with the candidate-to-release diff.

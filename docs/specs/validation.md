@@ -122,8 +122,9 @@ decides these rules for the root RC and 1.0.
   exception. The Release gate criteria stay as written above.
 - **Windows resources.** Bench CI includes hosted Windows amd64 and arm64. For the RC, also run the Windows
   amd64 local bench of all 25 grammars on the same candidate commit.
-- **RC exit.** A change to root code, contract or inputs during an RC cuts a new RC and repeats the affected
-  gates. Otherwise 14 days without root defect reports lead to 1.0.
+- **RC exit.** A change to root code, the public API or contracts during an RC cuts a new RC and repeats the
+  affected gates. Changes to grammar modules, `pins.json` and CI workflows are classified separately and recorded
+  with the candidate-to-release diff. Otherwise 14 days without root defect reports lead to 1.0.
 
 ## Known-regression ratchet
 
