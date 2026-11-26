@@ -354,6 +354,14 @@ class GateTest(unittest.TestCase):
             self.assertIn("--workflow %s" % wf, text, wf)
             self.assertEqual(text.count(GATE_CMD), 1, wf)
 
+    def test_main_pushes_share_one_group_and_never_cancel_a_running_run(self):
+        group = "github.event_name == 'push' && github.run_attempt == 1 && 'main'"  # one pending run per workflow; re-runs and dispatches keep their own group
+        for wf in GATE_WORKFLOWS:
+            text = norm(workflow_text(wf))
+            self.assertIn(group, text, wf)
+            cancel = re.search(r'cancel-in-progress"?: "?\$\{\{ (.*?) \}\}', text).group(1)
+            self.assertTrue(cancel.startswith("github.event_name == 'pull_request' &&"), wf)
+
     def run_cmd(self, cmd, needs, expect="[]"):
         import shutil
         bash, jq = shutil.which("bash"), shutil.which("jq")
