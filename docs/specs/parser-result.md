@@ -66,7 +66,7 @@ UTF-8 source is not converted and both return the offset unchanged (clamped). Se
 - `Snapshot`, `Node`, `Index`, `LineIndex` are immutable and safe for any number of goroutines. A snapshot owns its
   source (one copy; none with `ParseOwned`, whose caller must never modify the bytes again) and stays valid after the
   parser is closed. `Node.Text` is a zero-allocation substring of that source.
-- Snapshot arrays retain 25 B/node (previously 41), plus sparse field exceptions and source. Node points derive
+- Snapshot arrays retain 21 B/node (previously 25, and 41 before that), plus sparse field exceptions and source. Node points derive
   LF-counted rows and byte columns from source offsets using a shared, lazy `sync.Once` line index:
   `[]uint32` line starts cost `4 * (LF count + 1)` bytes plus fixed object/allocator overhead, with at most
   `len(source) + 1` entries and no extra source copy. Only `LineIndex.Pos` adds its lazy non-ASCII bitset

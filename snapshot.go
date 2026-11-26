@@ -27,7 +27,7 @@ const (
 	flagHasError = 16
 )
 
-// Snapshot is an immutable, goroutine-safe copy of one parse tree in struct-of-arrays form (25 bytes per node plus sparse field exceptions and a lazy line index).
+// Snapshot is an immutable, goroutine-safe copy of one parse tree in struct-of-arrays form (21 bytes per node plus sparse field exceptions and a lazy line index).
 // It owns its source text (Parse: one copy; ParseOwned: the caller's slice). Node i is the i-th node in preorder, which
 // equals C's descendant index.
 type Snapshot struct {
@@ -39,8 +39,7 @@ type Snapshot struct {
 	flags              []uint8
 	startByte, endByte []uint32
 	parent             []int32  // -1 for the root
-	descEnd            []int32  // exclusive end of the subtree in preorder (i+1 for a leaf)
-	childCount         []uint32 // number of children (visible nodes only)
+	descEnd            []int32  // exclusive end of the subtree in preorder (i+1 for a leaf; a node has children iff descEnd > i+1)
 
 	fieldLookups []fieldLookup // sorted by node, then field; target -1 is an explicit null
 
@@ -104,7 +103,7 @@ func (s *Snapshot) Walk(fn func(n Node, depth int) WalkAction) {
 			i = s.descEnd[i]
 			continue
 		}
-		if s.childCount[i] > 0 {
+		if s.descEnd[i] > i+1 {
 			ends = append(ends, s.descEnd[i])
 		}
 		i++
@@ -183,7 +182,7 @@ func (s *Snapshot) descendantFor(start, end uint64, named, points bool) Node {
 }
 
 func (s *Snapshot) firstChild(i int32) (int32, bool) {
-	if s.childCount[i] == 0 {
+	if s.descEnd[i] == i+1 {
 		return 0, false
 	}
 	return i + 1, true
@@ -215,7 +214,7 @@ func newSnapshotBuilder(n int, lang *Language, src string, invalidUTF8 bool) *sn
 		lang: lang, src: src, n: n, invalidUTF8: invalidUTF8,
 		symbol: make([]uint16, n), field: make([]uint16, n), flags: make([]uint8, n),
 		startByte: make([]uint32, n), endByte: make([]uint32, n),
-		parent: make([]int32, n), descEnd: make([]int32, n), childCount: make([]uint32, n),
+		parent: make([]int32, n), descEnd: make([]int32, n),
 	}}
 }
 
@@ -254,7 +253,7 @@ func (b *snapshotBuilder) add(cnt, kc int, chunk []byte) error {
 	return nil
 }
 
-// finish checks that the parent column is a valid preorder and derives descEnd and childCount.
+// finish checks that the parent column is a valid preorder and derives descEnd.
 func (b *snapshotBuilder) finish() (*Snapshot, error) {
 	s := b.s
 	if b.filled != s.n {
@@ -275,7 +274,6 @@ func (b *snapshotBuilder) finish() (*Snapshot, error) {
 				return nil, fmt.Errorf("node %d: parent %d is not on the root path", i, p)
 			}
 		}
-		s.childCount[p]++
 		stack = append(stack, i)
 	}
 	for _, j := range stack {

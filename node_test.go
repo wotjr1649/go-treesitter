@@ -81,6 +81,12 @@ func TestNavigation(t *testing.T) {
 	if _, ok := root.Child(-1); ok {
 		t.Fatal("Child negative")
 	}
+	if _, ok := s.Node(2).Child(0); ok {
+		t.Fatal("leaf has no child")
+	}
+	if c, ok := (Node{}).Child(0); ok || c != (Node{}) || (Node{}).ChildCount() != 0 {
+		t.Fatal("zero Node has no children")
+	}
 	if p, ok := s.Node(4).Parent(); !ok || p.Index() != 3 {
 		t.Fatal("Parent")
 	}

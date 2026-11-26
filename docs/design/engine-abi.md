@@ -69,9 +69,9 @@ Columns follow the header (offsets relative to `buf+16`), as validated in the sp
 `symbol u16[KC] @0`, `field u16[KC] @2KC`, `flags u8[KC] @4KC`, `startByte @5KC`, `endByte @9KC`, `startRow @13KC`,
 `startCol @17KC`, `endRow @21KC`, `endCol @25KC` (`u32[KC]` each), `parent i32[KC] @29KC` (global preorder index,
 `-1` = root). Flags: `1` named, `2` extra, `4` missing, `8` error, `16` has_error. `symbol 65535` = ERROR.
-The header is written by `tsg_init`; `NewParser` checks magic and format once (mismatch = `ErrIncompatibleLanguage`) and the Go side checks them again after every `tsg_export_begin` and nonempty chunk, and derives `descendantEnd`/`childCount`/siblings.
+The header is written by `tsg_init`; `NewParser` checks magic and format once (mismatch = `ErrIncompatibleLanguage`) and the Go side checks them again after every `tsg_export_begin` and nonempty chunk, and derives `descendantEnd`/siblings.
 
-The Go snapshot retains 25 B/node (previously 41 B/node), plus its owned source and sparse field exceptions.
+The Go snapshot retains 21 B/node (previously 25, and 41 before that), plus its owned source and sparse field exceptions.
 It skips the four exported point columns without changing either block format or engine ABI 1-4.
 Node points and point-range lookups derive LF-counted rows and byte columns from byte offsets. The snapshot's
 existing `Lines()` index builds once with `sync.Once`, on first use: `[]uint32` line starts occupy exactly
