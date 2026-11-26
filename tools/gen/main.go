@@ -27,6 +27,7 @@ import (
 )
 
 // rootVersionRx is Go's canonical semantic version: no leading zeros, no empty identifiers, no build metadata.
+// tools/lane/consumer_compat.py SEMVER is the same grammar; gen_test.go and test_consumer_compat.py keep the same cases.
 var rootVersionRx = regexp.MustCompile(`^v(0|[1-9][0-9]*)[.](0|[1-9][0-9]*)[.](0|[1-9][0-9]*)(-(0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)([.](0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*)?$`)
 
 const modulePrefix = "github.com/wotjr1649/go-treesitter/grammars/"

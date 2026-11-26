@@ -8,7 +8,7 @@
 # JS runtime and a twice-generated determinism check (ADR-0027). The fetch plan
 # (URLs, sha256, destinations) comes from tools/gen/pins.json via `gen -plan`; wasm2go is built from its pinned
 # module version with `go install -trimpath`. Output goes to grammars/<lang> in this repository.
-# Each selected grammar keeps the form and minimum root from its own go.mod. ROOT_VERSION=vX.Y.Z
+# Each selected grammar keeps the form and minimum root from its own go.mod. ROOT_VERSION=vX.Y.Z (or vX.Y.Z-prerelease, as `gen -root-version`)
 # overrides that form only for the selected grammars (all grammars if no language list is given).
 set -euo pipefail
 

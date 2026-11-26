@@ -55,6 +55,11 @@ func main() {
 """
 
 
+def escape_tag(tag):
+    """Go's module cache path form of a version: each uppercase letter becomes '!' and its lowercase."""
+    return re.sub("[A-Z]", lambda m: "!" + m[0].lower(), tag)
+
+
 def version(value):
     if not VERSION.fullmatch(value) or PSEUDO_VERSION_SUFFIX.search(value):
         raise argparse.ArgumentTypeError(f"expected an explicit release version, got {value!r}")
@@ -139,7 +144,7 @@ def exercise(scratch, out, env, root, grammars, single, samples):
             raise ValueError(f"MVS selected {selected}, expected {expected}")
         # Go ignores a dependency's replace directives, so check each published grammar's own go.mod for them.
         for name, tag in sorted(grammars.items()):
-            mod = cache / "cache" / "download" / grammar_path(name) / "@v" / f"{re.sub('[A-Z]', lambda m: '!' + m[0].lower(), tag)}.mod"
+            mod = cache / "cache" / "download" / grammar_path(name) / "@v" / f"{escape_tag(tag)}.mod"
             grammar = json.loads(run(cwd, env, out / f"go-mod-{name}.json", "go", "mod", "edit", "-json", str(mod)))
             if grammar.get("Replace"):
                 raise ValueError(f"{name}@{tag}: published go.mod has replace directives")

@@ -14,7 +14,8 @@ REPO = Path(__file__).resolve().parents[2]
 FIXTURES = REPO / "testdata" / "consumer-compat"
 ROOT = "github.com/wotjr1649/go-treesitter"
 PUBLIC_PROXY = "https://proxy.golang.org"
-# Go's semantic version grammar: no leading zeros, no empty identifiers, no build metadata.
+# Go's semantic version grammar: no leading zeros, no empty identifiers, no build metadata. Keep in step with
+# rootVersionRx in tools/gen/main.go (RE2); test_consumer_compat.py and the accept/reject lists in tools/gen/gen_test.go must keep the same cases.
 _NUM = r"(?:0|[1-9][0-9]*)"
 _PRE = r"(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)"
 SEMVER = re.compile(rf"v{_NUM}\.{_NUM}\.{_NUM}(?:-{_PRE}(?:\.{_PRE})*)?")
@@ -57,17 +58,32 @@ def grammar_path(name):
     return f"{ROOT}/grammars/{name}"
 
 
-def candidate_version(base, commit):
-    """Sort just above BASE's own release and below its next one: v0.7.0-consumercompat.X, v1.0.0-rc.1.consumercompat.X."""
+def semver_key(version):
+    """Sort key for a version that matches SEMVER (semver.org precedence, no build metadata)."""
+    core, _, pre = version[1:].partition("-")
+    ids = tuple((0, int(i), "") if i.isdigit() else (1, 0, i) for i in pre.split("."))
+    return tuple(int(n) for n in core.split(".")), not pre, ids if pre else ()
+
+
+def candidate_version(base, commit, minimum=None):
+    """BASE + a consumercompat identifier: v1.0.0-rc.1 gives v1.0.0-rc.1.consumercompat.X, above rc.1 and below rc.2.
+
+    A release base gives v0.7.0-consumercompat.X, which sorts BELOW v0.7.0 (a pre-release). When MINIMUM (the highest
+    minimum root of the rows) is given, a candidate below it fails here instead of in check_graph after MVS picks MINIMUM.
+    """
     if not SEMVER.fullmatch(base):
         raise ValueError(f"CANDIDATE_BASE {base!r} is not a semantic version")
     # Only a dot keeps an RC base's own identifiers in front: rc.1.consumercompat.X < rc.2 but rc.1-consumercompat.X > rc.2.
-    return f"{base}{'.' if '-' in base else '-'}consumercompat.{commit}"
+    version = f"{base}{'.' if '-' in base else '-'}consumercompat.{commit}"
+    if minimum and semver_key(version) < semver_key(minimum):
+        raise ValueError(f"candidate {version} sorts below minimum root {minimum}; set CANDIDATE_BASE to {minimum} or a later RC")
+    return version
 
 
 def candidate_zip(scratch, evidence):
     commit = run(REPO, ENV, "git", "rev-parse", "HEAD", capture=True).decode().strip()
-    version = candidate_version(os.environ.get("CANDIDATE_BASE", "v0.7.0"), commit)
+    minimum = max((row[4] for row in GRAMMARS.values()), key=semver_key)
+    version = candidate_version(os.environ.get("CANDIDATE_BASE", "v0.7.0"), commit, minimum)
     proxy = scratch / "proxy"
     versions = proxy / ROOT / "@v"
     versions.mkdir(parents=True)
@@ -196,6 +212,7 @@ def main(evidence, scratch):
             print(f"{label}: {exc}", flush=True)
             failures.append(label)
 
+    # rows[0][4] (lowest minimum root) starts the module graph; rows[1][4] (the highest, golang) is the published root MVS picks.
     rows = [GRAMMARS["abi1-json"], GRAMMARS["abi4-go"]]
     cwd = consumer(scratch, "mixed", rows[0][4], rows)
     base = isolated(scratch, "mixed-published-cache")

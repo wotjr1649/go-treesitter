@@ -245,7 +245,7 @@ Compare raw format-2 field-exception records with `python tools/gen/check-field-
 ## go.mod forms
 
 - default (development): `require github.com/wotjr1649/go-treesitter v0.0.0` and `replace … => ../..`;
-- `-root-version vX.Y.Z` (release, ADR-0022): `require github.com/wotjr1649/go-treesitter vX.Y.Z`, no `replace`, and a `go.sum` with the root module's two `h1:` lines taken from
+- `-root-version vX.Y.Z` or `vX.Y.Z-prerelease` such as `v1.0.0-rc.1` (release, ADR-0022; no build metadata): `require github.com/wotjr1649/go-treesitter vX.Y.Z`, no `replace`, and a `go.sum` with the root module's two `h1:` lines taken from
   `go mod download -json` through the default GOPROXY/GOSUMDB (generation fails if they are unavailable). The development
   form writes no `go.sum` and removes a stale one. `go.mod` and `go.sum` are not listed in `provenance.json`.
 

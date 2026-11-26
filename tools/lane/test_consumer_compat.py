@@ -27,6 +27,22 @@ class CandidateTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             consumer_compat.candidate_version("v1.0.0-rc.01", "abc")
 
+    def test_candidate_order_and_minimum(self):
+        key = consumer_compat.semver_key
+        order = ["v1.0.0-rc.2", "v1.0.0-rc.10", "v1.0.0-rc.10.x", "v1.0.0", "v1.0.1"]
+        self.assertEqual(sorted(reversed(order), key=key), order)
+        rc1 = consumer_compat.candidate_version("v1.0.0-rc.1", "abc")
+        self.assertTrue(key("v1.0.0-rc.1") < key(rc1) < key("v1.0.0-rc.2"))
+        self.assertTrue(key("v0.7.0-consumercompat.abc") < key("v0.7.0"))
+        self.assertEqual(consumer_compat.candidate_version("v0.8.0", "abc", "v0.7.0"), "v0.8.0-consumercompat.abc")
+        with self.assertRaises(ValueError):  # a release base sorts below its own release, so a row needing it fails early
+            consumer_compat.candidate_version("v0.7.0", "abc", "v0.7.0")
+        consumer_compat.candidate_version("v1.0.0-rc.1", "abc", "v0.7.0")
+
+    def test_cache_path_escape(self):
+        self.assertEqual(published_consumers.escape_tag("v1.0.0-RC.1"), "v1.0.0-!r!c.1")
+        self.assertEqual(published_consumers.escape_tag("v0.7.0"), "v0.7.0")
+
     def test_min_root_is_a_version(self):
         for row in consumer_compat.GRAMMARS.values():
             self.assertEqual(len(row), 5)
