@@ -1,0 +1,89 @@
+{
+  "inherited": {
+    "bash": "v0.6.0",
+    "c": "v0.6.0",
+    "cpp": "v0.6.0",
+    "csharp": "v0.6.0",
+    "css": "v0.6.0",
+    "dart": "v0.6.0",
+    "golang": "v0.6.0",
+    "html": "v0.6.0",
+    "java": "v0.6.0",
+    "javascript": "v0.6.0",
+    "json": "v0.6.0",
+    "kotlin": "v0.6.0",
+    "php": "v0.6.0",
+    "postgres": "v0.6.0",
+    "powershell": "v0.6.0",
+    "python": "v0.6.0",
+    "r": "v0.6.0",
+    "ruby": "v0.6.0",
+    "rust": "v0.6.0",
+    "swift": "v0.6.0",
+    "tsql": "v0.6.0",
+    "tsx": "v0.6.0",
+    "typescript": "v0.6.0",
+    "xml": "v0.6.0",
+    "yaml": "v0.6.0"
+  },
+  "released": {
+    "css": {
+      "version": "v0.8.0",
+      "minimum_root": "v0.7.0"
+    },
+    "powershell": {
+      "version": "v0.7.0",
+      "minimum_root": "v0.6.0"
+    },
+    "python": {
+      "version": "v0.7.0",
+      "minimum_root": "v0.7.0"
+    },
+    "ruby": {
+      "version": "v0.7.0",
+      "minimum_root": "v0.6.0"
+    },
+    "swift": {
+      "version": "v0.7.0",
+      "minimum_root": "v0.6.0"
+    },
+    "xml": {
+      "version": "v0.7.0",
+      "minimum_root": "v0.6.0"
+    }
+  },
+  "samples": {
+    "bash@v0.6.0": "\"#!/bin/bash\\nfor x in one two; do echo \\\"$x\\\"; done\\n\"",
+    "c@v0.6.0": "\"int f(int x) { return x + 1; }\\n\"",
+    "cpp@v0.6.0": "\"template <class T> T add(T a, T b) { return a + b; }\\n\"",
+    "csharp@v0.6.0": "\"class A { int F(int x) => x + 1; }\\n\"",
+    "css@v0.6.0": "\"body { color: red; margin: 0; }\\n\"",
+    "dart@v0.6.0": "\"int add(int a, int b) { return a + b; }\\n\"",
+    "golang@v0.6.0": "\"package main\\n\\nfunc main() {\\n\\tx := []int{1, 2}\\n\\t_ = x\\n}\\n\"",
+    "html@v0.6.0": "\"<!doctype html><html><body><p>Hello</p></body></html>\\n\"",
+    "java@v0.6.0": "\"class A { int f(int x) { return x + 1; } }\\n\"",
+    "javascript@v0.6.0": "\"const C = (p) => <div id=\\\"a\\\">{p.n + 1}</div>;\\n\"",
+    "json@v0.6.0": "\"{\\\"a\\\": [1, 2.5, true, null, {\\\"b\\\": \\\"c\\\"}]}\\n\"",
+    "kotlin@v0.6.0": "\"fun add(a: Int, b: Int): Int = a + b\\n\"",
+    "php@v0.6.0": "\"<?php function add($a, $b) { return $a + $b; }\\n\"",
+    "postgres@v0.6.0": "\"SELECT customer_id, count(*) FROM rental WHERE return_date IS NULL GROUP BY customer_id;\\n\"",
+    "powershell@v0.6.0": "\"$items = @(1, 2, 3)\\nforeach ($item in $items) { Write-Output $item }\\n\"",
+    "python@v0.6.0": "\"def f(x):\\n    return [i * 2 for i in x]\\n\\nprint(f([1, 2]))\\n\"",
+    "r@v0.6.0": "\"f <- function(x) { x + 1 }\\ny <- f(2)\\n\"",
+    "ruby@v0.6.0": "\"def add(a, b)\\n  a + b\\nend\\n\"",
+    "rust@v0.6.0": "\"fn f(x: i32) -> i32 { x + 1 }\\n\"",
+    "swift@v0.6.0": "\"func add(_ a: Int, _ b: Int) -> Int { return a + b }\\n\"",
+    "tsql@v0.6.0": "\"SELECT a, b FROM t WHERE a > 1;\\n\"",
+    "tsx@v0.6.0": "\"const C = (p: { n: number }) => <div id=\\\"a\\\">{p.n}</div>;\\n\"",
+    "typescript@v0.6.0": "\"interface A { x: number }\\nconst f = (a: A): number => a.x + 1;\\n\"",
+    "xml@v0.6.0": "\"<?xml version=\\\"1.0\\\"?><root><item id=\\\"1\\\">value</item></root>\\n\"",
+    "yaml@v0.6.0": "\"items:\\n  - name: one\\n    value: 1\\n\"",
+    "css@v0.7.0": "\"body { color: red; margin: 0; }\\n\"",
+    "powershell@v0.7.0": "\"$items = @(1, 2, 3)\\nforeach ($item in $items) { Write-Output $item }\\n\"",
+    "ruby@v0.7.0": "\"def add(a, b)\\n  a + b\\nend\\n\"",
+    "swift@v0.7.0": "\"func add(_ a: Int, _ b: Int) -> Int { return a + b }\\n\"",
+    "xml@v0.7.0": "\"<?xml version=\\\"1.0\\\"?><root><item id=\\\"1\\\">value</item></root>\\n\"",
+    "python@v0.7.0": "\"def f(x):\\n    return [i * 2 for i in x]\\n\\nprint(f([1, 2]))\\n\"",
+    "css@v0.8.0": "\"body { color: red; margin: 0; }\\n\""
+  }
+}
