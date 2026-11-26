@@ -22,6 +22,9 @@
 # fetch phase's work directory, downloads and builds nothing (an archive missing or differing from its pin is an error), extracts
 # the verified archives and regenerates; run it under tools/gen/sandbox-run.sh with the work directory writable, <work-dir>/dl
 # read-only and grammars/<lang> writable. Unset: both in one go, as before.
+# RUNTIME_REHEARSAL_{PINS,ARCHIVE,TREE,OUT} (all four, set by tools/gen/runtime-rehearsal.sh) make it a TEST-ONLY runtime
+# rehearsal: the runtime source comes from ARCHIVE/TREE (hashed by `gen runtime-pins` into the pins copy PINS), every other
+# pin is unchanged, and the modules go to OUT/<lang> instead of grammars/<lang>.
 set -euo pipefail
 
 W=${1:?usage: regen.sh <work-dir> [lang ...]}
@@ -62,6 +65,16 @@ else
 fi
 
 "$GEN" -root "$REPO/tools/gen" -plan host >"$W/plan.tsv"
+OUT_ROOT=grammars
+rehearsal=()
+if [ -n "${RUNTIME_REHEARSAL_PINS:-}" ]; then
+  : "${RUNTIME_REHEARSAL_ARCHIVE:?}" "${RUNTIME_REHEARSAL_TREE:?}" "${RUNTIME_REHEARSAL_OUT:?}"
+  cp "$RUNTIME_REHEARSAL_ARCHIVE" "$W/dl/"
+  cp -R "$RUNTIME_REHEARSAL_TREE" "$W/src/"
+  rehearsal=(-runtime-rehearsal "$RUNTIME_REHEARSAL_PINS")
+  module_form=()
+  OUT_ROOT=$RUNTIME_REHEARSAL_OUT
+fi
 while IFS=$'\t' read -r kind file url sum dest mirrors; do
   case "$kind" in
     goinstall)
@@ -106,7 +119,7 @@ for lang in "${LANGS[@]}"; do
   "$GEN" -lang "$lang" -root tools/gen -src "$W/src" -dl "$W/dl" -sdk "$W/sdk" \
     -wasm2go "$W/bin/wasm2go$EXE" -wasm-opt "$W/binaryen/bin/wasm-opt$EXE" \
     -tree-sitter "$W/bin/tree-sitter$EXE" "${fetch_npm[@]}" -patch-alert "${PATCH_ALERT_THRESHOLD:-3}" \
-    -out "grammars/$lang" -work "$W/work" -repo . "${module_form[@]}" || rc=$?
+    -out "$OUT_ROOT/$lang" -work "$W/work" -repo . "${rehearsal[@]}" "${module_form[@]}" || rc=$?
   if [ "$rc" -ne 0 ]; then
     [ -n "${REGEN_KEEP_GOING:-}" ] || exit "$rc"
     echo "regen: $lang failed (exit $rc)" >&2

@@ -291,6 +291,35 @@ Runbook (the workflow is `upstream-autopr.yml`; it is dispatched by the owner an
    CHANGELOG. The required checks (`regen`, `pin-move` evidence, conformance) re-derive everything on other jobs; a tampered
    artifact shows as regenerate drift. Merge needs the owner's explicit authority (merge commit).
 
+## Runtime-only rehearsal (test only, report only)
+
+Before a runtime pin move (a new tree-sitter patch tag, later 0.28) this measures what changes in the engine's results when
+`lib/` moves and nothing else does. Nothing is written under `grammars/`, no pin changes, no PR is opened. A difference is a
+result; the numbers are local measurements of the named inputs and identity, not parity evidence
+([validation.md](../../docs/specs/validation.md)).
+
+```sh
+bash tools/gen/runtime-rehearsal.sh <new-empty-work-dir> <v0.27.3 | 40-hex commit> <pins-key> ...        # generation
+bash tools/conformance/runtime-rehearsal.sh <ciconf-data-dir> <work-dir> <new-out-dir> <pins-key> ...    # measurement
+```
+
+- **Generation** downloads the runtime archive (the GitHub API tarball of the commit, as the pin does), extracts it into the
+  work directory and runs `gen runtime-pins`, which hashes archive, tree and LICENSE into a **pins copy** (`<work>/pins.runtime.json`)
+  that equals `pins.json` outside its `runtime` block (`gen` refuses any other difference). Then `regen.sh` runs with the
+  `RUNTIME_REHEARSAL_*` variables, so fetching, hash checks, the pinned CLI, wasm2go and wasi-sdk are the production path, and
+  `gen -runtime-rehearsal <copy>` writes each module to `<work>/out/<lang>`. That directory must be new and empty and outside
+  `grammars/` (the boundary of `-balance-probe`); `-keep-module-form`, `-root-version` and `-balance-probe` are refused. The
+  modules' `provenance.json` carries `"testOnly": "runtime-rehearsal"` and the candidate runtime identity.
+- **Measurement** (`TestRuntimeRehearsalDump`, `tools/conformance/rehearsal`, `cmd/rehearsal-compare`) parses every ciconf input
+  (corpus, seeded edits; optionally large inputs from `TSG_REHEARSAL_LARGE`) with the committed modules and, through a copy of
+  `tools/conformance/go.mod` (`go -modfile`, replace lines to `<work>/out`), with the generated ones. Each table row has the
+  hashes of the canonical dump and the `Fields()` dump of the fresh parse and, for edits, of the incremental reparse and the
+  ChangedRanges, and whether incremental equals fresh. The summary lists per grammar and kind (corpus, edit, large): tree
+  changed, same tree with changed fields, incremental changed, ChangedRanges changed, incremental-vs-fresh flipped. It needs no
+  native executable and no recorded native result; it says nothing about which side agrees with C.
+- CI: `.github/workflows/runtime-rehearsal.yml` (manual dispatch from `main` only; `permissions: {}`, no secrets, no caches)
+  runs both steps on ubuntu and uploads the tables. The native C reference is built only there, to record the seeded edits.
+
 ## Pins (`pins.json`)
 
 Everything a generation consumes is pinned, and the identity of a generated module never depends on the host:
