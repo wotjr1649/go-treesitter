@@ -117,6 +117,17 @@ for m, err := range tree.Matches(ctx, q, nil) {
   `Parse` returns a `*Tree` for incremental work (`Edit`, then `Parse(ctx, src, old)`); close every `Tree`.
 - A `Parser` and its `Tree`s are one confinement unit: use them from one goroutine at a time. `NewParserPool` lends parsers
   to concurrent goroutines.
+- Input is UTF-8. `NewSource` converts UTF-16 that starts with a byte order mark; for UTF-16 without one, call
+  `NewSourceUTF16` with the byte order; for CP949 (Korean), call `NewSourceCP949`. The library never guesses an
+  encoding, and no other legacy code page (for example Shift_JIS) is built in: convert it to UTF-8 first. See the
+  [Korean and CP949 input guide](docs/guides/korean-input.md) for decoding, offset and column conversion, and writing
+  edited text back. A C# file that ends in a preprocessor directive without a final newline gets a
+  root error without an ERROR node ([known gap](docs/known-gaps/csharp.md#csharp-directive-eof)); append a newline.
+- A nil error means a complete tree, which can still contain syntax errors: check `snap.Root().HasError()` (`Tree.Outcome()`
+  is `AcceptedClean` or `AcceptedWithErrors`). No result is a `*ParseError` carrying the `Outcome` (`Timeout`, `Cancelled`, …).
+
+Contracts: [`docs/specs/parser-result.md`](docs/specs/parser-result.md), [`docs/design/api-v2.md`](docs/design/api-v2.md).
+
 ### Performance guidance
 
 - **Create a `Parser` once and reuse it.** `NewParser` instantiates the grammar's linear memory, which is far more
@@ -142,17 +153,6 @@ grammar, input and machine:
 | `ParserPool` `Get`/`Put` instead of one reused `Parser` | +3–11% |
 | `ParseSnapshot` instead of `Parse` + `Close` | +33–76% (large inputs), +18–48% (small files) |
 | First parse on a new instance | +15–20% |
-
-- Input is UTF-8. `NewSource` converts UTF-16 that starts with a byte order mark; for UTF-16 without one, call
-  `NewSourceUTF16` with the byte order; for CP949 (Korean), call `NewSourceCP949`. The library never guesses an
-  encoding, and no other legacy code page (for example Shift_JIS) is built in: convert it to UTF-8 first. See the
-  [Korean and CP949 input guide](docs/guides/korean-input.md) for decoding, offset and column conversion, and writing
-  edited text back. A C# file that ends in a preprocessor directive without a final newline gets a
-  root error without an ERROR node ([known gap](docs/known-gaps/csharp.md#csharp-directive-eof)); append a newline.
-- A nil error means a complete tree, which can still contain syntax errors: check `snap.Root().HasError()` (`Tree.Outcome()`
-  is `AcceptedClean` or `AcceptedWithErrors`). No result is a `*ParseError` carrying the `Outcome` (`Timeout`, `Cancelled`, …).
-
-Contracts: [`docs/specs/parser-result.md`](docs/specs/parser-result.md), [`docs/design/api-v2.md`](docs/design/api-v2.md).
 
 Preview [limitations](docs/reports/limitations.md); coming from the removed `syntax` API: [MIGRATING.md](MIGRATING.md).
 
