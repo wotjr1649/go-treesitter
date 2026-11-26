@@ -50,11 +50,13 @@ func newestTag(api *githubAPI, repo, like string) (string, error) {
 }
 
 // pinBehind reports how far the pin trails the default branch. The comparison path is the one pinReachability uses, so
-// the request is shared. Only an owner repository gets a warning.
+// the request is shared. Only an owner repository gets a warning, and only when the compare API's file list shows a
+// change under the pin's hashed paths (hashed.go); commits that touch docs, tests or dev scripts are information.
 func pinBehind(api *githubAPI, w io.Writer, base string, s source, branch, head string, health *[]string) {
 	var cmp struct {
-		Status  string `json:"status"`
-		AheadBy int    `json:"ahead_by"`
+		Status  string        `json:"status"`
+		AheadBy int           `json:"ahead_by"`
+		Files   []compareFile `json:"files"`
 	}
 	if err := api.get(base+"/compare/"+url.PathEscape(s.pin)+"..."+url.PathEscape(head)+"?per_page=1", &cmp); err != nil || cmp.Status != "ahead" {
 		return // identical, diverged (a release-branch pin) or unreadable: pinReachability reports what matters
@@ -62,6 +64,10 @@ func pinBehind(api *githubAPI, w io.Writer, base string, s source, branch, head 
 	text := fmt.Sprintf("pin is %d commit(s) behind %s", cmp.AheadBy, branch)
 	if !isOwner(s.repo) {
 		*health = append(*health, text)
+		return
+	}
+	if h, ok := api.hashed[s.name]; ok && h.docsOnly(cmp.Files) {
+		*health = append(*health, text+" (docs/tests only)")
 		return
 	}
 	*health = append(*health, "WARNING "+text)

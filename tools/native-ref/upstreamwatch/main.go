@@ -2,7 +2,8 @@
 // release freshness and repository health of every pinned source and tool. A newer tool/runtime release exits 1;
 // a tag newer than the latest release (a tag without a GitHub Release) counts as a newer release; a missing repository,
 // unreachable pin or API failure exits 2. A grammar pin behind its repository's default branch is reported for every
-// grammar and warned about only for owner repositories (ADR-0024 rule 7; tags.go). Renames, archives and age are warnings. Stdlib only;
+// grammar and warned about only for owner repositories (ADR-0024 rule 7; tags.go) whose commits since the pin change a hashed path
+// (hashed.go); a range of docs/tests/dev-script commits is information. Renames, archives and age are warnings. Stdlib only;
 // GITHUB_TOKEN lifts the API rate limit. Requests are cached for shared repositories and pins are never changed.
 //
 // Every grammar pin is also compared with nvim-treesitter's parsers.lua (information, never a failure; see nvim.go).
@@ -70,6 +71,7 @@ func run(args []string, stdout io.Writer, api *githubAPI) int {
 		return fail(err)
 	}
 	var out bytes.Buffer
+	api.hashed = loadHashed(raw)
 	api.acceptances, err = loadAcceptances(acceptedWarningsJSON)
 	if err != nil {
 		return fail(err)
@@ -347,6 +349,7 @@ type githubAPI struct {
 	cache          map[string]apiReply
 	redirected     map[string]bool
 	candidates     []candidate
+	hashed         map[string]hashedPaths // per grammar; nil: no docs-only filter
 	acceptances    []acceptance
 	findings       []finding
 	requests       int
