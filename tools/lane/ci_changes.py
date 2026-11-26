@@ -98,6 +98,7 @@ CODE = {"root", "grammars", "gen", "conf", "nativeref", "bench"}
 NEEDS = {
     # engine
     "engine_core": CODE | {"docs", "license"},  # root tests read docs/design/api-stability.md; tools/gen tests read LICENSES
+    "engine_winarm": {"root"},  # native windows/arm64 on a pull request: the coverage windows.yml's product job gave root changes
     "engine_platforms": CODE | {"lane"},  # the engine jobs also run the tools/lane unit tests (windows.yml no longer does)
     "engine_grammars": {"root", "grammars"},  # grammar tests are the root engine plus the module; generator drift is regen's
     "engine_floor": {"root", "grammars"},
@@ -113,7 +114,7 @@ NEEDS = {
     "pin_move": {"gen", "nativeref"},
 }
 WORKFLOW_OF = {
-    "engine_core": "engine", "engine_platforms": "engine", "engine_grammars": "engine", "engine_floor": "engine",
+    "engine_core": "engine", "engine_platforms": "engine", "engine_winarm": "engine", "engine_grammars": "engine", "engine_floor": "engine",
     "engine_compat": "engine", "regen": "regen", "conformance_full": "conformance",
     "windows_licenses": "windows", "windows_race": "windows", "api_guard": "api-guard", "pin_move": "pin-move",
 }
@@ -126,7 +127,7 @@ JOB_IF = {
     "engine": {
         "engine-linux-amd64": ["engine_core"], "engine-linux-arm64": ["engine_platforms", "full"],
         "engine-macos-arm64": ["engine_platforms", "full"], "engine-windows-amd64": ["engine_platforms"],
-        "engine-windows-arm64": ["engine_platforms", "full"], "engine-go126": ["engine_floor"],
+        "engine-windows-arm64": ["engine_winarm"], "engine-go126": ["engine_floor"],
         "engine-consumer-compat": ["engine_compat"], "grammar-linux-amd64": ["engine_grammars"],
         "grammar-linux-arm64": ["engine_grammars", "full"], "grammar-macos-arm64": ["engine_grammars", "full"],
         "grammar-windows-amd64": ["engine_grammars"], "grammar-windows-arm64": ["engine_grammars", "full"],

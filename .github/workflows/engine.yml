@@ -31,6 +31,7 @@ jobs:
       full: ${{ steps.classify.outputs.full }}
       engine_core: ${{ steps.classify.outputs.engine_core }}
       engine_platforms: ${{ steps.classify.outputs.engine_platforms }}
+      engine_winarm: ${{ steps.classify.outputs.engine_winarm }}
       engine_grammars: ${{ steps.classify.outputs.engine_grammars }}
       engine_floor: ${{ steps.classify.outputs.engine_floor }}
       engine_compat: ${{ steps.classify.outputs.engine_compat }}
@@ -53,7 +54,8 @@ jobs:
           python3 $cc --workflow engine --event $ev
 
   # Pull requests run ubuntu-24.04 and windows-latest (engine and grammar shards), the Go 1.26 floor on the root and one shard,
-  # and the cross-compat lane; pushes to main, dispatch and a change to this file run all five platforms and the floor on every shard.
+  # the cross-compat lane, and engine (windows-11-arm) without its grammar shards when the root changes (the native windows/arm64
+  # coverage the old windows.yml product job gave); pushes to main, dispatch and a change to this file run all five platforms and the floor on every shard.
   engine-linux-amd64:
     needs: [changes, grammar-linux-amd64]
     # Always start when selected: the first step fails the job unless every grammar shard succeeded or was skipped on purpose.
@@ -70,7 +72,7 @@ jobs:
       - name: Grammar shards passed
         env:
           RESULTS: ${{ join(needs.*.result, ' ') }}
-          SHARDS_WANTED: ${{ needs.changes.outputs.engine_grammars }}
+          SHARDS_WANTED: ${{ needs.changes.outputs.engine_grammars == 'true' && (env.GRAMMARS_FULL_ONLY != 'true' || needs.changes.outputs.full == 'true') }}
         run: &shards_passed |
           for r in $RESULTS; do
             case "$r" in
@@ -171,7 +173,7 @@ jobs:
 
   engine-windows-arm64:
     needs: [changes, grammar-windows-arm64]
-    if: ${{ always() && needs.changes.outputs.engine_platforms == 'true' && needs.changes.outputs.full == 'true' }}
+    if: ${{ always() && needs.changes.outputs.engine_winarm == 'true' }}
     name: engine (windows-11-arm)
     runs-on: windows-11-arm
     timeout-minutes: 45
@@ -180,6 +182,7 @@ jobs:
       EXPECTED_GOOS: windows
       EXPECTED_GOARCH: arm64
       GO_VERSION: 1.27.x
+      GRAMMARS_FULL_ONLY: "true" # on a pull request this job runs without grammar shards (engine_winarm); the shards need a full run
     steps: *engine_steps
 
   # The oldest supported Go (go.mod floor 1.26): engine, root package and grammar modules must build and pass there too.
@@ -272,7 +275,7 @@ jobs:
           result=0
           for lang in "${grammars[@]}"; do
             echo "::group::$lang"
-            (cd "grammars/$lang" && go test -count=1 -timeout 900s .) || result=1
+            (cd "grammars/$lang" && go test -count=1 -timeout 900s .) || { echo "::error::grammar test failed: $lang"; result=1; }
             echo "::endgroup::"
           done
           exit "$result"

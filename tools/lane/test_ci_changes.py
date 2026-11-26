@@ -57,7 +57,7 @@ class DecideTest(unittest.TestCase):
 
     def test_root_code(self):
         f = ["query.go", "internal/engine/x.go"]
-        self.assertEqual(on("engine", f), ["engine_compat", "engine_core", "engine_floor", "engine_grammars", "engine_platforms"])
+        self.assertEqual(on("engine", f), ["engine_compat", "engine_core", "engine_floor", "engine_grammars", "engine_platforms", "engine_winarm"])
         self.assertEqual(on("regen", f), ["regen"])
         self.assertEqual(on("windows", f), ["windows_race"])
         self.assertEqual(on("api-guard", f), ["api_guard"])
@@ -87,12 +87,25 @@ class DecideTest(unittest.TestCase):
         eng = [".github/workflows/engine.yml"]
         self.assertEqual(flags("engine", eng)["full"], "true")
         self.assertEqual(len(json.loads(flags("engine", eng)["floor_shards"])["include"]), len(cc.ENGINE_SHARDS))
-        self.assertEqual(len(on("engine", eng)), 5)
+        self.assertEqual(len(on("engine", eng)), 6)
         self.assertEqual(on("regen", eng), [])
         reg = [".github/workflows/regen.yml"]
         self.assertEqual(on("regen", reg), ["regen"])
         self.assertEqual(on("pin-move", [".github/workflows/pin-move.yml"]), ["pin_move"])
         self.assertEqual(flags("conformance", [".github/workflows/conformance.yml"])["conformance_full"], "true")
+
+    def test_native_windows_arm64_on_pull_requests_for_root_changes(self):
+        # The old windows.yml product job ran windows-11-arm on every root change; engine (windows-11-arm) keeps that, without grammar shards.
+        for f in (["query.go"], ["internal/engine/vm_windows.go"], ["experimental/match/match.go"], ["go.mod"], ["testdata/x.txt"]):
+            out = flags("engine", f)
+            self.assertEqual(out["full"], "false", f)
+            expect = json.loads(out["expect"])
+            self.assertIn("engine-windows-arm64", expect, f)
+            self.assertNotIn("grammar-windows-arm64", expect, f)
+            self.assertNotIn("engine-linux-arm64", expect, f)
+        for f in (["README.md"], ["grammars/c/parser.go"], ["tools/gen/pins.json"], ["tools/lane/record.py"]):
+            self.assertNotIn("engine-windows-arm64", json.loads(flags("engine", f)["expect"]), f)
+        self.assertIn("grammar-windows-arm64", json.loads(flags("engine", ["README.md"], "push")["expect"]))
 
     def test_conformance_inputs(self):
         for f in (["tools/conformance/a_test.go"], ["tools/native-ref/main.go"], ["tools/gen/pins.json"], ["grammars/c/parser.go"]):

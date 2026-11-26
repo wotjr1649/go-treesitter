@@ -7,9 +7,9 @@ Definition of Done.
 
 | Lane | Build | Decides product gates? | Purpose |
 |---|---|---|---|
-| **product** | `CGO_ENABLED=0`, Windows native | **yes** | The only lane that can pass or fail a product gate. |
+| **product** | `CGO_ENABLED=0`, Windows native: the jobs `engine (windows-latest)` and `engine (windows-11-arm)` of `.github/workflows/engine.yml` (root packages vet and test, grammar module tests, tools/lane tests, windows/arm64 cross-build), with the licence check and the race diagnostic of `windows.yml` | **yes** | The Windows native engine jobs are the lanes that can pass or fail a product gate. The former `windows.yml` product job is retired. |
 | **race** | CGO + `-race` | no | Data-race and concurrency diagnostics. |
-| **engine CI** | `CGO_ENABLED=0` on hosted Linux/macOS/Windows, amd64 and arm64 (`.github/workflows/engine.yml`) | yes, for the platform it ran on | Execution evidence per platform; a platform is claimed only after this lane ran there. A pull request runs Linux amd64 and Windows amd64 (and the Go 1.26 floor on the root and shard 1); a push to `main`, a dispatch and a change to `engine.yml` run all five platforms and the floor on every shard, so the evidence for Linux arm64, macOS arm64 and Windows arm64 is the `main` run of the commit, not the pull request run. |
+| **engine CI** | `CGO_ENABLED=0` on hosted Linux/macOS/Windows, amd64 and arm64 (`.github/workflows/engine.yml`) | yes, for the platform it ran on | Execution evidence per platform; a platform is claimed only after this lane ran there. A pull request runs Linux amd64 and Windows amd64 (and the Go 1.26 floor on the root and shard 1), and, when the root module changes (root `.go`, `internal/**`, `experimental/**`, `go.mod`, `go.sum`, `testdata/**`), `engine (windows-11-arm)` without its grammar shards, which keeps the native Windows arm64 root-package evidence a pull request had from the retired product job; a push to `main`, a dispatch and a change to `engine.yml` run all five platforms and the floor on every shard, so the evidence for Linux arm64, macOS arm64 and Windows arm64 is the `main` run of the commit, not the pull request run. |
 | **API guard** | `CGO_ENABLED=0` on hosted Linux amd64 (`.github/workflows/api-guard.yml`, `tools/apiguard`) | no | Fails on incompatible root Go API changes between the latest released root tag (`API_BASELINE_TAG` in the workflow, moved at each root release by the post-release PR) and the checked-out commit, using pinned `apidiff`. `apidiff` does not report a field added to or reordered in a struct whose fields are all exported (other packages can write it as an unkeyed literal); `tools/apiguard/structliterals` checks that field list against the baseline. The root tests in the product and engine CI lanes check the documented identifier inventory (the set of exported identifiers, fields and methods, not their signatures, values or classes) for the root and `experimental/match`. |
 | **cross** | `CGO_ENABLED=0`, other `GOOS/GOARCH` | scope-limited | Link-only proof that no C toolchain is required. |
 | **native reference** | C compiler, same runtime release and grammar sources (ADR-0020), with the engine's pinned wasi-libc character semantics; `tools/native-ref` | yes, for C-agreement claims | Produces the reference dumps. See `docs/specs/oracle.md`. |
@@ -74,7 +74,7 @@ Every claim carries a level. Do not state a claim above the level you actually p
 | `E0` | assertion | Someone said so. **Never sufficient for any claim.** |
 | `E1` | static inspection | Read the source, spec, or a recorded artifact. |
 | `E2` | focused probe | A one-off executable check, not retained in the repository. |
-| `E3` | retained test | A test in this repository that re-runs in the product lane. |
+| `E3` | retained test | A test in this repository that re-runs in the product lane (the Windows native `engine (windows-latest)` and `engine (windows-11-arm)` jobs). |
 | `E4` | controlled comparison | A/B with exactly one variable changed and all identities bound. |
 | `E5` | C reference differential | Compared byte-for-byte with native C reference dumps of the same runtime release and grammar sources, built with the engine's pinned wasi-libc character semantics. |
 | `E6` | release gate | Full lane set, provenance, budgets, packaging, and limitations. |
@@ -83,7 +83,7 @@ Every claim carries a level. Do not state a claim above the level you actually p
 
 | To write… | You need |
 |---|---|
-| "builds on Windows without CGO" | `E3` |
+| "builds on Windows without CGO" | `E3` (the Windows native `engine` jobs) |
 | "parses this fixture cleanly" | `E3` |
 | "incremental equals fresh" | `E3` (and say it is self-consistency, not parity) |
 | "faster / slower than X" | `E4` with identity binding and stated conditions |
@@ -97,7 +97,7 @@ Every claim carries a level. Do not state a claim above the level you actually p
 
 | Gate | Passes when | Known blockers in pinned sources allowed? |
 |---|---|---|
-| **Development** | Product lane builds; focused tests for changed behavior pass; every known-regression signature still matches its record. | **yes**, if ratcheted |
+| **Development** | Product lane (Windows native `engine` jobs) builds; focused tests for changed behavior pass; every known-regression signature still matches its record. | **yes**, if ratcheted |
 | **Integration** | Development gate, plus the result contract is exercised end to end and a consumer can depend on the API shape. | yes, if documented in the consumer-facing limitations |
 | **Release-Critical** | For each language *claimed in scope*: zero unresolved correctness blockers; conformance (fresh and edit cases) agrees with the native reference; every `incremental != fresh` case is a ratchet attributed to the pinned source. | **no** |
 | **Release** | Release-Critical for the claimed scope, plus platform validation, reproducible generation, resource budgets (large-input parse geomean <= 2.5x native; small files <= 1 ms or <= 2.5x native, where a file failing the first pass gets one paired confirmation pass and fails only if both fail, with both passes recorded; peak <= 100 x input + 64 MB; after `Close` every engine region returned and private bytes within start + 16 MB, ADR-0022; on macOS the footprint delta is net of the growth of the runtime's released heap bytes and a snapshot case must have been collected, ADR-0022 macOS amendment), packaging, and an explicit limitations list. | **no** |
@@ -213,7 +213,7 @@ they remain in Git history at `9ad82eb`.
 
 ```
 [ ] the scoped change is implemented, and nothing outside the scope changed
-[ ] focused tests for the changed behavior pass in the product lane
+[ ] focused tests for the changed behavior pass in the product lane (`engine (windows-latest)`; `engine (windows-11-arm)` when the root changed)
 [ ] required regression tests pass
 [ ] every known-regression signature still matches its record
 [ ] the diff was reviewed against docs/reviews/review-checklist.md
