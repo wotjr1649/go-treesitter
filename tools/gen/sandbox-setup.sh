@@ -4,7 +4,11 @@
 # runner files, a read-only input, a writable output, no network. Each check fails the step on its own.
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
-sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends bubblewrap
+# A failing third-party apt source (packages.microsoft.com answered 403 on 2026-11-26) must not skip the install: "a && b"
+# does not stop on a under set -e. Update what can be updated, install, and require bwrap.
+sudo apt-get update -qq || echo "::warning::apt-get update reported errors; installing bubblewrap from the indexes that updated"
+sudo apt-get install -y -qq --no-install-recommends bubblewrap
+command -v bwrap >/dev/null || { echo "::error::bubblewrap is not installed"; exit 1; }
 if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
   sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 fi
