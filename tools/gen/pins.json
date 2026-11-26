@@ -26,6 +26,10 @@
         "url": "https://github.com/tree-sitter/tree-sitter/releases/download/v0.27.2/tree-sitter-windows-x64.gz",
         "sha256": "230779ee4a729e3044d4a8ed57490b776ea1bac0671d12afbd6f5b4d1878f1d0"
       },
+      "windows-arm64": {
+        "url": "https://github.com/tree-sitter/tree-sitter/releases/download/v0.27.2/tree-sitter-windows-arm64.gz",
+        "sha256": "45be92c6537758f7c9a880f4598d45b435b6fa0b5a4ab5d48284b1e9b2225a11"
+      },
       "linux-amd64": {
         "url": "https://github.com/tree-sitter/tree-sitter/releases/download/v0.27.2/tree-sitter-linux-x64.gz",
         "sha256": "7ed56d152c52437397b9fcaa43cf341f49933cecc1ca291843f0d347c6e2cb3a"

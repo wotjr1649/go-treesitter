@@ -351,8 +351,8 @@ kind `source`/`toolchain`; no header):
 awk -F '\t' '$4 == "source"' release-assets.tsv > release-source-assets.tsv
 ```
 
-The command lists 34 rows for the current pins. The v0.6.0 and v0.7.0 releases each mirror all 26 `source` archives plus
-`SHA256SUMS`. The eight `toolchain` rows are excluded. The v0.5.0 release mirrors its original 25 source archives plus `SHA256SUMS`.
+The command lists 35 rows for the current pins (the `windows-arm64` CLI adds a `toolchain` row; the pre-add count was 34). The v0.6.0 and v0.7.0 releases each mirror all 26 `source` archives plus
+`SHA256SUMS`. The nine `toolchain` rows are excluded (the v0.6.0 and v0.7.0 releases predate the ninth). The v0.5.0 release mirrors its original 25 source archives plus `SHA256SUMS`.
 The v0.6.0 inventory adds the Swift archive, the T-SQL owner release v2.8.0 archive `tree-sitter-mssql-3d42c1a55fb5.tar.gz`,
 the Java v3.0.3 archive `tree-sitter-java-358048c1c6f9.tar.gz`, the shared TypeScript/TSX owner release v3.1.0 archive
 `tree-sitter-typescript-c37edc69610d.tar.gz`, the JavaScript v4.4.0 archive `tree-sitter-javascript-e5ada307a6f1.tar.gz`,
