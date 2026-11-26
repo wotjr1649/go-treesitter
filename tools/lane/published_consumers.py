@@ -9,9 +9,8 @@ import subprocess
 import sys
 import tempfile
 
-from consumer_compat import ENV, PUBLIC_PROXY, REPO, ROOT, grammar_path
+from consumer_compat import ENV, PUBLIC_PROXY, REPO, ROOT, SEMVER as VERSION, grammar_path
 
-VERSION = re.compile(r"v[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?")
 PSEUDO_VERSION_SUFFIX = re.compile(r"[.-][0-9]{14}-[0-9a-f]{12}$")
 NAME = re.compile(r"[a-z][a-z0-9]*")
 MODULE = "example.com/published-consumer"
@@ -140,7 +139,7 @@ def exercise(scratch, out, env, root, grammars, single, samples):
             raise ValueError(f"MVS selected {selected}, expected {expected}")
         # Go ignores a dependency's replace directives, so check each published grammar's own go.mod for them.
         for name, tag in sorted(grammars.items()):
-            mod = cache / "cache" / "download" / grammar_path(name) / "@v" / f"{tag}.mod"
+            mod = cache / "cache" / "download" / grammar_path(name) / "@v" / f"{re.sub('[A-Z]', lambda m: '!' + m[0].lower(), tag)}.mod"
             grammar = json.loads(run(cwd, env, out / f"go-mod-{name}.json", "go", "mod", "edit", "-json", str(mod)))
             if grammar.get("Replace"):
                 raise ValueError(f"{name}@{tag}: published go.mod has replace directives")
