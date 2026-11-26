@@ -38,6 +38,11 @@ on:
       mem_runs:
         description: Fresh processes per memory measurement
         default: "3"
+      runner:
+        description: Runner to measure on. all = the five-platform matrix (125 jobs); one runner = 25 jobs (a rehearsal, not an RC bench run)
+        type: choice
+        options: [all, ubuntu-24.04, ubuntu-24.04-arm, macos-latest, windows-latest, windows-11-arm]
+        default: all
 
 permissions:
   contents: read
@@ -49,13 +54,8 @@ jobs:
       fail-fast: false
       matrix:
         lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin, postgres, swift]
-        runner: [ubuntu-24.04, ubuntu-24.04-arm, macos-latest, windows-latest, windows-11-arm]
-        include:
-          - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
-          - {runner: ubuntu-24.04-arm, goos: linux, goarch: arm64}
-          - {runner: macos-latest, goos: darwin, goarch: arm64}
-          - {runner: windows-latest, goos: windows, goarch: amd64}
-          - {runner: windows-11-arm, goos: windows, goarch: arm64}
+        # An "include" per runner would add a lang-less job for every runner left out of a one-runner dispatch, so goos and goarch are derived below.
+        runner: ${{ fromJSON(inputs.runner && inputs.runner != 'all' && format('["{0}"]', inputs.runner) || '["ubuntu-24.04","ubuntu-24.04-arm","macos-latest","windows-latest","windows-11-arm"]') }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     env:
@@ -69,7 +69,9 @@ jobs:
       CORPUS_REPS: ${{ inputs.corpus_reps || '7' }}
       MEM_RUNS: ${{ inputs.mem_runs || '3' }}
       NATIVE_CC: ${{ matrix.runner == 'windows-11-arm' && 'C:/msys64/clangarm64/bin/clang.exe' || 'gcc' }} # the windows-11-arm gcc is x86_64; the clang path assumes the image's C:\msys64 (Install-Msys2.ps1 --root)
-      EXE: ${{ matrix.goos == 'windows' && '.exe' || '' }} # go build -o keeps the name as given; the drivers look for <lang>.exe (the runner context is not available in job-level env)
+      GOOS_WANT: ${{ startsWith(matrix.runner, 'windows') && 'windows' || startsWith(matrix.runner, 'macos') && 'darwin' || 'linux' }}
+      GOARCH_WANT: ${{ (endsWith(matrix.runner, '-arm') || matrix.runner == 'macos-latest') && 'arm64' || 'amd64' }}
+      EXE: ${{ startsWith(matrix.runner, 'windows') && '.exe' || '' }} # go build -o keeps the name as given; the drivers look for <lang>.exe (the runner context is not available in job-level env)
     defaults:
       run:
         shell: bash
@@ -85,7 +87,7 @@ jobs:
         run: MSYSTEM=CLANGARM64 /c/msys64/usr/bin/bash.exe -lc 'pacman -Sy --noconfirm --noprogressbar --needed mingw-w64-clang-aarch64-clang && pacman -Q mingw-w64-clang-aarch64-clang'
       - name: Native architecture and parameters
         run: |
-          test "$(go env GOOS)" = "${{ matrix.goos }}" && test "$(go env GOARCH)" = "${{ matrix.goarch }}" || { echo "native target mismatch"; exit 1; }
+          test "$(go env GOOS)" = "$GOOS_WANT" && test "$(go env GOARCH)" = "$GOARCH_WANT" || { echo "native target mismatch"; exit 1; }
           for v in "$LARGE_ROUNDS" "$LARGE_REPS" "$CORPUS_ROUNDS" "$CORPUS_REPS" "$MEM_RUNS"; do
             [[ "$v" =~ ^[0-9]{1,3}$ ]] || { echo "::error::round, rep and run counts must be digits"; exit 1; }
           done
@@ -93,7 +95,7 @@ jobs:
           if [ "$RUNNER_OS" = Windows ]; then
             m="$("$NATIVE_CC" -dumpmachine)"; echo "compiler target: $m"
             case "$m" in x86_64-*) a=amd64 ;; aarch64-*) a=arm64 ;; *) a="$m" ;; esac
-            [ "$a" = "${{ matrix.goarch }}" ] || { echo "::error::$NATIVE_CC targets $m, not the runner's ${{ matrix.goarch }}"; exit 1; }
+            [ "$a" = "$GOARCH_WANT" ] || { echo "::error::$NATIVE_CC targets $m, not the runner's $GOARCH_WANT"; exit 1; }
           fi
       - name: Fetch pinned sources, build the native executables, extract the corpus inputs
         working-directory: tools/native-ref
