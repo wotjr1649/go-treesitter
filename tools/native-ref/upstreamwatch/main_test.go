@@ -143,6 +143,8 @@ func TestReportCoversAllPinsAndCachesSharedRepositories(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requests[r.URL.String()]++
 		switch {
+		case strings.HasSuffix(r.URL.Path, "/tags"), strings.HasSuffix(r.URL.Path, "/branches"):
+			fmt.Fprint(w, `[]`)
 		case strings.HasSuffix(r.URL.Path, "/releases/latest"):
 			fmt.Fprint(w, `{"tag_name":"v1.0.0"}`)
 		case strings.Contains(r.URL.Path, "/commits/"):
