@@ -32,7 +32,8 @@ func TestScannerPatchesGrammarText(t *testing.T) {
 		"rust":       {"block_comment", "inner_doc_comment_marker", "outer_doc_comment_marker", "doc_comment", "line_comment", "let_declaration", "function_item"},
 		"javascript": {"jsx_text", "html_character_reference", "string", "binary_expression"},
 		"html":       {"text", "entity", "attribute_value"},
-		"css":        {"class_selector", "class_name", "identifier", "escape_sequence"},
+		"css":        {"class_selector", "class_name", "identifier", "escape_sequence", "plain_value"},
+		"python":     {"binary_operator", "await", "unary_operator", "not_operator", "call"},
 		"xml":        {"element", "Attribute", "EntityRef"},
 		"powershell": {"variable", "command_parameter", "simple_name", "member_name", "type_identifier", "label"},
 	}

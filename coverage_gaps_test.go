@@ -352,10 +352,10 @@ func TestQueryPredicatesOverCaptureLists(t *testing.T) {
 		for i := range extra {
 			steps = append(steps, [2]uint32{2, uint32(i + 1)})
 		}
-		if err := q.readMeta(fakeQueryMeta(lits, append(steps, [2]uint32{0, 0}))); err != nil {
+		if err := q.readMeta(fakeQueryMeta(lits, append(steps, [2]uint32{0, 0})), nil, nil); err != nil {
 			t.Fatal(err)
 		}
-		return q.accepts(QueryMatch{Captures: captures})
+		return q.accepts(QueryMatch{Captures: captures}, nil)
 	}
 	one, two := cap0(0), cap0(1)
 	for _, tc := range []struct {
@@ -407,14 +407,14 @@ func TestQueryPredicatesArePerPattern(t *testing.T) {
 	put(0)
 	b[8], b[9], b[10], b[11] = byte(len(b)), byte(len(b)>>8), 0, 0
 	q := &Query{source: "query"}
-	if err := q.readMeta(b); err != nil {
+	if err := q.readMeta(b, nil, nil); err != nil {
 		t.Fatal(err)
 	}
 	two := QueryCapture{Index: 0, Node: s.Node(1)}
-	if q.accepts(QueryMatch{Pattern: 0, Captures: []QueryCapture{two}}) {
+	if q.accepts(QueryMatch{Pattern: 0, Captures: []QueryCapture{two}}, nil) {
 		t.Fatal("pattern 0 must filter \"two\"")
 	}
-	if !q.accepts(QueryMatch{Pattern: 1, Captures: []QueryCapture{two}}) {
+	if !q.accepts(QueryMatch{Pattern: 1, Captures: []QueryCapture{two}}, nil) {
 		t.Fatal("pattern 1 must not inherit the predicate of pattern 0")
 	}
 }

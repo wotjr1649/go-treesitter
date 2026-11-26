@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"iter"
+	"math"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -27,7 +29,7 @@ import (
 // Test hook: the public Matches API always filters. The only seam this module has is the query text, so the raw Go side
 // runs the query with every `(#...)` predicate list overwritten by spaces (stripPredicates): same offsets, same
 // patterns, same captures, same C matching. The unmodified query must still compile and its filtered matches must be a
-// subsequence of the raw ones (checked below).
+// subsequence of the raw ones. The opt-in budgets must preserve both the raw and filtered results.
 
 // stripPredicates blanks every list whose first element starts with '#' (a predicate or directive) with spaces. Strings
 // ("..." with backslash escapes) and ;-comments are skipped, so a "(#" inside them is left alone.
@@ -189,12 +191,12 @@ func queryFilesFor(t *testing.T, root, lang string) []queryFile {
 	return out
 }
 
-// goRawQuery renders the raw matches in the native "#tsg-query/1" text.
-func goRawQuery(t *testing.T, tree *treesitter.Tree, q *treesitter.Query) []byte {
+// renderQuery renders matches in the native "#tsg-query/1" format.
+func renderQuery(t *testing.T, q *treesitter.Query, matches iter.Seq2[treesitter.QueryMatch, error]) []byte {
 	t.Helper()
 	var b bytes.Buffer
 	fmt.Fprintf(&b, "#tsg-query/1 patterns=%d captures=%d\n", q.PatternCount(), len(q.CaptureNames()))
-	for m, err := range tree.Matches(bg, q, nil) {
+	for m, err := range matches {
 		if err != nil {
 			t.Fatalf("Matches: %v", err)
 		}
@@ -248,7 +250,19 @@ func TestQueryNative(t *testing.T) {
 			qfiles := queryFilesFor(t, root, lang)
 			dir := t.TempDir()
 			language := languages[lang]()
-			var raws, full []*treesitter.Query
+			var raws, full, budgetRaws, budgetFull []*treesitter.Query
+			compile := func(source string) *treesitter.Query {
+				t.Helper()
+				q, err := treesitter.NewQueryWithOptions(bg, language, source,
+					treesitter.WithMaxQuerySourceBytes(int64(len(source))),
+					treesitter.WithMaxQueryMemoryBytes(1<<32),
+					treesitter.WithMaxQueryMetadataBytes(math.MaxUint32),
+					treesitter.WithMaxQueryRegexUnits(math.MaxInt64))
+				if err != nil {
+					t.Fatal(err)
+				}
+				return q
+			}
 			var qpaths []string
 			for _, qf := range qfiles {
 				p := filepath.Join(dir, qf.name)
@@ -260,7 +274,8 @@ func TestQueryNative(t *testing.T) {
 				if err != nil {
 					t.Fatalf("%s: NewQuery(original): %v", qf.name, err)
 				}
-				raw, err := treesitter.NewQuery(language, stripPredicates(qf.source))
+				stripped := stripPredicates(qf.source)
+				raw, err := treesitter.NewQuery(language, stripped)
 				if err != nil {
 					t.Fatalf("%s: NewQuery(stripped): %v", qf.name, err)
 				}
@@ -268,6 +283,7 @@ func TestQueryNative(t *testing.T) {
 					t.Fatalf("%s: stripped query differs in patterns/captures", qf.name)
 				}
 				full, raws = append(full, orig), append(raws, raw)
+				budgetFull, budgetRaws = append(budgetFull, compile(qf.source)), append(budgetRaws, compile(stripped))
 			}
 			type input struct {
 				id, name string
@@ -323,6 +339,12 @@ func TestQueryNative(t *testing.T) {
 			nativeSecs := time.Since(start).Seconds()
 
 			p := newParser(t, lang)
+			budgeted := func(tree *treesitter.Tree, q *treesitter.Query) iter.Seq2[treesitter.QueryMatch, error] {
+				return tree.MatchesWithOptions(bg, q, nil,
+					treesitter.WithMaxQueryCaptures(math.MaxInt64),
+					treesitter.WithMaxQueryResults(math.MaxInt64),
+					treesitter.WithMaxQueryPredicateWork(math.MaxInt64))
+			}
 			var mism, matches, captures, compared, empty int
 			perQuery := map[string][2]int{} // name -> [inputs with matches, matches]
 			ji := 0
@@ -340,7 +362,7 @@ func TestQueryNative(t *testing.T) {
 					if j.err != nil {
 						t.Fatalf("%s %s: native query: %v", in.id, qf.name, j.err)
 					}
-					got := goRawQuery(t, tree, raws[qi])
+					got := renderQuery(t, raws[qi], tree.Matches(bg, raws[qi], nil))
 					compared++
 					if !bytes.Equal(got, j.out) {
 						mism++
@@ -362,20 +384,24 @@ func TestQueryNative(t *testing.T) {
 					}
 					pq[1] += len(keys)
 					perQuery[qf.name] = pq
-					// The filtered public result must be a subsequence of the raw one.
-					var filtered bytes.Buffer
-					for m, err := range tree.Matches(bg, full[qi], nil) {
-						if err != nil {
-							t.Fatalf("%s %s: filtered Matches: %v", in.id, qf.name, err)
-						}
-						fmt.Fprintf(&filtered, "m\t%d\t%d\n", m.Pattern, len(m.Captures))
-						for _, c := range m.Captures {
-							fmt.Fprintf(&filtered, "c\t%d\t%d\t%d\t%d\t%d\n", c.Index, c.Node.Index(), c.Node.Symbol(), c.Node.StartByte(), c.Node.EndByte())
-						}
+					budgetRaw := renderQuery(t, budgetRaws[qi], budgeted(tree, budgetRaws[qi]))
+					if !bytes.Equal(budgetRaw, j.out) {
+						mism++
+						t.Errorf("%s %s: budgeted raw matches differ from native: %s", in.id, qf.name, firstDiff(budgetRaw, j.out))
+						preserve(fmt.Sprintf("query/%s/%s/%s.budgeted.txt", lang, qf.name, in.name), budgetRaw)
+						preserve(fmt.Sprintf("query/%s/%s/%s.native.txt", lang, qf.name, in.name), j.out)
 					}
-					if fk := rawMatchKeys(append([]byte("h\n"), filtered.Bytes()...)); !isSubsequence(fk, keys) {
+					filtered := renderQuery(t, full[qi], tree.Matches(bg, full[qi], nil))
+					if fk := rawMatchKeys(filtered); !isSubsequence(fk, keys) {
 						mism++
 						t.Errorf("%s %s: filtered matches are not a subsequence of the raw matches", in.id, qf.name)
+					}
+					budgetFiltered := renderQuery(t, budgetFull[qi], budgeted(tree, budgetFull[qi]))
+					if !bytes.Equal(budgetFiltered, filtered) {
+						mism++
+						t.Errorf("%s %s: budgeted filtered matches differ: %s", in.id, qf.name, firstDiff(budgetFiltered, filtered))
+						preserve(fmt.Sprintf("query/%s/%s/%s.budgeted-filtered.txt", lang, qf.name, in.name), budgetFiltered)
+						preserve(fmt.Sprintf("query/%s/%s/%s.filtered.txt", lang, qf.name, in.name), filtered)
 					}
 				}
 				tree.Close()

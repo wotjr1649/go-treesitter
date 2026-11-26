@@ -1,6 +1,7 @@
 package treesitter
 
 import (
+	"context"
 	"errors"
 	"regexp"
 	"strings"
@@ -84,6 +85,8 @@ func FuzzQueryRegexClass(f *testing.F) {
 		}
 		// Invalid patterns may return errors; panics fail the fuzz case.
 		compileQueryRegex(pattern)
+		budget := newQueryMeter(context.Background(), 4096, "query regex")
+		compileQueryRegexWithMeter(pattern, &budget)
 	})
 }
 
@@ -158,7 +161,9 @@ func TestQueryRegexLiteralPrefix(t *testing.T) {
 
 func TestQueryRegexCanonicalForm(t *testing.T) {
 	p := regexTranslator{src: `(?i:é)[a\W]`}
-	canonical, err := p.expression(regexFlags{unicode: true}, false)
+	var out strings.Builder
+	err := p.expression(&out, regexFlags{unicode: true}, false)
+	canonical := out.String()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -172,7 +177,7 @@ func TestQueryRegexCanonicalForm(t *testing.T) {
 		{"match?", `\w`, true}, {"any-match?", `\w`, true}, {"any-not-match?", `\<`, false},
 	} {
 		q := &Query{source: " "}
-		err := q.readMeta(fakeQueryMeta([]string{tc.op, tc.pattern}, [][2]uint32{{2, 0}, {1, 0}, {2, 1}, {0, 0}}))
+		err := q.readMeta(fakeQueryMeta([]string{tc.op, tc.pattern}, [][2]uint32{{2, 0}, {1, 0}, {2, 1}, {0, 0}}), nil, nil)
 		if (err == nil) != tc.ok {
 			t.Errorf("%s %q: %v", tc.op, tc.pattern, err)
 		}
