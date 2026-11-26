@@ -13,6 +13,31 @@ code graphs and application policy belong to consumers.
 Start with [AGENTS.md](AGENTS.md) and the [documentation map](docs/README.md). The
 [status board](docs/reports/release-critical-status.md) separates development use from release approval.
 
+## When to use go-treesitter
+
+Use it when your Go program should not depend on a C toolchain. The library builds with `CGO_ENABLED=0`
+([getting started](docs/guides/getting-started.md): no C compiler is needed), so:
+
+- cross-compiling needs no C cross-compiler, and a binary can be built statically;
+- Windows needs no C toolchain (Windows amd64 is the Tier-1 platform; the other platforms claimed are listed under
+  [Support](#support));
+- each `Parser` runs its grammar in its own translated-wasm instance, and its linear memory can be capped
+  (`WithMaxMemoryBytes`), with input size, snapshot size and query budgets and `context` cancellation alongside, which
+  bounds the cost of parsing untrusted input ([resource limits and cancellation](docs/guides/getting-started.md#resource-limits-and-cancellation)).
+
+It runs the upstream tree-sitter runtime and grammar C pinned in [pins.json](tools/gen/pins.json), translated by
+`tools/gen`. Failures come back as one result contract: a complete tree, or a `*ParseError` with an `Outcome`
+([parser-result](docs/specs/parser-result.md)). What is not shown yet is on the
+[limitations](docs/reports/limitations.md) page.
+
+Trade-offs: parsing runs translated code, not native C, so it can be slower than native tree-sitter, and
+`NewParser` and `NewQuery` have a start-up cost. This README gives no comparison numbers; the only measurements here are
+the labeled local diagnostics under [Performance guidance](#performance-guidance), which also say how to reduce the cost
+(reuse `Parser` and `Query`; use `Parse` rather than `ParseSnapshot` where a snapshot is not needed). If raw
+parsing speed is your priority and your build can use C, consider the official
+[Go bindings of the tree-sitter C library](https://github.com/tree-sitter/go-tree-sitter) instead, and measure on your own
+grammar and inputs.
+
 ## Use
 
 The root module has no grammar. v0.7.0 provides 25 grammar modules using engine ABI 4: five at new `v0.7.0` tags
