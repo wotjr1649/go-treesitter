@@ -1,7 +1,7 @@
 # tools/gen
 
 Generates one grammar module (`grammars/<lang>`) from pinned runtime and grammar sources: clang (wasi-sdk) → wasm → wasm-opt
-(recipe-dependent) → `wasm2go` → patched `memory_grow` → Go module. Design: `docs/design/engine-abi.md`, ADR-0020, ADR-0022.
+(recipe-dependent) → `wasm2go` → patched `memory_grow` and single-copy initial memory in `New`/`X_initialize` → Go module. Design: `docs/design/engine-abi.md`, ADR-0020, ADR-0022.
 
 ## CP949 decode table
 

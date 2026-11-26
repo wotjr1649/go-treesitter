@@ -203,22 +203,23 @@ func Refused(mem *[]byte) bool                       // a grow was refused since
 func ClearRefused(mem *[]byte)
 func Committed(mem *[]byte) int64                    // for WithRecycleAboveBytes
 func Release(mem *[]byte)                            // return the region to the OS; idempotent
-func InitMemory(mem *[]byte, size int, segs ...Segment) // records an initial memory (no copy); for a generated New that calls it
-func StartMemory(mem *[]byte)                        // creates the region and writes the segments once; first statement of X_initialize
+func InitMemory(mem *[]byte, size int, segs ...Segment) // generated New: records the initial memory, copies nothing
+func StartMemory(mem *[]byte)                        // first statement of X_initialize: creates the region, writes the segments
 func Call(fn func()) error                           // runs fn; a trap (any panic from generated code) becomes *Trap
 ```
 
 Memory provider: reserve-then-commit, `VirtualAlloc` on Windows, `mmap` on Unix (standard library `syscall` first;
 `golang.org/x/sys` only with a stated reason). The generated `memory_grow` body is replaced by
 `return engine.MemoryGrow(mem, delta, max)` in a deterministic, sha256-checked step (expected original body hash
-recorded in the generator; mismatch = generation failure). `InitMemory`/`StartMemory` are additive provider API for a
-generator step that copies the data segments once, straight into the reserved region (after `SetLimit`, with no
-initial-size Go-heap slice); no generated module calls them yet, and `MemoryGrow` keeps its Go-heap-slice path, so modules
-generated before this API still work unchanged. `StartMemory` does nothing when no `InitMemory` is pending; an initial
-size above the limit traps with `Refused` set (a refused grow).
+recorded in the generator; mismatch = generation failure). The same step replaces the generated `New`'s
+`m.memory = make([]byte, N)` and `memory_init` statements with one `engine.InitMemory(&m.memory, N, Segment…)` and
+prepends `engine.StartMemory(&m.memory)` to `X_initialize` (shape-checked, any other shape = generation failure), so the
+data segments are copied once, straight into the reserved region, after `SetLimit` and with no initial-size Go-heap
+slice. `*Slice()` is nil between `New` and `X_initialize`; an initial size above the limit traps in `X_initialize` with
+`Refused` set (a refused grow). Modules generated before this step still work: `MemoryGrow` keeps its Go-heap-slice path.
 
 Instance sequence (the `treesitter` package): `m := g.New(h)` → `SetLimit(m.Xmemory().Slice(), limit)` →
-`engine.Call(m.X_initialize)` → `Xtsg_abi_version() == g.ABI` (accepted: 1–4) → `Xtsg_init() == 0` → export header magic/format (format 1 for ABI 1/2, format 2 for ABI 3/4); any failure =
+`engine.Call(m.X_initialize)` (starts with `StartMemory`) → `Xtsg_abi_version() == g.ABI` (accepted: 1–4) → `Xtsg_init() == 0` → export header magic/format (format 1 for ABI 1/2, format 2 for ABI 3/4); any failure =
 `ErrIncompatibleLanguage` (version) or `EngineFault`. A trap with `Refused` set maps to `ResourceLimit`; any other trap
 to `EngineFault`; both discard the instance (`Release`) and create a new one.
 

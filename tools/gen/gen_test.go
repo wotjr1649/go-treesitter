@@ -408,3 +408,39 @@ func TestReadmeGrammarSource(t *testing.T) {
 		}
 	}
 }
+
+func TestPatchNewMemory(t *testing.T) {
+	src := "package x\n\nimport (\n\t\"" + enginePath + "\"\n)\n\nfunc New(v0 Xtsg) *Module {\n\tm := new(Module)\n\tm.t0 = make([]any, 28)\n" +
+		"\tm.memory = make([]byte, 0x20000)\n\ttable_init(m.t0, nil, i32(1), 0, 0)\n" +
+		"\tmemory_init(m.memory, data[0:11980], uint32(i32(65536)), 0, len(data[0:11980]))\n" +
+		"\tmemory_init(m.memory, data[7:9], uint32(i32(100)), 0, len(data[7:9]))\n\treturn m\n}\n\n" +
+		"func (m *Module) X_initialize() {\n\tt0 := 1\n}\n"
+	got, err := patchNewMemory(src)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{
+		"\tengine.InitMemory(&m.memory, 0x20000,\n\t\tengine.Segment{Dest: 65536, Data: data[0:11980]},\n\t\tengine.Segment{Dest: 100, Data: data[7:9]},\n\t)\n",
+		"X_initialize() {\n\tengine.StartMemory(&m.memory)\n\tt0 := 1\n",
+	} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("missing %q in:\n%s", want, got)
+		}
+	}
+	if strings.Contains(got, "memory_init") || strings.Contains(got, "make([]byte") {
+		t.Fatalf("old statements remain:\n%s", got)
+	}
+	for name, bad := range map[string]string{
+		"no engine import": strings.Replace(src, enginePath, "other", 1),
+		"no make":          strings.Replace(src, "m.memory = make([]byte, 0x20000)", "", 1),
+		"two make":         strings.Replace(src, "\treturn m", "\tm.memory = make([]byte, 1)\n\treturn m", 1),
+		"odd init":         strings.Replace(src, "0, len(data[0:11980])", "5, len(data[0:11980])", 1),
+		"no init":          strings.Replace(strings.Replace(src, "\tmemory_init(m.memory, data[0:11980], uint32(i32(65536)), 0, len(data[0:11980]))\n", "", 1), "\tmemory_init(m.memory, data[7:9], uint32(i32(100)), 0, len(data[7:9]))\n", "", 1),
+		"other memory use": strings.Replace(src, "\treturn m", "\t_ = len(m.memory)\n\treturn m", 1),
+		"no X_initialize":  strings.Replace(src, "X_initialize", "Y", 1),
+	} {
+		if _, err := patchNewMemory(bad); err == nil {
+			t.Errorf("%s: must fail", name)
+		}
+	}
+}

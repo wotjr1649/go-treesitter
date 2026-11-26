@@ -86,6 +86,58 @@ func patchMemoryGrow(src, wantSHA string) (string, error) {
 	return src[:m[2]] + strings.Join(lines, "\n") + src[m[3]:], nil
 }
 
+// ---- single-copy initial memory (docs/design/engine-abi.md §4) ----
+
+var (
+	newFuncRx    = regexp.MustCompile(`(?ms)^func New\(.*?^\}\n`)
+	newMemRx     = regexp.MustCompile(`(?m)^\tm\.memory = make\(\[\]byte, (0x[0-9a-fA-F]+|[0-9]+)\)\n`)
+	memInitRx    = regexp.MustCompile(`(?m)^\tmemory_init\(m\.memory, (data\[\w+:\w+\]), uint32\(i32\((\d+)\)\), 0, len\((data\[\w+:\w+\])\)\)\n`)
+	initializeRx = regexp.MustCompile(`(?m)^func \(m \*Module\) X_initialize\(\) \{\n`)
+)
+
+// patchNewMemory makes New record the initial memory (size and data segments) with engine.InitMemory instead of
+// allocating it on the Go heap and copying the segments in; X_initialize starts with engine.StartMemory, which creates
+// the reserved region (after SetLimit) and writes the segments into it once. It fails unless New has exactly one
+// `m.memory = make` and at least one `memory_init` of the shape wasm2go emits, and X_initialize exactly once, so a
+// changed wasm2go output stops generation. Call it after patchMemoryGrow, which adds the engine import.
+func patchNewMemory(src string) (string, error) {
+	if !strings.Contains(src, strconv.Quote(enginePath)) {
+		return "", fmt.Errorf("New memory: the engine import is missing (patchMemoryGrow first)")
+	}
+	loc := newFuncRx.FindAllStringIndex(src, -1)
+	if len(loc) != 1 {
+		return "", fmt.Errorf("New memory: found %d New functions, want 1", len(loc))
+	}
+	fn := src[loc[0][0]:loc[0][1]]
+	mk := newMemRx.FindAllStringSubmatch(fn, -1)
+	if len(mk) != 1 {
+		return "", fmt.Errorf("New memory: found %d `m.memory = make` statements in New, want 1", len(mk))
+	}
+	inits := memInitRx.FindAllStringSubmatch(fn, -1)
+	if len(inits) == 0 {
+		return "", fmt.Errorf("New memory: no memory_init statement of the expected shape in New")
+	}
+	call := "\tengine.InitMemory(&m.memory, " + mk[0][1] + ",\n"
+	for _, in := range inits {
+		if in[1] != in[3] {
+			return "", fmt.Errorf("New memory: memory_init data slices differ: %s, %s", in[1], in[3])
+		}
+		call += "\t\tengine.Segment{Dest: " + in[2] + ", Data: " + in[1] + "},\n"
+	}
+	call += "\t)\n"
+	nf := memInitRx.ReplaceAllString(fn, "")
+	nf = newMemRx.ReplaceAllLiteralString(nf, call)
+	if strings.Contains(strings.ReplaceAll(nf, "&m.memory", ""), "m.memory") {
+		return "", fmt.Errorf("New memory: New still uses m.memory after the replacement")
+	}
+	src = src[:loc[0][0]] + nf + src[loc[0][1]:]
+	hs := initializeRx.FindAllStringIndex(src, -1)
+	if len(hs) != 1 {
+		return "", fmt.Errorf("New memory: found %d X_initialize functions, want 1", len(hs))
+	}
+	return src[:hs[0][1]] + "\tengine.StartMemory(&m.memory)\n" + src[hs[0][1]:], nil
+}
+
 // checkImports fails if the module needs an import the engine host does not stub (engine.Host).
 func checkImports(src string) error {
 	allowed := map[string]map[string]bool{
