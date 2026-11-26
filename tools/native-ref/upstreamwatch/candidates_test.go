@@ -73,6 +73,7 @@ func TestCandidatesSection(t *testing.T) {
 	api.propose(candidate{Component: "bash", Pinned: "p", Newest: "v1.2.3", Kind: "release", Repo: "wotjr1649/tree-sitter-bash", Grammar: true}, "k")
 	api.propose(candidate{Component: "held", Pinned: "p", Newest: "v9.9.9", Kind: "release", Repo: "a/held", Grammar: true}, "k") // accepted
 	api.propose(candidate{Component: "evil", Pinned: "p", Newest: "v1;touch x", Kind: "release", Repo: "a/evil", Grammar: true}, "")
+	api.propose(candidate{Component: "thirdparty", Pinned: "p", Newest: "v3.0.0", Kind: "release", Repo: "a/thirdparty", Grammar: true}, "")
 	api.propose(candidate{Component: "owned", Pinned: "p", Newest: "abc123", Kind: "head", Repo: "wotjr1649/o", Grammar: true}, "")
 	api.propose(candidate{Component: "wasm2go", Pinned: "v1", Newest: "v2", Kind: "release", Repo: "ncruces/wasm2go", TagOnly: true}, "")
 	var b strings.Builder
@@ -80,6 +81,7 @@ func TestCandidatesSection(t *testing.T) {
 	got := b.String()
 	for _, want := range []string{
 		"- `bash` release `v1.2.3`: `gh workflow run " + autoPRWorkflow + " -f grammar=bash -f tag=v1.2.3`",
+		"- `thirdparty` release, third party `v3.0.0` — no dispatch",
 		"- `owned` default-branch head `abc123` — no dispatch",
 		"- `wasm2go` tag without a release, third party `v2` — no dispatch",
 		"- (name not shown: unexpected characters) — no dispatch",

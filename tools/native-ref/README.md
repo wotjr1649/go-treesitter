@@ -172,8 +172,8 @@ leave the issue unchanged. The issue job uses that state rather than inferring w
 `-candidates FILE` writes the pins that could move as JSON (`{"version":1,"candidates":[...]}`, sorted by component, kind,
 newest; fields `component`, `pinned`, `newest`, `kind` = `release`|`head`, `repo`, `owner`, `tagOnly`, `grammar`,
 `accepted`) and removes the file after a hard error. The issue body lists the unaccepted candidates, with a
-`gh workflow run` line for each grammar release or tag (names restricted to `[A-Za-z0-9._+-]`); the watch job dispatches
-nothing, and the workflow uploads the file as the `upstream-watch-candidates` artifact.
+`gh workflow run` line for each owner-repository grammar release and "no dispatch" for the others (names restricted to
+`[A-Za-z0-9._+-]`); the watch job dispatches nothing, and the workflow uploads the file as the `upstream-watch-candidates` artifact.
 
 ## Recorded grammar patches
 

@@ -99,7 +99,7 @@ func candidatesSection(w io.Writer, api *githubAPI) {
 			continue
 		}
 		line := fmt.Sprintf("- `%s` %s `%s`", c.Component, what, c.Newest)
-		if c.Grammar && c.Kind == "release" {
+		if c.Grammar && c.Owner && c.Kind == "release" { // pinbump refuses a repository outside the owner account
 			line += fmt.Sprintf(": `gh workflow run %s -f grammar=%s -f tag=%s`", autoPRWorkflow, c.Component, c.Newest)
 		} else {
 			line += " — no dispatch (the pin moves by hand)"
