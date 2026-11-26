@@ -95,16 +95,26 @@ jobs:
             case "$m" in x86_64-*) a=amd64 ;; aarch64-*) a=arm64 ;; *) a="$m" ;; esac
             [ "$a" = "${{ matrix.goarch }}" ] || { echo "::error::$NATIVE_CC targets $m, not the runner's ${{ matrix.goarch }}"; exit 1; }
           fi
-      - name: Fetch pinned sources, build the native executables, extract the corpus inputs
+      - name: Build the repository's own native-ref and ciconf tools
         working-directory: tools/native-ref
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
         run: |
           go build -o "$RUNNER_TEMP/native-ref$EXE" .
           go build -o "$RUNNER_TEMP/ciconf$EXE" ./ciconf
-          cd "$GITHUB_WORKSPACE"
-          "$RUNNER_TEMP/native-ref$EXE" -pins tools/gen/pins.json -fetch -cc "$NATIVE_CC" \
-            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" "${{ matrix.lang }}"
+      # The only step with a token (it lifts the api.github.com rate limit for the pinned tarballs). It downloads and sha256-verifies
+      # every archive the build needs (-stage) and extracts the corpus; it compiles, generates and runs nothing, so no third-party
+      # code runs while the token is in the environment.
+      - name: Fetch and verify pinned sources, extract the corpus
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          "$RUNNER_TEMP/native-ref$EXE" -pins tools/gen/pins.json -stage -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/stage-work" \
+            -corpus "$RUNNER_TEMP/corpus" "${{ matrix.lang }}"
+      # Offline (no -fetch: a missing archive is an error, not a download) and without the token: the native build and the first run
+      # of the native executable (ciconf) happen here.
+      - name: Build the native executable (offline), extract the corpus inputs
+        run: |
+          "$RUNNER_TEMP/native-ref$EXE" -pins tools/gen/pins.json -cc "$NATIVE_CC" \
+            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" "${{ matrix.lang }}"
           "$RUNNER_TEMP/ciconf$EXE" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "${{ matrix.lang == 'golang' && 'go' || matrix.lang }}"
       - name: Build the product bench binaries and the driver
         working-directory: tools/bench

@@ -4,6 +4,8 @@ name: C-reference conformance (CI corpora)
 # repositories' own test/corpus files plus deterministic seeded edits (tools/native-ref/ciconf). The native reference
 # is built here with the runner's gcc from the same pinned, sha256-verified sources (or restored from a main-push cache of that
 # build, see "Native reference cache identity"); the Go side stays CGO_ENABLED=0.
+# Third-party inputs are fetched in one step that holds the GITHUB_TOKEN and executes nothing; the native build then runs offline in
+# bubblewrap without the token. The native executables themselves still run unsandboxed (ciconf, go test): see tools/gen/README.md.
 
 on:
   push:
@@ -111,7 +113,7 @@ jobs:
         id: native-id
         env:
           GROUP_NAME: ${{ matrix.group.name }}
-          INPUTS_HASH: ${{ hashFiles('tools/gen/pins.json', 'tools/gen/go.mod', 'tools/gen/go.sum', 'tools/gen/patches/**', 'tools/gen/grammarpatch/**', 'tools/bench/proc/**', 'tools/native-ref/**', '.github/workflows/conformance.yml') }}
+          INPUTS_HASH: ${{ hashFiles('tools/gen/pins.json', 'tools/gen/go.mod', 'tools/gen/go.sum', 'tools/gen/patches/**', 'tools/gen/grammarpatch/**', 'tools/bench/proc/**', 'tools/native-ref/**', 'tools/gen/sandbox-run.sh', '.github/workflows/conformance.yml') }}
         run: |
           ident=$(printf '%s\n' "${ImageOS:-}-${ImageVersion:-}" "$(gcc --version | head -1)" "$(go version)" "$GROUP_LANGS")
           printf '%s\n' "$ident"
@@ -146,25 +148,44 @@ jobs:
             echo "::warning::the restored native references do not match their recorded checksums; building them. This cache entry stays unusable (an existing key cannot be overwritten) until the key changes"
             rm -rf "$RUNNER_TEMP/exe" "$RUNNER_TEMP/corpus" "$RUNNER_TEMP/queries" "$RUNNER_TEMP/scanner-stages"
           fi
-      - name: Build the native-ref and ciconf tools
+      - name: Build the repository's own native-ref and ciconf tools
         working-directory: tools/native-ref
         env:
           CGO_ENABLED: "0"
-          GITHUB_TOKEN: ${{ github.token }}
         run: |
           [ "$GROUP_DOCS" != true ] || go test -count=1 ./...
           go build -o "$RUNNER_TEMP/native-ref" .
           go build -o "$RUNNER_TEMP/ciconf" ./ciconf
-      # Archives are fetched from the pinned commits and their sha256 checked against tools/gen/pins.json before use.
-      - name: Fetch pinned sources, build native references, extract corpus and queries
+      # The only step with a token (it lifts the api.github.com rate limit for the pinned tarballs). It downloads and sha256-verifies
+      # every archive a build needs (-stage: runtime, wasi-libc, grammars, the pinned CLI, npm inputs) and extracts the corpus and
+      # queries; it compiles and generates nothing, so no third-party code runs while the token is in the environment.
+      - name: Fetch and verify pinned sources, extract corpus and queries
         if: ${{ steps.native-ready.outputs.usable != 'true' }}
         env:
           CGO_ENABLED: "0"
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -fetch -cc gcc \
-            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" -queries "$RUNNER_TEMP/queries" \
-            -scanner-stages "$RUNNER_TEMP/scanner-stages" $GROUP_LANGS
+          "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -stage -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/stage-work" \
+            -corpus "$RUNNER_TEMP/corpus" -queries "$RUNNER_TEMP/queries" $GROUP_LANGS
+      # Not skipped on a native cache hit: a sandbox that no longer isolates is found on every run, not first on the main push that misses the cache.
+      - name: Prepare and check the sandbox for the native builds
+        run: bash tools/gen/sandbox-setup.sh
+      # Offline (no -fetch: a missing archive is an error, not a download) and sandboxed (tools/gen/sandbox-run.sh): gcc builds the
+      # grammars' C, and the pinned CLI regenerates the parsers that are not committed, with no network and no token or runner
+      # files in reach; the archives, the checkout and the tool are read-only, the build directories the only writable paths.
+      - name: Build native references (offline, sandboxed)
+        if: ${{ steps.native-ready.outputs.usable != 'true' }}
+        env:
+          CGO_ENABLED: "0"
+        run: |
+          mkdir -p "$RUNNER_TEMP/work" "$RUNNER_TEMP/exe" "$RUNNER_TEMP/scanner-stages"
+          bash tools/gen/sandbox-run.sh \
+            --ro "$GITHUB_WORKSPACE" --ro "$RUNNER_TEMP/native-ref" --ro "$RUNNER_TEMP/dl" \
+            --rw "$RUNNER_TEMP/work" --rw "$RUNNER_TEMP/exe" --rw "$RUNNER_TEMP/scanner-stages" \
+            --chdir "$GITHUB_WORKSPACE" -- \
+            "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -cc gcc \
+              -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" \
+              -scanner-stages "$RUNNER_TEMP/scanner-stages" $GROUP_LANGS
       - name: Record the native build for the cache
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.native-id.outputs.id != '' && steps.native-cache.outputs.cache-hit != 'true' }}
         run: bash tools/native-ref/cachesums.sh write "$RUNNER_TEMP"

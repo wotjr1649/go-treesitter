@@ -72,7 +72,9 @@ jobs:
         with:
           go-version: 1.27.x # newest supported; go.mod states the floor (1.26.0)
       - name: Transient fetch retry regression checks
-        run: bash tools/gen/fetch_test.sh
+        run: |
+          bash tools/gen/fetch_test.sh
+          bash tools/gen/sandbox_run_test.sh
       # Verified archives (wasi-sdk, binaryen, the CLI, the runtime, wasi-libc and the 25 grammars, a few hundred MB) are cached
       # once per pins.json content. Only a push to main saves; pull requests restore. fetch.sh still checks every restored
       # file against its pinned sha256 (TSG_DL_CACHE), so the key selects files, never their bytes.

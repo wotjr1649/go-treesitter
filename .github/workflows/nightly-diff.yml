@@ -76,17 +76,30 @@ jobs:
           echo "TSG_NIGHTLY_SEED=$seed" >> "$GITHUB_ENV"
           echo "TSG_CONF_OUT=$RUNNER_TEMP/out" >> "$GITHUB_ENV"
           echo "seed $seed, $MINUTES min per grammar, $FUZZ_SECONDS s per fuzz target, commit $GITHUB_SHA"
-      - name: Fetch pinned sources, build one native executable, extract its corpus
+      - name: Build the repository's own native-ref and ciconf tools
         working-directory: tools/native-ref
+        env:
+          CGO_ENABLED: "0"
+        run: |
+          go build -o "$RUNNER_TEMP/native-ref" .
+          go build -o "$RUNNER_TEMP/ciconf" ./ciconf
+      # The only step with a token (it lifts the api.github.com rate limit for the pinned tarballs). It downloads and sha256-verifies
+      # every archive the build needs (-stage) and extracts the corpus; it compiles, generates and runs nothing, so no third-party
+      # code runs while the token is in the environment.
+      - name: Fetch and verify pinned sources, extract the corpus
         env:
           CGO_ENABLED: "0"
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          go build -o "$RUNNER_TEMP/native-ref" .
-          go build -o "$RUNNER_TEMP/ciconf" ./ciconf
-          cd "$GITHUB_WORKSPACE"
-          "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -fetch -cc gcc \
-            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" "${{ matrix.lang }}"
+          "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -stage -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/stage-work" \
+            -corpus "$RUNNER_TEMP/corpus" "${{ matrix.lang }}"
+      # Offline (no -fetch: a missing archive is an error, not a download) and without the token.
+      - name: Build one native executable (offline)
+        env:
+          CGO_ENABLED: "0"
+        run: |
+          "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -cc gcc \
+            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" "${{ matrix.lang }}"
       # Extract only mutation seeds: every parse belongs inside the differential watchdog below.
       - name: Extract the corpus inputs
         env:

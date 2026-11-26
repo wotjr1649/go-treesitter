@@ -129,7 +129,10 @@ jobs:
         env:
           BASE: ${{ steps.refs.outputs.base }}
           HEAD: ${{ steps.refs.outputs.head }}
-          GITHUB_TOKEN: ${{ github.token }}
+        # No GITHUB_TOKEN here: this step downloads the old and new pins and then builds and runs them, and a token in its environment
+        # would be inherited by the pinned CLI, gcc and the native executables. Without it the downloads are anonymous, as in
+        # regen.yml. The runtime, wasi-libc and ten grammars use the rate-limited api.github.com tarball and fall back to the release
+        # mirrors; a rate-limit failure is visible and a re-run fetches again.
         run: |
           args=()
           if [ -n "$BASE" ] || [ -n "$HEAD" ]; then

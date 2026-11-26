@@ -83,7 +83,7 @@ is recorded in [the schema register](../../docs/validation/grammar-schemas.md#of
 `.github/workflows/pin-move.yml` fetches and verifies the PR `base.sha`, then compares the **merge base** of base and
 head with the head commit (`--merge-base`), so a branch that is behind the base is never judged against pins it does
 not contain. Full history is checked out; a missing merge base fails the step. The cache, Go setup and native work
-are skipped when no grammar entry differs (`--detect`). It runs again when the PR body changes. Dispatch requires explicit `base` and `head`
+are skipped when no grammar entry differs (`--detect`). It runs again when the PR body changes. The job has no `GITHUB_TOKEN`: its downloads are anonymous. Dispatch requires explicit `base` and `head`
 refs; a push or dispatch without refs reports **diff skipped**, never an inferred baseline. Local replay uses
 the same driver from the repository root (the named commits must already be available locally):
 
@@ -213,6 +213,16 @@ The digest covers the results (status, each differing file's change kind and bot
 per-code and per-risk counts) and not the CLI identity, error text or timings, so the weekly job comments on issue #67
 only when a result changed since the last comment.
 
+## Sandbox for third-party execution (`sandbox-run.sh`)
+
+`sandbox-run.sh [--ro PATH]... [--rw PATH]... [--chdir DIR] [--env NAME=VALUE]... -- COMMAND ...` is the general form of
+`nightly-sandbox.sh`: bubblewrap with no network, an empty environment (`--env` refuses token, secret and `GITHUB_*`/`ACTIONS_*`/`RUNNER_*`
+names), read-only `/usr`, an empty `/tmp`, and only the named paths mounted, each at its own absolute path. `sandbox-setup.sh`
+installs bubblewrap on a hosted ubuntu runner and checks the isolation. `conformance.yml` runs the native build (gcc, and the
+pinned CLI for grammars without a committed parser) in it after a token-holding `native-ref -stage` step has fetched and verified
+every input; the native executables built there still run unsandboxed in `ciconf` and `go test`. `bench.yml` and `nightly-diff.yml` split their fetch the same way (a token step with `native-ref -stage`, then an offline build step without the token) but are not sandboxed. Linux only; there is no local
+equivalent on Windows.
+
 ## Pins (`pins.json`)
 
 Everything a generation consumes is pinned, and the identity of a generated module never depends on the host:
@@ -247,7 +257,7 @@ The modules are `bash`, `c`, `cpp`, `csharp`, `css`, `dart`, `golang`, `html`, `
 `kotlin`, `php`, `postgres`, `powershell`, `python`, `r`, `ruby`, `rust`, `swift`, `tsql`, `tsx`, `typescript`, `xml`, and `yaml`. Each has a grammar-specific generated smoke-test sample.
 Downloads allow three attempts with 1s/2s backoff only for transient transport failures. HTTP, certificate and local
 write errors end that URL attempt; transient HTTP 408/429/5xx responses also receive bounded retries. A failed primary download or hash check then tries each configured mirror; sha256 verification remains mandatory before extraction. The retry self-check is
-`bash tools/gen/fetch_test.sh`.
+`bash tools/gen/fetch_test.sh`; `bash tools/gen/sandbox_run_test.sh` checks the argument handling of `sandbox-run.sh` against a stub `bwrap`.
 
 Compare raw format-2 field-exception records with `python tools/gen/check-field-export.py --before BEFORE_TREE --after AFTER_TREE --jobs JOBS_JSON --out NEW_DIR`; exact arguments of the 2026-11-15 field-export-cost run (`q13/run.py`, `differential-final`), input hashes (`differential-jobs.json`) and results (`differential-final/receipt.json`) are kept in the maintainer-local evidence archive. The source and result identities are recorded in [engine-abi.md](../../docs/design/engine-abi.md#field-lookup-evidence).
 
