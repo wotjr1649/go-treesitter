@@ -112,6 +112,37 @@ func TestQueryStreamingAndCache(t *testing.T) {
 	}
 }
 
+func TestQueryCursorMatchLimitReuse(t *testing.T) {
+	fl, _, tree, q := queryFixture(t, nil)
+	f := fl.cur()
+	for _, tc := range []struct {
+		limit   uint32
+		deleted int
+	}{
+		{0, 0},
+		{^uint32(0), 0},
+		{64, 1},
+		{64, 1},
+		{128, 1},
+		{8, 2},
+		{0, 2},
+		{1, 3},
+	} {
+		if _, err := collectQuery(tree, context.Background(), q, &QueryOptions{MatchLimit: tc.limit}); err != nil {
+			t.Fatal(err)
+		}
+		if got := f.count("qcursor_delete"); got != tc.deleted {
+			t.Errorf("limit %d: deleted %d cursors, want %d", tc.limit, got, tc.deleted)
+		}
+		if got := f.count("qcursor_new"); got != tc.deleted+1 {
+			t.Errorf("limit %d: allocated %d cursors, want %d", tc.limit, got, tc.deleted+1)
+		}
+	}
+	if got := f.count("query_new"); got != 1 {
+		t.Errorf("compiled %d queries, want 1", got)
+	}
+}
+
 func TestQueryCursorSharedAcrossQueriesAndTrees(t *testing.T) {
 	fl, p, tree, q := queryFixture(t, nil)
 	f := p.c.inst.m.(*fakeModule)

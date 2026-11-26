@@ -13,8 +13,9 @@ import (
 
 // QueryOptions restricts matches to nodes intersecting [StartByte, EndByte).
 // EndByte zero is unlimited, including zero-width nodes at EOF. An explicit EndByte equal to the
-// source length excludes those EOF nodes. MatchLimit zero uses C's default (unlimited); a nonzero
-// limit bounds in-progress match states, not the number of results.
+// source length excludes those EOF nodes. MatchLimit bounds in-progress match states for each call.
+// The number of results may exceed MatchLimit.
+// Zero and the maximum uint32 value both use C's default (unlimited).
 // Neither the byte range nor MatchLimit bounds the retained whole-tree capture index (less than
 // 32 bytes per node in wasm32, excluding allocator overhead) or query-dependent cursor arrays.
 // Both count against WithMaxMemoryBytes. See Tree.Matches for their release lifetimes.
@@ -37,12 +38,13 @@ type QueryMatch struct {
 // Errors terminate the stream.
 // On match-limit overflow it ends with ErrQueryMatchLimit, discarding any match produced by that
 // same engine call. Earlier matches remain valid; a small limit may produce no matches before the error.
-// Cost: the first match on a different tree indexes the whole tree (O(nodes)), whatever the byte range.
-// Consecutive calls on the same tree reuse that index, including calls with a different query or range.
+// Cost: the first match after switching trees or lowering the effective match limit indexes the whole
+// tree (O(nodes)), whatever the byte range. Other calls on the same tree reuse that index.
 // The last queried live tree's index retains less than 32 bytes per node in wasm32, excluding allocator
 // overhead, until that tree is deleted (Close, leak drain or ParserPool.Put), another tree is queried,
-// or the instance is discarded. Query-dependent cursor arrays and the match buffer remain allocated
-// until the instance is discarded (Reset, parser Close, recycling or a trap).
+// the effective match limit is lowered, or the instance is discarded. Query-dependent cursor arrays
+// and the match buffer remain allocated until the cursor is replaced or the instance is discarded
+// (Reset, parser Close, recycling or a trap).
 // All of this memory counts against WithMaxMemoryBytes, leaving less room for subsequent parsing.
 // Freeing the index allows reuse within the instance; linear memory shrinks only on instance discard.
 func (t *Tree) Matches(ctx context.Context, q *Query, opts *QueryOptions) iter.Seq2[QueryMatch, error] {
@@ -126,6 +128,17 @@ func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, yield f
 	if ctx.Err() != nil {
 		return ctxError(ctx, "query compilation stopped by the context")
 	}
+	limit := opts.MatchLimit
+	if limit == 0 {
+		limit = ^uint32(0)
+	}
+	// C reuses already allocated capture lists even when the new limit is smaller.
+	if in.queryCursor != 0 && limit < in.cursorLimit {
+		if err = c.queryCall("tsg_qcursor_delete", func() { m.Xtsg_qcursor_delete(in.queryCursor) }); err != nil {
+			return err
+		}
+		in.queryCursor = 0
+	}
 	if in.queryCursor == 0 {
 		if err = c.queryCall("tsg_qcursor_new", func() { in.queryCursor = m.Xtsg_qcursor_new() }); err != nil {
 			return err
@@ -134,6 +147,7 @@ func (t *Tree) matches(ctx context.Context, q *Query, opts QueryOptions, yield f
 			return c.engineFault("query cursor allocation returned NULL")
 		}
 	}
+	in.cursorLimit = limit
 	cursor := in.queryCursor
 	defer func() {
 		if c.gen != gen || c.inst != in {
