@@ -379,5 +379,184 @@ class CommandTimeoutTest(unittest.TestCase):
             self.assertEqual(receipt["exit"], "TIMEOUT")
 
 
+
+def archive(root, name, members):
+    """A .tar.gz in root; returns its sha256 (members: {path: bytes})."""
+    import io, tarfile
+    buffer = io.BytesIO()
+    with tarfile.open(fileobj=buffer, mode="w:gz") as tar:
+        for member, data in members.items():
+            info = tarfile.TarInfo(member)
+            info.size = len(data)
+            tar.addfile(info, io.BytesIO(data))
+    (root / name).write_bytes(buffer.getvalue())
+    return pin_move.sha(buffer.getvalue())
+
+
+class PhaseTest(unittest.TestCase):
+    """S140: --phase fetch downloads into the cache and runs nothing; --phase run is offline and sandboxed."""
+
+    def pins(self, root):
+        grammar = archive(root, "g.tgz", {"top/src/node-types.json": b"[]"})
+        runtime, wasi = archive(root, "rt.tgz", {"a": b"1"}), archive(root, "wasi.tgz", {"a": b"2"})
+        return {"runtime": {"archive": "rt.tgz", "archiveSHA256": runtime},
+                "wasiLibc": {"archive": "wasi.tgz", "archiveSHA256": wasi},
+                "grammars": {"c": {"archive": "g.tgz", "archiveSHA256": grammar, "grammarDir": "src"}}}
+
+    def cache_all(self, root, pins):
+        for source in (pins["runtime"], pins["wasiLibc"], pins["grammars"]["c"]):
+            pin_move.write(root / "cache/archives" / source["archiveSHA256"], (root / source["archive"]).read_bytes())
+
+    def test_constructor_pairs_run_with_a_sandbox(self):
+        for phase, sandbox in [("run", None), (None, Path("s.sh")), ("fetch", Path("s.sh")), ("other", None)]:
+            with self.subTest(phase=phase, sandbox=sandbox), self.assertRaises(ValueError):
+                pin_move.Review(Path("out"), Path("cache"), phase, sandbox)
+        pin_move.Review(Path("out"), Path("cache"))
+        pin_move.Review(Path("out"), Path("cache"), "fetch")
+        pin_move.Review(Path("out"), Path("cache"), "run", Path("s.sh"))
+
+    def test_cli_rejects_run_without_sandbox_and_sandbox_without_run(self):
+        for flags in (["--phase", "run"], ["--sandbox", "s.sh"], ["--phase", "fetch", "--sandbox", "s.sh"]):
+            with self.subTest(flags=flags), patch.object(sys, "argv", ["pin-move.py", *flags, "--out", "o", "--cache", "c"]), \
+                    patch.object(sys, "stderr"), self.assertRaises(SystemExit) as stop:
+                pin_move.main()
+            self.assertEqual(stop.exception.code, 2)
+
+    def test_sandbox_wraps_only_commands_with_mounts_and_keeps_the_logical_receipt(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            review = pin_move.Review(root / "out", root / "cache", "run", root / "sandbox-run.sh")
+            seen = []
+
+            def run(args, **kwargs):
+                seen.append(list(args))
+                return subprocess.CompletedProcess(args, 0)
+
+            with patch.object(pin_move.proctree, "run", side_effect=run):
+                review.command(["tool", "a"], cwd=root, mounts=["--ro", root / "in"])
+                review.command(["git", "status"], cwd=root)
+            self.assertEqual(seen[0], ["bash", root / "sandbox-run.sh", "--ro", root / "in", "--chdir", root, "--", "tool", "a"])
+            self.assertEqual(seen[1], ["git", "status"])
+            wrapped = json.loads((review.out / "logs/0001.json").read_text(encoding="utf-8"))
+            self.assertEqual(wrapped["args"], ["tool", "a"])
+            self.assertEqual(wrapped["sandbox"][:2], ["bash", str(root / "sandbox-run.sh")])
+            self.assertNotIn("sandbox", json.loads((review.out / "logs/0002.json").read_text(encoding="utf-8")))
+
+    def test_side_fetch_stages_into_the_cache_and_builds_nothing(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            pins = self.pins(root)
+            review = pin_move.Review(root / "out", root / "cache", "fetch")
+            review.tools = {"native-ref": "native-ref"}
+            calls = []
+
+            def command(args, **kwargs):  # -stage downloads: the archives and one npm tarball appear in dl
+                calls.append([str(x) for x in args])
+                dl = Path(args[args.index("-dl") + 1])
+                for source in (pins["runtime"], pins["wasiLibc"], pins["grammars"]["c"]):
+                    pin_move.write(dl / source["archive"], (root / source["archive"]).read_bytes())
+                pin_move.write(dl / "npm" / "x.tgz", b"npm")
+                pin_move.write(Path(args[args.index("-work") + 1]) / "extracted", b"x")
+                return b"", 0
+
+            with patch.object(review, "command", side_effect=command):
+                folder = review.side("head", pins, "c", "new", build=False)
+            self.assertEqual(len(calls), 1)
+            self.assertIn("-stage", calls[0])
+            for flag in ("-fetch", "-nobuild", "-out", "-corpus"):
+                self.assertNotIn(flag, calls[0])
+            self.assertFalse((folder / "stage-work").exists())
+            for source in (pins["runtime"], pins["wasiLibc"], pins["grammars"]["c"]):  # wasi-libc too, although build=False
+                self.assertTrue((root / "cache/archives" / source["archiveSHA256"]).exists())
+            self.assertEqual((root / "cache/npm/x.tgz").read_bytes(), b"npm")
+
+    def test_side_run_is_offline_and_mounts_only_the_build_directories_writable(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            pins = self.pins(root)
+            self.cache_all(root, pins)
+            pin_move.write(root / "cache/npm/x.tgz", b"npm")
+            review = pin_move.Review(root / "out", root / "cache", "run", root / "sandbox-run.sh")
+            review.tools = {"native-ref": root / "native-ref", "gen": "gen", "ciconf": "ciconf"}
+            calls = []
+
+            def command(args, **kwargs):
+                calls.append((list(args), kwargs.get("mounts")))
+                return b"{}", 0
+
+            with patch.object(review, "command", side_effect=command):
+                folder = review.side("head", pins, "c", "new")
+            build = calls[0]
+            self.assertNotIn("-fetch", build[0])
+            self.assertEqual(build[1][:6], ["--ro", pin_move.ROOT, "--ro", root / "native-ref", "--ro", folder])
+            self.assertEqual(build[1][6:], ["--rw", folder / "work", "--rw", folder / "exe", "--rw", folder / "corpus"])
+            self.assertTrue(all(mounts is None for _, mounts in calls[1:]))  # first-party schema check and ciconf stay on the host
+            self.assertEqual((folder / "dl/npm/x.tgz").read_bytes(), b"npm")
+
+    def test_large_inputs_download_only_in_fetch_and_never_in_run(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            fetched = []
+
+            def command(args, **kwargs):  # benchci fetch: write each manifest entry's bytes under -out
+                subset = json.loads(Path(args[args.index("-manifest") + 1]).read_text(encoding="utf-8"))
+                fetched.append([e["kind"] for e in subset])
+                return b"", 0
+
+            fetch = pin_move.Review(root / "out", root / "cache", "fetch")
+            fetch.tools = {"benchci": "benchci"}
+            with patch.object(fetch, "command", side_effect=command):
+                self.assertEqual(fetch.large_inputs("json", "", root / "f"), [])  # json: derived, nothing to download
+                with self.assertRaises(FileNotFoundError):  # golang: url entries are requested, the stub wrote none
+                    fetch.large_inputs("golang", "", root / "f")
+            self.assertEqual(len(fetched), 1)
+            self.assertTrue(set(fetched[0]) <= set(pin_move.NETWORK_KINDS))
+
+            run = pin_move.Review(root / "out2", root / "cache", "run", root / "sandbox-run.sh")
+            run.tools = {"benchci": "benchci"}
+            with patch.object(run, "command") as command:
+                with self.assertRaisesRegex(ValueError, "not in the cache"):
+                    run.large_inputs("golang", root / "data", root / "r")
+                command.assert_not_called()
+
+    def test_grammar_fetch_stages_both_sides_and_compares_nothing(self):
+        for status, sides, large in (("CHANGED", 2, 1), ("ADDED", 1, 0), ("REMOVED", 0, 0)):
+            with self.subTest(status=status), tempfile.TemporaryDirectory() as temp:
+                review = pin_move.Review(Path(temp) / "out", Path(temp) / "cache", "fetch")
+                with patch.object(review, "side") as side, patch.object(review, "large_inputs") as large_inputs, \
+                        patch.object(review, "command") as command:
+                    row = review.grammar("base", "head", {}, {}, "c", status, set())
+                self.assertTrue(row["pass"])
+                self.assertEqual((side.call_count, large_inputs.call_count), (sides, large))
+                command.assert_not_called()
+
+    def test_native_dump_is_sandboxed_with_only_the_grammar_tree_mounted(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            review = pin_move.Review(root / "out", root / "cache", "run", root / "sandbox-run.sh")
+            review.tools = {"gen": "gen"}
+            folders = {}
+            for side in ("old", "new"):
+                folders[side] = review.out / "c" / side
+                corpus = folders[side] / "data/corpus"
+                (corpus / "c").mkdir(parents=True)
+                (corpus / "c/sample.in").write_bytes(b"x")
+                (corpus / "manifest.csv").write_text(f"id,sha256\nc/sample,{pin_move.sha(b'x')}\n", encoding="utf-8")
+                (corpus / "skipped.csv").write_text("id,reason\n", encoding="utf-8")
+            dumps = []
+
+            def command(args, **kwargs):
+                if args[1] == "schema":
+                    return b'{"differences": []}', 0
+                dumps.append((kwargs.get("mounts"), kwargs.get("cwd")))
+                return dump(), 0
+
+            with patch.object(review, "side", side_effect=lambda ref, pins, lang, side, **kw: folders[side]), \
+                    patch.object(review, "command", side_effect=command), patch.object(review, "large_inputs", return_value=[]):
+                row = review.grammar("base", "head", {}, {}, "c", "CHANGED", set())
+            self.assertTrue(row["pass"])
+            self.assertEqual(dumps, [(["--ro", review.out / "c"], review.out / "c")] * 4)  # old and new exe over both sides' inputs
+
+
 if __name__ == "__main__":
     unittest.main()
