@@ -20,23 +20,33 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.action == 'synchronize' && github.run_attempt == 1 }}
 
 jobs:
+  changes:
+    name: conformance-changes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      conformance_full: ${{ steps.classify.outputs.conformance_full }}
+      conformance_matrix: ${{ steps.classify.outputs.conformance_matrix }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          # A pull request is checked out as its merge commit; HEAD^1..HEAD is exactly the files the pull request changes.
+          fetch-depth: 2
+      - id: classify
+        name: Classify the changed files (tools/lane/ci_changes.py)
+        run: python3 tools/lane/ci_changes.py --workflow conformance
+
   conformance-grammar:
     name: conformance (${{ matrix.runner }}, ${{ matrix.group.name }})
+    needs: changes
     strategy:
       fail-fast: false
-      matrix:
-        # Each job runs several grammars (one native build and one go test per job); the 25 grammars are split by measured
-        # run time. g1 also runs the repository-wide checks once per architecture (native-ref unit tests, TestKnownGap*).
-        group:
-          - {name: g1, docs: true, langs: "tsql css c"}
-          - {name: g2, langs: "postgres ruby golang php"}
-          - {name: g3, langs: "swift yaml dart tsx json r"}
-          - {name: g4, langs: "powershell typescript java javascript rust xml"}
-          - {name: g5, langs: "kotlin csharp cpp bash python html"}
-        runner: [ubuntu-24.04, ubuntu-24.04-arm]
-        include:
-          - {runner: ubuntu-24.04, goos: linux, goarch: amd64}
-          - {runner: ubuntu-24.04-arm, goos: linux, goarch: arm64}
+      # Each job runs several grammars (one native build and one go test per job); the 25 grammars are split by measured run time
+      # (CONFORMANCE_GROUPS in tools/lane/ci_changes.py). g1 also runs the repository-wide checks once per architecture (native-ref
+      # unit tests, TestKnownGap*). A pull request that changes nothing the lane builds or runs keeps only g1 on ubuntu-24.04,
+      # because TestKnownGap* reads every tracked file; main, dispatch and relevant changes run all five groups on both architectures.
+      matrix: ${{ fromJSON(needs.changes.outputs.conformance_matrix) }}
     runs-on: ${{ matrix.runner }}
     # The step limits (go test 40m, query 40m, fuzz seeds 30m) sum to 110m; the job limit leaves room for setup and the
     # native build so a hung step fails at its own limit and the later !cancelled() steps still run. Expected: ~9-12m.
@@ -178,10 +188,12 @@ jobs:
           if-no-files-found: ignore
           retention-days: 90
 
+  # Required check names kept until the ruleset requires conformance-gate. They no longer prove that the arm64 jobs ran on a
+  # reduced pull request (see the matrix above); conformance-gate is the single check that carries the meaning.
   conformance:
     name: conformance (${{ matrix.runner }})
     if: ${{ always() }}
-    needs: conformance-grammar
+    needs: [changes, conformance-grammar]
     strategy:
       matrix:
         runner: [ubuntu-24.04, ubuntu-24.04-arm]
@@ -189,5 +201,20 @@ jobs:
     steps:
       - name: All grammar shards passed
         env:
-          RESULT: ${{ needs.conformance-grammar.result }}
-        run: test "$RESULT" = success
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          for r in $RESULTS; do [ "$r" = success ] || { echo "a needed job ended $r"; exit 1; }; done
+
+  # The one required check of this workflow: red when the classifier or any job failed or was cancelled, green when every
+  # job succeeded or was skipped on purpose (a skipped required check would otherwise pass even when its dependency failed).
+  conformance-gate:
+    name: conformance-gate
+    if: ${{ always() }}
+    needs: [changes, conformance-grammar, conformance]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Every needed job passed or was skipped on purpose
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped 'all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok' <<<$NEEDS

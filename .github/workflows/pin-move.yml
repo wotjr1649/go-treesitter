@@ -18,7 +18,26 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: pin-move-changes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      pin_move: ${{ steps.classify.outputs.pin_move }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          # A pull request is checked out as its merge commit; HEAD^1..HEAD is exactly the files the pull request changes.
+          fetch-depth: 2
+      - id: classify
+        name: Classify the changed files (tools/lane/ci_changes.py)
+        run: python3 tools/lane/ci_changes.py --workflow pin-move
+
   pin-move:
+    needs: changes
+    # Runs when the pull request touches the generator, its pins, patches or native-ref (pin-move.py --detect then decides whether pins moved).
+    if: ${{ needs.changes.outputs.pin_move == 'true' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
@@ -129,3 +148,17 @@ jobs:
             !${{ runner.temp }}/pin-move-out/**/bin/**
           if-no-files-found: warn
           retention-days: 30
+
+  # The one required check of this workflow: red when the classifier or any job failed or was cancelled, green when every
+  # job succeeded or was skipped on purpose (a skipped required check would otherwise pass even when its dependency failed).
+  pin-move-gate:
+    name: pin-move-gate
+    if: ${{ always() }}
+    needs: [changes, pin-move]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Every needed job passed or was skipped on purpose
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped 'all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok' <<<$NEEDS

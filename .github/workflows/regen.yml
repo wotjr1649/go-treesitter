@@ -18,8 +18,26 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.action == 'synchronize' && github.run_attempt == 1 }}
 
 jobs:
+  changes:
+    name: regen-changes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      regen: ${{ steps.classify.outputs.regen }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          # A pull request is checked out as its merge commit; HEAD^1..HEAD is exactly the files the pull request changes.
+          fetch-depth: 2
+      - id: classify
+        name: Classify the changed files (tools/lane/ci_changes.py)
+        run: python3 tools/lane/ci_changes.py --workflow regen
+
   regen-grammar:
     name: regenerate ${{ matrix.lang }} and diff (ubuntu-24.04)
+    needs: changes
+    if: ${{ needs.changes.outputs.regen == 'true' }}
     strategy:
       fail-fast: false
       matrix:
@@ -90,13 +108,36 @@ jobs:
           git diff --exit-code --stat -- grammars/
           test -z "$(git status --porcelain -- grammars/)"
 
+  # Required check name kept until the ruleset requires regen-gate; skipped shards (docs-only and similar pull requests) pass.
   regen:
     name: regenerate and diff (ubuntu-24.04)
     if: ${{ always() }}
-    needs: regen-grammar
+    needs: [changes, regen-grammar]
     runs-on: ubuntu-24.04
     steps:
       - name: All grammar shards matched
         env:
-          RESULT: ${{ needs.regen-grammar.result }}
-        run: test "$RESULT" = success
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+          WANTED: ${{ needs.changes.outputs.regen }}
+        run: |
+          for r in $RESULTS; do
+            case "$r" in
+              success) ;;
+              skipped) [ "$WANTED" != true ] || { echo "grammar shards were skipped but are needed"; exit 1; } ;;
+              *) echo "a needed job ended $r"; exit 1 ;;
+            esac
+          done
+
+  # The one required check of this workflow: red when the classifier or any job failed or was cancelled, green when every
+  # job succeeded or was skipped on purpose (a skipped required check would otherwise pass even when its dependency failed).
+  regen-gate:
+    name: regen-gate
+    if: ${{ always() }}
+    needs: [changes, regen-grammar, regen]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Every needed job passed or was skipped on purpose
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped 'all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok' <<<$NEEDS

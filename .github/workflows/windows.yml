@@ -7,7 +7,23 @@
     "cancel-in-progress": "${{ github.event_name == 'pull_request' && github.event.action == 'synchronize' && github.run_attempt == 1 }}"
   },
   "jobs": {
+    "changes": {
+      "name": "windows-changes",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 5,
+      "outputs": {
+        "windows_product": "${{ steps.classify.outputs.windows_product }}",
+        "windows_licenses": "${{ steps.classify.outputs.windows_licenses }}",
+        "windows_race": "${{ steps.classify.outputs.windows_race }}"
+      },
+      "steps": [
+        {"uses": "actions/checkout@v7", "with": {"persist-credentials": false, "fetch-depth": 2}},
+        {"id": "classify", "name": "Classify the changed files (tools/lane/ci_changes.py)", "run": "python3 tools/lane/ci_changes.py --workflow windows"}
+      ]
+    },
     "product": {
+      "needs": "changes",
+      "if": "${{ needs.changes.outputs.windows_product == 'true' }}",
       "strategy": {"fail-fast": false, "matrix": {"include": [
         {"runner": "windows-latest", "arch": "amd64"},
         {"runner": "windows-11-arm", "arch": "arm64"}
@@ -31,6 +47,8 @@
       ]
     },
     "licenses": {
+      "needs": "changes",
+      "if": "${{ needs.changes.outputs.windows_licenses == 'true' }}",
       "runs-on": "windows-latest",
       "timeout-minutes": 5,
       "steps": [
@@ -39,6 +57,8 @@
       ]
     },
     "race": {
+      "needs": "changes",
+      "if": "${{ needs.changes.outputs.windows_race == 'true' }}",
       "runs-on": "windows-latest",
       "timeout-minutes": 15,
       "env": {"CGO_ENABLED": "1"},
@@ -47,6 +67,20 @@
         {"uses": "actions/setup-go@v7", "with": {"go-version": "1.27.x"}},
         {"name": "Race diagnostic toolchain", "run": "go env GOOS GOARCH CGO_ENABLED\ngcc --version"},
         {"name": "Race diagnostic (root package and engine)", "run": "go test -race . ./internal/engine -count=1 -timeout=600s"}
+      ]
+    },
+    "windows-gate": {
+      "name": "windows-gate",
+      "if": "${{ always() }}",
+      "needs": ["changes", "product", "licenses", "race"],
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 5,
+      "steps": [
+        {
+          "name": "Every needed job passed or was skipped on purpose",
+          "env": {"NEEDS": "${{ toJSON(needs) }}"},
+          "run": "jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped 'all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok' <<<$NEEDS"
+        }
       ]
     }
   }

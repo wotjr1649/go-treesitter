@@ -10,7 +10,25 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: api-guard-changes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      api_guard: ${{ steps.classify.outputs.api_guard }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          # A pull request is checked out as its merge commit; HEAD^1..HEAD is exactly the files the pull request changes.
+          fetch-depth: 2
+      - id: classify
+        name: Classify the changed files (tools/lane/ci_changes.py)
+        run: python3 tools/lane/ci_changes.py --workflow api-guard
+
   api-guard:
+    needs: changes
+    if: ${{ needs.changes.outputs.api_guard == 'true' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
@@ -50,3 +68,17 @@ jobs:
           fi
           # apidiff does not report a field added to or reordered in a struct that other packages can write as an unkeyed literal.
           go -C tools/apiguard run -mod=readonly ./structliterals "$baseline" "$GITHUB_WORKSPACE"
+
+  # The one required check of this workflow: red when the classifier or any job failed or was cancelled, green when every
+  # job succeeded or was skipped on purpose (a skipped required check would otherwise pass even when its dependency failed).
+  api-guard-gate:
+    name: api-guard-gate
+    if: ${{ always() }}
+    needs: [changes, api-guard]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Every needed job passed or was skipped on purpose
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped 'all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok' <<<$NEEDS
