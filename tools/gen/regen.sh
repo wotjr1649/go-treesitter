@@ -73,6 +73,8 @@ cd "$REPO"
 failed=()
 for lang in "${LANGS[@]}"; do
   echo "== $lang"
+  # gen creates $W/work/<lang>/patches with os.Mkdir: the half-done directory of the stopped run must go (a resumed language runs from scratch)
+  [ "${REGEN_RESUME:-}" != 1 ] || rm -rf -- "${W:?}/work/${lang:?}"
   rc=0
   "$GEN" -lang "$lang" -root tools/gen -src "$W/src" -dl "$W/dl" -sdk "$W/sdk" \
     -wasm2go "$W/bin/wasm2go$EXE" -wasm-opt "$W/binaryen/bin/wasm-opt$EXE" \

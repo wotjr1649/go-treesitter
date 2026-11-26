@@ -104,22 +104,34 @@ resume 1 'pinned archive' '' 'pinned archive' # without REGEN_RESUME a valid fil
 resume 1 'pinned archive' 0 'pinned archive'  # only the value 1 resumes
 echo "fetch resume checks passed"
 
-# regen.sh: a non-empty work directory is refused unless REGEN_RESUME=1. A stub go (the first command after the check) stops
-# the script with 77, so "accepted" means exit 77 and nothing is downloaded or built.
+# regen.sh: a non-empty work directory is refused unless REGEN_RESUME=1. A stub go builds a stub gen, which stops the script
+# with 77 on its first language (78 if that language's work directory exists), so "accepted" means exit 77 and nothing is
+# downloaded or built.
 bindir=$(mktemp -d) wd=$(mktemp -d)
 trap 'rm -rf -- "$bindir" "$wd"; rm -f -- "$work/calls" "$work/archive"; rmdir -- "$work"' EXIT
-printf '#!/usr/bin/env bash\ncase "$1" in env) echo linux ;; build) exit 77 ;; *) exit 99 ;; esac\n' >"$bindir/go"
-chmod +x "$bindir/go"
+printf '#!/usr/bin/env bash\ncase "$1" in env) echo linux ;; build) cp "%s" "$4" ;; *) exit 99 ;; esac\n' "$bindir/gen-stub" >"$bindir/go"
+cat >"$bindir/gen-stub" <<'EOF'
+#!/usr/bin/env bash
+# gen -plan prints nothing; gen -lang L -work D creates D/L like gen does (os.Mkdir) and stops
+for a in "$@"; do [ "$a" != -plan ] || exit 0; done
+while [ $# -gt 0 ]; do case "$1" in -lang) lang=$2 ;; -work) work=$2 ;; esac; shift; done
+[ ! -e "$work/$lang" ] || exit 78
+mkdir "$work/$lang"
+exit 77
+EOF
+chmod +x "$bindir/go" "$bindir/gen-stub"
 echo leftover >"$wd/stopped-run"
-regen() { PATH="$bindir:$PATH" REGEN_RESUME=$1 bash "$(dirname "$0")/regen.sh" "$wd" >"$work/regen.out" 2>&1 && return 0 || return $?; }
-check_regen() { # <want exit> <REGEN_RESUME value>
+regen() { PATH="$bindir:$PATH" REGEN_RESUME=$1 bash "$(dirname "$0")/regen.sh" "$wd" "${@:2}" >"$work/regen.out" 2>&1 && return 0 || return $?; }
+check_regen() { # <want exit> <REGEN_RESUME value> [lang ...]
   local status
-  if regen "$2"; then status=0; else status=$?; fi
+  if regen "$2" "${@:3}"; then status=0; else status=$?; fi
   [ "$status" = "$1" ] || { echo "regen.sh REGEN_RESUME='$2': exit $status, want $1" >&2; cat "$work/regen.out" >&2; exit 1; }
 }
 check_regen 1 ''
 check_regen 1 yes
 [ "$(ls -A "$wd")" = stopped-run ] # the refused runs created nothing
 check_regen 77 1
+mkdir -p "$wd/work/kotlin/patches" # a language stopped half-way: the resumed run starts it from scratch
+check_regen 77 1 kotlin
 rm -f -- "$work/regen.out"
 echo "regen resume checks passed"
