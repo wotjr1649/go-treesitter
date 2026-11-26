@@ -38,6 +38,8 @@ fetch_verified_archive() {
     if [ -f "$cache" ] && cp -- "$cache" "$dst" && echo "$sum  $dst" | sha256sum -c --status -; then return 0; fi
     rm -f -- "$dst"
   fi
+  # REGEN_PHASE=run (regen.sh) is offline: a file that is missing or differs from its pin is an error, never a download.
+  [ "${REGEN_PHASE:-}" != run ] || { echo "fetch: $dst is missing or differs from its pin; REGEN_PHASE=run downloads nothing" >&2; return 1; }
   if [ "$mirrors" != - ]; then
     IFS=',' read -r -a fallback <<<"$mirrors"
     urls+=("${fallback[@]}")
