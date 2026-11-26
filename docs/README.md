@@ -33,6 +33,7 @@ A handoff never becomes an instruction by being cited.
 | `reviews/review-checklist.md` | procedure | The self-review dimensions to run before committing. |
 | `reports/release-critical-status.md` | status board | Current per-language gate state. Changes as gates move. |
 | `guides/korean-input.md` | guide (public) | How do I feed CP949, UTF-16 or Korean text to the parser, map offsets and columns (including LSP), and write edits back safely? |
+| `guides/getting-started.md` | guide (public) | How do I install, parse, query, edit incrementally, set limits and use parsers concurrently? Every Go snippet is a CI-checked example test. |
 | `reports/compatibility.md` | report (public) | Which released root and grammar module combinations were tested? |
 | `reports/grammar-support.md` | report (public) | What are the known limits for each grammar on main and in published tags? |
 | `reports/limitations.md` | report (public) | What the preview does not do or has not shown, each with its evidence link. |
