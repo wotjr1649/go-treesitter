@@ -4,7 +4,6 @@ package typescript
 
 import (
 	_ "embed"
-	"encoding/binary"
 	"github.com/wotjr1649/go-treesitter/internal/engine"
 	"math"
 	"math/bits"
@@ -27,7 +26,10 @@ func New(v0 Xtsg, v1 Xwasi_snapshot_preview1) *Module {
 	m._tsg = v0
 	m._wasi_snapshot_preview1 = v1
 	m.t0 = make([]any, 34)
-	engine.InitMemory(&m.memory, 0x200000,
+	if !unalignedOK {
+		panic("guard pages need unaligned memory access")
+	}
+	engine.InitGuardedMemory(&m.memory, 0x200000,
 		engine.Segment{Dest: 65536, Data: data[0:2012492]},
 	)
 	m.elements = [][]any{{m.fn23, m.fn24, m.fn25, m.fn14, m.fn15, m.fn16, m.fn17, m.fn18, m.fn19, m.fn54, m.fn76, m.fn75, m.fn78, m.fn77, m.fn73, m.fn4, m.fn5, m.fn6, m.Xfree, m.fn94, m.fn96, m.fn97, m.Xfree, m.fn101, m.fn99, m.fn100, m.fn115, m.fn138, m.fn116, m.fn143, m.fn146, fn144, m.fn155}}
@@ -47,6 +49,9 @@ func New(v0 Xtsg, v1 Xwasi_snapshot_preview1) *Module {
 	}
 	return m
 }
+
+// Largest static offset in this module is 2078652; an access is at most 8 bytes. A smaller engine.GuardSize fails to compile.
+const _ = uint(engine.GuardSize - 2078660)
 
 const maxMem = 65536
 
@@ -509,7 +514,7 @@ func (m *Module) fn8(v0, v1 int32) int32 {
 	var v16, v17 int64
 	mem := m.memory
 	{
-		t0 := int32(mem[uint64(uint32(v0))+28])
+		t0 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+28)))
 		if t0 != 0 {
 			goto l0
 		}
@@ -546,7 +551,7 @@ func (m *Module) fn8(v0, v1 int32) int32 {
 				{
 					{
 						{
-							t10 := int32(mem[uint64(uint32(v12))])
+							t10 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v12)))))
 							var p11 int32
 							if t10&i32(1) != 0 {
 								p11 = i32(0)
@@ -610,7 +615,7 @@ func (m *Module) fn8(v0, v1 int32) int32 {
 											if v6&i32(1) != 0 {
 												goto l3
 											}
-											t30 := int32(mem[uint64(uint32(v6))+44])
+											t30 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+44)))
 											if t30&i32(64) == 0 {
 												goto l3
 											}
@@ -643,9 +648,9 @@ func (m *Module) fn8(v0, v1 int32) int32 {
 								p9 = t33
 								goto l7
 							}
-							t34 := int32(mem[uint64(uint32(v5))+6])
+							t34 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+6)))
 							v10 = v3 + t34
-							t35 := int32(mem[uint64(uint32(v5))+7])
+							t35 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+7)))
 							t36 := v10
 							v6 = t35
 							v2 = t36 + v6
@@ -750,7 +755,7 @@ func (m *Module) fn8(v0, v1 int32) int32 {
 							}
 						}
 						if uint32(v1) < uint32(v10) {
-							mem[uint64(uint32(v0))+28] = byte(i32(1))
+							*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+28)) = byte(i32(1))
 							return i32(1)
 						}
 						t65 := int32(load32(mem, uint64(uint32(v0))+24))
@@ -758,8 +763,8 @@ func (m *Module) fn8(v0, v1 int32) int32 {
 						return i32(1)
 					}
 				l8:
-					t66 := int32(mem[uint64(uint32(v5))+4])
-					t67 := int64(mem[uint64(uint32(v5))+5])
+					t66 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+4)))
+					t67 := int64(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+5)))
 					t68 := int32(int64(uint64(v16) >> 32))
 					v17 = t67 & i64(15)
 					p69 := t68
@@ -792,7 +797,7 @@ func (m *Module) fn9(v0 int32) {
 	var v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17 int32
 	mem := m.memory
 	{
-		t0 := int32(mem[uint64(uint32(v0))+28])
+		t0 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+28)))
 		if t0 == 0 {
 			t1 := int32(load32(mem, uint64(uint32(v0))+8))
 			v6 = t1
@@ -869,7 +874,7 @@ func (m *Module) fn9(v0 int32) {
 						if v5&i32(1) != 0 {
 							goto l3
 						}
-						t26 := int32(mem[uint64(uint32(v5))+44])
+						t26 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+44)))
 						if t26&i32(64) == 0 {
 							goto l3
 						}
@@ -888,7 +893,7 @@ func (m *Module) fn9(v0 int32) {
 								if v3&i32(1) != 0 {
 									goto l4
 								}
-								t30 := int32(mem[uint64(uint32(v3))+44])
+								t30 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+44)))
 								if t30&i32(64) == 0 {
 									goto l4
 								}
@@ -935,13 +940,13 @@ func (m *Module) fn9(v0 int32) {
 					t37 := int32(load32(mem, uint64(uint32(v8))))
 					v2 = t37
 					if v2&i32(1) != 0 {
-						t38 := int32(mem[uint64(uint32(v8))+7])
+						t38 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8))+7)))
 						v10 = t38
-						t39 := int32(mem[uint64(uint32(v8))+6])
+						t39 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8))+6)))
 						v11 = v10 + t39
-						t40 := int32(mem[uint64(uint32(v8))+4])
+						t40 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8))+4)))
 						v12 = t40
-						t41 := int32(mem[uint64(uint32(v8))+5])
+						t41 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8))+5)))
 						t42 := t41 & i32(15)
 						p36 = t42
 						goto l9
@@ -1076,7 +1081,7 @@ func (m *Module) fn9(v0 int32) {
 						t85 := int32(load32(mem, uint64(uint32(v2))))
 						v1 = t85
 						if v1&i32(1) != 0 {
-							t86 := int32(mem[uint64(uint32(v2))+6])
+							t86 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+6)))
 							p84 = t86
 							goto l13
 						}
@@ -1085,7 +1090,7 @@ func (m *Module) fn9(v0 int32) {
 					}
 				l13:
 					if p84 != 0 {
-						mem[uint64(uint32(v0))+28] = byte(i32(1))
+						*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+28)) = byte(i32(1))
 						return
 					}
 					goto l14
@@ -1096,7 +1101,7 @@ func (m *Module) fn9(v0 int32) {
 			}
 			return
 		}
-		mem[uint64(uint32(v0))+28] = byte(i32(0))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+28)) = byte(i32(0))
 		{
 			var p89 int32
 			{
@@ -1230,20 +1235,20 @@ func (m *Module) fn10(v0, v1, v2 int32) int32 {
 		l1:
 			t17 := int32(load32(mem, uint64(uint32(v0))+52))
 			v0 = t17 + v3&i32(0xffff)<<3
-			t18 := int32(mem[uint64(uint32(v0))])
+			t18 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 			v2 = t18
 			if v2 == 0 {
 				goto l0
 			}
 			v0 = v0 + v2<<3
-			t19 := int32(mem[uint64(uint32(v0))])
+			t19 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 			if t19 != 0 {
 				goto l0
 			}
 			t20 := v1
 			v0 = v0 + i32(8)
 			t21 := int32(load16(mem, uint64(uint32(v0-i32(6)))))
-			t22 := int32(mem[uint64(uint32(v0-i32(4)))])
+			t22 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0-i32(4))))))
 			p23 := t21
 			if t22&i32(1) != 0 {
 				p23 = t20
@@ -1366,12 +1371,12 @@ func (m *Module) fn12(v0, v1, v2, v3 int32) int32 {
 				}
 				t4 := int32(load32(mem, uint64(uint32(v0))+72))
 				v4 = t4 + v6
-				t5 := int32(mem[uint64(uint32(v4-i32(2)))])
-				t6 := int32(mem[uint64(uint32(v4))])
+				t5 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4-i32(2))))))
+				t6 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4)))))
 				if (t5|t6)&i32(1) == 0 {
 					goto l2
 				}
-				t7 := int32(mem[uint64(uint32(v4-i32(1)))])
+				t7 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4-i32(1))))))
 				if t7 != v3 {
 					goto l2
 				}
@@ -1433,7 +1438,7 @@ func (m *Module) fn13(v0, v1, v2 int32) int32 {
 			default:
 				goto l2
 			case 1:
-				t5 := int32(mem[uint64(uint32(v0+v2))])
+				t5 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0+v2)))))
 				if t5 != 0 {
 					goto l2
 				}
@@ -1508,9 +1513,9 @@ func (m *Module) fn17(v0 int32) int32 {
 	v4 = t0 - i32(16)
 	m.g0 = v4
 	mem := m.memory
-	mem[uint64(uint32(v0))+120] = byte(i32(1))
+	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+120)) = byte(i32(1))
 	{
-		t1 := int32(mem[uint64(uint32(v0))+128])
+		t1 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+128)))
 		if t1 != 0 {
 			goto l0
 		}
@@ -1524,7 +1529,7 @@ func (m *Module) fn17(v0 int32) int32 {
 		v3 = t5
 		if v2 != 0 {
 			store32(mem, uint64(uint32(v0))+124, uint32(i32(0)))
-			mem[uint64(uint32(v0))+128] = byte(i32(0))
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+128)) = byte(i32(0))
 		}
 		v9 = v0 + i32(36)
 		store32(mem, uint64(uint32(v0))+40, uint32(i32(0)))
@@ -1602,7 +1607,7 @@ func (m *Module) fn17(v0 int32) int32 {
 			store32(mem, uint64(uint32(v0))+112, uint32(i32(0)))
 		}
 	l2:
-		mem[uint64(uint32(v0))+128] = byte(i32(1))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+128)) = byte(i32(1))
 		store32(mem, uint64(uint32(v0)), uint32(i32(0)))
 		store32(mem, uint64(uint32(v0))+116, uint32(v2))
 		store32(mem, uint64(uint32(v0))+124, uint32(i32(0)))
@@ -1778,12 +1783,12 @@ func (m *Module) fn19(v0, v1 int32) {
 				goto l2
 			}
 			t25 := int32(load32(mem, uint64(uint32(v0))+72))
-			t26 := int32(int8(mem[uint64(uint32(t25+(v2-v3)))]))
+			t26 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t25+(v2-v3)))))))
 			v3 = t26
 			if v3 < i32(0) {
 				goto l2
 			}
-			t27 := int32(mem[uint64(uint32(v0))+128])
+			t27 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+128)))
 			if t27 == i32(1) {
 				t28 := int32(load32(mem, uint64(uint32(v0))+124))
 				store32(mem, uint64(uint32(v0))+124, uint32(t28+i32(1)))
@@ -1826,7 +1831,7 @@ func (m *Module) fn20(v0, v1 int32) {
 			t3 := int32(load32(mem, uint64(uint32(v0))))
 			v4 = t3
 			if v4 == i32(10) {
-				mem[uint64(uint32(v0))+128] = byte(i32(1))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+128)) = byte(i32(1))
 				store32(mem, uint64(uint32(v0))+40, uint32(i32(0)))
 				store32(mem, uint64(uint32(v0))+124, uint32(i32(0)))
 				t4 := int32(load32(mem, uint64(uint32(v0))+36))
@@ -1849,7 +1854,7 @@ func (m *Module) fn20(v0, v1 int32) {
 				if p7&p8 != 0 {
 					goto l2
 				}
-				t9 := int32(mem[uint64(uint32(v0))+128])
+				t9 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+128)))
 				if t9 != i32(1) {
 					goto l2
 				}
@@ -1975,7 +1980,7 @@ func (m *Module) fn21(v0 int32) {
 			case 1:
 				goto l2
 			case 0:
-				t7 := int32(int8(mem[uint64(uint32(v2))]))
+				t7 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))))))
 				v3 = t7
 				if v3 < i32(0) {
 					v3 = i32(2)
@@ -2056,7 +2061,7 @@ func (m *Module) fn22(v0 int32) {
 	v1 = t0 - i32(16)
 	m.g0 = v1
 	mem := m.memory
-	mem[uint64(uint32(v0))+120] = byte(i32(0))
+	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+120)) = byte(i32(0))
 	store16(mem, uint64(uint32(v0))+4, uint16(i32(0)))
 	t1 := int32(load32(mem, uint64(uint32(v0))+40))
 	store32(mem, uint64(uint32(v0))+52, uint32(t1))
@@ -2114,7 +2119,7 @@ func (m *Module) fn22(v0 int32) {
 			mem = m.memory
 		}
 		store32(mem, uint64(uint32(v0))+124, uint32(i32(0)))
-		mem[uint64(uint32(v0))+128] = byte(i32(1))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+128)) = byte(i32(1))
 	}
 l0:
 	m.g0 = v1 + i32(16)
@@ -2156,7 +2161,7 @@ l0:
 func (m *Module) fn24(v0, v1, v2 int32) int32 {
 	var v3, v4, v5, v6 int32
 	mem := m.memory
-	t0 := int32(int8(mem[uint64(uint32(v0))]))
+	t0 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))))))
 	t1 := v2
 	v3 = t0
 	v4 = v3 & i32(255)
@@ -2174,8 +2179,8 @@ func (m *Module) fn24(v0, v1, v2 int32) int32 {
 							t2 := v2
 							v4 = v4 & i32(15)
 							store32(mem, uint64(uint32(t2)), uint32(v4))
-							t3 := int32(mem[uint64(uint32(v4))+72328])
-							t4 := int32(mem[uint64(uint32(v0))+1])
+							t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+72328)))
+							t4 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+1)))
 							v3 = t4
 							if i32_shr_u(t3, int32(uint32(v3)>>5))&i32(1) == 0 {
 								goto l0
@@ -2190,9 +2195,9 @@ func (m *Module) fn24(v0, v1, v2 int32) int32 {
 						if uint32(v3) > uint32(i32(-12)) {
 							goto l0
 						}
-						t6 := int32(mem[uint64(uint32(v0))+1])
+						t6 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+1)))
 						v3 = t6
-						t7 := int32(int8(mem[uint64(uint32(int32(uint32(v3)>>4)))+73048]))
+						t7 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(int32(uint32(v3)>>4)))+73048))))
 						if i32_shr_u(t7, v4)&i32(1) == 0 {
 							goto l0
 						}
@@ -2204,7 +2209,7 @@ func (m *Module) fn24(v0, v1, v2 int32) int32 {
 							goto l0
 						}
 						v3 = i32(3)
-						t9 := int32(mem[uint64(uint32(v0))+2])
+						t9 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+2)))
 						v6 = t9 ^ i32(-128)
 						if uint32(v6&i32(255)) > uint32(i32(63)) {
 							goto l0
@@ -2230,7 +2235,7 @@ func (m *Module) fn24(v0, v1, v2 int32) int32 {
 				v3 = i32(1)
 			}
 		l2:
-			t13 := int32(mem[uint64(uint32(v0+v3))])
+			t13 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0+v3)))))
 			v0 = (t13 ^ i32(-128)) & i32(255)
 			if uint32(v0) <= uint32(i32(63)) {
 				store32(mem, uint64(uint32(v2)), uint32(v4<<6|v0))
@@ -2370,7 +2375,7 @@ l0:
 				p9 = t12
 				goto l1
 			}
-			t13 := int32(mem[uint64(uint32(v0))+45])
+			t13 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+45)))
 			if t13&i32(2) != 0 {
 				p9 = i32(610)
 				goto l1
@@ -2452,11 +2457,11 @@ func (m *Module) fn31(v0, v1 int32) {
 		t1 := int32(load32(mem, uint64(uint32(v1))))
 		v2 = t1
 		if v2&i32(1) != 0 {
-			t2 := int32(mem[uint64(uint32(v1))+5])
+			t2 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+5)))
 			v3 = t2 & i32(15)
-			t3 := int32(mem[uint64(uint32(v1))+4])
+			t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+4)))
 			v4 = t3
-			t4 := int32(mem[uint64(uint32(v1))+6])
+			t4 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+6)))
 			p0 = t4
 			goto l0
 		}
@@ -2600,11 +2605,11 @@ func (m *Module) fn32(v0, v1, v2 int32) {
 												var p29 int32
 												{
 													if v16 != 0 {
-														t30 := int32(mem[uint64(uint32(v7+i32(4)))])
+														t30 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v7+i32(4))))))
 														v14 = t30
-														t31 := int32(mem[uint64(uint32(v7+i32(6)))])
+														t31 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v7+i32(6))))))
 														v19 = t31
-														t32 := int32(mem[uint64(uint32(v7+i32(5)))])
+														t32 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v7+i32(5))))))
 														t33 := t32 & i32(15)
 														p29 = t33
 														goto l8
@@ -2634,7 +2639,7 @@ func (m *Module) fn32(v0, v1, v2 int32) {
 											var p38 int32
 											{
 												if v16 != 0 {
-													t39 := int32(mem[uint64(uint32(v7+i32(7)))])
+													t39 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v7+i32(7))))))
 													t40 := v6
 													v14 = t39
 													v6 = t40 + v14
@@ -2663,7 +2668,7 @@ func (m *Module) fn32(v0, v1, v2 int32) {
 												v8 = v9
 												goto l10
 											}
-											t48 := int32(mem[uint64(uint32(v9))+2])
+											t48 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v9))+2)))
 											if uint32(t48) > uint32(v11-i32(1)) {
 												v7 = v7 + i32(8)
 												t49 := v15
@@ -2674,7 +2679,7 @@ func (m *Module) fn32(v0, v1, v2 int32) {
 												goto l11
 											}
 										}
-										t50 := int32(mem[uint64(uint32(v9))+3])
+										t50 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v9))+3)))
 										if t50 == i32(1) {
 											if v8 == v17 {
 												goto l12
@@ -2816,11 +2821,11 @@ func (m *Module) fn32(v0, v1, v2 int32) {
 																	var p88 int32
 																	{
 																		if v16 != 0 {
-																			t89 := int32(mem[uint64(uint32(v6))+4])
+																			t89 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+4)))
 																			v1 = t89
-																			t90 := int32(mem[uint64(uint32(v6))+6])
+																			t90 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+6)))
 																			v0 = t90
-																			t91 := int32(mem[uint64(uint32(v6))+5])
+																			t91 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+5)))
 																			t92 := t91 & i32(15)
 																			p88 = t92
 																			goto l19
@@ -2851,7 +2856,7 @@ func (m *Module) fn32(v0, v1, v2 int32) {
 																		{
 																			if v16 != 0 {
 																				v10 = v10 + i32(1)
-																				t99 := int32(mem[uint64(uint32(v6))+7])
+																				t99 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+7)))
 																				t100 := v1
 																				v8 = t99
 																				v4 = t100 + v8
@@ -3021,7 +3026,7 @@ func (m *Module) fn33(v0, v1 int32) {
 	var v9 int64
 	mem := m.memory
 	{
-		t0 := int32(mem[uint64(uint32(v1))])
+		t0 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 		if t0&i32(1) != 0 {
 			return
 		}
@@ -3185,7 +3190,7 @@ func (m *Module) fn33(v0, v1 int32) {
 					goto l5
 				}
 				{
-					t44 := int32(mem[uint64(uint32(v4))+44])
+					t44 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+44)))
 					if t44&i32(64) == 0 {
 						goto l6
 					}
@@ -3426,7 +3431,7 @@ l0:
 	t6 := int32(load32(mem, uint64(uint32(v0))+32))
 	if t6 != 0 {
 		store32(mem, uint64(uint32(v0))+124, uint32(i32(0)))
-		mem[uint64(uint32(v0))+128] = byte(i32(0))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+128)) = byte(i32(0))
 		store64(mem, uint64(uint32(v0))+36, uint64(i64(0)))
 		store32(mem, uint64(uint32(v0))+32, uint32(i32(0)))
 		t7 := int32(load32(mem, uint64(uint32(v0))+68))
@@ -3526,7 +3531,7 @@ l0:
 		mem = m.memory
 		store64(mem, uint64(uint32(v0))+1204, uint64(i64(0)))
 	}
-	mem[uint64(uint32(v0))+1350] = byte(i32(0))
+	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+1350)) = byte(i32(0))
 	store32(mem, uint64(uint32(v0))+1296, uint32(i32(0)))
 	store16(mem, uint64(uint32(v0))+1348, uint16(i32(0)))
 	store64(mem, uint64(uint32(v0))+1332, uint64(i64(0)))
@@ -3680,7 +3685,7 @@ func (m *Module) fn37(v0 int32) {
 		{
 			{
 				{
-					t3 := int32(mem[uint64(uint32(v1))])
+					t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 					v2 = t3
 					if v2 == i32(34) {
 						goto l1
@@ -3700,7 +3705,7 @@ func (m *Module) fn37(v0 int32) {
 				t5 := int32(load32(mem, uint64(uint32(v0))+1292))
 				m.fn150(i32(92), t5)
 				mem = m.memory
-				t6 := int32(mem[uint64(uint32(v1))])
+				t6 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 				v2 = t6
 			}
 		l2:
@@ -3723,8 +3728,8 @@ func (m *Module) fn38(v0, v1, v2, v3, v4 int32) {
 		t2 := int32(load32(mem, uint64(uint32(v0))))
 		v6 = t2
 		if v6&i32(1) != 0 {
-			t3 := int32(mem[uint64(uint32(v0))+6])
-			t4 := int32(mem[uint64(uint32(v0))+7])
+			t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+6)))
+			t4 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+7)))
 			v7 = t3 + t4
 			p5 := int32(uint32(v6&i32(0xff00)) >> 8)
 			if v3 != 0 {
@@ -3830,7 +3835,7 @@ l2:
 					p25 = i32(0)
 					goto l4
 				}
-				t29 := int32(mem[uint64(uint32(v0))+5])
+				t29 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+5)))
 				v9 = int32(uint32(t29) >> 4)
 				v7 = int32(uint32(v3)>>7) & i32(1)
 				v10 = int32(uint32(v3)>>4) & i32(1)
@@ -3952,8 +3957,8 @@ l6:
 				t50 := int32(load32(mem, uint64(uint32(v3))))
 				v9 = t50
 				if v9&i32(1) != 0 {
-					t51 := int32(mem[uint64(uint32(v3+i32(6)))])
-					t52 := int32(mem[uint64(uint32(v3+i32(7)))])
+					t51 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3+i32(6))))))
+					t52 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3+i32(7))))))
 					t53 := t51 + t52
 					p49 = t53
 					goto l10
@@ -3998,7 +4003,7 @@ func (m *Module) fn39(v0 int32) {
 		t6 := int32(load32(mem, uint64(uint32(v3))+16))
 		t7 := int32(load32(mem, uint64(uint32(v3))+4))
 		v9 = t6 + t7
-		t8 := int32(mem[uint64(uint32(v3))+44])
+		t8 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+44)))
 		if t8&i32(64) == 0 {
 			goto l0
 		}
@@ -4015,7 +4020,7 @@ func (m *Module) fn39(v0 int32) {
 				if v6&i32(1) != 0 {
 					goto l1
 				}
-				t11 := int32(mem[uint64(uint32(v6))+44])
+				t11 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+44)))
 				if t11&i32(64) == 0 {
 					goto l1
 				}
@@ -4205,7 +4210,7 @@ func (m *Module) fn40(v0, v1 int32) int32 {
 									v10 = int32(uint32(v6&i32(0xff00)) >> 8)
 									goto l3
 								l1:
-									t24 := int32(mem[uint64(uint32(v6))+44])
+									t24 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+44)))
 									if t24&i32(4) != 0 {
 										goto l2
 									}
@@ -4360,7 +4365,7 @@ func (m *Module) fn41(v0, v1, v2, v3 int32) int32 {
 	var p1 int32
 	mem := m.memory
 	{
-		t2 := int32(mem[uint64(uint32(v2))])
+		t2 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 		v8 = t2
 		if v8&i32(1) == 0 {
 			t3 := int32(load32(mem, uint64(uint32(v2))))
@@ -4383,7 +4388,7 @@ func (m *Module) fn41(v0, v1, v2, v3 int32) int32 {
 			p1 = t9
 			goto l0
 		}
-		t10 := int32(mem[uint64(uint32(v2))+1])
+		t10 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+1)))
 		v9 = t10
 		p1 = v2 + i32(2)
 	}
@@ -4478,7 +4483,7 @@ l1:
 			t40 := int32(load32(mem, uint64(uint32(v2))))
 			v0 = t40
 			if v0&i32(1) != 0 {
-				t41 := int32(mem[uint64(uint32(v2))+7])
+				t41 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+7)))
 				p39 = t41
 				goto l4
 			}
@@ -4503,7 +4508,7 @@ l1:
 		if t45 != 0 {
 			goto l2
 		}
-		t46 := int32(mem[uint64(uint32(v3))+8])
+		t46 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+8)))
 		v0 = t46
 	}
 l2:
@@ -4524,9 +4529,9 @@ func (m *Module) fn42(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10 int32) {
 		default:
 			t1 := int32(load32(mem, uint64(uint32(v10))+72))
 			v10 = t1 + v2*i32(3)
-			t2 := int32(mem[uint64(uint32(v10))+1])
+			t2 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v10))+1)))
 			v13 = t2
-			t3 := int32(mem[uint64(uint32(v10))])
+			t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v10)))))
 			v12 = t3
 			var p4 int32
 			if v2 == 0 {
@@ -4570,12 +4575,12 @@ func (m *Module) fn42(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10 int32) {
 			if uint32(t10) > uint32(i32(254)) {
 				goto l1
 			}
-			mem[uint64(uint32(v0))+7] = byte(v17)
-			mem[uint64(uint32(v0))+6] = byte(v10)
-			mem[uint64(uint32(v0))+4] = byte(v16)
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+7)) = byte(v17)
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+6)) = byte(v10)
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+4)) = byte(v16)
 			store16(mem, uint64(uint32(v0))+2, uint16(v6))
-			mem[uint64(uint32(v0))+1] = byte(v2)
-			mem[uint64(uint32(v0))+5] = byte(v15&i32(15) | v5<<4)
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+1)) = byte(v2)
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+5)) = byte(v15&i32(15) | v5<<4)
 			t12 := v0
 			t13 := v13 << 2
 			p11 := i32(8)
@@ -4592,7 +4597,7 @@ func (m *Module) fn42(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10 int32) {
 			if v8 != 0 {
 				p16 = i32(-128)
 			}
-			mem[uint64(uint32(t12))] = byte(t17 | p16 + v12<<1 | i32(1))
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t12)))) = byte(t17 | p16 + v12<<1 | i32(1))
 			goto l3
 		case 0:
 			v12 = i32(0)
@@ -4892,7 +4897,7 @@ func (m *Module) fn44(v0, v1, v2 int32) {
 	m.g0 = v5
 	mem := m.memory
 	{
-		t1 := int32(mem[uint64(uint32(v2))])
+		t1 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 		if t1&i32(1) != 0 {
 			t2 := int64(load64(mem, uint64(uint32(v2))))
 			store64(mem, uint64(uint32(v0)), uint64(t2))
@@ -4941,7 +4946,7 @@ func (m *Module) fn44(v0, v1, v2 int32) {
 				}
 				goto l2
 			}
-			t16 := int32(mem[uint64(uint32(v3))+44])
+			t16 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+44)))
 			if t16&i32(64) == 0 {
 				goto l2
 			}
@@ -5030,9 +5035,9 @@ l0:
 	store32(mem, uint64(uint32(v0))+160, uint32(i32(0)))
 	var p10 int32
 	if v1 != 0 {
-		mem[uint64(uint32(v0))+31] = byte(i32(0))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+31)) = byte(i32(0))
 		store16(mem, uint64(uint32(v0))+29, uint16(i32(0)))
-		mem[uint64(uint32(v0))+28] = byte(v3)
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+28)) = byte(v3)
 		store64(mem, uint64(uint32(v0))+20, uint64(v5))
 		store32(mem, uint64(uint32(v0))+16, uint32(v1))
 		store16(mem, uint64(uint32(v0))+144, uint16(i32(1)))
@@ -5060,7 +5065,7 @@ l0:
 			goto l2
 		}
 		v3 = i32(610)
-		t19 := int32(mem[uint64(uint32(v2))+45])
+		t19 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+45)))
 		t21 := v1
 		var p20 int32
 		if t19&i32(2) != 0 {
@@ -5435,9 +5440,9 @@ func (m *Module) fn46(v0, v1, v2, v3, v4, v5, v6, v7 int32) int32 {
 						t63 := v8 + i32(152)
 						var p62 int32
 						{
-							t64 := int32(mem[uint64(uint32(v8))+144])
+							t64 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8))+144)))
 							if t64&i32(1) != 0 {
-								t65 := int32(mem[uint64(uint32(v8))+145])
+								t65 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8))+145)))
 								p62 = t65
 								goto l11
 							}
@@ -5895,7 +5900,7 @@ func (m *Module) fn48(v0, v1, v2 int32) {
 					v2 = i32(0)
 				l5:
 					{
-						t36 := int32(int8(mem[uint64(uint32(v2+v5))]))
+						t36 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2+v5))))))
 						store32(mem, uint64(uint32(v3))+96, uint32(t36))
 						m.fn148(v6, i32(71602), v3+i32(96))
 						mem = m.memory
@@ -6082,7 +6087,7 @@ l22:
 					{
 						t74 := int32(load32(mem, uint64(uint32(v4-i32(8)))))
 						v2 = t74
-						t75 := int32(mem[uint64(uint32(v4))])
+						t75 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4)))))
 						t76 := int32(load32(mem, uint64(uint32(v4-i32(12)))))
 						t77 := v3
 						v16 = t76
@@ -6165,7 +6170,7 @@ l22:
 							var p91 int32
 							if v8 == 0 {
 								v7 = i32(610)
-								t93 := int32(mem[uint64(uint32(v2))+45])
+								t93 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+45)))
 								if t93&i32(2) == 0 {
 									t94 := int32(load32(mem, uint64(uint32(v2))+32))
 									v7 = t94
@@ -6375,7 +6380,7 @@ func (m *Module) fn49(v0, v1, v2 int32) {
 								v5 = i32(0)
 								goto l2
 							}
-							t13 := int32(mem[uint64(uint32(v10))+44])
+							t13 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v10))+44)))
 							if t13&i32(4) != 0 {
 								goto l1
 							}
@@ -6613,7 +6618,7 @@ l0:
 		if v17 == 0 {
 			goto l1
 		}
-		t15 := int32(mem[uint64(uint32(v2))])
+		t15 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 		if t15&i32(1) == 0 {
 			t16 := int32(load32(mem, uint64(uint32(v2))))
 			t17 := int32(load16(mem, uint64(uint32(t16))+40))
@@ -6683,9 +6688,9 @@ l0:
 				}
 				var p32 int32
 				{
-					t33 := int32(mem[uint64(uint32(v2))])
+					t33 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 					if t33&i32(1) != 0 {
-						t34 := int32(mem[uint64(uint32(v2))+1])
+						t34 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+1)))
 						p32 = t34
 						goto l5
 					}
@@ -6883,7 +6888,7 @@ l0:
 									if t76 != i32(0xffff) {
 										goto l13
 									}
-									mem[uint64(uint32(v4))+296] = byte(i32(0))
+									*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+296)) = byte(i32(0))
 									m.fn55(v4+i32(320), v9, v5, i32(14), v4+i32(296), i32(1))
 									mem = m.memory
 									t77 := int32(load32(mem, uint64(uint32(v4))+324))
@@ -7344,10 +7349,10 @@ l1:
 	{
 		var p186 int32
 		{
-			t187 := int32(mem[uint64(uint32(v2))])
+			t187 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 			v8 = t187
 			if v8&i32(1) != 0 {
-				t188 := int32(mem[uint64(uint32(v2))+1])
+				t188 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+1)))
 				p186 = t188
 				goto l30
 			}
@@ -7460,7 +7465,7 @@ l1:
 			if v8&i32(1) != 0 {
 				goto l33
 			}
-			t221 := int32(mem[uint64(uint32(v5))+44])
+			t221 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+44)))
 			if t221&i32(128) == 0 {
 				goto l33
 			}
@@ -7477,10 +7482,10 @@ l1:
 		var p224 int32
 		{
 			if v5&i32(1) != 0 {
-				t225 := int32(mem[uint64(uint32(v2))+6])
-				t226 := int32(mem[uint64(uint32(v2))+7])
+				t225 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+6)))
+				t226 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+7)))
 				v6 = t225 + t226
-				t227 := int32(mem[uint64(uint32(v2))+5])
+				t227 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+5)))
 				t228 := t227 & i32(15)
 				p224 = t228
 				goto l34
@@ -7591,17 +7596,17 @@ l1:
 		{
 			t255 := int32(load32(mem, uint64(uint32(v10))+52))
 			v3 = t255 + v3&i32(0xffff)<<3
-			t256 := int32(mem[uint64(uint32(v3))])
+			t256 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3)))))
 			v7 = t256
 			if v7 == 0 {
 				goto l41
 			}
 			v3 = v3 + v7<<3
-			t257 := int32(mem[uint64(uint32(v3))])
+			t257 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3)))))
 			if t257 != 0 {
 				goto l41
 			}
-			t258 := int32(mem[uint64(uint32(v3+i32(4)))])
+			t258 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3+i32(4))))))
 			if t258 != i32(1) {
 				goto l41
 			}
@@ -7610,10 +7615,10 @@ l1:
 			m.fn44(v4+i32(320), v0+i32(1160), v4+i32(96))
 			mem = m.memory
 			{
-				t260 := int32(mem[uint64(uint32(v4))+320])
+				t260 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+320)))
 				v3 = t260
 				if v3&i32(1) != 0 {
-					mem[uint64(uint32(v4))+320] = byte(v3 | i32(8))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+320)) = byte(v3 | i32(8))
 					goto l42
 				}
 				t261 := int32(load32(mem, uint64(uint32(v4))+320))
@@ -7902,7 +7907,7 @@ l1:
 				v29 = t337
 				store64(mem, uint64(uint32(t338))+232, uint64(v29))
 				store64(mem, uint64(uint32(v4))+200, uint64(v29))
-				t339 := int32(mem[uint64(uint32(v2))])
+				t339 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 				t340 := int32(load32(mem, uint64(uint32(v0))+1156))
 				store64(mem, uint64(uint32(v4))+56, uint64(v29))
 				m.fn45(t340, v1, v4+i32(56), i32(0), i32(0))
@@ -7914,7 +7919,7 @@ l1:
 		l47:
 			t341 := int32(load32(mem, uint64(uint32(v2))))
 			v8 = t341
-			t342 := int32(mem[uint64(uint32(v8))+44])
+			t342 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8))+44)))
 			if t342&i32(64) == 0 {
 				goto l48
 			}
@@ -7935,7 +7940,7 @@ l1:
 					if v2&i32(1) != 0 {
 						goto l54
 					}
-					t347 := int32(mem[uint64(uint32(v2))+44])
+					t347 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+44)))
 					if t347&i32(64) == 0 {
 						goto l54
 					}
@@ -8029,7 +8034,7 @@ l1:
 			p356 = i32(1)
 		}
 	l60:
-		mem[uint64(uint32(t357))+1350] = byte(p356)
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t357))+1350)) = byte(p356)
 	}
 l32:
 	m.g0 = v4 + i32(352)
@@ -8157,7 +8162,7 @@ func (m *Module) fn52(v0, v1, v2 int32) int32 {
 					p16 = i32(73020)
 					goto l1
 				}
-				t18 := int32(mem[uint64(uint32(v3))+44])
+				t18 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+44)))
 				if t18&i32(64) == 0 {
 					p16 = i32(73020)
 					goto l1
@@ -8180,7 +8185,7 @@ func (m *Module) fn52(v0, v1, v2 int32) int32 {
 				if v4&i32(1) != 0 {
 					goto l2
 				}
-				t22 := int32(mem[uint64(uint32(v4))+44])
+				t22 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+44)))
 				if t22&i32(64) == 0 {
 					goto l2
 				}
@@ -8397,7 +8402,7 @@ func (m *Module) fn53(v0, v1, v2 int32) int32 {
 							t28 := int32(load32(mem, uint64(uint32(v7))+52))
 							v3 = t28 + v4&i32(0xffff)<<3
 							v6 = v3 + i32(8)
-							t29 := int32(mem[uint64(uint32(v3))])
+							t29 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3)))))
 							v3 = t29
 						}
 						t30 := m.fn91(v0, v6, v3)
@@ -8507,7 +8512,7 @@ func (m *Module) fn53(v0, v1, v2 int32) int32 {
 									t53 := int32(load16(mem, uint64(uint32(v3))))
 									v3 = t52 + t53<<3
 									v19 = v3 + i32(8)
-									t54 := int32(mem[uint64(uint32(v3))])
+									t54 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3)))))
 									v10 = t54
 									t55 := v5
 									p42 = t55
@@ -8802,7 +8807,7 @@ func (m *Module) fn55(v0, v1, v2, v3, v4, v5 int32) {
 	store32(mem, uint64(uint32(v1))+28, uint32(i32(0)))
 	store32(mem, uint64(uint32(v1))+16, uint32(i32(0)))
 	t1 := int32(load32(mem, uint64(uint32(v1))))
-	mem[uint64(uint32(v13))+46] = byte(i32(0))
+	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v13))+46)) = byte(i32(0))
 	store16(mem, uint64(uint32(v13))+44, uint16(i32(0)))
 	t2 := int32(load32(mem, uint64(uint32(t1+v2<<5))))
 	v11 = t2
@@ -8871,13 +8876,13 @@ l1:
 	}
 	store32(mem, uint64(uint32(t7))+28, uint32(p10))
 	v6 = v7 + v6*i32(24)
-	mem[uint64(uint32(v6))+20] = byte(i32(1))
+	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+20)) = byte(i32(1))
 	store32(mem, uint64(uint32(v1))+24, uint32(v7))
 	store32(mem, uint64(uint32(v6))+16, uint32(i32(0)))
 	store32(mem, uint64(uint32(v6))+12, uint32(v8))
 	store32(mem, uint64(uint32(v6))+8, uint32(i32(0)))
-	t19 := int32(mem[uint64(uint32(v13))+46])
-	mem[uint64(uint32(v6))+23] = byte(t19)
+	t19 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v13))+46)))
+	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+23)) = byte(t19)
 	t20 := int32(load16(mem, uint64(uint32(v13))+44))
 	store16(mem, uint64(uint32(v6))+21, uint16(t20))
 	store32(mem, uint64(uint32(v6))+4, uint32(v12))
@@ -9310,7 +9315,7 @@ l1:
 								t111 := v6
 								v9 = v7
 								if t111 == v9 {
-									t112 := int32(mem[uint64(uint32(v14))+28])
+									t112 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v14))+28)))
 									v16 = t112
 									t113 := int32(load32(mem, uint64(uint32(v14))+24))
 									v12 = t113
@@ -9329,7 +9334,7 @@ l1:
 									goto l23
 								}
 								v2 = v19 + v9<<4
-								t119 := int32(mem[uint64(uint32(v2))+12])
+								t119 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+12)))
 								v16 = t119
 								t120 := int32(load32(mem, uint64(uint32(v2))+8))
 								v12 = t120
@@ -9550,7 +9555,7 @@ l1:
 								}
 							}
 						l30:
-							mem[uint64(uint32(v6))+20] = byte(i32(0))
+							*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+20)) = byte(i32(0))
 						}
 					l23:
 						v7 = v9 + i32(1)
@@ -9599,7 +9604,7 @@ func (m *Module) fn56(v0, v1, v2 int32) {
 l9:
 	{
 		{
-			t2 := int32(m.memory[uint64(uint32(v3))])
+			t2 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(m.memory)), uint64(uint32(v3)))))
 			v0 = t2
 			switch v0 {
 			case 34:
@@ -9627,7 +9632,7 @@ l9:
 		}
 	l7:
 		m.fn150(i32(92), v1)
-		t3 := int32(int8(m.memory[uint64(uint32(v3))]))
+		t3 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(m.memory)), uint64(uint32(v3))))))
 		m.fn150(t3, v1)
 		v3 = v3 + i32(1)
 		goto l9
@@ -9637,7 +9642,7 @@ func (m *Module) fn57(v0 int32) int32 {
 	var v1, v2, v3, v4, v5, v6, v7 int32
 	mem := m.memory
 	t0 := int32(load32(mem, uint64(uint32(v0))))
-	t1 := int32(mem[uint64(uint32(v0))+16])
+	t1 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+16)))
 	t2 := v0
 	v3 = t0 + t1
 	store32(mem, uint64(uint32(t2)), uint32(v3))
@@ -9645,7 +9650,7 @@ func (m *Module) fn57(v0 int32) int32 {
 		t3 := int32(load32(mem, uint64(uint32(v0))+8))
 		v5 = t3
 		if uint32(v5) > uint32(v3) {
-			t4 := int32(int8(mem[uint64(uint32(v3))]))
+			t4 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))))))
 			t5 := v0
 			v1 = t4
 			v2 = v1 & i32(255)
@@ -9664,8 +9669,8 @@ func (m *Module) fn57(v0 int32) int32 {
 									t6 := v0
 									v2 = v2 & i32(15)
 									store32(mem, uint64(uint32(t6))+12, uint32(v2))
-									t7 := int32(mem[uint64(uint32(v2))+72328])
-									t8 := int32(mem[uint64(uint32(v3))+1])
+									t7 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+72328)))
+									t8 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+1)))
 									v1 = t8
 									if i32_shr_u(t7, int32(uint32(v1)>>5))&i32(1) == 0 {
 										goto l0
@@ -9680,9 +9685,9 @@ func (m *Module) fn57(v0 int32) int32 {
 								if uint32(v1) > uint32(i32(-12)) {
 									goto l0
 								}
-								t10 := int32(mem[uint64(uint32(v3))+1])
+								t10 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+1)))
 								v1 = t10
-								t11 := int32(int8(mem[uint64(uint32(int32(uint32(v1)>>4)))+73048]))
+								t11 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(int32(uint32(v1)>>4)))+73048))))
 								if i32_shr_u(t11, v2)&i32(1) == 0 {
 									goto l0
 								}
@@ -9694,7 +9699,7 @@ func (m *Module) fn57(v0 int32) int32 {
 									goto l0
 								}
 								v1 = i32(3)
-								t13 := int32(mem[uint64(uint32(v3))+2])
+								t13 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+2)))
 								v7 = t13 ^ i32(-128)
 								if uint32(v7&i32(255)) > uint32(i32(63)) {
 									goto l0
@@ -9719,11 +9724,11 @@ func (m *Module) fn57(v0 int32) int32 {
 						v1 = i32(1)
 					}
 				l2:
-					t16 := int32(mem[uint64(uint32(v1+v3))])
+					t16 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1+v3)))))
 					v4 = (t16 ^ i32(-128)) & i32(255)
 					if uint32(v4) <= uint32(i32(63)) {
 						store32(mem, uint64(uint32(v0))+12, uint32(v2<<6|v4))
-						mem[uint64(uint32(v0))+16] = byte(v1 + i32(1))
+						*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+16)) = byte(v1 + i32(1))
 						return i32(1)
 					}
 					v4 = v1
@@ -9731,11 +9736,11 @@ func (m *Module) fn57(v0 int32) int32 {
 			l0:
 				store32(mem, uint64(uint32(v0))+12, uint32(i32(-1)))
 			}
-			mem[uint64(uint32(v0))+16] = byte(v4)
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+16)) = byte(v4)
 			return i32(1)
 		}
 		store32(mem, uint64(uint32(v0))+12, uint32(i32(0)))
-		mem[uint64(uint32(v0))+16] = byte(i32(0))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+16)) = byte(i32(0))
 		return i32(0)
 	}
 }
@@ -9919,7 +9924,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 						mem = m.memory
 						v11 = t124
 						if v11 == 0 {
-							mem[uint64(uint32(v1))+16] = byte(i32(0))
+							*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+16)) = byte(i32(0))
 							store32(mem, uint64(uint32(v1)), uint32(v8+i32(1)))
 							_ = m.fn57(v1)
 							mem = m.memory
@@ -10467,7 +10472,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 														}
 													}
 												l71:
-													mem[uint64(uint32(v1))+16] = byte(i32(0))
+													*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+16)) = byte(i32(0))
 													store32(mem, uint64(uint32(v1)), uint32(v4))
 													_ = m.fn57(v1)
 													mem = m.memory
@@ -10614,7 +10619,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 													if v6 != 0 {
 														goto l84
 													}
-													mem[uint64(uint32(v1))+16] = byte(i32(0))
+													*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+16)) = byte(i32(0))
 													store32(mem, uint64(uint32(v1)), uint32(v7+i32(1)))
 													_ = m.fn57(v1)
 													mem = m.memory
@@ -10647,7 +10652,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 										if v6 != 0 {
 											goto l84
 										}
-										mem[uint64(uint32(v1))+16] = byte(i32(0))
+										*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+16)) = byte(i32(0))
 										store32(mem, uint64(uint32(v1)), uint32(v7))
 										_ = m.fn57(v1)
 										mem = m.memory
@@ -10657,7 +10662,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 								case 0:
 									v8 = i32(0)
 									v6 = i32(0)
-									t307 := int32(mem[uint64(uint32(v10))])
+									t307 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v10)))))
 									if t307 != i32(95) {
 										goto l79
 									}
@@ -10665,7 +10670,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 								}
 							}
 						l83:
-							mem[uint64(uint32(v1))+16] = byte(i32(0))
+							*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+16)) = byte(i32(0))
 							_ = m.fn57(v1)
 							mem = m.memory
 							goto l86
@@ -10678,7 +10683,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 								v8 = i32(0)
 								goto l84
 							}
-							mem[uint64(uint32(v1))+16] = byte(i32(0))
+							*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+16)) = byte(i32(0))
 							store32(mem, uint64(uint32(v1)), uint32(v10))
 							_ = m.fn57(v1)
 							mem = m.memory
@@ -10761,7 +10766,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 							}
 							t332 := int32(load32(mem, uint64(uint32(v0))+156))
 							t333 := int32(load32(mem, uint64(uint32(t332))+72))
-							t334 := int32(mem[uint64(uint32(t333+v6*i32(3)))+2])
+							t334 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t333+v6*i32(3)))+2)))
 							if t334&i32(1) == 0 {
 								goto l88
 							}
@@ -10788,7 +10793,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 							v11 = v3 - i32(18)
 							t339 := int32(load16(mem, uint64(uint32(v11))))
 							if t339 == 0 {
-								mem[uint64(uint32(v1))+16] = byte(i32(0))
+								*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+16)) = byte(i32(0))
 								store32(mem, uint64(uint32(v1)), uint32(v10-i32(1)))
 								_ = m.fn57(v1)
 								mem = m.memory
@@ -10857,7 +10862,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 							v8 = p343
 							store16(mem, uint64(uint32(t344)), uint16(v8))
 							if v8 == 0 {
-								mem[uint64(uint32(v1))+16] = byte(i32(0))
+								*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+16)) = byte(i32(0))
 								store32(mem, uint64(uint32(v1)), uint32(v3))
 								_ = m.fn57(v1)
 								mem = m.memory
@@ -10891,7 +10896,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 										goto l94
 									}
 									t363 := int32(load32(mem, uint64(uint32(v6))+72))
-									t364 := int32(mem[uint64(uint32(t363+v3*i32(3)))+2])
+									t364 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t363+v3*i32(3)))+2)))
 									if t364&i32(1) != 0 {
 										goto l95
 									}
@@ -11250,7 +11255,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 							}
 						}
 					l97:
-						mem[uint64(uint32(v1))+16] = byte(i32(0))
+						*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+16)) = byte(i32(0))
 						store32(mem, uint64(uint32(v1)), uint32(v10-i32(1)))
 						_ = m.fn57(v1)
 						mem = m.memory
@@ -11540,12 +11545,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 										v17 = t54
 									l25:
 										{
-											t55 := int32(mem[uint64(uint32(v7+v17))])
+											t55 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v7+v17)))))
 											v12 = t55
 											{
 												t56 := int32(load32(mem, uint64(uint32(v5))))
 												v18 = t56 + v7
-												t57 := int32(mem[uint64(uint32(v18))])
+												t57 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v18)))))
 												v10 = t57
 												switch v10 {
 												case 2:
@@ -11581,7 +11586,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 										l23:
 											v10 = i32(0)
 										l20:
-											mem[uint64(uint32(v18))] = byte(v10)
+											*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v18)))) = byte(v10)
 											v7 = v7 + i32(1)
 											if v7 != v6 {
 												goto l25
@@ -11601,14 +11606,14 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 								{
 									t70 := int32(load32(mem, uint64(uint32(v5))))
 									v7 = t70 + v6
-									t71 := int64(mem[uint64(uint32(v7))])
+									t71 := int64(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v7)))))
 									t72 := v7
 									v19 = t71
 									p73 := i32(0)
 									if uint64(v19) < uint64(i64(5)) {
 										p73 = int32(i64_shr_u(i64(8606843136), v19<<3))
 									}
-									mem[uint64(uint32(t72))] = byte(p73)
+									*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t72)))) = byte(p73)
 									v6 = v6 + i32(1)
 									t74 := int32(load32(mem, uint64(uint32(v5))+4))
 									if uint32(v6) < uint32(t74) {
@@ -11758,7 +11763,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 					mem = m.memory
 					t105 := int32(load32(mem, uint64(uint32(v1))+12))
 					if t105 != i32(58) {
-						mem[uint64(uint32(v1))+16] = byte(i32(0))
+						*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+16)) = byte(i32(0))
 						store32(mem, uint64(uint32(v1)), uint32(v8))
 						_ = m.fn57(v1)
 						mem = m.memory
@@ -12052,12 +12057,12 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 										{
 											t527 := int32(load32(mem, uint64(uint32(v5))))
 											v3 = t527 + v1
-											t528 := int32(mem[uint64(uint32(v3))])
+											t528 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3)))))
 											switch t528 - i32(1) {
 											case 2:
 												goto l137
 											case 0:
-												t529 := int32(mem[uint64(uint32(v0))])
+												t529 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 												v7 = t529
 												goto l137
 											case 3:
@@ -12074,7 +12079,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 											}
 										}
 									l137:
-										mem[uint64(uint32(v3))] = byte(v7)
+										*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3)))) = byte(v7)
 										v1 = v1 + i32(1)
 										t530 := int32(load16(mem, uint64(uint32(v5))+4))
 										if uint32(v1) < uint32(t530) {
@@ -12092,7 +12097,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 								p435 = p437
 								goto l119
 							case 21:
-								t438 := int32(mem[uint64(uint32(v8+i32(73068)))])
+								t438 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8+i32(73068))))))
 								p435 = t438
 								goto l119
 							}
@@ -12195,14 +12200,14 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 						}
 						t463 := int32(load32(mem, uint64(uint32(v5))))
 						v3 = t463 + v11
-						t464 := int64(mem[uint64(uint32(v3))])
+						t464 := int64(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3)))))
 						t465 := v3
 						v19 = t464
 						p466 := i32(0)
 						if uint64(v19) < uint64(i64(5)) {
 							p466 = int32(i64_shr_u(i64(17247241219), v19<<3))
 						}
-						mem[uint64(uint32(t465))] = byte(p466)
+						*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t465)))) = byte(p466)
 						t467 := int32(load32(mem, uint64(uint32(v0))+60))
 						v7 = t467
 						v6 = v13
@@ -12278,7 +12283,7 @@ func (m *Module) fn59(v0, v1, v2, v3, v4, v5 int32) int32 {
 			goto l0
 		}
 	l43:
-		mem[uint64(uint32(v1))+16] = byte(i32(0))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+16)) = byte(i32(0))
 		store32(mem, uint64(uint32(v1)), uint32(v6))
 		_ = m.fn57(v1)
 		mem = m.memory
@@ -12756,7 +12761,7 @@ l60:
 							t109 := int32(load32(mem, uint64(uint32(v19))+52))
 							v3 = t109 + v3<<3
 							v39 = v3 + i32(8)
-							t110 := int32(mem[uint64(uint32(v3))])
+							t110 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3)))))
 							v31 = t110
 							v11 = i32(0)
 							p96 = v4
@@ -12769,11 +12774,11 @@ l60:
 						}
 						v30 = i32(0)
 						v3 = v39 + v31<<3
-						t111 := int32(mem[uint64(uint32(v3-i32(8)))])
+						t111 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3-i32(8))))))
 						if t111 != 0 {
 							goto l23
 						}
-						t112 := int32(mem[uint64(uint32(v3-i32(4)))])
+						t112 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3-i32(4))))))
 						if t112 != 0 {
 							v3 = v11
 							v4 = v29
@@ -12826,7 +12831,7 @@ l60:
 								if uint32(v12) < uint32(v21) {
 									goto l27
 								}
-								t120 := int32(mem[uint64(uint32(v7))+4])
+								t120 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v7))+4)))
 								v21 = t120
 								v12 = v21 & i32(127)
 								if uint32(v12) < uint32(v26) {
@@ -12860,7 +12865,7 @@ l60:
 							if uint32(v5) < uint32(v9) {
 								goto l25
 							}
-							t124 := int32(mem[uint64(uint32(v3))+4])
+							t124 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+4)))
 							if uint32(t124&i32(127)) >= uint32(v26) {
 								goto l25
 							}
@@ -12884,7 +12889,7 @@ l60:
 						if t126 != t127 {
 							goto l23
 						}
-						t128 := int32(mem[uint64(uint32(v3))+4])
+						t128 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+4)))
 						v4 = t128
 						t129 := int32(int8(v4))
 						if v4&i32(127) != v26 {
@@ -12906,7 +12911,7 @@ l60:
 							}
 							v9 = i32(0)
 							t135 := int32(load32(mem, uint64(uint32(v8))+72))
-							t136 := int32(mem[uint64(uint32(t135+v21*i32(3)))])
+							t136 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t135+v21*i32(3))))))
 							if t136 != i32(1) {
 								goto l29
 							}
@@ -12938,11 +12943,11 @@ l60:
 							v3 = t142 + t143<<2
 						l32:
 							{
-								t144 := int32(mem[uint64(uint32(v3+i32(3)))])
+								t144 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3+i32(3))))))
 								if t144 != 0 {
 									goto l31
 								}
-								t145 := int32(mem[uint64(uint32(v3+i32(2)))])
+								t145 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3+i32(2))))))
 								if v29 != t145 {
 									goto l31
 								}
@@ -13002,7 +13007,7 @@ l60:
 													goto l34
 												}
 												t155 := int32(load32(mem, uint64(uint32(v8))+72))
-												t156 := int32(mem[uint64(uint32(t155+v9*i32(3)))+1])
+												t156 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t155+v9*i32(3)))+1)))
 												p153 = t156
 												goto l34
 											}
@@ -13060,7 +13065,7 @@ l60:
 									t166 := int32(int16(load16(mem, uint64(uint32(p165)))))
 									if t166 >= i32(0) {
 										if uint32(v4) >= uint32(i32(7)) {
-											mem[uint64(uint32(v2))+72] = byte(i32(1))
+											*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+72)) = byte(i32(1))
 											goto l37
 										}
 										t167 := v10
@@ -13414,7 +13419,7 @@ l1:
 	if v38 != i32(256) {
 		goto l60
 	}
-	mem[uint64(uint32(v2))+72] = byte(i32(1))
+	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+72)) = byte(i32(1))
 l0:
 	m.g0 = v10 + i32(112)
 }
@@ -13659,12 +13664,12 @@ func (m *Module) fn62(v0, v1 int32) {
 	l7:
 		{
 			t16 := int32(load32(mem, uint64(uint32(v1))))
-			t17 := int32(mem[uint64(uint32(t16+v3))])
+			t17 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t16+v3)))))
 			v2 = t17
 			{
 				t18 := int32(load32(mem, uint64(uint32(v0))))
 				v5 = t18 + v3
-				t19 := int32(mem[uint64(uint32(v5))])
+				t19 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5)))))
 				switch t19 {
 				case 0:
 					goto l1
@@ -13696,7 +13701,7 @@ func (m *Module) fn62(v0, v1 int32) {
 		l6:
 			v2 = i32(0)
 		l1:
-			mem[uint64(uint32(v5))] = byte(v2)
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5)))) = byte(v2)
 			v3 = v3 + i32(1)
 			t20 := int32(load16(mem, uint64(uint32(v1))+4))
 			v4 = v4 + i32(1)
@@ -13780,7 +13785,7 @@ func (m *Module) fn63(v0, v1 int32) int32 {
 									}
 									store32(mem, uint64(uint32(t10))+136, uint32(p13))
 									store32(mem, uint64(uint32(v0))+132, uint32(v3))
-									mem[uint64(uint32(v3+v4))] = byte(i32(10))
+									*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3+v4)))) = byte(i32(10))
 									goto l6
 								case 33:
 									t22 := v0
@@ -13826,7 +13831,7 @@ func (m *Module) fn63(v0, v1 int32) int32 {
 									}
 									store32(mem, uint64(uint32(t22))+136, uint32(p25))
 									store32(mem, uint64(uint32(v0))+132, uint32(v3))
-									mem[uint64(uint32(v3+v4))] = byte(i32(13))
+									*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3+v4)))) = byte(i32(13))
 									goto l6
 								case 34:
 									t34 := v0
@@ -13872,7 +13877,7 @@ func (m *Module) fn63(v0, v1 int32) int32 {
 									}
 									store32(mem, uint64(uint32(t34))+136, uint32(p37))
 									store32(mem, uint64(uint32(v0))+132, uint32(v3))
-									mem[uint64(uint32(v3+v4))] = byte(i32(9))
+									*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3+v4)))) = byte(i32(9))
 									goto l6
 								case 0:
 									t46 := v0
@@ -13918,13 +13923,13 @@ func (m *Module) fn63(v0, v1 int32) int32 {
 									}
 									store32(mem, uint64(uint32(t46))+136, uint32(p49))
 									store32(mem, uint64(uint32(v0))+132, uint32(v3))
-									mem[uint64(uint32(v3+v4))] = byte(i32(0))
+									*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3+v4)))) = byte(i32(0))
 									goto l6
 								default:
 									t58 := int32(load32(mem, uint64(uint32(v1))))
 									v6 = t58
 									{
-										t59 := int32(mem[uint64(uint32(v1))+16])
+										t59 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+16)))
 										t60 := v4
 										v2 = t59
 										v5 = t60 + v2
@@ -13990,7 +13995,7 @@ func (m *Module) fn63(v0, v1 int32) int32 {
 								}
 							l6:
 								t70 := int32(load32(mem, uint64(uint32(v1))))
-								t71 := int32(mem[uint64(uint32(v1))+16])
+								t71 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+16)))
 								v4 = t70 + t71
 								p7 = i32(0)
 								goto l13
@@ -14144,7 +14149,7 @@ func (m *Module) fn63(v0, v1 int32) int32 {
 			goto l23
 		}
 	l14:
-		mem[uint64(uint32(v1))+16] = byte(i32(0))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+16)) = byte(i32(0))
 		store32(mem, uint64(uint32(v1)), uint32(v8))
 		p4 = i32(1)
 	l23:
@@ -14271,7 +14276,7 @@ func (m *Module) fn65(v0, v1, v2 int32) int32 {
 		}
 		t22 := int32(load32(mem, uint64(uint32(v0))))
 		t23 := int32(load32(mem, uint64(uint32(v0))+4))
-		mem[uint64(uint32(t22+t23-i32(1)))] = byte(i32(0))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t22+t23-i32(1))))) = byte(i32(0))
 		t24 := int32(load32(mem, uint64(uint32(v0))+12))
 		v4 = t24
 		t25 := int32(load32(mem, uint64(uint32(v0))+16))
@@ -14738,7 +14743,7 @@ func (m *Module) fn71(v0, v1, v2, v3 int32) {
 	var v8, v9, v10 int64
 	mem := m.memory
 	{
-		t0 := int32(mem[uint64(uint32(v1))+19])
+		t0 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+19)))
 		if t0&i32(64) != 0 {
 			return
 		}
@@ -15055,7 +15060,7 @@ l1:
 		{
 		l9:
 			{
-				t30 := int32(mem[uint64(uint32(v2))+79])
+				t30 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+79)))
 				if t30 == i32(1) {
 					t31 := v0
 					v1 = v3 + i32(1)
@@ -15241,7 +15246,7 @@ func (m *Module) fn73(v0, v1, v2 int32) int32 {
 		}
 	l1:
 		v5 = p9
-		mem[uint64(uint32(t10))] = byte(v5)
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t10)))) = byte(v5)
 		var p14 int32
 		{
 			t15 := int32(load32(mem, uint64(uint32(v3))))
@@ -15268,7 +15273,7 @@ func (m *Module) fn73(v0, v1, v2 int32) int32 {
 					p22 = 1
 				}
 				v5 = p22
-				mem[uint64(uint32(t21))] = byte(v5)
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t21)))) = byte(v5)
 			}
 			store32(mem, uint64(uint32(v0))+28, uint32(v1+i32(1)))
 			t23 := int32(load32(mem, uint64(uint32(v3))))
@@ -15294,7 +15299,7 @@ func (m *Module) fn73(v0, v1, v2 int32) int32 {
 			v1 = t27
 			if v1&i32(1) != 0 {
 				v6 = v0 + i32(16)
-				t28 := int32(mem[uint64(uint32(v3))+7])
+				t28 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+7)))
 				v1 = t28
 				t29 := int32(load32(mem, uint64(uint32(v0))+12))
 				v5 = v1 + t29
@@ -15452,10 +15457,10 @@ func (m *Module) fn74(v0 int32) int32 {
 			store32(mem, uint64(uint32(v1))+32, uint32(t23))
 			t24 := int64(load64(mem, uint64(uint32(v1))+68))
 			store64(mem, uint64(uint32(v1))+36, uint64(t24))
-			mem[uint64(uint32(v1))+7] = byte(i32(0))
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+7)) = byte(i32(0))
 			_ = m.fn73(v1+i32(8), v1+i32(48), v1+i32(7))
 			mem = m.memory
-			t26 := int32(mem[uint64(uint32(v1))+7])
+			t26 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+7)))
 			if t26 == i32(1) {
 				t27 := int32(load32(mem, uint64(uint32(v0))+8))
 				if uint32(t27+i32(1)) < uint32(v4) {
@@ -15472,7 +15477,7 @@ func (m *Module) fn74(v0 int32) int32 {
 				{
 				l8:
 					{
-						t30 := int32(mem[uint64(uint32(v1))+7])
+						t30 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+7)))
 						if t30 == i32(1) {
 							t31 := int32(load32(mem, uint64(uint32(v0))+4))
 							v2 = t31
@@ -15648,7 +15653,7 @@ func (m *Module) fn76(v0, v1 int32) int32 {
 	if t0 == 0 {
 		return i32(0)
 	}
-	t1 := int32(mem[uint64(uint32(v1))+20])
+	t1 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+20)))
 	p2 := i32(1)
 	if t1 != 0 {
 		p2 = i32(3)
@@ -15662,7 +15667,7 @@ func (m *Module) fn77(v0, v1 int32) int32 {
 	if t0 == 0 {
 		return i32(0)
 	}
-	t1 := int32(mem[uint64(uint32(v0))])
+	t1 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 	if t1 != 0 {
 		return i32(1)
 	}
@@ -15678,7 +15683,7 @@ func (m *Module) fn77(v0, v1 int32) int32 {
 		if t4 != i32(0xffff) {
 			goto l0
 		}
-		mem[uint64(uint32(v0))] = byte(i32(1))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))) = byte(i32(1))
 		v2 = i32(3)
 	}
 l0:
@@ -15717,9 +15722,9 @@ func (m *Module) fn79(v0, v1, v2 int32) {
 			v18 = v4 & i32(32)
 			v19 = int32(uint32(v4)>>3) & i32(1)
 			v20 = int32(uint32(v4&i32(0xff00)) >> 8)
-			t4 := int32(mem[uint64(uint32(v1))+11])
+			t4 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+11)))
 			v8 = t4
-			t5 := int32(mem[uint64(uint32(v1))+10])
+			t5 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+10)))
 			v9 = t5
 			v10 = v15
 		l15:
@@ -15757,9 +15762,9 @@ func (m *Module) fn79(v0, v1, v2 int32) {
 					if t9 != p10&i32(0xffff) {
 						goto l2
 					}
-					t12 := int32(mem[uint64(uint32(v6+i32(11)))])
+					t12 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6+i32(11))))))
 					v12 = t12
-					t13 := int32(mem[uint64(uint32(v6+i32(10)))])
+					t13 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6+i32(10))))))
 					v3 = t13
 					{
 						{
@@ -15769,7 +15774,7 @@ func (m *Module) fn79(v0, v1, v2 int32) {
 								}
 								goto l4
 							}
-							t14 := int32(mem[uint64(uint32(v5))+45])
+							t14 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+45)))
 							if t14&i32(2) != 0 {
 								goto l3
 							}
@@ -15786,7 +15791,7 @@ func (m *Module) fn79(v0, v1, v2 int32) {
 								}
 								goto l1
 							}
-							t16 := int32(mem[uint64(uint32(v4))+45])
+							t16 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+45)))
 							if t16&i32(2) != 0 {
 								goto l1
 							}
@@ -15877,7 +15882,7 @@ func (m *Module) fn79(v0, v1, v2 int32) {
 							p33 = i32(73020)
 							goto l7
 						}
-						t34 := int32(mem[uint64(uint32(v5))+44])
+						t34 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+44)))
 						if t34&i32(64) == 0 {
 							p33 = i32(73020)
 							goto l7
@@ -15895,7 +15900,7 @@ func (m *Module) fn79(v0, v1, v2 int32) {
 						if v11 != 0 {
 							goto l8
 						}
-						t37 := int32(mem[uint64(uint32(v4))+44])
+						t37 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+44)))
 						if t37&i32(64) == 0 {
 							goto l8
 						}
@@ -16361,7 +16366,7 @@ l23:
 													if v4 != 0 {
 														p15 = int32(uint32(v3)>>7) & i32(1)
 													} else {
-														t16 := int32(mem[uint64(uint32(v3))+45])
+														t16 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+45)))
 														p15 = t16 & i32(1)
 													}
 													if p15 != 0 {
@@ -16392,7 +16397,7 @@ l23:
 													goto l3
 												}
 											l2:
-												t20 := int32(mem[uint64(uint32(v3))+44])
+												t20 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+44)))
 												if t20&i32(128) != 0 {
 													t21 := int32(load16(mem, uint64(uint32(v2))+44))
 													store16(mem, uint64(uint32(v2))+44, uint16(t21|i32(128)))
@@ -16517,7 +16522,7 @@ l23:
 										v10 = t54
 										v4 = i32(610)
 										t55 := int32(load32(mem, uint64(uint32(v2))+32))
-										t56 := int32(mem[uint64(uint32(v3))+45])
+										t56 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+45)))
 										t58 := v2
 										var p57 int32
 										if t56&i32(2) != 0 {
@@ -16530,7 +16535,7 @@ l23:
 										goto l11
 									}
 									v4 = i32(610)
-									t60 := int32(mem[uint64(uint32(v3))+45])
+									t60 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+45)))
 									t62 := v2
 									var p61 int32
 									if t60&i32(2) != 0 {
@@ -16634,7 +16639,7 @@ l23:
 									goto l15
 								default:
 									t84 := int32(load32(mem, uint64(uint32(v1))+72))
-									t85 := int32(mem[uint64(uint32(t84+v4*i32(3)))+1])
+									t85 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t84+v4*i32(3)))+1)))
 									if t85&i32(1) == 0 {
 										goto l15
 									}
@@ -16661,7 +16666,7 @@ l23:
 						store32(mem, uint64(uint32(v2))+56, uint32(v6+i32(1)))
 						t90 := int32(load32(mem, uint64(uint32(v2))+48))
 						store32(mem, uint64(uint32(v2))+48, uint32(t90+i32(1)))
-						t91 := int32(mem[uint64(uint32(v3))+44])
+						t91 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+44)))
 						if t91&i32(2) == 0 {
 							goto l18
 						}
@@ -16702,7 +16707,7 @@ l23:
 				goto l19
 			}
 		l18:
-			t97 := int32(mem[uint64(uint32(v3))+44])
+			t97 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+44)))
 			if t97&i32(64) != 0 {
 				t98 := int32(load16(mem, uint64(uint32(v2))+44))
 				store16(mem, uint64(uint32(v2))+44, uint16(t98|i32(64)))
@@ -16779,7 +16784,7 @@ l0:
 				}
 				t125 := int32(load16(mem, uint64(uint32(t124+p122))))
 				store16(mem, uint64(uint32(t123))+70, uint16(t125))
-				t126 := int32(mem[uint64(uint32(v0))+44])
+				t126 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+44)))
 				if t126&i32(8) == 0 {
 					goto l25
 				}
@@ -16795,7 +16800,7 @@ l0:
 			if v1&i32(1) != 0 {
 				goto l26
 			}
-			t128 := int32(mem[uint64(uint32(v1))+44])
+			t128 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+44)))
 			if t128&i32(16) == 0 {
 				goto l26
 			}
@@ -16806,7 +16811,7 @@ l0:
 		if v4 == i32(1) {
 			return
 		}
-		t130 := int32(mem[uint64(uint32(v2))+44])
+		t130 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+44)))
 		if t130&i32(3) != 0 {
 			return
 		}
@@ -16870,8 +16875,8 @@ func (m *Module) fn82(v0, v1, v2, v3, v4 int32) {
 	default:
 		t1 := int32(load32(mem, uint64(uint32(v4))+72))
 		v6 = t1 + v1*i32(3)
-		t2 := int32(mem[uint64(uint32(v6))+1])
-		t3 := int32(mem[uint64(uint32(v6))])
+		t2 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+1)))
+		t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6)))))
 		v8 = t2<<1 + t3&i32(101)
 	}
 l1:
@@ -17268,10 +17273,10 @@ func (m *Module) fn88(v0 int32) int32 {
 				v2 = v1 + v3<<2
 			l8:
 				{
-					t30 := int32(mem[uint64(uint32(v1+i32(3)))])
+					t30 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1+i32(3))))))
 					if t30 == 0 {
 						t31 := int32(load32(mem, uint64(uint32(v5))+20))
-						t32 := int32(mem[uint64(uint32(v1+i32(2)))])
+						t32 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1+i32(2))))))
 						if t31 == t32 {
 							t34 := int32(load16(mem, uint64(uint32(v1))))
 							v6 = t34
@@ -17322,7 +17327,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 				p3 = t4
 				goto l1
 			}
-			t5 := int32(mem[uint64(uint32(v5))+45])
+			t5 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+45)))
 			if t5&i32(2) != 0 {
 				p3 = i32(610)
 				goto l1
@@ -17337,7 +17342,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 		{
 			{
 				if v6&i32(1) == 0 {
-					t7 := int32(mem[uint64(uint32(v6))+45])
+					t7 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+45)))
 					if t7&i32(2) == 0 {
 						t8 := int32(load32(mem, uint64(uint32(v6))+32))
 						t9 := v4
@@ -17454,7 +17459,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 			{
 				{
 					if v5&i32(1) == 0 {
-						t27 := int32(mem[uint64(uint32(v5))+45])
+						t27 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+45)))
 						var p28 int32
 						if t27&i32(2) != 0 {
 							p28 = i32(610)
@@ -17832,7 +17837,7 @@ func (m *Module) fn89(v0, v1, v2 int32) int32 {
 					}
 					goto l0
 				}
-				t95 := int32(mem[uint64(uint32(v6))+45])
+				t95 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+45)))
 				if t95&i32(2) != 0 {
 					goto l0
 				}
@@ -18456,7 +18461,7 @@ func (m *Module) fn90(v0, v1, v2 int32) int32 {
 				p1 = t2
 				goto l1
 			}
-			t3 := int32(mem[uint64(uint32(v3))+45])
+			t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+45)))
 			if t3&i32(2) != 0 {
 				p1 = i32(610)
 				goto l1
@@ -18580,7 +18585,7 @@ l0:
 						p28 = i32(73020)
 						goto l5
 					}
-					t30 := int32(mem[uint64(uint32(v3))+44])
+					t30 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+44)))
 					if t30&i32(64) == 0 {
 						p28 = i32(73020)
 						goto l5
@@ -18603,7 +18608,7 @@ l0:
 					if v3&i32(1) != 0 {
 						goto l6
 					}
-					t34 := int32(mem[uint64(uint32(v3))+44])
+					t34 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+44)))
 					if t34&i32(64) == 0 {
 						goto l6
 					}
@@ -18667,7 +18672,7 @@ l6:
 		t0 := int32(int16(load16(mem, uint64(uint32(v3))+4)))
 		v9 = t0
 		{
-			t1 := int32(mem[uint64(uint32(v3))])
+			t1 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3)))))
 			switch t1 {
 			default:
 				goto l3
@@ -18679,7 +18684,7 @@ l6:
 				v6 = p2 | v6
 				goto l3
 			case 1:
-				t3 := int32(mem[uint64(uint32(v3))+1])
+				t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+1)))
 				v10 = t3
 				if v10 == 0 {
 					goto l3
@@ -19132,7 +19137,7 @@ func (m *Module) fn93(v0, v1, v2 int32) int32 {
 			}
 		}
 	l1:
-		mem[uint64(uint32(v0))+175] = byte(i32(1))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+175)) = byte(i32(1))
 		v4 = i32(0)
 		v16 = v9 + i32(12)
 		store32(mem, uint64(uint32(v16)), uint32(i32(-1)))
@@ -28442,8 +28447,8 @@ l0:
 	var p6 int32
 	if v5 != 0 {
 		v2 = v1 + v4
-		t7 := int32(mem[uint64(uint32(v2))+5])
-		mem[uint64(uint32(v2))+5] = byte(t7 & (i32_shl(i32(-1), v5) ^ i32(-1)))
+		t7 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+5)))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+5)) = byte(t7 & (i32_shl(i32(-1), v5) ^ i32(-1)))
 		t8 := int32(load16(mem, uint64(uint32(v0))+4))
 		p6 = t8
 	} else {
@@ -28470,8 +28475,8 @@ l0:
 			goto l1
 		}
 		v3 = v2 + v3 - i32(1)
-		t12 := int32(mem[uint64(uint32(v3))])
-		mem[uint64(uint32(v3))] = byte(t12 & (i32_shl(i32(-1), v0) ^ i32(-1)))
+		t12 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3)))))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3)))) = byte(t12 & (i32_shl(i32(-1), v0) ^ i32(-1)))
 	}
 l1:
 	v0 = i32(0)
@@ -28481,7 +28486,7 @@ l1:
 	v1 = v1 + v4 + i32(5)
 l3:
 	{
-		t13 := int32(mem[uint64(uint32(v1+v2))])
+		t13 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1+v2)))))
 		if t13 != 0 {
 			v0 = v2
 			goto l2
@@ -28516,10 +28521,10 @@ func (m *Module) fn100(v0, v1, v2 int32) {
 			store16(mem, uint64(uint32(v0))+4, uint16(v3))
 			t2 := int32(load32(mem, uint64(uint32(v1))))
 			store32(mem, uint64(uint32(v0)), uint32(t2))
-			t3 := int32(mem[uint64(uint32(v1))+6])
+			t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+6)))
 			v1 = t3
-			mem[uint64(uint32(v0))+1026] = byte(i32(0))
-			mem[uint64(uint32(v0))+8] = byte(v1)
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+1026)) = byte(i32(0))
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+8)) = byte(v1)
 			return
 		}
 	l1:
@@ -28565,13 +28570,13 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 	m.g0 = v6
 	mem := m.memory
 	{
-		t1 := int32(mem[uint64(uint32(v2))+37])
+		t1 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+37)))
 		if t1 != 0 {
 			goto l0
 		}
-		t2 := int32(mem[uint64(uint32(v2))+1])
+		t2 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+1)))
 		if t2 == i32(1) {
-			t3 := int32(mem[uint64(uint32(v2))])
+			t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 			if t3 != 0 {
 				goto l0
 			}
@@ -28672,7 +28677,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 				goto l7
 			}
 			v3 = i32(1)
-			t22 := int32(mem[uint64(uint32(v2))])
+			t22 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 			if t22 != i32(1) {
 				goto l7
 			}
@@ -28685,9 +28690,9 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 		}
 	l7:
 		{
-			t24 := int32(mem[uint64(uint32(v2))+29])
+			t24 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+29)))
 			if t24 == i32(1) {
-				t25 := int32(mem[uint64(uint32(v2))+30])
+				t25 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+30)))
 				t26 := v1
 				v0 = t25
 				p27 := i32(31)
@@ -28804,7 +28809,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 				goto l0
 			}
 			{
-				t51 := int32(mem[uint64(uint32(v2))+7])
+				t51 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+7)))
 				if t51 != i32(1) {
 					goto l14
 				}
@@ -28908,7 +28913,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 				}
 			}
 		l14:
-			t66 := int32(mem[uint64(uint32(v2))+23])
+			t66 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+23)))
 			if t66 == i32(1) {
 				t67 := int32(load32(mem, uint64(uint32(v1))+12))
 				m.t0[uint(t67)].(func(int32))(v1)
@@ -28932,15 +28937,15 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 				v3 = i32(1)
 				goto l0
 			}
-			t70 := int32(mem[uint64(uint32(v2))+21])
+			t70 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+21)))
 			v3 = t70
 			var p71 int32
 			{
-				t72 := int32(mem[uint64(uint32(v2))+20])
+				t72 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+20)))
 				if t72 == 0 {
 					if v3&i32(1) == 0 {
 						{
-							t75 := int32(mem[uint64(uint32(v2))+39])
+							t75 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+39)))
 							if t75 != i32(1) {
 								goto l27
 							}
@@ -28960,7 +28965,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 								case 0, 8, 20, 22, 24, 25, 85, 86:
 									goto l28
 								case 53:
-									t79 := int32(mem[uint64(uint32(v6))+8])
+									t79 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+8)))
 									if t79 != i32(1) {
 										goto l28
 									}
@@ -29035,14 +29040,14 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 							v3 = i32(1)
 							goto l0
 						l28:
-							t90 := int32(mem[uint64(uint32(v6))+9])
+							t90 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+9)))
 							if t90 == 0 {
 								goto l27
 							}
 							goto l0
 						}
 					l27:
-						t91 := int32(mem[uint64(uint32(v2))+25])
+						t91 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+25)))
 						if t91 == i32(1) {
 							v4 = i32(0)
 							t92 := m.g0
@@ -29083,16 +29088,16 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 										fallthrough
 									case 2:
 										store16(mem, uint64(uint32(v1))+4, uint16(i32(0)))
-										t98 := int32(mem[uint64(uint32(v2))])
+										t98 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 										v4 = t98
 										goto l37
 									}
 								}
 							l35:
 								v4 = i32(1)
-								t99 := int32(mem[uint64(uint32(v3))+8])
+								t99 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+8)))
 								if t99 == i32(1) {
-									t100 := int32(mem[uint64(uint32(v2))])
+									t100 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 									if t100 == i32(1) {
 										store16(mem, uint64(uint32(v1))+4, uint16(i32(11)))
 										store16(mem, uint64(uint32(v0))+6, uint16(i32(0x4000)))
@@ -29110,7 +29115,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 						}
 						{
 							{
-								t101 := int32(mem[uint64(uint32(v2))+24])
+								t101 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+24)))
 								if t101 == i32(1) {
 									t102 := int32(load32(mem, uint64(uint32(v1))+12))
 									m.t0[uint(t102)].(func(int32))(v1)
@@ -29157,7 +29162,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 											}
 											fallthrough
 										default:
-											t108 := int32(mem[uint64(uint32(v6))+8])
+											t108 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+8)))
 											v7 = t108
 											if v7 != i32(1) {
 												goto l43
@@ -29167,14 +29172,14 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 											default:
 												goto l46
 											case 1:
-												t109 := int32(mem[uint64(uint32(v2))+32])
+												t109 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+32)))
 												v3 = t109
 												goto l46
 											case 0:
 												v3 = i32(1)
 												t110 := int32(load32(mem, uint64(uint32(v1))))
 												v5 = t110
-												t111 := int32(mem[uint64(uint32(v2))+32])
+												t111 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+32)))
 												if t111 == i32(1) {
 													switch v5 - i32(91) {
 													case 0, 5:
@@ -29185,7 +29190,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 														}
 													}
 												}
-												t112 := int32(mem[uint64(uint32(v2))+33])
+												t112 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+33)))
 												var p113 int32
 												if v5 == i32(96) {
 													p113 = 1
@@ -29227,7 +29232,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 									if v4 != 0 {
 										goto l0
 									}
-									t117 := int32(mem[uint64(uint32(v6))+9])
+									t117 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+9)))
 									if t117&i32(1) != 0 {
 										goto l0
 									}
@@ -29237,7 +29242,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 										default:
 											goto l51
 										case 1:
-											t119 := int32(mem[uint64(uint32(v2))+2])
+											t119 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+2)))
 											if t119 != i32(1) {
 												goto l51
 											}
@@ -29246,7 +29251,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 											v3 = t120
 											goto l0
 										case 0:
-											t121 := int32(mem[uint64(uint32(v2))+38])
+											t121 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+38)))
 											if t121 == i32(1) {
 												goto l52
 											}
@@ -29259,14 +29264,14 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 									goto l0
 								}
 								{
-									t122 := int32(mem[uint64(uint32(v2))])
+									t122 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 									if t122 == 0 {
-										t123 := int32(mem[uint64(uint32(v2))+36])
+										t123 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+36)))
 										if t123 != i32(1) {
 											goto l54
 										}
 									}
-									mem[uint64(uint32(v6))+7] = byte(i32(0))
+									*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+7)) = byte(i32(0))
 									v9 = v6 + i32(8)
 									v11 = v6 + i32(7)
 									v8 = v6 + i32(6)
@@ -29297,7 +29302,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 												default:
 													goto l56
 												case 0:
-													t127 := int32(mem[uint64(uint32(v2))+28])
+													t127 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+28)))
 													if t127 != 0 {
 														goto l55
 													}
@@ -29310,19 +29315,19 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 											if t129 != 0 {
 												goto l55
 											}
-											mem[uint64(uint32(v8))] = byte(i32(1))
+											*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8)))) = byte(i32(1))
 											t130 := v9
 											var p131 int32
 											if v5 == i32(63) {
 												p131 = 1
 											}
-											mem[uint64(uint32(t130))] = byte(p131)
+											*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t130)))) = byte(p131)
 											t132 := v11
 											var p133 int32
 											if v5 == i32(62) {
 												p133 = 1
 											}
-											mem[uint64(uint32(t132))] = byte(p133)
+											*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t132)))) = byte(p133)
 											goto l59
 										}
 									l55:
@@ -29336,13 +29341,13 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 											p136 = 1
 										}
 										v13 = p136
-										t137 := int32(mem[uint64(uint32(v4))+9])
+										t137 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+9)))
 										t138 := v13
 										v14 = t137
-										t139 := int32(mem[uint64(uint32(v4))+8])
+										t139 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+8)))
 										t140 := v14
 										v7 = t139
-										mem[uint64(uint32(t135))] = byte(t138 & (t140 | v7 ^ i32(-1)))
+										*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t135)))) = byte(t138 & (t140 | v7 ^ i32(-1)))
 										t141 := v9
 										v15 = (v14 ^ i32(-1)) & v13
 										var p142 int32
@@ -29356,31 +29361,31 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 										} else {
 											p142 = i32(0)
 										}
-										mem[uint64(uint32(t141))] = byte(p142)
+										*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t141)))) = byte(p142)
 										v9 = i32(0)
 										var p145 int32
 										{
-											t146 := int32(mem[uint64(uint32(v2))+34])
+											t146 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+34)))
 											if t146 != i32(1) {
 												p145 = i32(0)
 												goto l60
 											}
-											t147 := int32(mem[uint64(uint32(v2))+11])
+											t147 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+11)))
 											if t147 != 0 {
 												p145 = i32(0)
 												goto l60
 											}
-											t148 := int32(mem[uint64(uint32(v2))+8])
+											t148 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+8)))
 											if t148 != 0 {
 												p145 = i32(0)
 												goto l60
 											}
-											t149 := int32(mem[uint64(uint32(v2))+15])
+											t149 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+15)))
 											if t149 != 0 {
 												p145 = i32(0)
 												goto l60
 											}
-											t150 := int32(mem[uint64(uint32(v2))+10])
+											t150 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+10)))
 											if t150 != 0 {
 												p145 = i32(0)
 												goto l60
@@ -29393,13 +29398,13 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 											p145 = p152
 										}
 									l60:
-										t153 := int32(mem[uint64(uint32(v2))+4])
+										t153 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+4)))
 										v16 = t153
 										v12 = p145 | v16
-										t154 := int32(mem[uint64(uint32(v2))+10])
+										t154 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+10)))
 										v3 = t154
 										if v3 == i32(1) {
-											t155 := int32(mem[uint64(uint32(v2))+8])
+											t155 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+8)))
 											v9 = t155
 										}
 										v10 = v3 & (v9 ^ i32(1))
@@ -29408,7 +29413,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 												{
 													{
 														{
-															t156 := int32(mem[uint64(uint32(v2))+28])
+															t156 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+28)))
 															if t156 != i32(1) {
 																goto l61
 															}
@@ -29420,7 +29425,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 															if v3 != i32(117) {
 																goto l62
 															}
-															mem[uint64(uint32(v8))] = byte(i32(0))
+															*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8)))) = byte(i32(0))
 															t158 := v0
 															t159 := v1
 															t160 := v2
@@ -29429,22 +29434,22 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 															t163 := v3
 															var p161 int32
 															{
-																t164 := int32(mem[uint64(uint32(v2))+4])
+																t164 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+4)))
 																if t164 != i32(1) {
 																	p161 = i32(1)
 																	goto l63
 																}
-																t165 := int32(mem[uint64(uint32(v4))+10])
+																t165 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+10)))
 																if t165&i32(1) != 0 {
 																	p161 = i32(1)
 																	goto l63
 																}
-																t166 := int32(mem[uint64(uint32(v4))+11])
+																t166 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+11)))
 																if t166 != 0 {
 																	p161 = i32(0)
 																	goto l63
 																}
-																t167 := int32(mem[uint64(uint32(v2))+14])
+																t167 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+14)))
 																p161 = t167 ^ i32(1)
 															}
 														l63:
@@ -29461,9 +29466,9 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 															if t170 == 0 {
 																goto l64
 															}
-															t171 := int32(mem[uint64(uint32(v4))+10])
-															t172 := int32(mem[uint64(uint32(v4))+14])
-															t173 := int32(mem[uint64(uint32(v4))+15])
+															t171 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+10)))
+															t172 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+14)))
+															t173 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+15)))
 															v3 = t171 | (v10 | (v12 ^ i32(1))) | (t172 | t173 ^ i32(1))
 															goto l59
 														}
@@ -29474,7 +29479,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 															if v5 != i32(1) {
 																goto l68
 															}
-															t179 := int32(mem[uint64(uint32(v2))+32])
+															t179 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+32)))
 															if t179 == 0 {
 																goto l67
 															}
@@ -29516,7 +29521,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 												t180 := int32(load32(mem, uint64(uint32(v1))))
 												v8 = t180
 												{
-													t181 := int32(mem[uint64(uint32(v2))+32])
+													t181 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+32)))
 													if t181 != i32(1) {
 														goto l69
 													}
@@ -29528,7 +29533,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 													}
 												}
 											l69:
-												t182 := int32(mem[uint64(uint32(v2))+33])
+												t182 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+33)))
 												if t182 != i32(1) {
 													goto l67
 												}
@@ -29550,7 +29555,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 											} else {
 												p183 = i32(0)
 											}
-											mem[uint64(uint32(t184))] = byte(p183)
+											*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t184)))) = byte(p183)
 											if v7&i32(1) == 0 {
 												goto l59
 											}
@@ -29567,7 +29572,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 													goto l64
 												}
 												v3 = i32(1)
-												t188 := int32(mem[uint64(uint32(v2))+4])
+												t188 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+4)))
 												if t188&i32(1) == 0 {
 													goto l59
 												}
@@ -29576,7 +29581,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 												v3 = t189 ^ i32(1)
 												goto l59
 											}
-											t190 := int32(mem[uint64(uint32(v4))+10])
+											t190 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+10)))
 											v7 = t190
 											{
 												if v12&i32(1) == 0 {
@@ -29585,11 +29590,11 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 												if v7&i32(1) != 0 {
 													goto l70
 												}
-												t191 := int32(mem[uint64(uint32(v4))+11])
+												t191 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+11)))
 												if t191 != 0 {
 													goto l59
 												}
-												t192 := int32(mem[uint64(uint32(v2))+14])
+												t192 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+14)))
 												if t192 != 0 {
 													goto l59
 												}
@@ -29599,21 +29604,21 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 											v8 = t193
 											var p194 int32
 											{
-												t195 := int32(mem[uint64(uint32(v2))+11])
+												t195 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+11)))
 												if t195 == 0 {
 													if v8 != i32(4096) {
 														p194 = i32(0)
 														goto l71
 													}
 												}
-												t196 := int32(mem[uint64(uint32(v2))+4])
+												t196 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+4)))
 												p194 = t196 ^ i32(1)
 											}
 										l71:
 											v10 = p194
-											t197 := int32(mem[uint64(uint32(v4))+13])
+											t197 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+13)))
 											v11 = t197
-											t198 := int32(mem[uint64(uint32(v4))+12])
+											t198 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+12)))
 											v12 = t198
 											v3 = i32(1)
 											if v9&v13 != 0 {
@@ -29670,19 +29675,19 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 										store16(mem, uint64(uint32(v0))+6, uint16(i32(0)))
 										goto l0
 									}
-									t210 := int32(mem[uint64(uint32(v6))+7])
+									t210 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+7)))
 									if t210 == i32(1) {
-										t211 := int32(mem[uint64(uint32(v2))+38])
+										t211 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+38)))
 										if t211 == i32(1) {
 											goto l52
 										}
 									}
 									{
-										t212 := int32(mem[uint64(uint32(v6))+8])
+										t212 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+8)))
 										if t212 != i32(1) {
 											goto l72
 										}
-										t213 := int32(mem[uint64(uint32(v2))+2])
+										t213 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+2)))
 										if t213 != i32(1) {
 											goto l72
 										}
@@ -29692,7 +29697,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 										goto l0
 									}
 								l72:
-									t215 := int32(mem[uint64(uint32(v6))+6])
+									t215 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+6)))
 									if t215 != 0 {
 										goto l53
 									}
@@ -29707,11 +29712,11 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 						l53:
 							v4 = i32(1)
 							{
-								t217 := int32(mem[uint64(uint32(v2))+28])
+								t217 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+28)))
 								if t217 != i32(1) {
 									goto l73
 								}
-								t218 := int32(mem[uint64(uint32(v2))])
+								t218 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 								if t218 != 0 {
 									goto l73
 								}
@@ -29729,7 +29734,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 										if t220 != i32(117) {
 											goto l75
 										}
-										t221 := int32(mem[uint64(uint32(v6))+8])
+										t221 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+8)))
 										t222 := m.fn107(v0, v1, v2, t221, i32(0))
 										mem = m.memory
 										v3 = t222
@@ -29750,43 +29755,43 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 								if v5 != 0 {
 									goto l0
 								}
-								t225 := int32(mem[uint64(uint32(v6))+9])
+								t225 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+9)))
 								if t225&i32(1) != 0 {
 									goto l0
 								}
 							}
 						l73:
 							{
-								t226 := int32(mem[uint64(uint32(v2))+22])
+								t226 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+22)))
 								if t226 != 0 {
 									goto l77
 								}
-								t227 := int32(mem[uint64(uint32(v2))+16])
+								t227 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+16)))
 								if t227 != 0 {
 									goto l77
 								}
-								t228 := int32(mem[uint64(uint32(v2))+17])
+								t228 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+17)))
 								if t228 != 0 {
 									goto l77
 								}
-								t229 := int32(mem[uint64(uint32(v2))+18])
+								t229 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+18)))
 								if t229 != 0 {
 									goto l77
 								}
-								t230 := int32(mem[uint64(uint32(v2))+19])
+								t230 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+19)))
 								v4 = t230
 							}
 						l77:
 							{
-								t231 := int32(mem[uint64(uint32(v2))+3])
+								t231 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+3)))
 								if t231 != i32(1) {
 									goto l78
 								}
-								t232 := int32(mem[uint64(uint32(v2))+5])
+								t232 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+5)))
 								if t232 != 0 {
 									goto l78
 								}
-								t233 := int32(mem[uint64(uint32(v2))+6])
+								t233 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+6)))
 								if t233 != 0 {
 									goto l78
 								}
@@ -29821,7 +29826,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 									t240 := int32(load32(mem, uint64(uint32(v1))))
 									v3 = t240
 									{
-										t241 := int32(mem[uint64(uint32(v2))+22])
+										t241 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+22)))
 										if t241 == i32(1) {
 											v4 = i32(22)
 											if v3 == i32(123) {
@@ -29841,22 +29846,22 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 										}
 										var p244 int32
 										{
-											t245 := int32(mem[uint64(uint32(v2))+16])
+											t245 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+16)))
 											if t245 == i32(1) {
 												p244 = i32(16)
 												goto l82
 											}
-											t246 := int32(mem[uint64(uint32(v2))+17])
+											t246 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+17)))
 											if t246 != 0 {
 												p244 = i32(17)
 												goto l82
 											}
-											t247 := int32(mem[uint64(uint32(v2))+18])
+											t247 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+18)))
 											if t247 != 0 {
 												p244 = i32(18)
 												goto l82
 											}
-											t248 := int32(mem[uint64(uint32(v2))+19])
+											t248 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+19)))
 											if t248 == 0 {
 												goto l83
 											}
@@ -29876,16 +29881,16 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 											goto l84
 										}
 										v3 = v0 + int32(uint32(v2)>>2)
-										t251 := int32(mem[uint64(uint32(v3))+8])
+										t251 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+8)))
 										t252 := v3
 										v3 = v2 << 1 & i32(6)
-										mem[uint64(uint32(t252))+8] = byte(t251&(i32_shl(i32(3), v3)^i32(-1)) | i32_shl(v5&i32(3), v3))
+										*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t252))+8)) = byte(t251&(i32_shl(i32(3), v3)^i32(-1)) | i32_shl(v5&i32(3), v3))
 										store16(mem, uint64(uint32(v0))+4, uint16(v2+i32(1)))
 										v0 = v0 + int32(uint32(v2)>>3)
-										t253 := int32(mem[uint64(uint32(v0))+1026])
+										t253 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+1026)))
 										t254 := v0
 										v0 = t253
-										mem[uint64(uint32(t254))+1026] = byte((v0^v5<<29>>31)&i32_shl(i32(1), v2&i32(7)) ^ v0)
+										*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t254))+1026)) = byte((v0^v5<<29>>31)&i32_shl(i32(1), v2&i32(7)) ^ v0)
 									}
 								l84:
 									store16(mem, uint64(uint32(v1))+4, uint16(v4))
@@ -29896,7 +29901,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 								if v3 != i32(97) {
 									goto l83
 								}
-								t255 := int32(mem[uint64(uint32(v2))+35])
+								t255 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+35)))
 								if t255 != i32(1) {
 									v3 = i32(97)
 									goto l83
@@ -29917,9 +29922,9 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 									}
 									t259 := v0
 									v4 = v4 - i32(1)
-									t260 := int32(mem[uint64(uint32(t259+int32(uint32(v4)>>2)))+8])
+									t260 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t259+int32(uint32(v4)>>2)))+8)))
 									v5 = i32_shr_u(t260, v4<<1&i32(6)) & i32(3)
-									t261 := int32(mem[uint64(uint32(v0+int32(uint32(v4)>>3)))+1026])
+									t261 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0+int32(uint32(v4)>>3)))+1026)))
 									p262 := v5
 									if i32_shr_u(t261, v4&i32(7))&i32(1) != 0 {
 										p262 = v5 | i32(4)
@@ -29937,7 +29942,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 							}
 						l83:
 							{
-								t264 := int32(mem[uint64(uint32(v2))+15])
+								t264 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+15)))
 								if t264 != i32(1) {
 									goto l86
 								}
@@ -29962,7 +29967,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 								if v3 != i32(63) {
 									goto l87
 								}
-								t268 := int32(mem[uint64(uint32(v2))+2])
+								t268 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+2)))
 								if t268&i32(1) == 0 {
 									goto l87
 								}
@@ -29976,7 +29981,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 								if v3 != i32(115) {
 									goto l88
 								}
-								t270 := int32(mem[uint64(uint32(v2))+13])
+								t270 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+13)))
 								if t270&i32(1) == 0 {
 									goto l88
 								}
@@ -30083,12 +30088,12 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 									v0 = t287
 									{
 										{
-											t288 := int32(mem[uint64(uint32(v2))+9])
+											t288 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+9)))
 											if t288 != i32(1) {
 												goto l91
 											}
 											v3 = i32(1)
-											t289 := int32(mem[uint64(uint32(v2))+8])
+											t289 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+8)))
 											if t289&i32(1) == 0 {
 												goto l91
 											}
@@ -30189,7 +30194,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 										if t295 != 0 {
 											goto l89
 										}
-										t296 := int32(mem[uint64(uint32(v2))])
+										t296 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 										if t296&i32(1) == 0 {
 											goto l89
 										}
@@ -30210,7 +30215,7 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 							}
 						l88:
 							v3 = i32(0)
-							t299 := int32(mem[uint64(uint32(v2))+38])
+							t299 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+38)))
 							if t299 != i32(1) {
 								goto l0
 							}
@@ -30463,16 +30468,16 @@ func (m *Module) fn101(v0, v1, v2 int32) int32 {
 					goto l115
 				}
 				v5 = v0 + int32(uint32(v2)>>2)
-				t327 := int32(mem[uint64(uint32(v5))+8])
+				t327 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+8)))
 				t328 := v5
 				v5 = v2 << 1 & i32(6)
-				mem[uint64(uint32(t328))+8] = byte(t327&(i32_shl(i32(3), v5)^i32(-1)) | i32_shl(v3&i32(3), v5))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t328))+8)) = byte(t327&(i32_shl(i32(3), v5)^i32(-1)) | i32_shl(v3&i32(3), v5))
 				store16(mem, uint64(uint32(v0))+4, uint16(v2+i32(1)))
 				v0 = v0 + int32(uint32(v2)>>3)
-				t329 := int32(mem[uint64(uint32(v0))+1026])
+				t329 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+1026)))
 				t330 := v0
 				v0 = t329
-				mem[uint64(uint32(t330))+1026] = byte((v0^v3<<29>>31)&i32_shl(i32(1), v2&i32(7)) ^ v0)
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t330))+1026)) = byte((v0^v3<<29>>31)&i32_shl(i32(1), v2&i32(7)) ^ v0)
 			}
 		l115:
 			store16(mem, uint64(uint32(v1))+4, uint16(v4))
@@ -30793,7 +30798,7 @@ l17:
 				default:
 					goto l3
 				case 5:
-					mem[uint64(uint32(v1))+6] = byte(i32(1))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+6)) = byte(i32(1))
 				l9:
 					{
 						t10 := int32(load32(mem, uint64(uint32(v0))+8))
@@ -30895,14 +30900,14 @@ l17:
 								goto l14
 							}
 						l13:
-							t25 := int32(mem[uint64(uint32(v1))+4])
-							t26 := int32(mem[uint64(uint32(v1))+1])
+							t25 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+4)))
+							t26 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+1)))
 							t28 := v1
 							p27 := i32(0)
 							if v2 != i32(13) {
 								p27 = t26
 							}
-							mem[uint64(uint32(t28))+4] = byte(t25 | p27)
+							*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t28))+4)) = byte(t25 | p27)
 							v4 = i32(1)
 							goto l14
 						}
@@ -30912,7 +30917,7 @@ l17:
 					mem = m.memory
 				l11:
 					v2 = v4
-					t29 := int32(mem[uint64(uint32(v1))+1])
+					t29 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+1)))
 					if t29 == 0 {
 						v2 = i32(0)
 						v5 = i32(0)
@@ -30928,23 +30933,23 @@ l17:
 							}
 							p30 = p33
 						}
-						mem[uint64(uint32(t31))+5] = byte(p30)
+						*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t31))+5)) = byte(p30)
 					}
-					mem[uint64(uint32(v1))+7] = byte(i32(1))
-					t34 := int32(mem[uint64(uint32(v1))])
-					mem[uint64(uint32(v1))] = byte(t34 | v4)
-					t35 := int32(mem[uint64(uint32(v1))+3])
-					mem[uint64(uint32(v1))+3] = byte(t35 | v2&i32(1))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+7)) = byte(i32(1))
+					t34 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))) = byte(t34 | v4)
+					t35 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+3)))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+3)) = byte(t35 | v2&i32(1))
 				}
 			}
 		l8:
-			mem[uint64(uint32(v1))+1] = byte(i32(1))
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+1)) = byte(i32(1))
 			goto l17
 		}
 	l3:
 		return v5
 	l2:
-		mem[uint64(uint32(v1))+7] = byte(i32(0))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+7)) = byte(i32(0))
 		switch v2 - i32(10) {
 		case 1, 2:
 			goto l19
@@ -30954,13 +30959,13 @@ l17:
 			}
 			fallthrough
 		case 0, 3:
-			mem[uint64(uint32(v1))] = byte(i32(1))
-			t36 := int32(mem[uint64(uint32(v1))+1])
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))) = byte(i32(1))
+			t36 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+1)))
 			t37 := v1
 			v4 = t36
-			t38 := int32(mem[uint64(uint32(v1))+3])
-			mem[uint64(uint32(t37))+3] = byte(v4 | t38)
-			t39 := int32(mem[uint64(uint32(v1))+4])
+			t38 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+3)))
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t37))+3)) = byte(v4 | t38)
+			t39 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+4)))
 			t40 := v1
 			t41 := v4
 			var p42 int32
@@ -30972,9 +30977,9 @@ l17:
 			if v2 != 0 {
 				p43 = t41
 			}
-			mem[uint64(uint32(t40))+4] = byte(t39 | p43)
-			t44 := int32(mem[uint64(uint32(v1))+2])
-			mem[uint64(uint32(v1))+2] = byte(t44 | v2&(v4^i32(1)))
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t40))+4)) = byte(t39 | p43)
+			t44 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+2)))
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+2)) = byte(t44 | v2&(v4^i32(1)))
 		}
 	l19:
 		t45 := int32(load32(mem, uint64(uint32(v0))+8))
@@ -30987,7 +30992,7 @@ func (m *Module) fn104(v0, v1 int32) int32 {
 	var v2, v3 int32
 	mem := m.memory
 	{
-		t0 := int32(mem[uint64(uint32(v1))])
+		t0 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 		v3 = t0
 		if v3 != 0 {
 			v1 = v1 + i32(1)
@@ -31000,7 +31005,7 @@ func (m *Module) fn104(v0, v1 int32) int32 {
 				t2 := int32(load32(mem, uint64(uint32(v0))+8))
 				m.t0[uint(t2)].(func(int32, int32))(v0, i32(0))
 				mem = m.memory
-				t3 := int32(mem[uint64(uint32(v1))])
+				t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 				v3 = t3
 				v1 = v1 + i32(1)
 				if v3 != 0 {
@@ -31076,13 +31081,13 @@ func (m *Module) fn105(v0, v1, v2, v3, v4 int32) int32 {
 		{
 			switch v2 {
 			case 1:
-				t1 := int32(mem[uint64(uint32(v1))+4])
+				t1 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+4)))
 				v5 = t1 | v3&v4 ^ i32(1)
 				goto l3
 			case 0:
 				t2 := int32(load32(mem, uint64(uint32(v0))))
 				v2 = t2
-				t3 := int32(mem[uint64(uint32(v1))+40])
+				t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+40)))
 				if t3 != i32(1) {
 					goto l4
 				}
@@ -31211,10 +31216,10 @@ func (m *Module) fn105(v0, v1, v2, v3, v4 int32) int32 {
 							{
 								t7 := int32(load32(mem, uint64(uint32(v1+i32(2071720)))))
 								v8 = t7
-								t8 := int32(mem[uint64(uint32(v8))])
+								t8 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8)))))
 								v3 = t8
 								{
-									t9 := int32(mem[uint64(uint32(v6))])
+									t9 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6)))))
 									v4 = t9
 									if v4 == 0 {
 										goto l16
@@ -31226,9 +31231,9 @@ func (m *Module) fn105(v0, v1, v2, v3, v4 int32) int32 {
 									v8 = v8 + i32(1)
 								l17:
 									{
-										t10 := int32(mem[uint64(uint32(v8))])
+										t10 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8)))))
 										v3 = t10
-										t11 := int32(mem[uint64(uint32(v7))])
+										t11 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v7)))))
 										v4 = t11
 										if v4 == 0 {
 											goto l16
@@ -31249,7 +31254,7 @@ func (m *Module) fn105(v0, v1, v2, v3, v4 int32) int32 {
 									goto l3
 								}
 							}
-							t12 := int32(mem[uint64(uint32(v6))+2])
+							t12 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+2)))
 							t13 := int32(load16(mem, uint64(uint32(v6))))
 							if t12|(t13^i32(28265)) == 0 {
 								goto l3
@@ -31260,7 +31265,7 @@ func (m *Module) fn105(v0, v1, v2, v3, v4 int32) int32 {
 								goto l3
 							}
 							v5 = i32(1)
-							t16 := int32(mem[uint64(uint32(v6))+4])
+							t16 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+4)))
 							t17 := int32(load32(mem, uint64(uint32(v6))))
 							if t16|(t17^i32(0x68746977)) != 0 {
 								goto l3
@@ -31322,7 +31327,7 @@ func (m *Module) fn105(v0, v1, v2, v3, v4 int32) int32 {
 					if uint32(v2-i32(123)) < uint32(i32(-26)) {
 						goto l10
 					}
-					mem[uint64(uint32(v1+v6))] = byte(v2)
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1+v6)))) = byte(v2)
 					v5 = v3
 				l10:
 					t5 := int32(load32(mem, uint64(uint32(v0))+8))
@@ -31338,11 +31343,11 @@ func (m *Module) fn105(v0, v1, v2, v3, v4 int32) int32 {
 				v2 = t20
 			}
 		l4:
-			t21 := int32(mem[uint64(uint32(v1))+8])
+			t21 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+8)))
 			t22 := v3
 			v9 = t21
 			v8 = t22 | v9
-			t23 := int32(mem[uint64(uint32(v1))+4])
+			t23 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+4)))
 			v7 = t23
 			v5 = i32(0)
 			switch v2 - i32(33) {
@@ -31471,11 +31476,11 @@ func (m *Module) fn105(v0, v1, v2, v3, v4 int32) int32 {
 					}
 				}
 			case 90:
-				t34 := int32(mem[uint64(uint32(v1))+36])
+				t34 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+36)))
 				if t34 != 0 {
 					goto l3
 				}
-				t35 := int32(mem[uint64(uint32(v1))+40])
+				t35 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+40)))
 				v5 = t35 ^ i32(1)
 				goto l3
 			case 9:
@@ -31488,14 +31493,14 @@ func (m *Module) fn105(v0, v1, v2, v3, v4 int32) int32 {
 				if v7&i32(1) != 0 {
 					goto l3
 				}
-				t36 := int32(mem[uint64(uint32(v1))+12])
+				t36 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+12)))
 				v5 = t36 ^ i32(1)
 				goto l3
 			case 58:
 				if v7&i32(1) != 0 {
 					goto l3
 				}
-				t37 := int32(mem[uint64(uint32(v1))+9])
+				t37 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+9)))
 				if t37 != 0 {
 					goto l3
 				}
@@ -31563,7 +31568,7 @@ func (m *Module) fn105(v0, v1, v2, v3, v4 int32) int32 {
 				if v5 != 0 {
 					goto l3
 				}
-				t51 := int32(mem[uint64(uint32(v1))+9])
+				t51 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+9)))
 				v5 = v3 | t51 ^ i32(1)
 				goto l3
 			default:
@@ -31775,7 +31780,7 @@ func (m *Module) fn107(v0, v1, v2, v3, v4 int32) int32 {
 						t12 := m.fn103(v1, v6+i32(8), i32(0), i32(2))
 						mem = m.memory
 						v5 = t12
-						t13 := int32(mem[uint64(uint32(v6))+8])
+						t13 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+8)))
 						var p14 int32
 						if v5 != i32(0) {
 							p14 = 1
@@ -31866,7 +31871,7 @@ func (m *Module) fn107(v0, v1, v2, v3, v4 int32) int32 {
 							}
 							t20 := v0
 							v3 = v3 - i32(1)
-							t21 := int32(mem[uint64(uint32(t20+int32(uint32(v3)>>2)))+8])
+							t21 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t20+int32(uint32(v3)>>2)))+8)))
 							if i32_shr_u(t21, v3<<1&i32(6))&i32(1) == 0 {
 								goto l10
 							}
@@ -31884,7 +31889,7 @@ func (m *Module) fn107(v0, v1, v2, v3, v4 int32) int32 {
 					if t22 != 0 {
 						goto l10
 					}
-					t23 := int32(mem[uint64(uint32(v2))])
+					t23 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 					if t23 != 0 {
 						{
 							if v7&i32(1) != 0 {
@@ -31906,14 +31911,14 @@ func (m *Module) fn107(v0, v1, v2, v3, v4 int32) int32 {
 						}
 					l13:
 						store16(mem, uint64(uint32(v1))+4, uint16(i32(34)))
-						t28 := int32(mem[uint64(uint32(v2))+34])
+						t28 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+34)))
 						v4 = t28
 						goto l0
 					}
 				}
 			l10:
 				store16(mem, uint64(uint32(v1))+4, uint16(i32(14)))
-				t24 := int32(mem[uint64(uint32(v2))+14])
+				t24 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+14)))
 				v4 = t24
 				goto l0
 			}
@@ -32000,7 +32005,7 @@ func (m *Module) fn109(v0, v1, v2, v3 int32) int32 {
 		}
 		t4 := v0
 		v4 = v4 - i32(1)
-		t5 := int32(mem[uint64(uint32(t4+int32(uint32(v4)>>2)))+8])
+		t5 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t4+int32(uint32(v4)>>2)))+8)))
 		p1 = i32_shr_u(t5, v4<<1&i32(6))
 	}
 l0:
@@ -32029,7 +32034,7 @@ l0:
 			t11 := int32(load32(mem, uint64(uint32(v1))+8))
 			m.t0[uint(t11)].(func(int32, int32))(v1, i32(0))
 			mem = m.memory
-			t12 := int32(mem[uint64(uint32(v3))+35])
+			t12 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+35)))
 			v5 = t12
 			t13 := int32(load32(mem, uint64(uint32(v1))))
 			t14 := v1
@@ -32041,7 +32046,7 @@ l0:
 				if v5&i32(1) == 0 {
 					goto l1
 				}
-				t16 := int32(mem[uint64(uint32(v3))+9])
+				t16 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+9)))
 				if t16 != i32(1) {
 					goto l1
 				}
@@ -32077,10 +32082,10 @@ l0:
 				}
 				t23 := int32(load32(mem, uint64(uint32(v1))))
 				v3 = t23
-				t24 := int32(mem[uint64(uint32(v6))+8])
+				t24 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+8)))
 				v5 = t24
 				{
-					t25 := int32(mem[uint64(uint32(v6))+9])
+					t25 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+9)))
 					if t25 != i32(1) {
 						goto l4
 					}
@@ -33078,12 +33083,12 @@ func (m *Module) Xtsg_init() int32 {
 			v8 = i32(0)
 		l19:
 			{
-				t153 := int32(mem[uint64(uint32(v2))+3])
+				t153 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+3)))
 				if t153 != 0 {
 					v5 = i32(0xffff)
 					goto l17
 				}
-				t154 := int32(mem[uint64(uint32(v2))+2])
+				t154 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+2)))
 				v7 = t154
 				if v0 != v2 {
 					t155 := int32(load16(mem, uint64(uint32(v2))))
@@ -33099,7 +33104,7 @@ func (m *Module) Xtsg_init() int32 {
 							p157 = 1
 						}
 						v14 = p157
-						t158 := int32(mem[uint64(uint32(v1+i32(2)))])
+						t158 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1+i32(2))))))
 						t159 := v14
 						t160 := v7
 						v15 = t158
@@ -33290,7 +33295,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 			{
 				{
 					{
-						t27 := int32(mem[uint64(uint32(v3))+1349])
+						t27 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+1349)))
 						v5 = t27
 						if v5 != 0 {
 							goto l5
@@ -33339,7 +33344,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 						store64(mem, uint64(uint32(v3))+132, uint64(t39))
 						m.fn37(v3)
 						mem = m.memory
-						t40 := int32(mem[uint64(uint32(v3))+1349])
+						t40 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+1349)))
 						if t40 == 0 {
 							goto l8
 						}
@@ -33362,7 +33367,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 					}
 				l10:
 					v2 = i32(0)
-					t44 := int32(mem[uint64(uint32(v3))+1348])
+					t44 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+1348)))
 					if t44 != 0 {
 						goto l11
 					}
@@ -33491,8 +33496,8 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 								goto l16
 							}
 						l15:
-							t80 := int32(mem[uint64(uint32(i32(66995)))])
-							mem[uint64(uint32(v3))+148] = byte(t80)
+							t80 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(66995))))))
+							*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+148)) = byte(t80)
 							t81 := int64(load64(mem, uint64(uint32(i32(66987)))))
 							store64(mem, uint64(uint32(v3))+140, uint64(t81))
 							t82 := int64(load64(mem, uint64(uint32(i32(66979)))))
@@ -33881,7 +33886,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 															p166 = i32(73020)
 															goto l33
 														}
-														t168 := int32(mem[uint64(uint32(v0))+44])
+														t168 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+44)))
 														if t168&i32(64) == 0 {
 															p166 = i32(73020)
 															goto l33
@@ -33899,7 +33904,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 														if v19 != 0 {
 															goto l34
 														}
-														t171 := int32(mem[uint64(uint32(v20))+44])
+														t171 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v20))+44)))
 														if t171&i32(64) == 0 {
 															goto l34
 														}
@@ -34159,7 +34164,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																	if uint32(v5) < uint32(i32(65534)) {
 																		goto l55
 																	}
-																	mem[uint64(uint32(v4))+496] = byte(i32(0))
+																	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+496)) = byte(i32(0))
 																	store32(mem, uint64(uint32(v4))+492, uint32(i32(0)))
 																	p232 = i32(0)
 																	goto l56
@@ -34232,10 +34237,10 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																t253 := int32(load32(mem, uint64(uint32(v11))+52))
 																t254 := v4
 																v0 = t253 + v2&i32(0xffff)<<3
-																t255 := int32(mem[uint64(uint32(v0))])
+																t255 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 																store32(mem, uint64(uint32(t254))+492, uint32(t255))
-																t256 := int32(mem[uint64(uint32(v0))+1])
-																mem[uint64(uint32(v4))+496] = byte(t256)
+																t256 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+1)))
+																*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+496)) = byte(t256)
 																p232 = v0 + i32(8)
 															}
 														l56:
@@ -34537,7 +34542,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 												p308 = i32(73020)
 												goto l77
 											}
-											t310 := int32(mem[uint64(uint32(v2))+44])
+											t310 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+44)))
 											if t310&i32(64) == 0 {
 												p308 = i32(73020)
 												goto l77
@@ -34558,7 +34563,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 											if v20&i32(1) != 0 {
 												goto l78
 											}
-											t313 := int32(mem[uint64(uint32(v20))+44])
+											t313 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v20))+44)))
 											if t313&i32(64) == 0 {
 												goto l78
 											}
@@ -34613,7 +34618,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 												if uint32(v6) < uint32(i32(65534)) {
 													goto l80
 												}
-												mem[uint64(uint32(v4))+496] = byte(i32(0))
+												*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+496)) = byte(i32(0))
 												store32(mem, uint64(uint32(v4))+492, uint32(i32(0)))
 												p322 = i32(0)
 												goto l81
@@ -34684,10 +34689,10 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 											t339 := int32(load32(mem, uint64(uint32(v5))+52))
 											t340 := v4
 											v0 = t339 + v2&i32(0xffff)<<3
-											t341 := int32(mem[uint64(uint32(v0))])
+											t341 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 											store32(mem, uint64(uint32(t340))+492, uint32(t341))
-											t342 := int32(mem[uint64(uint32(v0))+1])
-											mem[uint64(uint32(v4))+496] = byte(t342)
+											t342 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+1)))
+											*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+496)) = byte(t342)
 											p322 = v0 + i32(8)
 										}
 									l81:
@@ -34800,7 +34805,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																							t370 := int32(load32(mem, uint64(uint32(v3))+32))
 																							if t370 != v11 {
 																								store32(mem, uint64(uint32(v3))+124, uint32(i32(0)))
-																								mem[uint64(uint32(v3))+128] = byte(i32(0))
+																								*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+128)) = byte(i32(0))
 																								store64(mem, uint64(uint32(v3))+36, uint64(v56))
 																								store32(mem, uint64(uint32(v3))+32, uint32(v11))
 																								t371 := int32(load32(mem, uint64(uint32(v3))+68))
@@ -34967,7 +34972,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																										t406 := m.t0[uint(t405)].(func(int32, int32, int32) int32)(t400, t402, t403+t404*v1)
 																										mem = m.memory
 																										v1 = t406
-																										t407 := int32(mem[uint64(uint32(v3))+1348])
+																										t407 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+1348)))
 																										if t407 != 0 {
 																											v9 = i32(0)
 																											goto l87
@@ -35016,7 +35021,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																											v2 = int32(v60)
 																										}
 																									l94:
-																										t420 := int32(mem[uint64(uint32(v3))+120])
+																										t420 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+120)))
 																										t421 := int32(load32(mem, uint64(uint32(v38))))
 																										t422 := t420 | v19&i32(1)
 																										if uint32(t421) > uint32(v2) {
@@ -35057,7 +35062,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																												if v53 != 0 {
 																													goto l97
 																												}
-																												t434 := int32(mem[uint64(uint32(v28))+44])
+																												t434 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v28))+44)))
 																												if t434&i32(64) == 0 {
 																													goto l97
 																												}
@@ -35136,9 +35141,9 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																													{
 																														v55 = v0 & i32(1)
 																														if v55 != 0 {
-																															t457 := int32(mem[uint64(uint32(v2))+27])
+																															t457 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+27)))
 																															t458 := int32(load16(mem, uint64(uint32(v2))+24))
-																															t459 := int32(mem[uint64(uint32(v2+i32(26)))])
+																															t459 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2+i32(26))))))
 																															t460 := t457 + int32(uint32((t458|t459<<16)&i32(0xff0000))>>16)
 																															p456 = t460
 																															goto l101
@@ -35163,7 +35168,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																															}
 																															goto l99
 																														}
-																														t465 := int32(mem[uint64(uint32(v0))+45])
+																														t465 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+45)))
 																														if t465&i32(2) != 0 {
 																															goto l99
 																														}
@@ -35224,7 +35229,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																										t474 := int32(load32(mem, uint64(uint32(v27))))
 																										if t474 != v5 {
 																											store32(mem, uint64(uint32(v3))+124, uint32(i32(0)))
-																											mem[uint64(uint32(v3))+128] = byte(i32(0))
+																											*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+128)) = byte(i32(0))
 																											store64(mem, uint64(uint32(v3))+36, uint64(v58))
 																											store32(mem, uint64(uint32(v3))+32, uint32(v5))
 																											t475 := int32(load32(mem, uint64(uint32(v3))+68))
@@ -35421,7 +35426,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																										goto l115
 																									}
 																									store32(mem, uint64(uint32(v3))+124, uint32(i32(0)))
-																									mem[uint64(uint32(v3))+128] = byte(i32(0))
+																									*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+128)) = byte(i32(0))
 																									store64(mem, uint64(uint32(v3))+36, uint64(v56))
 																									store32(mem, uint64(uint32(v3))+32, uint32(v5))
 																									t520 := int32(load32(mem, uint64(uint32(v3))+68))
@@ -35820,7 +35825,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																		}
 																		t624 := int32(load32(mem, uint64(uint32(v27))))
 																		if t624 != v5 {
-																			mem[uint64(uint32(v3))+128] = byte(i32(0))
+																			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+128)) = byte(i32(0))
 																			store32(mem, uint64(uint32(v3))+124, uint32(i32(0)))
 																			store32(mem, uint64(uint32(v3))+32, uint32(v5))
 																			t625 := int64(load64(mem, uint64(uint32(v3))+48))
@@ -36117,7 +36122,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																t695 := int64(load64(mem, uint64(uint32(i32(71708)))))
 																store64(mem, uint64(uint32(v13)), uint64(t695))
 																{
-																	t696 := int32(mem[uint64(uint32(v2))])
+																	t696 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 																	v6 = t696
 																	if v6 == 0 {
 																		v2 = i32(20)
@@ -36157,7 +36162,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																			goto l148
 																		default:
 																			if v5 != i32(92) {
-																				mem[uint64(uint32(v2+v13))] = byte(v6)
+																				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2+v13)))) = byte(v6)
 																				t703 := v2 + i32(1)
 																				p697 = t703
 																				goto l148
@@ -36167,7 +36172,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																		}
 																	l148:
 																		v2 = p697
-																		t704 := int32(mem[uint64(uint32(v1))])
+																		t704 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 																		v6 = t704
 																		if v6 == 0 {
 																			goto l141
@@ -36200,7 +36205,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 														l87:
 															store32(mem, uint64(uint32(v4))+580, uint32(v9))
 															store32(mem, uint64(uint32(v4))+576, uint32(v0))
-															t710 := int32(mem[uint64(uint32(v3))+1348])
+															t710 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+1348)))
 															if t710 != 0 {
 																goto l150
 															}
@@ -36250,7 +36255,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																			goto l151
 																		}
 																		v2 = i32(0)
-																		mem[uint64(uint32(v4))+496] = byte(i32(0))
+																		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+496)) = byte(i32(0))
 																		store32(mem, uint64(uint32(v4))+492, uint32(i32(0)))
 																		t722 := v0
 																		p711 = t722
@@ -36321,10 +36326,10 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																	t737 := int32(load32(mem, uint64(uint32(v5))+52))
 																	t738 := v4
 																	v1 = t737 + v2&i32(0xffff)<<3
-																	t739 := int32(mem[uint64(uint32(v1))])
+																	t739 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 																	store32(mem, uint64(uint32(t738))+492, uint32(t739))
-																	t740 := int32(mem[uint64(uint32(v1))+1])
-																	mem[uint64(uint32(v4))+496] = byte(t740)
+																	t740 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+1)))
+																	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+496)) = byte(t740)
 																	v2 = v1 + i32(8)
 																	p711 = i32(0)
 																	goto l152
@@ -36397,10 +36402,10 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																t756 := int32(load32(mem, uint64(uint32(v5))+52))
 																t757 := v4
 																v1 = t756 + v2&i32(0xffff)<<3
-																t758 := int32(mem[uint64(uint32(v1))])
+																t758 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 																store32(mem, uint64(uint32(t757))+492, uint32(t758))
-																t759 := int32(mem[uint64(uint32(v1))+1])
-																mem[uint64(uint32(v4))+496] = byte(t759)
+																t759 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+1)))
+																*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+496)) = byte(t759)
 																v2 = v1 + i32(8)
 																p711 = v0
 															}
@@ -36410,8 +36415,8 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 															v8 = v1
 														}
 														store32(mem, uint64(uint32(v3))+1336, uint32(v29))
-														t760 := int32(mem[uint64(uint32(v3))+1350])
-														mem[uint64(uint32(v3))+1340] = byte(t760)
+														t760 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+1350)))
+														*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+1340)) = byte(t760)
 														t761 := int32(load32(mem, uint64(uint32(v3))+1300))
 														t762 := v3
 														v2 = t761 + i32(1)
@@ -36444,7 +36449,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 													}
 												l150:
 													v2 = i32(0)
-													t767 := int32(mem[uint64(uint32(v3))+1348])
+													t767 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+1348)))
 													if t767 != 0 {
 														goto l11
 													}
@@ -36471,7 +36476,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 															t771 := int32(load16(mem, uint64(uint32(v2+i32(2)))))
 															v0 = t771
 															{
-																t772 := int32(mem[uint64(uint32(v2))])
+																t772 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 																switch t772 {
 																case 2:
 																	{
@@ -36574,9 +36579,9 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																		t781 := v16
 																		var p780 int32
 																		{
-																			t782 := int32(mem[uint64(uint32(v4))+576])
+																			t782 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+576)))
 																			if t782&i32(1) != 0 {
-																				t783 := int32(mem[uint64(uint32(v4))+577])
+																				t783 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+577)))
 																				p780 = t783
 																				goto l172
 																			}
@@ -36627,7 +36632,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																		m.fn44(v4+i32(624), v30, v4+i32(168))
 																		mem = m.memory
 																		{
-																			t795 := int32(mem[uint64(uint32(v4))+624])
+																			t795 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+624)))
 																			v0 = t795
 																			if v0&i32(1) != 0 {
 																				t797 := v4
@@ -36636,7 +36641,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																				if v5 != 0 {
 																					p796 = i32(8)
 																				}
-																				mem[uint64(uint32(t797))+624] = byte(t798 | p796)
+																				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t797))+624)) = byte(t798 | p796)
 																				goto l175
 																			}
 																			t799 := int32(load32(mem, uint64(uint32(v4))+624))
@@ -36667,7 +36672,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																		if int32(v56)&i32(1) != 0 {
 																			goto l176
 																		}
-																		t808 := int32(mem[uint64(uint32(v0))+44])
+																		t808 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+44)))
 																		if t808&i32(64) == 0 {
 																			goto l176
 																		}
@@ -36685,7 +36690,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																				if v6&i32(1) != 0 {
 																					goto l177
 																				}
-																				t811 := int32(mem[uint64(uint32(v6))+44])
+																				t811 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6))+44)))
 																				if t811&i32(64) == 0 {
 																					goto l177
 																				}
@@ -36744,7 +36749,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 																case 1:
 																	t821 := int32(load16(mem, uint64(uint32(v2+i32(6)))))
 																	v14 = t821
-																	t822 := int32(mem[uint64(uint32(v2+i32(1)))])
+																	t822 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2+i32(1))))))
 																	v12 = t822
 																	{
 																		t823 := int32(load32(mem, uint64(uint32(v3))+96))
@@ -36876,7 +36881,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 															if uint32(v6) < uint32(i32(65534)) {
 																goto l191
 															}
-															mem[uint64(uint32(v4))+496] = byte(i32(0))
+															*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+496)) = byte(i32(0))
 															store32(mem, uint64(uint32(v4))+492, uint32(i32(0)))
 															p353 = i32(0)
 															goto l194
@@ -36912,7 +36917,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 															v1 = t867
 															v10 = int32(uint32(v1) >> 8)
 															v2 = i32(0)
-															t868 := int32(mem[uint64(uint32(v1))+45])
+															t868 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+45)))
 															if t868&i32(4) != 0 {
 																goto l197
 															}
@@ -36982,7 +36987,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 													}
 												l199:
 													if uint32(v6) >= uint32(i32(65534)) {
-														mem[uint64(uint32(v4))+496] = byte(i32(0))
+														*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+496)) = byte(i32(0))
 														store64(mem, uint64(uint32(v4))+488, uint64(i64(0)))
 														v2 = v0
 														goto l196
@@ -37054,11 +37059,11 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 													t899 := int32(load32(mem, uint64(uint32(v9))+52))
 													t900 := v4
 													v2 = t899 + v2&i32(0xffff)<<3
-													t901 := int32(mem[uint64(uint32(v2))])
+													t901 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 													v5 = t901
 													store32(mem, uint64(uint32(t900))+492, uint32(v5))
-													t902 := int32(mem[uint64(uint32(v2))+1])
-													mem[uint64(uint32(v4))+496] = byte(t902)
+													t902 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+1)))
+													*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+496)) = byte(t902)
 													store32(mem, uint64(uint32(v4))+488, uint32(v2+i32(8)))
 													if v5 == 0 {
 														v2 = v0
@@ -37141,19 +37146,19 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 														default:
 															t920 := int32(load32(mem, uint64(uint32(v5))+72))
 															v1 = t920 + v0*i32(3)
-															t921 := int32(mem[uint64(uint32(v1))+1])
+															t921 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+1)))
 															v2 = t921
-															t922 := int32(mem[uint64(uint32(v1))])
+															t922 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 															v1 = t922
 														}
 													}
 												l210:
 													{
-														t923 := int32(mem[uint64(uint32(v4))+592])
+														t923 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+592)))
 														v5 = t923
 														if v5&i32(1) != 0 {
-															mem[uint64(uint32(v4))+593] = byte(v0)
-															mem[uint64(uint32(v4))+592] = byte(v5&i32(249) | v2<<2 + v1<<1)
+															*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+593)) = byte(v0)
+															*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+592)) = byte(v5&i32(249) | v2<<2 + v1<<1)
 															goto l212
 														}
 														t924 := int32(load32(mem, uint64(uint32(v4))+592))
@@ -37361,10 +37366,10 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 										t976 := int32(load32(mem, uint64(uint32(v5))+52))
 										t977 := v4
 										v1 = t976 + v2&i32(0xffff)<<3
-										t978 := int32(mem[uint64(uint32(v1))])
+										t978 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 										store32(mem, uint64(uint32(t977))+492, uint32(t978))
-										t979 := int32(mem[uint64(uint32(v1))+1])
-										mem[uint64(uint32(v4))+496] = byte(t979)
+										t979 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+1)))
+										*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+496)) = byte(t979)
 										p353 = v1 + i32(8)
 									}
 								l194:
@@ -37875,11 +37880,11 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 												l246:
 													t1088 := int32(load32(mem, uint64(uint32(v5))+52))
 													v1 = t1088 + v2&i32(0xffff)<<3
-													t1089 := int32(mem[uint64(uint32(v1))])
+													t1089 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 													if t1089 == 0 {
 														goto l245
 													}
-													t1090 := int32(mem[uint64(uint32(v1))+8])
+													t1090 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+8)))
 													if t1090 != i32(1) {
 														goto l245
 													}
@@ -37894,7 +37899,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 															goto l250
 														}
 														store32(mem, uint64(uint32(v3))+124, uint32(i32(0)))
-														mem[uint64(uint32(v3))+128] = byte(i32(0))
+														*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+128)) = byte(i32(0))
 														store64(mem, uint64(uint32(v3))+36, uint64(v56))
 														store32(mem, uint64(uint32(v3))+32, uint32(v0))
 														t1094 := int32(load32(mem, uint64(uint32(v3))+68))
@@ -38162,10 +38167,10 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 													mem = m.memory
 													v2 = v5 - i32(1)
 													{
-														t1164 := int32(mem[uint64(uint32(v4))+488])
+														t1164 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+488)))
 														v1 = t1164
 														if v1&i32(1) != 0 {
-															mem[uint64(uint32(v4))+488] = byte(v1 | i32(32))
+															*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+488)) = byte(v1 | i32(32))
 															goto l258
 														}
 														t1165 := int32(load32(mem, uint64(uint32(v4))+488))
@@ -38377,8 +38382,8 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 							goto l271
 						}
 					}
-					t1214 := int32(mem[uint64(uint32(i32(70271)))])
-					mem[uint64(uint32(v13))+8] = byte(t1214)
+					t1214 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(70271))))))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v13))+8)) = byte(t1214)
 					t1215 := int64(load64(mem, uint64(uint32(i32(70263)))))
 					store64(mem, uint64(uint32(v13)), uint64(t1215))
 					m.fn37(v3)
@@ -38414,7 +38419,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 							p1221 = t1222
 							goto l273
 						}
-						t1223 := int32(mem[uint64(uint32(v0))+45])
+						t1223 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+45)))
 						if t1223&i32(2) != 0 {
 							p1221 = i32(610)
 							goto l273
@@ -38464,7 +38469,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 				}
 			l9:
 				{
-					t1232 := int32(mem[uint64(uint32(v3))+1349])
+					t1232 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+1349)))
 					if t1232 != 0 {
 						goto l277
 					}
@@ -38894,7 +38899,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 						}
 					}
 				}
-				mem[uint64(uint32(v3))+1349] = byte(i32(0))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+1349)) = byte(i32(0))
 				var p1340 int32
 				{
 					{
@@ -38905,8 +38910,8 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 								goto l292
 							}
 						}
-						t1343 := int32(mem[uint64(uint32(i32(70855)))])
-						mem[uint64(uint32(v3))+136] = byte(t1343)
+						t1343 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(70855))))))
+						*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+136)) = byte(t1343)
 						t1344 := int32(load32(mem, uint64(uint32(i32(70851)))))
 						store32(mem, uint64(uint32(v3))+132, uint32(t1344))
 						m.fn37(v3)
@@ -38997,7 +39002,7 @@ func (m *Module) Xtsg_parse(v0, v1, v2 int32) int32 {
 			mem = m.memory
 			goto l1
 		l280:
-			mem[uint64(uint32(v3))+1349] = byte(i32(1))
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+1349)) = byte(i32(1))
 			v2 = i32(0)
 		}
 	l1:
@@ -39456,23 +39461,23 @@ l22:
 			v6 = v3 & i32(1)
 			if v6 != 0 {
 				v33 = int32(uint32(v3&i32(128)) >> 7)
-				t60 := int32(mem[uint64(uint32(v24))+7])
+				t60 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v24))+7)))
 				v2 = t60
 				v11 = int64(uint32(v2)) << 32
-				t61 := int32(mem[uint64(uint32(v24))+6])
+				t61 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v24))+6)))
 				v0 = t61
-				t62 := int32(mem[uint64(uint32(v24))+5])
+				t62 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v24))+5)))
 				v21 = t62
-				t63 := int64(mem[uint64(uint32(v24))+4])
+				t63 := int64(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v24))+4)))
 				t64 := int64(uint32(v21&i32(15))) | t63<<32
 				p56 = t64
 				goto l5
 			}
-			t65 := int32(mem[uint64(uint32(v3))+45])
+			t65 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+45)))
 			v33 = t65 & i32(1)
 			t66 := int32(load32(mem, uint64(uint32(v3))+4))
 			v0 = t66
-			t67 := int32(mem[uint64(uint32(v24))+5])
+			t67 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v24))+5)))
 			v21 = t67
 			t68 := int64(load64(mem, uint64(uint32(v3))+20))
 			v11 = t68
@@ -39702,7 +39707,7 @@ l22:
 			m.fn44(v8+i32(8), v32, v8)
 			mem = m.memory
 			{
-				t122 := int32(mem[uint64(uint32(v8))+8])
+				t122 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8))+8)))
 				v5 = t122
 				if v5&i32(1) != 0 {
 					{
@@ -39727,11 +39732,11 @@ l22:
 						if v11&i64(0xffffffff) != i64(0) {
 							goto l10
 						}
-						mem[uint64(uint32(v8))+14] = byte(v0)
-						mem[uint64(uint32(v8))+15] = byte(v6)
-						mem[uint64(uint32(v8))+12] = byte(int64(uint64(v10) >> 32))
-						t123 := int32(mem[uint64(uint32(v8))+13])
-						mem[uint64(uint32(v8))+13] = byte(t123&i32(240) | int32(v10)&i32(15))
+						*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8))+14)) = byte(v0)
+						*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8))+15)) = byte(v6)
+						*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8))+12)) = byte(int64(uint64(v10) >> 32))
+						t123 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8))+13)))
+						*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8))+13)) = byte(t123&i32(240) | int32(v10)&i32(15))
 						v2 = v5
 						goto l11
 					}
@@ -39764,7 +39769,7 @@ l22:
 					store64(mem, uint64(uint32(v2))+8, uint64(v10))
 					store32(mem, uint64(uint32(v2))+4, uint32(v0))
 					store32(mem, uint64(uint32(v2)), uint32(i32(1)))
-					t131 := int32(mem[uint64(uint32(v8))+9])
+					t131 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8))+9)))
 					store16(mem, uint64(uint32(v2))+40, uint16(t131))
 					t132 := int32(load16(mem, uint64(uint32(v8))+10))
 					store16(mem, uint64(uint32(v2))+42, uint16(t132))
@@ -39783,7 +39788,7 @@ l22:
 		l11:
 			{
 				if v2&i32(1) != 0 {
-					mem[uint64(uint32(v8))+8] = byte(v2 | i32(16))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8))+8)) = byte(v2 | i32(16))
 					goto l13
 				}
 				t135 := int32(load32(mem, uint64(uint32(v8))+8))
@@ -39820,7 +39825,7 @@ l22:
 				v0 = t140
 				t141 := int32(load32(mem, uint64(uint32(v0))+36))
 				v25 = v0 - t141<<3 + v35
-				t142 := int32(mem[uint64(uint32(v25+i32(5)))])
+				t142 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v25+i32(5))))))
 				v6 = t142
 				var p143 int32
 				{
@@ -39829,11 +39834,11 @@ l22:
 					v7 = v0 & i32(1)
 					if v7 != 0 {
 						v21 = v6 & i32(15)
-						t145 := int32(mem[uint64(uint32(v25+i32(4)))])
+						t145 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v25+i32(4))))))
 						v37 = t145
-						t146 := int32(mem[uint64(uint32(v25+i32(7)))])
+						t146 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v25+i32(7))))))
 						v38 = t146
-						t147 := int32(mem[uint64(uint32(v25+i32(6)))])
+						t147 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v25+i32(6))))))
 						t148 := v38 + t147
 						p143 = t148
 						goto l14
@@ -39909,7 +39914,7 @@ l22:
 						if v7 != 0 {
 							p163 = int32(uint32(v0)>>7) & i32(1)
 						} else {
-							t164 := int32(mem[uint64(uint32(v0))+45])
+							t164 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+45)))
 							p163 = t164 & i32(1)
 						}
 						if p163 == 0 {
@@ -40197,11 +40202,11 @@ func (m *Module) Xtsg_changed_ranges(v0, v1 int32) int32 {
 		t4 := int32(load32(mem, uint64(uint32(v0))))
 		v1 = t4
 		if v1&i32(1) != 0 {
-			t5 := int32(mem[uint64(uint32(v0))+4])
+			t5 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+4)))
 			v7 = t5
-			t6 := int32(mem[uint64(uint32(v0))+6])
+			t6 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+6)))
 			v15 = t6
-			t7 := int32(mem[uint64(uint32(v0))+5])
+			t7 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+5)))
 			t8 := t7 & i32(15)
 			p3 = t8
 			goto l0
@@ -40234,11 +40239,11 @@ l0:
 		t15 := int32(load32(mem, uint64(uint32(v3))))
 		v1 = t15
 		if v1&i32(1) != 0 {
-			t16 := int32(mem[uint64(uint32(v3))+4])
+			t16 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+4)))
 			v7 = t16
-			t17 := int32(mem[uint64(uint32(v3))+6])
+			t17 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+6)))
 			v15 = t17
-			t18 := int32(mem[uint64(uint32(v3))+5])
+			t18 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+5)))
 			t19 := t18 & i32(15)
 			p14 = t19
 			goto l1
@@ -40413,7 +40418,7 @@ l1:
 	v6 = t66
 	t67 := int64(load64(mem, uint64(uint32(v0-i32(20)))))
 	v35 = t67
-	t68 := int32(mem[uint64(uint32(v2))+68])
+	t68 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+68)))
 	if t68 == 0 {
 		t69 := int32(v35)
 		v1 = int32(int64(uint64(v35) >> 32))
@@ -40424,11 +40429,11 @@ l1:
 			t72 := int32(load32(mem, uint64(uint32(v3))))
 			v0 = t72
 			if v0&i32(1) != 0 {
-				t73 := int32(mem[uint64(uint32(v3))+4])
+				t73 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+4)))
 				v9 = t73
-				t74 := int32(mem[uint64(uint32(v3))+6])
+				t74 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+6)))
 				v4 = t74
-				t75 := int32(mem[uint64(uint32(v3))+5])
+				t75 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+5)))
 				t76 := t75 & i32(15)
 				p70 = t76
 				goto l5
@@ -40467,11 +40472,11 @@ l1:
 		t90 := int32(load32(mem, uint64(uint32(v15))))
 		v0 = t90
 		if v0&i32(1) != 0 {
-			t91 := int32(mem[uint64(uint32(v15))+4])
+			t91 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v15))+4)))
 			v17 = t91
-			t92 := int32(mem[uint64(uint32(v15))+6])
+			t92 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v15))+6)))
 			v4 = t92
-			t93 := int32(mem[uint64(uint32(v15))+5])
+			t93 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v15))+5)))
 			t94 := t93 & i32(15)
 			p88 = t94
 			goto l6
@@ -40532,7 +40537,7 @@ l83:
 			var p104 int32
 			{
 				{
-					t105 := int32(mem[uint64(uint32(v2))+68])
+					t105 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+68)))
 					v26 = t105
 					if v26 == i32(1) {
 						if v1 != 0 {
@@ -40592,7 +40597,7 @@ l83:
 				l13:
 					if p116|v0&i32(0xffff) != 0 {
 						v5 = int32(uint32(v9) >> 8)
-						t120 := int32(mem[uint64(uint32(v12))+7])
+						t120 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v12))+7)))
 						v29 = t120
 						t121 := int32(load32(mem, uint64(uint32(v1-i32(16)))))
 						p103 = t121
@@ -40626,7 +40631,7 @@ l83:
 			var p123 int32
 			{
 				{
-					t124 := int32(mem[uint64(uint32(v2))+28])
+					t124 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+28)))
 					v21 = t124
 					if v21 == i32(1) {
 						if v1 != 0 {
@@ -40686,7 +40691,7 @@ l83:
 				l21:
 					if p135|v10&i32(0xffff) != 0 {
 						v4 = int32(uint32(v17) >> 8)
-						t139 := int32(mem[uint64(uint32(v12))+7])
+						t139 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v12))+7)))
 						v30 = t139
 						t140 := int32(load32(mem, uint64(uint32(v1-i32(16)))))
 						p122 = t140
@@ -40796,12 +40801,12 @@ l83:
 							}
 							v0 = i32(0)
 							if v22 == 0 {
-								t155 := int32(mem[uint64(uint32(v9))+44])
+								t155 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v9))+44)))
 								v0 = int32(uint32(t155&i32(64)) >> 6)
 							}
 							v1 = v0
 							if v12 == 0 {
-								t156 := int32(mem[uint64(uint32(v17))+44])
+								t156 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v17))+44)))
 								v1 = v1 ^ int32(uint32(t156&i32(64))>>6)
 							}
 							var p157 int32
@@ -40811,7 +40816,7 @@ l83:
 									p157 = t158
 									goto l28
 								}
-								t159 := int32(mem[uint64(uint32(v9))+45])
+								t159 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v9))+45)))
 								if t159&i32(2) != 0 {
 									p157 = i32(610)
 									goto l28
@@ -40828,7 +40833,7 @@ l83:
 									p161 = t162
 									goto l29
 								}
-								t163 := int32(mem[uint64(uint32(v17))+45])
+								t163 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v17))+45)))
 								if t163&i32(2) != 0 {
 									p161 = i32(610)
 									goto l29
@@ -40896,7 +40901,7 @@ l83:
 									p171 = i32(73020)
 									goto l31
 								}
-								t173 := int32(mem[uint64(uint32(v0))+44])
+								t173 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+44)))
 								if t173&i32(64) == 0 {
 									p171 = i32(73020)
 									goto l31
@@ -40919,7 +40924,7 @@ l83:
 								if v0&i32(1) != 0 {
 									goto l32
 								}
-								t177 := int32(mem[uint64(uint32(v0))+44])
+								t177 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+44)))
 								if t177&i32(64) == 0 {
 									goto l32
 								}
@@ -40978,13 +40983,13 @@ l83:
 										t195 := int32(load32(mem, uint64(uint32(v18))))
 										v22 = t195
 										if v22&i32(1) != 0 {
-											t196 := int32(mem[uint64(uint32(v18))+6])
+											t196 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v18))+6)))
 											v1 = v1 + t196
-											t197 := int32(mem[uint64(uint32(v18))+5])
+											t197 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v18))+5)))
 											t198 := v5
 											v0 = t197 & i32(15)
 											v10 = t198 + v0
-											t199 := int32(mem[uint64(uint32(v18))+4])
+											t199 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v18))+4)))
 											p200 := v3
 											if v0 != 0 {
 												p200 = i32(0)
@@ -40993,7 +40998,7 @@ l83:
 											if v26 != 0 {
 												goto l34
 											}
-											t201 := int32(mem[uint64(uint32(v18))+7])
+											t201 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v18))+7)))
 											t202 := v1
 											v4 = t201
 											t203 := t202 + v4
@@ -41053,13 +41058,13 @@ l83:
 										t218 := int32(load32(mem, uint64(uint32(v5))))
 										v11 = t218
 										if v11&i32(1) != 0 {
-											t219 := int32(mem[uint64(uint32(v5))+6])
+											t219 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+6)))
 											v4 = v8 + t219
-											t220 := int32(mem[uint64(uint32(v5))+5])
+											t220 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+5)))
 											t221 := v12
 											v0 = t220 & i32(15)
 											v3 = t221 + v0
-											t222 := int32(mem[uint64(uint32(v5))+4])
+											t222 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+4)))
 											p223 := v13
 											if v0 != 0 {
 												p223 = i32(0)
@@ -41068,7 +41073,7 @@ l83:
 											if v21 != 0 {
 												goto l38
 											}
-											t224 := int32(mem[uint64(uint32(v5))+7])
+											t224 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+7)))
 											t225 := v4
 											v0 = t224
 											t226 := t225 + v0
@@ -41154,14 +41159,14 @@ l83:
 					v18 = t246
 					v12 = v18 & i32(1)
 					if v12 != 0 {
-						t247 := int32(mem[uint64(uint32(v11))+6])
+						t247 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v11))+6)))
 						v0 = v5 + t247
 						t248 := v0
 						if v26 != 0 {
 							p244 = t248
 							goto l43
 						}
-						t249 := int32(mem[uint64(uint32(v11))+7])
+						t249 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v11))+7)))
 						t250 := v0 + t249
 						p244 = t250
 						goto l43
@@ -41213,13 +41218,13 @@ l83:
 				{
 					{
 						if v12 != 0 {
-							t261 := int32(mem[uint64(uint32(v11))+6])
+							t261 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v11))+6)))
 							v3 = v5 + t261
-							t262 := int32(mem[uint64(uint32(v11))+5])
+							t262 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v11))+5)))
 							t263 := v1
 							v0 = t262 & i32(15)
 							v1 = t263 + v0
-							t264 := int32(mem[uint64(uint32(v11))+4])
+							t264 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v11))+4)))
 							p265 := v8
 							if v0 != 0 {
 								p265 = i32(0)
@@ -41228,7 +41233,7 @@ l83:
 							if v26 != 0 {
 								goto l46
 							}
-							t266 := int32(mem[uint64(uint32(v11))+7])
+							t266 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v11))+7)))
 							t267 := v3
 							v0 = t266
 							t268 := t267 + v0
@@ -41304,23 +41309,23 @@ l83:
 						t288 := int32(load32(mem, uint64(uint32(v13))))
 						v5 = t288
 						if v5&i32(1) != 0 {
-							t289 := int32(mem[uint64(uint32(v13))+6])
+							t289 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v13))+6)))
 							v3 = v1 + t289
-							t290 := int32(mem[uint64(uint32(v13))+5])
+							t290 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v13))+5)))
 							t291 := v8
 							v1 = t290 & i32(15)
 							v0 = t291 + v1
-							t292 := int32(mem[uint64(uint32(v13))+4])
+							t292 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v13))+4)))
 							p293 := v12
 							if v1 != 0 {
 								p293 = i32(0)
 							}
 							v10 = t292 + p293
-							t294 := int32(mem[uint64(uint32(v2))+68])
+							t294 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+68)))
 							if t294 != 0 {
 								goto l50
 							}
-							t295 := int32(mem[uint64(uint32(v13))+7])
+							t295 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v13))+7)))
 							t296 := v3
 							v1 = t295
 							t297 := t296 + v1
@@ -41339,7 +41344,7 @@ l83:
 						v0 = v0 + v8
 						t302 := int32(load32(mem, uint64(uint32(v5))+4))
 						v3 = t302 + v1
-						t303 := int32(mem[uint64(uint32(v2))+68])
+						t303 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+68)))
 						if t303 != i32(1) {
 							goto l52
 						}
@@ -41385,23 +41390,23 @@ l83:
 						t316 := int32(load32(mem, uint64(uint32(v13))))
 						v5 = t316
 						if v5&i32(1) != 0 {
-							t317 := int32(mem[uint64(uint32(v13))+6])
+							t317 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v13))+6)))
 							v3 = v1 + t317
-							t318 := int32(mem[uint64(uint32(v13))+5])
+							t318 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v13))+5)))
 							t319 := v8
 							v1 = t318 & i32(15)
 							v0 = t319 + v1
-							t320 := int32(mem[uint64(uint32(v13))+4])
+							t320 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v13))+4)))
 							p321 := v12
 							if v1 != 0 {
 								p321 = i32(0)
 							}
 							v10 = t320 + p321
-							t322 := int32(mem[uint64(uint32(v2))+28])
+							t322 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+28)))
 							if t322 != 0 {
 								goto l53
 							}
-							t323 := int32(mem[uint64(uint32(v13))+7])
+							t323 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v13))+7)))
 							t324 := v3
 							v1 = t323
 							t325 := t324 + v1
@@ -41420,7 +41425,7 @@ l83:
 						v0 = v0 + v8
 						t330 := int32(load32(mem, uint64(uint32(v5))+4))
 						v3 = t330 + v1
-						t331 := int32(mem[uint64(uint32(v2))+28])
+						t331 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+28)))
 						if t331 != i32(1) {
 							goto l55
 						}
@@ -41477,23 +41482,23 @@ l83:
 							t350 := int32(load32(mem, uint64(uint32(v18))))
 							v21 = t350
 							if v21&i32(1) != 0 {
-								t351 := int32(mem[uint64(uint32(v18))+6])
+								t351 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v18))+6)))
 								v1 = v1 + t351
-								t352 := int32(mem[uint64(uint32(v18))+5])
+								t352 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v18))+5)))
 								t353 := v5
 								v0 = t352 & i32(15)
 								v10 = t353 + v0
-								t354 := int32(mem[uint64(uint32(v18))+4])
+								t354 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v18))+4)))
 								p355 := v3
 								if v0 != 0 {
 									p355 = i32(0)
 								}
 								v3 = t354 + p355
-								t356 := int32(mem[uint64(uint32(v2))+68])
+								t356 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+68)))
 								if t356 != 0 {
 									goto l56
 								}
-								t357 := int32(mem[uint64(uint32(v18))+7])
+								t357 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v18))+7)))
 								t358 := v1
 								v4 = t357
 								t359 := t358 + v4
@@ -41512,7 +41517,7 @@ l83:
 							v10 = v0 + v5
 							t364 := int32(load32(mem, uint64(uint32(v21))+4))
 							v1 = t364 + v1
-							t365 := int32(mem[uint64(uint32(v2))+68])
+							t365 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+68)))
 							if t365 != i32(1) {
 								goto l58
 							}
@@ -41554,23 +41559,23 @@ l83:
 							t375 := int32(load32(mem, uint64(uint32(v5))))
 							v11 = t375
 							if v11&i32(1) != 0 {
-								t376 := int32(mem[uint64(uint32(v5))+6])
+								t376 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+6)))
 								v4 = v8 + t376
-								t377 := int32(mem[uint64(uint32(v5))+5])
+								t377 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+5)))
 								t378 := v12
 								v0 = t377 & i32(15)
 								v3 = t378 + v0
-								t379 := int32(mem[uint64(uint32(v5))+4])
+								t379 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+4)))
 								p380 := v13
 								if v0 != 0 {
 									p380 = i32(0)
 								}
 								v9 = t379 + p380
-								t381 := int32(mem[uint64(uint32(v2))+28])
+								t381 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+28)))
 								if t381 != 0 {
 									goto l60
 								}
-								t382 := int32(mem[uint64(uint32(v5))+7])
+								t382 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+7)))
 								t383 := v4
 								v0 = t382
 								t384 := t383 + v0
@@ -41589,7 +41594,7 @@ l83:
 							v3 = v0 + v12
 							t389 := int32(load32(mem, uint64(uint32(v11))+4))
 							v4 = t389 + v8
-							t390 := int32(mem[uint64(uint32(v2))+28])
+							t390 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+28)))
 							if t390 != i32(1) {
 								goto l62
 							}
@@ -41663,22 +41668,22 @@ l83:
 					t405 := int32(load32(mem, uint64(uint32(v12))))
 					v8 = t405
 					if v8&i32(1) != 0 {
-						t406 := int32(mem[uint64(uint32(v12))+6])
+						t406 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v12))+6)))
 						v0 = v5 + t406
-						t407 := int32(mem[uint64(uint32(v2))+68])
+						t407 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+68)))
 						t408 := v0
 						if t407 != 0 {
 							p403 = t408
 							goto l65
 						}
-						t409 := int32(mem[uint64(uint32(v12))+7])
+						t409 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v12))+7)))
 						t410 := v0 + t409
 						p403 = t410
 						goto l65
 					}
 					t411 := int32(load32(mem, uint64(uint32(v8))+4))
 					v0 = t411 + v5
-					t412 := int32(mem[uint64(uint32(v2))+68])
+					t412 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+68)))
 					t413 := v0
 					if t412 != 0 {
 						p403 = t413
@@ -41717,22 +41722,22 @@ l83:
 					t421 := int32(load32(mem, uint64(uint32(v12))))
 					v8 = t421
 					if v8&i32(1) != 0 {
-						t422 := int32(mem[uint64(uint32(v12))+6])
+						t422 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v12))+6)))
 						v0 = v5 + t422
-						t423 := int32(mem[uint64(uint32(v2))+28])
+						t423 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+28)))
 						t424 := v0
 						if t423 != 0 {
 							p419 = t424
 							goto l67
 						}
-						t425 := int32(mem[uint64(uint32(v12))+7])
+						t425 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v12))+7)))
 						t426 := v0 + t425
 						p419 = t426
 						goto l67
 					}
 					t427 := int32(load32(mem, uint64(uint32(v8))+4))
 					v0 = t427 + v5
-					t428 := int32(mem[uint64(uint32(v2))+28])
+					t428 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+28)))
 					t429 := v0
 					if t428 != 0 {
 						p419 = t429
@@ -41752,7 +41757,7 @@ l83:
 		}
 		v4 = i32(0)
 	l68:
-		t431 := int32(mem[uint64(uint32(v2))+68])
+		t431 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+68)))
 		v9 = t431
 		t432 := int32(load32(mem, uint64(uint32(v2))+64))
 		v0 = t432
@@ -41830,10 +41835,10 @@ l83:
 				}
 			}
 		}
-		mem[uint64(uint32(v2))+68] = byte(v9)
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+68)) = byte(v9)
 		store32(mem, uint64(uint32(v2))+48, uint32(v1))
 		store32(mem, uint64(uint32(v2))+64, uint32(v0))
-		t452 := int32(mem[uint64(uint32(v2))+28])
+		t452 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+28)))
 		v1 = t452
 		if uint32(v0) < uint32(v10) {
 			t453 := int32(load32(mem, uint64(uint32(v2))+20))
@@ -41906,7 +41911,7 @@ l83:
 				}
 			}
 		}
-		mem[uint64(uint32(v2))+28] = byte(v1)
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+28)) = byte(v1)
 		store32(mem, uint64(uint32(v2))+8, uint32(v4))
 		store32(mem, uint64(uint32(v2))+24, uint32(v10))
 		if v13 == 0 {
@@ -42019,13 +42024,13 @@ l83:
 		t487 := int32(load32(mem, uint64(uint32(v24))))
 		v6 = t487
 		if v6&i32(1) != 0 {
-			t488 := int32(mem[uint64(uint32(v24))+7])
+			t488 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v24))+7)))
 			v1 = t488
-			t489 := int32(mem[uint64(uint32(v24))+6])
+			t489 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v24))+6)))
 			v4 = v1 + t489
-			t490 := int32(mem[uint64(uint32(v24))+4])
+			t490 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v24))+4)))
 			v3 = t490
-			t491 := int32(mem[uint64(uint32(v24))+5])
+			t491 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v24))+5)))
 			t492 := t491 & i32(15)
 			p486 = t492
 			goto l84
@@ -42053,13 +42058,13 @@ l84:
 		t501 := int32(load32(mem, uint64(uint32(v27))))
 		v6 = t501
 		if v6&i32(1) != 0 {
-			t502 := int32(mem[uint64(uint32(v27))+7])
+			t502 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v27))+7)))
 			v1 = t502
-			t503 := int32(mem[uint64(uint32(v27))+6])
+			t503 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v27))+6)))
 			v10 = v1 + t503
-			t504 := int32(mem[uint64(uint32(v27))+4])
+			t504 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v27))+4)))
 			v9 = t504
-			t505 := int32(mem[uint64(uint32(v27))+5])
+			t505 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v27))+5)))
 			t506 := t505 & i32(15)
 			p500 = t506
 			goto l85
@@ -42267,7 +42272,7 @@ l87:
 func (m *Module) Xtsg_export_end() {
 	var v0 int32
 	mem := m.memory
-	t0 := int32(mem[uint64(uint32(i32(2078140)))])
+	t0 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078140))))))
 	if t0 != 0 {
 		t1 := int32(load32(mem, uint64(uint32(i32(2078124)))))
 		v0 = t1
@@ -42278,7 +42283,7 @@ func (m *Module) Xtsg_export_end() {
 		}
 		store32(mem, uint64(uint32(i32(2078132))), uint32(i32(0)))
 		store64(mem, uint64(uint32(i32(2078124))), uint64(i64(0)))
-		mem[uint64(uint32(i32(2078140)))] = byte(i32(0))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078140))))) = byte(i32(0))
 	}
 	t3 := int32(load32(mem, uint64(uint32(i32(2078108)))))
 	m.fn168(t3)
@@ -42300,14 +42305,14 @@ func (m *Module) Xtsg_export_end() {
 	if v0 != 0 {
 		store32(mem, uint64(uint32(v0))+12, uint32(i32(0)))
 	}
-	mem[uint64(uint32(i32(2078092)))] = byte(i32(1))
+	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078092))))) = byte(i32(1))
 }
 func (m *Module) Xtsg_export_buf() int32 {
 	t0 := int32(load32(m.memory, uint64(uint32(i32(2078096)))))
 	return t0
 }
 func (m *Module) Xtsg_export_err() int32 {
-	t0 := int32(m.memory[uint64(uint32(i32(2078100)))])
+	t0 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(m.memory)), uint64(uint32(i32(2078100))))))
 	return t0
 }
 func (m *Module) Xtsg_export_begin(v0 int32) int32 {
@@ -42316,7 +42321,7 @@ func (m *Module) Xtsg_export_begin(v0 int32) int32 {
 	v1 = t0 - i32(128)
 	m.g0 = v1
 	mem := m.memory
-	t1 := int32(mem[uint64(uint32(i32(2078140)))])
+	t1 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078140))))))
 	if t1 != 0 {
 		t2 := int32(load32(mem, uint64(uint32(i32(2078124)))))
 		v2 = t2
@@ -42327,7 +42332,7 @@ func (m *Module) Xtsg_export_begin(v0 int32) int32 {
 		}
 		store32(mem, uint64(uint32(i32(2078132))), uint32(i32(0)))
 		store64(mem, uint64(uint32(i32(2078124))), uint64(i64(0)))
-		mem[uint64(uint32(i32(2078140)))] = byte(i32(0))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078140))))) = byte(i32(0))
 	}
 	t4 := int32(load32(mem, uint64(uint32(i32(2078108)))))
 	m.fn168(t4)
@@ -42351,8 +42356,8 @@ func (m *Module) Xtsg_export_begin(v0 int32) int32 {
 				t8 := int32(load32(mem, uint64(uint32(i32(2078096)))))
 				v2 = t8
 				if v2 == 0 {
-					mem[uint64(uint32(i32(2078100)))] = byte(i32(0))
-					mem[uint64(uint32(i32(2078092)))] = byte(i32(0))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078100))))) = byte(i32(0))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078092))))) = byte(i32(0))
 					if v0 == 0 {
 						p7 = i32(0)
 						goto l0
@@ -42370,8 +42375,8 @@ func (m *Module) Xtsg_export_begin(v0 int32) int32 {
 					goto l1
 				}
 				store32(mem, uint64(uint32(v2))+12, uint32(i32(0)))
-				mem[uint64(uint32(i32(2078092)))] = byte(i32(0))
-				mem[uint64(uint32(i32(2078100)))] = byte(i32(0))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078092))))) = byte(i32(0))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078100))))) = byte(i32(0))
 				if v0 == 0 {
 					p7 = i32(0)
 					goto l0
@@ -42414,7 +42419,7 @@ func (m *Module) Xtsg_export_begin(v0 int32) int32 {
 			store64(mem, uint64(uint32(i32(2078128))), uint64(t19))
 			t20 := int64(load64(mem, uint64(uint32(v1))+84))
 			store64(mem, uint64(uint32(i32(2078120))), uint64(t20))
-			mem[uint64(uint32(i32(2078140)))] = byte(i32(1))
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078140))))) = byte(i32(1))
 			store32(mem, uint64(uint32(i32(2078144))), uint32(i32(0)))
 			store32(mem, uint64(uint32(i32(2078148))), uint32(i32(0)))
 			t21 := int32(load32(mem, uint64(uint32(i32(2078116)))))
@@ -42437,11 +42442,11 @@ func (m *Module) Xtsg_export_next() int32 {
 	store32(mem, uint64(uint32(v4))+12, uint32(i32(0)))
 	store32(mem, uint64(uint32(i32(2078152))), uint32(i32(0)))
 	{
-		t2 := int32(mem[uint64(uint32(i32(2078140)))])
+		t2 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078140))))))
 		if t2 == 0 {
 			goto l0
 		}
-		t3 := int32(mem[uint64(uint32(i32(2078092)))])
+		t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078092))))))
 		if t3&i32(1) != 0 {
 			goto l0
 		}
@@ -42470,8 +42475,8 @@ func (m *Module) Xtsg_export_next() int32 {
 							t6 := m.fn0()
 							mem = m.memory
 							if t6 != 0 {
-								mem[uint64(uint32(i32(2078092)))] = byte(i32(1))
-								mem[uint64(uint32(i32(2078100)))] = byte(i32(1))
+								*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078092))))) = byte(i32(1))
+								*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078100))))) = byte(i32(1))
 								v1 = v4
 								goto l2
 							}
@@ -42480,8 +42485,8 @@ func (m *Module) Xtsg_export_next() int32 {
 						}
 						t8 := int32(load32(mem, uint64(uint32(i32(2078116)))))
 						if uint32(p5) >= uint32(t8) {
-							mem[uint64(uint32(i32(2078092)))] = byte(i32(1))
-							mem[uint64(uint32(i32(2078100)))] = byte(i32(1))
+							*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078092))))) = byte(i32(1))
+							*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078100))))) = byte(i32(1))
 							v1 = v4
 							goto l2
 						}
@@ -43040,7 +43045,7 @@ func (m *Module) Xtsg_export_next() int32 {
 							t139 := int32(load32(mem, uint64(uint32(v1))+20))
 							t140 := int32(load32(mem, uint64(uint32(t139))+8))
 							t141 := int32(load32(mem, uint64(uint32(t140))+72))
-							t142 := int32(mem[uint64(uint32(t141+v2*i32(3)))+1])
+							t142 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t141+v2*i32(3)))+1)))
 							var p143 int32
 							if t142 != i32(0) {
 								p143 = 1
@@ -43144,7 +43149,7 @@ func (m *Module) Xtsg_export_next() int32 {
 				if t178 != 0 {
 					p179 = i32(16)
 				}
-				mem[uint64(uint32(t172))] = byte(t180 | p179)
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t172)))) = byte(t180 | p179)
 				t181 := int64(load64(mem, uint64(uint32(v0))+408))
 				store64(mem, uint64(uint32(v0))+48, uint64(t181))
 				t182 := int64(load64(mem, uint64(uint32(v0))+400))
@@ -43206,7 +43211,7 @@ func (m *Module) Xtsg_export_next() int32 {
 					t203 := m.fn86(i32(2078120))
 					mem = m.memory
 					if t203 == 0 {
-						mem[uint64(uint32(i32(2078092)))] = byte(i32(1))
+						*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078092))))) = byte(i32(1))
 						v1 = v4
 						goto l2
 					}
@@ -43233,8 +43238,8 @@ func (m *Module) Xtsg_export_next() int32 {
 		}
 		goto l2
 	l13:
-		mem[uint64(uint32(i32(2078100)))] = byte(i32(1))
-		mem[uint64(uint32(i32(2078092)))] = byte(i32(1))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078100))))) = byte(i32(1))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078092))))) = byte(i32(1))
 		v1 = v4
 	l2:
 		t207 := int32(load32(mem, uint64(uint32(i32(2078152)))))
@@ -43246,16 +43251,16 @@ func (m *Module) Xtsg_export_next() int32 {
 			t209 := int32(load32(mem, uint64(uint32(i32(2078096)))))
 			store32(mem, uint64(uint32(t209))+12, uint32(v2))
 		}
-		t210 := int32(mem[uint64(uint32(i32(2078092)))])
+		t210 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078092))))))
 		if t210 == 0 {
 			goto l0
 		}
 		t211 := int32(load32(mem, uint64(uint32(i32(2078144)))))
 		t212 := int32(load32(mem, uint64(uint32(i32(2078116)))))
 		if t211 != t212 {
-			mem[uint64(uint32(i32(2078100)))] = byte(i32(1))
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078100))))) = byte(i32(1))
 		}
-		t213 := int32(mem[uint64(uint32(i32(2078140)))])
+		t213 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078140))))))
 		if t213 != 0 {
 			t214 := int32(load32(mem, uint64(uint32(i32(2078124)))))
 			v4 = t214
@@ -43266,7 +43271,7 @@ func (m *Module) Xtsg_export_next() int32 {
 			}
 			store32(mem, uint64(uint32(i32(2078132))), uint32(i32(0)))
 			store64(mem, uint64(uint32(i32(2078124))), uint64(i64(0)))
-			mem[uint64(uint32(i32(2078140)))] = byte(i32(0))
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078140))))) = byte(i32(0))
 		}
 		t216 := int32(load32(mem, uint64(uint32(i32(2078108)))))
 		m.fn168(t216)
@@ -43552,11 +43557,11 @@ func (m *Module) Xtsg_lang_meta() int32 {
 				v4 = v7 + i32(13)
 				switch v2 - i32(65534) {
 				case 1:
-					mem[uint64(uint32(v4))+2] = byte(i32(0))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+2)) = byte(i32(0))
 					store16(mem, uint64(uint32(v4)), uint16(i32(257)))
 					goto l7
 				case 0:
-					mem[uint64(uint32(v4))+2] = byte(i32(0))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+2)) = byte(i32(0))
 					store16(mem, uint64(uint32(v4)), uint16(i32(0)))
 					goto l7
 				default:
@@ -43565,8 +43570,8 @@ func (m *Module) Xtsg_lang_meta() int32 {
 					v16 = t18 + v2*i32(3)
 					t20 := int32(load16(mem, uint64(uint32(v16))))
 					store16(mem, uint64(uint32(t19)), uint16(t20))
-					t21 := int32(mem[uint64(uint32(v16))+2])
-					mem[uint64(uint32(v4))+2] = byte(t21)
+					t21 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v16))+2)))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+2)) = byte(t21)
 				}
 			l7:
 				t23 := v10
@@ -43579,10 +43584,10 @@ func (m *Module) Xtsg_lang_meta() int32 {
 					p22 = i32(0xffff)
 				}
 				store16(mem, uint64(uint32(t23)), uint16(p22))
-				t26 := int32(mem[uint64(uint32(v7))+14])
-				t27 := int32(mem[uint64(uint32(v7))+13])
-				t28 := int32(mem[uint64(uint32(v7))+15])
-				mem[uint64(uint32(v3+v15))] = byte(t26 | t27<<1 | t28<<2)
+				t26 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v7))+14)))
+				t27 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v7))+13)))
+				t28 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v7))+15)))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3+v15)))) = byte(t26 | t27<<1 | t28<<2)
 				v6 = v6 + i32(4)
 				v10 = v10 + i32(2)
 				v0 = v0 + v13
@@ -43764,9 +43769,9 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 				l2:
 					store32(mem, uint64(uint32(v5))+100, uint32(v0))
 					store16(mem, uint64(uint32(v4))+8, uint16(i32(0)))
-					mem[uint64(uint32(v4))+10] = byte(i32(0))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+10)) = byte(i32(0))
 					v0 = v3 + v2*i32(28)
-					mem[uint64(uint32(v0))+24] = byte(i32(0))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+24)) = byte(i32(0))
 					store32(mem, uint64(uint32(v5))+96, uint32(v3))
 					store32(mem, uint64(uint32(v0)), uint32(v1))
 					store32(mem, uint64(uint32(v0))+4, uint32(i32(0)))
@@ -43777,8 +43782,8 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 					store32(mem, uint64(uint32(v0))+20, uint32(i32(0)))
 					t31 := int32(load16(mem, uint64(uint32(v4))+8))
 					store16(mem, uint64(uint32(v0))+25, uint16(t31))
-					t32 := int32(mem[uint64(uint32(v4))+10])
-					mem[uint64(uint32(v0))+27] = byte(t32)
+					t32 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+10)))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+27)) = byte(t32)
 					store32(mem, uint64(uint32(v4))+120, uint32(i32(0)))
 					store64(mem, uint64(uint32(v4))+112, uint64(i64(0)))
 					t33 := m.fn59(v5, v4+i32(12), i32(0), i32(0), i32(0), v4+i32(112))
@@ -43957,7 +43962,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 							if t84 != i32(1) {
 								goto l7
 							}
-							t85 := int32(mem[uint64(uint32(v10))+18])
+							t85 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v10))+18)))
 							if t85&i32(2) != 0 {
 								goto l7
 							}
@@ -43989,7 +43994,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 							v1 = v11 + v6*i32(20) + i32(32)
 						l10:
 							{
-								t91 := int32(mem[uint64(uint32(v1+i32(6)))])
+								t91 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1+i32(6))))))
 								if t91&i32(16) != 0 {
 									goto l9
 								}
@@ -44110,8 +44115,8 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						memory_copy(mem, uint32(v0+i32(6)), uint32(v0), uint32(v1))
 					l16:
 						v0 = v2 + v3
-						mem[uint64(uint32(v0))+5] = byte(i32(0))
-						mem[uint64(uint32(v0))+4] = byte(v12)
+						*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+5)) = byte(i32(0))
+						*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+4)) = byte(v12)
 						store16(mem, uint64(uint32(v0))+2, uint16(v8))
 						store16(mem, uint64(uint32(v0)), uint16(v6))
 						store32(mem, uint64(uint32(v5))+72, uint32(v2))
@@ -44315,7 +44320,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 				{
 					t164 := int32(load32(mem, uint64(uint32(v5))+72))
 					v2 = t164 + v1
-					t165 := int32(mem[uint64(uint32(v2+i32(4)))])
+					t165 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2+i32(4))))))
 					if t165 != 0 {
 						goto l23
 					}
@@ -44542,7 +44547,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 												goto l31
 											}
 											t219 := int32(load32(mem, uint64(uint32(v1))+72))
-											t220 := int32(mem[uint64(uint32(t219+v0*i32(3)))+2])
+											t220 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t219+v0*i32(3)))+2)))
 											if t220&i32(1) == 0 {
 												goto l31
 											}
@@ -44775,7 +44780,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 					{
 						if v2 != i32(65534) {
 							t261 := int32(load32(mem, uint64(uint32(v13))+72))
-							t262 := int32(mem[uint64(uint32(t261+v2*i32(3)))])
+							t262 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t261+v2*i32(3))))))
 							if t262&i32(1) != 0 {
 								goto l48
 							}
@@ -44991,7 +44996,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 								t310 := int32(load32(mem, uint64(uint32(v16))+52))
 								v0 = t310 + v9<<3
 								v12 = v0 + i32(8)
-								t311 := int32(mem[uint64(uint32(v0))])
+								t311 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 								v7 = t311
 								v14 = i32(0)
 								v15 = v1
@@ -45006,7 +45011,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						l73:
 							{
 								v20 = v12 + v6<<3
-								t312 := int32(mem[uint64(uint32(v20))])
+								t312 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v20)))))
 								switch t312 {
 								default:
 									goto l65
@@ -45143,15 +45148,15 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 										}
 										store32(mem, uint64(uint32(t334))+20, uint32(p337))
 										store32(mem, uint64(uint32(v11))+16, uint32(v0))
-										t346 := int32(mem[uint64(uint32(v20))+1])
+										t346 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v20))+1)))
 										v9 = t346
 										t347 := int32(load16(mem, uint64(uint32(v20))+6))
 										v1 = t347
 										v0 = v0 + v3*i32(6)
-										mem[uint64(uint32(v0))+5] = byte(i32(0))
+										*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+5)) = byte(i32(0))
 										store16(mem, uint64(uint32(v0))+2, uint16(v1))
 										store16(mem, uint64(uint32(v0)), uint16(v10))
-										mem[uint64(uint32(v0))+4] = byte(v9 | i32(128))
+										*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+4)) = byte(v9 | i32(128))
 									}
 								l69:
 									v8 = v8 + i32(2)
@@ -45160,7 +45165,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 									}
 									goto l65
 								case 0:
-									t348 := int32(mem[uint64(uint32(v20))+4])
+									t348 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v20))+4)))
 									if t348 != 0 {
 										goto l65
 									}
@@ -45457,7 +45462,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						t405 := v14
 						v12 = v0 - i32(1)
 						v2 = t405 + v12*i32(6)
-						t406 := int32(mem[uint64(uint32(v2))+4])
+						t406 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+4)))
 						v1 = t406 & i32(127)
 						if uint32(v1) < uint32(i32(2)) {
 							v0 = v12
@@ -45505,7 +45510,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 										if uint32(v2) > uint32(v13) {
 											goto l93
 										}
-										t415 := int32(mem[uint64(uint32(v11))+4])
+										t415 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v11))+4)))
 										v6 = t415
 										v2 = v6 & i32(127)
 										if uint32(v2) < uint32(v22) {
@@ -45548,7 +45553,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 											v1 = v3
 											goto l89
 										}
-										t420 := int32(mem[uint64(uint32(v2))+4])
+										t420 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+4)))
 										v1 = t420
 										v0 = v1 & i32(127)
 										if uint32(v0) < uint32(v22) {
@@ -45615,8 +45620,8 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 								memory_copy(mem, uint32(v0+i32(6)), uint32(v0), uint32(v1))
 							l99:
 								v0 = v2 + v7
-								mem[uint64(uint32(v0))+5] = byte(i32(0))
-								mem[uint64(uint32(v0))+4] = byte(v22)
+								*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+5)) = byte(i32(0))
+								*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+4)) = byte(v22)
 								store16(mem, uint64(uint32(v0))+2, uint16(v23))
 								store16(mem, uint64(uint32(v0)), uint16(v13))
 								store32(mem, uint64(uint32(v20))+16, uint32(v7))
@@ -45653,8 +45658,8 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 								}
 							l100:
 								v1 = v14 + v12*i32(6)
-								mem[uint64(uint32(v1))+5] = byte(i32(0))
-								mem[uint64(uint32(v1))+4] = byte(v22)
+								*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+5)) = byte(i32(0))
+								*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+4)) = byte(v22)
 								store16(mem, uint64(uint32(v1))+2, uint16(v23))
 								store16(mem, uint64(uint32(v1)), uint16(v13))
 								v12 = v0
@@ -45977,10 +45982,10 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 									}
 								}
 							}
-							mem[uint64(uint32(v4))+104] = byte(i32(0))
+							*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+104)) = byte(i32(0))
 							m.fn60(v5, v4+i32(112), v4+i32(32))
 							mem = m.memory
-							t502 := int32(mem[uint64(uint32(v4))+104])
+							t502 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+104)))
 							if t502 == i32(1) {
 								v3 = v19 + i32(1)
 								t503 := int32(load32(mem, uint64(uint32(v5))+64))
@@ -46388,7 +46393,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 							if t577 == i32(0xffff) {
 								goto l147
 							}
-							t578 := int32(mem[uint64(uint32(v2))+18])
+							t578 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+18)))
 							if t578&i32(128) != 0 {
 								goto l147
 							}
@@ -46402,7 +46407,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 								if uint32(v1) < uint32(v3) {
 									goto l148
 								}
-								t580 := int32(mem[uint64(uint32(v6+v1*i32(20)))+18])
+								t580 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6+v1*i32(20)))+18)))
 								if t580&i32(128) == 0 {
 									goto l149
 								}
@@ -46437,7 +46442,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 					}
 				}
 			l146:
-				mem[uint64(uint32(v4))+104] = byte(i32(0))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+104)) = byte(i32(0))
 				if v27 != 0 {
 					v19 = i32(0)
 				l171:
@@ -46562,11 +46567,11 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 									t609 := int32(load32(mem, uint64(uint32(v5))+156))
 									t610 := int32(load32(mem, uint64(uint32(t609))+72))
 									v0 = t610 + v0*i32(3)
-									t611 := int32(mem[uint64(uint32(v0))])
+									t611 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 									if t611&i32(1) != 0 {
 										goto l157
 									}
-									t612 := int32(mem[uint64(uint32(v0))+1])
+									t612 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+1)))
 									if t612&i32(1) != 0 {
 										goto l157
 									}
@@ -46684,7 +46689,7 @@ func (m *Module) Xtsg_query_new(v0, v1 int32) int32 {
 						if v6 != 0 {
 							t638 := int32(load32(mem, uint64(uint32(v5))+96))
 							t639 := int32(load16(mem, uint64(uint32(v8))+2))
-							mem[uint64(uint32(t638+t639*i32(28)))+24] = byte(i32(1))
+							*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t638+t639*i32(28)))+24)) = byte(i32(1))
 							t640 := int32(load32(mem, uint64(uint32(v5))+144))
 							v7 = t640
 							t641 := int32(load32(mem, uint64(uint32(v5))+148))
@@ -47587,7 +47592,7 @@ func (m *Module) Xtsg_qcursor_exec(v0, v1, v2, v3, v4, v5 int32) int32 {
 		mem = m.memory
 		store64(mem, uint64(uint32(v0))+24, uint64(i64(0)))
 	}
-	mem[uint64(uint32(v0))+32] = byte(i32(0))
+	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+32)) = byte(i32(0))
 	store32(mem, uint64(uint32(v0))+4, uint32(v2))
 	store32(mem, uint64(uint32(v0))+12, uint32(i32(28)))
 	store32(mem, uint64(uint32(v0))+8, uint32(v0))
@@ -47777,7 +47782,7 @@ func (m *Module) fn138(v0 int32) int32 {
 	t1 := m.fn0()
 	v1 = t1
 	if v1 != 0 {
-		m.memory[uint64(uint32(v0))+32] = byte(i32(1))
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(m.memory)), uint64(uint32(v0))+32)) = byte(i32(1))
 	}
 	var p2 int32
 	if v1 != i32(0) {
@@ -47812,7 +47817,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 					v17 = i32(0)
 				l152:
 					{
-						t6 := int32(mem[uint64(uint32(v4))+174])
+						t6 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+174)))
 						if t6 != i32(1) {
 							goto l0
 						}
@@ -47913,7 +47918,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 										if v17&i32(1) != 0 {
 											goto l4
 										}
-										t32 := int32(mem[uint64(uint32(v4))+174])
+										t32 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+174)))
 										if t32 == i32(1) {
 											goto l4
 										}
@@ -47946,14 +47951,14 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 											if t41 == 0 {
 												goto l5
 											}
-											mem[uint64(uint32(v4))+174] = byte(i32(1))
+											*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+174)) = byte(i32(1))
 											goto l6
 										}
 									l5:
-										t42 := int32(mem[uint64(uint32(v4))+173])
+										t42 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+173)))
 										if t42 == i32(1) {
 											v17 = i32(0)
-											t43 := int32(mem[uint64(uint32(v4))+172])
+											t43 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+172)))
 											if t43 != i32(1) {
 												goto l7
 											}
@@ -48655,7 +48660,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 											goto l35
 										}
 									}
-									t215 := int32(mem[uint64(uint32(v4))+172])
+									t215 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+172)))
 									if t215 != i32(1) {
 										goto l35
 									}
@@ -48692,7 +48697,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 										if v18 != 0 {
 											t221 := int32(load32(mem, uint64(uint32(v16))+8))
 											t222 := int32(load32(mem, uint64(uint32(t221))+72))
-											t223 := int32(mem[uint64(uint32(t222+v18*i32(3)))+1])
+											t223 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t222+v18*i32(3)))+1)))
 											var p224 int32
 											if t223 != i32(0) {
 												p224 = 1
@@ -48723,9 +48728,9 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 									v39 = v10 + i32(112)
 									v8 = i32(0)
 									v21 = v10 + i32(135)
-									mem[uint64(uint32(v21))] = byte(i32(0))
+									*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v21)))) = byte(i32(0))
 									v30 = v10 + i32(134)
-									mem[uint64(uint32(v30))] = byte(i32(0))
+									*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v30)))) = byte(i32(0))
 									v31 = v10 + i32(108)
 									t228 := int32(load32(mem, uint64(uint32(v31))))
 									v40 = t228
@@ -48733,7 +48738,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 									v33 = v10 + i32(130)
 									store16(mem, uint64(uint32(v33)), uint16(i32(0)))
 									v41 = v10 + i32(133)
-									mem[uint64(uint32(v41))] = byte(i32(0))
+									*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v41)))) = byte(i32(0))
 									{
 										t229 := int32(load32(mem, uint64(uint32(v23))+8))
 										v3 = t229
@@ -48814,12 +48819,12 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 												v2 = t248 + v11*i32(3)
 												t249 := int32(load32(mem, uint64(uint32(v23))+8))
 												if t249 != v6 {
-													t250 := int32(mem[uint64(uint32(v2))])
+													t250 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 													if t250&i32(1) != 0 {
 														goto l41
 													}
 												}
-												t251 := int32(mem[uint64(uint32(v2))+2])
+												t251 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+2)))
 												if t251&i32(1) == 0 {
 													goto l45
 												}
@@ -48840,7 +48845,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 											}
 										l45:
 											{
-												t254 := int32(mem[uint64(uint32(v30))])
+												t254 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v30)))))
 												if t254 != 0 {
 													goto l48
 												}
@@ -48928,12 +48933,12 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 															default:
 																t273 := int32(load32(mem, uint64(uint32(v16))+72))
 																v2 = t273 + v2*i32(3)
-																t274 := int32(mem[uint64(uint32(v2))])
+																t274 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 																if t274&i32(1) == 0 {
 																	goto l53
 																}
-																t275 := int32(mem[uint64(uint32(v2))+1])
-																mem[uint64(uint32(v21))] = byte(i32(1))
+																t275 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+1)))
+																*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v21)))) = byte(i32(1))
 																if t275&i32(1) != 0 {
 																	goto l56
 																}
@@ -48954,7 +48959,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 															if t277 == 0 {
 																goto l57
 															}
-															mem[uint64(uint32(v21))] = byte(i32(1))
+															*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v21)))) = byte(i32(1))
 															t278 := int32(load32(mem, uint64(uint32(v7))+52))
 															if t278 != 0 {
 																goto l56
@@ -48967,9 +48972,9 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 														goto l59
 													}
 												l54:
-													mem[uint64(uint32(v21))] = byte(i32(1))
+													*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v21)))) = byte(i32(1))
 												l56:
-													mem[uint64(uint32(v30))] = byte(i32(1))
+													*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v30)))) = byte(i32(1))
 													goto l48
 												l58:
 													p272 = int32(uint32(v7)>>3) & i32(1)
@@ -49030,10 +49035,10 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 													v11 = v2
 												l64:
 													{
-														t296 := int32(mem[uint64(uint32(v11+i32(3)))])
+														t296 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v11+i32(3))))))
 														if t296 == 0 {
 															t297 := int32(load32(mem, uint64(uint32(v15))+20))
-															t298 := int32(mem[uint64(uint32(v11+i32(2)))])
+															t298 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v11+i32(2))))))
 															if t297 == t298 {
 																goto l63
 															}
@@ -49063,11 +49068,11 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 														goto l65
 													}
 													t302 := int32(load32(mem, uint64(uint32(v15))+20))
-													t303 := int32(mem[uint64(uint32(v2+i32(2)))])
+													t303 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2+i32(2))))))
 													if uint32(t302) >= uint32(t303) {
 														goto l65
 													}
-													mem[uint64(uint32(v41))] = byte(i32(1))
+													*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v41)))) = byte(i32(1))
 													goto l62
 												}
 											l65:
@@ -49156,7 +49161,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 											v21 = t320
 											{
 												{
-													t321 := int32(mem[uint64(uint32(v1+i32(4)))])
+													t321 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1+i32(4))))))
 													if t321 == i32(1) {
 														if v28 != 0 {
 															goto l71
@@ -49273,7 +49278,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 										{
 											{
 												{
-													t347 := int32(mem[uint64(uint32(v1))+4])
+													t347 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+4)))
 													if t347 == i32(1) {
 														if v28 != 0 {
 															goto l77
@@ -49326,11 +49331,11 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 									if t357 == 0 {
 										goto l35
 									}
-									t358 := int32(mem[uint64(uint32(v10))+133])
+									t358 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v10))+133)))
 									v19 = t358
-									t359 := int32(mem[uint64(uint32(v10))+134])
+									t359 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v10))+134)))
 									v18 = t359
-									t360 := int32(mem[uint64(uint32(v10))+135])
+									t360 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v10))+135)))
 									v24 = t360
 									v27 = v15 | v20
 									t361 := int32(load16(mem, uint64(uint32(v10))+130))
@@ -49716,7 +49721,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 															v2 = v6 - i32(20)
 														l101:
 															{
-																t451 := int32(mem[uint64(uint32(v2+i32(18)))])
+																t451 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2+i32(18))))))
 																if t451&i32(24) == 0 {
 																	t452 := int32(load16(mem, uint64(uint32(v2+i32(12)))))
 																	if t452 == 0 {
@@ -49775,7 +49780,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 															if t469&i32(1) != 0 {
 																goto l102
 															}
-															t470 := int32(mem[uint64(uint32(v2))+18])
+															t470 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+18)))
 															if t470&i32(2) == 0 {
 																goto l102
 															}
@@ -50148,7 +50153,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 											t562 := v21
 											v3 = t561
 											v2 = t562 + v3
-											t563 := int32(mem[uint64(uint32(v2))+19])
+											t563 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+19)))
 											if t563&i32(64) == 0 {
 												v7 = v6 + i32(1)
 												if uint32(v7) >= uint32(v1) {
@@ -50260,8 +50265,8 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 												p595 = t596 + v8*i32(12)
 											}
 											v16 = p595
-											mem[uint64(uint32(v5))] = byte(i32(1))
-											mem[uint64(uint32(v1))] = byte(i32(1))
+											*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5)))) = byte(i32(1))
+											*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))) = byte(i32(1))
 											t597 := int32(load32(mem, uint64(uint32(v16))+4))
 											v20 = t597
 											{
@@ -50344,18 +50349,18 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 																goto l125
 															}
 														}
-														mem[uint64(uint32(v5))] = byte(i32(0))
+														*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5)))) = byte(i32(0))
 														v8 = v8 + i32(1)
 														goto l129
 													}
 												l126:
-													mem[uint64(uint32(v1))] = byte(i32(0))
+													*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))) = byte(i32(0))
 													v9 = v9 + i32(1)
 													goto l129
 												}
 											l125:
-												mem[uint64(uint32(v1))] = byte(i32(0))
-												mem[uint64(uint32(v5))] = byte(i32(0))
+												*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))) = byte(i32(0))
+												*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5)))) = byte(i32(0))
 											l124:
 												v8 = v8 + i32(1)
 												v9 = v9 + i32(1)
@@ -50369,10 +50374,10 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 												goto l131
 											}
 										l123:
-											mem[uint64(uint32(v5))] = byte(i32(0))
+											*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5)))) = byte(i32(0))
 										l131:
 											{
-												t618 := int32(mem[uint64(uint32(v10))+80])
+												t618 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v10))+80)))
 												if t618 == i32(1) {
 													t619 := int32(load32(mem, uint64(uint32(v3))+18))
 													v1 = t619
@@ -50383,7 +50388,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 															goto l132
 														}
 														if v1&i32(4096) == 0 {
-															t622 := int32(mem[uint64(uint32(v2))+19])
+															t622 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+19)))
 															if t622&i32(16) != 0 {
 																goto l132
 															}
@@ -50467,7 +50472,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 												l132:
 													store32(mem, uint64(uint32(v3))+18, uint32(v1|i32(8192)))
 												}
-												t644 := int32(mem[uint64(uint32(v10))+104])
+												t644 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v10))+104)))
 												if t644 == i32(1) {
 													t645 := int32(load32(mem, uint64(uint32(v2))+18))
 													v1 = t645
@@ -50478,7 +50483,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 															goto l136
 														}
 														if v1&i32(4096) == 0 {
-															t648 := int32(mem[uint64(uint32(v3))+19])
+															t648 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3))+19)))
 															if t648&i32(16) != 0 {
 																goto l136
 															}
@@ -50591,7 +50596,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 										if t679 != i32(0xffff) {
 											goto l139
 										}
-										t680 := int32(mem[uint64(uint32(v2))+19])
+										t680 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+19)))
 										if t680&i32(32) != 0 {
 											goto l139
 										}
@@ -50721,7 +50726,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 											if uint32(t714) >= uint32(t715) {
 												goto l143
 											}
-											t716 := int32(mem[uint64(uint32(v4))+172])
+											t716 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+172)))
 											if t716 != 0 {
 												goto l143
 											}
@@ -50733,7 +50738,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 											if v1&i32(1) != 0 {
 												goto l144
 											}
-											t721 := int32(mem[uint64(uint32(v1))+44])
+											t721 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+44)))
 											if t721&i32(3) != 0 {
 												goto l144
 											}
@@ -50800,7 +50805,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 										}
 									}
 								l143:
-									mem[uint64(uint32(v4))+173] = byte(i32(1))
+									*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+173)) = byte(i32(1))
 									goto l152
 								l151:
 									v2 = i32(1)
@@ -50808,7 +50813,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 									store32(mem, uint64(uint32(v4))+92, uint32(t734+i32(1)))
 								}
 							l150:
-								mem[uint64(uint32(v4))+172] = byte(v2)
+								*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+172)) = byte(v2)
 								goto l152
 							}
 						l15:
@@ -50824,22 +50829,22 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 						mem = m.memory
 						switch t736 - i32(1) {
 						case 1:
-							t737 := int32(mem[uint64(uint32(v4))+172])
+							t737 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+172)))
 							if t737 == 0 {
-								mem[uint64(uint32(v4))+172] = byte(i32(1))
+								*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+172)) = byte(i32(1))
 								t738 := int32(load32(mem, uint64(uint32(v4))+92))
 								store32(mem, uint64(uint32(v4))+92, uint32(t738+i32(1)))
 							}
-							mem[uint64(uint32(v4))+173] = byte(i32(0))
+							*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+173)) = byte(i32(0))
 							goto l152
 						case 0:
-							t739 := int32(mem[uint64(uint32(v4))+172])
+							t739 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+172)))
 							if t739 == i32(1) {
-								mem[uint64(uint32(v4))+172] = byte(i32(0))
+								*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+172)) = byte(i32(0))
 								t740 := int32(load32(mem, uint64(uint32(v4))+92))
 								store32(mem, uint64(uint32(v4))+92, uint32(t740-i32(1)))
 							}
-							mem[uint64(uint32(v4))+173] = byte(i32(0))
+							*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+173)) = byte(i32(0))
 							goto l152
 						default:
 							t741 := int32(load32(mem, uint64(uint32(v4))+12))
@@ -50916,7 +50921,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 								t757 := int32(load32(mem, uint64(uint32(v4))+92))
 								store32(mem, uint64(uint32(v4))+92, uint32(t757-i32(1)))
 							} else {
-								mem[uint64(uint32(v4))+174] = byte(i32(1))
+								*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4))+174)) = byte(i32(1))
 							}
 							goto l152
 						}
@@ -51529,7 +51534,7 @@ func (m *Module) Xtsg_qcursor_next(v0 int32) int32 {
 			if t926 != 0 {
 				goto l181
 			}
-			mem[uint64(uint32(v0))+32] = byte(i32(1))
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+32)) = byte(i32(1))
 			goto l180
 		}
 	l181:
@@ -51657,13 +51662,13 @@ l180:
 	return v25
 }
 func (m *Module) Xtsg_qcursor_halted(v0 int32) int32 {
-	t0 := int32(m.memory[uint64(uint32(v0))+32])
+	t0 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(m.memory)), uint64(uint32(v0))+32)))
 	return t0
 }
 func (m *Module) Xtsg_qcursor_exceeded(v0 int32) int32 {
 	mem := m.memory
 	t0 := int32(load32(mem, uint64(uint32(v0))))
-	t1 := int32(mem[uint64(uint32(t0))+175])
+	t1 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t0))+175)))
 	return t1
 }
 func (m *Module) fn142(v0 int32) int32 {
@@ -51673,8 +51678,8 @@ func (m *Module) fn142(v0 int32) int32 {
 		var p1 int32
 		{
 			if uint32(v0) <= uint32(i32(0x1ffff)) {
-				t2 := int32(mem[uint64(uint32(int32(uint32(v0)>>8)))+2071728])
-				t3 := int32(mem[uint64(uint32(int32(uint32(v0)>>3)&i32(31)|t2<<5))+2071728])
+				t2 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(int32(uint32(v0)>>8)))+2071728)))
+				t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(int32(uint32(v0)>>3)&i32(31)|t2<<5))+2071728)))
 				t4 := i32_shr_u(t3, v0&i32(7)) & i32(1)
 				p1 = t4
 				goto l0
@@ -52058,14 +52063,14 @@ func (m *Module) fn150(v0, v1 int32) {
 			goto l0
 		}
 		store32(mem, uint64(uint32(v1))+20, uint32(v2+i32(1)))
-		mem[uint64(uint32(v2))] = byte(v0)
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))) = byte(v0)
 		return
 	}
 l0:
 	t3 := m.g0
 	v2 = t3 - i32(16)
 	m.g0 = v2
-	mem[uint64(uint32(v2))+15] = byte(v3)
+	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+15)) = byte(v3)
 	{
 		{
 			t4 := int32(load32(mem, uint64(uint32(v1))+16))
@@ -52092,7 +52097,7 @@ l0:
 				goto l2
 			}
 			store32(mem, uint64(uint32(v1))+20, uint32(v0+i32(1)))
-			mem[uint64(uint32(v0))] = byte(v3)
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))) = byte(v3)
 			goto l1
 		}
 	l2:
@@ -52102,7 +52107,7 @@ l0:
 		if t11 != i32(1) {
 			goto l1
 		}
-		_ = int32(mem[uint64(uint32(v2))+15])
+		_ = int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2))+15)))
 	}
 l1:
 	m.g0 = v2 + i32(16)
@@ -52145,7 +52150,7 @@ func (m *Module) fn151(v0, v1, v2 int32) {
 			v3 = i32(0)
 		l3:
 			{
-				t8 := int32(mem[uint64(uint32(v3+v4-i32(1)))])
+				t8 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v3+v4-i32(1))))))
 				if t8 == i32(10) {
 					goto l2
 				}
@@ -52239,7 +52244,7 @@ func (m *Module) fn152(v0, v1, v2, v3 int32) {
 			{
 			l3:
 				{
-					t16 := int32(mem[uint64(uint32(v4+v6-i32(1)))])
+					t16 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v4+v6-i32(1))))))
 					if t16 == i32(10) {
 						goto l2
 					}
@@ -52321,7 +52326,7 @@ func (m *Module) fn154(v0, v1, v2, v3 int32) {
 	}
 	store32(mem, uint64(uint32(t3))+136, uint32(t4-p5))
 	memory_zero(mem, uint32(v4), uint32(i32(128)))
-	mem[uint64(uint32(v0))] = byte(i32(0))
+	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))) = byte(i32(0))
 	store32(mem, uint64(uint32(v4))+72, uint32(i32(-1)))
 	store32(mem, uint64(uint32(v4))+32, uint32(i32(33)))
 	store32(mem, uint64(uint32(v4))+76, uint32(v4+i32(132)))
@@ -52377,7 +52382,7 @@ func (m *Module) fn155(v0, v1, v2 int32) int32 {
 		t14 := int32(load32(mem, uint64(uint32(v3))+4))
 		store32(mem, uint64(uint32(v3))+4, uint32(t14-v4))
 	}
-	mem[uint64(uint32(v6))] = byte(i32(0))
+	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6)))) = byte(i32(0))
 	t15 := int32(load32(mem, uint64(uint32(v0))+40))
 	t16 := v0
 	v1 = t15
@@ -52393,9 +52398,9 @@ func (m *Module) fn156(v0, v1, v2 int32) int32 {
 	}
 l1:
 	{
-		t0 := int32(mem[uint64(uint32(v0))])
+		t0 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 		v4 = t0
-		t1 := int32(mem[uint64(uint32(v1))])
+		t1 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 		t2 := v4
 		v5 = t1
 		if t2 == v5 {
@@ -52420,7 +52425,7 @@ func (m *Module) fn157(v0 int32) int32 {
 		if v1&i32(3) == 0 {
 			goto l0
 		}
-		t0 := int32(mem[uint64(uint32(v1))])
+		t0 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 		if t0 == 0 {
 			return i32(0)
 		}
@@ -52428,7 +52433,7 @@ func (m *Module) fn157(v0 int32) int32 {
 		if v1&i32(3) == 0 {
 			goto l0
 		}
-		t1 := int32(mem[uint64(uint32(v1))])
+		t1 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 		if t1 == 0 {
 			goto l1
 		}
@@ -52436,7 +52441,7 @@ func (m *Module) fn157(v0 int32) int32 {
 		if v1&i32(3) == 0 {
 			goto l0
 		}
-		t2 := int32(mem[uint64(uint32(v1))])
+		t2 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 		if t2 == 0 {
 			goto l1
 		}
@@ -52444,7 +52449,7 @@ func (m *Module) fn157(v0 int32) int32 {
 		if v1&i32(3) == 0 {
 			goto l0
 		}
-		t3 := int32(mem[uint64(uint32(v1))])
+		t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 		if t3 == 0 {
 			goto l1
 		}
@@ -52469,7 +52474,7 @@ l2:
 l3:
 	{
 		v1 = v1 + i32(1)
-		t5 := int32(mem[uint64(uint32(v2))])
+		t5 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v2)))))
 		v2 = v2 + i32(1)
 		if t5 != 0 {
 			goto l3
@@ -52485,7 +52490,7 @@ func (m *Module) fn158(v0, v1, v2 int32) int32 {
 	}
 	mem := m.memory
 	{
-		t0 := int32(mem[uint64(uint32(v0))])
+		t0 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 		v3 = t0
 		if v3 == 0 {
 			v3 = i32(0)
@@ -52495,7 +52500,7 @@ func (m *Module) fn158(v0, v1, v2 int32) int32 {
 		v2 = v2 - i32(1)
 	l2:
 		{
-			t1 := int32(mem[uint64(uint32(v1))])
+			t1 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 			t2 := v3
 			v4 = t1
 			if t2 != v4 {
@@ -52506,7 +52511,7 @@ func (m *Module) fn158(v0, v1, v2 int32) int32 {
 			}
 			v2 = v2 - i32(1)
 			v1 = v1 + i32(1)
-			t3 := int32(mem[uint64(uint32(v0))])
+			t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 			v3 = t3
 			v0 = v0 + i32(1)
 			if v3 != 0 {
@@ -52517,7 +52522,7 @@ func (m *Module) fn158(v0, v1, v2 int32) int32 {
 	l1:
 	}
 l0:
-	t4 := int32(mem[uint64(uint32(v1))])
+	t4 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 	return v3 - t4
 }
 func (m *Module) fn159(v0, v1 int32) int32 {
@@ -52530,7 +52535,7 @@ func (m *Module) fn159(v0, v1 int32) int32 {
 	if v0 != 0 {
 		var p1 int32
 		if uint32(v1) <= uint32(i32(127)) {
-			mem[uint64(uint32(v0))] = byte(v1)
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))) = byte(v1)
 			p1 = i32(1)
 			goto l0
 		}
@@ -52549,13 +52554,13 @@ func (m *Module) fn159(v0, v1 int32) int32 {
 				if v1&i32(-128) != i32(57216) {
 					goto l1
 				}
-				mem[uint64(uint32(v0))] = byte(v1)
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))) = byte(v1)
 				p1 = i32(1)
 				goto l0
 			}
 			if uint32(v1) <= uint32(i32(2047)) {
-				mem[uint64(uint32(v0))+1] = byte(v1&i32(63) | i32(128))
-				mem[uint64(uint32(v0))] = byte(int32(uint32(v1)>>6) | i32(192))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+1)) = byte(v1&i32(63) | i32(128))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))) = byte(int32(uint32(v1)>>6) | i32(192))
 				p1 = i32(2)
 				goto l0
 			}
@@ -52568,17 +52573,17 @@ func (m *Module) fn159(v0, v1 int32) int32 {
 				p6 = 1
 			}
 			if p5&p6 == 0 {
-				mem[uint64(uint32(v0))+2] = byte(v1&i32(63) | i32(128))
-				mem[uint64(uint32(v0))] = byte(int32(uint32(v1)>>12) | i32(224))
-				mem[uint64(uint32(v0))+1] = byte(int32(uint32(v1)>>6)&i32(63) | i32(128))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+2)) = byte(v1&i32(63) | i32(128))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))) = byte(int32(uint32(v1)>>12) | i32(224))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+1)) = byte(int32(uint32(v1)>>6)&i32(63) | i32(128))
 				p1 = i32(3)
 				goto l0
 			}
 			if uint32(v1-i32(65536)) <= uint32(i32(0xfffff)) {
-				mem[uint64(uint32(v0))+3] = byte(v1&i32(63) | i32(128))
-				mem[uint64(uint32(v0))] = byte(int32(uint32(v1)>>18) | i32(240))
-				mem[uint64(uint32(v0))+2] = byte(int32(uint32(v1)>>6)&i32(63) | i32(128))
-				mem[uint64(uint32(v0))+1] = byte(int32(uint32(v1)>>12)&i32(63) | i32(128))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+3)) = byte(v1&i32(63) | i32(128))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))) = byte(int32(uint32(v1)>>18) | i32(240))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+2)) = byte(int32(uint32(v1)>>6)&i32(63) | i32(128))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0))+1)) = byte(int32(uint32(v1)>>12)&i32(63) | i32(128))
 				p1 = i32(4)
 				goto l0
 			}
@@ -52746,7 +52751,7 @@ l5:
 		{
 			{
 				{
-					t1 := int32(mem[uint64(uint32(v6))])
+					t1 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6)))))
 					v5 = t1
 					if v5 != 0 {
 					l15:
@@ -52755,20 +52760,20 @@ l5:
 							if v5 != 0 {
 								if v5 != i32(37) {
 									v1 = v1 + i32(1)
-									t23 := int32(mem[uint64(uint32(v1))])
+									t23 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 									v5 = t23
 									goto l15
 								}
 								v5 = v1
 							l3:
 								{
-									t2 := int32(mem[uint64(uint32(v1+i32(1)))])
+									t2 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1+i32(1))))))
 									if t2 != i32(37) {
 										goto l2
 									}
 									v5 = v5 + i32(1)
 									v1 = v1 + i32(2)
-									t3 := int32(mem[uint64(uint32(v1))])
+									t3 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 									if t3 == i32(37) {
 										goto l3
 									}
@@ -52787,7 +52792,7 @@ l5:
 								if v0 == 0 {
 									goto l4
 								}
-								t5 := int32(mem[uint64(uint32(v0))])
+								t5 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 								if t5&i32(32) != 0 {
 									goto l4
 								}
@@ -52801,18 +52806,18 @@ l5:
 							v7 = v1 + i32(1)
 							v11 = i32(-1)
 							{
-								t6 := int32(int8(mem[uint64(uint32(v1))+1]))
+								t6 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+1))))
 								v10 = t6
 								v5 = v10 - i32(48)
 								if uint32(v5) > uint32(i32(9)) {
 									goto l6
 								}
-								t7 := int32(mem[uint64(uint32(v1))+2])
+								t7 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+2)))
 								if t7 != i32(36) {
 									goto l6
 								}
 								v7 = v1 + i32(3)
-								t8 := int32(int8(mem[uint64(uint32(v1))+3]))
+								t8 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+3))))
 								v10 = t8
 								v27 = i32(1)
 								v11 = v5
@@ -52834,7 +52839,7 @@ l5:
 							{
 								v12 = v5 | v12
 								v1 = v7
-								t9 := int32(int8(mem[uint64(uint32(v1))]))
+								t9 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))))))
 								v10 = t9
 								v5 = v10 - i32(32)
 								if uint32(v5) >= uint32(i32(32)) {
@@ -52851,12 +52856,12 @@ l5:
 								var p10 int32
 								{
 									{
-										t11 := int32(int8(mem[uint64(uint32(v1))+1]))
+										t11 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+1))))
 										v5 = t11 - i32(48)
 										if uint32(v5) > uint32(i32(9)) {
 											goto l9
 										}
-										t12 := int32(mem[uint64(uint32(v1))+2])
+										t12 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+2)))
 										if t12 != i32(36) {
 											goto l9
 										}
@@ -52924,7 +52929,7 @@ l5:
 										p20 = i32(-1)
 									}
 									v13 = p20
-									t21 := int32(int8(mem[uint64(uint32(v5))+1]))
+									t21 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+1))))
 									v1 = v5 + i32(1)
 									v5 = v1
 									v7 = t21 - i32(48)
@@ -52936,7 +52941,7 @@ l5:
 									}
 									goto l13
 								}
-								t22 := int32(int8(mem[uint64(uint32(v5))+1]))
+								t22 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+1))))
 								v13 = i32(-1)
 								v5 = v5 + i32(1)
 								v7 = t22 - i32(48)
@@ -53049,22 +53054,22 @@ l5:
 			l13:
 				v5 = i32(0)
 				{
-					t34 := int32(mem[uint64(uint32(v1))])
+					t34 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 					if t34 != i32(46) {
 						v10 = i32(-1)
 						v17 = i32(0)
 						goto l22
 					}
-					t35 := int32(int8(mem[uint64(uint32(v1))+1]))
+					t35 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+1))))
 					v7 = t35
 					if v7 == i32(42) {
 						{
-							t36 := int32(int8(mem[uint64(uint32(v1))+2]))
+							t36 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+2))))
 							v7 = t36 - i32(48)
 							if uint32(v7) > uint32(i32(9)) {
 								goto l20
 							}
-							t37 := int32(mem[uint64(uint32(v1))+3])
+							t37 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+3)))
 							if t37 != i32(36) {
 								goto l20
 							}
@@ -53130,7 +53135,7 @@ l5:
 						}
 						v7 = v10
 						v1 = v1 + i32(1)
-						t45 := int32(int8(mem[uint64(uint32(v1))]))
+						t45 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))))))
 						v15 = t45 - i32(48)
 						if uint32(v15) < uint32(i32(10)) {
 							goto l21
@@ -53140,13 +53145,13 @@ l5:
 			l22:
 				{
 					v7 = v5
-					t46 := int32(int8(mem[uint64(uint32(v1))]))
+					t46 := int32(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))))))
 					v5 = t46
 					if uint32(v5-i32(123)) < uint32(i32(-58)) {
 						goto l12
 					}
 					v1 = v1 + i32(1)
-					t47 := int32(mem[uint64(uint32(v7*i32(58)+v5+i32(2077375)))])
+					t47 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v7*i32(58)+v5+i32(2077375))))))
 					v5 = t47
 					if uint32((v5-i32(1))&i32(255)) < uint32(i32(8)) {
 						goto l22
@@ -53203,7 +53208,7 @@ l5:
 										{
 											var p53 int32
 											{
-												t54 := int32(mem[uint64(uint32(v1-i32(1)))])
+												t54 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1-i32(1))))))
 												v5 = t54
 												v8 = int32(int8(v5))
 												p55 := v8
@@ -53285,7 +53290,7 @@ l5:
 															if v7 == 0 {
 															l73:
 																{
-																	t133 := int32(mem[uint64(uint32(v0))])
+																	t133 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 																	if t133&i32(32) == 0 {
 																		m.fn151(v9+i32(608), i32(256), v0)
 																		mem = m.memory
@@ -53359,7 +53364,7 @@ l5:
 															if v7 == 0 {
 															l75:
 																{
-																	t144 := int32(mem[uint64(uint32(v0))])
+																	t144 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 																	if t144&i32(32) == 0 {
 																		m.fn151(v9+i32(608), i32(256), v0)
 																		mem = m.memory
@@ -53370,7 +53375,7 @@ l5:
 																	}
 																}
 															}
-															t145 := int32(mem[uint64(uint32(v0))])
+															t145 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 															if t145&i32(32) != 0 {
 																goto l74
 															}
@@ -53686,7 +53691,7 @@ l5:
 																if uint32(v8) >= uint32(v15) {
 																	goto l94
 																}
-																t196 := int32(mem[uint64(uint32(v15-i32(4)))])
+																t196 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v15-i32(4))))))
 																if t196&i32(1) == 0 {
 																	goto l94
 																}
@@ -53712,7 +53717,7 @@ l5:
 																if v36 != 0 {
 																	goto l95
 																}
-																t201 := int32(mem[uint64(uint32(v28))])
+																t201 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v28)))))
 																if t201 != i32(45) {
 																	goto l95
 																}
@@ -53938,7 +53943,7 @@ l5:
 																t235 := int32(uint32(v5) / uint32(i32(10)))
 																t236 := v5
 																v7 = t235
-																mem[uint64(uint32(t234))] = byte(t236 - v7*i32(10) | i32(48))
+																*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t234)))) = byte(t236 - v7*i32(10) | i32(48))
 																if uint32(v5) > uint32(i32(99)) {
 																	goto l105
 																}
@@ -53947,7 +53952,7 @@ l5:
 													l104:
 														if v7 != 0 {
 															v6 = v6 - i32(1)
-															mem[uint64(uint32(v6))] = byte(v7 | i32(48))
+															*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6)))) = byte(v7 | i32(48))
 														}
 														if v26-v6 <= i32(1) {
 															v6 = v6 + v32
@@ -53957,13 +53962,13 @@ l5:
 															v6 = v30
 														}
 														v25 = v6 - i32(2)
-														mem[uint64(uint32(v25))] = byte(v20)
+														*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v25)))) = byte(v20)
 														t238 := v6 - i32(1)
 														p237 := i32(43)
 														if v10 < i32(0) {
 															p237 = i32(45)
 														}
-														mem[uint64(uint32(t238))] = byte(p237)
+														*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t238)))) = byte(p237)
 														v5 = v26 - v25
 														if v5 > v14^i32(0x7fffffff) {
 															goto l0
@@ -54001,7 +54006,7 @@ l5:
 														if v7 == 0 {
 														l107:
 															{
-																t242 := int32(mem[uint64(uint32(v0))])
+																t242 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 																if t242&i32(32) == 0 {
 																	m.fn151(v9+i32(608), i32(256), v0)
 																	mem = m.memory
@@ -54012,7 +54017,7 @@ l5:
 																}
 															}
 														}
-														t243 := int32(mem[uint64(uint32(v0))])
+														t243 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 														if t243&i32(32) != 0 {
 															goto l106
 														}
@@ -54020,7 +54025,7 @@ l5:
 														mem = m.memory
 													}
 												l106:
-													t244 := int32(mem[uint64(uint32(v0))])
+													t244 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 													if t244&i32(32) == 0 {
 														m.fn151(v28, v24, v0)
 														mem = m.memory
@@ -54050,7 +54055,7 @@ l5:
 														if v7 == 0 {
 														l109:
 															{
-																t248 := int32(mem[uint64(uint32(v0))])
+																t248 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 																if t248&i32(32) == 0 {
 																	m.fn151(v9+i32(608), i32(256), v0)
 																	mem = m.memory
@@ -54061,7 +54066,7 @@ l5:
 																}
 															}
 														}
-														t249 := int32(mem[uint64(uint32(v0))])
+														t249 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 														if t249&i32(32) != 0 {
 															goto l108
 														}
@@ -54091,7 +54096,7 @@ l5:
 																		t253 := int32(uint32(v5) / uint32(i32(10)))
 																		t254 := v5
 																		v8 = t253
-																		mem[uint64(uint32(t252))] = byte(t254 - v8*i32(10) | i32(48))
+																		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t252)))) = byte(t254 - v8*i32(10) | i32(48))
 																		if uint32(v5) > uint32(i32(99)) {
 																			goto l110
 																		}
@@ -54099,7 +54104,7 @@ l5:
 																}
 																if v8 != 0 {
 																	v6 = v6 - i32(1)
-																	mem[uint64(uint32(v6+(v9+i32(576))))] = byte(v8 | i32(48))
+																	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6+(v9+i32(576)))))) = byte(v8 | i32(48))
 																}
 																v8 = v9 + i32(576)
 																v5 = v8 + v6
@@ -54126,9 +54131,9 @@ l5:
 																	goto l111
 																}
 																v5 = v5 - i32(1)
-																mem[uint64(uint32(v5))] = byte(i32(48))
+																*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5)))) = byte(i32(48))
 															l111:
-																t258 := int32(mem[uint64(uint32(v0))])
+																t258 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 																if t258&i32(32) == 0 {
 																	m.fn151(v5, v29-v5, v0)
 																	mem = m.memory
@@ -54142,7 +54147,7 @@ l5:
 																if v22 == 0 {
 																	goto l113
 																}
-																t259 := int32(mem[uint64(uint32(v0))])
+																t259 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 																if t259&i32(32) != 0 {
 																	goto l113
 																}
@@ -54176,7 +54181,7 @@ l5:
 																		t262 := int32(uint32(v5) / uint32(i32(10)))
 																		t263 := v5
 																		v8 = t262
-																		mem[uint64(uint32(t261))] = byte(t263 - v8*i32(10) | i32(48))
+																		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t261)))) = byte(t263 - v8*i32(10) | i32(48))
 																		if uint32(v5) > uint32(i32(99)) {
 																			goto l116
 																		}
@@ -54185,7 +54190,7 @@ l5:
 															l115:
 																if v8 != 0 {
 																	v6 = v6 - i32(1)
-																	mem[uint64(uint32(v6))] = byte(v8 | i32(48))
+																	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6)))) = byte(v8 | i32(48))
 																}
 																v5 = v9 + i32(576)
 																if uint32(v5) < uint32(v6) {
@@ -54195,7 +54200,7 @@ l5:
 																	}
 																	v6 = v9 + i32(576)
 																}
-																t264 := int32(mem[uint64(uint32(v0))])
+																t264 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 																if t264&i32(32) == 0 {
 																	t266 := v6
 																	p265 := v11
@@ -54248,7 +54253,7 @@ l5:
 																		t271 := int32(uint32(v5) / uint32(i32(10)))
 																		t272 := v5
 																		v7 = t271
-																		mem[uint64(uint32(t270))] = byte(t272 - v7*i32(10) | i32(48))
+																		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t270)))) = byte(t272 - v7*i32(10) | i32(48))
 																		if uint32(v5) > uint32(i32(99)) {
 																			goto l120
 																		}
@@ -54256,12 +54261,12 @@ l5:
 																}
 																if v7 != 0 {
 																	v6 = v6 - i32(1)
-																	mem[uint64(uint32(v6+(v9+i32(576))))] = byte(v7 | i32(48))
+																	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6+(v9+i32(576)))))) = byte(v7 | i32(48))
 																}
 																v5 = v9 + i32(576) + v6
 																if v6 == i32(9) {
 																	v5 = v5 - i32(1)
-																	mem[uint64(uint32(v5))] = byte(i32(48))
+																	*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5)))) = byte(i32(48))
 																}
 																{
 																	if v8 != v12 {
@@ -54277,7 +54282,7 @@ l5:
 																		v5 = v9 + i32(576)
 																		goto l121
 																	}
-																	t274 := int32(mem[uint64(uint32(v0))])
+																	t274 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 																	if t274&i32(32) == 0 {
 																		m.fn151(v5, i32(1), v0)
 																		mem = m.memory
@@ -54286,7 +54291,7 @@ l5:
 																	if v11|v17 == 0 {
 																		goto l121
 																	}
-																	t275 := int32(mem[uint64(uint32(v0))])
+																	t275 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 																	if t275&i32(32) != 0 {
 																		goto l121
 																	}
@@ -54295,7 +54300,7 @@ l5:
 																}
 															l121:
 																v6 = v29 - v5
-																t276 := int32(mem[uint64(uint32(v0))])
+																t276 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 																if t276&i32(32) == 0 {
 																	t278 := v5
 																	p277 := v11
@@ -54318,7 +54323,7 @@ l5:
 													l119:
 														m.fn164(v0, i32(48), v11+i32(18), i32(18), i32(0))
 														mem = m.memory
-														t279 := int32(mem[uint64(uint32(v0))])
+														t279 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 														if t279&i32(32) != 0 {
 															goto l118
 														}
@@ -54351,7 +54356,7 @@ l5:
 														if v7 == 0 {
 														l124:
 															{
-																t283 := int32(mem[uint64(uint32(v0))])
+																t283 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 																if t283&i32(32) == 0 {
 																	m.fn151(v9+i32(608), i32(256), v0)
 																	mem = m.memory
@@ -54362,7 +54367,7 @@ l5:
 																}
 															}
 														}
-														t284 := int32(mem[uint64(uint32(v0))])
+														t284 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 														if t284&i32(32) != 0 {
 															goto l123
 														}
@@ -54395,7 +54400,7 @@ l5:
 													mem = m.memory
 													goto l67
 												case 34:
-													t87 := int32(mem[uint64(uint32(v9))+40])
+													t87 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v9))+40)))
 													v5 = t87
 													goto l55
 												case 44:
@@ -54457,7 +54462,7 @@ l5:
 														goto l5
 													case 4:
 														t62 := int32(load32(mem, uint64(uint32(v9))+40))
-														mem[uint64(uint32(t62))] = byte(v19)
+														*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t62)))) = byte(v19)
 														goto l5
 													case 6:
 														t63 := int32(load32(mem, uint64(uint32(v9))+40))
@@ -54491,8 +54496,8 @@ l5:
 												l48:
 													{
 														v6 = v6 - i32(1)
-														t67 := int32(mem[uint64(uint32(int32(v39)&i32(15)))+2077904])
-														mem[uint64(uint32(v6))] = byte(t67 | v5)
+														t67 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(int32(v39)&i32(15)))+2077904)))
+														*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6)))) = byte(t67 | v5)
 														v39 = int64(uint64(v39) >> 4)
 														if v39 != i64(0) {
 															goto l48
@@ -54511,7 +54516,7 @@ l5:
 													if v39 != i64(0) {
 													l49:
 														v6 = v6 - i32(1)
-														mem[uint64(uint32(v6))] = byte(int32(v39)&i32(7) | i32(48))
+														*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6)))) = byte(int32(v39)&i32(7) | i32(48))
 														v39 = int64(uint64(v39) >> 3)
 														if v39 != i64(0) {
 															goto l49
@@ -54569,7 +54574,7 @@ l5:
 												t75 := int64(uint64(v39) / uint64(i64(10)))
 												t76 := v40
 												v39 = t75
-												mem[uint64(uint32(t74))] = byte(int32(t76-v39*i64(10)) | i32(48))
+												*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t74)))) = byte(int32(t76-v39*i64(10)) | i32(48))
 												if uint64(v40) > uint64(i64(0x9ffffffff)) {
 													goto l51
 												}
@@ -54585,7 +54590,7 @@ l5:
 													t78 := int32(uint32(v5) / uint32(i32(10)))
 													t79 := v5
 													v7 = t78
-													mem[uint64(uint32(t77))] = byte(t79 - v7*i32(10) | i32(48))
+													*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t77)))) = byte(t79 - v7*i32(10) | i32(48))
 													if uint32(v5) > uint32(i32(99)) {
 														goto l52
 													}
@@ -54595,7 +54600,7 @@ l5:
 												goto l47
 											}
 											v6 = v6 - i32(1)
-											mem[uint64(uint32(v6))] = byte(v7 | i32(48))
+											*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6)))) = byte(v7 | i32(48))
 										}
 									l47:
 										t80 := v17
@@ -54671,7 +54676,7 @@ l5:
 										if v5 == 0 {
 											goto l57
 										}
-										t101 := int32(mem[uint64(uint32(v6))])
+										t101 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6)))))
 										if t101 == 0 {
 											v8 = v6
 											v7 = v5
@@ -54690,7 +54695,7 @@ l5:
 										if v7 == 0 {
 											goto l59
 										}
-										t103 := int32(mem[uint64(uint32(v8))])
+										t103 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8)))))
 										if t103 == 0 {
 											goto l64
 										}
@@ -54707,7 +54712,7 @@ l5:
 										if v7 == 0 {
 											goto l59
 										}
-										t105 := int32(mem[uint64(uint32(v8))])
+										t105 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8)))))
 										if t105 == 0 {
 											goto l64
 										}
@@ -54724,7 +54729,7 @@ l5:
 										if v7 == 0 {
 											goto l59
 										}
-										t107 := int32(mem[uint64(uint32(v8))])
+										t107 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8)))))
 										if t107 == 0 {
 											goto l64
 										}
@@ -54745,7 +54750,7 @@ l5:
 										goto l60
 									}
 									{
-										t109 := int32(mem[uint64(uint32(v8))])
+										t109 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8)))))
 										if t109 == 0 {
 											goto l61
 										}
@@ -54772,7 +54777,7 @@ l5:
 									}
 								l64:
 									{
-										t111 := int32(mem[uint64(uint32(v8))])
+										t111 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v8)))))
 										t112 := v8
 										if t111 == 0 {
 											p97 = t112
@@ -54800,7 +54805,7 @@ l5:
 								if v10 >= i32(0) {
 									goto l54
 								}
-								t114 := int32(mem[uint64(uint32(v5))])
+								t114 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5)))))
 								if t114 == 0 {
 									goto l54
 								}
@@ -54867,7 +54872,7 @@ l5:
 							if uint32(v6) > uint32(v5) {
 								goto l67
 							}
-							t122 := int32(mem[uint64(uint32(v0))])
+							t122 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 							if t122&i32(32) == 0 {
 								m.fn151(v11, v8, v0)
 								mem = m.memory
@@ -54932,7 +54937,7 @@ l5:
 				}
 			l126:
 				v38 = float64(v38 * math.Float64frombits(uint64(int64(uint32(v6+i32(1023)))<<52)))
-				t288 := int32(mem[uint64(uint32(v22))])
+				t288 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v22)))))
 				if t288 == i32(45) {
 					v37 = -float64(v38 + float64(-v37-v38))
 					goto l125
@@ -54955,7 +54960,7 @@ l5:
 					t292 := int32(uint32(v5) / uint32(i32(10)))
 					t293 := v5
 					v8 = t292
-					mem[uint64(uint32(t291))] = byte(t293 - v8*i32(10) | i32(48))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t291)))) = byte(t293 - v8*i32(10) | i32(48))
 					if uint32(v5) > uint32(i32(99)) {
 						goto l127
 					}
@@ -54963,22 +54968,22 @@ l5:
 			}
 			if v8 != 0 {
 				v6 = v6 - i32(1)
-				mem[uint64(uint32(v6+(v9+i32(564))))] = byte(v8 | i32(48))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6+(v9+i32(564)))))) = byte(v8 | i32(48))
 			}
 			v5 = v9 + i32(564) + v6
 			if v6 == i32(12) {
 				v5 = v5 - i32(1)
-				mem[uint64(uint32(v5))] = byte(i32(48))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5)))) = byte(i32(48))
 			}
 			v8 = v20 & i32(32)
 			v15 = v5 - i32(2)
-			mem[uint64(uint32(v15))] = byte(v20 + i32(15))
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v15)))) = byte(v20 + i32(15))
 			t295 := v5 - i32(1)
 			p294 := i32(43)
 			if v7 < i32(0) {
 				p294 = i32(45)
 			}
-			mem[uint64(uint32(t295))] = byte(p294)
+			*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t295)))) = byte(p294)
 			var p296 int32
 			if v16&i32(8) == 0 {
 				p296 = 1
@@ -54994,8 +54999,8 @@ l5:
 				v5 = v6
 				t298 := v5
 				v6 = i32_trunc_sat_f64_s(v37)
-				t299 := int32(mem[uint64(uint32(v6+i32(2077904)))])
-				mem[uint64(uint32(t298))] = byte(t299 | v8)
+				t299 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v6+i32(2077904))))))
+				*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(t298)))) = byte(t299 | v8)
 				v37 = float64(float64(v37-float64(v6)) * float64(16))
 				{
 					v6 = v5 + i32(1)
@@ -55010,7 +55015,7 @@ l5:
 					if t300&p301 != 0 {
 						goto l128
 					}
-					mem[uint64(uint32(v5))+1] = byte(i32(46))
+					*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v5))+1)) = byte(i32(46))
 					v6 = v5 + i32(2)
 				}
 			l128:
@@ -55065,7 +55070,7 @@ l5:
 				if v7 == 0 {
 				l131:
 					{
-						t312 := int32(mem[uint64(uint32(v0))])
+						t312 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 						if t312&i32(32) == 0 {
 							m.fn151(v9+i32(608), i32(256), v0)
 							mem = m.memory
@@ -55076,7 +55081,7 @@ l5:
 						}
 					}
 				}
-				t313 := int32(mem[uint64(uint32(v0))])
+				t313 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 				if t313&i32(32) != 0 {
 					goto l130
 				}
@@ -55084,7 +55089,7 @@ l5:
 				mem = m.memory
 			}
 		l130:
-			t314 := int32(mem[uint64(uint32(v0))])
+			t314 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 			if t314&i32(32) == 0 {
 				m.fn151(v22, v8, v0)
 				mem = m.memory
@@ -55114,7 +55119,7 @@ l5:
 				if v7 == 0 {
 				l133:
 					{
-						t318 := int32(mem[uint64(uint32(v0))])
+						t318 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 						if t318&i32(32) == 0 {
 							m.fn151(v9+i32(608), i32(256), v0)
 							mem = m.memory
@@ -55125,7 +55130,7 @@ l5:
 						}
 					}
 				}
-				t319 := int32(mem[uint64(uint32(v0))])
+				t319 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 				if t319&i32(32) != 0 {
 					goto l132
 				}
@@ -55133,7 +55138,7 @@ l5:
 				mem = m.memory
 			}
 		l132:
-			t320 := int32(mem[uint64(uint32(v0))])
+			t320 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 			if t320&i32(32) == 0 {
 				m.fn151(v9+i32(576), v14, v0)
 				mem = m.memory
@@ -55160,7 +55165,7 @@ l5:
 				if v7 == 0 {
 				l135:
 					{
-						t324 := int32(mem[uint64(uint32(v0))])
+						t324 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 						if t324&i32(32) == 0 {
 							m.fn151(v9+i32(608), i32(256), v0)
 							mem = m.memory
@@ -55171,7 +55176,7 @@ l5:
 						}
 					}
 				}
-				t325 := int32(mem[uint64(uint32(v0))])
+				t325 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 				if t325&i32(32) != 0 {
 					goto l134
 				}
@@ -55179,7 +55184,7 @@ l5:
 				mem = m.memory
 			}
 		l134:
-			t326 := int32(mem[uint64(uint32(v0))])
+			t326 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 			if t326&i32(32) == 0 {
 				m.fn151(v15, v12, v0)
 				mem = m.memory
@@ -55209,7 +55214,7 @@ l5:
 				if v7 == 0 {
 				l137:
 					{
-						t330 := int32(mem[uint64(uint32(v0))])
+						t330 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 						if t330&i32(32) == 0 {
 							m.fn151(v9+i32(608), i32(256), v0)
 							mem = m.memory
@@ -55220,7 +55225,7 @@ l5:
 						}
 					}
 				}
-				t331 := int32(mem[uint64(uint32(v0))])
+				t331 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 				if t331&i32(32) != 0 {
 					goto l136
 				}
@@ -55236,7 +55241,7 @@ l5:
 			goto l5
 		}
 	l55:
-		mem[uint64(uint32(v9))+39] = byte(v5)
+		*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v9))+39)) = byte(v5)
 		v11 = i32(0)
 		v21 = i32(65766)
 		v12 = i32(1)
@@ -55289,7 +55294,7 @@ l5:
 			if v18 == 0 {
 			l139:
 				{
-					t340 := int32(mem[uint64(uint32(v0))])
+					t340 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 					if t340&i32(32) == 0 {
 						m.fn151(v9+i32(48), i32(256), v0)
 						mem = m.memory
@@ -55300,7 +55305,7 @@ l5:
 					}
 				}
 			}
-			t341 := int32(mem[uint64(uint32(v0))])
+			t341 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 			if t341&i32(32) != 0 {
 				goto l138
 			}
@@ -55308,7 +55313,7 @@ l5:
 			mem = m.memory
 		}
 	l138:
-		t342 := int32(mem[uint64(uint32(v0))])
+		t342 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 		if t342&i32(32) == 0 {
 			m.fn151(v21, v11, v0)
 			mem = m.memory
@@ -55338,7 +55343,7 @@ l5:
 			if v11 == 0 {
 			l141:
 				{
-					t346 := int32(mem[uint64(uint32(v0))])
+					t346 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 					if t346&i32(32) == 0 {
 						m.fn151(v9+i32(48), i32(256), v0)
 						mem = m.memory
@@ -55349,7 +55354,7 @@ l5:
 					}
 				}
 			}
-			t347 := int32(mem[uint64(uint32(v0))])
+			t347 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 			if t347&i32(32) != 0 {
 				goto l140
 			}
@@ -55379,7 +55384,7 @@ l5:
 			if v11 == 0 {
 			l143:
 				{
-					t351 := int32(mem[uint64(uint32(v0))])
+					t351 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 					if t351&i32(32) == 0 {
 						m.fn151(v9+i32(48), i32(256), v0)
 						mem = m.memory
@@ -55390,7 +55395,7 @@ l5:
 					}
 				}
 			}
-			t352 := int32(mem[uint64(uint32(v0))])
+			t352 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 			if t352&i32(32) != 0 {
 				goto l142
 			}
@@ -55398,7 +55403,7 @@ l5:
 			mem = m.memory
 		}
 	l142:
-		t353 := int32(mem[uint64(uint32(v0))])
+		t353 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 		if t353&i32(32) == 0 {
 			m.fn151(v6, v22, v0)
 			mem = m.memory
@@ -55427,7 +55432,7 @@ l5:
 		if v8 == 0 {
 		l144:
 			{
-				t357 := int32(mem[uint64(uint32(v0))])
+				t357 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 				if t357&i32(32) == 0 {
 					m.fn151(v9+i32(48), i32(256), v0)
 					mem = m.memory
@@ -55438,7 +55443,7 @@ l5:
 				}
 			}
 		}
-		t358 := int32(mem[uint64(uint32(v0))])
+		t358 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 		if t358&i32(32) != 0 {
 			goto l5
 		}
@@ -55478,7 +55483,7 @@ func (m *Module) fn163(v0, v1, v2 int32) {
 		t7 := v2
 		v1 = t6
 		store32(mem, uint64(uint32(t7)), uint32(v1+i32(4)))
-		t8 := int64(int8(mem[uint64(uint32(v1))]))
+		t8 := int64(int8(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))))))
 		store64(mem, uint64(uint32(v0)), uint64(t8))
 		return
 	case 9:
@@ -55486,7 +55491,7 @@ func (m *Module) fn163(v0, v1, v2 int32) {
 		t10 := v2
 		v1 = t9
 		store32(mem, uint64(uint32(t10)), uint32(v1+i32(4)))
-		t11 := int64(mem[uint64(uint32(v1))])
+		t11 := int64(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1)))))
 		store64(mem, uint64(uint32(v0)), uint64(t11))
 		return
 	case 16:
@@ -55569,7 +55574,7 @@ func (m *Module) fn164(v0, v1, v2, v3, v4 int32) {
 		if v2 == 0 {
 		l1:
 			{
-				t4 := int32(mem[uint64(uint32(v0))])
+				t4 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 				if t4&i32(32) == 0 {
 					m.fn151(v5, i32(256), v0)
 					mem = m.memory
@@ -55580,7 +55585,7 @@ func (m *Module) fn164(v0, v1, v2, v3, v4 int32) {
 				}
 			}
 		}
-		t5 := int32(mem[uint64(uint32(v0))])
+		t5 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v0)))))
 		if t5&i32(32) != 0 {
 			goto l0
 		}
@@ -56143,7 +56148,7 @@ func (m *Module) fn167(v0 int32) int32 {
 						goto l2
 					}
 				l22:
-					t94 := int32(mem[uint64(uint32(i32(2078792)))])
+					t94 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(i32(2078792))))))
 					if t94&i32(4) != 0 {
 						goto l23
 					}
@@ -56420,7 +56425,7 @@ func (m *Module) fn167(v0 int32) int32 {
 						goto l38
 					}
 				}
-				t139 := int32(mem[uint64(uint32(v1))+12])
+				t139 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uint64(uint32(v1))+12)))
 				if t139&i32(8) == 0 {
 					store32(mem, uint64(uint32(v1)), uint32(v2))
 					t171 := int32(load32(mem, uint64(uint32(v1))+4))
@@ -57525,7 +57530,7 @@ func (m *Module) fn169(v0, v1 int32) int32 {
 		if v0 == 0 {
 			goto l1
 		}
-		t4 := int32(m.memory[uint64(uint32(v0-i32(4)))])
+		t4 := int32(*(*byte)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(m.memory)), uint64(uint32(v0-i32(4))))))
 		if t4&i32(3) == 0 {
 			goto l1
 		}
@@ -58215,11 +58220,6 @@ const (
 
 //go:nosplit
 func load16[T uint32 | uint64](mem []byte, addr T) uint16 {
-	if !unalignedOK {
-		a := uint64(addr)
-		return binary.LittleEndian.Uint16(mem[:0:len(mem)][a : a+2 : a+2])
-	}
-	_ = mem[uint64(addr)+1]
 	val := *(*uint16)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uintptr(addr)))
 	if big {
 		return bits.ReverseBytes16(val)
@@ -58229,25 +58229,14 @@ func load16[T uint32 | uint64](mem []byte, addr T) uint16 {
 
 //go:nosplit
 func store16[T uint32 | uint64](mem []byte, addr T, val uint16) {
-	if !unalignedOK {
-		a := uint64(addr)
-		binary.LittleEndian.PutUint16(mem[:0:len(mem)][a:a+2:a+2], val)
-		return
-	}
 	if big {
 		val = bits.ReverseBytes16(val)
 	}
-	_ = mem[uint64(addr)+1]
 	*(*uint16)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uintptr(addr))) = val
 }
 
 //go:nosplit
 func load32[T uint32 | uint64](mem []byte, addr T) uint32 {
-	if !unalignedOK {
-		a := uint64(addr)
-		return binary.LittleEndian.Uint32(mem[:0:len(mem)][a : a+4 : a+4])
-	}
-	_ = mem[uint64(addr)+3]
 	val := *(*uint32)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uintptr(addr)))
 	if big {
 		return bits.ReverseBytes32(val)
@@ -58257,25 +58246,14 @@ func load32[T uint32 | uint64](mem []byte, addr T) uint32 {
 
 //go:nosplit
 func store32[T uint32 | uint64](mem []byte, addr T, val uint32) {
-	if !unalignedOK {
-		a := uint64(addr)
-		binary.LittleEndian.PutUint32(mem[:0:len(mem)][a:a+4:a+4], val)
-		return
-	}
 	if big {
 		val = bits.ReverseBytes32(val)
 	}
-	_ = mem[uint64(addr)+3]
 	*(*uint32)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uintptr(addr))) = val
 }
 
 //go:nosplit
 func load64[T uint32 | uint64](mem []byte, addr T) uint64 {
-	if !unalignedOK {
-		a := uint64(addr)
-		return binary.LittleEndian.Uint64(mem[:0:len(mem)][a : a+8 : a+8])
-	}
-	_ = mem[uint64(addr)+7]
 	val := *(*uint64)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uintptr(addr)))
 	if big {
 		return bits.ReverseBytes64(val)
@@ -58285,15 +58263,9 @@ func load64[T uint32 | uint64](mem []byte, addr T) uint64 {
 
 //go:nosplit
 func store64[T uint32 | uint64](mem []byte, addr T, val uint64) {
-	if !unalignedOK {
-		a := uint64(addr)
-		binary.LittleEndian.PutUint64(mem[:0:len(mem)][a:a+8:a+8], val)
-		return
-	}
 	if big {
 		val = bits.ReverseBytes64(val)
 	}
-	_ = mem[uint64(addr)+7]
 	*(*uint64)(unsafe.Add(unsafe.Pointer(unsafe.SliceData(mem)), uintptr(addr))) = val
 }
 
