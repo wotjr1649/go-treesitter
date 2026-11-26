@@ -59,7 +59,7 @@ class DecideTest(unittest.TestCase):
         f = ["query.go", "internal/engine/x.go"]
         self.assertEqual(on("engine", f), ["engine_compat", "engine_core", "engine_floor", "engine_grammars", "engine_platforms"])
         self.assertEqual(on("regen", f), ["regen"])
-        self.assertEqual(on("windows", f), ["windows_product", "windows_race"])
+        self.assertEqual(on("windows", f), ["windows_race"])
         self.assertEqual(on("api-guard", f), ["api_guard"])
         self.assertEqual(on("pin-move", f), [])
         out = flags("conformance", f)
@@ -233,7 +233,7 @@ class WiringTest(unittest.TestCase):
         self.assertEqual(json.loads(flags("engine", ["query.go"])["expect"]),
                          [j for j in cc.JOB_IF["engine"] if "full" not in cc.JOB_IF["engine"][j]])
         self.assertEqual(json.loads(flags("engine", ["README.md"], "push")["expect"]), list(cc.JOB_IF["engine"]))
-        self.assertEqual(json.loads(flags("windows", None)["expect"]), ["product", "licenses", "race"])
+        self.assertEqual(json.loads(flags("windows", None)["expect"]), ["licenses", "race"])
 
 
 MATRIX_STEP = "The successful matrix jobs are the expected instances"

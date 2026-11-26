@@ -91,7 +91,7 @@ CODE = {"root", "grammars", "gen", "conf", "nativeref", "bench"}
 NEEDS = {
     # engine
     "engine_core": CODE | {"docs", "license"},  # root tests read docs/design/api-stability.md; tools/gen tests read LICENSES
-    "engine_platforms": CODE,
+    "engine_platforms": CODE | {"lane"},  # the engine jobs also run the tools/lane unit tests (windows.yml no longer does)
     "engine_grammars": {"root", "grammars"},  # grammar tests are the root engine plus the module; generator drift is regen's
     "engine_floor": {"root", "grammars"},
     "engine_compat": {"root", "grammars", "lane", "gen"},
@@ -99,8 +99,7 @@ NEEDS = {
     "regen": CODE | {"license"},
     # conformance: the full matrix; every other change keeps g1 on amd64 (repository-wide TestKnownGap*)
     "conformance_full": CODE,
-    # windows
-    "windows_product": {"root", "lane"},
+    # windows (the product build/vet/test lived here; engine.yml runs it on both Windows architectures)
     "windows_licenses": {"license", "grammars", "gen"},  # LICENSE files, grammars/* list, pins.json licenseSHA256
     "windows_race": {"root"},
     "api_guard": {"root", "apiguard"},
@@ -108,7 +107,7 @@ NEEDS = {
 }
 WORKFLOW_OF = {
     "engine_core": "engine", "engine_platforms": "engine", "engine_grammars": "engine", "engine_floor": "engine",
-    "engine_compat": "engine", "regen": "regen", "conformance_full": "conformance", "windows_product": "windows",
+    "engine_compat": "engine", "regen": "regen", "conformance_full": "conformance",
     "windows_licenses": "windows", "windows_race": "windows", "api_guard": "api-guard", "pin_move": "pin-move",
 }
 
@@ -128,7 +127,7 @@ JOB_IF = {
     },
     "regen": {"regen-grammar": ["regen"]},
     "conformance": {},
-    "windows": {"product": ["windows_product"], "licenses": ["windows_licenses"], "race": ["windows_race"]},
+    "windows": {"licenses": ["windows_licenses"], "race": ["windows_race"]},
     "api-guard": {"api-guard": ["api_guard"]},
     "pin-move": {"pin-move": ["pin_move"]},
 }

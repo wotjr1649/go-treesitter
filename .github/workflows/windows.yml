@@ -12,7 +12,6 @@
       "runs-on": "ubuntu-24.04",
       "timeout-minutes": 5,
       "outputs": {
-        "windows_product": "${{ steps.classify.outputs.windows_product }}",
         "windows_licenses": "${{ steps.classify.outputs.windows_licenses }}",
         "windows_race": "${{ steps.classify.outputs.windows_race }}",
         "expect": "${{ steps.classify.outputs.expect }}"
@@ -20,31 +19,6 @@
       "steps": [
         {"uses": "actions/checkout@v7", "with": {"persist-credentials": false, "fetch-depth": 2}},
         {"id": "classify", "name": "Classify the changed files (tools/lane/ci_changes.py)", "run": "python3 -m unittest discover -s tools/lane -p test_ci_changes.py\ncc=tools/lane/ci_changes.py ev=$GITHUB_EVENT_NAME\nif [ $ev = pull_request ]; then git show HEAD^1:$cc > $RUNNER_TEMP/base_ci_changes.py 2>/dev/null && cc=$RUNNER_TEMP/base_ci_changes.py || ev=workflow_dispatch; fi\npython3 $cc --workflow windows --event $ev"}
-      ]
-    },
-    "product": {
-      "needs": "changes",
-      "if": "${{ needs.changes.outputs.windows_product == 'true' }}",
-      "strategy": {"fail-fast": false, "matrix": {"include": [
-        {"runner": "windows-latest", "arch": "amd64"},
-        {"runner": "windows-11-arm", "arch": "arm64"}
-      ]}},
-      "runs-on": "${{ matrix.runner }}",
-      "timeout-minutes": 15,
-      "env": {"CGO_ENABLED": "0", "GOENV": "off", "GOWORK": "off", "GOTOOLCHAIN": "local"},
-      "steps": [
-        {"uses": "actions/checkout@v7", "with": {"persist-credentials": false}},
-        {"uses": "actions/setup-go@v7", "with": {"go-version": "1.27.x"}},
-        {"name": "Native architecture", "run": "go env GOOS GOARCH CGO_ENABLED\n[Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture\nif ((go env GOOS) -ne 'windows' -or (go env GOARCH) -ne '${{ matrix.arch }}') { throw 'native target mismatch' }"},
-        {"name": "Build", "run": "go build ./..."},
-        {"name": "Vet", "run": "go vet ./..."},
-        {"name": "Test", "run": "go test ./... -count=1 -timeout 120s"},
-        {"name": "Local lane receipt tests", "run": "python -m unittest discover -s tools/lane -p test_*.py"},
-        {
-          "name": "Windows ARM64 build",
-          "env": {"GOOS": "windows", "GOARCH": "arm64"},
-          "run": "go build ./..."
-        }
       ]
     },
     "licenses": {
@@ -73,7 +47,7 @@
     "windows-gate": {
       "name": "windows-gate",
       "if": "${{ always() }}",
-      "needs": ["changes", "product", "licenses", "race"],
+      "needs": ["changes", "licenses", "race"],
       "runs-on": "ubuntu-24.04",
       "timeout-minutes": 5,
       "steps": [

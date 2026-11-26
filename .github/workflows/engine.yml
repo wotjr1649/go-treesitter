@@ -92,7 +92,15 @@ jobs:
       - name: Engine and root package
         run: |
           go vet ./internal/engine ./internal/langid ./experimental/... .
-          go test -count=1 -timeout 600s ./internal/engine ./experimental/... .
+          go test -count=1 -timeout 600s ./internal/engine ./internal/langid ./experimental/... .
+      # windows.yml's product job (go build/vet/test ./... on both Windows architectures) ran only what the steps above and the grammar
+      # shards already cover, plus this cross-compile: a pull request has no native windows/arm64 job, so the amd64 job compiles for it.
+      - name: Cross-build windows/arm64
+        if: ${{ !cancelled() && env.EXPECTED_GOOS == 'windows' && env.EXPECTED_GOARCH == 'amd64' }}
+        env:
+          GOOS: windows
+          GOARCH: arm64
+        run: go build ./...
       - name: Subprocess tree supervision
         if: ${{ !cancelled() }}
         working-directory: tools/bench/proc
@@ -102,6 +110,9 @@ jobs:
       - name: Python subprocess and gate regression tests
         if: ${{ !cancelled() }}
         run: ${{ runner.os == 'Windows' && 'python' || 'python3' }} -m unittest discover -s tools/native-ref -p '*_test.py'
+      - name: Lane receipt and classifier tests
+        if: ${{ !cancelled() }}
+        run: ${{ runner.os == 'Windows' && 'python' || 'python3' }} -m unittest discover -s tools/lane -p 'test_*.py'
       - name: Generator unit tests
         if: ${{ !cancelled() }}
         working-directory: tools/gen
