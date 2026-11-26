@@ -57,9 +57,9 @@ class DecideTest(unittest.TestCase):
 
     def test_root_code(self):
         f = ["query.go", "internal/engine/x.go"]
-        self.assertEqual(on("engine", f), ["engine_compat", "engine_core", "engine_floor", "engine_grammars", "engine_platforms"])
+        self.assertEqual(on("engine", f), ["engine_compat", "engine_core", "engine_floor", "engine_grammars", "engine_platforms", "engine_winarm"])
         self.assertEqual(on("regen", f), ["regen"])
-        self.assertEqual(on("windows", f), ["windows_product", "windows_race"])
+        self.assertEqual(on("windows", f), ["windows_race"])
         self.assertEqual(on("api-guard", f), ["api_guard"])
         self.assertEqual(on("pin-move", f), [])
         out = flags("conformance", f)
@@ -86,13 +86,26 @@ class DecideTest(unittest.TestCase):
         # A change to the workflow itself runs all of that workflow (and only that one).
         eng = [".github/workflows/engine.yml"]
         self.assertEqual(flags("engine", eng)["full"], "true")
-        self.assertEqual(len(json.loads(flags("engine", eng)["floor_shards"])["include"]), 5)
-        self.assertEqual(len(on("engine", eng)), 5)
+        self.assertEqual(len(json.loads(flags("engine", eng)["floor_shards"])["include"]), len(cc.ENGINE_SHARDS))
+        self.assertEqual(len(on("engine", eng)), 6)
         self.assertEqual(on("regen", eng), [])
         reg = [".github/workflows/regen.yml"]
         self.assertEqual(on("regen", reg), ["regen"])
         self.assertEqual(on("pin-move", [".github/workflows/pin-move.yml"]), ["pin_move"])
         self.assertEqual(flags("conformance", [".github/workflows/conformance.yml"])["conformance_full"], "true")
+
+    def test_native_windows_arm64_on_pull_requests_for_root_changes(self):
+        # The old windows.yml product job ran windows-11-arm on every root change; engine (windows-11-arm) keeps that, without grammar shards.
+        for f in (["query.go"], ["internal/engine/vm_windows.go"], ["experimental/match/match.go"], ["go.mod"], ["testdata/x.txt"]):
+            out = flags("engine", f)
+            self.assertEqual(out["full"], "false", f)
+            expect = json.loads(out["expect"])
+            self.assertIn("engine-windows-arm64", expect, f)
+            self.assertNotIn("grammar-windows-arm64", expect, f)
+            self.assertNotIn("engine-linux-arm64", expect, f)
+        for f in (["README.md"], ["grammars/c/parser.go"], ["tools/gen/pins.json"], ["tools/lane/record.py"]):
+            self.assertNotIn("engine-windows-arm64", json.loads(flags("engine", f)["expect"]), f)
+        self.assertIn("grammar-windows-arm64", json.loads(flags("engine", ["README.md"], "push")["expect"]))
 
     def test_conformance_inputs(self):
         for f in (["tools/conformance/a_test.go"], ["tools/native-ref/main.go"], ["tools/gen/pins.json"], ["grammars/c/parser.go"]):
@@ -109,7 +122,7 @@ class DecideTest(unittest.TestCase):
                 self.assertTrue(all(v == "true" for k, v in out.items() if k[:3] in ("eng", "reg", "win", "api", "pin", "con") and v in ("true", "false")), (wf, f, ev, out))
             self.assertEqual(flags("engine", f, ev)["full"], "true" if ev != "pull_request" else "false")
         self.assertEqual(len(json.loads(flags("conformance", ["README.md"], "push")["conformance_matrix"])["include"]), 10)
-        self.assertEqual(len(json.loads(flags("engine", ["README.md"], "push")["floor_shards"])["include"]), 5)
+        self.assertEqual(len(json.loads(flags("engine", ["README.md"], "push")["floor_shards"])["include"]), len(cc.ENGINE_SHARDS))
 
     def test_every_job_flag_is_covered(self):
         got = set()
@@ -149,11 +162,11 @@ class RepoTest(unittest.TestCase):
 GATE_CMD = "jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped " \
            "'. as $n | all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok " \
            "and all(.changes.outputs.expect | fromjson[]; $n[.].result == $ok)' <<<$NEEDS"
-# The classify step of every changes job: the lane tests first, then the classifier of the base commit (a pull request that edits the
-# classifier is judged by the old one and hits its "lib" rule; a base without it runs everything). Same text in each, apart from the workflow.
+# The classify step of every changes job: the lane tests first, then the classifier (the base's own when the pull request does not edit it;
+# when it does, or HEAD^1 cannot be read, the pull request's classifier runs everything). Same text in each, apart from the workflow.
 CHANGES_CMD = """python3 -m unittest discover -s tools/lane -p test_ci_changes.py
 cc=tools/lane/ci_changes.py ev=$GITHUB_EVENT_NAME
-if [ $ev = pull_request ]; then git show HEAD^1:$cc > $RUNNER_TEMP/base_ci_changes.py 2>/dev/null && cc=$RUNNER_TEMP/base_ci_changes.py || ev=workflow_dispatch; fi
+if [ $ev = pull_request ] && ! git diff --quiet HEAD^1 HEAD -- $cc; then ev=workflow_dispatch; fi
 python3 $cc --workflow %s --event $ev"""
 
 
@@ -200,7 +213,7 @@ class WiringTest(unittest.TestCase):
             self.assertLessEqual(exported, produced, wf)
             self.assertIn("expect", exported, wf)  # the gate reads it
             # conformance_full only shapes conformance_matrix (matrix.group.name), no job reads it.
-            flags = {k for k in produced if (k in cc.NEEDS and k != "conformance_full") or k in ("engine_shards", "floor_shards", "conformance_matrix")}
+            flags = {k for k in produced if (k in cc.NEEDS and k != "conformance_full") or k in ("engine_shards", "floor_shards", "conformance_matrix", "regen_matrix")}
             self.assertLessEqual(flags, used, "%s: produced but never used: %s" % (wf, flags - used))
 
     def test_every_job_waits_for_changes_and_the_gate_waits_for_every_job(self):
@@ -233,7 +246,7 @@ class WiringTest(unittest.TestCase):
         self.assertEqual(json.loads(flags("engine", ["query.go"])["expect"]),
                          [j for j in cc.JOB_IF["engine"] if "full" not in cc.JOB_IF["engine"][j]])
         self.assertEqual(json.loads(flags("engine", ["README.md"], "push")["expect"]), list(cc.JOB_IF["engine"]))
-        self.assertEqual(json.loads(flags("windows", None)["expect"]), ["product", "licenses", "race"])
+        self.assertEqual(json.loads(flags("windows", None)["expect"]), ["licenses", "race"])
 
 
 MATRIX_STEP = "The successful matrix jobs are the expected instances"
@@ -262,21 +275,24 @@ class MatrixCountTest(unittest.TestCase):
         self.assertEqual(self.names("engine", ["README.md"]), [])  # only engine (ubuntu-24.04), which has no matrix
         self.assertEqual(self.names("engine", ["tools/gen/pins.json"]), [])  # no grammar shards: drift is regen's
         pr = self.names("engine", ["query.go"])
-        self.assertEqual(len(pr), 5 + 5 + 1)  # linux-amd64 and windows-amd64 shards, one floor shard
+        self.assertEqual(len(pr), 2 + 2 + 1)  # linux-amd64 and windows-amd64 shards, one floor shard
         self.assertIn("grammar (ubuntu-24.04, Go 1.26.x, shard 1)", pr)
         self.assertNotIn("grammar (ubuntu-24.04, Go 1.26.x, shard 2)", pr)
+        self.assertEqual(self.names("regen", ["README.md"]), [])  # docs only: no regeneration
+        self.assertEqual(self.names("regen", ["query.go"]), ["regenerate group g%d and diff (ubuntu-24.04)" % i for i in range(1, 5)])
         for wf in cc.WORKFLOWS:
-            if wf not in ("engine", "conformance"):
+            if wf not in ("engine", "conformance", "regen"):
                 self.assertNotIn("expect_matrix", flags(wf, ["README.md"]))
 
     def test_full_runs_have_the_full_size(self):
-        for wf, files in (("engine", ["README.md"]), ("conformance", ["README.md"])):
+        for wf, files in (("engine", ["README.md"]), ("conformance", ["README.md"]), ("regen", ["README.md"])):
             for ev in ("push", "workflow_dispatch", "schedule"):
                 env, _ = matrix_step(wf)
                 size = int(re.search(r"'(\d+)'", env["FULL"]).group(1))
                 self.assertEqual(len(self.names(wf, files, ev)), size, (wf, ev))
         self.assertEqual(len(cc.CONFORMANCE_GROUPS) * len(cc.RUNNERS), 10)
-        self.assertEqual(len(cc.ENGINE_MATRIX_JOBS) * len(cc.ENGINE_SHARDS), 30)
+        self.assertEqual(len(cc.REGEN_GROUPS), 4)
+        self.assertEqual(len(cc.ENGINE_MATRIX_JOBS) * len(cc.ENGINE_SHARDS), 12)
 
     def test_names_match_the_workflows(self):
         text = workflow_text("engine")
@@ -287,18 +303,55 @@ class MatrixCountTest(unittest.TestCase):
             # engine_shards sits in a YAML anchor shared by the five platform jobs; the floor job has its own matrix
             self.assertIn("fromJSON(needs.changes.outputs.%s)" % key, job_text[job] if key == "floor_shards" else text, job)
         self.assertIn("    name: conformance (${{ matrix.runner }}, ${{ matrix.group.name }})\n", workflow_text("conformance"))
+        self.assertIn("    name: %s\n" % (cc.REGEN_MATRIX_JOB % "${{ matrix.group.name }}"), workflow_text("regen"))
+        self.assertIn("fromJSON(needs.changes.outputs.regen_matrix)", workflow_text("regen"))
         self.assertEqual(cc.CONFORMANCE_MATRIX_JOB, "conformance (%s, %s)")
+
+    MATRIX_OUTPUT = {("conformance", "conformance-grammar"): "conformance_matrix", ("regen", "regen-grammar"): "regen_matrix"}
+
+    def rendered_names(self, wf, event="push"):
+        """The names GitHub gives the matrix jobs: each job's name template with matrix.<key> taken from the classifier's matrix entries."""
+        out = flags(wf, ["README.md"], event)
+        text = workflow_text(wf)
+        parts = re.split(r"^  ([A-Za-z0-9_-]+):\s*$", text[text.index("\njobs:\n"):], flags=re.M)
+        job_text = {parts[i]: parts[i + 1] for i in range(1, len(parts), 2)}
+        jobs = {j: key for j, (_, key) in cc.ENGINE_MATRIX_JOBS.items()} if wf == "engine" else \
+            {j: k for (w, j), k in self.MATRIX_OUTPUT.items() if w == wf}
+        names = []
+        for job, key in jobs.items():
+            template = re.search(r"^    name: (.*)$", job_text[job], flags=re.M).group(1)
+            for entry in json.loads(out[key])["include"]:
+                def value(m):
+                    v = entry
+                    for part in m.group(1).split("."):
+                        self.assertIsInstance(v, dict, "%s %s: matrix.%s is not in the matrix entry %s" % (wf, job, m.group(1), entry))
+                        self.assertIn(part, v, "%s %s: matrix.%s is not in the matrix entry %s" % (wf, job, m.group(1), entry))
+                        v = v[part]
+                    self.assertNotIsInstance(v, (dict, list), "%s %s: matrix.%s is not a scalar" % (wf, job, m.group(1)))
+                    return str(v)
+                names.append(re.sub(r"\$\{\{\s*matrix\.([A-Za-z0-9_.]+)\s*\}\}", value, template))
+        return sorted(names)
+
+    def test_rendered_job_names_are_the_expected_instances(self):
+        # A job name that uses a matrix key the entries do not have renders with an empty part, and the gate's name comparison fails.
+        for wf in ("engine", "conformance", "regen"):
+            for event in ("push", "workflow_dispatch"):
+                self.assertEqual(self.rendered_names(wf, event), sorted(self.names(wf, ["README.md"], event)), (wf, event))
+            for names in (self.rendered_names(wf),):
+                self.assertTrue(all(n.strip() and "  " not in n for n in names), (wf, names))
 
     def test_pattern_selects_only_the_matrix_jobs(self):
         for wf, files, others in (("engine", ["tools/conformance/x.go"], ["engine (ubuntu-24.04)", "engine, oldest supported Go (ubuntu-24.04)", "engine-gate", "engine-changes"]),
-                                  ("conformance", ["tools/conformance/x.go"], ["conformance (ubuntu-24.04)", "conformance (ubuntu-24.04-arm)", "conformance-gate", "conformance-changes"])):
+                                  ("conformance", ["tools/conformance/x.go"], ["conformance (ubuntu-24.04)", "conformance (ubuntu-24.04-arm)", "conformance-gate", "conformance-changes"]),
+                                  ("regen", ["tools/conformance/x.go"], ["regenerate and diff (ubuntu-24.04)", "regen-gate", "regen-changes"])):
             env, _ = matrix_step(wf)
             rx = re.compile(env["MATRIX_RE"].strip("'"))
             self.assertTrue(all(rx.search(n) for n in self.names(wf, files, "push")), wf)
             self.assertFalse(any(rx.search(n) for n in others), wf)
 
-    def test_both_gates_run_the_same_script(self):
+    def test_all_gates_run_the_same_script(self):
         self.assertEqual(matrix_step("engine")[1], matrix_step("conformance")[1])
+        self.assertEqual(matrix_step("regen")[1], matrix_step("conformance")[1])
 
     def run_step(self, wf, listed, ran, event="pull_request"):
         import shutil
@@ -334,17 +387,145 @@ class MatrixCountTest(unittest.TestCase):
         self.assertNotEqual(self.run_step("conformance", j(c[:9]), c[:9] + other, "push"), 0)
         for bad in ("", "null", "{}", "conformance"):
             self.assertNotEqual(self.run_step("conformance", bad, c + other, "push"), 0, bad)
+        r = self.names("regen", ["README.md"], "push")
+        self.assertEqual(len(r), 4)
+        self.assertEqual(self.run_step("regen", j(r), r + ["regenerate and diff (ubuntu-24.04)"], "push"), 0, self.last)
+        self.assertNotEqual(self.run_step("regen", j(r), r[:-1], "push"), 0)  # a group did not succeed
+        self.assertNotEqual(self.run_step("regen", j(r[:3]), r[:3], "push"), 0)  # a group dropped from the matrix on a push
         e = self.names("engine", ["README.md"], "push")
-        self.assertEqual(len(e), 30)
+        self.assertEqual(len(e), 12)
         self.assertEqual(self.run_step("engine", j(e), e + ["engine (ubuntu-24.04)"], "push"), 0)
-        self.assertNotEqual(self.run_step("engine", j(e[:25]), e[:25], "push"), 0)  # floor shards dropped on a push
+        self.assertNotEqual(self.run_step("engine", j(e[:10]), e[:10], "push"), 0)  # floor shards dropped on a push
         self.assertNotEqual(self.run_step("engine", j(e), e[:-1], "push"), 0)
 
 
+class MatrixKeysTest(unittest.TestCase):
+    """Every matrix.<path> a job reads must exist in every matrix entry the classifier emits: a missing key renders as an empty string
+    (an empty job name; an empty GROUP_LANGS that a loop or regen.sh then treats as 'nothing' or 'everything')."""
+
+    OUTPUTS = {"engine": ("engine_shards", "floor_shards"), "conformance": ("conformance_matrix",), "regen": ("regen_matrix",)}
+    OPTIONAL = {("conformance", "group.docs")}  # only g1 carries it; the others read it as empty on purpose
+    SAMPLES = [(["README.md"], "push"), (["README.md"], "workflow_dispatch"), (["README.md"], "pull_request"), (["query.go"], "pull_request"),
+               (["grammars/c/parser.go"], "pull_request"), (["tools/gen/pins.json"], "pull_request"),
+               (["tools/conformance/a_test.go"], "pull_request"), ([".github/workflows/engine.yml"], "pull_request"),
+               ([".github/workflows/regen.yml"], "pull_request"), ([".github/workflows/conformance.yml"], "pull_request")]
+
+    def matrix_paths(self, wf):
+        text = workflow_text(wf)
+        parts = re.split(r"^  ([A-Za-z0-9_-]+):\s*$", text[text.index("\njobs:\n"):], flags=re.M)
+        found = {}
+        for i in range(1, len(parts), 2):
+            job, body = parts[i], parts[i + 1]
+            uses_matrix_output = any("needs.changes.outputs.%s" % k in body for k in self.OUTPUTS[wf]) or (wf == "engine" and job.startswith("grammar-"))
+            if not uses_matrix_output:
+                continue  # a static matrix (the conformance aggregate job) is not the classifier's
+            code = "\n".join(l for l in body.splitlines() if not l.lstrip().startswith("#"))
+            paths = set()
+            for expr in re.findall(r"\$\{\{.*?\}\}", code):
+                paths |= set(re.findall(r"\bmatrix\.([A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+)*)", expr))
+            found[job] = paths
+        return found
+
+    @staticmethod
+    def has(entry, path):
+        for part in path.split("."):
+            if not isinstance(entry, dict) or part not in entry:
+                return False
+            entry = entry[part]
+        return True
+
+    def test_every_matrix_path_exists_in_every_entry(self):
+        for wf, keys in self.OUTPUTS.items():
+            by_job = self.matrix_paths(wf)
+            self.assertTrue(by_job, wf)
+            entries = []
+            for files, event in self.SAMPLES:
+                out = flags(wf, files, event)
+                for key in keys:
+                    entries += [(key, e) for e in json.loads(out[key])["include"]]
+            self.assertTrue(entries, wf)
+            for job, paths in by_job.items():
+                self.assertTrue(paths, "%s %s reads no matrix path: the scan matched nothing" % (wf, job))
+                for path in paths:
+                    holders = [self.has(e, path) for _, e in entries]
+                    if (wf, path) in self.OPTIONAL:
+                        self.assertTrue(any(holders), "%s %s: matrix.%s is in no entry" % (wf, job, path))
+                    elif not all(holders):
+                        self.fail("%s %s: matrix.%s is missing from a matrix entry (%s)" % (
+                            wf, job, path, next(e for _, e in entries if not self.has(e, path))))
+
+    def test_loops_over_matrix_lists_check_them_first(self):
+        # tools/lane/check_langs.sh fails on an empty or unknown list; regen.sh and native-ref take every grammar when given none.
+        for wf, n in (("regen", 2), ("conformance", 2), ("engine", 1)):
+            self.assertEqual(workflow_text(wf).count("tools/lane/check_langs.sh"), n, wf)
+
+    def run_check(self, *args):
+        import shutil
+        bash = shutil.which("bash")
+        if not bash or "system32" in bash.lower().replace("/", "\\"):
+            if sys.platform.startswith("linux"):
+                self.fail("bash is needed")
+            self.skipTest("bash (not the WSL launcher) is needed")
+        return subprocess.run([bash, str(ROOT / "tools/lane/check_langs.sh"), *args], capture_output=True, text=True, cwd=ROOT)
+
+    def test_check_langs(self):
+        self.assertEqual(self.run_check("c", "golang").returncode, 0)
+        for bad in ((), ("",), ("c", "nope"), ("../tools",)):
+            res = self.run_check(*bad)
+            self.assertNotEqual(res.returncode, 0, bad)
+            self.assertIn("::error::", res.stdout, bad)
+        for wf in ("regen", "conformance"):  # the matrix lists are the table the check relies on
+            for files, event in MatrixKeysTest.SAMPLES[:1]:
+                key = MatrixKeysTest.OUTPUTS[wf][0]
+                for entry in json.loads(flags(wf, files, event)[key])["include"]:
+                    group = entry["group"]
+                    self.assertEqual(self.run_check(*group["langs"].split()).returncode, 0, group["name"])
+
+
 class GateTest(unittest.TestCase):
-    def test_every_changes_job_runs_the_lane_tests_and_the_base_classifier(self):
+    def test_every_changes_job_runs_the_lane_tests_and_the_classifier(self):
         for wf in GATE_WORKFLOWS:
             self.assertIn(norm(CHANGES_CMD % wf), norm(workflow_text(wf)), wf)
+
+    def classify_event(self, event, edit_classifier, parents=2):
+        """Runs the classify step's shell lines in a scratch git repository, with the classifier replaced by an echo of its arguments,
+        and returns the --event the classifier would get."""
+        import shutil
+        import tempfile
+        bash, git = shutil.which("bash"), shutil.which("git")
+        if not bash or not git or "system32" in bash.lower().replace("/", "\\"):
+            if sys.platform.startswith("linux"):
+                self.fail("bash and git are needed")
+            self.skipTest("bash (not the WSL launcher) and git are needed")
+        script = (CHANGES_CMD % "engine").split("\n", 1)[1].replace("python3 $cc", "echo $cc")  # without the unittest line
+        with tempfile.TemporaryDirectory() as d:
+            def git_(*args):
+                subprocess.run([git, "-c", "user.name=t", "-c", "user.email=t@invalid", *args], cwd=d, check=True, capture_output=True)
+            git_("init", "-q")
+            lane = Path(d, "tools/lane")
+            lane.mkdir(parents=True)
+            (lane / "ci_changes.py").write_text("base\n", newline="\n")
+            git_("add", "-A")
+            git_("commit", "-q", "-m", "base")
+            if parents == 2:  # a pull request's merge commit: HEAD^1 is the base
+                git_("checkout", "-q", "-b", "pr")
+                Path(d, "other.txt").write_text("x")
+                if edit_classifier:
+                    (lane / "ci_changes.py").write_text("changed\n", newline="\n")
+                git_("add", "-A")
+                git_("commit", "-q", "-m", "pr")
+                git_("checkout", "-q", "-")
+                git_("merge", "-q", "--no-ff", "-m", "merge", "pr")
+            env = dict(os.environ, GITHUB_EVENT_NAME=event, RUNNER_TEMP=d)
+            res = subprocess.run([bash, "-e", "-c", script], cwd=d, env=env, capture_output=True, text=True)
+            self.assertEqual(res.returncode, 0, res.stderr)
+            return res.stdout.split("--event")[1].strip()
+
+    def test_a_pull_request_that_edits_the_classifier_runs_everything_with_its_own_classifier(self):
+        self.assertEqual(self.classify_event("pull_request", edit_classifier=True), "workflow_dispatch")
+        self.assertEqual(self.classify_event("pull_request", edit_classifier=False), "pull_request")  # every other pull request: unchanged
+        self.assertEqual(self.classify_event("pull_request", edit_classifier=False, parents=1), "workflow_dispatch")  # HEAD^1 unreadable
+        self.assertEqual(self.classify_event("push", edit_classifier=True), "push")
 
     def test_every_required_workflow_has_the_gate_and_a_changes_job(self):
         for wf, gate in GATE_WORKFLOWS.items():

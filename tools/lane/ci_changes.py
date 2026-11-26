@@ -3,14 +3,18 @@
 
 Every PR-required workflow starts with a cheap "changes" job that runs this script and feeds its outputs to job-level
 "if" conditions (a job skipped by "if" counts as passing for a required check; a workflow-level paths filter would leave
-the check pending forever) and, for engine.yml and conformance.yml, to dynamic matrices. A gate job per workflow then
-fails when "changes" or any needed job failed or was cancelled, or when a job the "expect" output lists did not succeed. The engine and
+the check pending forever) and, for engine.yml, regen.yml and conformance.yml, to dynamic matrices. A gate job per workflow then
+fails when "changes" or any needed job failed or was cancelled, or when a job the "expect" output lists did not succeed. The engine, regen and
 conformance gates also count the matrix instances that succeeded against "expect_matrix" (and, outside pull requests, against the full size).
 
     ci_changes.py --workflow engine|regen|conformance|windows|api-guard|pin-move [--files FILE]
 
-The workflow runs the copy of this script from the pull request's base commit (git show HEAD^1:tools/lane/ci_changes.py), so a pull
-request that edits it is classified by the old rules and hits the "lib" rule; a base without the script runs everything.
+A pull request that does not edit this script is classified by it (it is the base commit's copy, since HEAD^1 and HEAD hold the same
+bytes), so a pull request cannot change its own classification by any other file. A pull request that edits it (git diff --quiet
+HEAD^1 HEAD -- tools/lane/ci_changes.py is false, or HEAD^1 cannot be read) runs this script of the pull request in run-everything mode
+(--event workflow_dispatch): every job, the whole matrices, the full gate sizes, described by the pull request's own tables and workflows,
+whose agreement the lane tests (run first in every changes job) check. The base copy cannot be used there: its expect lists and matrix
+outputs name the base's jobs, which the pull request's workflows may not have.
 
 Changed files come from "git diff --name-only --no-renames HEAD^1 HEAD" on the pull request's merge commit (the default
 checkout of a pull_request event; fetch-depth 2), or from --files ("-" is stdin; tests). Anything unknown, an empty or
@@ -31,12 +35,11 @@ from pathlib import Path
 WORKFLOWS = ("engine", "regen", "conformance", "windows", "api-guard", "pin-move")
 
 # Grammar partitions. They must name every grammars/* directory exactly once (checked here and in the unit test).
+# Two shards balanced by the measured per-grammar test time of main push runs (powershell and swift take most of it; the other 23 grammars
+# are a few seconds each), so each job pays checkout and Go setup once instead of five times.
 ENGINE_SHARDS = [
-    {"shard": 1, "grammars": "powershell golang json python html"},
-    {"shard": 2, "grammars": "swift javascript java xml r"},
-    {"shard": 3, "grammars": "tsql bash typescript php dart"},
-    {"shard": 4, "grammars": "cpp css tsx csharp yaml"},
-    {"shard": 5, "grammars": "postgres kotlin rust ruby c"},
+    {"shard": 1, "grammars": "powershell cpp css postgres php golang dart typescript tsx rust r json"},
+    {"shard": 2, "grammars": "swift bash kotlin tsql csharp ruby c xml javascript html java python yaml"},
 ]
 # Split by measured run time; g1 also runs the repository-wide checks once per architecture.
 CONFORMANCE_GROUPS = [
@@ -45,6 +48,14 @@ CONFORMANCE_GROUPS = [
     {"name": "g3", "langs": "swift yaml dart tsx json r"},
     {"name": "g4", "langs": "powershell typescript java javascript rust xml"},
     {"name": "g5", "langs": "kotlin csharp cpp bash python html"},
+]
+# regen.yml groups, balanced by the measured regenerate-and-compare time per grammar (postgres alone: about 11 of its 12 minutes);
+# each group pays checkout, Go setup and the toolchain build once.
+REGEN_GROUPS = [
+    {"name": "g1", "langs": "postgres"},
+    {"name": "g2", "langs": "swift kotlin bash css dart python rust json"},
+    {"name": "g3", "langs": "tsql csharp ruby javascript java html xml yaml"},
+    {"name": "g4", "langs": "powershell cpp typescript tsx php r golang c"},
 ]
 RUNNERS = [
     {"runner": "ubuntu-24.04", "goos": "linux", "goarch": "amd64"},
@@ -91,7 +102,8 @@ CODE = {"root", "grammars", "gen", "conf", "nativeref", "bench"}
 NEEDS = {
     # engine
     "engine_core": CODE | {"docs", "license"},  # root tests read docs/design/api-stability.md; tools/gen tests read LICENSES
-    "engine_platforms": CODE,
+    "engine_winarm": {"root"},  # native windows/arm64 on a pull request: the coverage windows.yml's product job gave root changes
+    "engine_platforms": CODE | {"lane"},  # the engine jobs also run the tools/lane unit tests (windows.yml no longer does)
     "engine_grammars": {"root", "grammars"},  # grammar tests are the root engine plus the module; generator drift is regen's
     "engine_floor": {"root", "grammars"},
     "engine_compat": {"root", "grammars", "lane", "gen"},
@@ -99,16 +111,15 @@ NEEDS = {
     "regen": CODE | {"license"},
     # conformance: the full matrix; every other change keeps g1 on amd64 (repository-wide TestKnownGap*)
     "conformance_full": CODE,
-    # windows
-    "windows_product": {"root", "lane"},
+    # windows (the product build/vet/test lived here; engine.yml runs it on both Windows architectures)
     "windows_licenses": {"license", "grammars", "gen"},  # LICENSE files, grammars/* list, pins.json licenseSHA256
     "windows_race": {"root"},
     "api_guard": {"root", "apiguard"},
     "pin_move": {"gen", "nativeref"},
 }
 WORKFLOW_OF = {
-    "engine_core": "engine", "engine_platforms": "engine", "engine_grammars": "engine", "engine_floor": "engine",
-    "engine_compat": "engine", "regen": "regen", "conformance_full": "conformance", "windows_product": "windows",
+    "engine_core": "engine", "engine_platforms": "engine", "engine_winarm": "engine", "engine_grammars": "engine", "engine_floor": "engine",
+    "engine_compat": "engine", "regen": "regen", "conformance_full": "conformance",
     "windows_licenses": "windows", "windows_race": "windows", "api_guard": "api-guard", "pin_move": "pin-move",
 }
 
@@ -120,7 +131,7 @@ JOB_IF = {
     "engine": {
         "engine-linux-amd64": ["engine_core"], "engine-linux-arm64": ["engine_platforms", "full"],
         "engine-macos-arm64": ["engine_platforms", "full"], "engine-windows-amd64": ["engine_platforms"],
-        "engine-windows-arm64": ["engine_platforms", "full"], "engine-go126": ["engine_floor"],
+        "engine-windows-arm64": ["engine_winarm"], "engine-go126": ["engine_floor"],
         "engine-consumer-compat": ["engine_compat"], "grammar-linux-amd64": ["engine_grammars"],
         "grammar-linux-arm64": ["engine_grammars", "full"], "grammar-macos-arm64": ["engine_grammars", "full"],
         "grammar-windows-amd64": ["engine_grammars"], "grammar-windows-arm64": ["engine_grammars", "full"],
@@ -128,7 +139,7 @@ JOB_IF = {
     },
     "regen": {"regen-grammar": ["regen"]},
     "conformance": {},
-    "windows": {"product": ["windows_product"], "licenses": ["windows_licenses"], "race": ["windows_race"]},
+    "windows": {"licenses": ["windows_licenses"], "race": ["windows_race"]},
     "api-guard": {"api-guard": ["api_guard"]},
     "pin-move": {"pin-move": ["pin_move"]},
 }
@@ -147,12 +158,14 @@ ENGINE_MATRIX_JOBS = {
     "grammar-go126": ("grammar (ubuntu-24.04, Go 1.26.x, shard %d)", "floor_shards"),
 }
 CONFORMANCE_MATRIX_JOB = "conformance (%s, %s)"  # job conformance-grammar: runner, group name
+REGEN_MATRIX_JOB = "regenerate group %s and diff (ubuntu-24.04)"  # job regen-grammar: group name
 
 
 def partition_ok(root):
     present = sorted(p.name for p in (Path(root) / "grammars").iterdir() if p.is_dir())
     for name, table in (("engine shards", [s["grammars"] for s in ENGINE_SHARDS]),
-                        ("conformance groups", [g["langs"] for g in CONFORMANCE_GROUPS])):
+                        ("conformance groups", [g["langs"] for g in CONFORMANCE_GROUPS]),
+                        ("regen groups", [g["langs"] for g in REGEN_GROUPS])):
         listed = sorted(n for entry in table for n in entry.split())
         # The conformance lane spells the Go grammar "go" for the corpus but the directory is grammars/golang.
         if listed != present:
@@ -185,7 +198,10 @@ def decide(workflow, files, event, root=None):
         include = [dict(r, group=g) for g in groups for r in runners]
         out["conformance_matrix"] = json.dumps({"include": include}, separators=(",", ":"))
         names = [CONFORMANCE_MATRIX_JOB % (e["runner"], e["group"]["name"]) for e in include]
-    if workflow in ("engine", "conformance"):
+    if workflow == "regen":
+        out["regen_matrix"] = json.dumps({"include": [{"group": g} for g in REGEN_GROUPS]}, separators=(",", ":"))  # matrix.group.name, as in conformance
+        names = [REGEN_MATRIX_JOB % g["name"] for g in REGEN_GROUPS if "regen-grammar" in expect]
+    if workflow in ("engine", "conformance", "regen"):
         out["expect_matrix"] = json.dumps(names, separators=(",", ":"))
     return out
 
@@ -229,7 +245,7 @@ def main(argv=None):
         with open(summary, "a", encoding="utf-8") as fh:
             fh.write("### %s: %s (event %s, %d changed files)\n\n" % (
                 args.workflow, out["classes"], args.event or "-", len(files) if files else 0))
-            fh.write("".join("- %s: %s\n" % (k, v) for k, v in out.items() if k not in ("classes", "engine_shards", "floor_shards", "conformance_matrix", "expect_matrix")))
+            fh.write("".join("- %s: %s\n" % (k, v) for k, v in out.items() if k not in ("classes", "engine_shards", "floor_shards", "conformance_matrix", "regen_matrix", "expect_matrix")))
     return 0
 
 

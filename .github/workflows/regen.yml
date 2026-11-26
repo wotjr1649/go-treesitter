@@ -24,7 +24,9 @@ jobs:
     timeout-minutes: 5
     outputs:
       regen: ${{ steps.classify.outputs.regen }}
+      regen_matrix: ${{ steps.classify.outputs.regen_matrix }}
       expect: ${{ steps.classify.outputs.expect }}
+      expect_matrix: ${{ steps.classify.outputs.expect_matrix }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -36,25 +38,29 @@ jobs:
         run: |
           python3 -m unittest discover -s tools/lane -p test_ci_changes.py
           cc=tools/lane/ci_changes.py ev=$GITHUB_EVENT_NAME
-          if [ $ev = pull_request ]; then git show HEAD^1:$cc > $RUNNER_TEMP/base_ci_changes.py 2>/dev/null && cc=$RUNNER_TEMP/base_ci_changes.py || ev=workflow_dispatch; fi
+          if [ $ev = pull_request ] && ! git diff --quiet HEAD^1 HEAD -- $cc; then ev=workflow_dispatch; fi
           python3 $cc --workflow regen --event $ev
 
   regen-grammar:
-    name: regenerate ${{ matrix.lang }} and diff (ubuntu-24.04)
+    name: regenerate group ${{ matrix.group.name }} and diff (ubuntu-24.04)
     needs: changes
     if: ${{ needs.changes.outputs.regen == 'true' }}
     strategy:
       fail-fast: false
-      matrix:
-        lang: [csharp, golang, json, python, tsql, tsx, typescript, javascript, html, css, java, c, rust, bash, cpp, yaml, php, powershell, r, dart, xml, ruby, kotlin, postgres, swift]
+      # Each job regenerates several grammars after one checkout, Go setup and toolchain build; the 25 grammars are split by measured
+      # run time (REGEN_GROUPS in tools/lane/ci_changes.py). A grammar that fails is named in the log (REGEN_KEEP_GOING, one ::group:: per
+      # grammar for the behaviour gate) and the others still run; each grammar keeps its own report under generator-gate/<lang> in the artifact.
+      matrix: ${{ fromJSON(needs.changes.outputs.regen_matrix) }}
     runs-on: ubuntu-24.04
-    # PostgreSQL builds patched and upstream-LFS variants independently; retain the 90-minute shard budget.
-    timeout-minutes: ${{ matrix.lang == 'postgres' && 90 || 60 }}
+    # PostgreSQL (group g1, alone) builds patched and upstream-LFS variants independently and takes about 12 minutes; the other groups take about
+    # 10. A hung step fails at its own limit, so this only bounds a group in which several grammars hang.
+    timeout-minutes: 90
     env:
       CGO_ENABLED: "0"
       GOENV: "off"
       GOWORK: "off"
       GOTOOLCHAIN: local
+      GROUP_LANGS: ${{ matrix.group.langs }}
     defaults:
       run:
         shell: bash
@@ -77,47 +83,62 @@ jobs:
           path: ${{ runner.temp }}/dl-cache
           key: regen-dl-${{ runner.os }}-${{ hashFiles('tools/gen/pins.json') }}
       # Downloads each pinned archive into a new empty directory and checks its sha256 before extracting;
-      # builds wasm2go from its pinned module version; regenerates the selected module into grammars/.
+      # builds wasm2go from its pinned module version; regenerates the group's grammars into grammars/.
       - name: Regenerate grammar modules
         env:
           TSG_DL_CACHE: ${{ runner.temp }}/dl-cache
-        run: /usr/bin/time -v -o "$RUNNER_TEMP/regen-cost.txt" bash tools/gen/regen.sh "$RUNNER_TEMP/regen" "${{ matrix.lang }}"
-      # One shard saves (every shard downloads the same set), and only when main's pins.json has no cache yet.
+          REGEN_KEEP_GOING: "1"
+        # regen.sh regenerates every grammar when given none, so the list is checked first.
+        run: |
+          bash tools/lane/check_langs.sh $GROUP_LANGS
+          /usr/bin/time -v -o "$RUNNER_TEMP/regen-cost.txt" bash tools/gen/regen.sh "$RUNNER_TEMP/regen" $GROUP_LANGS
+      # One group saves (every group downloads the same set), and only when main's pins.json has no cache yet.
       - name: Save the verified archive cache
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.lang == 'json' && steps.dl-cache.outputs.cache-hit != 'true' }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.group.name == 'g1' && steps.dl-cache.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v5
         with:
           path: ${{ runner.temp }}/dl-cache
           key: regen-dl-${{ runner.os }}-${{ hashFiles('tools/gen/pins.json') }}
+      # The steps below run even when a grammar failed to regenerate, so one failure does not hide the others' results.
       - name: Build generator behaviour gate tools
+        if: ${{ !cancelled() }}
         run: |
           (cd tools/native-ref && go build -trimpath -o "$RUNNER_TEMP/native-ref" . && go build -trimpath -o "$RUNNER_TEMP/ciconf" ./ciconf)
           (cd tools/bench && go build -trimpath -o "$RUNNER_TEMP/benchci" ./ci)
           python3 -m unittest discover -s tools/native-ref -p 'generatorgate_test.py'
       - name: Compare regenerated and reference C behaviour (ADR-0027)
+        if: ${{ !cancelled() }}
         run: |
-          /usr/bin/time -v -o "$RUNNER_TEMP/generator-gate-cost.txt" \
-            python3 tools/native-ref/generatorgate.py --lang "${{ matrix.lang }}" \
-              --native-ref "$RUNNER_TEMP/native-ref" --ciconf "$RUNNER_TEMP/ciconf" --benchci "$RUNNER_TEMP/benchci" \
-              --cli "$RUNNER_TEMP/regen/bin/tree-sitter" --dl "$RUNNER_TEMP/regen/dl" --out "$RUNNER_TEMP/generator-gate"
+          bash tools/lane/check_langs.sh $GROUP_LANGS
+          status=0
+          for lang in $GROUP_LANGS; do
+            echo "::group::generator gate: $lang"
+            /usr/bin/time -v -o "$RUNNER_TEMP/generator-gate-cost-$lang.txt" \
+              python3 tools/native-ref/generatorgate.py --lang "$lang" \
+                --native-ref "$RUNNER_TEMP/native-ref" --ciconf "$RUNNER_TEMP/ciconf" --benchci "$RUNNER_TEMP/benchci" \
+                --cli "$RUNNER_TEMP/regen/bin/tree-sitter" --dl "$RUNNER_TEMP/regen/dl" --out "$RUNNER_TEMP/generator-gate/$lang" \
+              || { echo "::error::generator gate failed: $lang"; status=1; }
+            echo "::endgroup::"
+          done
+          exit $status
       - name: Upload generator gate evidence and hosted cost
         if: ${{ always() }}
         uses: actions/upload-artifact@v7
         with:
-          name: generator-gate-${{ matrix.lang }}-ubuntu-24.04
+          name: generator-gate-${{ matrix.group.name }}-ubuntu-24.04
           path: |
             ${{ runner.temp }}/regen-cost.txt
-            ${{ runner.temp }}/generator-gate-cost.txt
-            ${{ runner.temp }}/generator-gate/report.json
+            ${{ runner.temp }}/generator-gate-cost-*.txt
+            ${{ runner.temp }}/generator-gate/*/report.json
             ${{ runner.temp }}/generator-gate/**/*.log
             ${{ runner.temp }}/generator-gate/**/*.command.json
-            ${{ runner.temp }}/generator-gate/reference/data
-            ${{ runner.temp }}/generator-gate/candidate/data
-            ${{ runner.temp }}/generator-gate/large
+            ${{ runner.temp }}/generator-gate/*/reference/data
+            ${{ runner.temp }}/generator-gate/*/candidate/data
+            ${{ runner.temp }}/generator-gate/*/large
           if-no-files-found: warn
           retention-days: 14
       - name: Pinned CLI integration tests (patched and unpatched inputs)
-        if: ${{ matrix.lang == 'postgres' }}
+        if: ${{ !cancelled() && contains(matrix.group.langs, 'postgres') }}
         working-directory: tools/gen
         env:
           TREE_SITTER_CLI_ARCHIVE: ${{ runner.temp }}/regen/dl/tree-sitter-linux-x64.gz
@@ -159,8 +180,24 @@ jobs:
     needs: [changes, regen-grammar, regen]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    permissions:
+      actions: read # list the jobs of this run
     steps:
       - name: Every needed job passed or was skipped on purpose
         env:
           NEEDS: ${{ toJSON(needs) }}
         run: jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped '. as $n | all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok and all(.changes.outputs.expect | fromjson[]; $n[.].result == $ok)' <<<$NEEDS
+      # The needed jobs above are one result per matrix, so a matrix that came out smaller than it should (a classifier regression) stays green.
+      # Count the successful instances in the run: they must be exactly the ones the classifier listed and, outside pull requests, the full
+      # matrix (4 jobs; test_ci_changes.py ties the number to the partitions).
+      - name: The successful matrix jobs are the expected instances
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECT: ${{ needs.changes.outputs.expect_matrix }}
+          MATRIX_RE: '^regenerate group g[0-9]+ and diff \(ubuntu-24\.04\)$'
+          FULL: ${{ github.event_name != 'pull_request' && '4' || '' }}
+        run: |
+          want=$(jq -nr --argjson e "$EXPECT" '$e[]' | tr -d '\r' | sort)
+          [ -z "$FULL" ] || [ "$(jq -n --argjson e "$EXPECT" '$e | length')" = "$FULL" ] || { echo "::error::the classifier listed $(jq -n --argjson e "$EXPECT" '$e | length') matrix jobs, the full run has $FULL"; exit 1; }
+          ok=$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs?per_page=100" --jq '.jobs[] | select(.conclusion == "success") | .name' | { grep -E "$MATRIX_RE" || true; } | sort)
+          [ "$ok" = "$want" ] || { echo "::error::the successful matrix jobs differ from the expected ones (< successful, > expected)"; diff <(echo "$ok") <(echo "$want"); exit 1; }
