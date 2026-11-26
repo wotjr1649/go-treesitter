@@ -26,7 +26,9 @@ import (
 	"github.com/wotjr1649/go-treesitter/tools/gen/patches"
 )
 
-var rootVersionRx = regexp.MustCompile(`^v[0-9]+[.][0-9]+[.][0-9]+(-[0-9A-Za-z.-]+)?$`)
+// rootVersionRx is Go's canonical semantic version: no leading zeros, no empty identifiers, no build metadata.
+// tools/lane/consumer_compat.py SEMVER is the same grammar; gen_test.go and test_consumer_compat.py keep the same cases.
+var rootVersionRx = regexp.MustCompile(`^v(0|[1-9][0-9]*)[.](0|[1-9][0-9]*)[.](0|[1-9][0-9]*)(-(0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)([.](0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*)?$`)
 
 const modulePrefix = "github.com/wotjr1649/go-treesitter/grammars/"
 
@@ -88,7 +90,7 @@ func main() {
 	flag.StringVar(&o.out, "out", "", "output module directory")
 	flag.StringVar(&o.work, "work", "", "scratch directory (wasm, meta runner)")
 	flag.StringVar(&o.repo, "repo", "../..", "repository root (only for the meta runner's replace directive)")
-	flag.StringVar(&o.rootVersion, "root-version", "", "release mode: emit go.mod with this minimum root version (vX.Y.Z) and no replace; default is the local-development form")
+	flag.StringVar(&o.rootVersion, "root-version", "", "release mode: emit go.mod with this minimum root version (vX.Y.Z or vX.Y.Z-prerelease) and no replace; default is the local-development form")
 	flag.BoolVar(&o.keepModuleForm, "keep-module-form", false, "keep the development or release form and minimum root version from the output grammar's existing go.mod")
 	flag.StringVar(&o.plan, "plan", "", "print the fetch plan for this host platform (GOOS-GOARCH, or \"host\") and exit; tools/gen/regen.sh executes it")
 	flag.BoolVar(&o.verifyBinaries, "verify-binaries", false, "also check the host binary hashes pinned in localBinarySHA256 (optional local verification, not an identity)")
@@ -141,7 +143,7 @@ func run(o opts) error {
 		return fmt.Errorf("-keep-module-form cannot be combined with -root-version")
 	}
 	if o.rootVersion != "" && !rootVersionRx.MatchString(o.rootVersion) {
-		return fmt.Errorf("-root-version %q is not a semantic version vX.Y.Z", o.rootVersion)
+		return fmt.Errorf("-root-version %q is not a semantic version (vX.Y.Z or vX.Y.Z-prerelease)", o.rootVersion)
 	}
 	if o.src == "" {
 		return fmt.Errorf("-src is required")
