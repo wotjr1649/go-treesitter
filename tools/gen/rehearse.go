@@ -71,13 +71,14 @@ type rehearsalGrammar struct {
 	Lang string `json:"lang"`
 	// identical, headers-only, differs (both generated); pinned-failed, nightly-failed, both-failed; input-failed (common
 	// input check failed, neither CLI ran)
-	Status         string           `json:"status"`
-	Error          string           `json:"error,omitempty"` // input-failed only
-	Pinned         *rehearsalRun    `json:"pinned,omitempty"`
-	Nightly        *rehearsalRun    `json:"nightly,omitempty"`
-	Files          []rehearsalFile  `json:"files,omitempty"`
-	Schema         *rehearsalSchema `json:"schema,omitempty"`
-	ArtifactErrors []string         `json:"artifactErrors,omitempty"` // a generated file could not be read or its copy not written
+	Status         string             `json:"status"`
+	Error          string             `json:"error,omitempty"` // input-failed only
+	Pinned         *rehearsalRun      `json:"pinned,omitempty"`
+	Nightly        *rehearsalRun      `json:"nightly,omitempty"`
+	Files          []rehearsalFile    `json:"files,omitempty"`
+	Schema         *rehearsalSchema   `json:"schema,omitempty"`
+	FieldMap       *rehearsalFieldMap `json:"fieldMap,omitempty"`       // parser.c's field tables; report only, not in the digest
+	ArtifactErrors []string           `json:"artifactErrors,omitempty"` // a generated file could not be read or its copy not written
 }
 
 // nightlyMeta is what tools/gen/nightly-rehearsal.sh observed through the release API, before running anything.
@@ -106,6 +107,7 @@ type nightlyIdentity struct {
 }
 
 type rehearsalReport struct {
+	Label      string `json:"label,omitempty"` // names the unpinned CLI in the summary ("nightly" when empty)
 	Kind       string `json:"kind"`
 	ReportOnly bool   `json:"reportOnly"`
 	Platform   string `json:"platform"`
@@ -208,10 +210,14 @@ func (r *rehearsalReport) markdown() string {
 		}
 		return s
 	}
-	fmt.Fprintf(&b, "### Nightly CLI rehearsal (report only, %s)\n\n", r.Platform)
-	fmt.Fprintf(&b, "Not a gate and not parity evidence: the pinned CLI `%s` against the unpinned nightly CLI `%s` "+
+	name := r.Label
+	if name == "" {
+		name = "nightly"
+	}
+	fmt.Fprintf(&b, "### %s CLI rehearsal (report only, %s)\n\n", strings.ToUpper(name[:1])+name[1:], r.Platform)
+	fmt.Fprintf(&b, "Not a gate and not parity evidence: the pinned CLI `%s` against the unpinned %s CLI `%s` "+
 		"(asset sha256 `%s`, binary sha256 `%s`, %d bytes; identity **%s**, sandbox `%s`). Same inputs, patches and double generation for both.\n\n",
-		r.Pinned.Version, r.Nightly.Version, short(r.Nightly.GzipSHA256), short(r.Nightly.BinSHA256), r.Nightly.GzipBytes,
+		r.Pinned.Version, name, r.Nightly.Version, short(r.Nightly.GzipSHA256), short(r.Nightly.BinSHA256), r.Nightly.GzipBytes,
 		r.Nightly.Identity, r.Nightly.Sandbox)
 	if r.Nightly.Identity == "held" {
 		b.WriteString("**Comparison held**: the nightly CLI's identity is missing or inconsistent, so no grammar was compared and the tracking issue is not updated.\n\n")
@@ -220,7 +226,7 @@ func (r *rehearsalReport) markdown() string {
 		}
 		return b.String()
 	}
-	b.WriteString("| grammar | result | parser.c | grammar.json | node-types.json | other files | schema diff | seconds pinned/nightly |\n|---|---|---|---|---|---|---|---|\n")
+	b.WriteString("| grammar | result | parser.c | grammar.json | node-types.json | other files | schema diff | field map | seconds pinned/nightly |\n|---|---|---|---|---|---|---|---|---|\n")
 	counts := map[string]int{}
 	secs := func(r *rehearsalRun) string {
 		if r == nil {
@@ -231,7 +237,7 @@ func (r *rehearsalReport) markdown() string {
 	for _, g := range r.Grammars {
 		counts[g.Status]++
 		if g.Pinned == nil || g.Nightly == nil || !g.Pinned.OK || !g.Nightly.OK {
-			fmt.Fprintf(&b, "| %s | %s | - | - | - | - | - | %s / %s |\n", g.Lang, g.Status, secs(g.Pinned), secs(g.Nightly))
+			fmt.Fprintf(&b, "| %s | %s | - | - | - | - | - | - | %s / %s |\n", g.Lang, g.Status, secs(g.Pinned), secs(g.Nightly))
 			continue
 		}
 		other := 0
@@ -247,9 +253,9 @@ func (r *rehearsalReport) markdown() string {
 				sch = fmt.Sprintf("%d changes (%s)", g.Schema.Changes, sortedCounts(g.Schema.ByRisk))
 			}
 		}
-		fmt.Fprintf(&b, "| %s | %s | %s | %s | %s | %d | %s | %s / %s |\n", g.Lang, g.Status,
+		fmt.Fprintf(&b, "| %s | %s | %s | %s | %s | %d | %s | %s | %s / %s |\n", g.Lang, g.Status,
 			yesNo(g.Files, "parser.c"), yesNo(g.Files, "grammar.json"), yesNo(g.Files, "node-types.json"), other, sch,
-			secs(g.Pinned), secs(g.Nightly))
+			g.FieldMap.text(), secs(g.Pinned), secs(g.Nightly))
 	}
 	var parts []string
 	for _, s := range []string{"identical", "headers-only", "differs", "pinned-failed", "nightly-failed", "both-failed", "input-failed"} {
@@ -334,9 +340,13 @@ var (
 
 // assetProblems checks the API metadata against the bytes on disk; it runs before the binary is executed.
 func assetProblems(m *nightlyMeta, gzBytes int64, gzSum string) []string {
+	return assetProblemsUnder(nightlyAssetPrefix, m, gzBytes, gzSum)
+}
+
+func assetProblemsUnder(prefix string, m *nightlyMeta, gzBytes int64, gzSum string) []string {
 	var p []string
-	if !strings.HasPrefix(m.URL, nightlyAssetPrefix) {
-		p = append(p, fmt.Sprintf("asset URL %q is not under %s", m.URL, nightlyAssetPrefix))
+	if !strings.HasPrefix(m.URL, prefix) {
+		p = append(p, fmt.Sprintf("asset URL %q is not under %s", m.URL, prefix))
 	}
 	if m.Size != gzBytes {
 		p = append(p, fmt.Sprintf("release API size %d, downloaded %d bytes", m.Size, gzBytes))
@@ -366,6 +376,24 @@ func commitProblems(m *nightlyMeta, commit string) []string {
 	return p
 }
 
+// releaseProblems is commitProblems for a release asset (-expect-version): a release build's --version names no build commit,
+// so the identity is the version the tag names, with the tag read before and after the download unchanged.
+func releaseProblems(m *nightlyMeta, version, want string) []string {
+	var p []string
+	if f := strings.Fields(version); len(f) < 2 || f[0] != "tree-sitter" || f[1] != want {
+		p = append(p, fmt.Sprintf("--version %q, the release tag names %s", version, want))
+	}
+	if m == nil {
+		return p
+	}
+	if !fullCommit.MatchString(m.TagCommitBefore) || !fullCommit.MatchString(m.TagCommitAfter) {
+		p = append(p, fmt.Sprintf("tag lookups %q / %q are not commits", m.TagCommitBefore, m.TagCommitAfter))
+	} else if m.TagCommitBefore != m.TagCommitAfter || m.TagMoved {
+		p = append(p, fmt.Sprintf("release tag moved during the download: %s -> %s", m.TagCommitBefore, m.TagCommitAfter))
+	}
+	return p
+}
+
 type rehearsal struct {
 	pins           *Pins
 	root, dl, out  string
@@ -385,6 +413,9 @@ func runRehearsalCommand(args []string, stdout io.Writer) error {
 	sandbox := fs.String("nightly-sandbox", "", "wrapper that runs the nightly CLI isolated (tools/gen/nightly-sandbox.sh); required unless -nightly-unsandboxed")
 	unsandboxed := fs.Bool("nightly-unsandboxed", false, "local opt-in: run the nightly CLI directly, with this user's access to files, credentials and network")
 	out := fs.String("out", "", "new empty output directory (report.json, summary.md, digest.txt, differing generated files)")
+	assetPrefix := fs.String("asset-prefix", nightlyAssetPrefix, "URL prefix the asset in -nightly-meta must be under (a tree-sitter/tree-sitter release download directory)")
+	label := fs.String("label", "", "name of the unpinned CLI in the summary (default nightly)")
+	expectVersion := fs.String("expect-version", "", "the unpinned CLI is the release asset of this X.Y.Z: --version must report it, and no build commit is expected")
 	fetchNPM := fs.Bool("fetch-npm", false, "download missing lockfile-pinned npm grammar tarballs during the common input check (no install scripts)")
 	if err := fs.Parse(args); err != nil {
 		return err
@@ -396,6 +427,9 @@ func runRehearsalCommand(args []string, stdout io.Writer) error {
 	pins, err := loadPins(filepath.Join(*root, "pins.json"))
 	if err != nil {
 		return err
+	}
+	if !strings.HasPrefix(*assetPrefix, "https://github.com/tree-sitter/tree-sitter/releases/download/") || !strings.HasSuffix(*assetPrefix, "/") || strings.Contains(*assetPrefix, "..") {
+		return fmt.Errorf("-asset-prefix %q is not a tree-sitter/tree-sitter release download directory", *assetPrefix)
 	}
 	if entries, err := os.ReadDir(*out); err == nil && len(entries) > 0 {
 		return fmt.Errorf("-out %s is not empty", *out)
@@ -427,7 +461,7 @@ func runRehearsalCommand(args []string, stdout io.Writer) error {
 	if r.pinnedBin, err = filepath.Abs(*pinnedCLI); err != nil {
 		return err
 	}
-	rep := &rehearsalReport{Kind: "nightly-rehearsal", ReportOnly: true, Platform: rehearsalPlatform()}
+	rep := &rehearsalReport{Label: *label, Kind: "nightly-rehearsal", ReportOnly: true, Platform: rehearsalPlatform()}
 	rep.Pinned.Version, rep.Pinned.ArchiveSHA256 = pins.Tools.TreeSitterCLI, cliArchive.SHA256
 	rep.Nightly.Sandbox = "none"
 
@@ -477,7 +511,7 @@ func runRehearsalCommand(args []string, stdout io.Writer) error {
 		} else {
 			rep.Nightly.Meta = meta
 			if gzErr == nil { // size and digest of the compressed bytes, before decompressing them
-				rep.Nightly.Problems = append(rep.Nightly.Problems, assetProblems(meta, rep.Nightly.GzipBytes, rep.Nightly.GzipSHA256)...)
+				rep.Nightly.Problems = append(rep.Nightly.Problems, assetProblemsUnder(*assetPrefix, meta, rep.Nightly.GzipBytes, rep.Nightly.GzipSHA256)...)
 			}
 		}
 	}
@@ -499,7 +533,11 @@ func runRehearsalCommand(args []string, stdout io.Writer) error {
 			if m := versionCommit.FindStringSubmatch(rep.Nightly.Version); m != nil {
 				rep.Nightly.BuildCommit = m[1]
 			}
-			rep.Nightly.Problems = append(rep.Nightly.Problems, commitProblems(meta, rep.Nightly.BuildCommit)...)
+			if *expectVersion != "" {
+				rep.Nightly.Problems = append(rep.Nightly.Problems, releaseProblems(meta, rep.Nightly.Version, *expectVersion)...)
+			} else {
+				rep.Nightly.Problems = append(rep.Nightly.Problems, commitProblems(meta, rep.Nightly.BuildCommit)...)
+			}
 		}
 	}
 	switch {
@@ -609,8 +647,8 @@ func (r *rehearsal) grammar(lang string, g GrammarPin, inputErr error) rehearsal
 		}
 	}
 	dir := func(root string) string { return filepath.Join(root, filepath.FromSlash(g.GrammarDir)) }
-	var nodes [2][]byte
-	var nodesRead [2]bool
+	var nodes, parserC [2][]byte
+	var nodesRead, parserRead [2]bool
 	for _, f := range res.Files {
 		if !slices.Contains(rehearsalKeyFiles, f.Name) {
 			continue
@@ -631,6 +669,9 @@ func (r *rehearsal) grammar(lang string, g GrammarPin, inputErr error) rehearsal
 			if f.Name == "node-types.json" { // read is what the schema verdict needs; a failed copy is only an artifact error
 				nodes[i], nodesRead[i] = b, true
 			}
+			if f.Name == "parser.c" {
+				parserC[i], parserRead[i] = b, true
+			}
 			if err := saveGz(filepath.Join(r.out, "files", lang, side.name, f.Name+".gz"), b); err != nil {
 				res.ArtifactErrors = append(res.ArtifactErrors, oneLine("saving "+side.name+" "+f.Name+": "+err.Error(), 300))
 			}
@@ -638,6 +679,12 @@ func (r *rehearsal) grammar(lang string, g GrammarPin, inputErr error) rehearsal
 	}
 	// Always, also when no file differs: a pair without node-types.json is BLOCKED, never identical.
 	res.Schema = nodeTypesSchema(res.Files, pProv.Outputs, nodes, nodesRead)
+	switch {
+	case parserRead[0] && parserRead[1]:
+		res.FieldMap = fieldMapSummary(parserC[0], parserC[1])
+	case !slices.ContainsFunc(res.Files, func(f rehearsalFile) bool { return f.Name == "parser.c" }):
+		res.FieldMap = &rehearsalFieldMap{Assessment: "identical"} // parser.c has the same hash on both sides
+	}
 	return res
 }
 

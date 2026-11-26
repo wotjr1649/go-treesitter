@@ -320,6 +320,43 @@ bash tools/conformance/runtime-rehearsal.sh <ciconf-data-dir> <work-dir> <new-ou
 - CI: `.github/workflows/runtime-rehearsal.yml` (manual dispatch from `main` only; `permissions: {}`, no secrets, no caches)
   runs both steps on ubuntu and uploads the tables. The native C reference is built only there, to record the seeded edits.
 
+## Runtime + CLI pair rehearsal (test only, report only, CI sandbox only)
+
+A 0.28 move changes the runtime **and** the CLI (ADR-0027): the candidate CLI changes `parser.c`, the field maps (tree-sitter
+#6050 changes how supertype fields are inherited) and `node-types.json`, which the runtime-only rehearsal cannot show. This
+extends the runtime-only rehearsal with the CLI. The same limits apply: nothing under `grammars/`, no pin or PR, numbers are
+measurements of the named inputs and identity, not parity evidence.
+
+```sh
+bash tools/gen/nightly-rehearsal.sh fetch <work>                                   # pinned CLI + grammar archives (verified)
+bash tools/gen/cli-candidate.sh <work> 0.28.0                                       # candidate release asset + API facts; runs nothing
+CANDIDATE_CLI_VERSION=0.28.0 bash tools/gen/nightly-rehearsal.sh run <work> [lang ...]   # CLI-only report (sandboxed)
+RUNTIME_REHEARSAL_CLI_VERSION=0.28.0 RUNTIME_REHEARSAL_CLI_GZ=<work>/nightly/tree-sitter-linux-x64.gz \
+  bash tools/gen/runtime-rehearsal.sh <new-empty-dir> <v0.28.0 | 40-hex> <pins-key> ...    # pair generation (sandboxed)
+bash tools/conformance/runtime-rehearsal.sh <ciconf-data-dir> <dir> <new-out-dir> <pins-key> ...   # measurement, unchanged
+```
+
+- **The candidate CLI is code nothing pins.** It runs only through `nightly-sandbox.sh` (bubblewrap), the repository's one path for
+  an unpinned CLI (`grammarpatch.Config.Unpinned`); the scripts refuse a non-Linux host or one without `bwrap` and there is no
+  unsandboxed switch. `gen` runs the sandboxed `--version` first, after checking in trusted code that the binary is the
+  decompressed archive whose sha256 the pins copy holds. The run needs no token: the asset and release facts are fetched
+  anonymously (`cli-candidate.sh`, `jq`), and nothing but the sandbox executes the asset. Run it only where the workflow does
+  (`runtime-cli-rehearsal.yml`), never on a developer host.
+- **Pins copy.** `gen runtime-pins -cli-version X.Y.Z -cli-archive <asset>` additionally sets `tools.treeSitterCLI` and this
+  host's entry of `tools.treeSitterCLIArchives` (the release URL and the sha256 of the downloaded asset; other platforms'
+  archives belong to the committed version and are removed) and drops each grammar's `upstreamTestException` (today Swift's: it is
+  bound to the committed CLI version, and the real move has to re-decide it). `gen` refuses a copy that differs from
+  `pins.json` anywhere else, and a copy that moves the CLI unless `-cli-sandbox` is given (and `-cli-sandbox` without one).
+  `runtime-identity.json` gains a `cli` block; provenance says `"testOnly": "runtime-cli-rehearsal"`.
+- **CLI-only report** is `gen nightly-rehearsal` with the candidate release in the nightly's place (`-asset-prefix`, `-label
+  candidate`, `-expect-version`: a release's `--version` names no build commit, so the identity is API size and digest against the
+  bytes, the tag unchanged around the download, and the version the tag names). It adds a **field map** column to the table: the
+  `ts_field_map_slices`/`ts_field_map_entries` of `parser.c` (entries, inherited entries, field names whose counts differ). The
+  field-map cell is not part of the result digest (`parser.c` already is).
+- **Pair tables** are the runtime-only tables (`rehearsal-compare`), over modules built with both candidates.
+- CI: `.github/workflows/runtime-cli-rehearsal.yml`, manual dispatch from `main`, `permissions: {}`. It checks that the pair
+  used the bytes the report verified (`runtime-identity.json` `cli.archiveSHA256` against `report.json`).
+
 ## Pins (`pins.json`)
 
 Everything a generation consumes is pinned, and the identity of a generated module never depends on the host:

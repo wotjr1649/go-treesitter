@@ -10,6 +10,11 @@
 # changed, into <work-dir>/pins.runtime.json by `gen runtime-pins`. The rest of the fetch and the generation are regen.sh
 # (pinned CLI, wasm2go, wasi-sdk, grammar archives, all sha256-verified). Output: <work-dir>/out/<lang>/ (provenance.json
 # says testOnly), <work-dir>/runtime-identity.json, <work-dir>/pins.runtime.json. No token is needed or used.
+#
+# Runtime + CLI pair: RUNTIME_REHEARSAL_CLI_VERSION=X.Y.Z and RUNTIME_REHEARSAL_CLI_GZ=<file> (tools/gen/cli-candidate.sh makes it)
+# also move the CLI to that release's archive for this host. Nothing pins that CLI, so it runs only through
+# tools/gen/nightly-sandbox.sh (bubblewrap, as in the nightly rehearsal): the script refuses anywhere but Linux with bwrap, and
+# there is no unsandboxed switch. Everything else is as above; the identity file gains a "cli" block.
 # The measuring half is tools/conformance/runtime-rehearsal.sh.
 set -euo pipefail
 
@@ -27,6 +32,13 @@ if command -v cygpath >/dev/null 2>&1; then # Git Bash: native paths for the Go 
 fi
 EXE=""
 [ "$(go env GOOS)" = windows ] && EXE=.exe
+CLI_VERSION=${RUNTIME_REHEARSAL_CLI_VERSION:-} CLI_GZ=${RUNTIME_REHEARSAL_CLI_GZ:-}
+cli_pins=()
+if [ -n "$CLI_VERSION$CLI_GZ" ]; then
+  [ -n "$CLI_VERSION" ] && [ -f "$CLI_GZ" ] || { echo "runtime-rehearsal: RUNTIME_REHEARSAL_CLI_VERSION and an existing RUNTIME_REHEARSAL_CLI_GZ go together" >&2; exit 1; }
+  { [ "$(uname -s)" = Linux ] && command -v bwrap >/dev/null; } || { echo "runtime-rehearsal: a candidate CLI runs only inside bubblewrap on Linux; refused on $(uname -s)" >&2; exit 1; }
+  cli_pins=(-cli-version "$CLI_VERSION" -cli-archive "$CLI_GZ")
+fi
 UPSTREAM=tree-sitter/tree-sitter # the repo of the pinned runtime
 
 if [[ "$REF" =~ ^[0-9a-f]{40}$ ]]; then
@@ -50,9 +62,13 @@ fetch_archive "$W/runtime/dl/$ARCHIVE" "https://api.github.com/repos/$UPSTREAM/t
 
 (cd "$REPO/tools/gen" && CGO_ENABLED=0 go build -trimpath -o "$W/bin/gen$EXE" .)
 "$W/bin/gen$EXE" runtime-pins -root "$REPO/tools/gen" -src "$W/runtime/src" -extract-dir "$EXTRACT" \
-  -archive "$W/runtime/dl/$ARCHIVE" -release "$LABEL" -commit "$COMMIT" -out "$W/pins.runtime.json" >"$W/runtime-identity.json"
+  -archive "$W/runtime/dl/$ARCHIVE" -release "$LABEL" -commit "$COMMIT" -out "$W/pins.runtime.json" "${cli_pins[@]}" >"$W/runtime-identity.json"
 cat "$W/runtime-identity.json"
 
+if [ -n "$CLI_GZ" ]; then
+  install -m 755 "$REPO/tools/gen/nightly-sandbox.sh" "$W/bin/nightly-sandbox" # gen executes it as the candidate CLI
+  export RUNTIME_REHEARSAL_CLI_GZ="$CLI_GZ" RUNTIME_REHEARSAL_CLI_SANDBOX="$W/bin/nightly-sandbox"
+fi
 RUNTIME_REHEARSAL_PINS="$W/pins.runtime.json" RUNTIME_REHEARSAL_ARCHIVE="$W/runtime/dl/$ARCHIVE" \
   RUNTIME_REHEARSAL_TREE="$W/runtime/src/$EXTRACT" RUNTIME_REHEARSAL_OUT="$W/out" \
   bash "$REPO/tools/gen/regen.sh" "$W/regen" "$@"

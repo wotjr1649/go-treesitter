@@ -24,7 +24,9 @@
 # read-only and grammars/<lang> writable. Unset: both in one go, as before.
 # RUNTIME_REHEARSAL_{PINS,ARCHIVE,TREE,OUT} (all four, set by tools/gen/runtime-rehearsal.sh) make it a TEST-ONLY runtime
 # rehearsal: the runtime source comes from ARCHIVE/TREE (hashed by `gen runtime-pins` into the pins copy PINS), every other
-# pin is unchanged, and the modules go to OUT/<lang> instead of grammars/<lang>.
+# pin is unchanged, and the modules go to OUT/<lang> instead of grammars/<lang>. With RUNTIME_REHEARSAL_CLI_GZ (a candidate CLI
+# archive, named like the pinned asset) and RUNTIME_REHEARSAL_CLI_SANDBOX (tools/gen/nightly-sandbox.sh) the candidate CLI replaces
+# the pinned one: it is only decompressed here, and gen runs it solely through the sandbox wrapper (gen -cli-sandbox).
 set -euo pipefail
 
 W=${1:?usage: regen.sh <work-dir> [lang ...]}
@@ -72,6 +74,10 @@ if [ -n "${RUNTIME_REHEARSAL_PINS:-}" ]; then
   cp "$RUNTIME_REHEARSAL_ARCHIVE" "$W/dl/"
   cp -R "$RUNTIME_REHEARSAL_TREE" "$W/src/"
   rehearsal=(-runtime-rehearsal "$RUNTIME_REHEARSAL_PINS")
+  if [ -n "${RUNTIME_REHEARSAL_CLI_GZ:-}" ]; then
+    : "${RUNTIME_REHEARSAL_CLI_SANDBOX:?a candidate CLI runs only through the sandbox wrapper}"
+    rehearsal+=(-cli-sandbox "$RUNTIME_REHEARSAL_CLI_SANDBOX")
+  fi
   module_form=()
   OUT_ROOT=$RUNTIME_REHEARSAL_OUT
 fi
@@ -90,7 +96,11 @@ while IFS=$'\t' read -r kind file url sum dest mirrors; do
       (cd "$W" && tar -xzf "dl/$file" --strip-components=1 -C "$dest") # relative paths: GNU tar reads "D:/x" as a remote host
       ;;
     cli)
-      fetch_verified_archive "$W/dl/$file" "$sum" "$url" "$mirrors"
+      if [ -n "${RUNTIME_REHEARSAL_CLI_GZ:-}" ]; then # the candidate replaces the pinned CLI (its hash is in the pins copy)
+        cp "$RUNTIME_REHEARSAL_CLI_GZ" "$W/dl/$file"
+      else
+        fetch_verified_archive "$W/dl/$file" "$sum" "$url" "$mirrors"
+      fi
       [ "$PHASE" != fetch ] || continue
       gzip -dc "$W/dl/$file" >"$W/$dest"
       chmod +x "$W/$dest"

@@ -15,6 +15,8 @@
 #              the nightly CLI runs unless NIGHTLY_REHEARSAL_UNSANDBOXED=1 (local opt-in; the report says "sandbox": "none").
 #     all      fetch, nightly and run in order (local use).
 # Output: <work-dir>/out/{report.json,summary.md,digest.txt,files/} (no digest.txt when the identity is held).
+# CANDIDATE_CLI_VERSION=X.Y.Z (runtime + CLI pair rehearsal, tools/gen/cli-candidate.sh wrote the asset and metadata instead of the
+# `nightly` phase): `run` compares the pinned CLI with that release's CLI and names it "candidate" in the summary.
 set -euo pipefail
 
 PHASE=${1:?usage: nightly-rehearsal.sh fetch|nightly|run|all <work-dir> [lang ...]}
@@ -86,11 +88,15 @@ run_phase() {
     echo "nightly-rehearsal: no sandbox on $(go env GOOS); set NIGHTLY_REHEARSAL_UNSANDBOXED=1 to run the nightly CLI unisolated" >&2
     exit 1
   fi
+  local candidate=()
+  if [ -n "${CANDIDATE_CLI_VERSION:-}" ]; then
+    candidate=(-label candidate -expect-version "$CANDIDATE_CLI_VERSION" -asset-prefix "https://github.com/$NIGHTLY_REPO/releases/download/v$CANDIDATE_CLI_VERSION/")
+  fi
   cd "$REPO"
   # gen and the CLIs it starts never need a GitHub token (the `nightly` phase does, in `all` as well).
   env -u GH_TOKEN -u GITHUB_TOKEN -u GH_ENTERPRISE_TOKEN -u GITHUB_ENTERPRISE_TOKEN \
     "$GEN" nightly-rehearsal -root tools/gen -dl "$W/dl" -tree-sitter "$pinned" -nightly-gz "$W/nightly/$ASSET" \
-    -nightly-meta "$W/nightly-meta.json" "${sandbox[@]}" -fetch-npm -out "$W/out" "$@"
+    -nightly-meta "$W/nightly-meta.json" "${sandbox[@]}" "${candidate[@]}" -fetch-npm -out "$W/out" "$@"
 }
 
 case "$PHASE" in

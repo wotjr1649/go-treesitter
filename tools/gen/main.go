@@ -45,7 +45,8 @@ var (
 )
 
 type opts struct {
-	treeSitter, grammarSrc                                                                 string
+	treeSitter, grammarSrc, cliSandbox                                                     string
+	cliMoved                                                                               bool // the -runtime-rehearsal copy moves the CLI: it runs only through cliSandbox
 	patchStatus                                                                            bool
 	fetchNPM                                                                               bool
 	patchAlert                                                                             int
@@ -109,6 +110,7 @@ func main() {
 	flag.BoolVar(&o.mirrorAssets, "mirror-assets", false, "list pinned archives for every platform: file, sha256, primary download URL, kind (source/toolchain)")
 	flag.BoolVar(&o.fetchNPM, "fetch-npm", false, "download missing lockfile-pinned npm grammar tarballs (no install scripts)")
 	flag.StringVar(&o.treeSitter, "tree-sitter", "", "pinned tree-sitter CLI (needed for regenerate: true)")
+	flag.StringVar(&o.cliSandbox, "cli-sandbox", "", "TEST ONLY: wrapper that runs the candidate CLI of a -runtime-rehearsal copy that moves the CLI (tools/gen/nightly-sandbox.sh); required exactly then")
 	flag.IntVar(&o.patchAlert, "patch-alert", 3, "warn when a grammar has more than this many patches")
 	flag.BoolVar(&o.patchStatus, "patch-status", false, "list every grammar's patch count and threshold warnings")
 	flag.Parse()
@@ -121,10 +123,15 @@ func main() {
 func run(o opts) error {
 	pinsPath := filepath.Join(o.root, "pins.json")
 	if o.runtimeRehearsal != "" {
-		if err := checkRuntimeOnlyPins(pinsPath, o.runtimeRehearsal); err != nil {
+		cliMoved, err := checkRehearsalPins(pinsPath, o.runtimeRehearsal)
+		if err != nil {
 			return err
 		}
+		o.cliMoved = cliMoved
 		pinsPath = o.runtimeRehearsal
+	}
+	if o.cliMoved != (o.cliSandbox != "") {
+		return fmt.Errorf("a -runtime-rehearsal copy that moves the CLI runs it only through -cli-sandbox, and -cli-sandbox needs such a copy")
 	}
 	pins, err := loadPins(pinsPath)
 	if err != nil {
@@ -317,7 +324,7 @@ func run(o opts) error {
 		id.Tools["test-only"] = "balancing-cancel"
 	}
 	if o.runtimeRehearsal != "" {
-		id.Tools["test-only"] = testOnlyRuntimeRehearsal
+		id.Tools["test-only"] = rehearsalKind(o)
 	}
 	if rc.opt != "" {
 		id.Tools["binaryen"] = pins.Tools.Binaryen
@@ -352,7 +359,7 @@ func run(o opts) error {
 	if o.balanceProbe {
 		prov.TestOnly = "balancing-cancel"
 	} else if o.runtimeRehearsal != "" {
-		prov.TestOnly = testOnlyRuntimeRehearsal
+		prov.TestOnly = rehearsalKind(o)
 	}
 	provJSON, err := marshal(prov)
 	if err != nil {
