@@ -121,15 +121,20 @@ func (s *Snapshot) All() iter.Seq[Node] {
 	}
 }
 
-// DescendantForByteRange is C's ts_node_(named_)descendant_for_byte_range on the root: the smallest node spanning
-// [start, end]; named=true considers only named nodes. Like C it returns the null node, here the zero Node (check
-// Node.IsZero before use), when start > end. Cost is O(depth x fan-out); use an Index for bulk lookups.
+// DescendantForByteRange returns the smallest visible node of the snapshot spanning [start, end]; named=true considers
+// only named nodes. Like C it returns the null node, here the zero Node (check Node.IsZero before use), when
+// start > end. It is not C's ts_node_(named_)descendant_for_byte_range: C walks the full tree, including hidden
+// nodes such as zero-width scanner marker tokens, and a snapshot holds visible nodes only. For a zero-width range at a
+// node boundary C may therefore stop at an ancestor of this result, or step over a zero-width MISSING node that this
+// function returns. No equality with C is promised there (see docs/specs/parser-result.md,
+// "Navigation differs from C at zero-width nodes").
+// Cost is O(depth x fan-out); use an Index for bulk lookups.
 func (s *Snapshot) DescendantForByteRange(start, end uint32, named bool) Node {
 	return s.descendantFor(uint64(start), uint64(end), named, false)
 }
 
-// DescendantForPointRange is the point-based variant (C: ts_node_(named_)descendant_for_point_range); it also returns
-// the zero Node when start > end.
+// DescendantForPointRange is the point-based variant of DescendantForByteRange, with the same difference from C's
+// ts_node_(named_)descendant_for_point_range; it also returns the zero Node when start > end.
 func (s *Snapshot) DescendantForPointRange(start, end Point, named bool) Node {
 	return s.descendantFor(start.key(), end.key(), named, true)
 }
@@ -148,8 +153,8 @@ func (s *Snapshot) endKey(i int32, points bool) uint64 {
 	return uint64(s.endByte[i])
 }
 
-// Same loop as C's ts_node__descendant_for_byte_range/_point_range (node.c, v0.27.2); every snapshot node is visible,
-// so "relevant" is "named" or "any".
+// The loop of C's ts_node__descendant_for_byte_range/_point_range (node.c, v0.27.2) run over the visible nodes only,
+// so "relevant" is "named" or "any"; hidden nodes C also walks are absent (see DescendantForByteRange).
 func (s *Snapshot) descendantFor(start, end uint64, named, points bool) Node {
 	if start > end {
 		return Node{}

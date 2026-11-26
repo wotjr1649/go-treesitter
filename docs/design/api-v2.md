@@ -158,6 +158,11 @@ func (*Language) SymbolForName(name string, named bool) (Symbol, bool)
 
 The zero `Node` is the null node. Its methods return documented zero results, including empty iterators.
 
+Navigation is over visible nodes only. `DescendantForByteRange`/`DescendantForPointRange` return the smallest visible
+node spanning the range, and `NextSibling`/`NextNamedSibling` include a zero-width sibling directly after the node.
+At zero-width nodes the results can differ from C's functions, which also walk hidden nodes; no equality with C is
+claimed there. See [Navigation differs from C at zero-width nodes](../specs/parser-result.md#navigation-differs-from-c-at-zero-width-nodes).
+
 `SymbolForName` selects the first visible or supertype raw symbol in raw ID order with the requested name and
 namedness. With ABI 4 grammar modules it returns that symbol's public ID, in the same ID space as `Node.Symbol()`,
 `SymbolName` and `Index.OfSymbol` (ADR-0011). Named `ERROR` resolves to `ErrorSymbol`. ABI 1–3 grammar modules
