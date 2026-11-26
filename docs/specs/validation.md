@@ -30,7 +30,7 @@ pull request always keeps the engine job on Linux amd64 and conformance group g1
 six gates (`engine-gate`, `regen-gate`, `conformance-gate`, `windows-gate`, `api-guard-gate`, `pin-move-gate`): a gate fails
 when its `changes` job or any job it needs failed or was cancelled, or when a job the classifier expected to run was skipped (a
 misspelled condition); every `changes` job also runs the classifier's unit tests. A green gate on a pull request says only that the lanes
-the change could affect passed; the full matrix result of a commit is its `main` run.
+the change could affect passed; the full matrix result of a commit is its `main` run, when that run was not superseded (Main push runs).
 
 Rules:
 
@@ -146,8 +146,9 @@ Never widen a record to absorb a new failure. Open a new record.
 ## Failure and iteration policy
 
 A push to a PR may cancel superseded automatic `pull_request` runs of the same workflow for that PR (engine, regen,
-conformance, windows, API guard and pin move alike). Main push, scheduled, dispatched, re-run and release runs are exempt. Keep completed results under their original
-commit. Work canceled before execution is `NOT_RUN`.
+conformance, windows, API guard and pin move alike). Scheduled, dispatched, re-run and release runs are exempt, and so is a
+main push run that is executing: a newer push never cancels it, it only replaces the run waiting behind it (below). Keep
+completed results under their original commit. Work canceled before execution is `NOT_RUN`.
 
 | Situation | Required action |
 |---|---|
@@ -161,6 +162,29 @@ commit. Work canceled before execution is `NOT_RUN`.
 | Three attempts, same goal, no new evidence | Stop. Change layer, or report the blocker. |
 
 Declare the number of runs **before** running. A benchmark is never repeated until it passes.
+
+### Main push runs
+
+Pushes to `main` of the six workflows with a `main` trigger (engine, regen, conformance, windows, API guard, pin move) share
+one concurrency group per workflow (`<workflow>-main`, first attempt only) with `cancel-in-progress: false`. A run that is
+executing or waiting for runners always finishes; behind it only the newest push waits, and GitHub cancels an older waiting run
+when a newer push arrives. Merging several pull requests in a row is therefore allowed, and the merge commits in between are
+`NOT_RUN` by design. Re-runs and dispatches keep their own group and are never replaced.
+
+- **Per workflow.** A superseded run makes its commit `NOT_RUN` for that workflow only; the other workflows may have run on it. The
+  full matrix result of a commit means a completed first-attempt push run of all six workflows on that commit.
+- **Never cited.** A `NOT_RUN` commit is not called validated, tested or in agreement with anything. A completed run on a later
+  commit is evidence for that commit's tree, not for the commits it skipped.
+- **Failures keep their range.** A failed run on commit T fails every commit after the previous green run of that workflow up
+  to T (`git log --first-parent <green>..T`), none of which is recorded as passing. Find the commit by dispatching the workflow on
+  a branch at a suspect merge commit (dispatched runs are exempt); never re-run until green.
+- **Record.** `tools/lane/main-coverage.sh [COUNT [REF]]` prints each workflow's push-run result per first-parent commit (`NOT_RUN`
+  for no run or a cancelled one). A claim that depends on a range copies that table into its receipt, and release evidence into
+  `artifacts/release-candidate/`.
+- **Release candidate.** Evidence for a candidate commit C is a completed first-attempt push run of each of the six workflows
+  on C itself, with the job list the declaration names. Merge nothing after C until they finish; nothing then replaces them. If a
+  run on C was superseded or `main` moved past C, push a branch at C (it triggers nothing) and dispatch each missing workflow
+  with `--ref <branch>`: a dispatched run executes the whole workflow on C, and the declaration records it as a dispatch.
 
 ## Scratch retention
 
