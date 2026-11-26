@@ -33,7 +33,19 @@ type state struct {
 	reserved  bool
 	committed int64
 	refused   bool
+	pending   *initMem // set by InitMemory, consumed by StartMemory
 	cleanup   runtime.Cleanup
+}
+
+// Segment is one active data segment of the initial linear memory.
+type Segment struct {
+	Dest int
+	Data string
+}
+
+type initMem struct {
+	size int
+	segs []Segment
 }
 
 // live maps uintptr(mem) -> *state. A uintptr key keeps the module collectable so the AddCleanup safety net can fire.
@@ -83,7 +95,8 @@ func stateOf(mem *[]byte, create bool) *state {
 	return st
 }
 
-// SetLimit sets the instance's memory cap in bytes. Call it after New and before the first grow (X_initialize).
+// SetLimit sets the instance's memory cap in bytes. Call it after New and before the first grow or StartMemory
+// (both happen in X_initialize).
 func SetLimit(mem *[]byte, bytes int64) error {
 	if bytes < MinLimit || bytes > MaxLimit {
 		return fmt.Errorf("%w: %d not in [%d, %d]", ErrLimitRange, bytes, int64(MinLimit), int64(MaxLimit))
@@ -96,6 +109,76 @@ func SetLimit(mem *[]byte, bytes int64) error {
 	}
 	st.limit = bytes
 	return nil
+}
+
+// open reserves the region for limit, commits its first n bytes and records it; the caller sets *mem.
+func (st *state) open(limit int64, n int) ([]byte, int, error) {
+	size := int((limit + pageSize - 1) &^ (pageSize - 1))
+	if err := st.reg.reserve(size); err != nil {
+		return nil, 0, err
+	}
+	if err := st.reg.commit(0, n); err != nil {
+		st.reg.release()
+		return nil, 0, err
+	}
+	st.reserved, st.committed = true, int64(n)
+	return st.reg.slice(), size, nil
+}
+
+func (st *state) limitOrDefault() int64 {
+	if st.limit == 0 {
+		return DefaultLimit
+	}
+	return st.limit
+}
+
+// InitMemory is called by the generated New instead of allocating the initial memory and copying the data segments
+// into it: it only records them (*mem stays nil, the segments are not copied). StartMemory, called at the start of
+// X_initialize after SetLimit, creates the reserved region and writes the segments straight into it, so the data is
+// copied once and no initial-size Go-heap slice exists.
+func InitMemory(mem *[]byte, size int, segs ...Segment) {
+	st := stateOf(mem, true)
+	st.mu.Lock()
+	st.pending = &initMem{size, segs}
+	st.mu.Unlock()
+}
+
+// StartMemory materializes the memory recorded by InitMemory; it does nothing when none is pending (a second call, or
+// a module generated before InitMemory existed). An initial size above the limit, a refused reservation or a segment
+// outside the initial memory panics (a trap in Call); the first two set the refused flag, like a refused grow.
+func StartMemory(mem *[]byte) {
+	st := stateOf(mem, false)
+	if st == nil {
+		return
+	}
+	st.mu.Lock()
+	defer st.mu.Unlock()
+	p := st.pending
+	if p == nil {
+		return
+	}
+	st.pending = nil
+	limit := st.limitOrDefault()
+	if int64(p.size) > limit {
+		st.refused = true
+		panic(fmt.Sprintf("engine: initial memory of %d bytes exceeds the limit of %d", p.size, limit))
+	}
+	if p.size == 0 {
+		return
+	}
+	s, size, err := st.open(limit, p.size)
+	if err != nil {
+		st.refused = true
+		panic(fmt.Sprintf("engine: initial memory: %v", err))
+	}
+	for _, sg := range p.segs {
+		if sg.Dest < 0 || sg.Dest > p.size || len(sg.Data) > p.size-sg.Dest {
+			st.free()
+			panic(fmt.Sprintf("engine: data segment [%d,+%d) outside the initial memory of %d bytes", sg.Dest, len(sg.Data), p.size))
+		}
+		copy(s[sg.Dest:], sg.Data)
+	}
+	*mem = s[:p.size:size]
 }
 
 // MemoryGrow replaces the generated memory_grow: same contract (old page count, or -1 on failure) and it sets the
@@ -117,10 +200,7 @@ func MemoryGrow(mem *[]byte, delta, max int64) int64 {
 		return refuse()
 	}
 	nl := int(nw << 16)
-	limit := st.limit
-	if limit == 0 {
-		limit = DefaultLimit
-	}
+	limit := st.limitOrDefault()
 	if int64(nl) > limit {
 		return refuse()
 	}
@@ -130,18 +210,12 @@ func MemoryGrow(mem *[]byte, delta, max int64) int64 {
 		}
 		*mem = buf[:nl]
 	} else {
-		size := int((limit + pageSize - 1) &^ (pageSize - 1))
-		if st.reg.reserve(size) != nil {
+		s, size, err := st.open(limit, nl)
+		if err != nil {
 			return refuse()
 		}
-		if st.reg.commit(0, nl) != nil {
-			st.reg.release()
-			return refuse()
-		}
-		s := st.reg.slice()
 		copy(s, buf)
 		*mem = s[:nl:size]
-		st.reserved = true
 	}
 	st.committed = int64(nl)
 	return int64(old)
