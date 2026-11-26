@@ -521,7 +521,28 @@ A temporary ADR-0023 scanner patch carries [upstream issue #292](https://github.
 
 The pinned upstream Ruby queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#v070-ruby-symbol-patch)).
 
-## Unreleased after v0.7.0
+## Upgrading from v0.7.0 to v1.0.0-rc.1
+
+`v1.0.0-rc.1` is a pre-release of the root. While `v0.7.0` is the latest final version, `@latest` still selects it, so name the tag:
+
+```sh
+go get github.com/wotjr1649/go-treesitter@v1.0.0-rc.1
+git diff -- go.mod
+go list -m all
+```
+
+Keep your grammar tags for the first upgrade. No grammar `go.mod` requires the RC: the highest minimum root is `v0.7.0`, so Go
+selects the RC only because you request it. Two grammar modules have new tags, `grammars/css/v0.8.0` and
+`grammars/python/v0.7.0`, each declaring root `v0.7.0` as its minimum; requesting one raises the root Go selects to at least
+`v0.7.0`. The other 23 modules keep their published tags (`swift`, `xml`, `ruby` and `powershell` at `v0.7.0`, 19 at `v0.6.0`).
+See the [compatibility table](docs/reports/compatibility.md) and the [per-tag support table](docs/reports/grammar-support.md).
+
+The root changes below keep every exported signature except for additions. Behaviour changes:
+[parser, pool and tree guards](#parser-pool-and-tree-guards),
+[per-call `MatchLimit`](#per-call-matchlimit-on-a-reused-parser) and
+[snapshot `Node.ChildCount` cost](#snapshot-node-storage-nodechildcount-is-ochildren). The `ChildByFieldName` wording now ties its
+results to the grammar module's pinned runtime ([v0.4.0 entry](#upgrading-from-v030-to-v040-engine-abi-3)). Query budgets are
+[opt-in additions](#opt-in-query-budgets).
 
 ### Parser, pool and tree guards
 
@@ -592,7 +613,7 @@ The earlier 25 B/node figure in the v0.5.0 entry is a historical record. See
 
 ### CSS non-Latin-1 declaration values
 
-Unreleased after `grammars/css/v0.7.0`. The ADR-0023 value patch adapts the widened identifier in
+Shipped in `grammars/css/v0.8.0`. The ADR-0023 value patch adapts the widened identifier in
 [upstream PR #105](https://github.com/tree-sitter/tree-sitter-css/pull/105#issuecomment-7140588000) to the pinned declaration rules.
 `a { b: 한글 }` now has a `declaration` with a `plain_value` spanning `한글`. Queries for those nodes
 can capture the repaired declaration and value. The syntax tree uses the existing node types and fields.
@@ -611,7 +632,7 @@ fixture. Review the affected corpus expectations and known-gap records in the sa
 
 ### Python `await` and the power operator
 
-A temporary ADR-0023 grammar-input patch carries [upstream PR #360](https://github.com/tree-sitter/tree-sitter-python/pull/360).
+Shipped in `grammars/python/v0.7.0`; the `v0.6.0` tag keeps the previous grouping. A temporary ADR-0023 grammar-input patch carries [upstream PR #360](https://github.com/tree-sitter/tree-sitter-python/pull/360).
 Node types and fields are unchanged (`node-types.json` is byte-identical with and without the patch).
 
 - **`await` ends before `**`.** Python's `await` takes a primary and `**` takes it as its left operand, so `await f() ** 2` is
