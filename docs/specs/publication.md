@@ -128,7 +128,7 @@ the highest root requirement in the graph wins. Upgrading one grammar can raise 
 
 Under the [2026-11-15 ADR-0026 amendment](../design/decisions/ADR-0026-never-block-on-upstream.md#amendment-2026-11-15),
 immutable releases mirror source archives plus `SHA256SUMS` (v0.4.0: 24 source archives; v0.6.0: 26 source archives; v0.7.0: 26).
-`(cd tools/gen && CGO_ENABLED=0 go run . -mirror-assets)` lists the candidate rows for the current pins (34) as
+`(cd tools/gen && CGO_ENABLED=0 go run . -mirror-assets)` lists the candidate rows for the current pins (35) as
 headerless TSV: filename, SHA-256, primary download URL, kind (`source`/`toolchain`). Select column 4 equal to `source`
 (for example, `awk -F '\t' '$4 == "source"' release-assets.tsv`), excluding the `toolchain` rows.
 Check the selected filenames equal `runtime.archive`, `wasiLibc.archive`, or a
@@ -136,7 +136,7 @@ Check the selected filenames equal `runtime.archive`, `wasiLibc.archive`, or a
 (TypeScript and TSX share one), the runtime and wasi-libc. Check that every selected row is present, that every
 row's hash equals its pin, and that no other row is attached.
 
-The excluded rows are `binaryen-version_133-x86_64-linux.tar.gz`, `binaryen-version_133-x86_64-windows.tar.gz`, `tree-sitter-linux-arm64.gz`, `tree-sitter-linux-x64.gz`, `tree-sitter-macos-arm64.gz`, `tree-sitter-windows-x64.gz`, `wasi-sdk-34.0-x86_64-linux.tar.gz`, `wasi-sdk-34.0-x86_64-windows.tar.gz`, because the exact toolchain archives' bundled licence/notice inventory is incomplete.
+The excluded rows are `binaryen-version_133-x86_64-linux.tar.gz`, `binaryen-version_133-x86_64-windows.tar.gz`, `tree-sitter-linux-arm64.gz`, `tree-sitter-linux-x64.gz`, `tree-sitter-macos-arm64.gz`, `tree-sitter-windows-arm64.gz`, `tree-sitter-windows-x64.gz`, `wasi-sdk-34.0-x86_64-linux.tar.gz`, `wasi-sdk-34.0-x86_64-windows.tar.gz`, because the exact toolchain archives' bundled licence/notice inventory is incomplete.
 Toolchains continue to be fetched from their official releases with pinned SHA-256 checks; releases supply no
 toolchain fallback assets until the complete notices can be established, for example from an SBOM of the exact
 archives. Preserve the collected upstream licence texts as maintainer-local evidence for that later work.
