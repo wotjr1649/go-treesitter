@@ -8,8 +8,10 @@
 // Every grammar pin is also compared with nvim-treesitter's parsers.lua (information, never a failure; see nvim.go).
 // -issue FILE writes a complete tracking-issue body unless a hard error occurred.
 // -state FILE writes warn, clean or error; accepted warnings do not prevent auto-close.
+// -candidates FILE writes the pins that could move (candidates.go, JSON with a version field) unless a hard error occurred;
+// the issue body lists them with dispatch lines. Nothing here dispatches a workflow.
 //
-//	upstreamwatch [-pins tools/gen/pins.json] [-nvim URL|""] [-issue FILE] [-state FILE]
+//	upstreamwatch [-pins tools/gen/pins.json] [-nvim URL|""] [-issue FILE] [-state FILE] [-candidates FILE]
 package main
 
 import (
@@ -56,6 +58,7 @@ func run(args []string, stdout io.Writer, api *githubAPI) int {
 	nvimURL := fs.String("nvim", nvimParsersURL, "nvim-treesitter parsers.lua URL (empty: skip the comparison)")
 	issue := fs.String("issue", "", "write the tracking-issue body here when the report is complete")
 	state := fs.String("state", "", "write warn, clean or error for the tracking-issue workflow")
+	candidates := fs.String("candidates", "", "write the pin-move candidates (JSON) here when the report is complete")
 	fs.Parse(args)
 	fail := func(err error) int { fmt.Fprintln(os.Stderr, "upstreamwatch:", err); return 2 }
 	raw, err := os.ReadFile(*file)
@@ -91,6 +94,11 @@ func run(args []string, stdout io.Writer, api *githubAPI) int {
 			return fail(err)
 		}
 	}
+	if *candidates != "" {
+		if err := writeCandidates(*candidates, api, failed); err != nil {
+			return fail(err)
+		}
+	}
 	if *state != "" {
 		value := "clean"
 		if failed {
@@ -121,7 +129,7 @@ type source struct {
 type finding struct{ component, text, kind string }
 
 // warn records a warning for the tracking issue and prints its annotation.
-func (a *githubAPI) warn(w io.Writer, name, kind, text string) {
+func (a *githubAPI) warn(w io.Writer, name, kind, text string) finding {
 	f := finding{name, text, kind}
 	a.findings = append(a.findings, f)
 	level := "warning"
@@ -129,6 +137,7 @@ func (a *githubAPI) warn(w io.Writer, name, kind, text string) {
 		level = "notice"
 	}
 	fmt.Fprintf(w, "::%s::%s: %s\n", level, name, text)
+	return f
 }
 
 func report(p *pins, w io.Writer, api *githubAPI) (stale, failed bool) {
@@ -181,6 +190,7 @@ func report(p *pins, w io.Writer, api *githubAPI) (stale, failed bool) {
 			status, stale = "**NEWER STABLE "+strings.ToUpper(what)+"**", true
 			fmt.Fprintf(w, "::error::%s: pinned %s, newest stable %s %s\n", t.name, t.pinned, what, latest)
 			api.findings = append(api.findings, finding{component: t.name, text: "newer stable " + what + " " + latest + " than pinned " + t.pinned})
+			api.propose(candidate{Component: t.name, Pinned: t.pinned, Newest: latest, Kind: "release", Repo: t.repo, TagOnly: what != "release"}, "")
 		}
 		fmt.Fprintf(w, "| %s | %s | %s | %s |\n", t.name, t.pinned, latest, status)
 	}
@@ -286,7 +296,8 @@ func health(api *githubAPI, w io.Writer, s source) (failed bool) {
 			releaseText += " (" + cmp.Status + ")"
 			if s.grammar && cmp.Status == "ahead" { // the release contains the pin and is newer
 				health = append(health, "WARNING newer stable release "+release.Tag)
-				api.warn(w, s.name, "newer stable release "+release.Tag+" than pin", fmt.Sprintf("newer stable release %s than pin %.12s", release.Tag, s.pin))
+				f := api.warn(w, s.name, "newer stable release "+release.Tag+" than pin", fmt.Sprintf("newer stable release %s than pin %.12s", release.Tag, s.pin))
+				api.propose(candidate{Component: s.name, Pinned: s.pin, Newest: release.Tag, Kind: "release", Repo: s.repo, Grammar: true}, f.kind)
 			}
 		}
 	}
@@ -335,6 +346,7 @@ type githubAPI struct {
 	now            time.Time
 	cache          map[string]apiReply
 	redirected     map[string]bool
+	candidates     []candidate
 	acceptances    []acceptance
 	findings       []finding
 	requests       int

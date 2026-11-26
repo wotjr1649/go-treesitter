@@ -65,7 +65,8 @@ func pinBehind(api *githubAPI, w io.Writer, base string, s source, branch, head 
 		return
 	}
 	*health = append(*health, "WARNING "+text)
-	api.warn(w, s.name, "pin behind default branch", text)
+	f := api.warn(w, s.name, "pin behind default branch", text)
+	api.propose(candidate{Component: s.name, Pinned: s.pin, Newest: head, Kind: "head", Repo: s.repo, Grammar: true}, f.kind)
 }
 
 // tagOnlyRelease warns when an owner repository has a newer tag than its latest release (or no release at all) that
@@ -85,6 +86,7 @@ func tagOnlyRelease(api *githubAPI, w io.Writer, base string, s source, release 
 	}
 	if err := api.get(base+"/compare/"+url.PathEscape(s.pin)+"..."+url.PathEscape(tag)+"?per_page=1", &cmp); err == nil && cmp.Status == "ahead" {
 		*health = append(*health, "WARNING newer tag "+tag+" without a release")
-		api.warn(w, s.name, "newer tag "+tag+" than pin", fmt.Sprintf("newer tag %s (no release) than pin %.12s", tag, s.pin))
+		f := api.warn(w, s.name, "newer tag "+tag+" than pin", fmt.Sprintf("newer tag %s (no release) than pin %.12s", tag, s.pin))
+		api.propose(candidate{Component: s.name, Pinned: s.pin, Newest: tag, Kind: "release", Repo: s.repo, TagOnly: true, Grammar: true}, f.kind)
 	}
 }

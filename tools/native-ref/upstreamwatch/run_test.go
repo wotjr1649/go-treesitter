@@ -20,6 +20,13 @@ const runPins = `{"runtime":{"release":"v1.0.0","commit":"rp","repo":"https://gi
 // runWatch runs the command against a fake API where every pin is healthy and current.
 func runWatch(t *testing.T, pinsJSON string, graphql func(w http.ResponseWriter)) (code int, state, issue, stdout string, api *githubAPI) {
 	t.Helper()
+	code, state, issue, stdout, api, _ = runWatchFiles(t, pinsJSON, graphql)
+	return
+}
+
+// runWatchFiles also returns the -candidates file ("" when it was not written).
+func runWatchFiles(t *testing.T, pinsJSON string, graphql func(w http.ResponseWriter)) (code int, state, issue, stdout string, api *githubAPI, candidates string) {
+	t.Helper()
 	isolateGit(t)
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch {
@@ -39,16 +46,16 @@ func runWatch(t *testing.T, pinsJSON string, graphql func(w http.ResponseWriter)
 	}))
 	t.Cleanup(server.Close)
 	dir := t.TempDir()
-	pinsFile, stateFile, issueFile := filepath.Join(dir, "pins.json"), filepath.Join(dir, "state"), filepath.Join(dir, "body.md")
+	pinsFile, stateFile, issueFile, candFile := filepath.Join(dir, "pins.json"), filepath.Join(dir, "state"), filepath.Join(dir, "body.md"), filepath.Join(dir, "candidates.json")
 	if err := os.WriteFile(pinsFile, []byte(pinsJSON), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	api = newAPI()
 	api.base, api.token, api.now, api.activityBudget = server.URL+"/", "secret-token", time.Date(2026, 11, 18, 0, 0, 0, 0, time.UTC), 30*time.Millisecond
 	var out bytes.Buffer
-	code = run([]string{"-pins", pinsFile, "-nvim", "", "-issue", issueFile, "-state", stateFile}, &out, api)
+	code = run([]string{"-pins", pinsFile, "-nvim", "", "-issue", issueFile, "-state", stateFile, "-candidates", candFile}, &out, api)
 	read := func(p string) string { b, _ := os.ReadFile(p); return string(b) }
-	return code, strings.TrimSpace(read(stateFile)), read(issueFile), out.String(), api
+	return code, strings.TrimSpace(read(stateFile)), read(issueFile), out.String(), api, read(candFile)
 }
 
 func okGraphQL(w http.ResponseWriter) {
