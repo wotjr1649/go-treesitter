@@ -85,3 +85,41 @@ fi
 [ ! -e "$work/archive" ] && [ ! -e "$work/cache/archive" ]
 unset TSG_DL_CACHE
 echo "fetch cache checks passed"
+
+# REGEN_RESUME=1 keeps a file that matches its pin and downloads any other one; without it nothing is kept.
+resume() { # <want calls> <want content> <REGEN_RESUME value or empty> <file content or - for none>
+  : >"$work/calls"
+  if [ "$4" = - ]; then rm -f -- "$work/archive"; else printf '%s' "$4" >"$work/archive"; fi
+  REGEN_RESUME=$3 fetch_verified_archive "$work/archive" "$sum" https://upstream.invalid/good -
+  [ "$(wc -l <"$work/calls")" = "$1" ] && [ "$(cat "$work/archive")" = "$2" ] || {
+    echo "unexpected resume: calls=$(wc -l <"$work/calls") content=$(cat "$work/archive")" >&2
+    exit 1
+  }
+}
+resume 0 'pinned archive' 1 'pinned archive' # all files valid: nothing downloaded
+resume 1 'pinned archive' 1 corrupt          # one corrupt file: downloaded again and verified
+resume 1 'pinned archive' 1 ''               # truncated to nothing
+resume 1 'pinned archive' 1 -                # missing
+resume 1 'pinned archive' '' 'pinned archive' # without REGEN_RESUME a valid file is still downloaded again
+resume 1 'pinned archive' 0 'pinned archive'  # only the value 1 resumes
+echo "fetch resume checks passed"
+
+# regen.sh: a non-empty work directory is refused unless REGEN_RESUME=1. A stub go (the first command after the check) stops
+# the script with 77, so "accepted" means exit 77 and nothing is downloaded or built.
+bindir=$(mktemp -d) wd=$(mktemp -d)
+trap 'rm -rf -- "$bindir" "$wd"; rm -f -- "$work/calls" "$work/archive"; rmdir -- "$work"' EXIT
+printf '#!/usr/bin/env bash\ncase "$1" in env) echo linux ;; build) exit 77 ;; *) exit 99 ;; esac\n' >"$bindir/go"
+chmod +x "$bindir/go"
+echo leftover >"$wd/stopped-run"
+regen() { PATH="$bindir:$PATH" REGEN_RESUME=$1 bash "$(dirname "$0")/regen.sh" "$wd" >"$work/regen.out" 2>&1 && return 0 || return $?; }
+check_regen() { # <want exit> <REGEN_RESUME value>
+  local status
+  if regen "$2"; then status=0; else status=$?; fi
+  [ "$status" = "$1" ] || { echo "regen.sh REGEN_RESUME='$2': exit $status, want $1" >&2; cat "$work/regen.out" >&2; exit 1; }
+}
+check_regen 1 ''
+check_regen 1 yes
+[ "$(ls -A "$wd")" = stopped-run ] # the refused runs created nothing
+check_regen 77 1
+rm -f -- "$work/regen.out"
+echo "regen resume checks passed"

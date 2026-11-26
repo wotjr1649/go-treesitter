@@ -27,6 +27,11 @@ fetch_archive() {
 # a missing or mismatching file is downloaded as usual, and only a verified download is stored, so the cache never changes bytes.
 fetch_verified_archive() {
   local dst=$1 sum=$2 upstream=$3 mirrors=${4:--} url cache=""
+  # REGEN_RESUME=1 (regen.sh): a file already in place whose sha256 matches the pin is kept; any other file is downloaded as usual.
+  if [ "${REGEN_RESUME:-}" = 1 ] && [ -f "$dst" ] && echo "$sum  $dst" | sha256sum -c - >/dev/null 2>&1; then
+    echo "fetch: $dst matches its pin; not downloaded again" >&2
+    return 0
+  fi
   local -a urls=("$upstream") fallback=()
   if [ -n "${TSG_DL_CACHE:-}" ]; then
     cache=$TSG_DL_CACHE/$(basename "$dst")

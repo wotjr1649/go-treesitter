@@ -4,7 +4,10 @@
 #   tools/gen/regen.sh <work-dir> [lang ...]
 #
 # <work-dir> must not exist or must be empty: every archive is downloaded and extracted only into it, its sha256 is
-# checked before extraction. All non-exception grammars execute grammar JS with the pinned CLI's native
+# checked before extraction. REGEN_RESUME=1 continues a stopped run in a non-empty <work-dir>: an archive already there whose
+# sha256 matches its pin is not downloaded again (any other file is), every extraction directory is replaced by a fresh
+# extraction of the verified archive, and the language list continues the run (the "== <lang>" lines of its log say which
+# were reached; a language is regenerated from scratch, never half-continued). All non-exception grammars execute grammar JS with the pinned CLI's native
 # JS runtime and a twice-generated determinism check (ADR-0027). The fetch plan
 # (URLs, sha256, destinations) comes from tools/gen/pins.json via `gen -plan`; wasm2go is built from its pinned
 # module version with `go install -trimpath`. Output goes to grammars/<lang> in this repository.
@@ -19,7 +22,8 @@ shift || true
 REPO=$(cd "$(dirname "$0")/../.." && pwd)
 source "$REPO/tools/gen/fetch.sh"
 mkdir -p "$W"
-[ -z "$(ls -A "$W")" ] || { echo "regen: $W is not empty" >&2; exit 1; }
+[ -z "${REGEN_RESUME:-}" ] || [ "$REGEN_RESUME" = 1 ] || { echo "regen: REGEN_RESUME must be 1 or unset" >&2; exit 1; }
+[ -n "${REGEN_RESUME:-}" ] || [ -z "$(ls -A "$W")" ] || { echo "regen: $W is not empty (REGEN_RESUME=1 continues a stopped run)" >&2; exit 1; }
 W=$(cd "$W" && pwd)
 if command -v cygpath >/dev/null 2>&1; then # Git Bash: native paths for the Go tools
   W=$(cygpath -m "$W")
@@ -48,6 +52,7 @@ while IFS=$'\t' read -r kind file url sum dest mirrors; do
       ;;
     tool | source)
       fetch_verified_archive "$W/dl/$file" "$sum" "$url" "$mirrors"
+      rm -rf -- "${W:?}/${dest:?}" # a stopped run may have left a partial extraction (no-op in a new directory)
       mkdir -p "$W/$dest"
       (cd "$W" && tar -xzf "dl/$file" --strip-components=1 -C "$dest") # relative paths: GNU tar reads "D:/x" as a remote host
       ;;
