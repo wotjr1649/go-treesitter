@@ -70,7 +70,7 @@ type entry struct {
 
 func main() {
 	if len(os.Args) < 2 {
-		die("usage: benchci fetch|run ...")
+		die("usage: benchci fetch|run|abba|abba-calib ...")
 	}
 	fs := flag.NewFlagSet(os.Args[1], flag.ExitOnError)
 	manifest := fs.String("manifest", "large.json", "large input manifest")
@@ -87,6 +87,13 @@ func main() {
 	creps := fs.Int("corpus-reps", 7, "timed reps per file")
 	mruns := fs.Int("mem-runs", 3, "fresh processes per memory measurement")
 	cc := fs.String("cc", "", "run: the native reference's C compiler, recorded in summary.md (--version and -dumpmachine)")
+	aDir := fs.String("a", "", "abba: directory of baseline (A) bench binaries")
+	bDir := fs.String("b", "", "abba: directory of candidate (B) bench binaries")
+	aArgs := fs.String("a-args", "-op parse", "abba: extra bench speed arguments of A")
+	bArgs := fs.String("b-args", "-op parse", "abba: extra bench speed arguments of B")
+	arounds := fs.Int("abba-rounds", 8, "abba: rounds of A,B,B,A")
+	budget := fs.Float64("budget", 10, "abba: allowed slowdown in percent")
+	calib := fs.String("calib", "", "abba-calib: abba-rounds.csv of A=A runs")
 	fs.Parse(os.Args[2:])
 	switch os.Args[1] {
 	case "fetch":
@@ -97,6 +104,12 @@ func main() {
 		if !ok {
 			os.Exit(1)
 		}
+	case "abba":
+		code, err := abba(*aDir, *bDir, *large, *out, strings.Split(*langsFlag, ","), *arounds, *lreps, *budget, *aArgs, *bArgs)
+		must(err)
+		os.Exit(code)
+	case "abba-calib":
+		must(abbaCalib(*calib, *budget))
 	default:
 		die("unknown command", os.Args[1])
 	}
