@@ -42,7 +42,7 @@ tools/modulezip/       builds official module ZIPs; tools/lane/ records command 
 testdata/              external fixtures and corpus inputs, LF-pinned, hashed in docs/validation/workloads.md
 docs/                  contract plane (see docs/README.md)
 artifacts/             evidence plane, append-only
-.github/workflows/     product, race and license lane (windows.yml), cross-platform engine lane (engine.yml)
+.github/workflows/     race and license lane (windows.yml), cross-platform engine lane (engine.yml)
 ```
 
 `tools/*` and `grammars/*` are separate Go modules. The `treesitter` package is the public import path; it is

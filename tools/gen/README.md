@@ -313,7 +313,7 @@ which includes [upstream PR #102](https://github.com/gmr/tree-sitter-postgres/pu
 ADR-0027 sets `regenerate: true` for every grammar except entries with a recorded `generatorException`
 (reason and exact failing input IDs). An exception retains the committed reference C. C# v0.24.0
 retires the initial exception. Its two independent generations match upstream's committed sources, and
-`regen.yml` runs the full behaviour gate in the C# shard. The original archive, tree and file pins
+`regen.yml` runs the full behaviour gate in the group that contains C#. The original archive, tree and file pins
 identify bytes from the pinned source. Generation adds identities for the generated files.
 `gen` and `native-ref` share one implementation: verify the full archive, extract a private copy, apply grammar-input
 patches, then run the pinned CLI twice on independent trees using `generate --abi 15 --js-runtime native`.
@@ -429,17 +429,17 @@ LFS pointer; the original pointer and input tree remain pinned, and both builder
 PL/pgSQL is excluded. The CLI is pinned for Windows x64, Linux x64/arm64 and macOS arm64.
 
 Windows feasibility measurement: one CLI generation took about 180 seconds and 4.52 GiB peak commit. `grammarpatch`
-allows 10 minutes per generation and runs the two independent generations sequentially. Regen and balancing
-jobs have 60 minutes; conformance, nightly and bench native builds also remain one grammar per job with 60 minutes.
+allows 10 minutes per generation and runs the two independent generations sequentially. Balancing jobs have
+60 minutes; regen group jobs have 90 minutes (PostgreSQL is alone in group g1, the others hold 8 grammars each, regenerated one after another); conformance, nightly and bench native builds also remain one grammar per job with 60 minutes.
 The balancing job generates both a probe and a fresh native reference, so it performs four sequential CLI runs.
-No generated-C cache or skip bypasses the drift check. Other grammar shards fetch the PostgreSQL archive but do not generate it.
+No generated-C cache or skip bypasses the drift check. Other regen groups fetch the PostgreSQL archive but do not generate it.
 
 [GitHub's hosted-runner specifications](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
 list 16 GB RAM for public Ubuntu x64/arm64 and 7 GB for macOS arm64 (private Ubuntu: 8 GB). Each CLI run precedes
-C compilation and no other language regenerates within the job. macOS has the least headroom; hosted results
+C compilation and the grammars of a group regenerate one after another, never at the same time. macOS has the least headroom; hosted results
 remain pending and an OOM/timeout must fail visibly. Windows measurements do not establish hosted memory or timing.
 
-The PostgreSQL regen shard also runs the small patched and unpatched CLI integration tests using the
+The PostgreSQL regen group also runs the small patched and unpatched CLI integration tests using the
 same verified CLI archive. A missing archive fails the step before Go can skip those tests. Pin-move CI
 selects grammars from `pins.json`: adding `postgres` checks its new schema, and later pin changes require
 the old/new native comparison. Its unpatched regeneration flag also prepares the pinned CLI for that job.

@@ -200,7 +200,7 @@ class WiringTest(unittest.TestCase):
             self.assertLessEqual(exported, produced, wf)
             self.assertIn("expect", exported, wf)  # the gate reads it
             # conformance_full only shapes conformance_matrix (matrix.group.name), no job reads it.
-            flags = {k for k in produced if (k in cc.NEEDS and k != "conformance_full") or k in ("engine_shards", "floor_shards", "conformance_matrix")}
+            flags = {k for k in produced if (k in cc.NEEDS and k != "conformance_full") or k in ("engine_shards", "floor_shards", "conformance_matrix", "regen_matrix")}
             self.assertLessEqual(flags, used, "%s: produced but never used: %s" % (wf, flags - used))
 
     def test_every_job_waits_for_changes_and_the_gate_waits_for_every_job(self):
@@ -265,17 +265,20 @@ class MatrixCountTest(unittest.TestCase):
         self.assertEqual(len(pr), 2 + 2 + 1)  # linux-amd64 and windows-amd64 shards, one floor shard
         self.assertIn("grammar (ubuntu-24.04, Go 1.26.x, shard 1)", pr)
         self.assertNotIn("grammar (ubuntu-24.04, Go 1.26.x, shard 2)", pr)
+        self.assertEqual(self.names("regen", ["README.md"]), [])  # docs only: no regeneration
+        self.assertEqual(self.names("regen", ["query.go"]), ["regenerate group g%d and diff (ubuntu-24.04)" % i for i in range(1, 5)])
         for wf in cc.WORKFLOWS:
-            if wf not in ("engine", "conformance"):
+            if wf not in ("engine", "conformance", "regen"):
                 self.assertNotIn("expect_matrix", flags(wf, ["README.md"]))
 
     def test_full_runs_have_the_full_size(self):
-        for wf, files in (("engine", ["README.md"]), ("conformance", ["README.md"])):
+        for wf, files in (("engine", ["README.md"]), ("conformance", ["README.md"]), ("regen", ["README.md"])):
             for ev in ("push", "workflow_dispatch", "schedule"):
                 env, _ = matrix_step(wf)
                 size = int(re.search(r"'(\d+)'", env["FULL"]).group(1))
                 self.assertEqual(len(self.names(wf, files, ev)), size, (wf, ev))
         self.assertEqual(len(cc.CONFORMANCE_GROUPS) * len(cc.RUNNERS), 10)
+        self.assertEqual(len(cc.REGEN_GROUPS), 4)
         self.assertEqual(len(cc.ENGINE_MATRIX_JOBS) * len(cc.ENGINE_SHARDS), 12)
 
     def test_names_match_the_workflows(self):
@@ -287,18 +290,22 @@ class MatrixCountTest(unittest.TestCase):
             # engine_shards sits in a YAML anchor shared by the five platform jobs; the floor job has its own matrix
             self.assertIn("fromJSON(needs.changes.outputs.%s)" % key, job_text[job] if key == "floor_shards" else text, job)
         self.assertIn("    name: conformance (${{ matrix.runner }}, ${{ matrix.group.name }})\n", workflow_text("conformance"))
+        self.assertIn("    name: %s\n" % (cc.REGEN_MATRIX_JOB % "${{ matrix.group.name }}"), workflow_text("regen"))
+        self.assertIn("fromJSON(needs.changes.outputs.regen_matrix)", workflow_text("regen"))
         self.assertEqual(cc.CONFORMANCE_MATRIX_JOB, "conformance (%s, %s)")
 
     def test_pattern_selects_only_the_matrix_jobs(self):
         for wf, files, others in (("engine", ["tools/conformance/x.go"], ["engine (ubuntu-24.04)", "engine, oldest supported Go (ubuntu-24.04)", "engine-gate", "engine-changes"]),
-                                  ("conformance", ["tools/conformance/x.go"], ["conformance (ubuntu-24.04)", "conformance (ubuntu-24.04-arm)", "conformance-gate", "conformance-changes"])):
+                                  ("conformance", ["tools/conformance/x.go"], ["conformance (ubuntu-24.04)", "conformance (ubuntu-24.04-arm)", "conformance-gate", "conformance-changes"]),
+                                  ("regen", ["tools/conformance/x.go"], ["regenerate and diff (ubuntu-24.04)", "regen-gate", "regen-changes"])):
             env, _ = matrix_step(wf)
             rx = re.compile(env["MATRIX_RE"].strip("'"))
             self.assertTrue(all(rx.search(n) for n in self.names(wf, files, "push")), wf)
             self.assertFalse(any(rx.search(n) for n in others), wf)
 
-    def test_both_gates_run_the_same_script(self):
+    def test_all_gates_run_the_same_script(self):
         self.assertEqual(matrix_step("engine")[1], matrix_step("conformance")[1])
+        self.assertEqual(matrix_step("regen")[1], matrix_step("conformance")[1])
 
     def run_step(self, wf, listed, ran, event="pull_request"):
         import shutil
@@ -334,6 +341,11 @@ class MatrixCountTest(unittest.TestCase):
         self.assertNotEqual(self.run_step("conformance", j(c[:9]), c[:9] + other, "push"), 0)
         for bad in ("", "null", "{}", "conformance"):
             self.assertNotEqual(self.run_step("conformance", bad, c + other, "push"), 0, bad)
+        r = self.names("regen", ["README.md"], "push")
+        self.assertEqual(len(r), 4)
+        self.assertEqual(self.run_step("regen", j(r), r + ["regenerate and diff (ubuntu-24.04)"], "push"), 0, self.last)
+        self.assertNotEqual(self.run_step("regen", j(r), r[:-1], "push"), 0)  # a group did not succeed
+        self.assertNotEqual(self.run_step("regen", j(r[:3]), r[:3], "push"), 0)  # a group dropped from the matrix on a push
         e = self.names("engine", ["README.md"], "push")
         self.assertEqual(len(e), 12)
         self.assertEqual(self.run_step("engine", j(e), e + ["engine (ubuntu-24.04)"], "push"), 0)

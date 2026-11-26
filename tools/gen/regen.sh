@@ -10,6 +10,8 @@
 # module version with `go install -trimpath`. Output goes to grammars/<lang> in this repository.
 # Each selected grammar keeps the form and minimum root from its own go.mod. ROOT_VERSION=vX.Y.Z (or vX.Y.Z-prerelease, as `gen -root-version`)
 # overrides that form only for the selected grammars (all grammars if no language list is given).
+# REGEN_KEEP_GOING=1 (CI: a regen.yml group of grammars shares one toolchain setup) regenerates the remaining grammars after one failed,
+# names every failed grammar and then exits 1; without it the first failure stops the run.
 set -euo pipefail
 
 W=${1:?usage: regen.sh <work-dir> [lang ...]}
@@ -63,10 +65,18 @@ if [ ${#LANGS[@]} -eq 0 ]; then
   LANGS=("${ALL[@]}")
 fi
 cd "$REPO"
+failed=()
 for lang in "${LANGS[@]}"; do
   echo "== $lang"
+  rc=0
   "$GEN" -lang "$lang" -root tools/gen -src "$W/src" -dl "$W/dl" -sdk "$W/sdk" \
     -wasm2go "$W/bin/wasm2go$EXE" -wasm-opt "$W/binaryen/bin/wasm-opt$EXE" \
     -tree-sitter "$W/bin/tree-sitter$EXE" -fetch-npm -patch-alert "${PATCH_ALERT_THRESHOLD:-3}" \
-    -out "grammars/$lang" -work "$W/work" -repo . "${module_form[@]}"
+    -out "grammars/$lang" -work "$W/work" -repo . "${module_form[@]}" || rc=$?
+  if [ "$rc" -ne 0 ]; then
+    [ -n "${REGEN_KEEP_GOING:-}" ] || exit "$rc"
+    echo "regen: $lang failed (exit $rc)" >&2
+    failed+=("$lang")
+  fi
 done
+[ ${#failed[@]} -eq 0 ] || { echo "regen: failed: ${failed[*]}" >&2; exit 1; }
