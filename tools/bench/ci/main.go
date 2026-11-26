@@ -93,6 +93,10 @@ func main() {
 	bArgs := fs.String("b-args", "-op parse", "abba: extra bench speed arguments of B")
 	arounds := fs.Int("abba-rounds", 8, "abba: rounds of A,B,B,A")
 	budget := fs.Float64("budget", 10, "abba: allowed slowdown in percent")
+	amax := fs.Int("abba-max-rounds", 16, "abba: rounds after an INCONCLUSIVE first look (= -abba-rounds: no extension)")
+	amode := fs.String("mode", "large", "abba: large | corpus (small files of -data)")
+	cfiles := fs.Int("corpus-files", 100, "abba corpus: at most this many small files, evenly spaced")
+	resample := fs.Int("resample", 0, "abba-calib: seeded resamples per row")
 	calib := fs.String("calib", "", "abba-calib: abba-rounds.csv of A=A runs")
 	fs.Parse(os.Args[2:])
 	switch os.Args[1] {
@@ -105,11 +109,16 @@ func main() {
 			os.Exit(1)
 		}
 	case "abba":
-		code, err := abba(*aDir, *bDir, *large, *out, strings.Split(*langsFlag, ","), *arounds, *lreps, *budget, *aArgs, *bArgs)
+		reps := *lreps
+		if *amode == "corpus" {
+			reps = *creps
+		}
+		code, err := abba(abbaCfg{aDir: *aDir, bDir: *bDir, largeDir: *large, dataDir: *data, out: *out, mode: *amode, langs: strings.Split(*langsFlag, ","),
+			rounds: *arounds, maxRounds: *amax, reps: reps, corpusFiles: *cfiles, budgetPct: *budget, aArgs: *aArgs, bArgs: *bArgs})
 		must(err)
 		os.Exit(code)
 	case "abba-calib":
-		must(abbaCalib(*calib, *budget))
+		must(abbaCalib(*calib, *budget, *arounds, *amax, *resample))
 	default:
 		die("unknown command", os.Args[1])
 	}

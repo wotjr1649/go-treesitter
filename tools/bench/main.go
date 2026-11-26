@@ -3,7 +3,8 @@
 // executables in the same time window. Output is plain text on stdout; the driver parses it.
 //
 //	bench speed  -file F -reps N [-op parse|snapshot]   per rep: "rep,total_ms,parse_ms,info" (rep 0 is the warm-up)
-//	bench corpus -list L -reps N                        per file: "name,bytes,outcome,ms0;ms1;..." (ms0 is the warm-up)
+//	bench corpus -list L -reps N [-fresh]               per file: "name,bytes,outcome,ms0;ms1;..." (ms0 is the warm-up);
+//	                                                    -fresh times NewParser + Parse + Close + Parser.Close per rep
 //	bench mem    -file F [-op parse|snapshot]           one line of key=value (one fresh process per run)
 //
 // mem also reports the ADR-0022 release criterion: priv_* are process private bytes (PROCESS_MEMORY_COUNTERS_EX
@@ -52,6 +53,7 @@ func main() {
 	list := fs.String("list", "", "file with one input path per line")
 	reps := fs.Int("reps", 5, "timed reps (a warm-up rep 0 is added)")
 	op := fs.String("op", "parse", "parse | snapshot")
+	fresh := fs.Bool("fresh", false, "corpus: a new Parser per rep (startup-dominated small inputs)")
 	fs.Parse(os.Args[2:])
 	if *op != "parse" && *op != "snapshot" {
 		fatal("bad -op", *op)
@@ -60,7 +62,7 @@ func main() {
 	case "speed":
 		speed(*file, *reps, *op)
 	case "corpus":
-		corpus(*list, *reps)
+		corpus(*list, *reps, *fresh)
 	case "mem":
 		mem(*file, *op)
 	default:
@@ -105,7 +107,7 @@ func speed(file string, reps int, op string) {
 	}
 }
 
-func corpus(list string, reps int) {
+func corpus(list string, reps int, fresh bool) {
 	b, err := os.ReadFile(list)
 	if err != nil {
 		fatal(err)
@@ -122,14 +124,24 @@ func corpus(list string, reps int) {
 		outcome := ""
 		for i := 0; i <= reps; i++ {
 			t0 := now()
-			tree, err := p.Parse(ctx, src, nil)
+			pp := p
+			if fresh {
+				pp = newParser()
+			}
+			tree, err := pp.Parse(ctx, src, nil)
 			if err != nil {
+				if fresh {
+					pp.Close()
+				}
 				outcome = "ERR:" + strings.ReplaceAll(err.Error(), ",", ";")
 				samples = append(samples, "-1")
 				break
 			}
 			outcome = tree.Outcome().String()
 			tree.Close()
+			if fresh {
+				pp.Close()
+			}
 			samples = append(samples, fmt.Sprintf("%.4f", ms(t0, now())))
 		}
 		fmt.Printf("%s,%d,%s,%s\n", path[strings.LastIndexAny(path, `\/`)+1:], len(src), outcome, strings.Join(samples, ";"))

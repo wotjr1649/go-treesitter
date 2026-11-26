@@ -6,6 +6,18 @@ name: Speed ABBA gate (paired, in one job; draft)
 # comes from the 90% t-interval of the per-round log ratios against the +10% budget (rule: tools/bench/ci/abba.go).
 # Memory is deterministic and stays a plain gate in bench.yml. INCONCLUSIVE is reported, never rerun until green; the
 # release gate reads the abba-verdicts artifact of the collect job. Draft: not run on a hosted runner yet.
+#
+# Rounds: the verdict is taken after "rounds" (8); only an INCONCLUSIVE first look continues to "max_rounds" (16) and is
+# decided once more from all of them with the same rule (pre-declared two-look rule, error rates in abba.go and
+# S96 REPORT). Modes: "large" (a few large inputs, throughput) and "corpus" (the pinned grammar's small inputs, each rep
+# with a fresh Parser when corpus_fresh is true: startup/NewParser-dominated; the corpus inputs need the native-ref/ciconf
+# extraction step below for every grammar). Run both modes for a release.
+#
+# Per-release gate and cumulative drift: base_ref = the previous release tag gives the per-release budget; a second
+# dispatch with base_ref = a FIXED baseline tag (the first 1.x tag, or the last tag whose numbers the owner accepted) and
+# the cumulative budget catches many small slowdowns that each stay under the per-release budget. Both dispatches use the
+# same tree B. A must contain tools/bench with the corpus -fresh flag; for an older baseline use corpus_fresh=false (the
+# old binary would fail on the unknown flag, loudly) or build B's driver against A's modules (not implemented).
 
 on:
   workflow_dispatch:
@@ -19,9 +31,21 @@ on:
       reps:
         description: Timed reps per run
         default: "5"
+      max_rounds:
+        description: Rounds after an INCONCLUSIVE first look (equal to rounds - no extension)
+        default: "16"
       budget:
-        description: Allowed slowdown in percent
+        description: Allowed slowdown in percent (per release, or cumulative for a fixed baseline tag)
         default: "10"
+      mode:
+        description: large (large inputs) or corpus (small inputs)
+        type: choice
+        options: [large, corpus]
+        default: large
+      corpus_fresh:
+        description: corpus mode, a fresh Parser per rep (startup-dominated)
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -44,6 +68,9 @@ jobs:
       GOTOOLCHAIN: local
       CGO_ENABLED: "0"
       ROUNDS: ${{ inputs.rounds }}
+      MAX_ROUNDS: ${{ inputs.max_rounds }}
+      MODE: ${{ inputs.mode }}
+      FRESH: ${{ inputs.corpus_fresh }}
       REPS: ${{ inputs.reps }}
       BUDGET: ${{ inputs.budget }}
       EXE: ${{ matrix.runner == 'windows-latest' && '.exe' || '' }}
@@ -55,10 +82,11 @@ jobs:
         env:
           BASE_REF: ${{ inputs.base_ref }}
         run: |
-          for v in "$ROUNDS" "$REPS" "$BUDGET"; do
+          for v in "$ROUNDS" "$MAX_ROUNDS" "$REPS" "$BUDGET"; do
             [[ "$v" =~ ^[0-9]{1,3}$ ]] || { echo "::error::rounds, reps and budget must be digits"; exit 1; }
           done
-          [ "$ROUNDS" -ge 3 ] || { echo "::error::at least 3 rounds"; exit 1; }
+          [ "$ROUNDS" -ge 3 ] && [ "$MAX_ROUNDS" -ge "$ROUNDS" ] || { echo "::error::need 3 <= rounds <= max_rounds"; exit 1; }
+          [[ "$MODE" =~ ^(large|corpus)$ ]] || { echo "::error::bad mode"; exit 1; }
           [[ "$BASE_REF" =~ ^[A-Za-z0-9._/-]{1,100}$ ]] || { echo "::error::bad base_ref"; exit 1; }
       - uses: actions/checkout@v7
         with:
@@ -78,9 +106,9 @@ jobs:
             (cd "$t/tools/bench" && go build -trimpath -tags "lang_${{ matrix.lang }}" -o "$RUNNER_TEMP/bin/$t/${{ matrix.lang }}$EXE" .)
           done
           (cd B/tools/bench && go build -o "$RUNNER_TEMP/benchci$EXE" ./ci)
-      # Only the tsql large input is derived from the pinned grammar's corpus (kind "concat"); the others are fetched.
-      - name: Corpus extraction for the concat input (tsql)
-        if: ${{ matrix.lang == 'tsql' }}
+      # The tsql large input is derived from the pinned grammar's corpus (kind "concat"), and corpus mode reads that corpus.
+      - name: Corpus extraction (tsql large input, corpus mode)
+        if: ${{ matrix.lang == 'tsql' || inputs.mode == 'corpus' }}
         working-directory: B/tools/native-ref
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -89,9 +117,10 @@ jobs:
           go build -o "$RUNNER_TEMP/ciconf$EXE" ./ciconf
           cd "$GITHUB_WORKSPACE/B"
           "$RUNNER_TEMP/native-ref$EXE" -pins tools/gen/pins.json -fetch -cc gcc \
-            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" tsql
-          "$RUNNER_TEMP/ciconf$EXE" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang tsql
+            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" "${{ matrix.lang }}"
+          "$RUNNER_TEMP/ciconf$EXE" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "${{ matrix.lang == 'golang' && 'go' || matrix.lang }}"
       - name: Fetch the large inputs (sha256-verified)
+        if: ${{ inputs.mode == 'large' }}
         working-directory: B
         run: |
           mkdir -p "$RUNNER_TEMP/data"
@@ -100,8 +129,13 @@ jobs:
         working-directory: B
         run: |
           rc=0
-          "$RUNNER_TEMP/benchci$EXE" abba -a "$RUNNER_TEMP/bin/A" -b "$RUNNER_TEMP/bin/B" -large "$RUNNER_TEMP/large" \
-            -out "$RUNNER_TEMP/abba-out" -langs "${{ matrix.lang }}" -abba-rounds "$ROUNDS" -large-reps "$REPS" -budget "$BUDGET" || rc=$?
+          extra=(-large "$RUNNER_TEMP/large")
+          if [ "$MODE" = corpus ]; then
+            extra=(-data "$RUNNER_TEMP/data" -corpus-reps "$REPS")
+            if [ "$FRESH" = true ]; then extra+=(-a-args=-fresh -b-args=-fresh); fi
+          fi
+          "$RUNNER_TEMP/benchci$EXE" abba -mode "$MODE" -a "$RUNNER_TEMP/bin/A" -b "$RUNNER_TEMP/bin/B" "${extra[@]}" \
+            -out "$RUNNER_TEMP/abba-out" -langs "${{ matrix.lang }}" -abba-rounds "$ROUNDS" -abba-max-rounds "$MAX_ROUNDS" -large-reps "$REPS" -budget "$BUDGET" || rc=$?
           [ -f "$RUNNER_TEMP/abba-out/abba-summary.md" ] && cat "$RUNNER_TEMP/abba-out/abba-summary.md" >> "$GITHUB_STEP_SUMMARY"
           # 0 PASS, 3 INCONCLUSIVE (annotated, not a failure: the owner decides), anything else fails the job.
           if [ "$rc" = 3 ]; then echo "::warning::INCONCLUSIVE ${{ matrix.runner }} ${{ matrix.lang }}"; exit 0; fi
@@ -110,13 +144,13 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
-          name: abba-${{ matrix.runner }}-${{ matrix.lang }}
+          name: abba-${{ inputs.mode }}-${{ matrix.runner }}-${{ matrix.lang }}
           path: ${{ runner.temp }}/abba-out
           if-no-files-found: ignore
           retention-days: 90
 
   collect:
-    # One table for the release gate: runner,grammar,verdict. Linux must be all PASS (INCONCLUSIVE needs the owner).
+    # One table for the release gate: mode,runner,grammar,verdict. Linux must be all PASS (INCONCLUSIVE needs the owner).
     needs: abba
     if: ${{ !cancelled() }}
     runs-on: ubuntu-24.04
@@ -127,16 +161,16 @@ jobs:
           path: abba
       - name: Verdict table
         run: |
-          echo "runner,lang,verdict" > abba-verdicts.csv
+          echo "mode,runner,lang,verdict" > abba-verdicts.csv
           for d in abba/abba-*; do
-            n="${d#abba/abba-}"                      # <runner>-<lang>; runner names contain a '-', lang names do not
-            lang="${n##*-}"; runner="${n%-*}"
+            n="${d#abba/abba-}"                      # <mode>-<runner>-<lang>; runner names contain a '-', mode and lang names do not
+            lang="${n##*-}"; rest="${n%-*}"; mode="${rest%%-*}"; runner="${rest#*-}"
             v="$(sed -n 's/^overall: \*\*\(.*\)\*\*$/\1/p' "$d/abba-summary.md" 2>/dev/null)"
-            echo "$runner,$lang,${v:-MISSING}" >> abba-verdicts.csv
+            echo "$mode,$runner,$lang,${v:-MISSING}" >> abba-verdicts.csv
           done
           sort -o abba-verdicts.csv abba-verdicts.csv
           cat abba-verdicts.csv >> "$GITHUB_STEP_SUMMARY"
-          if grep -E '^ubuntu-24.04,.*,(REGRESS|MISSING)$' abba-verdicts.csv; then exit 1; fi
+          if grep -E '^[a-z]+,ubuntu-24.04,.*,(REGRESS|MISSING)$' abba-verdicts.csv; then exit 1; fi
       - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
