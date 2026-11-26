@@ -7,9 +7,9 @@
     "python": {
       "Name": "Python",
       "Commit": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64",
-      "PinSHA256": "fe37ad83c6804c3f5a4aad3405bfaeb510dbaa5eda22714dc077abdd9786597f",
-      "ProvenanceSHA256": "16c80f55a44a26b4781473df6a69dc8f84caf967ad9a0967d48b6f242df27a76",
-      "PatchCount": 1
+      "PinSHA256": "8fb2d425ba28d52f392ecc16852ccb8d71075d48455b39be5dc2b3bdfbcdf1c2",
+      "ProvenanceSHA256": "be4a924f1af1217319b3139723df00a25accb334d2af92814b5e6adc47a2e640",
+      "PatchCount": 2
     },
     "csharp": {
       "Name": "C#",
@@ -17,13 +17,6 @@
       "PinSHA256": "00d265b8a944364d2891b3b38c99498c04b857ce79304e4ed5bd613cdc4d1a27",
       "ProvenanceSHA256": "d3aece8a0ae235e60b8435d0f7ec825074dd72f5f67f9c9edc821bb416eb8905",
       "PatchCount": 0
-    },
-    "css": {
-      "Name": "CSS",
-      "Commit": "dda5cfc5722c429eaba1c910ca32c2c0c5bb1a3f",
-      "PinSHA256": "5396081629b52157f4813d97914bc1955341e8ed8dc277b2b2a3eeb63f0bac2e",
-      "ProvenanceSHA256": "df7598196c394f7766c8ecd563bbf5823a22421d2362c3705ec44f8a2ce3c953",
-      "PatchCount": 1
     },
     "html": {
       "Name": "HTML",
@@ -55,27 +48,8 @@
           "URL": "https://docs.python.org/3/reference/expressions.html#binary-bitwise-operations"
         }
       ],
-      "Upstream": "https://github.com/tree-sitter/tree-sitter-python/issues/358"
-    },
-    {
-      "ID": "python-await-power",
-      "Grammar": "python",
-      "Input": "async def g():\n    await f() ** 2\n",
-      "InputSHA256": "cd893c4c0e887b6f60b5b21dc8d9b61bdd2b8c01787f314ae4ad69b45e3e065e",
-      "DumpSHA256": "28cca2fdede80ce83a60920a29c26db0f0f2f8d29e1e6f7f212e3cdfbc87e021",
-      "Observed": "The named await node spans [19,33), containing the ** binary_operator over [25,33): await (f() ** 2), without errors.",
-      "Expected": "await_expr takes a primary; power takes await_expr on its left. Group as (await f()) ** 2; the await operand ends at byte 28.",
-      "Specs": [
-        {
-          "Title": "Python reference 6.4: Await expression",
-          "URL": "https://docs.python.org/3/reference/expressions.html#await-expression"
-        },
-        {
-          "Title": "Python reference 6.5: The power operator",
-          "URL": "https://docs.python.org/3/reference/expressions.html#the-power-operator"
-        }
-      ],
-      "Upstream": ""
+      "Upstream": "https://github.com/tree-sitter/tree-sitter-python/issues/358",
+      "UpstreamNote": "Issue [#358](https://github.com/tree-sitter/tree-sitter-python/issues/358) was closed on 2026-11-21 by its reporter, who pointed to a community fork; the fix is not in upstream `master`."
     },
     {
       "ID": "csharp-default-constraint",
@@ -133,7 +107,7 @@
           "URL": "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/expressions#1283-interpolated-string-expressions"
         }
       ],
-      "Upstream": ""
+      "Upstream": "https://github.com/tree-sitter/tree-sitter-c-sharp/issues/497"
     },
     {
       "ID": "csharp-conditional-splits-statement",
@@ -147,22 +121,6 @@
         {
           "Title": "C# specification 6.5.5: Conditional compilation directives",
           "URL": "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#655-conditional-compilation-directives"
-        }
-      ],
-      "Upstream": ""
-    },
-    {
-      "ID": "css-non-latin1-value",
-      "Grammar": "css",
-      "Input": "a { b: 한글 }\n",
-      "InputSHA256": "9e72dd72130d55d7d5294e143ea1fbd1656ec0c3a7879e306db4fb46d9c730a1",
-      "DumpSHA256": "1e2f75f20d41affef8fa61e82f8570e8b5432cabbd307af2b2b93048e5ea58f3",
-      "Observed": "The root has errors: the declaration is an ERROR over [4,13) and the Hangul value [7,13) is a nested ERROR. The value token for bare identifiers retains the pinned Latin-1 range; a { b: abc } parses without errors.",
-      "Expected": "한글 is an identifier value (plain_value) of the declaration b, with no error.",
-      "Specs": [
-        {
-          "Title": "CSS Syntax Module Level 3 (2026-10-01): ident-start code point",
-          "URL": "https://www.w3.org/TR/2026/CRD-css-syntax-3-20261001/#ident-start-code-point"
         }
       ],
       "Upstream": ""
@@ -185,7 +143,8 @@
           "URL": "https://html.spec.whatwg.org/multipage/syntax.html#end-tags"
         }
       ],
-      "Upstream": ""
+      "Upstream": "https://github.com/tree-sitter/tree-sitter-html/issues/148",
+      "UpstreamNote": "Open as of 2026-11-25, with no comments."
     },
     {
       "ID": "swift-non-ascii-statement-label",

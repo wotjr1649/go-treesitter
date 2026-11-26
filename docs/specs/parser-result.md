@@ -4,8 +4,8 @@ Normative for the `treesitter` package (API v2, ADR-0021). Signatures and ration
 side: `docs/design/engine-abi.md`. Where this document and the code disagree, the code is a defect or this document
 is; fix one of them, never leave both.
 
-Transition: the old `syntax` package, `treesitter.New` and `internal/gtsadapter` remain until their approved removal
-(ADR-0020 §7). They follow the previous contract, kept in Git history at commit `9ad82eb`; nothing below applies to them.
+The old `syntax` package, `treesitter.New` and `internal/gtsadapter` were removed (ADR-0022). Their contract is in Git
+history at commit `9ad82eb`; nothing below applies to them.
 
 ## The traps this contract prevents
 
