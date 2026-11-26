@@ -68,7 +68,7 @@ Observed: The root has errors: an ERROR over [8,9) contains interpolation_start 
 Expected rule: The interpolated regular string production permits zero content and zero interpolations. $"" is a valid empty interpolated string and must parse without errors.
 
 - Specification: [C# specification 12.8.3: Interpolated string expressions](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/expressions#1283-interpolated-string-expressions)
-- Upstream issue: none recorded.
+- [Upstream issue](https://github.com/tree-sitter/tree-sitter-c-sharp/issues/497)
 - Input SHA-256: `55e49735e3373f85215a805a55fa39d41b3330363c66c8cd842737f26668e7b6`
 - [Recorded native dump](../../tools/conformance/testdata/known-gaps/csharp-empty-interpolation.dump), SHA-256: `44b803dd1798e548026b8f1e848b7768ffb1065838a23f8424f56b79489f7579`
 
