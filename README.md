@@ -140,6 +140,13 @@ Contracts: [`docs/specs/parser-result.md`](docs/specs/parser-result.md), [`docs/
 - **`Parse` + `Close` is cheaper than `ParseSnapshot`.** `ParseSnapshot` also exports the whole tree into an
   immutable `*Snapshot`. Use `Parse` when you query or walk the `*Tree` and then close it, or edit incrementally;
   use `ParseSnapshot` when the result must outlive the parser or be shared between goroutines.
+- **Create a `Query` once and reuse it.** `NewQuery` compiles the pattern in the grammar's engine on a scratch
+  `Parser` that it creates and closes on every call, so each call costs at least a `NewParser` plus the compile. Each
+  `Parser` compiles a `Query` once more on its first `Tree.Matches`, at about the same cost. The compile cost follows the
+  pattern's structure, not its length. A local Windows diagnostic (commit `7ffa3f9`, host CPU load 97–100%, 2026-11-26;
+  E4 in the terms of docs/specs/validation.md) took one `NewQuery` call about 33–191 ms with tsql queries, 9–64 ms with typescript
+  queries and 0.1 ms with json queries. A `Query` is immutable and may be shared by parsers of its language: cache it and do not call
+  `NewQuery` per file or per request.
 - The first parse on a new instance is slower than later ones (memory pages are committed on first use), another
   reason to reuse instances.
 
