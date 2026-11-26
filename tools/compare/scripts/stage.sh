@@ -62,18 +62,8 @@ if [ "${RUN_UNIT:-}" = 1 ]; then
   (cd "$repo/tools/compare/harness" && go vet ./... && go test ./...)
 fi
 
-# Module graphs of the adapters: the committed go.mod/go.sum are the approval. Download verifies them, 'go mod verify'
-# re-hashes the cache, 'go list -deps' proves go.mod needs no change, and the files must still be byte-identical.
-for a in $ADAPTERS; do
-  d="$repo/tools/compare/adapters/$a"
-  cgo=0; case $a in official|smacker) cgo=1;; esac
-  (cd "$d" && CGO_ENABLED=$cgo GOPROXY=https://proxy.golang.org GOFLAGS=-mod=readonly go mod download && go mod verify \
-     && CGO_ENABLED=$cgo go list -deps ./... > /dev/null)
-  (cd "$repo" && git diff --exit-code -- "tools/compare/adapters/$a/go.mod" "tools/compare/adapters/$a/go.sum") \
-    || { echo "::error::$a: go.mod or go.sum changed during resolution" >&2; exit 1; }
-  (cd "$d" && GOPROXY=off CGO_ENABLED=$cgo go list -m all) > "$T/identity/modules-$a.txt"
-done
-(cd "$repo/tools/compare/adapters" && sha256sum */go.mod */go.sum) > "$T/identity/gomod-gosum-sha256.txt"
+# Module graphs of the adapters (modgraph.sh): verified downloads, the full graph's go.mod files, and an offline proof.
+bash "$here/modgraph.sh" "$T/identity"
 
 [ "$lang" = none ] && exit 0
 case $lang in go) pinlang=golang;; *) pinlang=$lang;; esac

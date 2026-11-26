@@ -222,8 +222,10 @@ jobs:
         run: |
           set -euo pipefail
           list() {
+            # the runner rewrites _github_workflow/event.json at every step, so its mtime always differs (run 45816979373)
             find "$GITHUB_WORKSPACE" "$RUNNER_TEMP" -regextype posix-extended \
               \( -path "$RUNNER_TEMP/_runner_file_commands" -o -path "$RUNNER_TEMP/guard" -o -path "$RUNNER_TEMP/artifacts" \
+                 -o -path "$RUNNER_TEMP/_github_workflow/event.json" \
                  -o -regex "$RUNNER_TEMP/[0-9a-f-]{36}\.sh" \) -prune -o \
               \( -type d -printf '%p\td\t%m\n' -o -printf '%p\t%y\t%m\t%s\t%T@\t%l\n' \) | LC_ALL=C sort
           }
@@ -297,8 +299,10 @@ jobs:
         run: |
           set -euo pipefail
           list() {
+            # the runner rewrites _github_workflow/event.json at every step, so its mtime always differs (run 45816979373)
             find "$GITHUB_WORKSPACE" "$RUNNER_TEMP" -regextype posix-extended \
               \( -path "$RUNNER_TEMP/_runner_file_commands" -o -path "$RUNNER_TEMP/guard" -o -path "$RUNNER_TEMP/artifacts" \
+                 -o -path "$RUNNER_TEMP/_github_workflow/event.json" \
                  -o -regex "$RUNNER_TEMP/[0-9a-f-]{36}\.sh" \) -prune -o \
               \( -type d -printf '%p\td\t%m\n' -o -printf '%p\t%y\t%m\t%s\t%T@\t%l\n' \) | LC_ALL=C sort
           }
