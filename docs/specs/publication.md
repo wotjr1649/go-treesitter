@@ -112,7 +112,7 @@ the highest root requirement in the graph wins. Upgrading one grammar can raise 
   the selected grammar tags point at their step-4 commit.
 - The root ZIP is built by `golang.org/x/mod/zip` from the tagged tree: it contains the root package, `internal/engine`,
   `testdata/`, `LICENSE`/`LICENSES/`, `docs/`, `.github/`, `AGENTS.md` and `tools/lane` (no `go.mod` there). It omits
-  every nested module: `grammars/*`, `tools/gen`, `tools/bench`, `tools/conformance`, `tools/modulezip`, `artifacts`.
+  every nested module: `grammars/*`, `tools/gen`, `tools/bench`, `tools/conformance`, `tools/modulezip`, `tools/compare`, `artifacts`.
   Local-only paths (`docs/plans`, `docs/prompts`, `artifacts/handoff`, `.scratch`) must not be tracked, because a
   tracked file is published by the tag; check `git ls-files` before step 2.
 - Between releases `main` keeps grammar modules in development form (`require` root `v0.0.0` with `replace ../..`
