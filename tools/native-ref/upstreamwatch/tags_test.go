@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -160,5 +161,78 @@ func TestOwnerGrammarTagWithoutRelease(t *testing.T) {
 				t.Errorf("tag warnings=%d, want warn=%v: %v", warned, tc.warn, api.findings)
 			}
 		})
+	}
+}
+
+// An owner pin behind the head warns only when the compare file list touches the pin's hashed paths.
+func TestOwnerPinBehindDocsOnly(t *testing.T) {
+	hashed := map[string]hashedPaths{"g": {dirs: []string{"src", "common"}, files: []string{"src/parser.c"}}}
+	for _, tc := range []struct {
+		name, files string
+		hashed      bool
+		warn        bool
+	}{
+		{"docs, tests and dev scripts", `[{"filename":"README.md"},{"filename":"test/corpus/a.txt"},{"filename":"scripts/dev.sh"},{"filename":".github/workflows/ci.yml"}]`, true, false},
+		{"parser.c changed", `[{"filename":"README.md"},{"filename":"src/parser.c"}]`, true, true},
+		{"mixed: docs plus grammar.js", `[{"filename":"docs/a.md"},{"filename":"grammar.js"}]`, true, true},
+		{"mixed: docs plus a file under a hashed dir", `[{"filename":"docs/a.md"},{"filename":"common/define-grammar.js"}]`, true, true},
+		{"queries changed", `[{"filename":"queries/highlights.scm"}]`, true, true},
+		{"renamed out of a hashed dir", `[{"filename":"old/scanner.c","previous_filename":"src/scanner.c"}]`, true, true},
+		{"empty list is no proof", `[]`, true, true},
+		{"no hashed paths known", `[{"filename":"README.md"}]`, false, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			api := tagServer(t, "v1.0.0", nil, func(path string) string {
+				if strings.HasSuffix(path, "...v1.0.0") {
+					return `{"status":"behind"}`
+				}
+				return `{"status":"ahead","ahead_by":4,"files":` + tc.files + `}`
+			})
+			if tc.hashed {
+				api.hashed = hashed
+			}
+			p := tagPins(map[string]struct{ Repo, Commit string }{"g": {"https://github.com/wotjr1649/tree-sitter-owned", "pin"}})
+			var out bytes.Buffer
+			if stale, failed := report(p, &out, api); stale || failed {
+				t.Fatalf("stale=%v failed=%v\n%s", stale, failed, &out)
+			}
+			behind := 0
+			for _, f := range api.findings {
+				if f.kind == "pin behind default branch" {
+					behind++
+				}
+			}
+			if (behind == 1) != tc.warn || behind > 1 || (behind == 1) != (len(api.candidates) == 1) {
+				t.Errorf("warnings=%d candidates=%d, want warn=%v: %v", behind, len(api.candidates), tc.warn, api.findings)
+			}
+			if got := strings.Contains(out.String(), "4 commit(s) behind main (docs/tests only)"); got == tc.warn {
+				t.Errorf("information line present=%v, want %v\n%s", got, !tc.warn, &out)
+			}
+		})
+	}
+}
+
+func TestOwnerPinBehindTruncatedFileList(t *testing.T) {
+	var files []string
+	for i := 0; i < compareFileLimit; i++ {
+		files = append(files, fmt.Sprintf(`{"filename":"docs/%d.md"}`, i))
+	}
+	h := hashedPaths{dirs: []string{"src"}}
+	if got := h.docsOnly([]compareFile{{Name: "docs/a.md"}}); !got {
+		t.Error("a short docs-only list is docs only")
+	}
+	var list []compareFile
+	if err := json.Unmarshal([]byte("["+strings.Join(files, ",")+"]"), &list); err != nil || h.docsOnly(list) {
+		t.Errorf("a list at the API's 300-file limit may hide a change: err=%v", err)
+	}
+}
+
+func TestLoadHashed(t *testing.T) {
+	got := loadHashed([]byte(`{"grammars":{"a":{"grammarDir":"x/src","dirs":["x/src","common"],"files":{"parser.c":"h"}},"b":{}}}`))
+	if _, ok := got["b"]; ok || len(got) != 1 || !got["a"].affects("x/src/parser.c") || !got["a"].affects("common/z.js") || got["a"].affects("x/README.md") {
+		t.Errorf("%+v", got)
+	}
+	if loadHashed([]byte("{")) != nil {
+		t.Error("unreadable pins: no filter")
 	}
 }
