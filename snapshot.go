@@ -125,8 +125,8 @@ func (s *Snapshot) All() iter.Seq[Node] {
 // only named nodes. Like C it returns the null node, here the zero Node (check Node.IsZero before use), when
 // start > end. It is not C's ts_node_(named_)descendant_for_byte_range: C walks the full tree, including hidden
 // nodes such as zero-width scanner marker tokens, and a snapshot holds visible nodes only. For a zero-width range at a
-// node boundary C may therefore stop at an ancestor of this result, or step over a zero-width MISSING node, where this
-// function returns the deeper node. No equality with C is promised there (see docs/specs/parser-result.md,
+// node boundary C may therefore stop at an ancestor of this result, or step over a zero-width MISSING node that this
+// function returns. No equality with C is promised there (see docs/specs/parser-result.md,
 // "Navigation differs from C at zero-width nodes").
 // Cost is O(depth x fan-out); use an Index for bulk lookups.
 func (s *Snapshot) DescendantForByteRange(start, end uint32, named bool) Node {

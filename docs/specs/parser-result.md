@@ -142,7 +142,8 @@ do not cover the iterator's remaining elements or arbitrary inputs.
 ## Navigation differs from C at zero-width nodes
 
 `Snapshot.DescendantForByteRange`, `DescendantForPointRange`, `Node.NextSibling` and `Node.NextNamedSibling` are
-not claimed equal to C's `ts_node_(named_)descendant_for_{byte,point}_range` and `ts_node_(next_)(named_)sibling`.
+not claimed equal to C's `ts_node_(named_)descendant_for_{byte,point}_range`, `ts_node_next_sibling` and
+`ts_node_next_named_sibling`.
 The difference is structural: a snapshot holds visible nodes only, while C navigates the full tree, including hidden
 nodes (zero-width scanner marker tokens, hidden container rules). Two cases follow, both at zero-width positions:
 
@@ -152,13 +153,13 @@ nodes (zero-width scanner marker tokens, hidden container rules). Two cases foll
 - `NextSibling` / `NextNamedSibling`: C skips a zero-width sibling directly after the node but returns it from
   `ts_node_prev_sibling`. The snapshot keeps next and prev inverse to each other and includes the zero-width sibling.
 
-This subsection records what is known and its level (`docs/specs/validation.md`): E1, a reading of C v0.27.2 `node.c` and
-of grammar scanner sources; and the report-only navigation-comparison data of the open #156 CI run, which compared 8,463
-pinned-corpus and kit inputs and showed differing cells only at zero-width nodes (10,890 cells, none in `parent`,
-`prev` or `prevNamed`: no difference observed there, not a guarantee). That comparison is not a retained gate and no E3-E5 level is claimed. C's hidden zero-width
-leaves are not exported by the engine, so the hidden-leaf cause is inferred from source, not observed. Arbitrary
-ranges, edited trees and `DescendantForPointRange` are not covered by that data. Code that needs C's exact result at a
-zero-width position must not rely on these methods.
+This subsection records what is known and its level (`docs/specs/validation.md`): E1, a reading of C v0.27.2
+`node.c` and of grammar scanner sources; and report-only navigation-comparison data from one CI run (PR #156 head
+d39c3b95, run 45777241358, amd64 and arm64 identical): 8,463 pinned-corpus and kit inputs, 10,890 differing cells, all at
+zero-width nodes, none in `parent`, `prev` or `prevNamed` (observed there, not a guarantee). The run is not retained
+and no E3-E5 level is claimed. C's hidden zero-width leaves are not exported by the engine, so the hidden-leaf cause is
+inferred from source, not observed. Arbitrary ranges, edited trees and `DescendantForPointRange` are not covered by
+that data. Code that needs C's exact result at a zero-width position must not rely on these methods.
 
 ## Comparison discipline
 
