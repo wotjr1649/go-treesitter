@@ -39,7 +39,7 @@ class NativeCacheKeyTest(unittest.TestCase):
             self.assertTrue(any(d == p[:-3] or d.startswith(p[:-3] + "/") for p in patterns if p.endswith("/**"))
                             or any(p.startswith(d + "/") for p in patterns), "cache key does not cover " + d)
         # data the build reads that is not a Go import
-        for needed in ("tools/gen/pins.json", "tools/gen/patches/**", "tools/native-ref/**", ".github/workflows/conformance.yml"):
+        for needed in ("tools/gen/pins.json", "tools/gen/patches/**", "tools/native-ref/**", "tools/gen/sandbox-run.sh", ".github/workflows/conformance.yml"):
             self.assertIn(needed, patterns)
 
 
