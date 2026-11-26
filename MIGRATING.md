@@ -555,7 +555,8 @@ cap applies unless you pass one. Queries built with either constructor work with
 
 - **Compile caps.** `NewQueryWithOptions(ctx, lang, pattern, opts...)` takes `WithMaxQuerySourceBytes`, `WithMaxQueryMemoryBytes`,
   `WithMaxQueryMetadataBytes` and `WithMaxQueryRegexUnits`. The memory cap bounds the scratch engine instance (32 MiB to 4 GiB when
-  positive); the lazy compile on each parser still uses that parser's `WithMaxMemoryBytes`. Regex units are an implementation-dependent
+  positive); the lazy compile on each parser still uses that parser's `WithMaxMemoryBytes`. The metadata cap applies independently to the
+  TSGQ block bytes and to the cumulative bytes written into derived property strings. Regex units are an implementation-dependent
   measure, not bytes.
 - **Match caps.** `Tree.MatchesWithOptions(ctx, q, opts, budgets...)` takes `WithMaxQueryCaptures`, `WithMaxQueryResults` and
   `WithMaxQueryPredicateWork`. Captures and predicate work count candidates that a predicate rejects. The results cap stops the sequence
@@ -567,7 +568,7 @@ cap applies unless you pass one. Queries built with either constructor work with
   a `*QueryError` (`NewQuery` still returns the `*QueryError` directly). The cursor's `QueryOptions.MatchLimit` is a separate limit and
   still reports `ErrQueryMatchLimit`.
 - **What the caps do not bound.** C query compilation checks the context only at Go call boundaries, the capture and metadata caps apply
-  after the engine has allocated the data, and the first whole-tree index and engine traversal stay under the parser's limits. For a hard
+  after the engine has allocated the data, and the first whole-tree index and engine traversal stay under the parser's limits and cooperative engine cancellation. For a hard
   deadline or a total memory bound on untrusted queries, run the work in a separate process with an OS memory limit and a supervisor timeout.
 
 See the [query contract](docs/design/query-abi.md#opt-in-go-budgets), [query outcomes](docs/specs/parser-result.md#query-results-and-limits)
