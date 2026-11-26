@@ -183,5 +183,13 @@ logged '^gen -lang java ' && ! logged '-fetch-npm' && [ -f "$pt/w1/src/f" ] && [
 rm "$pt/w1/dl/src.tgz"
 phase 1 run "$pt/w1" java
 ! logged '^curl' && ! logged '^gen -lang' || { echo "run phase downloaded a missing archive or went on" >&2; exit 1; }
+# The phases change where things happen, not what gen is asked to do: the same gen -lang call, minus -fetch-npm (offline).
+normal() { grep '^gen -lang' "$LOG" | sed -E 's# -fetch-npm##; s#[^ ]*/w[23]/#W/#g'; }
+phase 0 '' "$pt/w2" java
+normal >"$pt/unphased.args"
+phase 0 fetch "$pt/w3" java
+phase 0 run "$pt/w3" java
+normal >"$pt/phased.args"
+[ -s "$pt/unphased.args" ] && cmp -s "$pt/unphased.args" "$pt/phased.args" || { echo "phased gen call differs from the single run" >&2; diff "$pt/unphased.args" "$pt/phased.args" >&2; exit 1; }
 rm -rf -- "$pt"
 echo "regen phase checks passed"
