@@ -82,7 +82,7 @@ candidate.
 | `cmd/compare/` | `tools/compare` | `select` freezes inputs and edits, `run` measures, `check` compares trees with the native references, `nocc` builds without a C compiler, `collect` validates, `pack` writes the one upload bundle, `report`/`seal`/`aggregate` summarize. |
 | `adapters/<name>/` | one each | One worker binary per candidate (`product`, `official`, `smacker`, `gotreesitter`, `bonsai`, `malivvan`), each pinned by its own `go.mod`/`go.sum`. Separate modules because the two cgo bindings carry colliding C symbols. `empty` is the size baseline. |
 | `native/sexp_ref.c` | | One C driver (`sexp`, `edit-sexp`: `ts_node_string` of a fresh or incremental parse) linked with each candidate's own runtime and grammar C. The product's build uses `native-ref -driver`. |
-| `scripts/` | | `pins.env` (Go version and checksums), `stage.sh` (pinned downloads, module graphs), `measure.sh` (one measurement job), `identity.sh`. |
+| `scripts/` | | `pins.env` (Go version and checksums), `stage.sh` (pinned downloads), `modgraph.sh` (module graphs; runnable alone as a local check), `measure.sh` (one measurement job), `identity.sh`. |
 
 ## Running it
 
@@ -97,8 +97,9 @@ verified them: they come from the workflow.
    (default checksum database) and uploads `go-sum-proposal/<adapter>/go.{mod,sum}`. No candidate is built, run or measured.
 2. Review the proposal (module list, versions against the plan, sums against the sum database) and commit the files to `main`.
 3. A normal run **stops before any candidate step** unless a committed `go.mod` and `go.sum` exist for every adapter. It then
-   downloads with `-mod=readonly`, runs `go mod verify` and `go list -deps`, fails if either file would change, and records
-   `go list -m all` and the file hashes with the results. Builds use `GOPROXY=off` and the staged cache.
+   downloads with `-mod=readonly`, runs `go mod verify` and `go list -deps`, fetches the `go.mod` of every module of the graph with `go list -m all`, fails if either
+   file would change, and records that listing and the file hashes with the results. It then repeats the listing and `go list -deps`
+   with `GOPROXY=off` and fails unless they succeed from the cache. Builds use `GOPROXY=off` and the staged cache.
 
 ## What is measured
 
