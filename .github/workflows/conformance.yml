@@ -106,13 +106,21 @@ jobs:
       # architecture and image version, the compiler and Go versions, the group's grammar list, and the content of pins.json, the
       # native-ref sources, the patches and the Go packages native-ref imports, and this file. tools/native-ref/cachesums.sh records the
       # sha256 of every cached file and refuses a restore that differs, so a damaged entry falls back to the build below.
-      - name: Native reference cache identity
+      - name: Native reference cache identity and key
         id: native-id
+        env:
+          GROUP_NAME: ${{ matrix.group.name }}
+          INPUTS_HASH: ${{ hashFiles('tools/gen/pins.json', 'tools/gen/go.mod', 'tools/gen/go.sum', 'tools/gen/patches/**', 'tools/gen/grammarpatch/**', 'tools/bench/proc/**', 'tools/native-ref/**', '.github/workflows/conformance.yml') }}
         run: |
           ident=$(printf '%s\n' "${ImageOS:-}-${ImageVersion:-}" "$(gcc --version | head -1)" "$(go version)" "$GROUP_LANGS")
           printf '%s\n' "$ident"
-          # A runner that states no image version is not cached.
-          [ -z "${ImageVersion:-}" ] || echo "id=$(printf '%s' "$ident" | sha256sum | cut -c1-32)" >> "$GITHUB_OUTPUT"
+          # A runner that states no image version is not cached. The key is computed once, here, before anything else runs, and reused
+          # to restore and to save, so a file that changes during the job cannot make the two differ.
+          if [ -n "${ImageVersion:-}" ]; then
+            id=$(printf '%s' "$ident" | sha256sum | cut -c1-32)
+            echo "id=$id" >> "$GITHUB_OUTPUT"
+            echo "key=conformance-native-$RUNNER_OS-$RUNNER_ARCH-$GROUP_NAME-$id-$INPUTS_HASH" | tee -a "$GITHUB_OUTPUT"
+          fi
       - name: Restore the built native references
         id: native-cache
         if: ${{ steps.native-id.outputs.id != '' }}
@@ -124,7 +132,7 @@ jobs:
             ${{ runner.temp }}/queries
             ${{ runner.temp }}/scanner-stages
             ${{ runner.temp }}/native-cache.sums
-          key: conformance-native-${{ runner.os }}-${{ runner.arch }}-${{ matrix.group.name }}-${{ steps.native-id.outputs.id }}-${{ hashFiles('tools/gen/pins.json', 'tools/gen/go.mod', 'tools/gen/go.sum', 'tools/gen/patches/**', 'tools/gen/grammarpatch/**', 'tools/bench/proc/**', 'tools/native-ref/**', '.github/workflows/conformance.yml') }}
+          key: ${{ steps.native-id.outputs.key }}
       - name: Verify the restored native references
         id: native-ready
         # The archives must be restored too: the YAML patch comparison below compiles the unpatched grammar from them.
@@ -134,13 +142,14 @@ jobs:
             echo "usable=true" >> "$GITHUB_OUTPUT"
             echo "native references restored from the cache: $(sed -n 2p "$RUNNER_TEMP/native-cache.sums")" | tee -a "$GITHUB_STEP_SUMMARY"
           else
-            echo "::warning::the restored native references do not match their recorded checksums; building them"
+            echo "::warning::the restored native references do not match their recorded checksums; building them. This cache entry stays unusable (an existing key cannot be overwritten) until the key changes"
             rm -rf "$RUNNER_TEMP/exe" "$RUNNER_TEMP/corpus" "$RUNNER_TEMP/queries" "$RUNNER_TEMP/scanner-stages"
           fi
       - name: Build the native-ref and ciconf tools
         working-directory: tools/native-ref
         env:
           CGO_ENABLED: "0"
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           [ "$GROUP_DOCS" != true ] || go test -count=1 ./...
           go build -o "$RUNNER_TEMP/native-ref" .
@@ -261,7 +270,7 @@ jobs:
             ${{ runner.temp }}/queries
             ${{ runner.temp }}/scanner-stages
             ${{ runner.temp }}/native-cache.sums
-          key: conformance-native-${{ runner.os }}-${{ runner.arch }}-${{ matrix.group.name }}-${{ steps.native-id.outputs.id }}-${{ hashFiles('tools/gen/pins.json', 'tools/gen/go.mod', 'tools/gen/go.sum', 'tools/gen/patches/**', 'tools/gen/grammarpatch/**', 'tools/bench/proc/**', 'tools/native-ref/**', '.github/workflows/conformance.yml') }}
+          key: ${{ steps.native-id.outputs.key }}
       - name: Save the verified archive cache
         if: ${{ success() && github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.dl-cache.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v5

@@ -25,7 +25,8 @@ class NativeCacheKeyTest(unittest.TestCase):
 
     def test_key_covers_what_native_ref_imports(self):
         text = (ROOT / ".github/workflows/conformance.yml").read_text(encoding="utf-8")
-        key = re.search(r"key: (conformance-native-.*)", text).group(1)
+        key = re.search(r"INPUTS_HASH: (.*hashFiles\(.*)", text).group(1)  # the key is computed once, in the identity step
+        self.assertIn("key: ${{ steps.native-id.outputs.key }}", text)
         patterns = re.findall(r"'([^']+)'", key)
         todo, seen = ["tools/native-ref"], set()
         while todo:
@@ -45,10 +46,20 @@ class NativeCacheKeyTest(unittest.TestCase):
 class CacheSumsTest(unittest.TestCase):
     def setUp(self):
         self.bash = shutil.which("bash")
-        if not self.bash or not shutil.which("sha256sum"):
+        reason = None
+        if not self.bash:
+            reason = "no bash"
+        elif "system32" in self.bash.lower().replace("/", "\\"):
+            reason = "bash is the WSL launcher (System32), not a shell with the GNU tools"
+        else:
+            probe = subprocess.run([self.bash, "-c", "command -v sha256sum xargs sort find >/dev/null && echo ok"],
+                                   capture_output=True, text=True, timeout=60)
+            if probe.stdout.strip() != "ok":
+                reason = "this bash lacks sha256sum, xargs, sort or find"
+        if reason:
             if sys.platform.startswith("linux"):
-                self.fail("bash and sha256sum are needed")
-            self.skipTest("bash and sha256sum are needed")
+                self.fail(reason)
+            self.skipTest(reason)
 
     def run_sums(self, mode, d):
         return subprocess.run([self.bash, str(ROOT / "tools/native-ref/cachesums.sh"), mode, Path(d).as_posix()],
