@@ -239,6 +239,29 @@ func TestGrowRefusalTraps(t *testing.T) {
 	}
 }
 
+// A wild pointer handed to the module must end in a *Trap, never in a crash or a silent access: a software bounds
+// check in the baseline recipe, a hardware guard-page fault in the guard-page recipe (engine.Call's SetPanicOnFault).
+func TestOutOfRangeAccessTraps(t *testing.T) {
+	for _, off := range []int64{16, 1 << 16, 3 << 16, 1 << 30, 1<<31 + 5, 1<<32 - 16} { // end of memory + off, or the absolute address when above 1<<30
+		for name, call := range map[string]func(m engine.Module, p int32){
+			"parse":     func(m engine.Module, p int32) { m.Xtsg_parse(p, 64, 0) },
+			"free":      func(m engine.Module, p int32) { m.Xfree(p) },
+			"tree_edit": func(m engine.Module, p int32) { m.Xtsg_tree_edit(p, 0, 1, 1, 0, 0, 0, 1, 0, 1) },
+		} {
+			m, mem := newInstance(t, engine.MinLimit) // a trapped instance is discarded, as the parser does
+			p := int32(uint32(off))
+			if off < 1<<30 {
+				p = int32(len(*mem) + int(off))
+			}
+			var trap *engine.Trap
+			if err := engine.Call(func() { call(m, p) }); !errors.As(err, &trap) {
+				t.Fatalf("%s at %#x: got %v, want *engine.Trap", name, p, err)
+			}
+			engine.Release(mem)
+		}
+	}
+}
+
 func TestIdentityMatchesProvenance(t *testing.T) {
 	b, err := os.ReadFile("provenance.json")
 	if err != nil {

@@ -69,6 +69,13 @@ func main() {
 		}
 		return
 	}
+	if len(os.Args) > 1 && os.Args[1] == "guard-pages" {
+		if err := runGuardPagesCommand(os.Args[2:], os.Stdout); err != nil {
+			fmt.Fprintln(os.Stderr, "gen:", err)
+			os.Exit(1)
+		}
+		return
+	}
 	if len(os.Args) > 1 && os.Args[1] == "cp949" {
 		if err := runCP949Command(os.Args[2:], os.Stdout); err != nil {
 			fmt.Fprintln(os.Stderr, "gen cp949:", err)
@@ -239,6 +246,11 @@ func run(o opts) error {
 	}
 	if patched, err = patchNewMemory(patched); err != nil {
 		return err
+	}
+	if rc.guard {
+		if patched, _, err = patchGuardPages(patched); err != nil {
+			return err
+		}
 	}
 	if rc.embed { // wasm2go -embed leaves no blank line before the directive, which gofmt -l reports
 		patched = strings.Replace(patched, "}\n//go:embed engine_gen.dat\n", "}\n\n//go:embed engine_gen.dat\n", 1)

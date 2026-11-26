@@ -65,3 +65,4 @@ understand whether the contract is still right.
 | 0027 | One pinned generator CLI for every grammar | Accepted 2026-11-16, implemented in `tools/gen`; amends ADR-0020 decision 1 |
 | 0028 | Root 1.x stability and independent grammar versioning | Accepted 2026-11-24; decisions 1 and 3 amended 2026-11-25 (root scope, RC bench, RC exit, Windows resources) |
 | 0029 | Included ranges for multi-language documents | Proposed 2026-11-25; implementation deferred until after 1.0 |
+| 0031 | Hardware guard pages instead of per-access bounds checks in generated modules | Proposed (prototype) |

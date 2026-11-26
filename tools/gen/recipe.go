@@ -11,15 +11,17 @@ import (
 type recipe struct {
 	opt   string // wasm-opt level ("-O3", "-Oz"), "" = no wasm-opt
 	embed bool   // wasm2go -embed: engine_gen.dat next to engine_gen.go
+	guard bool   // patchGuardPages: hardware guard pages instead of per-access bounds checks (needs engine.NewMemory)
 }
 
 var recipes = map[string]recipe{
-	"v0":    {},
-	"v1-O3": {opt: "-O3"},
-	"v1-Oz": {opt: "-Oz"},
-	"v2-v0": {embed: true},
-	"v2-O3": {opt: "-O3", embed: true},
-	"v2-Oz": {opt: "-Oz", embed: true},
+	"v0":          {},
+	"v1-O3":       {opt: "-O3"},
+	"v1-Oz":       {opt: "-Oz"},
+	"v2-v0":       {embed: true},
+	"v2-O3":       {opt: "-O3", embed: true},
+	"v2-Oz":       {opt: "-Oz", embed: true},
+	"v3-guard-O3": {opt: "-O3", embed: true, guard: true},
 }
 
 // optFeatures declares what clang emitted: `--strip-all` removes the target_features section, so wasm-opt would
@@ -63,6 +65,9 @@ func (r recipe) recipeLines(name string, pins *Pins) string {
 	}
 	if r.embed {
 		s += "\nwasm2go-embed=engine_gen.dat"
+	}
+	if r.guard {
+		s += "\nguard-pages.helpers.original=" + helperBlockSHA256 + "\nguard-pages.helpers.replacement=" + sumBytes([]byte(guardHelpers))
 	}
 	return s
 }

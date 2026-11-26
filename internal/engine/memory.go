@@ -20,8 +20,17 @@ const (
 	MinLimit     = 32 << 20
 	MaxLimit     = 4 << 30 // wasm32 address space
 
+	// GuardSize is the PROT_NONE / MEM_RESERVE tail after the 4 GiB wasm32 address space of a guarded instance. A
+	// module generated without software bounds checks (recipe v3-guard-O3) keeps every static offset plus access size
+	// below it; tools/gen emits a compile-time assertion against GuardSize.
+	GuardSize = 64 << 20
+
 	pageSize = 1 << 16
 )
+
+// ErrReserve reports that a guarded instance cannot get its address space (the unchecked module cannot fall back to
+// the heap). StartMemory panics with it, so Call turns it into *Trap.
+var ErrReserve = errors.New("engine: cannot reserve guarded address space")
 
 // ErrLimitRange reports a SetLimit value outside [MinLimit, MaxLimit]; it is never clamped.
 var ErrLimitRange = errors.New("engine: memory limit out of range")
@@ -34,6 +43,7 @@ type state struct {
 	committed int64
 	refused   bool
 	pending   *initMem // set by InitMemory, consumed by StartMemory
+	guarded   bool     // region is 4 GiB + GuardSize and the module has no bounds checks: only the committed prefix is accessible
 	cleanup   runtime.Cleanup
 }
 
@@ -44,8 +54,9 @@ type Segment struct {
 }
 
 type initMem struct {
-	size int
-	segs []Segment
+	size    int
+	guarded bool
+	segs    []Segment
 }
 
 // live maps uintptr(mem) -> *state. A uintptr key keeps the module collectable so the AddCleanup safety net can fire.
@@ -111,19 +122,21 @@ func SetLimit(mem *[]byte, bytes int64) error {
 	return nil
 }
 
-// open reserves the region for limit, commits its first n bytes and records it; the caller sets *mem.
-func (st *state) open(limit int64, n int) ([]byte, int, error) {
-	size := int((limit + pageSize - 1) &^ (pageSize - 1))
+// open reserves a region of size bytes, commits its first n bytes and records it; the caller sets *mem.
+func (st *state) open(size, n int) ([]byte, error) {
 	if err := st.reg.reserve(size); err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 	if err := st.reg.commit(0, n); err != nil {
 		st.reg.release()
-		return nil, 0, err
+		return nil, err
 	}
 	st.reserved, st.committed = true, int64(n)
-	return st.reg.slice(), size, nil
+	return st.reg.slice(), nil
 }
+
+// limitSize is the legacy reservation size for limit.
+func limitSize(limit int64) int { return int((limit + pageSize - 1) &^ (pageSize - 1)) }
 
 func (st *state) limitOrDefault() int64 {
 	if st.limit == 0 {
@@ -136,10 +149,18 @@ func (st *state) limitOrDefault() int64 {
 // into it: it only records them (*mem stays nil, the segments are not copied). StartMemory, called at the start of
 // X_initialize after SetLimit, creates the reserved region and writes the segments straight into it, so the data is
 // copied once and no initial-size Go-heap slice exists.
-func InitMemory(mem *[]byte, size int, segs ...Segment) {
+func InitMemory(mem *[]byte, size int, segs ...Segment) { initMemory(mem, size, false, segs) }
+
+// InitGuardedMemory is InitMemory for a module generated without software bounds checks (recipe v3-guard-O3).
+// StartMemory then reserves 4 GiB + GuardSize whatever the limit (which only caps the committed bytes), so every
+// address the module can form is committed or faults, and the base address never changes. A fault inside Call becomes
+// *Trap; touching the instance outside Call, or after Release, is not allowed.
+func InitGuardedMemory(mem *[]byte, size int, segs ...Segment) { initMemory(mem, size, true, segs) }
+
+func initMemory(mem *[]byte, size int, guarded bool, segs []Segment) {
 	st := stateOf(mem, true)
 	st.mu.Lock()
-	st.pending = &initMem{size, segs}
+	st.pending = &initMem{size, guarded, segs}
 	st.mu.Unlock()
 }
 
@@ -158,6 +179,9 @@ func StartMemory(mem *[]byte) {
 		return
 	}
 	st.pending = nil
+	if st.reserved {
+		panic(fmt.Errorf("%w: the instance already has memory", ErrReserve))
+	}
 	limit := st.limitOrDefault()
 	if int64(p.size) > limit {
 		st.refused = true
@@ -166,10 +190,25 @@ func StartMemory(mem *[]byte) {
 	if p.size == 0 {
 		return
 	}
-	s, size, err := st.open(limit, p.size)
+	size, capacity := limitSize(limit), 0 // capacity 0: the whole reservation
+	if p.guarded {
+		total := int64(1)<<32 + GuardSize // a variable: the constant overflows int on 32-bit targets, which must still compile
+		if int64(int(total)) != total || p.size%pageSize != 0 {
+			st.refused = true
+			panic(fmt.Errorf("%w: needs a 64-bit address space and whole pages (initial %d)", ErrReserve, p.size))
+		}
+		size, capacity, st.guarded = int(total), p.size, true // cap == len: host-side slicing stays bounds-checked
+	}
+	s, err := st.open(size, p.size)
 	if err != nil {
 		st.refused = true
+		if p.guarded {
+			panic(fmt.Errorf("%w: %v", ErrReserve, err))
+		}
 		panic(fmt.Sprintf("engine: initial memory: %v", err))
+	}
+	if capacity == 0 {
+		capacity = size
 	}
 	for _, sg := range p.segs {
 		if sg.Dest < 0 || sg.Dest > p.size || len(sg.Data) > p.size-sg.Dest {
@@ -178,7 +217,7 @@ func StartMemory(mem *[]byte) {
 		}
 		copy(s[sg.Dest:], sg.Data)
 	}
-	*mem = s[:p.size:size]
+	*mem = s[:p.size:capacity]
 }
 
 // MemoryGrow replaces the generated memory_grow: same contract (old page count, or -1 on failure) and it sets the
@@ -208,9 +247,14 @@ func MemoryGrow(mem *[]byte, delta, max int64) int64 {
 		if st.reg.commit(len(buf), nl-len(buf)) != nil {
 			return refuse()
 		}
-		*mem = buf[:nl]
+		if st.guarded {
+			*mem = st.reg.slice()[:nl:nl]
+		} else {
+			*mem = buf[:nl]
+		}
 	} else {
-		s, size, err := st.open(limit, nl)
+		size := limitSize(limit)
+		s, err := st.open(size, nl)
 		if err != nil {
 			return refuse()
 		}
@@ -275,10 +319,14 @@ func release(mem *[]byte) (released bool, err error) {
 	return released, err
 }
 
-// Call runs fn; any panic from it (generated-code trap) becomes *Trap. A hardware fault on unmapped memory is not a
-// panic and cannot be captured; the provider keeps every reachable address either committed or bounds-checked.
+// Call runs fn; any panic from it (generated-code trap) becomes *Trap. A hardware fault on a guarded instance's
+// uncommitted memory is a panic too, because Call sets SetPanicOnFault for the calling goroutine and restores the
+// previous value on return (nested calls and other goroutines are unaffected); the *Trap's Value is then a
+// runtime.Error with an Addr method. Code that touches a guarded instance outside Call crashes the process on a fault.
 func Call(fn func()) (err error) {
+	prev := debug.SetPanicOnFault(true)
 	defer func() {
+		debug.SetPanicOnFault(prev)
 		if r := recover(); r != nil {
 			err = &Trap{Value: r, Stack: debug.Stack()}
 		}
