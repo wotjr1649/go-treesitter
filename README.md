@@ -18,15 +18,17 @@ Start with [AGENTS.md](AGENTS.md) and the [documentation map](docs/README.md). T
 Use it when your Go program should not depend on a C toolchain. The library builds with `CGO_ENABLED=0`
 ([getting started](docs/guides/getting-started.md): no C compiler is needed), so:
 
-- cross-compiling needs no C cross-compiler, and a binary can be built statically;
+- cross-compiling needs no C cross-compiler;
 - Windows needs no C toolchain (Windows amd64 is the Tier-1 platform; the other platforms claimed are listed under
   [Support](#support));
 - each `Parser` runs its grammar in its own translated-wasm instance, and its linear memory can be capped
   (`WithMaxMemoryBytes`), with input size, snapshot size and query budgets and `context` cancellation alongside, which
-  bounds the cost of parsing untrusted input ([resource limits and cancellation](docs/guides/getting-started.md#resource-limits-and-cancellation)).
+  lets you limit the cost of parsing untrusted input ([resource limits and cancellation](docs/guides/getting-started.md#resource-limits-and-cancellation)).
+  These are limits, not a sandbox: see [running untrusted queries](docs/design/query-abi.md#running-untrusted-queries).
 
 It runs the upstream tree-sitter runtime and grammar C pinned in [pins.json](tools/gen/pins.json), translated by
-`tools/gen`. Failures come back as one result contract: a complete tree, or a `*ParseError` with an `Outcome`
+`tools/gen`. Results come back as one contract: a tree (syntax errors appear as ERROR or MISSING nodes, not Go errors), or a
+`*ParseError` with an `Outcome`
 ([parser-result](docs/specs/parser-result.md)). What is not shown yet is on the
 [limitations](docs/reports/limitations.md) page.
 
@@ -167,9 +169,10 @@ Contracts: [`docs/specs/parser-result.md`](docs/specs/parser-result.md), [`docs/
   use `ParseSnapshot` when the result must outlive the parser or be shared between goroutines.
 - **Create a `Query` once and reuse it.** `NewQuery` compiles the pattern in the grammar's engine on a scratch
   `Parser` that it creates and closes on every call, so each call costs at least a `NewParser` plus the compile. Each
-  `Parser` compiles a `Query` once more on its first `Tree.Matches`, at about the same cost. The compile cost follows the
-  pattern's structure, not its length. A local Windows diagnostic (commit `7ffa3f9`, host CPU load 97–100%, 2026-11-26;
-  E4 in the terms of docs/specs/validation.md) took one `NewQuery` call about 33–191 ms with tsql queries, 9–64 ms with typescript
+  `Parser` compiles a `Query` once more on its first `Tree.Matches`, at about the same cost. In these measurements the
+  compile cost did not follow the pattern's length (a 4.7 KB tsql query took longer than an 11 KB one). A one-off local
+  Windows diagnostic, not retained (commit `7ffa3f9`, host CPU load 97–100%, 2026-11-26; E2 in the terms of
+  docs/specs/validation.md; absolute values vary with load) took one `NewQuery` call about 33–191 ms with tsql queries, 9–64 ms with typescript
   queries and 0.1 ms with json queries. A `Query` is immutable and may be shared by parsers of its language: cache it and do not call
   `NewQuery` per file or per request.
 - The first parse on a new instance is slower than later ones (memory pages are committed on first use), another
