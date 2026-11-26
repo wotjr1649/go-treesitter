@@ -4,7 +4,8 @@
 Every PR-required workflow starts with a cheap "changes" job that runs this script and feeds its outputs to job-level
 "if" conditions (a job skipped by "if" counts as passing for a required check; a workflow-level paths filter would leave
 the check pending forever) and, for engine.yml and conformance.yml, to dynamic matrices. A gate job per workflow then
-fails when "changes" or any needed job failed or was cancelled, or when a job the "expect" output lists did not succeed.
+fails when "changes" or any needed job failed or was cancelled, or when a job the "expect" output lists did not succeed. The engine and
+conformance gates also count the matrix instances that succeeded against "expect_matrix" (and, outside pull requests, against the full size).
 
     ci_changes.py --workflow engine|regen|conformance|windows|api-guard|pin-move [--files FILE]
 
@@ -133,6 +134,21 @@ JOB_IF = {
 }
 
 
+# Matrix jobs whose instance count a dynamic matrix decides: the job name (workflow "name:" with the matrix values filled in) per instance
+# and the output that holds the matrix. The gate checks that the successful jobs of the run are exactly the instances listed in
+# "expect_matrix": a matrix that comes out smaller (a classifier regression) would otherwise leave every needed job green.
+# test_ci_changes.py compares the templates with the "name:" lines of the workflows.
+ENGINE_MATRIX_JOBS = {
+    "grammar-linux-amd64": ("grammar (ubuntu-24.04, Go 1.27.x, shard %d)", "engine_shards"),
+    "grammar-linux-arm64": ("grammar (ubuntu-24.04-arm, Go 1.27.x, shard %d)", "engine_shards"),
+    "grammar-macos-arm64": ("grammar (macos-latest, Go 1.27.x, shard %d)", "engine_shards"),
+    "grammar-windows-amd64": ("grammar (windows-latest, Go 1.27.x, shard %d)", "engine_shards"),
+    "grammar-windows-arm64": ("grammar (windows-11-arm, Go 1.27.x, shard %d)", "engine_shards"),
+    "grammar-go126": ("grammar (ubuntu-24.04, Go 1.26.x, shard %d)", "floor_shards"),
+}
+CONFORMANCE_MATRIX_JOB = "conformance (%s, %s)"  # job conformance-grammar: runner, group name
+
+
 def partition_ok(root):
     present = sorted(p.name for p in (Path(root) / "grammars").iterdir() if p.is_dir())
     for name, table in (("engine shards", [s["grammars"] for s in ENGINE_SHARDS]),
@@ -159,12 +175,18 @@ def decide(workflow, files, event, root=None):
         out["engine_shards"] = json.dumps({"include": ENGINE_SHARDS}, separators=(",", ":"))
         floor = ENGINE_SHARDS if out["full"] == "true" else ENGINE_SHARDS[:1]
         out["floor_shards"] = json.dumps({"include": floor}, separators=(",", ":"))
-    out["expect"] = json.dumps([j for j, keys in JOB_IF[workflow].items() if all(out[k] == "true" for k in keys)], separators=(",", ":"))
+    expect = [j for j, keys in JOB_IF[workflow].items() if all(out[k] == "true" for k in keys)]
+    out["expect"] = json.dumps(expect, separators=(",", ":"))
+    if workflow == "engine":
+        names = [tmpl % s["shard"] for j, (tmpl, key) in ENGINE_MATRIX_JOBS.items() if j in expect for s in json.loads(out[key])["include"]]
     if workflow == "conformance":
         groups = CONFORMANCE_GROUPS if out["conformance_full"] == "true" else CONFORMANCE_GROUPS[:1]
         runners = RUNNERS if out["conformance_full"] == "true" else RUNNERS[:1]
         include = [dict(r, group=g) for g in groups for r in runners]
         out["conformance_matrix"] = json.dumps({"include": include}, separators=(",", ":"))
+        names = [CONFORMANCE_MATRIX_JOB % (e["runner"], e["group"]["name"]) for e in include]
+    if workflow in ("engine", "conformance"):
+        out["expect_matrix"] = json.dumps(names, separators=(",", ":"))
     return out
 
 
@@ -207,7 +229,7 @@ def main(argv=None):
         with open(summary, "a", encoding="utf-8") as fh:
             fh.write("### %s: %s (event %s, %d changed files)\n\n" % (
                 args.workflow, out["classes"], args.event or "-", len(files) if files else 0))
-            fh.write("".join("- %s: %s\n" % (k, v) for k, v in out.items() if k not in ("classes", "engine_shards", "floor_shards", "conformance_matrix")))
+            fh.write("".join("- %s: %s\n" % (k, v) for k, v in out.items() if k not in ("classes", "engine_shards", "floor_shards", "conformance_matrix", "expect_matrix")))
     return 0
 
 

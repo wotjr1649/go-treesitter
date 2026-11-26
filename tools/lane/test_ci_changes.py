@@ -236,6 +236,111 @@ class WiringTest(unittest.TestCase):
         self.assertEqual(json.loads(flags("windows", None)["expect"]), ["product", "licenses", "race"])
 
 
+MATRIX_STEP = "The successful matrix jobs are the expected instances"
+
+
+def matrix_step(wf):
+    """(env mapping, run script) of the matrix-count step of a gate; it is the last step of engine.yml and conformance.yml."""
+    text = workflow_text(wf)
+    block = text[text.index("- name: %s\n" % MATRIX_STEP):]
+    env = dict(re.findall(r"^ {10}([A-Z_]+): (.*)$", block.split("        run: |\n")[0], flags=re.M))
+    script = "\n".join(l[10:] for l in block.split("        run: |\n")[1].splitlines())
+    return env, script
+
+
+class MatrixCountTest(unittest.TestCase):
+    """The gate counts the successful instances of the dynamic matrices, so a matrix that shrank cannot pass as a full run."""
+
+    def names(self, wf, files, event="pull_request"):
+        return json.loads(flags(wf, files, event)["expect_matrix"])
+
+    def test_expected_instances(self):
+        self.assertEqual(self.names("conformance", ["README.md"]), ["conformance (ubuntu-24.04, g1)"])
+        full = self.names("conformance", ["tools/conformance/a_test.go"])
+        self.assertEqual(len(full), 10)
+        self.assertIn("conformance (ubuntu-24.04-arm, g5)", full)
+        self.assertEqual(self.names("engine", ["README.md"]), [])  # only engine (ubuntu-24.04), which has no matrix
+        self.assertEqual(self.names("engine", ["tools/gen/pins.json"]), [])  # no grammar shards: drift is regen's
+        pr = self.names("engine", ["query.go"])
+        self.assertEqual(len(pr), 5 + 5 + 1)  # linux-amd64 and windows-amd64 shards, one floor shard
+        self.assertIn("grammar (ubuntu-24.04, Go 1.26.x, shard 1)", pr)
+        self.assertNotIn("grammar (ubuntu-24.04, Go 1.26.x, shard 2)", pr)
+        for wf in cc.WORKFLOWS:
+            if wf not in ("engine", "conformance"):
+                self.assertNotIn("expect_matrix", flags(wf, ["README.md"]))
+
+    def test_full_runs_have_the_full_size(self):
+        for wf, files in (("engine", ["README.md"]), ("conformance", ["README.md"])):
+            for ev in ("push", "workflow_dispatch", "schedule"):
+                env, _ = matrix_step(wf)
+                size = int(re.search(r"'(\d+)'", env["FULL"]).group(1))
+                self.assertEqual(len(self.names(wf, files, ev)), size, (wf, ev))
+        self.assertEqual(len(cc.CONFORMANCE_GROUPS) * len(cc.RUNNERS), 10)
+        self.assertEqual(len(cc.ENGINE_MATRIX_JOBS) * len(cc.ENGINE_SHARDS), 30)
+
+    def test_names_match_the_workflows(self):
+        text = workflow_text("engine")
+        parts = re.split(r"^  ([A-Za-z0-9_-]+):\s*$", text[text.index("\njobs:\n"):], flags=re.M)
+        job_text = {parts[i]: parts[i + 1] for i in range(1, len(parts), 2)}
+        for job, (tmpl, key) in cc.ENGINE_MATRIX_JOBS.items():
+            self.assertIn("    name: %s\n" % (tmpl % 0).replace("0)", "${{ matrix.shard }})"), job_text[job], job)
+            # engine_shards sits in a YAML anchor shared by the five platform jobs; the floor job has its own matrix
+            self.assertIn("fromJSON(needs.changes.outputs.%s)" % key, job_text[job] if key == "floor_shards" else text, job)
+        self.assertIn("    name: conformance (${{ matrix.runner }}, ${{ matrix.group.name }})\n", workflow_text("conformance"))
+        self.assertEqual(cc.CONFORMANCE_MATRIX_JOB, "conformance (%s, %s)")
+
+    def test_pattern_selects_only_the_matrix_jobs(self):
+        for wf, files, others in (("engine", ["tools/conformance/x.go"], ["engine (ubuntu-24.04)", "engine, oldest supported Go (ubuntu-24.04)", "engine-gate", "engine-changes"]),
+                                  ("conformance", ["tools/conformance/x.go"], ["conformance (ubuntu-24.04)", "conformance (ubuntu-24.04-arm)", "conformance-gate", "conformance-changes"])):
+            env, _ = matrix_step(wf)
+            rx = re.compile(env["MATRIX_RE"].strip("'"))
+            self.assertTrue(all(rx.search(n) for n in self.names(wf, files, "push")), wf)
+            self.assertFalse(any(rx.search(n) for n in others), wf)
+
+    def test_both_gates_run_the_same_script(self):
+        self.assertEqual(matrix_step("engine")[1], matrix_step("conformance")[1])
+
+    def run_step(self, wf, listed, ran, event="pull_request"):
+        import shutil
+        import tempfile
+        bash = shutil.which("bash")
+        if not bash or not shutil.which("jq"):
+            if sys.platform.startswith("linux"):
+                self.fail("bash and jq are needed to run the gate step")
+            self.skipTest("bash and jq are needed to run the gate step")
+        env, script = matrix_step(wf)
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "gh").write_text('#!/bin/sh\ncat "$GH_FIXTURE"\n', newline="\n")
+            Path(d, "gh").chmod(0o755)
+            Path(d, "jobs.txt").write_text("".join(n + "\n" for n in ran), encoding="utf-8")
+            full = re.search(r"'(\d+)'", env["FULL"]).group(1) if event != "pull_request" else ""
+            e = dict(os.environ, PATH=d + os.pathsep + os.environ.get("PATH", ""), GH_FIXTURE=str(Path(d, "jobs.txt")),
+                     EXPECT=listed, MATRIX_RE=env["MATRIX_RE"].strip("'"), FULL=full, GITHUB_REPOSITORY="o/r", GITHUB_RUN_ID="1")
+            res = subprocess.run([bash, "-e", "-c", script], env=e, capture_output=True)
+            self.last = (res.stdout + res.stderr).decode("utf-8", "replace").replace("\r", "<CR>")
+            return res.returncode
+
+    def test_step_logic(self):
+        c = self.names("conformance", ["tools/conformance/x.go"], "push")
+        other = ["conformance (ubuntu-24.04)", "conformance-gate", "changes"]  # successful jobs that are not matrix instances
+        j = lambda names: json.dumps(names)
+        self.assertEqual(self.run_step("conformance", j(c), c + other, "push"), 0, self.last)
+        self.assertEqual(self.run_step("conformance", j(c[:1]), c[:1] + other), 0)  # pull request: only g1
+        self.assertEqual(self.run_step("conformance", "[]", other), 0)
+        self.assertNotEqual(self.run_step("conformance", j(c), c[1:] + other, "push"), 0)  # one instance did not succeed
+        self.assertNotEqual(self.run_step("conformance", j(c[:1]), c + other), 0)  # more ran than listed
+        # A classifier regression: the matrix and the list shrink together. A push still demands the full size; a pull request cannot tell.
+        self.assertNotEqual(self.run_step("conformance", j(c[:1]), c[:1] + other, "push"), 0)
+        self.assertNotEqual(self.run_step("conformance", j(c[:9]), c[:9] + other, "push"), 0)
+        for bad in ("", "null", "{}", "conformance"):
+            self.assertNotEqual(self.run_step("conformance", bad, c + other, "push"), 0, bad)
+        e = self.names("engine", ["README.md"], "push")
+        self.assertEqual(len(e), 30)
+        self.assertEqual(self.run_step("engine", j(e), e + ["engine (ubuntu-24.04)"], "push"), 0)
+        self.assertNotEqual(self.run_step("engine", j(e[:25]), e[:25], "push"), 0)  # floor shards dropped on a push
+        self.assertNotEqual(self.run_step("engine", j(e), e[:-1], "push"), 0)
+
+
 class GateTest(unittest.TestCase):
     def test_every_changes_job_runs_the_lane_tests_and_the_base_classifier(self):
         for wf in GATE_WORKFLOWS:

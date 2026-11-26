@@ -37,6 +37,7 @@ jobs:
       engine_shards: ${{ steps.classify.outputs.engine_shards }}
       floor_shards: ${{ steps.classify.outputs.floor_shards }}
       expect: ${{ steps.classify.outputs.expect }}
+      expect_matrix: ${{ steps.classify.outputs.expect_matrix }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -318,6 +319,8 @@ jobs:
   # job succeeded or was skipped on purpose (a skipped required check would otherwise pass even when its dependency failed).
   engine-gate:
     name: engine-gate
+    permissions:
+      actions: read # list the jobs of this run
     if: ${{ always() }}
     needs: [changes, engine-linux-amd64, engine-linux-arm64, engine-macos-arm64, engine-windows-amd64, engine-windows-arm64, engine-go126, engine-consumer-compat, grammar-linux-amd64, grammar-linux-arm64, grammar-macos-arm64, grammar-windows-amd64, grammar-windows-arm64, grammar-go126]
     runs-on: ubuntu-24.04
@@ -327,3 +330,17 @@ jobs:
         env:
           NEEDS: ${{ toJSON(needs) }}
         run: jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped '. as $n | all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok and all(.changes.outputs.expect | fromjson[]; $n[.].result == $ok)' <<<$NEEDS
+      # The needed jobs above are one result per matrix, so a matrix that came out smaller than it should (a classifier regression) stays green.
+      # Count the successful instances in the run: they must be exactly the ones the classifier listed and, outside pull requests, the full
+      # matrix (30 jobs; test_ci_changes.py ties the number to the partitions).
+      - name: The successful matrix jobs are the expected instances
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECT: ${{ needs.changes.outputs.expect_matrix }}
+          MATRIX_RE: '^grammar \('
+          FULL: ${{ github.event_name != 'pull_request' && '30' || '' }}
+        run: |
+          want=$(jq -nr --argjson e "$EXPECT" '$e[]' | tr -d '\r' | sort)
+          [ -z "$FULL" ] || [ "$(jq -n --argjson e "$EXPECT" '$e | length')" = "$FULL" ] || { echo "::error::the classifier listed $(jq -n --argjson e "$EXPECT" '$e | length') matrix jobs, the full run has $FULL"; exit 1; }
+          ok=$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs?per_page=100" --jq '.jobs[] | select(.conclusion == "success") | .name' | { grep -E "$MATRIX_RE" || true; } | sort)
+          [ "$ok" = "$want" ] || { echo "::error::the successful matrix jobs differ from the expected ones (< successful, > expected)"; diff <(echo "$ok") <(echo "$want"); exit 1; }

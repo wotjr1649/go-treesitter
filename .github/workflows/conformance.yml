@@ -28,6 +28,7 @@ jobs:
       conformance_full: ${{ steps.classify.outputs.conformance_full }}
       conformance_matrix: ${{ steps.classify.outputs.conformance_matrix }}
       expect: ${{ steps.classify.outputs.expect }}
+      expect_matrix: ${{ steps.classify.outputs.expect_matrix }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -149,7 +150,7 @@ jobs:
         run: |
           known=TestKnownGaps
           [ "$GROUP_DOCS" != true ] || known=TestKnownGap
-          go test -count=1 -timeout 40m -v -run "TestCorpus|TestEdits|TestFieldLookup|TestParserPoolRealEngine|$known|TestHeredocUTF8|TestScannerPatches|TestSymbolLookupNative" .
+          go test -count=1 -timeout 40m -v -run "TestCorpus|TestEdits|TestFieldLookup|TestParserPoolRealEngine|$known|TestHeredocUTF8|TestScannerPatches|TestSymbolLookupNative|TestMemoryLimitRealEngine" .
       # Query raw matches: every grammar's own queries/*.scm (pinned archive, sha256-verified) plus structural probes,
       # over the corpus inputs, byte-identical to `<native exe> query` (docs/design/query-abi.md, "Verification").
       # The HTML grammar in g5 also checks per-call match limits on the Go engine.
@@ -233,8 +234,24 @@ jobs:
     needs: [changes, conformance-grammar, conformance]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    permissions:
+      actions: read # list the jobs of this run
     steps:
       - name: Every needed job passed or was skipped on purpose
         env:
           NEEDS: ${{ toJSON(needs) }}
         run: jq -c 'map_values(.result)' <<<$NEEDS; jq -e --arg ok success --arg sk skipped '. as $n | all(.[]; .result == $ok or .result == $sk) and .changes.result == $ok and all(.changes.outputs.expect | fromjson[]; $n[.].result == $ok)' <<<$NEEDS
+      # The needed jobs above are one result per matrix, so a matrix that came out smaller than it should (a classifier regression) stays green.
+      # Count the successful instances in the run: they must be exactly the ones the classifier listed and, outside pull requests, the full
+      # matrix (10 jobs; test_ci_changes.py ties the number to the partitions).
+      - name: The successful matrix jobs are the expected instances
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECT: ${{ needs.changes.outputs.expect_matrix }}
+          MATRIX_RE: '^conformance \([^,)]+, g[0-9]+\)$'
+          FULL: ${{ github.event_name != 'pull_request' && '10' || '' }}
+        run: |
+          want=$(jq -nr --argjson e "$EXPECT" '$e[]' | tr -d '\r' | sort)
+          [ -z "$FULL" ] || [ "$(jq -n --argjson e "$EXPECT" '$e | length')" = "$FULL" ] || { echo "::error::the classifier listed $(jq -n --argjson e "$EXPECT" '$e | length') matrix jobs, the full run has $FULL"; exit 1; }
+          ok=$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs?per_page=100" --jq '.jobs[] | select(.conclusion == "success") | .name' | { grep -E "$MATRIX_RE" || true; } | sort)
+          [ "$ok" = "$want" ] || { echo "::error::the successful matrix jobs differ from the expected ones (< successful, > expected)"; diff <(echo "$ok") <(echo "$want"); exit 1; }
