@@ -133,6 +133,15 @@ so it remains visible in review. An override applies only to that ok→error res
 schema failures or a native process failure. A reviewer still decides whether the regression is acceptable;
 the override does not grant pin-change or release authority.
 
+`--phase fetch` / `--phase run --sandbox tools/gen/sandbox-run.sh` (the owner-local evidence workflow; `pin-move.yml` still runs both
+in one go, unsandboxed) split the same driver at the network boundary through `--cache`. `fetch` runs `native-ref -stage` for
+both sides and downloads the `url`/`npm` large inputs, storing archives, npm tarballs and inputs in the cache, and compares
+nothing (`report.json` only, no `summary.md`). `run` passes no `-fetch` (a missing cache entry is an error, never a download) and
+sends two kinds of command through the sandbox: the `native-ref` build (repository read-only, only that side's `work`, `exe`
+and `corpus` writable) and each native `dump` (only that grammar's tree read-only). The schema checks, `ciconf` and the
+derived large inputs stay on the host. The analysis (`classify`, results, report) is unchanged; a command receipt in `logs/`
+keeps the logical `args` and adds a `sandbox` list, and `report.json` records `phase` and the sandbox script hash.
+
 `summary.md` is appended to the job summary even after a comparison failure. The artifact retains `report.json`,
 per-grammar schemas/results, inputs, dumps and logs; extracted sources, executable binaries and download caches
 are excluded. This is native-before/native-after evidence, not Go/native C agreement or release readiness.
@@ -248,10 +257,31 @@ Runbook (the workflow is `upstream-autopr.yml`; it is dispatched by the owner an
 
 1. `gh workflow run upstream-autopr.yml -f grammar=<name> -f tag=<tag>`. The `propose` job summary shows the move (commits,
    compare URL, release and CHANGELOG links, licence hash change). Approve Environment `autopr-untrusted` for the run only
-   after reading it: the `evidence` job then runs third-party code (`tree-sitter generate`, wasm2go, native C builds; not
-   sandboxed yet, no token) and uploads `autopr-regenerated` and `autopr-evidence` (regen cost, pin-move summary).
+   after reading it: the `evidence` job then runs third-party code (`tree-sitter generate`, the scanner compile, wasm2go, native
+   C builds and the native dumps) and uploads `autopr-regenerated` and `autopr-evidence` (regen cost, pin-move summary).
+   It has no token, and its steps are split at the network boundary (next paragraph); read the log of each fetch step and of
+   `Prepare and check the sandbox` before trusting the run: a failed isolation check stops it before any execute step.
 2. On a new branch from `origin/main` download into new empty directories: `gh run download <run> -n autopr-proposal -D P`
    and `-n autopr-regenerated -D G`.
+   Where the job stands in S140 terms: the *fetch* steps (`REGEN_PHASE=fetch bash tools/gen/regen.sh`, `pin-move.py --phase
+   fetch`) are the only ones with network. They download and sha256-verify the pinned archives, the npm inputs of regenerated
+   grammars and the downloaded large comparison inputs, and run nothing that was downloaded (wasm2go is compiled by `go
+   install`, not run). The *execute* steps (`REGEN_PHASE=run`, `pin-move.py --phase run --sandbox tools/gen/sandbox-run.sh`)
+   run offline in bubblewrap with an empty environment (no token, no runner files), the checkout and the archives read-only,
+   and only the moved `grammars/<name>`, the work directory (`regen`, `out/pin-move/<lang>/<side>/{work,exe,corpus}`) and
+   Go's build cache writable. Not inside the sandbox: this repository's own Go and Python that orchestrate and read the results
+   (`gen`, `native-ref`, `ciconf`, `benchci`, `pin-move.py`, `git`), and the compile of wasm2go. Run locally the same way
+   (Linux with bubblewrap; there is no sandbox on Windows, so use the unphased forms there):
+   ```
+   REGEN_PHASE=fetch bash tools/gen/regen.sh W <name>…                       # network
+   bash tools/gen/sandbox-run.sh --ro "$PWD" --rw "$PWD/grammars/<name>" --rw W --ro W/dl --ro "$(go env GOROOT)" \
+     --rw GOBUILD --chdir "$PWD" --env "PATH=/usr/bin:$(go env GOROOT)/bin" --env REGEN_PHASE=run --env CGO_ENABLED=0 \
+     --env GOENV=off --env GOWORK=off --env GOTOOLCHAIN=local --env GOCACHE=GOBUILD/cache --env GOTMPDIR=GOBUILD/tmp -- \
+     /usr/bin/bash tools/gen/regen.sh W <name>…                               # offline (W, GOBUILD: absolute paths)
+   ```
+   Limits: a release-form grammar module (`go.mod` without `replace`) needs `go mod download` of the root module in `gen`
+   (`rootGoSum`), which the offline run cannot do; the v1 grammars are development form. A tampered archive cannot get past the
+   fetch step's sha256 check, but a pinned archive that is itself hostile still runs inside the sandbox only.
 3. Verify, then apply: `cd tools/gen && go run ./autopr -main ../.. -proposal P -regenerated G` (add `-apply` to copy). The
    guard refuses a `pins.json` change outside the candidate's entries, files outside `grammars/<name>/`, links, and changed
    `go.mod`/`go.sum`. For an independent check run `pinbump -out Q` locally and compare `Q/pins.json` with `P/pins.json`;
@@ -290,6 +320,12 @@ Without `ROOT_VERSION`, `regen.sh` reads each selected grammar's existing `go.mo
 development module keeps `replace ../..`. A release module keeps its minimum root and has no `replace`. The drift
 check therefore also works on a mixed tree. `ROOT_VERSION` (`gen -root-version`) applies to every grammar in that
 invocation. Pass an explicit language list for a subset and use a separate invocation for each minimum root version.
+
+`REGEN_PHASE=fetch|run` splits a run at its network boundary (the owner-local evidence workflow, Owner-local pin move above).
+`fetch` builds `gen`, downloads and verifies the archives, builds wasm2go and fetches the npm inputs of the selected grammars
+(`native-ref -stage`), and extracts nothing. `run` needs that work directory, downloads and builds nothing (a missing or
+changed archive is an error), extracts the verified archives and runs `gen` without `-fetch-npm`; its `gen` calls are the same
+as in an unphased run otherwise (`fetch_test.sh` compares them). Unset: both, as before.
 
 A stopped run continues with `REGEN_RESUME=1 bash tools/gen/regen.sh <same-work-dir> [remaining langs ...]`: the work directory
 may be non-empty, an archive already in it is downloaded again only if its sha256 does not match the pin (the check before

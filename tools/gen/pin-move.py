@@ -9,6 +9,7 @@ import os
 from pathlib import Path, PurePosixPath
 import platform
 import re
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -207,14 +208,29 @@ def safe_path(name):
     return Path(*p.parts)
 
 
+# benchci large-input kinds that download; the others (concat, json) derive from the corpus and need no network.
+NETWORK_KINDS = ("url", "npm")
+
+
 class Review:
-    def __init__(self, out, cache):
-        self.out, self.cache = out, cache
+    """phase None: fetch and run in one go, unsandboxed (pin-move.yml). phase "fetch": the only phase with network; it downloads
+    and verifies archives, npm inputs and large inputs into the cache and runs no fetched code. phase "run": offline (a missing
+    cache entry is an error) and every command that executes fetched code (native build, native dump) goes through sandbox, the
+    path of tools/gen/sandbox-run.sh."""
+
+    def __init__(self, out, cache, phase=None, sandbox=None):
+        if phase not in (None, "fetch", "run") or (phase == "run") != (sandbox is not None):
+            raise ValueError("phase run needs a sandbox, and only phase run takes one")
+        self.out, self.cache, self.phase, self.sandbox = out, cache, phase, sandbox
         self.serial = 0
         self.env = dict(os.environ, CGO_ENABLED="0", GOWORK="off", GOENV="off", GOTOOLCHAIN="local")
 
-    def command(self, args, cwd=ROOT, timeout=900, check=True):
+    def command(self, args, cwd=ROOT, timeout=900, check=True, mounts=None):
+        """mounts: sandbox-run.sh path options (--ro/--rw) for a command that executes fetched code; used when sandboxed."""
         self.serial += 1
+        logical = args
+        if self.sandbox is not None and mounts is not None:
+            args = ["bash", self.sandbox, *mounts, "--chdir", cwd, "--", *args]
         log = self.out / "logs" / f"{self.serial:04d}"
         started = time.monotonic()
         # File-backed output retains partial compiler/native evidence on failure or timeout.
@@ -230,8 +246,10 @@ class Review:
                 except BaseException as error:
                     failure = error
         finally:
-            receipt = {"args": [str(x) for x in args], "cwd": str(cwd),
+            receipt = {"args": [str(x) for x in logical], "cwd": str(cwd),
                        "timeout_seconds": timeout, "seconds": time.monotonic() - started, "exit": code}
+            if logical is not args:
+                receipt["sandbox"] = [str(x) for x in args[:args.index("--")]]
             if failure is not None:
                 receipt["error"] = repr(failure)
             write_json(log.with_suffix(".json"), receipt)
@@ -263,7 +281,7 @@ class Review:
             file = patch["file"]
             write(folder / safe_path(file), self.git("show", f"{ref}:tools/gen/{file}"))
         sources = [pins["runtime"], g]
-        if build:
+        if build or self.phase == "fetch":  # the fetch phase caches what any later build of this side needs
             sources.append(pins["wasiLibc"])
         if g.get("regenerate"):
             host = ("windows" if os.name == "nt" else platform.system().lower()) + "-" + ("arm64" if platform.machine().lower() in ("aarch64", "arm64") else "amd64")
@@ -279,22 +297,31 @@ class Review:
                 if sha(raw) != digest:
                     raise ValueError(f"corrupt archive cache: {digest}")
                 write(folder / "dl" / safe_path(source["archive"]), raw)
+        if self.phase and (self.cache / "npm").is_dir():  # lockfile-pinned npm tarballs; native-ref checks each one's integrity
+            shutil.copytree(self.cache / "npm", folder / "dl" / "npm", dirs_exist_ok=True)
+        if self.phase == "fetch":
+            # -stage downloads and verifies every archive and npm input a build needs and compiles and runs nothing.
+            self.command([self.tools["native-ref"], "-pins", pinfile, "-dl", folder / "dl", "-work", folder / "stage-work",
+                          "-stage", lang])
+            shutil.rmtree(folder / "stage-work", ignore_errors=True)
+            self.remember(folder, sources)
+            if (folder / "dl" / "npm").is_dir():
+                shutil.copytree(folder / "dl" / "npm", self.cache / "npm", dirs_exist_ok=True)
+            return folder
         args = [self.tools["native-ref"], "-pins", pinfile, "-dl", folder / "dl", "-work", folder / "work",
-                "-out", folder / "exe", "-fetch", "-cc", "gcc"]
+                "-out", folder / "exe", *([] if self.phase else ["-fetch"]), "-cc", "gcc"]
         if build:
             args += ["-corpus", folder / "corpus"]
         else:
             args += ["-nobuild"]
-        self.command([*args, lang])
-        for source in sources:
-            archive = folder / "dl" / safe_path(source["archive"])
-            if archive.exists():
-                raw = archive.read_bytes()
-                if sha(raw) != source["archiveSHA256"]:
-                    raise ValueError("archive hash mismatch after native build")
-                cached = self.cache / "archives" / source["archiveSHA256"]
-                if not cached.exists():
-                    write(cached, raw)
+        mounts = None
+        if self.sandbox is not None:  # offline: no -fetch above, so a missing archive fails here; dl stays read-only
+            for sub in ("work", "exe", "corpus"):
+                (folder / sub).mkdir(exist_ok=True)
+            mounts = ["--ro", ROOT, "--ro", self.tools["native-ref"], "--ro", folder,
+                      *[x for sub in ("work", "exe", "corpus") for x in ("--rw", folder / sub)]]
+        self.command([*args, lang], mounts=mounts)
+        self.remember(folder, sources)
         archive = folder / "dl" / safe_path(g["archive"])
         member = PurePosixPath(g["grammarDir"], "node-types.json").as_posix()
         schemas = []
@@ -317,6 +344,17 @@ class Review:
                           "-out", folder / "data", "-lang", "go" if lang == "golang" else lang, "-inputs-only"])
         return folder
 
+    def remember(self, folder, sources):
+        for source in sources:
+            archive = folder / "dl" / safe_path(source["archive"])
+            if archive.exists():
+                raw = archive.read_bytes()
+                if sha(raw) != source["archiveSHA256"]:
+                    raise ValueError("archive hash mismatch after native build")
+                cached = self.cache / "archives" / source["archiveSHA256"]
+                if not cached.exists():
+                    write(cached, raw)
+
     def large_inputs(self, lang, data, folder):
         manifest = json.loads((ROOT / "tools/bench/ci/large.json").read_bytes())
         entries = [e for e in manifest if e["lang"] == lang]
@@ -332,6 +370,11 @@ class Review:
                 write(folder / "large" / lang / safe_path(entry["file"]), raw)
             else:
                 missing.append(entry)
+        if self.phase == "fetch":  # concat and json inputs are derived from the corpus in the run phase
+            entries = [e for e in entries if e["kind"] in NETWORK_KINDS]
+            missing = [e for e in missing if e["kind"] in NETWORK_KINDS]
+        elif self.phase == "run" and any(e["kind"] in NETWORK_KINDS for e in missing):
+            raise ValueError(f"{lang}: a downloaded large input is not in the cache (the fetch phase must run first)")
         if missing:
             subset = folder / "large-manifest.json"
             write_json(subset, missing)
@@ -354,6 +397,11 @@ class Review:
         if status == "REMOVED":
             return row
         after = self.side(head, new, lang, "new", build=status != "ADDED")
+        if self.phase == "fetch":  # nothing is compared here: archives, npm inputs and downloaded large inputs go to the cache
+            if status != "ADDED":
+                self.side(base, old, lang, "old")
+                self.large_inputs(lang, "", self.out / lang)
+            return row
         if status == "ADDED":
             row["schema"] = "PASS (new only)"
             return row
@@ -389,7 +437,10 @@ class Review:
             try:
                 for side, folder in [("old", before), ("new", after)]:
                     exe = folder / "exe" / (lang + (".exe" if os.name == "nt" else ""))
-                    dump, code = self.command([exe, "dump", path], timeout=30, check=False)
+                    # Sandboxed: the native executable sees only this grammar's old and new trees, read-only.
+                    mounts = None if self.sandbox is None else ["--ro", self.out / lang]
+                    dump, code = self.command([exe, "dump", path], cwd=self.out / lang if mounts else ROOT, timeout=30,
+                                              check=False, mounts=mounts)
                     write(self.out / lang / "dumps" / side / safe_path(name + ".dump"), dump)
                     if code != 0:
                         raise ValueError(f"{side} native dump exit={code}")
@@ -458,7 +509,13 @@ def main():
     parser.add_argument("--out", type=Path)
     parser.add_argument("--cache", type=Path)
     parser.add_argument("--pr-body-file", type=Path)
+    parser.add_argument("--phase", choices=("fetch", "run"),
+                        help="fetch: download and verify into --cache only (network, no fetched code runs); run: offline, "
+                             "needs a filled --cache and --sandbox; default: both in one go, unsandboxed")
+    parser.add_argument("--sandbox", type=Path, help="tools/gen/sandbox-run.sh: wraps every command that runs fetched code (--phase run)")
     args = parser.parse_args()
+    if (args.phase == "run") != (args.sandbox is not None):
+        parser.error("--phase run and --sandbox go together")
     if args.detect:
         if not args.base or not args.head:
             parser.error("--detect needs --base and --head")
@@ -475,10 +532,14 @@ def main():
         parser.error("--out and --cache are required")
     out, cache = args.out.resolve(), args.cache.resolve()
     out.mkdir(parents=True, exist_ok=False)
-    review = Review(out, cache)
+    review = Review(out, cache, args.phase, args.sandbox.resolve() if args.sandbox else None)
     report = {"kind": "pin-move/1", "status": "FAIL", "grammars": [], "platform": platform.platform(),
               "native_flags": ["wasi-libc ctype", "-fsigned-char", "-DNDEBUG"], "input_timeout_seconds": 30,
               "tool_source_head": "", "script_sha256": sha(Path(__file__).read_bytes())}
+    if args.phase:
+        report["phase"] = args.phase
+    if args.sandbox:
+        report["sandbox"] = {"script": "tools/gen/sandbox-run.sh", "sha256": sha(review.sandbox.read_bytes())}
     try:
         report["tool_source_head"] = review.git("rev-parse", "HEAD").decode().strip()
         report["tool_diff_sha256"] = sha(review.git("diff", "HEAD", "--", "tools", ".github/workflows/pin-move.yml"))
@@ -516,7 +577,8 @@ def main():
         report["error"] = str(error)
     finally:
         write_json(out / "report.json", report)
-        write(out / "summary.md", summarize(report).encode("utf-8"))
+        if args.phase != "fetch":  # the fetch phase compares nothing: report.json alone says what it cached
+            write(out / "summary.md", summarize(report).encode("utf-8"))
     print(report["status"], flush=True)
     return int(report["status"] == "FAIL")
 

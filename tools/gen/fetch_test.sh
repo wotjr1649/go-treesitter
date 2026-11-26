@@ -108,7 +108,7 @@ echo "fetch resume checks passed"
 # with 77 on its first language (78 if that language's work directory exists), so "accepted" means exit 77 and nothing is
 # downloaded or built.
 bindir=$(mktemp -d) wd=$(mktemp -d)
-trap 'rm -rf -- "$bindir" "$wd"; rm -f -- "$work/calls" "$work/archive"; rmdir -- "$work"' EXIT
+trap 'rm -rf -- "$bindir" "$wd" "${pt:-}"; rm -f -- "$work/calls" "$work/archive"; rmdir -- "$work"' EXIT
 printf '#!/usr/bin/env bash\ncase "$1" in env) echo linux ;; build) cp "%s" "$4" ;; *) exit 99 ;; esac\n' "$bindir/gen-stub" >"$bindir/go"
 cat >"$bindir/gen-stub" <<'EOF'
 #!/usr/bin/env bash
@@ -135,3 +135,61 @@ mkdir -p "$wd/work/kotlin/patches" # a language stopped half-way: the resumed ru
 check_regen 77 1 kotlin
 rm -f -- "$work/regen.out"
 echo "regen resume checks passed"
+
+# REGEN_PHASE: fetch downloads and verifies only (no extraction, no gen -lang); run is offline and does the rest. The stubs
+# stand in for go, curl, gen (it also serves the fetch plan) and native-ref; every call is logged to $LOG.
+pt=$(mktemp -d)
+export LOG="$pt/log" PLAN="$pt/plan.tsv" FAKEGEN="$pt/fakegen" FAKEDL="$pt/served"
+mkdir -p "$pt/bin" "$pt/served" "$pt/tree"
+echo content >"$pt/tree/f"
+tar -czf "$pt/served/src.tgz" -C "$pt" tree
+printf 'fake-cli' | gzip -c >"$pt/served/cli.gz"
+srcsum=$(sha256sum "$pt/served/src.tgz" | cut -d' ' -f1) clisum=$(sha256sum "$pt/served/cli.gz" | cut -d' ' -f1)
+printf 'goinstall\texample.invalid/wasm2go@v1\t-\t-\t-\t-\nsource\tsrc.tgz\thttps://example.invalid/src.tgz\t%s\tsrc\t-\ncli\tcli.gz\thttps://example.invalid/cli.gz\t%s\tbin/tree-sitter\t-\n' "$srcsum" "$clisum" >"$PLAN"
+printf '#!/usr/bin/env bash\ncase "$*" in *-plan*) cat "$PLAN" ;; *) echo "gen $*" >>"$LOG" ;; esac\n' >"$FAKEGEN"
+cat >"$pt/bin/go" <<'EOF'
+#!/usr/bin/env bash
+echo "go $*" >>"$LOG"
+case "$1" in
+  env) echo linux ;;
+  build) out=; while [ $# -gt 0 ]; do [ "$1" = -o ] && out=$2; shift; done
+    case "$out" in */gen) cp "$FAKEGEN" "$out" ;; *) printf '#!/usr/bin/env bash\necho "native-ref $*" >>"$LOG"\n' >"$out" ;; esac
+    chmod +x "$out" ;;
+esac
+EOF
+cat >"$pt/bin/curl" <<'EOF'
+#!/usr/bin/env bash
+while [ $# -gt 0 ]; do [ "$1" = -o ] && dst=$2; url=$1; shift; done
+echo "curl $url" >>"$LOG"
+cp "$FAKEDL/$(basename "$url")" "$dst" && printf 200
+EOF
+chmod +x "$pt/bin/go" "$pt/bin/curl"
+phase() { # <want exit> <phase> <work dir> [lang ...]
+  local want=$1 ph=$2 dir=$3 status; shift 3
+  : >"$LOG"
+  if PATH="$pt/bin:$PATH" REGEN_PHASE=$ph bash "$(dirname "$0")/regen.sh" "$dir" "$@" >"$pt/out" 2>&1; then status=0; else status=$?; fi
+  [ "$status" = "$want" ] || { echo "regen.sh REGEN_PHASE=$ph: exit $status, want $want" >&2; cat "$pt/out" >&2; exit 1; }
+}
+logged() { grep -q -- "$1" "$LOG"; }
+phase 1 bogus "$pt/w0"
+phase 1 run "$pt/w0" java # no fetched work directory
+phase 0 fetch "$pt/w1" java
+logged 'go install' && logged 'curl https://example.invalid/src.tgz' && logged 'curl https://example.invalid/cli.gz' || { echo "fetch phase did not download and build" >&2; exit 1; }
+logged 'native-ref .* -stage .*java' || { echo "fetch phase did not stage the npm inputs" >&2; exit 1; }
+! logged '^gen -lang' && [ -f "$pt/w1/dl/src.tgz" ] && [ -f "$pt/w1/dl/cli.gz" ] && [ ! -e "$pt/w1/src/f" ] && [ ! -e "$pt/w1/bin/tree-sitter" ] && [ ! -e "$pt/w1/stage-work" ] || { echo "fetch phase ran or extracted something" >&2; exit 1; }
+phase 0 run "$pt/w1" java
+! logged '^go [bi]' && ! logged '^curl' || { echo "run phase built or downloaded" >&2; exit 1; }
+logged '^gen -lang java ' && ! logged '-fetch-npm' && [ -f "$pt/w1/src/f" ] && [ -f "$pt/w1/bin/tree-sitter" ] || { echo "run phase did not extract and regenerate offline" >&2; exit 1; }
+rm "$pt/w1/dl/src.tgz"
+phase 1 run "$pt/w1" java
+! logged '^curl' && ! logged '^gen -lang' || { echo "run phase downloaded a missing archive or went on" >&2; exit 1; }
+# The phases change where things happen, not what gen is asked to do: the same gen -lang call, minus -fetch-npm (offline).
+normal() { grep '^gen -lang' "$LOG" | sed -E 's# -fetch-npm##; s#[^ ]*/w[23]/#W/#g'; }
+phase 0 '' "$pt/w2" java
+normal >"$pt/unphased.args"
+phase 0 fetch "$pt/w3" java
+phase 0 run "$pt/w3" java
+normal >"$pt/phased.args"
+[ -s "$pt/unphased.args" ] && cmp -s "$pt/unphased.args" "$pt/phased.args" || { echo "phased gen call differs from the single run" >&2; diff "$pt/unphased.args" "$pt/phased.args" >&2; exit 1; }
+rm -rf -- "$pt"
+echo "regen phase checks passed"
