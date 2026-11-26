@@ -167,6 +167,9 @@ func (n Node) NamedChild(i int) (Node, bool) {
 	return Node{}, false
 }
 
+// NextSibling returns the sibling after n in Children order, a zero-width sibling (for example a MISSING node)
+// included. C's ts_node_next_sibling skips a zero-width sibling directly after n while its ts_node_prev_sibling
+// returns it; here NextSibling and PrevSibling stay inverse to each other, so the results can differ from C.
 func (n Node) NextSibling() (Node, bool) {
 	if n.s == nil {
 		return Node{}, false
@@ -196,6 +199,8 @@ func (n Node) PrevSibling() (Node, bool) {
 	return n.at(prev), true
 }
 
+// NextNamedSibling is NextSibling restricted to named nodes; it differs from C's ts_node_next_named_sibling in the
+// same way (a zero-width named sibling directly after n is returned).
 func (n Node) NextNamedSibling() (Node, bool) {
 	if n.s == nil {
 		return Node{}, false
