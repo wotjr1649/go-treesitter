@@ -67,7 +67,7 @@ range, 3 unreadable input, 4 parse failure, 5 write failure.
 native-ref -pins tools/gen/pins.json -fetch -dl <dl> -work <work> -out <exe dir> -corpus <corpus dir>   # build + extract corpora
 #   -queries <dir>: also extract each archive's queries/ into <dir>/<extractDir>/queries (sha256-verified; TSG_QUERY_DIR for the query lane)
 #   -nobuild: verify and extract only (no compiler); GITHUB_TOKEN, when set, authenticates -fetch against API rate limits
-cd tools/native-ref && go run ./ciconf -pins ../gen/pins.json -corpus <corpus dir> -exe <exe dir> -out <data dir> [-seed N] [-j N] [-lang javascript,html,...]
+cd tools/native-ref && go run ./ciconf -pins ../gen/pins.json -corpus <corpus dir> -exe <exe dir> -out <data dir> -kit ../conformance/testdata/kit [-seed N] [-j N] [-lang javascript,html,...]
 cd tools/conformance && TSG_DATA_DIR=<data dir> TSG_NATIVE_EXE_DIR=<exe dir> go test -run 'TestCorpus|TestEdits|TestParserPoolRealEngine' .
 ```
 
@@ -75,6 +75,19 @@ In CI the build output (`exe`, `corpus`, `queries`, `scanner-stages`) is cached 
 the key holds the runner image, compiler and Go versions, the group's grammars and the content of `pins.json`, these sources, the
 patches and the packages this tool imports. `cachesums.sh` records the sha256 of every cached file; a restore that does not match
 it is discarded and the build runs as usual.
+
+`-kit` is what CI passes; data made without it has no kit inputs, so `TestCorpusKitInputs` fails for the seven kit grammars
+(a dropped flag must not leave a lane green). `go test ./...` in `tools/conformance` skips what lacks a prerequisite:
+
+| Test | Needs | Without it |
+|---|---|---|
+| `TestCorpus*`, `TestEdits`, `TestQuerySmoke` ... | `TSG_DATA_DIR` (ciconf output) or `TSG_S15_DIR` | skip |
+| `TestCorpusKitInputs` | ciconf data made with `-kit` (or no ciconf data) | **fails** (the guard) |
+| `TestFieldLookup`, `TestSnapshotPointsNative`, `TestInvalidUTF8VsNative`, native subtests | `TSG_NATIVE_EXE_DIR` (the `-out` directory above); `TestInvalidUTF8VsNative` also accepts `<data>/native/exe2/<lang>.exe` of the session-15 tree | skip |
+| `TestQuerySmoke`, `TestQueryNative` | queries: `TSG_QUERY_DIR` (`native-ref -queries`) or `<data>/src` | skip (`TestQueryNative` fails when its executable exists but the queries do not) |
+
+`TSG_REQUIRE_FIELD_LOOKUP=1` (CI) turns the skips of the field, snapshot-point, invalid-UTF-8 and query-smoke tests into failures.
+CI's `-run` lists do not include `TestSnapshotPointsNative`, `TestInvalidUTF8VsNative` or `TestQuerySmoke`.
 
 `-lang` limits corpus preparation to the comma-separated conformance language names (default: all 25). JSX inputs use the JavaScript corpus and parser. PHP selects the PHP parser; XML selects XML, not DTD.
 Nested corpus directories follow each pin's `grammarDir`; XML upstream queries are under `queries/xml`.

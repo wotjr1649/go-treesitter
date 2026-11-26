@@ -16,7 +16,7 @@ func TestSnapshotPointsNative(t *testing.T) {
 		t.Run(lang, func(t *testing.T) {
 			exe, ok := nativeExe(lang)
 			if !ok {
-				t.Fatal("TSG_NATIVE_EXE_DIR is required")
+				skipConformance(t, "no native executable for "+lang+" (TSG_NATIVE_EXE_DIR)")
 			}
 			p := newParser(t, lang)
 			nodes, missingEOF := 0, 0
