@@ -78,7 +78,6 @@
     "typescript@v0.6.0": "\"interface A { x: number }\\nconst f = (a: A): number => a.x + 1;\\n\"",
     "xml@v0.6.0": "\"<?xml version=\\\"1.0\\\"?><root><item id=\\\"1\\\">value</item></root>\\n\"",
     "yaml@v0.6.0": "\"items:\\n  - name: one\\n    value: 1\\n\"",
-    "css@v0.7.0": "\"body { color: red; margin: 0; }\\n\"",
     "powershell@v0.7.0": "\"$items = @(1, 2, 3)\\nforeach ($item in $items) { Write-Output $item }\\n\"",
     "ruby@v0.7.0": "\"def add(a, b)\\n  a + b\\nend\\n\"",
     "swift@v0.7.0": "\"func add(_ a: Int, _ b: Int) -> Int { return a + b }\\n\"",

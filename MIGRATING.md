@@ -537,7 +537,8 @@ selects the RC only because you request it. Two grammar modules have new tags, `
 `v0.7.0`. The other 23 modules keep their published tags (`swift`, `xml`, `ruby` and `powershell` at `v0.7.0`, 19 at `v0.6.0`).
 See the [compatibility table](docs/reports/compatibility.md) and the [per-tag support table](docs/reports/grammar-support.md).
 
-The root changes below keep every exported signature except for additions. Behaviour changes:
+The root changes below add API and change behaviour; the `api-guard` run compares the exported API with `v0.7.0` (its result is on the
+[status board](docs/reports/release-critical-status.md#v100-rc1-preparation-gates)). Behaviour changes:
 [parser, pool and tree guards](#parser-pool-and-tree-guards),
 [per-call `MatchLimit`](#per-call-matchlimit-on-a-reused-parser) and
 [snapshot `Node.ChildCount` cost](#snapshot-node-storage-nodechildcount-is-ochildren). The `ChildByFieldName` wording now ties its

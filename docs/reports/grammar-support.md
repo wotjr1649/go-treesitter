@@ -17,7 +17,7 @@ version selected by Go alongside the root in the [compatibility table](compatibi
   [`7e24331`](https://github.com/wotjr1649/go-treesitter/commit/7e243318b5b1f8223ac0e1f49e06e10a9b107757).
   “Same” carries the `v0.6.0` limit forward. “Fixed” and “Changed” apply to the recorded input in the new tag.
 - **`css` `v0.8.0` and `python` `v0.7.0` tags** ship with the root `v1.0.0-rc.1`. The new tags point to
-  `<GRAMMAR-RELEASE-COMMIT>` (pending until the tags are published), and each declares root `v0.7.0` as its minimum. In the tables
+  `<grammar-release-commit>` (pending until the tags are published), and each declares root `v0.7.0` as its minimum. In the tables
   below, the `v0.7.0 tag` column of a `python` row describes this new `python` tag, and the `v0.7.0 tag` column of a `css` row
   also describes the `css` `v0.8.0` tag unless the row says otherwise. `css` `v0.7.0` and `python` `v0.6.0` keep their published
   behavior, and the other 19 modules keep their `v0.6.0` tags (“Same”). [Fixed in the new tags](#fixed-in-the-css-v080-and-python-v070-tags)
@@ -76,7 +76,7 @@ None changed without a root error on either tag and have no register entry. Case
 
 ## Fixed in the css v0.8.0 and python v0.7.0 tags
 
-The CSS declaration value and Python `await` fixes ship in the new `css` `v0.8.0` and `python` `v0.7.0` tags (`<GRAMMAR-RELEASE-COMMIT>`).
+The CSS declaration value and Python `await` fixes ship in the new `css` `v0.8.0` and `python` `v0.7.0` tags (`<grammar-release-commit>`).
 Their two IDs left the register, and the inputs stay as regression fixtures. The earlier tags keep the published behavior.
 
 | Grammar module | Input | Earlier tags | New tag | Consumer impact | Evidence |
