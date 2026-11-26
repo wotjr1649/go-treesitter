@@ -5,8 +5,10 @@ import (
 	"errors"
 	"math"
 	"math/bits"
+	"runtime"
 	"strings"
 	"testing"
+	"time"
 	"unsafe"
 )
 
@@ -301,5 +303,98 @@ func TestStartMemoryTraps(t *testing.T) {
 				t.Fatalf("refused=%v mem=%v committed=%d", Refused(m), *m != nil, Committed(m))
 			}
 		})
+	}
+}
+
+// holdCleanups stalls the goroutine that runs runtime cleanups until the returned func is called, so cleanups queued
+// after it cannot run in the meantime: a collected module's slot can then be reused before its cleanup has run.
+func holdCleanups(t *testing.T) (resume func()) {
+	t.Helper()
+	started, gate := make(chan struct{}), make(chan struct{})
+	func() {
+		runtime.AddCleanup(new([64]byte), func(struct{}) { close(started); <-gate }, struct{}{})
+	}()
+	runtime.GC()
+	select {
+	case <-started:
+	case <-time.After(10 * time.Second):
+		t.Fatal("the blocking cleanup did not start")
+	}
+	return func() { close(gate) }
+}
+
+// dropModules creates n module slots whose state is created by f and leaves them unreferenced.
+//
+//go:noinline
+func dropModules(n int, f func(*[]byte)) {
+	for i := 0; i < n; i++ {
+		f(new([]byte))
+	}
+}
+
+// A module that is collected without Release leaves its state in live until its cleanup runs. A new module that gets the
+// same address must not inherit that state (its refused flag, limit, region and cleanup).
+func TestReusedAddressDoesNotInheritDeadState(t *testing.T) {
+	const n = 4096
+	resume := holdCleanups(t)
+	defer resume()
+	dropModules(n, func(m *[]byte) {
+		st := stateOf(m, true)
+		st.mu.Lock()
+		st.refused = true
+		st.mu.Unlock()
+	})
+	runtime.GC() // the slots are free again; their cleanups are queued behind the held one
+	bad := 0
+	for i := 0; i < n; i++ {
+		if Refused(new([]byte)) {
+			bad++
+		}
+	}
+	if bad > 0 {
+		t.Fatalf("%d of %d new modules inherited the state of a collected one", bad, n)
+	}
+}
+
+// The consequence of the same reuse: a dead module that never reserved (SetLimit only) is collected, a new module at
+// its address inherits the state and reserves its region in it, and the dead module's cleanup then frees that region.
+func TestReusedAddressKeepsLiveRegion(t *testing.T) {
+	const n = 4096
+	for round := 0; round < 5; round++ {
+		resume := holdCleanups(t)
+		dropModules(n, func(m *[]byte) {
+			if err := SetLimit(m, MinLimit); err != nil {
+				t.Fatal(err)
+			}
+		})
+		runtime.GC()
+		mods := make([]*[]byte, n)
+		for i := range mods { // all slots first: the freed ones are reused before anything else allocates
+			mods[i] = new([]byte)
+		}
+		for _, m := range mods {
+			*m = make([]byte, pageSize)
+			if err := SetLimit(m, MinLimit); err != nil {
+				t.Fatal(err)
+			}
+			if MemoryGrow(m, 1, 1<<15) < 0 {
+				t.Fatal("grow refused")
+			}
+		}
+		resume()
+		runtime.GC()
+		time.Sleep(100 * time.Millisecond) // the dead modules' cleanups run on another goroutine
+		bad := 0
+		for _, m := range mods {
+			if Committed(m) != int64(len(*m)) { // not read through *m: a freed region would fault
+				bad++
+			}
+		}
+		for _, m := range mods {
+			release(m)
+		}
+		if bad > 0 {
+			t.Fatalf("round %d: %d of %d live modules lost their region or state to a collected module's cleanup", round, bad, n)
+		}
 	}
 }
