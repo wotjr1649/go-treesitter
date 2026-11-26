@@ -31,6 +31,7 @@ Expected rule: An end tag whose name differs from the start tag does not close t
 
 - Specification: [HTML Standard: Valid custom element name](https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name)
 - Specification: [HTML Standard: End tags](https://html.spec.whatwg.org/multipage/syntax.html#end-tags)
-- Upstream issue: none recorded.
+- [Upstream issue](https://github.com/tree-sitter/tree-sitter-html/issues/148)
+- Open as of 2026-11-25, with no comments.
 - Input SHA-256: `8c47babd119327f3687226049a3a3bc8ec5a3501d467dc490c0b4fad118f92bb`
 - [Recorded native dump](../../tools/conformance/testdata/known-gaps/html-hangul-tag-low-byte-mismatch.dump), SHA-256: `71b903e64d0654a58d3d97fb924ffa548093162c8c29f538c8951a289affec77`

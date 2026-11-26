@@ -52,7 +52,8 @@ func WithMaxInputBytes(n int64) Option {
 }
 
 // WithMaxMemoryBytes limits the linear memory of this parser's instance (a refused grow becomes ResourceLimit).
-// A nonzero limit must be within the engine's range (32 MiB through 4 GiB).
+// A nonzero limit must be within the engine range (32 MiB through 4 GiB, inclusive).
+// Zero keeps the engine default (1 GiB). Out-of-range values return ErrInvalidInput.
 func WithMaxMemoryBytes(n int64) Option {
 	return func(c *config) error {
 		if err := nonNegative("WithMaxMemoryBytes", n); err != nil {

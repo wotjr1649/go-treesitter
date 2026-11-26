@@ -1,0 +1,346 @@
+name: Comparative benchmark
+
+# Compares this library with other Go tree-sitter libraries on identified inputs (tools/compare, plan S7/S10).
+#
+# Trigger: workflow_dispatch only, and only for the reviewed main branch: every job refuses any other ref.
+#
+# Threat model (tools/compare/README.md): the isolation boundary is the ephemeral GitHub-hosted runner VM of each job. The
+# workflow protects the repository: top-level permissions are empty and no job asks for any (GITHUB_TOKEN has none), there are no
+# secrets, no id-token, no caches and no environment, the commit is fetched anonymously (the repository is public; checkout would
+# need contents: read only for its token), and actions are pinned by commit SHA. It does NOT protect the job's own Actions runtime
+# credentials or the integrity of numbers against a malicious candidate: candidates run as the runner user in the same VM as the
+# product (paired timing needs it), so they can reach the artifact-service credential of that run and could forge or add artifacts
+# of this run, the same class as falsifying their own numbers (owner decision 2026-11-25). Each measuring job uploads exactly one
+# explicitly named bundle file, written by the measurer after validating the results; the aggregate job (no candidate code) downloads
+# only the 12 expected names undecompressed, checks each bundle's size, entry count and paths before extracting a byte, parses with
+# strict typed schemas, and uploads only its validated summary, and only when every bundle was accepted.
+#
+# Module pins: tools/compare/adapters/*/go.mod. Their go.sum files must be committed before a measuring run:
+#   1. Dispatch once with bootstrap=true. Only the proposal job runs: it resolves each module graph on a copy with
+#      'go mod tidy' and uploads go-sum-proposal/. No candidate is built, run or measured.
+#   2. Review the proposal and commit tools/compare/adapters/*/go.mod and go.sum to main.
+#   3. Normal runs stop before any candidate step unless those files are committed, and fail if resolution would change them.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: full (plan repetitions) or smoke (reduced)
+        type: choice
+        options: [full, smoke]
+        default: full
+      bootstrap:
+        description: Proposal only - resolve the adapters' module graphs and upload go.mod/go.sum proposals; nothing is measured
+        type: boolean
+        default: false
+
+permissions: {}
+
+# No job of this workflow may read or write the Actions cache: other workflows (bench.yml via setup-go, pin-move.yml via
+# actions/cache) restore caches from the default branch, and a workflow_dispatch run on main would otherwise be allowed to
+# write them. cache-mode: none is enforced by GitHub with scoped cache tokens (docs: Workflow syntax > cache-mode, and
+# Dependency caching reference > Controlling cache access with cache-mode); it is repeated on every job.
+cache-mode: none
+
+concurrency:
+  group: compare
+  cancel-in-progress: false
+
+env:
+  GOENV: "off"
+  GOWORK: "off"
+  GOTOOLCHAIN: local
+  MODE: ${{ inputs.mode }}
+
+jobs:
+  bootstrap:
+    name: go.sum proposal (no measurement)
+    if: ${{ github.ref == 'refs/heads/main' && inputs.bootstrap }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions: {}
+    cache-mode: none
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Set the comparison directory path
+        run: echo "T=$RUNNER_TEMP/cmp" >> "$GITHUB_ENV"
+      - name: Refuse any ref but main
+        run: '[ "$GITHUB_REF" = refs/heads/main ]'
+      - name: Fetch the commit (no token, no action)
+        env:
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          git init -q .
+          git remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
+          git fetch -q --depth 1 origin "$GITHUB_SHA"
+          git checkout -q --detach FETCH_HEAD
+      - name: Resolve the module graphs (executes no candidate code)
+        env:
+          STAGE_MODE: bootstrap
+        run: bash tools/compare/scripts/stage.sh "$T" none
+      - name: Bundle the proposal
+        run: '"$T/bin/compare" pack -dir "$T/out" -out "$T/pack/compare-go-sum-proposal.zip"'
+      - name: Upload the proposal (one explicit file)
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          path: ${{ runner.temp }}/cmp/pack/compare-go-sum-proposal.zip
+          archive: false
+          if-no-files-found: error
+          retention-days: 14
+
+  measure:
+    name: measure (${{ matrix.runner }}, ${{ matrix.lang }})
+    if: ${{ github.ref == 'refs/heads/main' && !inputs.bootstrap }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+        lang: [c, go, javascript, json, python]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 40
+    permissions: {}
+    cache-mode: none
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Set the comparison directory path
+        run: echo "T=$RUNNER_TEMP/cmp" >> "$GITHUB_ENV"
+      - name: Refuse any ref but main
+        run: '[ "$GITHUB_REF" = refs/heads/main ]'
+      - name: Fetch the commit (no token, no action)
+        env:
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          git init -q .
+          git remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
+          git fetch -q --depth 1 origin "$GITHUB_SHA"
+          git checkout -q --detach FETCH_HEAD
+      - name: Stage the pinned inputs (stops here unless every go.sum is committed)
+        run: bash tools/compare/scripts/stage.sh "$T" "${{ matrix.lang }}"
+      - name: Build and measure (candidates run on this VM only)
+        run: |
+          budget=20; [ "$MODE" = smoke ] && budget=5
+          bash tools/compare/scripts/measure.sh "$T" "${{ matrix.lang }}" "$MODE" "$budget"
+      - name: Record the run's identity
+        if: ${{ !cancelled() }}
+        run: bash tools/compare/scripts/identity.sh "$T" "$MODE"
+      - name: Validate the results and write the one bundle (the measurer)
+        id: bundle
+        if: ${{ !cancelled() }}
+        run: |
+          "$T/bin/compare" collect -in "$T/out" -out "$T/validated"
+          "$T/bin/compare" pack -dir "$T/validated" -out "$T/pack/compare-${{ matrix.runner }}-${{ matrix.lang }}.zip"
+      - name: Upload the bundle (one explicit file; nothing is uploaded unless validation succeeded)
+        if: ${{ !cancelled() && steps.bundle.outcome == 'success' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          path: ${{ runner.temp }}/cmp/pack/compare-${{ matrix.runner }}-${{ matrix.lang }}.zip
+          archive: false
+          if-no-files-found: error
+          retention-days: 14
+
+  nocc:
+    name: no-C-compiler build (${{ matrix.runner }})
+    if: ${{ github.ref == 'refs/heads/main' && !inputs.bootstrap }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    permissions: {}
+    cache-mode: none
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Set the comparison directory path
+        run: echo "T=$RUNNER_TEMP/cmp" >> "$GITHUB_ENV"
+      - name: Refuse any ref but main
+        run: '[ "$GITHUB_REF" = refs/heads/main ]'
+      - name: Fetch the commit (no token, no action)
+        env:
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          git init -q .
+          git remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
+          git fetch -q --depth 1 origin "$GITHUB_SHA"
+          git checkout -q --detach FETCH_HEAD
+      - name: Stage the module cache and run the orchestrator's unit tests
+        env:
+          RUN_UNIT: "1"
+        run: bash tools/compare/scripts/stage.sh "$T" none
+      - name: Build every adapter with CGO_ENABLED=0 and no compiler on PATH, then smoke-parse
+        run: |
+          mkdir -p "$T/out"
+          "$T/bin/compare" nocc -adapters tools/compare/adapters -go-bin "$T/go/bin" -modcache "$T/modcache" -out "$T/out/builds.csv"
+      - name: Record the run's identity
+        if: ${{ !cancelled() }}
+        run: bash tools/compare/scripts/identity.sh "$T" "$MODE"
+      - name: Validate the results and write the one bundle (the measurer)
+        id: bundle
+        if: ${{ !cancelled() }}
+        run: |
+          "$T/bin/compare" collect -in "$T/out" -out "$T/validated"
+          "$T/bin/compare" pack -dir "$T/validated" -out "$T/pack/compare-nocc-${{ matrix.runner }}.zip"
+      - name: Upload the bundle (one explicit file; nothing is uploaded unless validation succeeded)
+        if: ${{ !cancelled() && steps.bundle.outcome == 'success' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          path: ${{ runner.temp }}/cmp/pack/compare-nocc-${{ matrix.runner }}.zip
+          archive: false
+          if-no-files-found: error
+          retention-days: 14
+      - name: The product must build and parse without a C compiler
+        run: '"$T/bin/compare" gate-nocc -builds "$T/out/builds.csv"'
+
+  aggregate:
+    name: aggregate (no candidate code)
+    needs: [measure, nocc]
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' && !inputs.bootstrap }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions: {}
+    cache-mode: none
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Set the comparison directory path
+        run: echo "T=$RUNNER_TEMP/cmp" >> "$GITHUB_ENV"
+      - name: Refuse any ref but main
+        run: '[ "$GITHUB_REF" = refs/heads/main ]'
+      # The downloader names the saved file after the blob's Content-Disposition, which a candidate holding this run's
+      # runtime token could choose by pre-uploading an artifact of an expected name. The pinned action takes only the
+      # basename of that name (dist/index.js, streamExtractExternal), but nothing below relies on that alone: the downloads
+      # go into a directory that does not exist yet, before any orchestrator source or binary exists, and the steps after
+      # them fail if anything else under the workspace or the runner temp directory changed.
+      - name: Record the workspace and the runner temp directory before any download
+        run: |
+          set -euo pipefail
+          list() {
+            find "$GITHUB_WORKSPACE" "$RUNNER_TEMP" -regextype posix-extended \
+              \( -path "$RUNNER_TEMP/_runner_file_commands" -o -path "$RUNNER_TEMP/guard" -o -path "$RUNNER_TEMP/artifacts" \
+                 -o -regex "$RUNNER_TEMP/[0-9a-f-]{36}\.sh" \) -prune -o \
+              \( -type d -printf '%p\td\t%m\n' -o -printf '%p\t%y\t%m\t%s\t%T@\t%l\n' \) | LC_ALL=C sort
+          }
+          [ -z "$(ls -A "$GITHUB_WORKSPACE")" ]
+          for p in artifacts src cmp; do [ ! -e "$RUNNER_TEMP/$p" ]; done
+          mkdir "$RUNNER_TEMP/guard"
+          list > "$RUNNER_TEMP/guard/before.txt"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-c.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-c.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-go.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-go.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-javascript.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-javascript.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-json.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-json.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-python.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-python.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-nocc-ubuntu-24.04.zip
+          path: ${{ runner.temp }}/artifacts/compare-nocc-ubuntu-24.04.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-arm-c.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-arm-c.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-arm-go.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-arm-go.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-arm-javascript.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-arm-javascript.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-arm-json.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-arm-json.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-ubuntu-24.04-arm-python.zip
+          path: ${{ runner.temp }}/artifacts/compare-ubuntu-24.04-arm-python.zip
+          skip-decompress: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: compare-nocc-ubuntu-24.04-arm.zip
+          path: ${{ runner.temp }}/artifacts/compare-nocc-ubuntu-24.04-arm.zip
+          skip-decompress: true
+      - name: Nothing but the download directory may have changed; each download is one plain file in its own directory
+        env:
+          EXPECTED: compare-ubuntu-24.04-c.zip compare-ubuntu-24.04-go.zip compare-ubuntu-24.04-javascript.zip compare-ubuntu-24.04-json.zip compare-ubuntu-24.04-python.zip compare-nocc-ubuntu-24.04.zip compare-ubuntu-24.04-arm-c.zip compare-ubuntu-24.04-arm-go.zip compare-ubuntu-24.04-arm-javascript.zip compare-ubuntu-24.04-arm-json.zip compare-ubuntu-24.04-arm-python.zip compare-nocc-ubuntu-24.04-arm.zip
+        run: |
+          set -euo pipefail
+          list() {
+            find "$GITHUB_WORKSPACE" "$RUNNER_TEMP" -regextype posix-extended \
+              \( -path "$RUNNER_TEMP/_runner_file_commands" -o -path "$RUNNER_TEMP/guard" -o -path "$RUNNER_TEMP/artifacts" \
+                 -o -regex "$RUNNER_TEMP/[0-9a-f-]{36}\.sh" \) -prune -o \
+              \( -type d -printf '%p\td\t%m\n' -o -printf '%p\t%y\t%m\t%s\t%T@\t%l\n' \) | LC_ALL=C sort
+          }
+          list > "$RUNNER_TEMP/guard/after.txt"
+          diff -u "$RUNNER_TEMP/guard/before.txt" "$RUNNER_TEMP/guard/after.txt" || { echo "::error::something outside the download directory changed"; exit 1; }
+          cd "$RUNNER_TEMP/artifacts"
+          [ "$(ls -A | LC_ALL=C sort | tr '\n' ' ')" = "$(printf '%s\n' $EXPECTED | LC_ALL=C sort | tr '\n' ' ')" ] || { echo "::error::unexpected set of downloaded artifacts"; exit 1; }
+          for n in $EXPECTED; do
+            [ -d "$n" ] && [ ! -L "$n" ] || { echo "::error::$n is not a plain directory"; exit 1; }
+            [ "$(find "$n" -mindepth 1 | wc -l)" = 1 ] || { echo "::error::$n does not hold exactly one entry"; exit 1; }
+            [ "$(find "$n" -mindepth 1 -maxdepth 1 -type f -size -31457281c | wc -l)" = 1 ] || { echo "::error::$n: the entry is not a plain file within the size cap"; exit 1; }
+          done
+      - name: Fetch only the orchestrator's sources into a new directory (no adapter, no candidate module)
+        env:
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          mkdir "$RUNNER_TEMP/src"
+          cd "$RUNNER_TEMP/src"
+          git init -q .
+          git remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
+          git fetch -q --depth 1 origin "$GITHUB_SHA"
+          git checkout -q FETCH_HEAD -- tools/compare/cmd tools/compare/harness tools/compare/go.mod tools/compare/scripts/stage.sh tools/compare/scripts/pins.env tools/bench/proc
+      - name: Build the aggregator
+        working-directory: ${{ runner.temp }}/src
+        env:
+          STAGE_MODE: tools
+        run: bash tools/compare/scripts/stage.sh "$T" none
+      - name: Validate every bundle (bounded unpack, strict schemas) and report; executes nothing from them
+        run: |
+          "$T/bin/compare" aggregate -in "$RUNNER_TEMP/artifacts" -out "$T/aggregate" -work "$T/aggwork"
+          cat "$T/aggregate/summary.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload the validated summary (only when every bundle was accepted)
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          path: ${{ runner.temp }}/cmp/aggregate/summary.md
+          archive: false
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload the hashes of what the summary was built from
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          path: ${{ runner.temp }}/cmp/aggregate/SHA256SUMS
+          archive: false
+          if-no-files-found: error
+          retention-days: 14

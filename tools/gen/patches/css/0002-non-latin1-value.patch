@@ -1,0 +1,36 @@
+--- a/grammar.js
++++ b/grammar.js
+@@ -34,2 +34,3 @@
+     $._block_item,
++    $._declaration_values,
+   ],
+@@ -307,7 +308,3 @@
+       ':',
+-      $._value,
+-      repeat(seq(
+-        optional(','),
+-        $._value,
+-      )),
++      $._declaration_values,
+       optional($.important),
+@@ -319,9 +316,15 @@
+       ':',
+-      $._value,
+-      repeat(seq(
+-        optional(','),
+-        $._value,
+-      )),
++      $._declaration_values,
+       optional($.important),
+     )),
++
++    _declaration_values: $ => choice(
++      seq($._value, repeat(seq(optional(','), $._value))),
++      // Keep the bare identifier separate from numeric units and function calls.
++      alias($._non_latin1_value_name, $.plain_value),
++    ),
++
++    // The existing plain_value token must keep mixed values that start in Latin-1.
++    // Use the CSS Syntax 3 Latin-1 ranges for the new value token.
++    _non_latin1_value_name: _ => new RegExp(String.raw`-?[${non_latin1}][a-zA-Z_0-9\-\xB7\xC0-\xD6\xD8-\xF6\xF8-\xFF${non_latin1}]*`, 'u'),
+ 

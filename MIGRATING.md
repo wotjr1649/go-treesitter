@@ -450,9 +450,9 @@ An independently implemented ADR-0023 patch addresses the name defect reported i
 exercise type, ID, attribute and property names, `var(--변수)` references, keyframe names, combinators and nesting.
 Node types and fields are unchanged. Queries for `class_name`, `identifier`, `tag_name`, `id_name`,
 `attribute_name`, `property_name` and `keyframes_name` can now capture these names on the repaired inputs.
-The patch leaves bare identifier attribute values, unquoted `url()` arguments, bare declaration values,
-units, and at-rule names and arguments outside its scope. `a { b: 한글 }` remains a
-[known gap](docs/known-gaps/css.md#css-non-latin1-value). An unprefixed type selector can still produce an
+The name patch leaves bare identifier attribute values, unquoted `url()` arguments, units, and at-rule
+names and arguments outside its scope. See [CSS non-Latin-1 declaration values](#css-non-latin-1-declaration-values)
+for the separate unreleased value fix. An unprefixed type selector can still produce an
 error after whitespace when the pinned scanner does not recognize its first character. For example,
 `.a 🙂 {}` remains an error. Extended class names require adjacency, including at escapes.
 
@@ -518,3 +518,47 @@ A temporary ADR-0023 scanner patch carries [upstream issue #292](https://github.
   taken for a short interpolation (see [limitations](docs/reports/limitations.md), rows 27 and 33).
 
 The pinned upstream Ruby queries compile and match the patched native reference ([schema register](docs/validation/grammar-schemas.md#v070-ruby-symbol-patch)).
+
+## Unreleased after v0.7.0
+
+### CSS non-Latin-1 declaration values
+
+Unreleased after `grammars/css/v0.7.0`. The ADR-0023 value patch adapts the widened identifier in
+[upstream PR #105](https://github.com/tree-sitter/tree-sitter-css/pull/105#issuecomment-7140588000) to the pinned declaration rules.
+`a { b: 한글 }` now has a `declaration` with a `plain_value` spanning `한글`. Queries for those nodes
+can capture the repaired declaration and value. The syntax tree uses the existing node types and fields.
+
+The fix covers a single unquoted, unescaped identifier as the entire value when it starts with a code
+point beyond Latin-1, optionally after a hyphen. It also covers declarations ending in `;` or marked
+`!important`. Escaped identifiers such as `한\+글`, non-Latin-1 identifiers inside value lists and
+function arguments, unquoted `url()` arguments, bare attribute values, and units such as `1한`
+remain outside its scope. For out-of-scope inputs with parse errors, recovery nodes and query capture
+ranges can change. For example, a `plain_value` can appear under `ERROR` in `foo(한글)`.
+Both published CSS tags, `v0.6.0` and `v0.7.0`, retain the
+[original gap](https://github.com/wotjr1649/go-treesitter/blob/grammars/css/v0.7.0/docs/known-gaps/css.md#css-non-latin1-value).
+
+Retire this patch in the approved pin move to a source that correctly parses the retained declaration
+fixture. Review the affected corpus expectations and known-gap records in the same change.
+
+### Python `await` and the power operator
+
+A temporary ADR-0023 grammar-input patch carries [upstream PR #360](https://github.com/tree-sitter/tree-sitter-python/pull/360).
+Node types and fields are unchanged (`node-types.json` is byte-identical with and without the patch).
+
+- **`await` ends before `**`.** Python's `await` takes a primary and `**` takes it as its left operand, so `await f() ** 2` is
+  `(await f()) ** 2`. The grammar used to read `await (f() ** 2)`: an `await` containing a `binary_operator`. It now reads a
+  `binary_operator` whose `left` is the `await`, with the `await` ending at `f()`. These inputs were error-free before, so the
+  trees of previously error-free inputs change. The same holds for `await x ** y ** z` (now `(await x) ** (y ** z)`), for
+  `-await x ** 2` and `not await x ** 2` (the `argument` of the operator is now the `binary_operator`, not an `await`), and in arguments, comprehensions and
+  f-string replacement fields. Queries and code that match `(await (binary_operator))`, or that read the range or children of
+  such an `await` or `binary_operator`, see the new shape. Calls, attributes and subscripts still belong to the `await`
+  operand: `await f().x[0]` is one `await`.
+- **Unchanged.** `await (f() ** 2)`, `(await f()) ** 2`, `2 ** await f()`, `await x + 1`, `await x * 2` and `await x.y - await z` keep
+  their trees. A few inputs that Python rejects, such as `await x ** await await x`, were already accepted; their trees change in the
+  same way.
+- **Check.** Over 3,640 expressions of two operands that Python 3.14.8 accepts (every combination of the prefixes `await`, `-`, `not`, `~`
+  with five atoms and the operators `**`, `*`, `+`), the patched grammar groups each one as Python does and the unpatched grammar did not
+  for 450 of them (one-off check, E2).
+
+Retire the patch in the approved pin move to an upstream source containing a fix for the reported defect. That move updates the
+patch corpus expectations. See the [schema register](docs/validation/grammar-schemas.md#unreleased-after-v070-python-await-patch).
