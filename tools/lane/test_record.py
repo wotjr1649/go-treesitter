@@ -1,5 +1,6 @@
 import json
 import importlib.util
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -31,6 +32,10 @@ class RecordTest(unittest.TestCase):
             self.assertEqual(receipt['timeout_seconds'], 7200)
 
     def test_receipt_keeps_failure_and_refuses_overwrite(self):
+        # The receipt records the commit, so this needs git and a checkout with a HEAD (pwsh is optional: the CPU load is then null).
+        head = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=RECORD.parent, capture_output=True, text=True) if shutil.which('git') else None
+        if head is None or head.returncode != 0:
+            self.skipTest('git or a git checkout with a commit is missing')
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / 'receipt.json'
             command = [sys.executable, str(RECORD), '--output', str(output), '--',
