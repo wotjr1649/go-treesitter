@@ -1,0 +1,12 @@
+github.com/wotjr1649/go-treesitter v0.7.0 h1:3ACDdctZaRFxr56ZNrmiVfgtPtQzEExl7Oe50GGrOdw=
+github.com/wotjr1649/go-treesitter v0.7.0/go.mod h1:KJIvMYLvodmn4BQJCoD6xv78V+az/OFejtkmaybKoGk=
+github.com/wotjr1649/go-treesitter/grammars/c v0.6.0 h1:ep0t88tiX+RtM18r2EguZHjwaoY9ajg/8W+m0Bb88/Y=
+github.com/wotjr1649/go-treesitter/grammars/c v0.6.0/go.mod h1:mSKddH9/3lgcL7/xau4gq5fZR/YZSBoekolD44M0fs0=
+github.com/wotjr1649/go-treesitter/grammars/golang v0.6.0 h1:R2Ctn848Ap4fVL/Cfp29VTt2wnuN8EvdFPpQqo8n8Y0=
+github.com/wotjr1649/go-treesitter/grammars/golang v0.6.0/go.mod h1:ww/tbOtTrP5mym6ZnQgbxCUAzBrkzAQywZCPjbF43wg=
+github.com/wotjr1649/go-treesitter/grammars/javascript v0.6.0 h1:tnNsh3FxiwmjWGxBMSkoulskiNK1FnWWuzSlp2mCVB4=
+github.com/wotjr1649/go-treesitter/grammars/javascript v0.6.0/go.mod h1:1vWBTieLwYty3SSH9WR/2PWgADw7jUOzhIJrhumX+qU=
+github.com/wotjr1649/go-treesitter/grammars/json v0.6.0 h1:TWyPQCDB+qGVI3JFDgpU9Qw9e/TcNNMZTFsP3aW3E64=
+github.com/wotjr1649/go-treesitter/grammars/json v0.6.0/go.mod h1:kcYNejqVbJoPj/Kx9F+XAlrG1hw04d/1BH8TxIApU8Q=
+github.com/wotjr1649/go-treesitter/grammars/python v0.6.0 h1:AWHW3uvloNmVs0XEEYFKS794Up3pAxp+kZMqG8qNvk4=
+github.com/wotjr1649/go-treesitter/grammars/python v0.6.0/go.mod h1:a2Z/wNl77do/EdJuXnCGoeXwhLCkUqFUUQrV3wdmr4Y=
