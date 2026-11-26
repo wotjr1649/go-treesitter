@@ -220,7 +220,7 @@ only when a result changed since the last comment.
 names), read-only `/usr`, an empty `/tmp`, and only the named paths mounted, each at its own absolute path. `sandbox-setup.sh`
 installs bubblewrap on a hosted ubuntu runner and checks the isolation. `conformance.yml` runs the native build (gcc, and the
 pinned CLI for grammars without a committed parser) in it after a token-holding `native-ref -stage` step has fetched and verified
-every input; the native executables built there still run unsandboxed in `ciconf` and `go test`. Linux only; there is no local
+every input; the native executables built there still run unsandboxed in `ciconf` and `go test`. `bench.yml` and `nightly-diff.yml` split their fetch the same way (a token step with `native-ref -stage`, then an offline build step without the token) but are not sandboxed. Linux only; there is no local
 equivalent on Windows.
 
 ## Pins (`pins.json`)
