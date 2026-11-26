@@ -105,6 +105,6 @@ text, except as item 5 states. [Validation contract](../../specs/validation.md#r
    change, 14 days without root defect reports lead to 1.0.
 4. **Windows resources.** The hosted Windows bench required before 1.0 is in place for amd64 and arm64.
    For the RC, also run the Windows amd64 local bench for all 25 grammars on the candidate commit.
-5. **RC change classification (owner decision OD7, 2026-11-26).** In decision 1 and in item 3, "root code, contract
+5. **RC change classification (owner decision, 2026-11-26).** In decision 1 and in item 3, "root code, contract
    or inputs" reads "root code, the public API or contracts". Changes to grammar modules, `pins.json` and CI
    workflows are classified separately and recorded with the candidate-to-release diff.
