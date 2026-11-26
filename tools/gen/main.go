@@ -51,6 +51,7 @@ type opts struct {
 	hash, noAPI, verifyBinaries                                                            bool
 	keepModuleForm                                                                         bool
 	balanceProbe                                                                           bool
+	fieldFullCompare                                                                       bool
 	mirrorAssets                                                                           bool
 }
 
@@ -95,6 +96,7 @@ func main() {
 	flag.BoolVar(&o.hash, "hash", false, "print the computed values of every pin and exit")
 	flag.BoolVar(&o.noAPI, "no-api", false, "do not emit language_api.go (Language() needs the root treesitter package)")
 	flag.BoolVar(&o.balanceProbe, "balance-probe", false, "TEST ONLY: add balancing/reset observations and a deterministic conformance test; output must be a new directory outside grammars/")
+	flag.BoolVar(&o.fieldFullCompare, "field-full-compare", false, "TEST ONLY: compile the shim without the xfields_may_differ pre-check (every node with children is compared with C); output must be a new directory outside grammars/")
 	flag.BoolVar(&o.mirrorAssets, "mirror-assets", false, "list pinned archives for every platform: file, sha256, primary download URL, kind (source/toolchain)")
 	flag.BoolVar(&o.fetchNPM, "fetch-npm", false, "download missing lockfile-pinned npm grammar tarballs (no install scripts)")
 	flag.StringVar(&o.treeSitter, "tree-sitter", "", "pinned tree-sitter CLI (needed for regenerate: true)")
@@ -163,6 +165,14 @@ func run(o opts) error {
 	}
 	if o.balanceProbe {
 		if err := validateBalanceProbe(o); err != nil {
+			return err
+		}
+	}
+	if o.fieldFullCompare {
+		if o.balanceProbe || o.keepModuleForm {
+			return fmt.Errorf("-field-full-compare cannot be combined with -balance-probe or -keep-module-form")
+		}
+		if err := validateTestOnlyOutput(o, "-field-full-compare"); err != nil {
 			return err
 		}
 	}
@@ -290,6 +300,15 @@ func run(o opts) error {
 		id.RecipeSHA256 = sumBytes([]byte(id.RecipeSHA256 + "\nbalancing-cancel=" + probeHash + "\nexports=" + strings.Join(balanceProbeExports, " ")))
 		id.Tools["test-only"] = "balancing-cancel"
 	}
+	if o.fieldFullCompare { // product shim hash stays pinned above; the variant's hash is recorded beside it
+		h, err := sumFile(filepath.Join(o.work, fullCompareShimName))
+		if err != nil {
+			return err
+		}
+		id.SourceSHA256["shim.fieldFullCompare"] = h
+		id.RecipeSHA256 = sumBytes([]byte(id.RecipeSHA256 + "\nfield-full-compare=" + h))
+		id.Tools["test-only"] = "field-full-compare"
+	}
 	if rc.opt != "" {
 		id.Tools["binaryen"] = pins.Tools.Binaryen
 	}
@@ -323,6 +342,9 @@ func run(o opts) error {
 	if o.balanceProbe {
 		prov.TestOnly = "balancing-cancel"
 	}
+	if o.fieldFullCompare {
+		prov.TestOnly = "field-full-compare"
+	}
 	provJSON, err := marshal(prov)
 	if err != nil {
 		return err
@@ -350,6 +372,11 @@ func run(o opts) error {
 	}
 	if !o.noAPI {
 		files["language_api.go"] = []byte(languageAPI(o.lang))
+	}
+	if o.fieldFullCompare {
+		for name, b := range fieldFullCompareFiles(o) {
+			files[name] = b
+		}
 	}
 	if o.balanceProbe {
 		probeFiles, err := balanceProbeFiles(o)
@@ -556,7 +583,14 @@ func compile(o opts, pins *Pins, g GrammarPin, wasm string, extra ...string) (st
 		args = append(args, filepath.Join(gd, "scanner.c"))
 	}
 	if !o.balanceProbe {
-		args = append(args, filepath.Join(o.root, "shim", "tsg_abi.c"))
+		shim := filepath.Join(o.root, "shim", "tsg_abi.c")
+		if o.fieldFullCompare {
+			var err error
+			if shim, err = fullCompareShim(o); err != nil {
+				return "", err
+			}
+		}
+		args = append(args, shim)
 	}
 	args = append(args, "-o", wasm)
 	out, err := runCmd("", nil, clangPath(o.sdk), args...)

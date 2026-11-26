@@ -13,9 +13,12 @@ var balanceProbeExports = []string{
 	"tsg_probe_clear", "tsg_probe_parse_noreset",
 }
 
-func validateBalanceProbe(o opts) error {
+func validateBalanceProbe(o opts) error { return validateTestOnlyOutput(o, "-balance-probe") }
+
+// validateTestOnlyOutput keeps a test-only variant (flagName) out of the product modules and out of a non-empty directory.
+func validateTestOnlyOutput(o opts, flagName string) error {
 	if o.rootVersion != "" {
-		return fmt.Errorf("-balance-probe is test-only and cannot use -root-version")
+		return fmt.Errorf("%s is test-only and cannot use -root-version", flagName)
 	}
 	// Resolve existing ancestors as well: a symlink must not redirect a probe into product modules.
 	resolve := func(path string) (string, error) {
@@ -45,7 +48,7 @@ func validateBalanceProbe(o opts) error {
 	}
 	for _, path := range []string{o.out, o.work} {
 		if path == "" {
-			return fmt.Errorf("-balance-probe requires -out and -work")
+			return fmt.Errorf("%s requires -out and -work", flagName)
 		}
 		p, err := resolve(path)
 		if err != nil {
@@ -53,7 +56,7 @@ func validateBalanceProbe(o opts) error {
 		}
 		rel, err := filepath.Rel(product, p)
 		if err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
-			return fmt.Errorf("-balance-probe cannot write inside product grammars: %s", path)
+			return fmt.Errorf("%s cannot write inside product grammars: %s", flagName, path)
 		}
 	}
 	entries, err := os.ReadDir(o.out)
@@ -61,7 +64,7 @@ func validateBalanceProbe(o opts) error {
 		return err
 	}
 	if len(entries) != 0 {
-		return fmt.Errorf("-balance-probe requires a new empty output directory: %s", o.out)
+		return fmt.Errorf("%s requires a new empty output directory: %s", flagName, o.out)
 	}
 	return nil
 }

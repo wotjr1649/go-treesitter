@@ -272,6 +272,24 @@ CGO_ENABLED=0 GOWORK=off TSG_BALANCE_PROBE_DIR=<absolute-work-dir>/probes \
 
 The nightly/manual Linux job `.github/workflows/balancing-cancel.yml` runs this lane. It is not a PR-required check.
 
+## Test-only field pre-check soundness
+
+The shim's `xfields_may_differ` pre-check (`shim/tsg_abi.c`) skips the C comparison of a node's fields where it judges the
+two algorithms equal; it encodes the pinned runtime's `node.c`/`tree_cursor.c`. `-field-full-compare` compiles a copy of
+the shim from which that one call is removed (exactly one substitution, else an error), so every node with children is
+compared with `ts_node_child_by_field_id`. The product shim and every product module stay byte-identical (`shimSHA256`
+unchanged); the variant needs a new empty output outside `grammars/`, rejects `-root-version`, `-balance-probe` and
+`-keep-module-form`, records its shim hash as `shim.fieldFullCompare` and marks its provenance
+`testOnly: "field-full-compare"`. These modules are test artifacts, never product grammar modules.
+
+`tools/gen/field-precheck-soundness.sh <new-empty-out-dir> <ciconf-data-dir> <lang>...` (inputs prepared by
+`PREPARE_ONLY=1 tools/gen/regen.sh <work-dir>`, see the script header) builds the variants, runs `TestFieldsDigest` against the
+product modules and, with `go test -modfile`, against the variants, and requires identical per-input `Fields()` hashes
+(exit 1 otherwise). It checks the soundness of the pre-check against the corpus and edited inputs only; production
+that those inputs never reach is not covered. The scheduled/manual job
+`.github/workflows/field-precheck-soundness.yml` runs it for all 25 grammars. It is not a PR-required check. Run it
+before moving the runtime pin and after any change to the pre-check.
+
 ## Recorded grammar patches (ADR-0023)
 
 Each grammar's optional `patches` list keeps the existing single-file records: `file` (under `patches/<grammar>/`),

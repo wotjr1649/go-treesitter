@@ -1,0 +1,112 @@
+name: Field pre-check soundness (test only)
+
+# TEST ONLY, scheduled and manual, never a PR-required check. The shim's xfields_may_differ pre-check (tools/gen/shim/
+# tsg_abi.c) skips the C comparison of a node's fields for productions it judges safe. tools/gen -field-full-compare builds a
+# variant without that skip (a copy of the shim edited in the work directory; the product shim and every module stay
+# byte-identical), and tools/gen/field-precheck-soundness.sh requires the product module and the variant to give the same
+# Fields() result for every corpus and edited input. A difference means the pre-check skipped a place where C differs.
+# Run it before a runtime pin move (the pre-check encodes the pinned runtime's node.c / tree_cursor.c algorithms) and
+# after a change to the pre-check. Inputs: the pinned grammars' own test/corpus plus the seeded edits (as conformance.yml).
+
+on:
+  schedule:
+    - cron: "51 4 * * 6"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  field-precheck-soundness:
+    name: field pre-check soundness (ubuntu-24.04, ${{ matrix.group.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # The same five groups as conformance.yml, by measured run time of the native build and corpus.
+        group:
+          - {name: g1, langs: "tsql css c"}
+          - {name: g2, langs: "postgres ruby golang php"}
+          - {name: g3, langs: "swift yaml dart tsx json r"}
+          - {name: g4, langs: "powershell typescript java javascript rust xml"}
+          - {name: g5, langs: "kotlin csharp cpp bash python html"}
+    runs-on: ubuntu-24.04
+    # Estimate, not measured on a runner: native build and corpus ~5m, tool preparation ~3m, then per grammar ~1m for the
+    # variant (clang + wasm2go) and two builds and runs of the conformance test binary.
+    timeout-minutes: 90
+    env:
+      GOENV: "off"
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+      GROUP_LANGS: ${{ matrix.group.langs }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version: 1.27.x # newest supported; go.mod states the floor (1.26.0)
+      - name: Record identity
+        run: |
+          git rev-parse HEAD
+          go version
+          gcc --version | head -1
+          sha256sum tools/gen/pins.json tools/gen/shim/tsg_abi.c
+      - name: Select the group's grammars for conformance builds
+        run: |
+          list=""
+          for lang in $GROUP_LANGS; do
+            [ "$lang" != golang ] || lang=go
+            list="${list:+$list,}$lang"
+          done
+          echo "TSG_S15_LANGS=$list" >> "$GITHUB_ENV"
+          tags=""
+          for other in csharp go json python tsql tsx typescript javascript html css java c rust bash cpp yaml php powershell r dart xml ruby kotlin postgres swift; do
+            case ",$list," in *",$other,"*) ;; *) tags="${tags:+$tags,}no_$other" ;; esac
+          done
+          echo "GOFLAGS=-tags=$tags" >> "$GITHUB_ENV"
+      - name: Fetch pinned sources, build native references, extract corpus
+        working-directory: tools/native-ref
+        env:
+          CGO_ENABLED: "0"
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          go build -o "$RUNNER_TEMP/native-ref" .
+          go build -o "$RUNNER_TEMP/ciconf" ./ciconf
+          cd "$GITHUB_WORKSPACE"
+          "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -fetch -cc gcc \
+            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" $GROUP_LANGS
+      - name: Extract inputs and edits
+        env:
+          CGO_ENABLED: "0"
+        run: |
+          "$RUNNER_TEMP/ciconf" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "$TSG_S15_LANGS" -kit tools/conformance/testdata/kit
+      - name: Prepare the pinned generator tools (no regeneration)
+        env:
+          PREPARE_ONLY: "1"
+        run: bash tools/gen/regen.sh "$RUNNER_TEMP/prep"
+      - name: Build the full-compare variants and compare field results with the product modules
+        env:
+          CGO_ENABLED: "0"
+        run: |
+          P="$RUNNER_TEMP/prep"
+          GEN="$P/bin/gen" SRC="$P/src" DL="$P/dl" SDK="$P/sdk" WASM2GO="$P/bin/wasm2go" WASM_OPT="$P/binaryen/bin/wasm-opt" TS_CLI="$P/bin/tree-sitter" \
+            bash tools/gen/field-precheck-soundness.sh "$RUNNER_TEMP/soundness" "$RUNNER_TEMP/data" $GROUP_LANGS 2>&1 | tee "$RUNNER_TEMP/soundness.log"
+      - name: Product files unchanged
+        if: ${{ always() }}
+        run: |
+          git diff --exit-code -- grammars/ tools/gen/shim/tsg_abi.c
+          test -z "$(git status --porcelain -- grammars/ tools/gen/shim/tsg_abi.c)"
+      - name: Upload digests and log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: field-precheck-soundness-${{ matrix.group.name }}
+          path: |
+            ${{ runner.temp }}/soundness/digest-*.tsv
+            ${{ runner.temp }}/soundness/full/*/provenance.json
+            ${{ runner.temp }}/soundness.log
+          if-no-files-found: warn
+          retention-days: 90

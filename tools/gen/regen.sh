@@ -10,6 +10,8 @@
 # module version with `go install -trimpath`. Output goes to grammars/<lang> in this repository.
 # Each selected grammar keeps the form and minimum root from its own go.mod. ROOT_VERSION=vX.Y.Z
 # overrides that form only for the selected grammars (all grammars if no language list is given).
+# PREPARE_ONLY=1 stops after the verified fetch and the tool builds (bin/gen, bin/wasm2go, bin/tree-sitter, sdk, binaryen,
+# src, dl under <work-dir>) and regenerates nothing; field-precheck-soundness.sh runs on that preparation.
 set -euo pipefail
 
 W=${1:?usage: regen.sh <work-dir> [lang ...]}
@@ -58,6 +60,7 @@ while IFS=$'\t' read -r kind file url sum dest mirrors; do
   esac
 done <"$W/plan.tsv"
 
+[ -z "${PREPARE_ONLY:-}" ] || exit 0
 LANGS=("$@")
 if [ ${#LANGS[@]} -eq 0 ]; then
   LANGS=("${ALL[@]}")
