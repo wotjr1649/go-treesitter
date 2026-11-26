@@ -523,6 +523,31 @@ The pinned upstream Ruby queries compile and match the patched native reference 
 
 ## Unreleased after v0.7.0
 
+### Parser, pool and tree guards
+
+Root behaviour changes with unchanged signatures ([#141](https://github.com/wotjr1649/go-treesitter/pull/141)). Contracts:
+[parser result](docs/specs/parser-result.md).
+
+- **Nil options.** A `nil` `Option` passed to `NewParser` or `NewParserPool` now returns `ErrInvalidInput`; it used to panic.
+- **Pool construction.** `NewParserPool` copies its options, so changing the slice afterwards has no effect. A nonzero
+  `WithMaxMemoryBytes` below 32 MiB is rejected there with `ErrInvalidInput`, not at the first `Get`.
+- **Closing a pool wakes waiting `Get` calls.** A `Get` blocked on a full pool now returns an error matching
+  `ErrParserClosed` when `Close` runs, instead of waiting for a `Put` or its context. A `Get` that was still creating a
+  parser when the pool closed closes it and returns the same error. Parsers still lent are closed when they are `Put` back.
+- **`Tree.Snapshot` while the parser is busy.** It returns `ErrInvalidInput` when another operation on the same parser is
+  running, including a `Tree.Matches` loop on the same goroutine, even if the snapshot is already cached. Take the
+  snapshot before the loop or after it ends. Captures already yielded keep their snapshot.
+
+### Per-call `MatchLimit` on a reused parser
+
+A lower `QueryOptions.MatchLimit` now applies after calls with a higher or no limit on the same parser
+([#145](https://github.com/wotjr1649/go-treesitter/pull/145)). Before, the parser's reused query cursor could keep
+capture lists allocated under the higher limit, so a later low limit did not always overflow. Now it bounds in-progress
+states for each call, and overflow ends the sequence with `ErrQueryMatchLimit`. Zero and `math.MaxUint32` are both
+unlimited. Lowering the effective limit replaces the cursor, so the next `Matches` rebuilds the whole-tree capture
+index (O(nodes), even for a narrow byte range). Raising it does not. Handle `ErrQueryMatchLimit` wherever you use a
+low limit. [Query contract](docs/design/query-abi.md)
+
 ### CSS non-Latin-1 declaration values
 
 Unreleased after `grammars/css/v0.7.0`. The ADR-0023 value patch adapts the widened identifier in
