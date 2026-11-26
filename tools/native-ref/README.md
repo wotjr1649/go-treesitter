@@ -71,6 +71,11 @@ cd tools/native-ref && go run ./ciconf -pins ../gen/pins.json -corpus <corpus di
 cd tools/conformance && TSG_DATA_DIR=<data dir> TSG_NATIVE_EXE_DIR=<exe dir> go test -run 'TestCorpus|TestEdits|TestParserPoolRealEngine' .
 ```
 
+In CI the build output (`exe`, `corpus`, `queries`, `scanner-stages`) is cached per group by a push to main and restored by pull requests;
+the key holds the runner image, compiler and Go versions, the group's grammars and the content of `pins.json`, these sources, the
+patches and the packages this tool imports. `cachesums.sh` records the sha256 of every cached file; a restore that does not match
+it is discarded and the build runs as usual.
+
 `-lang` limits corpus preparation to the comma-separated conformance language names (default: all 25). JSX inputs use the JavaScript corpus and parser. PHP selects the PHP parser; XML selects XML, not DTD.
 Nested corpus directories follow each pin's `grammarDir`; XML upstream queries are under `queries/xml`.
 

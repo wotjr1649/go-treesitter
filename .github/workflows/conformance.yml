@@ -2,7 +2,8 @@ name: C-reference conformance (CI corpora)
 
 # Compares the CGO-free engine with native C tree-sitter on inputs that need no local data: the pinned grammar
 # repositories' own test/corpus files plus deterministic seeded edits (tools/native-ref/ciconf). The native reference
-# is built here with the runner's gcc from the same pinned, sha256-verified sources; the Go side stays CGO_ENABLED=0.
+# is built here with the runner's gcc from the same pinned, sha256-verified sources (or restored from a main-push cache of that
+# build, see "Native reference cache identity"); the Go side stays CGO_ENABLED=0.
 
 on:
   push:
@@ -100,20 +101,63 @@ jobs:
             case ",$list," in *",$other,"*) ;; *) tags="${tags:+$tags,}no_$other" ;; esac
           done
           echo "GOFLAGS=-tags=$tags" >> "$GITHUB_ENV"
-      # Archives are fetched from the pinned commits and their sha256 checked against tools/gen/pins.json before use.
-      - name: Fetch pinned sources, build native references, extract corpus and queries
+      # The built native references (exe, corpus, queries, scanner patch stages; the build is ~24 of ~71 runner-minutes per push) are cached
+      # like the archives: only a push to main saves, pull requests restore. The key holds everything that decides the build: runner OS,
+      # architecture and image version, the compiler and Go versions, the group's grammar list, and the content of pins.json, the
+      # native-ref sources, the patches and the Go packages native-ref imports, and this file. tools/native-ref/cachesums.sh records the
+      # sha256 of every cached file and refuses a restore that differs, so a damaged entry falls back to the build below.
+      - name: Native reference cache identity
+        id: native-id
+        run: |
+          ident=$(printf '%s\n' "${ImageOS:-}-${ImageVersion:-}" "$(gcc --version | head -1)" "$(go version)" "$GROUP_LANGS")
+          printf '%s\n' "$ident"
+          # A runner that states no image version is not cached.
+          [ -z "${ImageVersion:-}" ] || echo "id=$(printf '%s' "$ident" | sha256sum | cut -c1-32)" >> "$GITHUB_OUTPUT"
+      - name: Restore the built native references
+        id: native-cache
+        if: ${{ steps.native-id.outputs.id != '' }}
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            ${{ runner.temp }}/exe
+            ${{ runner.temp }}/corpus
+            ${{ runner.temp }}/queries
+            ${{ runner.temp }}/scanner-stages
+            ${{ runner.temp }}/native-cache.sums
+          key: conformance-native-${{ runner.os }}-${{ runner.arch }}-${{ matrix.group.name }}-${{ steps.native-id.outputs.id }}-${{ hashFiles('tools/gen/pins.json', 'tools/gen/go.mod', 'tools/gen/go.sum', 'tools/gen/patches/**', 'tools/gen/grammarpatch/**', 'tools/bench/proc/**', 'tools/native-ref/**', '.github/workflows/conformance.yml') }}
+      - name: Verify the restored native references
+        id: native-ready
+        # The archives must be restored too: the YAML patch comparison below compiles the unpatched grammar from them.
+        if: ${{ steps.native-cache.outputs.cache-hit == 'true' && steps.dl-cache.outputs.cache-hit == 'true' }}
+        run: |
+          if bash tools/native-ref/cachesums.sh check "$RUNNER_TEMP"; then
+            echo "usable=true" >> "$GITHUB_OUTPUT"
+            echo "native references restored from the cache: $(sed -n 2p "$RUNNER_TEMP/native-cache.sums")" | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::the restored native references do not match their recorded checksums; building them"
+            rm -rf "$RUNNER_TEMP/exe" "$RUNNER_TEMP/corpus" "$RUNNER_TEMP/queries" "$RUNNER_TEMP/scanner-stages"
+          fi
+      - name: Build the native-ref and ciconf tools
         working-directory: tools/native-ref
         env:
           CGO_ENABLED: "0"
-          GITHUB_TOKEN: ${{ github.token }}
         run: |
           [ "$GROUP_DOCS" != true ] || go test -count=1 ./...
           go build -o "$RUNNER_TEMP/native-ref" .
           go build -o "$RUNNER_TEMP/ciconf" ./ciconf
-          cd "$GITHUB_WORKSPACE"
+      # Archives are fetched from the pinned commits and their sha256 checked against tools/gen/pins.json before use.
+      - name: Fetch pinned sources, build native references, extract corpus and queries
+        if: ${{ steps.native-ready.outputs.usable != 'true' }}
+        env:
+          CGO_ENABLED: "0"
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
           "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -fetch -cc gcc \
             -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" -queries "$RUNNER_TEMP/queries" \
             -scanner-stages "$RUNNER_TEMP/scanner-stages" $GROUP_LANGS
+      - name: Record the native build for the cache
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.native-id.outputs.id != '' && steps.native-cache.outputs.cache-hit != 'true' }}
+        run: bash tools/native-ref/cachesums.sh write "$RUNNER_TEMP"
       - name: Extract inputs and edits, record native results
         id: native-inputs
         env:
@@ -202,6 +246,22 @@ jobs:
             ${{ runner.temp }}/data/corpus/skipped.csv
           if-no-files-found: ignore
           retention-days: 90
+      - name: Check the native references are unchanged before saving
+        id: native-final
+        if: ${{ success() && github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.native-id.outputs.id != '' && steps.native-cache.outputs.cache-hit != 'true' }}
+        run: |
+          if bash tools/native-ref/cachesums.sh check "$RUNNER_TEMP"; then echo "ok=true" >> "$GITHUB_OUTPUT"; du -sh "$RUNNER_TEMP/exe" "$RUNNER_TEMP/corpus" "$RUNNER_TEMP/queries" "$RUNNER_TEMP/scanner-stages"; else echo "::warning::the native references changed after the build; not caching them"; fi
+      - name: Save the built native references
+        if: ${{ steps.native-final.outputs.ok == 'true' }}
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            ${{ runner.temp }}/exe
+            ${{ runner.temp }}/corpus
+            ${{ runner.temp }}/queries
+            ${{ runner.temp }}/scanner-stages
+            ${{ runner.temp }}/native-cache.sums
+          key: conformance-native-${{ runner.os }}-${{ runner.arch }}-${{ matrix.group.name }}-${{ steps.native-id.outputs.id }}-${{ hashFiles('tools/gen/pins.json', 'tools/gen/go.mod', 'tools/gen/go.sum', 'tools/gen/patches/**', 'tools/gen/grammarpatch/**', 'tools/bench/proc/**', 'tools/native-ref/**', '.github/workflows/conformance.yml') }}
       - name: Save the verified archive cache
         if: ${{ success() && github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.dl-cache.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v5
