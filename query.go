@@ -1,8 +1,10 @@
 package treesitter
 
 import (
+	"context"
 	"encoding/binary"
 	"fmt"
+	"math"
 	"strings"
 
 	"github.com/wotjr1649/go-treesitter/internal/engine"
@@ -84,47 +86,84 @@ func (q *Query) Properties(pattern int) map[string]string {
 
 // NewQuery validates pattern using a scratch instance; each parser compiles it once per instance on first use.
 func NewQuery(lang *Language, pattern string) (*Query, error) {
+	return newQuery(context.Background(), lang, pattern, nil)
+}
+
+func newQuery(ctx context.Context, lang *Language, pattern string, cfg *queryCompileConfig) (result *Query, err error) {
+	if ctx == nil {
+		return nil, perr(InvalidInput, "nil context", nil)
+	}
+	if ctx.Err() != nil {
+		return nil, ctxError(ctx, "context done before query compilation")
+	}
 	if lang == nil || lang.g == nil {
 		return nil, perr(InvalidInput, "nil language", nil)
 	}
 	if lang.g.ABI == 1 {
 		return nil, ErrQueryUnsupported
 	}
-	if int64(len(pattern)) > hardMaxInput {
+	limit := int64(hardMaxInput)
+	var memory int64
+	var metadata, regex *queryMeter
+	if cfg != nil {
+		if cfg.source > 0 {
+			limit = cfg.source
+		}
+		memory = cfg.memory
+		m, r := newQueryMeter(ctx, cfg.metadata, "query metadata"), newQueryMeter(ctx, cfg.regex, "query regex")
+		metadata, regex = &m, &r
+	}
+	if int64(len(pattern)) > limit {
 		return nil, perr(ResourceLimit, "query source is too large", nil)
 	}
-	p, err := NewParser(lang)
+	p, err := NewParser(lang, WithMaxMemoryBytes(memory))
 	if err != nil {
 		return nil, err
 	}
 	defer p.Close()
 	c := p.c
+	in := c.inst
 	q := &Query{lang: lang, source: pattern}
-	ptr, err := c.compileQuery(q)
+	ptr, err := c.compileQuery(ctx, q)
 	if err != nil {
 		return nil, err
 	}
-	m := c.inst.m.(engine.QueryModule)
+	m := in.m.(engine.QueryModule)
 	var meta int32
-	if err := c.queryCall("tsg_query_meta", func() { meta = m.Xtsg_query_meta(ptr) }); err != nil {
+	defer func() {
+		if c.inst == in {
+			if e := c.queryCall("query metadata cleanup", func() {
+				if meta > 0 {
+					m.Xfree(meta)
+				}
+				m.Xtsg_query_delete(ptr)
+			}); e != nil {
+				result, err = nil, e
+			}
+		}
+	}()
+	if ctx.Err() != nil {
+		return nil, ctxError(ctx, "query compilation stopped before metadata export")
+	}
+	if err = c.queryCall("tsg_query_meta", func() { meta = m.Xtsg_query_meta(ptr) }); err != nil {
 		return nil, err
 	}
-	mem := *c.inst.mem
-	if meta <= 0 || uint64(uint32(meta))+24 > uint64(len(mem)) {
+	mem := *in.mem
+	if meta <= 0 || uint64(meta)+24 > uint64(len(mem)) {
 		return nil, c.engineFault("invalid query metadata pointer")
 	}
-	size := binary.LittleEndian.Uint32(mem[int(meta)+8:])
-	if size < 24 || uint64(uint32(meta))+uint64(size) > uint64(len(mem)) {
+	b := mem[meta:]
+	size := binary.LittleEndian.Uint32(b[8:])
+	if size < 24 || uint64(size) > uint64(len(b)) {
 		return nil, c.engineFault("invalid query metadata size")
 	}
-	if err := q.readMeta(mem[int(meta) : int(meta)+int(size)]); err != nil {
-		if _, ok := err.(*QueryError); !ok {
+	if err = q.readMeta(b[:int(size)], metadata, regex); err != nil {
+		switch err.(type) {
+		case *QueryError, *ParseError:
+			return nil, err
+		default:
 			return nil, c.engineFault(err.Error())
 		}
-		return nil, err
-	}
-	if err := c.queryCall("query metadata cleanup", func() { m.Xfree(meta); m.Xtsg_query_delete(ptr) }); err != nil {
-		return nil, err
 	}
 	return q, nil
 }
@@ -139,7 +178,10 @@ func (c *core) queryCall(what string, fn func()) error {
 	return nil
 }
 
-func (c *core) compileQuery(q *Query) (int32, error) {
+func (c *core) compileQuery(ctx context.Context, q *Query) (int32, error) {
+	if ctx.Err() != nil {
+		return 0, ctxError(ctx, "query compilation stopped before source upload")
+	}
 	in := c.inst
 	m, ok := in.m.(engine.QueryModule)
 	if !ok || c.lang.g.ABI < 2 {
@@ -153,7 +195,15 @@ func (c *core) compileQuery(q *Query) (int32, error) {
 	if src <= 0 || uint64(uint32(src))+uint64(len(q.source)) > uint64(len(*in.mem)) {
 		return 0, c.engineFault("invalid query source allocation")
 	}
-	copy((*in.mem)[src:], q.source)
+	if ctx.Err() == nil {
+		copy((*in.mem)[src:], q.source)
+	}
+	if ctx.Err() != nil {
+		if err := c.queryCall("query source free", func() { m.Xfree(src) }); err != nil {
+			return 0, err
+		}
+		return 0, ctxError(ctx, "query compilation stopped after source upload")
+	}
 	if err := c.queryCall("tsg_query_new", func() { ptr = m.Xtsg_query_new(src, int32(len(q.source))) }); err != nil {
 		return 0, err
 	}
@@ -166,6 +216,14 @@ func (c *core) compileQuery(q *Query) (int32, error) {
 	if err := c.queryCall("query source free", func() { m.Xfree(src) }); err != nil {
 		return 0, err
 	}
+	if ctx.Err() != nil {
+		if ptr != 0 {
+			if err := c.queryCall("cancelled query cleanup", func() { m.Xtsg_query_delete(ptr) }); err != nil {
+				return 0, err
+			}
+		}
+		return 0, ctxError(ctx, "query compilation stopped by the context")
+	}
 	if ptr == 0 {
 		if offset < 0 || int64(offset) > int64(len(q.source)) || typ < 1 || typ > 6 {
 			return 0, c.engineFault("invalid query compilation error")
@@ -175,18 +233,25 @@ func (c *core) compileQuery(q *Query) (int32, error) {
 	return ptr, nil
 }
 
-func (q *Query) readMeta(b []byte) error {
+func (q *Query) readMeta(b []byte, metadata, regex *queryMeter) error {
 	bad := func() error { return fmt.Errorf("invalid query metadata") }
 	if len(b) < 24 || string(b[:4]) != "TSGQ" || binary.LittleEndian.Uint32(b[4:]) != 1 || int(binary.LittleEndian.Uint32(b[8:])) != len(b) {
 		return bad()
 	}
-	np, nc, ns := int(binary.LittleEndian.Uint32(b[12:])), int(binary.LittleEndian.Uint32(b[16:])), int(binary.LittleEndian.Uint32(b[20:]))
-	if uint64(np)*8+uint64(nc)*4+uint64(ns)*4 > uint64(len(b)-24) {
+	if !metadata.charge(0) {
+		return metadata.err
+	}
+	if metadata != nil && metadata.limited && int64(len(b)) > metadata.remaining {
+		return perr(ResourceLimit, "query metadata block limit exceeded", nil)
+	}
+	patterns, captures, literals := binary.LittleEndian.Uint32(b[12:]), binary.LittleEndian.Uint32(b[16:]), binary.LittleEndian.Uint32(b[20:])
+	if uint64(patterns)*8+uint64(captures)*4+uint64(literals)*4 > uint64(len(b)-24) {
 		return bad()
 	}
+	np, nc, ns := int(patterns), int(captures), int(literals)
 	pos := 24
 	take := func() (uint32, bool) {
-		if pos+4 > len(b) {
+		if len(b)-pos < 4 {
 			return 0, false
 		}
 		v := binary.LittleEndian.Uint32(b[pos:])
@@ -196,6 +261,9 @@ func (q *Query) readMeta(b []byte) error {
 	readStrings := func(n int) ([]string, error) {
 		out := make([]string, n)
 		for i := range out {
+			if !metadata.charge(0) {
+				return nil, metadata.err
+			}
 			l, ok := take()
 			if !ok || uint64(pos)+uint64(l) > uint64(len(b)) {
 				return nil, bad()
@@ -214,6 +282,9 @@ func (q *Query) readMeta(b []byte) error {
 	}
 	q.patterns = make([]queryPattern, np)
 	for i := range q.patterns {
+		if !metadata.charge(0) {
+			return metadata.err
+		}
 		start, ok := take()
 		if !ok || uint64(start) > uint64(len(q.source)) {
 			return bad()
@@ -227,6 +298,9 @@ func (q *Query) readMeta(b []byte) error {
 		p.properties = map[string]string{}
 		var steps []queryArg
 		for j := uint32(0); j < count; j++ {
+			if !metadata.charge(0) {
+				return metadata.err
+			}
 			typ, _ := take()
 			id, _ := take()
 			switch typ {
@@ -234,7 +308,7 @@ func (q *Query) readMeta(b []byte) error {
 				if len(steps) == 0 || steps[0].capture {
 					return bad()
 				}
-				if err := q.addPredicate(p, steps); err != nil {
+				if err := q.addPredicate(p, steps, metadata, regex); err != nil {
 					return err
 				}
 				steps = nil
@@ -254,10 +328,13 @@ func (q *Query) readMeta(b []byte) error {
 	if pos != len(b) {
 		return bad()
 	}
+	if !metadata.charge(0) {
+		return metadata.err
+	}
 	return nil
 }
 
-func (q *Query) addPredicate(p *queryPattern, steps []queryArg) error {
+func (q *Query) addPredicate(p *queryPattern, steps []queryArg, metadata, regex *queryMeter) error {
 	op, args := q.strings[steps[0].id], steps[1:]
 	fail := func(why string) error {
 		return &QueryError{Offset: p.start, Type: QueryErrorPredicate, reason: op + ": " + why}
@@ -267,7 +344,7 @@ func (q *Query) addPredicate(p *queryPattern, steps []queryArg) error {
 	if opaqueAny {
 		base = strings.TrimPrefix(base, "any-")
 	}
-	pred := textPredicate{op: strings.TrimPrefix(base, "not-"), args: append([]queryArg(nil), args...), negate: strings.HasPrefix(base, "not-")}
+	pred := textPredicate{op: strings.TrimPrefix(base, "not-"), args: args, negate: strings.HasPrefix(base, "not-")}
 	filter := true
 	switch pred.op {
 	case "eq?":
@@ -279,8 +356,11 @@ func (q *Query) addPredicate(p *queryPattern, steps []queryArg) error {
 			return fail("expected a capture and a regex string")
 		}
 		var err error
-		pred.re, err = compileQueryRegex(q.strings[args[1].id])
+		pred.re, err = compileQueryRegexWithMeter(q.strings[args[1].id], regex)
 		if err != nil {
+			if _, ok := err.(*ParseError); ok {
+				return err
+			}
 			return fail(err.Error())
 		}
 	case "any-of?":
@@ -288,6 +368,9 @@ func (q *Query) addPredicate(p *queryPattern, steps []queryArg) error {
 			return fail("expected a capture and optional strings")
 		}
 		for _, a := range args[1:] {
+			if !metadata.charge(0) {
+				return metadata.err
+			}
 			if a.capture {
 				return fail("expected literal alternatives")
 			}
@@ -321,64 +404,129 @@ func (q *Query) addPredicate(p *queryPattern, steps []queryArg) error {
 		}
 	}
 	if !filter || opaqueAny {
-		var values []string
-		for _, a := range args {
-			v := ""
-			if a.capture {
-				v = "@" + q.names[a.id]
-			} else {
-				v = q.strings[a.id]
-			}
-			values = append(values, v)
+		size := int64(max(0, len(args)-1))
+		if !metadata.charge(size) {
+			return metadata.err
 		}
-		p.properties[op] = strings.Join(values, " ")
+		for _, a := range args {
+			var n int64
+			if a.capture {
+				n = 1 + int64(len(q.names[a.id]))
+			} else {
+				n = int64(len(q.strings[a.id]))
+			}
+			if !metadata.charge(n) {
+				return metadata.err
+			}
+			if n > int64(math.MaxInt)-size {
+				return perr(ResourceLimit, "query property exceeds string length range", nil)
+			}
+			size += n
+		}
+		var value strings.Builder
+		value.Grow(int(size))
+		for i, a := range args {
+			if !metadata.charge(0) {
+				return metadata.err
+			}
+			if i > 0 {
+				value.WriteByte(' ')
+			}
+			if a.capture {
+				value.WriteByte('@')
+				value.WriteString(q.names[a.id])
+			} else {
+				value.WriteString(q.strings[a.id])
+			}
+		}
+		p.properties[op] = value.String()
 		return nil
 	}
 	p.predicates = append(p.predicates, pred)
 	return nil
 }
 
-func (q *Query) accepts(m QueryMatch) bool {
+func (q *Query) accepts(m QueryMatch, work *queryMeter) bool {
+	if !work.charge(1) {
+		return false
+	}
 	for _, p := range q.patterns[m.Pattern].predicates {
+		if !work.charge(1) {
+			return false
+		}
 		var left, right []string
 		for _, c := range m.Captures {
+			if !work.charge(1) {
+				return false
+			}
 			if c.Index == p.args[0].id {
 				left = append(left, c.Node.Text())
 			}
 		}
 		if p.op == "eq?" && p.args[1].capture {
 			for _, c := range m.Captures {
+				if !work.charge(1) {
+					return false
+				}
 				if c.Index == p.args[1].id {
 					right = append(right, c.Node.Text())
 				}
 			}
-			if len(left) != len(right) {
+			if !work.charge(1) || len(left) != len(right) {
 				return false
 			}
 		}
 		for i, text := range left {
+			if !work.charge(1) {
+				return false
+			}
 			matched := false
 			switch p.op {
 			case "eq?":
 				if p.args[1].capture {
-					matched = text == right[i]
+					matched = queryTextEqual(text, right[i], work)
 				} else {
-					matched = text == q.strings[p.args[1].id]
+					matched = queryTextEqual(text, q.strings[p.args[1].id], work)
 				}
 			case "match?":
-				matched = p.re.MatchString(text)
+				if work == nil {
+					matched = p.re.MatchString(text)
+				} else {
+					matched = regexVMMatchWithMeter(p.re.prog, text, p.re.asciiBoundaries, work)
+				}
 			case "any-of?":
 				for _, a := range p.args[1:] {
-					if text == q.strings[a.id] {
+					if queryTextEqual(text, q.strings[a.id], work) {
 						matched = true
 						break
 					}
+					if work != nil && work.err != nil {
+						return false
+					}
 				}
 			}
-			if matched == p.negate {
+			if (work != nil && work.err != nil) || matched == p.negate {
 				return false
 			}
 		}
+	}
+	return true
+}
+
+// queryTextEqual meters the length check and each attempted byte comparison.
+func queryTextEqual(a, b string, work *queryMeter) bool {
+	if work == nil {
+		return a == b
+	}
+	if !work.charge(1) || len(a) != len(b) {
+		return false
+	}
+	for len(a) != 0 {
+		n := min(len(a), 64)
+		if !work.charge(int64(n)) || a[:n] != b[:n] {
+			return false
+		}
+		a, b = a[n:], b[n:]
 	}
 	return true
 }

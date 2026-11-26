@@ -71,8 +71,8 @@ func sentinelFor(o Outcome) error {
 	return nil
 }
 
-// ParseError reports a parse (or snapshot export) that produced no result. errors.Is matches the sentinel of Outcome
-// and, through Unwrap, the context error for Timeout/Cancelled.
+// ParseError classifies errors from parsing, snapshot export, and query operations.
+// errors.Is matches the Outcome sentinel and, through Unwrap, the context error for Timeout/Cancelled.
 type ParseError struct {
 	Outcome Outcome
 	Reason  string
