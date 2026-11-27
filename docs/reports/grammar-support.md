@@ -16,6 +16,12 @@ version selected by Go alongside the root in the [compatibility table](compatibi
   [`2d11c3f`](https://github.com/wotjr1649/go-treesitter/commit/2d11c3fcf592d67de025782a2942ddf1b01af4d5), with root `v0.7.0`. The published tag comparison uses the candidate at
   [`7e24331`](https://github.com/wotjr1649/go-treesitter/commit/7e243318b5b1f8223ac0e1f49e06e10a9b107757).
   “Same” carries the `v0.6.0` limit forward. “Fixed” and “Changed” apply to the recorded input in the new tag.
+- **`css` `v0.8.0` and `python` `v0.7.0` tags** ship with the root `v1.0.0-rc.1`. The new tags point to
+  `<grammar-release-commit>` (pending until the tags are published), and each declares root `v0.7.0` as its minimum. In the tables
+  below, the `v0.7.0 tag` column of a `python` row describes this new `python` tag, and the `v0.7.0 tag` column of a `css` row
+  also describes the `css` `v0.8.0` tag unless the row says otherwise. `css` `v0.7.0` and `python` `v0.6.0` keep their published
+  behavior, and the other 19 modules keep their `v0.6.0` tags (“Same”). [Fixed in the new tags](#fixed-in-the-css-v080-and-python-v070-tags)
+  lists the two changes.
 
 The inputs below are illustrative excerpts. Linked records give the exact fixtures and scope. The error
 column refers to the root's syntax error flag (`HasError()`). An error-free tree can still have the
@@ -68,14 +74,15 @@ None changed without a root error on either tag and have no register entry. Case
 | `powershell` | `"$name님 환영합니다"` | `v0.6.0` | Changed, no root error | No | The `v0.6.0` tree reads the variable `$name` followed by text. The `v0.7.0` tag reads one `variable`, `$name님`, so variable captures and ranges differ between the tags. | A tag includes the patch ([row 32](limitations.md)). Keep the fixture and recheck variable ranges on the next pin. | None; [migration](../../MIGRATING.md#powershell-names), [row 32](limitations.md) |
 | `powershell` | `echo $env:한글` | `v0.6.0` | Changed, no root error | No | The `v0.6.0` tree reads the variable `$env`, a `:` token and a word. The `v0.7.0` tag reads one `variable`, `$env:한글`. | A tag includes the patch ([row 32](limitations.md)). Keep the fixture and recheck scoped names on the next pin. | None; [migration](../../MIGRATING.md#powershell-names), [row 32](limitations.md) |
 
-## Fixed in the development tree after v0.7.0
+## Fixed in the css v0.8.0 and python v0.7.0 tags
 
-The CSS declaration value and Python `await` fixes are in the development tree. Their two IDs leave the register, and the inputs stay as regression fixtures.
+The CSS declaration value and Python `await` fixes ship in the new `css` `v0.8.0` and `python` `v0.7.0` tags (`<grammar-release-commit>`).
+Their two IDs left the register, and the inputs stay as regression fixtures. The earlier tags keep the published behavior.
 
-| Grammar module | Input | Published behavior | Development tree | Consumer impact | Evidence |
+| Grammar module | Input | Earlier tags | New tag | Consumer impact | Evidence |
 |---|---|---|---|---|---|
-| `css` | `a { b: 한글 }` | Both `v0.6.0` and `v0.7.0` report a root error | Fixed, no root error | Queries can capture the declaration and the complete `plain_value`. | [Published gap](https://github.com/wotjr1649/go-treesitter/blob/grammars/css/v0.7.0/docs/known-gaps/css.md#css-non-latin1-value), [regression input](../../tools/conformance/testdata/korean/css/probe-ident-value.in), [migration](../../MIGRATING.md#css-non-latin-1-declaration-values) |
-| `python` | `await f() ** 2` inside an async function | The carried-forward `v0.6.0` tag puts the power expression inside the await operand without a root error | Groups as `(await f()) ** 2` | Expression analysis sees a different grouping. | [Published gap](https://github.com/wotjr1649/go-treesitter/blob/grammars/python/v0.6.0/docs/known-gaps/python.md#python-await-power), [row 35](limitations.md), [migration](../../MIGRATING.md#python-await-and-the-power-operator) |
+| `css` | `a { b: 한글 }` | Both `v0.6.0` and `v0.7.0` report a root error | `v0.8.0`: fixed, no root error | Queries can capture the declaration and the complete `plain_value`. | [Published gap](https://github.com/wotjr1649/go-treesitter/blob/grammars/css/v0.7.0/docs/known-gaps/css.md#css-non-latin1-value), [regression input](../../tools/conformance/testdata/korean/css/probe-ident-value.in), [migration](../../MIGRATING.md#css-non-latin-1-declaration-values) |
+| `python` | `await f() ** 2` inside an async function | The carried-forward `v0.6.0` tag puts the power expression inside the await operand without a root error | `v0.7.0`: groups as `(await f()) ** 2` | Expression analysis sees a different grouping. | [Published gap](https://github.com/wotjr1649/go-treesitter/blob/grammars/python/v0.6.0/docs/known-gaps/python.md#python-await-power), [row 35](limitations.md), [migration](../../MIGRATING.md#python-await-and-the-power-operator) |
 
 ## Other documented grammar limits
 

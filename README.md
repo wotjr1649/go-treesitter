@@ -85,6 +85,11 @@ Go selects the highest root that any selected module requires. Each new tag decl
 root `v0.7.0` is the recommended pairing. The [compatibility table](docs/reports/compatibility.md) records the tested combinations and the
 [support table](docs/reports/grammar-support.md) lists known limits by tag.
 
+The root pre-release `v1.0.0-rc.1` pairs with two newer grammar tags, `grammars/css/v0.8.0` and `grammars/python/v0.7.0`, each with minimum
+root `v0.7.0`; every other tag above stays as listed. Request the RC by name (`go get github.com/wotjr1649/go-treesitter@v1.0.0-rc.1`):
+`@latest` still selects `v0.7.0` while it is the latest final version. See the
+[migration notes](MIGRATING.md#upgrading-from-v070-to-v100-rc1).
+
 Install the root and the grammar modules you use, each at the tag in the table above. For example,
 
 ```sh
