@@ -2,7 +2,7 @@
 
 Updated 2026-11-25 for the v0.7.0 Preview release (25 grammar modules, five of them with new tags, engine ABI 4).
 The latest published release is v0.7.0 (see [Released](#released)). Historical gate tables retain their original commits, pins and scope.
-The v1.0.0-rc.1 pre-release is in preparation (updated `<DATE>`): see [its scope](#v100-rc1-release-scope) and [gates](#v100-rc1-preparation-gates).
+The v1.0.0-rc.1 pre-release is in preparation (updated 2026-11-28): see [its scope](#v100-rc1-release-scope) and [gates](#v100-rc1-preparation-gates).
 The previous board for the `gotreesitter` carrier is in Git history at main `9ad82eb`.
 
 ## v1.0.0-rc.1 release scope
@@ -13,16 +13,21 @@ The previous board for the `gotreesitter` carrier is in Git history at main `9ad
   decision, 2026-11-26). The other 23 modules keep their published tags: `swift`, `xml`, `ruby` and `powershell` at `v0.7.0` and 19
   at `v0.6.0`. The [migration notes](../../MIGRATING.md#upgrading-from-v070-to-v100-rc1) describe the consumer-visible changes and
   the [compatibility table](compatibility.md) binds each tested combination to its commits and evidence.
-- **Root changes since v0.7.0** (verify against `git diff v0.7.0..<C>` at the candidate): parser, pool and tree guards ([#141](https://github.com/wotjr1649/go-treesitter/pull/141)), per-call
+- **Root changes since v0.7.0** (`git diff v0.7.0..8e3b271`): parser, pool and tree guards ([#141](https://github.com/wotjr1649/go-treesitter/pull/141)), per-call
   `MatchLimit` ([#145](https://github.com/wotjr1649/go-treesitter/pull/145)), opt-in query budgets, an additive API ([#143](https://github.com/wotjr1649/go-treesitter/pull/143), [ADR-0030](../design/decisions/ADR-0030-query-budgets.md)),
   the snapshot `childCount` column removed ([#152](https://github.com/wotjr1649/go-treesitter/pull/152)), `ChildByFieldName` wording tied to the module's pinned runtime ([#153](https://github.com/wotjr1649/go-treesitter/pull/153)), and
   single-copy initial engine memory ([#154](https://github.com/wotjr1649/go-treesitter/pull/154)), engine live-state cleanup on address
   reuse ([#166](https://github.com/wotjr1649/go-treesitter/pull/166)), and `ErrQueryMatchLimit` matching `ErrResourceLimit`
-  ([#168](https://github.com/wotjr1649/go-treesitter/pull/168)). `<ROOT-CHANGE-REVIEW>`
+  ([#168](https://github.com/wotjr1649/go-treesitter/pull/168)). The diff changes 17 root code files, including `internal/engine/memory.go`
+  (1,106 lines added, 299 removed); besides the pull requests above, [#127](https://github.com/wotjr1649/go-treesitter/pull/127), [#140](https://github.com/wotjr1649/go-treesitter/pull/140), [#162](https://github.com/wotjr1649/go-treesitter/pull/162) and
+  [#164](https://github.com/wotjr1649/go-treesitter/pull/164) change only doc comments (#127 adds `doc.go`).
 - **Release policy (ADR-0028, [publication.md](../specs/publication.md#multi-module-release)).** The candidate `C` is a single main commit
-  (`<C>`), frozen after the declaration (`<DECLARATION-PR-URL>`, SHA-256 `<DECLARATION-SHA256>`). The owner set no fixed date for `C`.
+  ([`8e3b27146ae7a34c8fb7a6850420151c03f36648`](https://github.com/wotjr1649/go-treesitter/commit/8e3b27146ae7a34c8fb7a6850420151c03f36648), the merge of [#180](https://github.com/wotjr1649/go-treesitter/pull/180)), frozen after the [declaration](https://github.com/wotjr1649/go-treesitter/pull/180#issuecomment-7206947173) (SHA-256
+  `9d4f4de61eb49a9ac35508912dde3b24cf7aaa440da1f3cfc0c9a5a9b622befc`). The owner set no fixed date for `C`.
   The release commit `<r-commit>` has `C` as an ancestor and differs from it only in these paths: `MIGRATING.md`, `README.md`,
-  `docs/reports/` and `tools/lane/published-consumers/` (`git diff --name-only --no-renames <C> <r-commit>`: `<NAME-STATUS-RESULT>`). A path
+  `docs/reports/` and `tools/lane/published-consumers/` (`git diff --name-only --no-renames 8e3b271 <r-commit>`: `MIGRATING.md`, `README.md`,
+  `docs/reports/compatibility.md`, `docs/reports/grammar-support.md`, `docs/reports/limitations.md`,
+  `docs/reports/release-critical-status.md` and `tools/lane/published-consumers/v1.0.0-rc.1.json`). A path
   anywhere else (root code and tests, `internal/`, `go.mod`, the contracts under `docs/specs` and `docs/design`, workflows, grammars, pins)
   is a root, contract or input change and needs a new candidate. A change to root code, the public API or contracts cuts a new RC and repeats
   the affected gates; 14 days without root defect reports lead to 1.0, with owner approval. Tags, tag pushes, the GitHub release and its
@@ -30,41 +35,59 @@ The previous board for the `gotreesitter` carrier is in Git history at main `9ad
 
 ## v1.0.0-rc.1 preparation gates
 
-Candidate: `<C>` (main after the merges listed above). Every hosted run below reports `<C>` as its head SHA. The pins SHA-256 is
-`<PINS-SHA256>`; the candidate uses tree-sitter runtime and CLI 0.27.2, recipe `v2-O3` and engine ABI 4. Product results use
+Candidate: [`8e3b27146ae7a34c8fb7a6850420151c03f36648`](https://github.com/wotjr1649/go-treesitter/commit/8e3b27146ae7a34c8fb7a6850420151c03f36648) (main after the merges listed above). Every hosted run below reports it as its head SHA. The pins SHA-256 is
+`7dce99ecb96294a661fc5055b7b09d00d6088fa873c4a3fadc77dacf04b7a3d9`; the candidate uses tree-sitter runtime and CLI 0.27.2, recipe `v2-O3` and engine ABI 4. Product results use
 `CGO_ENABLED=0`. The declared gate runs are listed with their counts. The six CI gates use the first-attempt push runs on C.
 If a push run was superseded or main moved past C, the declaration records a full dispatch at C for the missing workflow
 ([validation contract](../specs/validation.md#main-push-runs)). Each CI gate counts as passed only when its `*-gate` job
 (`windows-gate`, `regen-gate`, `conformance-gate`, `engine-gate`, `api-guard-gate`, `pin-move-gate`) succeeded, the job list equals
 the one in the declaration and no job was skipped. Failed or unstarted runs keep their first results. The declaration classifies
-them and records the outcome (`<RESULT>`: all gates `<N>` of `<N>` passed, or the failures named below).
+them and records the outcome. Every hosted run finished on its first attempt and none was re-run. All ten gate runs passed. The
+upstream-watch observation failed on one external warning, which the owner recorded as a per-case exception (see Source watch
+below and [limitations](limitations.md), row 40).
 
 | Gate | v1.0.0-rc.1 candidate result | Scope |
 |---|---|---|
-| Windows CI | `<RESULT>`, `<N>/<N>` jobs | Licence checks and the diagnostic CGO race job. Native Windows amd64/arm64 product execution (CGO 0) is in Engine CI. [<RUN-ID-WINDOWS>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-WINDOWS>) |
-| Grammar pin move evidence | `<RESULT>`, `<N>/<N>` push jobs, diff skipped | The push supplies no explicit comparison refs. The CSS value patch and the Python `await` patch have their own old/new evidence in the [schema register](../validation/grammar-schemas.md). [<RUN-ID-PIN-MOVE>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-PIN-MOVE>) |
-| Reproducible generation | `<RESULT>`, E3, attempt `<N>`, `<N>/<N>` jobs | Four Linux amd64 groups regenerate all 25 grammar modules and compare them with the committed bytes, including `css` and `python`. [<RUN-ID-REGEN>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-REGEN>) |
-| Conformance | `<RESULT>`, E5, `<N>/<N>` jobs | Five grammar groups on each Linux architecture (amd64 and arm64) and one aggregate per architecture: native dumps, seeded edits and ranges, raw query matches, strict fresh/edited fields, symbol lookups and retained known gaps. The group filters select and run their tests (`<RESULT>`). [<RUN-ID-CONFORMANCE>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-CONFORMANCE>) |
-| Engine CI | `<RESULT>`, E3, `<N>/<N>` jobs | Grammar shard jobs, the engine jobs (native Linux amd64/arm64, macOS arm64, Windows amd64/arm64 on Go 1.27.x, Linux amd64 on the oldest supported Go 1.26.x; their `Engine and root package` step also runs the root `TestAPIInventory`) and `engine-consumer-compat`, which is not the exact-version ZIP rehearsal. [<RUN-ID-ENGINE>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-ENGINE>) |
-| API compatibility | `<RESULT>`, E3 | `api-guard` runs `apidiff` of the root API against `v0.7.0` and the struct-literal check; the first column says whether either reported an incompatible change (the query budgets are additions by design, [ADR-0030](../design/decisions/ADR-0030-query-budgets.md)). `TestAPIInventory` belongs to the engine row. [<RUN-ID-API-GUARD>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-API-GUARD>) |
-| Speed / memory bench (hosted, exactly one run) | `<RESULT>`, E4, `<N>/125` grammar/platform jobs | Paired product/native speed and memory on hashed large inputs and the pinned small corpora, all 25 grammars on Linux amd64/arm64, macOS arm64 and Windows amd64/arm64, with the declared parameters (5 rounds x 5 reps for large inputs, 3 x 7 for small files, 3 fresh processes per memory condition). The criteria are fixed: large-input geomean at most 2.5x native, small files at most 1 ms or 2.5x native, peak at most 100x the input plus 64 MB, private-byte growth at most 16 MB. `<BENCH-SUMMARY>` Exceptions: `<BENCH-EXCEPTIONS>`. [<RUN-ID-BENCH>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-BENCH>) |
-| Windows amd64 local bench | `<RESULT>`, E4, maintainer-local, `<N>/25` grammars | Candidate `<C>`, Windows amd64, Go `<GO-VERSION>`, `CGO_ENABLED=0`, all 25 grammars with the declared repetitions, one run. Smallest peak margin: `<RUBY-PEAK-MARGIN>`. The evidence covers these inputs and this host only and is not E5. Declaration record: `<DECLARATION-SHA256>`. |
-| Balancing cancellation | `<RESULT>`, E5 probe builds, `<N>/25` jobs | Linux amd64. `<BALANCING-COUNTS>`. [<RUN-ID-BALANCING>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-BALANCING>) |
-| Nightly diff | `<RESULT>`, E5 for sampled cases, `<N>/50` jobs | All 25 grammars on Linux amd64/arm64. Seed `<SEED>`. [<RUN-ID-NIGHTLY>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-NIGHTLY>) |
-| Upstream watch | `<RESULT>`, E1, `<N>/<N>` jobs | `<N>` unaccepted warnings. [<RUN-ID-UPSTREAM-WATCH>](https://github.com/wotjr1649/go-treesitter/actions/runs/<RUN-ID-UPSTREAM-WATCH>) |
+| Windows CI | PASS, 4/4 jobs | Licence checks and the diagnostic CGO race job. Native Windows amd64/arm64 product execution (CGO 0) is in Engine CI. [45917256568](https://github.com/wotjr1649/go-treesitter/actions/runs/45917256568) |
+| Grammar pin move evidence | PASS, 3/3 push jobs, diff skipped | The push supplies no explicit comparison refs. The CSS value patch and the Python `await` patch have their own old/new evidence in the [schema register](../validation/grammar-schemas.md). [45917256700](https://github.com/wotjr1649/go-treesitter/actions/runs/45917256700) |
+| Reproducible generation | PASS, E3, attempt 1, 7/7 jobs | Four Linux amd64 groups regenerate all 25 grammar modules and compare them with the committed bytes, including `css` and `python`; the aggregate passed. [45917256552](https://github.com/wotjr1649/go-treesitter/actions/runs/45917256552) |
+| Conformance | PASS, E5, 14/14 jobs | Five grammar groups on each Linux architecture (amd64 and arm64) and one aggregate per architecture: native dumps, seeded edits and ranges, raw query matches, strict fresh/edited fields, symbol lookups and retained known gaps. The group filters select and run their tests: each of the ten group jobs passed its three `go test` steps (the native comparisons, the query tests, and the fuzz seeds and examples), `TestMemoryLimitRealEngine` passed in group `g3` and `TestQueryMatchLimitIsPerCall` in group `g5` on each architecture. [45917256637](https://github.com/wotjr1649/go-treesitter/actions/runs/45917256637) |
+| Engine CI | PASS, E3, 21/21 jobs | Grammar shard jobs, the engine jobs (native Linux amd64/arm64, macOS arm64, Windows amd64/arm64 on Go 1.27.x, Linux amd64 on the oldest supported Go 1.26.x; their `Engine and root package` step also runs the root `TestAPIInventory`) and `engine-consumer-compat`, which is not the exact-version ZIP rehearsal. [45917256641](https://github.com/wotjr1649/go-treesitter/actions/runs/45917256641) |
+| API compatibility | PASS, E3: no incompatible change reported | `api-guard` runs `apidiff` of the root API against `v0.7.0` and the struct-literal check; the first column says whether either reported an incompatible change (the query budgets are additions by design, [ADR-0030](../design/decisions/ADR-0030-query-budgets.md)). The hosted job prints only incompatible changes; the full compatible diff, from a local run of the same pinned `apidiff` (`tools/apiguard`) on the `8e3b271` root package against `v0.7.0`, lists 11 additions and no incompatible change: `(*Tree).MatchesWithOptions`, `NewQueryWithOptions`, `QueryCompileOption`, `QueryMatchOption` and the seven `WithMaxQuery*` options (`Captures`, `MemoryBytes`, `MetadataBytes`, `PredicateWork`, `RegexUnits`, `Results`, `SourceBytes`). `TestAPIInventory` belongs to the engine row. [45917256629](https://github.com/wotjr1649/go-treesitter/actions/runs/45917256629) |
+| Speed / memory bench (hosted, exactly one run) | PASS, E4, 125/125 grammar/platform jobs | Paired product/native speed and memory on hashed large inputs and the pinned small corpora, all 25 grammars on Linux amd64/arm64, macOS arm64 and Windows amd64/arm64, with the declared parameters (5 rounds x 5 reps for large inputs, 3 x 7 for small files, 3 fresh processes per memory condition). The criteria are fixed: large-input geomean at most 2.5x native, small files at most 1 ms or 2.5x native, peak at most 100x the input plus 64 MB, private-byte growth at most 16 MB. Every job passed every measured criterion. The highest large-input geomean was 2.243x native (YAML, Linux amd64); the highest on the other platforms were 2.216x on Linux arm64 and 2.146x on macOS arm64 (both Python), 1.904x on Windows amd64 (XML) and 1.975x on Windows arm64 (Python). All 8,184 eligible small files passed on each platform. All 86 memory rows per platform passed and returned every engine region after `Close`; the highest peak was 0.927 of its limit (Ruby, macOS arm64) and the largest private-byte growth 5.0 MiB (macOS arm64, after the ADR-0022 adjustment). Exceptions: none. [45920175363](https://github.com/wotjr1649/go-treesitter/actions/runs/45920175363) |
+| Windows amd64 local bench | PASS, E4, maintainer-local, 25/25 grammars | Candidate `8e3b271`, Windows amd64, Go 1.27.4, `CGO_ENABLED=0`, all 25 grammars with the declared repetitions, one run. Every measured criterion passed: the highest large-input geomean was 1.766 (Python; limit 2.5), all 8,184 small files passed, private-byte growth was at most 5.7 MiB (limit 16) and every engine region was returned. Smallest peak margin: the Ruby snapshot of `gb18030-tbl.rb`, 177.6 MiB against the 193.5 MiB limit (0.918 of the limit). The host was not idle (owner-approved: no reboot before the run and other user sessions open); the CPU load before each grammar's measurement, 29 to 66 %, was recorded and is not a criterion. The evidence covers these inputs and this host only and is not E5. Declaration record: SHA-256 `9d4f4de61eb49a9ac35508912dde3b24cf7aaa440da1f3cfc0c9a5a9b622befc`; its local-bench row quotes the machine-read bench declaration, SHA-256 `2f063162b103a524ec4c25f9ad61bbdfa781cce5c377b52777db8b8ecede56b4`. |
+| Balancing cancellation | PASS, E5 probe builds, 25/25 jobs | Linux amd64. Across the pinned big and follow-up inputs, 6,175 stops landed in balancing and all 8,618 next parses matched the native reference; the JSON no-reset control disagreed in all three comparisons. [45920180138](https://github.com/wotjr1649/go-treesitter/actions/runs/45920180138) |
+| Nightly diff | PASS, E5 for sampled cases, 50/50 jobs | All 25 grammars on Linux amd64/arm64. Seed `100782277401`, four minutes per grammar and 30 seconds per Go fuzz target. [45920184625](https://github.com/wotjr1649/go-treesitter/actions/runs/45920184625) |
+| Upstream watch | **FAIL**, E1, 1/2 jobs (`watch` failed, `issue` passed); external, per-case exception ([limitations](limitations.md), row 40) | 1 unaccepted warning: `wasm2go` is pinned at `v0.4.21` and its newest stable release is `v0.4.23`. See Source watch below. [45920188239](https://github.com/wotjr1649/go-treesitter/actions/runs/45920188239) |
 | Root ZIP rehearsal (step 1) | `<result>`, local E3 packaging | Commit `<r-commit>`, host `<host>`, file `GOPROXY`, empty module cache, no `replace`: root `v1.0.0-rc.1` with the carried-forward grammar tags. Samples parsed with `CGO_ENABLED=0`, `go mod verify`, `linux/arm64` link. Root ZIP SHA-256 `<root-zip-sha256>`, reproducible, file list equal to the tracked files minus the nested modules. |
 | New-grammar ZIP rehearsal (steps 1 and 4) | `<result>`, local E3 packaging, `<n>` assertions | Release-form commit `<grammar-release-commit>`: `css` `v0.8.0` and `python` `v0.7.0` each alone at root `v0.7.0` (Go selected `v0.7.0`) and the mixed consumer (root `v1.0.0-rc.1`, the two new tags, four carried-forward `v0.7.0` tags, 19 `v0.6.0` tags). Grammar ZIPs SHA-256 `<css-zip-sha256>` and `<python-zip-sha256>`, reproducible. |
-| Candidate source-row inventory | `<RESULT>`, local E1 | `gen -mirror-assets` listed `<N>` rows: `<N>` `source` and `<N>` `toolchain`. The draft upload is the source archives plus `SHA256SUMS` (27 assets if the pins' source set is unchanged since v0.7.0). |
+| Candidate source-row inventory | PASS, local E1 | `gen -mirror-assets` on `8e3b271` listed 35 rows: 26 `source` and 9 `toolchain`. The draft upload is the 26 source archives plus `SHA256SUMS` (27 assets; the pins' source set is unchanged since v0.7.0). |
 | Tag/proxy resolution (steps 3 and 6) | Pending | Filled by the documentation-only update after the tags are pushed. |
 | Hosted published-consumers run | Pending | Five platforms, profile [`v1.0.0-rc.1.json`](../../tools/lane/published-consumers/v1.0.0-rc.1.json), run `<run-id-published-consumers>`. |
 | Draft assets, publication and published mirror assets (steps 7 to 10) | Pending | Filled after publication. |
 
-- **Scheduled runs.** The scheduled bench, nightly-diff, balancing and upstream-watch workflows that ran on `<C>` before or during the gates are
-  extra observations, kept and reported, not declared gate runs: `<SCHEDULED-RUNS>`.
-- **Conformance.** `<CONFORMANCE-TOTALS>` (sums of the per-grammar `SUMMARY` lines in the shard logs of each architecture).
-- **Nightly inputs.** `<NIGHTLY-TOTALS>` (per-shard input-set hashes and kit manifest SHA-256 in the job summaries).
-- **Bench exceptions and failures.** `<RESULT>`. Each failure is kept as run; an accepted exception is a limitations row with the owner decision date.
-- **Source watch.** `<RESULT>`.
+- **Scheduled runs.** The scheduled bench, nightly-diff, balancing and upstream-watch workflows that started while main equalled `8e3b271` are
+  extra observations, kept and reported, not declared gate runs. By 2026-11-27T23:23Z two had run: nightly diff [45986575257](https://github.com/wotjr1649/go-treesitter/actions/runs/45986575257)
+  (success, 50/50 jobs) and balancing cancellation [46003999181](https://github.com/wotjr1649/go-treesitter/actions/runs/46003999181) (success, 25/25 jobs). The scheduled bench and
+  upstream watch had not run on `8e3b271`.
+- **Conformance.** Each Linux architecture recorded 8,463 fresh corpus inputs, 24,729 seeded edit/range comparisons,
+  115,956 query/input pairs (stride 1), 76,414 fresh-field rows and 179,899 edited-field native result rows, with zero
+  differences against the native reference. Incremental trees differ from fresh in 30 cases per architecture, none of them a
+  difference from native. Totals are sums of the per-grammar `SUMMARY` lines in the five group logs of each architecture.
+  Groups `g2`, `g3` and `g4` on each architecture restored their native reference build from the cache written by the main push
+  run [45915565449](https://github.com/wotjr1649/go-treesitter/actions/runs/45915565449) (commit `6055706`) after `cachesums.sh` checked it; groups `g1` and `g5` built it.
+  [Conformance run](https://github.com/wotjr1649/go-treesitter/actions/runs/45917256637)
+- **Nightly inputs.** The 50 job logs record seed `100782277401`, one input-set hash per grammar (the same on both
+  architectures) and kit manifest SHA-256 `2e694d893c5cfd74cbb46f2c9b1837bccd75c8da101cac7f2da9491e82afed8c`. They report 670,689 cases on Linux amd64
+  and 573,072 on Linux arm64 with zero mismatches. [Nightly run](https://github.com/wotjr1649/go-treesitter/actions/runs/45920184625)
+- **Bench exceptions and failures.** None: the hosted bench and the local Windows amd64 bench passed every measured criterion. Each failure is kept as run; an accepted exception is a limitations row with the owner decision date.
+- **Source watch.** The watch run reports 1 unaccepted warning: `wasm2go` is pinned at `v0.4.21` and its newest stable release
+  is `v0.4.23`, so the `watch` job failed; the `issue` job passed. On 2026-11-27 the owner classified the result as external: it
+  concerns a newer release of a pinned tool and says nothing about the candidate, which stays unchanged. The RC and 1.0 keep
+  `v0.4.21`; the move to `v0.4.23` is a separate pin move after 1.0. The exception covers this run only ([limitations](limitations.md),
+  row 40). The CSS, Go (`golang`), HTML and Python tier-review notices and the Java, JavaScript, TSX and TypeScript
+  different-repository notices are covered by existing acceptances (8); no stale acceptance was listed. Watch run
+  [45920188239](https://github.com/wotjr1649/go-treesitter/actions/runs/45920188239).
 - **Order and approvals.** Per the [publication procedure](../specs/publication.md#multi-module-release), the root tag, the two grammar tags, the draft
   release and its publication each need separate owner approval; the gates, both local file-`GOPROXY` rehearsals and the read-only checks need none.
 
