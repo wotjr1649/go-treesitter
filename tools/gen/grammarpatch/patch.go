@@ -235,14 +235,12 @@ func checkCLI(c Config) error {
 	return nil
 }
 
-func verifyCLI(c Config) error {
-	if c.CLIVersion == "" || c.CLI == "" || c.CLIArchive == "" {
-		return fmt.Errorf("pinned tree-sitter CLI and archive are required")
-	}
-	if err := checkFile(c.CLIArchive, c.CLIArchiveSHA256); err != nil {
+// CheckCLIBytes verifies, without executing anything, that archive has the given sha256 and that bin is its decompressed content.
+func CheckCLIBytes(archive, archiveSHA256, bin string) error {
+	if err := checkFile(archive, archiveSHA256); err != nil {
 		return err
 	}
-	f, err := os.Open(c.CLIArchive)
+	f, err := os.Open(archive)
 	if err != nil {
 		return err
 	}
@@ -256,8 +254,18 @@ func verifyCLI(c Config) error {
 	if _, err := io.Copy(h, z); err != nil {
 		return err
 	}
-	if err := checkFile(c.CLI, hex.EncodeToString(h.Sum(nil))); err != nil {
+	if err := checkFile(bin, hex.EncodeToString(h.Sum(nil))); err != nil {
 		return fmt.Errorf("CLI differs from pinned archive: %w", err)
+	}
+	return nil
+}
+
+func verifyCLI(c Config) error {
+	if c.CLIVersion == "" || c.CLI == "" || c.CLIArchive == "" {
+		return fmt.Errorf("pinned tree-sitter CLI and archive are required")
+	}
+	if err := CheckCLIBytes(c.CLIArchive, c.CLIArchiveSHA256, c.CLI); err != nil {
+		return err
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()

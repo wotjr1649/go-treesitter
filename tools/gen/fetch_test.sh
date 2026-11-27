@@ -193,3 +193,26 @@ normal >"$pt/phased.args"
 [ -s "$pt/unphased.args" ] && cmp -s "$pt/unphased.args" "$pt/phased.args" || { echo "phased gen call differs from the single run" >&2; diff "$pt/unphased.args" "$pt/phased.args" >&2; exit 1; }
 rm -rf -- "$pt"
 echo "regen phase checks passed"
+
+# Runtime + CLI pair rehearsal: the candidate CLI is refused before anything is downloaded or run unless it can run in bubblewrap.
+gz=$(mktemp)
+pair() { # <want exit> <message> <env assignment...>; the work directory is new each time
+  local want=$1 msg=$2 d status
+  shift 2
+  d=$(mktemp -d)
+  if env "$@" bash "$(dirname "$0")/runtime-rehearsal.sh" "$d/w" v0.28.0 json >"$work/pair.out" 2>&1; then status=0; else status=$?; fi
+  rm -rf -- "$d"
+  [ "$status" = "$want" ] && grep -q -- "$msg" "$work/pair.out" || { echo "runtime-rehearsal.sh $*: exit $status, want $want and '$msg'" >&2; cat "$work/pair.out" >&2; exit 1; }
+}
+pair 1 'go together' RUNTIME_REHEARSAL_CLI_VERSION=0.28.0 RUNTIME_REHEARSAL_CLI_GZ=/nonexistent
+pair 1 'go together' RUNTIME_REHEARSAL_CLI_GZ="$gz"
+if [ "$(uname -s)" != Linux ] || ! command -v bwrap >/dev/null 2>&1; then
+  pair 1 'bubblewrap' RUNTIME_REHEARSAL_CLI_VERSION=0.28.0 RUNTIME_REHEARSAL_CLI_GZ="$gz"
+else
+  echo "bwrap present: the refusal on a host without it is not exercised here"
+fi
+if bash "$(dirname "$0")/cli-candidate.sh" "$work" v0.28.0 >"$work/pair.out" 2>&1 || ! grep -q 'is not X.Y.Z' "$work/pair.out"; then
+  echo "cli-candidate.sh accepted a v-prefixed version" >&2; exit 1
+fi
+rm -f -- "$gz" "$work/pair.out"
+echo "pair rehearsal gate checks passed"

@@ -1,0 +1,173 @@
+name: Runtime + CLI pair rehearsal
+
+# DRAFT, TEST ONLY, report only. Answers "what changes if the pinned tree-sitter runtime (lib/) AND CLI both move, to
+# <runtime_ref> and <cli_version>?" before a pin move such as 0.27.2 -> 0.28 (ADR-0027: the CLI moves with the runtime; ADR-0028
+# decision 6). It extends runtime-rehearsal.yml with the CLI half that workflow cannot measure: the candidate CLI changes
+# parser.c, the field maps and node-types.json, not only the runtime's behavior. Two reports, one run:
+#   1. CLI only (tools/gen/nightly-rehearsal.sh run with CANDIDATE_CLI_VERSION): pinned CLI against the candidate release CLI,
+#      same inputs and patches: which of parser.c / grammar.json / node-types.json differ, the node-types schema diff, and the
+#      field-map summary of parser.c (tools/gen/fieldmap.go). The same report as nightly-cli-rehearsal.yml, with the same identity
+#      checks (release API size and digest against the downloaded bytes; the tag read before and after; --version).
+#   2. Runtime + CLI (tools/gen/runtime-rehearsal.sh with RUNTIME_REHEARSAL_CLI_*): modules generated with the candidate runtime
+#      and CLI into a directory outside grammars/, parsed against the committed modules on the CI conformance inputs
+#      (tools/conformance/runtime-rehearsal.sh: the same tables as runtime-rehearsal.yml).
+# The tables are measurements on this run's inputs and identity, not parity evidence (docs/specs/validation.md); nothing is
+# committed, pushed or commented, and a difference is a result, not a failure (a held CLI identity or a broken harness is).
+#
+# Isolation: the ephemeral GitHub-hosted runner VM, no token (permissions: {}, the commit is fetched anonymously), no secrets,
+# no caches. The candidate CLI is unpinned code. It runs ONLY inside bubblewrap (tools/gen/nightly-sandbox.sh: no network, no
+# token, empty environment, the call's inputs read-only, one writable output directory), the repository's existing path for an
+# unpinned CLI, after tools/gen/sandbox-prepare.sh proved the sandbox on this runner. Both reports pass through it. Nothing runs
+# the candidate before the report's identity check, and the pair generation is skipped if that check fails. The candidate's
+# release asset is downloaded anonymously and only decompressed by trusted code. Native C (gcc) builds only the pinned
+# references, as in conformance.yml. Never run this on a developer host: the scripts refuse anywhere but Linux with bwrap.
+#
+# actionlint (the repository's build) does not know the cache-mode key (compare.yml has the same finding); it is the only one.
+
+on:
+  workflow_dispatch:
+    inputs:
+      runtime_ref:
+        description: tree-sitter/tree-sitter tag (v0.28.0) or full 40-hex commit of the candidate runtime
+        type: string
+        required: true
+      cli_version:
+        description: Candidate tree-sitter CLI release, X.Y.Z without the v (its linux-x64 asset is used)
+        type: string
+        required: true
+      grammars:
+        description: Space-separated pins.json grammar names
+        type: string
+        default: json python typescript rust tsql
+
+permissions: {}
+
+cache-mode: none
+
+concurrency:
+  group: runtime-cli-rehearsal
+  cancel-in-progress: false
+
+jobs:
+  rehearse:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    permissions: {}
+    cache-mode: none
+    env:
+      GOENV: "off"
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+      CGO_ENABLED: "0"
+      RUNTIME_REF: ${{ inputs.runtime_ref }}
+      CLI_VERSION: ${{ inputs.cli_version }}
+      GRAMMARS_INPUT: ${{ inputs.grammars }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Refuse any ref but main
+        run: '[ "$GITHUB_REF" = refs/heads/main ]'
+      - name: Fetch the commit (no token)
+        env:
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          git init -q .
+          git remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
+          git fetch -q --depth 1 origin "$GITHUB_SHA"
+          git checkout -q --detach FETCH_HEAD
+      - uses: actions/setup-go@v7
+        with:
+          go-version: 1.27.x # newest supported; go.mod states the floor (1.26.0)
+          cache: false
+      - name: Check the inputs
+        run: |
+          [[ "$RUNTIME_REF" =~ ^([0-9a-f]{40}|v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?)$ ]] || { echo "runtime_ref must be a vX.Y.Z tag or a full commit"; exit 1; }
+          [[ "$CLI_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]] || { echo "cli_version must be X.Y.Z"; exit 1; }
+          all=" postgres bash c cpp csharp css dart golang html java javascript json php powershell python r ruby rust tsql tsx typescript xml yaml kotlin swift "
+          list=""
+          for g in $GRAMMARS_INPUT; do
+            case "$all" in *" $g "*) ;; *) echo "unknown grammar: $g"; exit 1 ;; esac
+            list="${list:+$list }$g"
+          done
+          [ -n "$list" ] || { echo "no grammar selected"; exit 1; }
+          echo "GRAMMARS=$list" >> "$GITHUB_ENV"
+          conf=""
+          for g in $list; do
+            [ "$g" != golang ] || g=go
+            conf="${conf:+$conf,}$g"
+          done
+          echo "CONF_LANGS=$conf" >> "$GITHUB_ENV"
+          echo "RT=$RUNNER_TEMP/rt" >> "$GITHUB_ENV"
+          echo "CLI_WORK=$RUNNER_TEMP/cli" >> "$GITHUB_ENV"
+      - name: Record identity and native architecture
+        run: |
+          git rev-parse HEAD
+          go version
+          gcc --version | head -1
+          sha256sum tools/gen/pins.json tools/gen/shim/tsg_abi.c
+      - name: Unit tests of the rehearsal tooling
+        working-directory: tools/gen
+        run: go test -count=1 -run '^(TestCompareOutputs|TestSchemaSummary|TestNodeTypesSchema|TestRehearsal.*|TestNightlyIdentityProblems|TestCheckCLIUnpinned|TestUnpinnedGenerateEnvironment|TestRuntime.*|TestCandidateCLI.*|TestFieldMapSummary|TestReleaseProblems)$' . ./grammarpatch
+      - name: Fetch and verify the pinned CLI and the grammar archives
+        run: bash tools/gen/nightly-rehearsal.sh fetch "$CLI_WORK"
+      # No token: anonymous release metadata and asset download of the public tree-sitter repository. Nothing runs the asset here.
+      - name: Download the candidate CLI release asset and read its release facts
+        run: bash tools/gen/cli-candidate.sh "$CLI_WORK" "$CLI_VERSION"
+      - name: Prepare and prove the sandbox for the unpinned CLI
+        run: bash tools/gen/sandbox-prepare.sh
+      # First execution of the candidate: --version inside the sandbox, after the bytes were checked against the API facts.
+      # Exits non-zero with the comparison held when the identity does not verify; then nothing below runs.
+      - name: CLI-only report (pinned CLI against the candidate CLI)
+        env:
+          CANDIDATE_CLI_VERSION: ${{ inputs.cli_version }}
+        run: bash tools/gen/nightly-rehearsal.sh run "$CLI_WORK" $GRAMMARS 2>&1 | tee "$RUNNER_TEMP/cli-report.log" | tail -n 40
+      - name: Require a verified candidate identity
+        run: jq -e '.nightly.identity == "verified" and .nightly.meta.tagMoved == false' "$CLI_WORK/out/report.json"
+      # Same steps as runtime-rehearsal.yml: pinned sources, native references, corpus, seeded edits recorded with native C.
+      - name: Fetch pinned sources, build native references, extract corpus
+        working-directory: tools/native-ref
+        run: |
+          go build -o "$RUNNER_TEMP/native-ref" .
+          go build -o "$RUNNER_TEMP/ciconf" ./ciconf
+          cd "$GITHUB_WORKSPACE"
+          "$RUNNER_TEMP/native-ref" -pins tools/gen/pins.json -fetch -cc gcc \
+            -dl "$RUNNER_TEMP/dl" -work "$RUNNER_TEMP/work" -out "$RUNNER_TEMP/exe" -corpus "$RUNNER_TEMP/corpus" -queries "$RUNNER_TEMP/queries" \
+            -scanner-stages "$RUNNER_TEMP/scanner-stages" $GRAMMARS
+      - name: Extract inputs and edits
+        run: '"$RUNNER_TEMP/ciconf" -pins tools/gen/pins.json -corpus "$RUNNER_TEMP/corpus" -exe "$RUNNER_TEMP/exe" -out "$RUNNER_TEMP/data" -lang "$CONF_LANGS" -kit tools/conformance/testdata/kit'
+      - name: Generate the grammars with the candidate runtime and CLI (test-only output, CLI sandboxed)
+        env:
+          RUNTIME_REHEARSAL_CLI_VERSION: ${{ inputs.cli_version }}
+        run: |
+          export RUNTIME_REHEARSAL_CLI_GZ="$CLI_WORK/nightly/tree-sitter-linux-x64.gz"
+          bash tools/gen/runtime-rehearsal.sh "$RT" "$RUNTIME_REF" $GRAMMARS 2>&1 | tee "$RUNNER_TEMP/rehearsal-gen.log"
+      - name: Check that the pair used the bytes the report verified
+        run: jq -e --slurpfile r "$CLI_WORK/out/report.json" '.cli.version == env.CLI_VERSION and .cli.archiveSHA256 == $r[0].nightly.gzipSHA256' "$RT/runtime-identity.json"
+      - name: Parse the inputs with both module sets and classify the differences
+        run: bash tools/conformance/runtime-rehearsal.sh "$RUNNER_TEMP/data" "$RT" "$RUNNER_TEMP/result" $GRAMMARS
+      - name: Job summary
+        if: ${{ !cancelled() }}
+        run: |
+          for f in "$CLI_WORK/out/summary.md" "$RUNNER_TEMP/result/summary.md"; do
+            [ ! -f "$f" ] || { cat "$f"; echo; } >> "$GITHUB_STEP_SUMMARY"
+          done
+      - name: Check that the repository is unchanged
+        if: ${{ !cancelled() }}
+        run: test -z "$(git status --porcelain)"
+      - name: Upload the tables and the identity
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: runtime-cli-rehearsal
+          path: |
+            ${{ runner.temp }}/cli/out
+            ${{ runner.temp }}/cli/nightly-meta.json
+            ${{ runner.temp }}/result
+            ${{ runner.temp }}/rt/pins.runtime.json
+            ${{ runner.temp }}/rt/runtime-identity.json
+            ${{ runner.temp }}/rt/out/*/provenance.json
+            ${{ runner.temp }}/rehearsal-gen.log
+            ${{ runner.temp }}/cli-report.log
+          if-no-files-found: warn
+          retention-days: 90

@@ -57,6 +57,11 @@ func preparePatches(o *opts, p *Pins, g GrammarPin, work string, id *Identity) (
 		PatchRoot: o.root, Work: filepath.Join(work, "patches"), GrammarDir: g.GrammarDir, Patches: g.Patches, Regenerate: true,
 		GenerateFrom: g.GenerateFrom, NPMDependencies: g.NPMDependencies, FetchNPM: o.fetchNPM, NPMCache: filepath.Join(o.dl, "npm"),
 		CLI: bin, CLIArchive: filepath.Join(o.dl, path.Base(cli.URL)), CLIArchiveSHA256: cli.SHA256, CLIVersion: p.Tools.TreeSitterCLI}
+	if o.cliMoved { // the runtime-rehearsal copy moved the CLI: nothing pins it, so it runs only through the sandbox wrapper
+		if err := sandboxCandidateCLI(&c, *o, cli); err != nil {
+			return nil, err
+		}
+	}
 	root, prov, err := grammarpatch.Prepare(c)
 	if err != nil {
 		return nil, err
