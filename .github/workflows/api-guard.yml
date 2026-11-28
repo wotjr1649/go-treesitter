@@ -44,7 +44,7 @@ jobs:
     timeout-minutes: 10
     env:
       # The latest released root tag; set it to each new root tag in the post-release PR (docs/specs/publication.md, step 11).
-      API_BASELINE_TAG: v0.7.0
+      API_BASELINE_TAG: v1.0.0-rc.1
       CGO_ENABLED: "0"
       GOENV: "off"
       GOWORK: "off"

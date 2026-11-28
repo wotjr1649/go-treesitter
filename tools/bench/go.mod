@@ -3,7 +3,7 @@ module github.com/wotjr1649/go-treesitter/tools/bench
 go 1.26.0
 
 require (
-	github.com/wotjr1649/go-treesitter v0.7.0
+	github.com/wotjr1649/go-treesitter v1.0.0-rc.1
 	github.com/wotjr1649/go-treesitter/grammars/bash v0.0.0
 	github.com/wotjr1649/go-treesitter/grammars/c v0.0.0
 	github.com/wotjr1649/go-treesitter/grammars/cpp v0.0.0
