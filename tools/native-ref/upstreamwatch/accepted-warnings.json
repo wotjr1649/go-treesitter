@@ -1,5 +1,12 @@
 [
   {
+    "component": "bash",
+    "kind": "tier review (>12 months)",
+    "accepted": "2026-12-07",
+    "expires": "2027-06-07",
+    "reason": "[ADR-0024 tier review](https://github.com/wotjr1649/go-treesitter/blob/main/docs/design/decisions/ADR-0024-grammar-source-tiers.md#amendment-2026-11-16-tier-review-of-tier-1-sources-without-a-commit-in-12-months): no maintained fork under rule 6; retain the tier-1 source."
+  },
+  {
     "component": "css",
     "kind": "tier review (>12 months)",
     "accepted": "2026-11-16",

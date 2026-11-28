@@ -63,11 +63,15 @@ func TestAcceptedWarnings(t *testing.T) {
 
 func TestCheckedInAcceptances(t *testing.T) {
 	entries, err := loadAcceptances(acceptedWarningsJSON)
-	if err != nil || len(entries) != 8 {
+	if err != nil || len(entries) != 9 {
 		t.Fatalf("checked-in list: %d entries, %v", len(entries), err)
 	}
 	for _, a := range entries {
 		switch {
+		case a.Component == "bash":
+			if a.Kind != "tier review (>12 months)" || a.Accepted != "2026-12-07" || a.Expires != "2027-06-07" {
+				t.Fatalf("unexpected acceptance: %+v", a)
+			}
 		case a.Component == "javascript" || a.Component == "tsx" || a.Component == "typescript":
 			if a.Kind != "nvim-treesitter: **different repository**" || a.Accepted != "2026-11-19" || a.Expires != "2027-05-19" {
 				t.Fatalf("unexpected acceptance: %+v", a)
@@ -158,7 +162,7 @@ func TestWatchReportWithAcceptances(t *testing.T) {
 	p.WasiLibc.Repo, p.WasiLibc.Commit = "https://github.com/WebAssembly/wasi-libc", "libc-pin"
 	p.Grammars = map[string]struct{ Repo, Commit string }{}
 	api := newAPI()
-	api.base, api.token, api.now = server.URL+"/", "", time.Date(2026, 11, 16, 0, 0, 0, 0, time.UTC)
+	api.base, api.token, api.now = server.URL+"/", "", time.Date(2026, 12, 7, 0, 0, 0, 0, time.UTC)
 	var err error
 	api.acceptances, err = loadAcceptances(acceptedWarningsJSON)
 	if err != nil {
@@ -173,7 +177,7 @@ func TestWatchReportWithAcceptances(t *testing.T) {
 	}
 	var out, summary bytes.Buffer
 	stale, failed := report(&p, &out, api)
-	if stale || failed || tiers != 4 || len(api.findings) != tiers || warningSummary(&summary, api) != 0 {
+	if stale || failed || tiers != 5 || len(api.findings) != tiers || warningSummary(&summary, api) != 0 {
 		t.Fatalf("stale=%v failed=%v findings=%v\n%s\n%s", stale, failed, api.findings, &out, &summary)
 	}
 	path := filepath.Join(t.TempDir(), "body.md")
