@@ -1,7 +1,7 @@
 # Preview limitations (v0.7.0), with RC scope rows
 
 What the preview does not do or has not shown. Rows marked "RC scope" (36-38) also bind the root `v1.0.0-rc.N` and 1.0. Gate results and their evidence levels are on the
-[status board](release-critical-status.md), alongside the publication record for v0.7.0, the latest published release.
+[status board](release-critical-status.md), alongside the publication records for v0.7.0, the latest final release, and the v1.0.0-rc.1 pre-release, the latest published release.
 The [per-grammar support table](grammar-support.md) gives the affected tags, tree outcomes and
 re-review conditions for the grammar limits below.
 
@@ -65,12 +65,12 @@ Release authority, tags and publication are separate from this list: see
 
 ## Release source mirror scope
 
-The v0.7.0 release mirrors 26 source archives (24 distinct grammar archives, tree-sitter runtime and wasi-libc)
-plus `SHA256SUMS`. TypeScript and TSX share one archive. The Swift archive `tree-sitter-swift-fef12360.tar.gz`
-replaces `tree-sitter-swift-a1d4a7b8.tar.gz`, which stays in the immutable v0.6.0 release. Before publication, all 27
-uploaded asset digests matched the local files. All 26 source archives downloaded anonymously from the published release
-matched their pinned SHA-256 hashes. `tools/gen/pins.json` lists v0.7.0 first and v0.6.0 second. The v0.6.0 base
-can serve only the exact archives published with that release.
+The v1.0.0-rc.1 release mirrors 26 source archives (24 distinct grammar archives, tree-sitter runtime and wasi-libc)
+plus `SHA256SUMS`, the same set as v0.7.0. TypeScript and TSX share one archive. From v0.7.0 on, the Swift archive
+`tree-sitter-swift-fef12360.tar.gz` replaces `tree-sitter-swift-a1d4a7b8.tar.gz`, which stays in the immutable v0.6.0 release.
+Before publication, all 27 uploaded asset digests matched the local `SHA256SUMS`. All 26 source archives downloaded anonymously
+from the published release matched their pinned SHA-256 hashes. `tools/gen/pins.json` lists v1.0.0-rc.1 first and v0.7.0 second.
+Each base can serve only the exact archives published with that release.
 Toolchain archives (wasi-sdk, binaryen and tree-sitter CLI, including Linux arm64 and macOS arm64 CLI) are fetched
 from their official releases with pinned SHA-256 checks. This release provides no toolchain mirror fallback;
 upstream tool availability remains a prerequisite until a complete bundled-notice inventory permits mirroring.

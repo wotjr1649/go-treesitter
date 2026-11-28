@@ -516,8 +516,8 @@ kind `source`/`toolchain`; no header):
 awk -F '\t' '$4 == "source"' release-assets.tsv > release-source-assets.tsv
 ```
 
-The command lists 35 rows for the current pins (the `windows-arm64` CLI adds a `toolchain` row; the pre-add count was 34). The v0.6.0 and v0.7.0 releases each mirror all 26 `source` archives plus
-`SHA256SUMS`. The nine `toolchain` rows are excluded (the v0.6.0 and v0.7.0 releases predate the ninth). The v0.5.0 release mirrors its original 25 source archives plus `SHA256SUMS`.
+The command lists 35 rows for the current pins (the `windows-arm64` CLI adds a `toolchain` row; the pre-add count was 34). The v0.6.0, v0.7.0 and v1.0.0-rc.1 releases each mirror all 26 `source` archives plus
+`SHA256SUMS` (v1.0.0-rc.1 has the same set as v0.7.0). The nine `toolchain` rows are excluded (the v0.6.0 and v0.7.0 releases predate the ninth). The v0.5.0 release mirrors its original 25 source archives plus `SHA256SUMS`.
 The v0.6.0 inventory adds the Swift archive, the T-SQL owner release v2.8.0 archive `tree-sitter-mssql-3d42c1a55fb5.tar.gz`,
 the Java v3.0.3 archive `tree-sitter-java-358048c1c6f9.tar.gz`, the shared TypeScript/TSX owner release v3.1.0 archive
 `tree-sitter-typescript-c37edc69610d.tar.gz`, the JavaScript v4.4.0 archive `tree-sitter-javascript-e5ada307a6f1.tar.gz`,
@@ -535,8 +535,8 @@ and digest checks. The v0.5.0 base carries the historical T-SQL origin archive
 established. Those tools are fetched from their official releases with pinned SHA-256 checks and have no assets
 in this release to provide mirror fallback, even if the fetch plan lists URLs at the configured bases.
 
-The pins use v0.7.0 and then v0.6.0 as mirror bases. All 26 source archives downloaded anonymously from the
-published v0.7.0 base matched the pinned SHA-256 hashes.
+The pins use v1.0.0-rc.1 and then v0.7.0 as mirror bases. All 26 source archives downloaded anonymously from the
+published v1.0.0-rc.1 base matched the pinned SHA-256 hashes.
 A configured base can supply only the exact files already published there. A new source archive gains fallback coverage when a
 carrying release is published and its base is configured. Published releases are immutable. This command does not
 upload anything. `wasm2go` remains a Go module installed through Go's checksum-verified module mechanism

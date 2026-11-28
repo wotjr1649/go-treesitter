@@ -165,8 +165,8 @@ def exercise(scratch, out, env, root, grammars, single, samples):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("evidence", type=Path, help="new directory for the resolved graphs, logs and summary")
-    parser.add_argument("--root", type=version, default="v0.7.0", help="published root for root-only and mixed consumers")
-    parser.add_argument("--combination", type=version, default="v0.7.0", help="release profile under published-consumers/")
+    parser.add_argument("--root", type=version, default="v1.0.0-rc.1", help="published root for root-only and mixed consumers")
+    parser.add_argument("--combination", type=version, default="v1.0.0-rc.1", help="release profile under published-consumers/")
     parser.add_argument("--platform", help="require this native GOOS/GOARCH")
     args = parser.parse_args()
     profile_path = Path(__file__).with_name("published-consumers") / f"{args.combination}.json"
