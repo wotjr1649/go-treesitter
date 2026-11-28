@@ -454,7 +454,7 @@ Node types and fields are unchanged. Queries for `class_name`, `identifier`, `ta
 `attribute_name`, `property_name` and `keyframes_name` can now capture these names on the repaired inputs.
 The name patch leaves bare identifier attribute values, unquoted `url()` arguments, units, and at-rule
 names and arguments outside its scope. See [CSS non-Latin-1 declaration values](#css-non-latin-1-declaration-values)
-for the separate unreleased value fix. An unprefixed type selector can still produce an
+for the separate value fix in `grammars/css/v0.8.0`. An unprefixed type selector can still produce an
 error after whitespace when the pinned scanner does not recognize its first character. For example,
 `.a 🙂 {}` remains an error. Extended class names require adjacency, including at escapes.
 
